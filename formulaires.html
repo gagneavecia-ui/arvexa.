@@ -1,0 +1,2463 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <meta name="theme-color" content="#0A0A0A">
+  <meta name="description" content="ARVEXA School - Formulaires BAC Terminale D">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon.png">
+  <link rel="icon" href="icon.png" type="image/png">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <!-- KaTeX -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  <script src="register-sw.js" defer></script>
+
+  <style>
+    /* ============================================================
+       ROOT
+       ============================================================ */
+    :root{
+      --accent:#B8860B;--accent-bright:#E0B84A;--accent-dim:rgba(184,134,11,.08);
+      --success:#2D7D5A;--success-light:#3AB67E;--danger:#B85C3A;--danger-light:#f87171;
+      --warning:#D4A017;--info:#4AAFE0;--blue:#60a5fa;
+      --bg-dark:#0A0A0A;--bg-surface:#141414;--bg-card:rgba(20,20,20,.7);
+      --text-light:#F5F0E8;--text-dim:#8A8A7A;--text-muted:#5A5A4A;--text-body:#cfd0cc;
+      --card-border:rgba(184,134,11,.08);--border-soft:rgba(255,255,255,.05);
+      --transition:all .3s cubic-bezier(.25,1,.5,1);--transition-fast:all .15s ease;
+      --shadow:0 8px 32px rgba(0,0,0,.4);--radius:16px;
+      --font-body:'Inter','Segoe UI',Arial,sans-serif;
+      --font-serif:'Playfair Display',Georgia,serif;
+      --safe-top:env(safe-area-inset-top,0px);
+      --safe-bottom:env(safe-area-inset-bottom,0px);
+    }
+    *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html{scroll-behavior:smooth;width:100%;overflow-x:hidden;-webkit-text-size-adjust:100%}
+    body{font-family:var(--font-body);background:var(--bg-dark);color:var(--text-light);
+      font-size:14px;line-height:1.6;min-height:100vh;width:100%;overflow-x:hidden;
+      -webkit-overflow-scrolling:touch;display:flex;flex-direction:column;
+      -webkit-font-smoothing:antialiased;padding-top:var(--safe-top);padding-bottom:var(--safe-bottom)}
+    .gradient-bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-2;
+      background:radial-gradient(ellipse 40% 30% at 30% 15%,rgba(26,58,42,.16) 0%,transparent 70%),
+                  radial-gradient(ellipse 35% 25% at 75% 85%,rgba(184,134,11,.05) 0%,transparent 60%),
+                  linear-gradient(180deg,#0A0A0A 0%,#060606 100%)}
+    .glow{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:-1;
+      opacity:.15;animation:glowMove 10s ease-in-out infinite alternate}
+    .glow-1{width:300px;height:300px;background:rgba(26,58,42,.18);top:-80px;right:-80px}
+    .glow-2{width:180px;height:180px;background:rgba(184,134,11,.05);bottom:0;left:0;animation-delay:-4s}
+    @keyframes glowMove{0%{transform:translate(0,0) scale(1)}100%{transform:translate(30px,-20px) scale(1.1)}}
+
+    /* HEADER */
+    .header{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;
+      padding:calc(10px + var(--safe-top)) 16px 10px;background:rgba(10,10,10,.92);
+      backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+      border-bottom:1px solid rgba(184,134,11,.06);gap:12px;min-height:56px}
+    .header-left{display:flex;align-items:center;gap:12px;min-width:0;flex:1}
+    .back-btn{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:10px;
+      border:1px solid rgba(255,255,255,.05);background:transparent;color:var(--text-dim);cursor:pointer;
+      transition:var(--transition);font-size:16px;text-decoration:none;flex-shrink:0}
+    .back-btn:hover{border-color:rgba(184,134,11,.14);color:var(--text-light)}
+    .page-title{font-size:clamp(13px,1.6vw,15px);font-weight:600;color:var(--text-light);
+      font-family:var(--font-serif);display:flex;align-items:center;gap:8px;min-width:0}
+    .page-title i{color:var(--accent-bright);font-size:14px}
+    .fav-count{font-size:11px;color:var(--accent-bright);background:rgba(184,134,11,.12);
+      padding:2px 9px;border-radius:10px;font-weight:700;display:none;
+      border:1px solid rgba(184,134,11,.15)}
+    .fav-count.visible{display:inline-block}
+
+    /* CONTAINER */
+    .container{max-width:720px;margin:0 auto;padding:12px 12px 32px;width:100%;display:flex;flex-direction:column;gap:10px;flex:1}
+
+    /* SEARCH */
+    .search-wrap{position:relative}
+    .search-wrap i{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:13px;pointer-events:none}
+    .search-input{width:100%;padding:11px 14px 11px 38px;border-radius:12px;border:1px solid var(--card-border);
+      background:var(--bg-card);backdrop-filter:blur(10px);color:var(--text-light);font-size:13px;
+      font-family:var(--font-body);outline:none;transition:var(--transition)}
+    .search-input:focus{border-color:rgba(184,134,11,.25);background:rgba(184,134,11,.02)}
+    .search-input::placeholder{color:var(--text-muted)}
+
+    /* TABS */
+    .tabs{display:flex;gap:4px;background:rgba(255,255,255,.02);border-radius:12px;padding:4px;border:1px solid rgba(255,255,255,.04);overflow-x:auto}
+    .tab-btn{flex:1;min-width:70px;padding:9px 6px;border:none;border-radius:10px;background:transparent;color:var(--text-muted);
+      font-size:11px;font-weight:600;cursor:pointer;transition:var(--transition);font-family:var(--font-body);
+      display:flex;align-items:center;justify-content:center;gap:5px;white-space:nowrap}
+    .tab-btn i{font-size:11px}
+    .tab-btn.active{background:rgba(184,134,11,.1);color:var(--accent-bright);border:1px solid rgba(184,134,11,.12)}
+    .tab-btn:not(.active){border:1px solid transparent}
+    .tab-btn:hover:not(.active){color:var(--text-dim)}
+
+    /* THEME FILTERS */
+    .filters{display:flex;gap:6px;flex-wrap:wrap}
+    .filter-btn{padding:6px 12px;border-radius:20px;border:1px solid rgba(255,255,255,.05);background:transparent;
+      color:var(--text-muted);font-size:11px;font-weight:600;cursor:pointer;transition:var(--transition);
+      font-family:var(--font-body)}
+    .filter-btn.active{background:rgba(184,134,11,.1);color:var(--accent-bright);border-color:rgba(184,134,11,.12)}
+    .filter-btn:hover:not(.active){color:var(--text-dim);border-color:rgba(255,255,255,.08)}
+
+    /* CONTENT */
+    .content{display:flex;flex-direction:column;gap:16px}
+
+    /* CATEGORY */
+    .category-label{font-size:11px;font-weight:700;color:var(--accent-bright);text-transform:uppercase;
+      letter-spacing:1px;padding:4px 0 8px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(184,134,11,.06)}
+    .category-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(184,134,11,.15),transparent)}
+    .category-label .cat-count{font-size:10px;color:var(--text-muted);font-weight:500;text-transform:none;letter-spacing:0}
+
+    /* FORMULA CARD */
+    .f-card{background:var(--bg-card);backdrop-filter:blur(10px);border:1px solid var(--card-border);
+      border-radius:14px;padding:14px 16px;position:relative;overflow:hidden;transition:var(--transition);
+      animation:fadeInUp .4s cubic-bezier(.25,1,.5,1) backwards}
+    .f-card:nth-child(1){animation-delay:.02s}
+    .f-card:nth-child(2){animation-delay:.04s}
+    .f-card:nth-child(3){animation-delay:.06s}
+    .f-card:nth-child(4){animation-delay:.08s}
+    .f-card:nth-child(5){animation-delay:.1s}
+    @keyframes fadeInUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    .f-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+      background:linear-gradient(90deg,var(--accent),var(--success))}
+    .f-card:hover{border-color:rgba(184,134,11,.2);transform:translateY(-2px);
+      box-shadow:0 8px 24px rgba(0,0,0,.2)}
+
+    .f-card-header{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:8px}
+    .f-card-title{font-size:14px;font-weight:700;color:var(--text-light);line-height:1.4;cursor:pointer;
+      flex:1;min-width:0}
+    .f-card-title:hover{color:var(--accent-bright)}
+    .f-card-actions{display:flex;gap:4px;flex-shrink:0}
+    .icon-action{background:none;border:1px solid transparent;color:var(--text-muted);font-size:14px;
+      cursor:pointer;transition:var(--transition);padding:5px 7px;border-radius:8px;line-height:1;
+      display:flex;align-items:center;justify-content:center;min-width:32px;height:32px}
+    .icon-action:hover{color:var(--text-light);background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.05)}
+    .icon-action.fav:hover{color:var(--accent-bright);background:rgba(184,134,11,.1)}
+    .icon-action.fav.active{color:var(--accent-bright)}
+    .icon-action.fav.active i{font-weight:900}
+    .icon-action.fav.pop i{animation:favPop .4s cubic-bezier(.34,1.56,.64,1)}
+    @keyframes favPop{0%{transform:scale(1)}50%{transform:scale(1.4)}100%{transform:scale(1)}}
+
+    /* FORMULE DANS LA CARTE */
+    .f-card-formula{
+      padding:12px 0;
+      border-top:1px solid rgba(255,255,255,.03);
+      border-bottom:1px solid rgba(255,255,255,.03);
+      margin:4px 0;
+      cursor:pointer;
+      transition:var(--transition);
+      overflow-x:auto;
+      overflow-y:hidden;
+      -webkit-overflow-scrolling:touch;
+      min-height:44px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .f-card-formula:hover{
+      background:rgba(184,134,11,.03);
+    }
+    .f-card-formula .katex{
+      color:var(--accent-bright);
+      font-size:1.15em;
+    }
+    .f-card-formula .katex-display{
+      margin:0;
+    }
+    .f-card-formula .katex-display > .katex{
+      font-size:1.2em;
+    }
+
+    .f-card-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+    .f-tag{font-size:10px;padding:3px 8px;border-radius:8px;font-weight:600}
+    .f-tag.units{background:rgba(26,58,42,.12);color:var(--success-light)}
+    .f-tag.condition{background:rgba(184,134,11,.06);color:var(--accent-bright)}
+    .f-card-note{font-size:11px;color:var(--text-muted);margin-top:8px;line-height:1.5;font-style:italic}
+    .f-card-more{font-size:11px;color:var(--accent-bright);margin-top:8px;font-weight:600;
+      display:flex;align-items:center;gap:5px;cursor:pointer;opacity:.85}
+    .f-card-more:hover{opacity:1}
+
+    /* EMPTY */
+    .empty-state{text-align:center;padding:40px 20px}
+    .empty-state i{font-size:32px;color:var(--text-muted);margin-bottom:10px}
+    .empty-state h4{font-size:15px;color:var(--text-light);margin-bottom:4px}
+    .empty-state p{font-size:12px;color:var(--text-dim)}
+
+    /* SKELETON */
+    .skeleton-card{background:var(--bg-card);border:1px solid var(--card-border);border-radius:14px;
+      padding:14px 16px;position:relative;overflow:hidden;margin-bottom:8px}
+    .skeleton-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+      background:linear-gradient(90deg,rgba(184,134,11,.1) 0%,rgba(184,134,11,.4) 50%,rgba(184,134,11,.1) 100%);
+      background-size:200% 100%;animation:skeletonShimmer 1.6s ease-in-out infinite}
+    @keyframes skeletonShimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+    .skeleton-line{background:linear-gradient(90deg,rgba(255,255,255,.03) 0%,rgba(255,255,255,.08) 50%,rgba(255,255,255,.03) 100%);
+      background-size:200% 100%;animation:skeletonShimmer 1.6s ease-in-out infinite;border-radius:6px;height:14px;margin-bottom:10px}
+    .skeleton-line.title{width:70%;height:16px}
+    .skeleton-line.formula{width:100%;height:22px;margin:12px 0;border-radius:8px}
+    .skeleton-line.meta{width:40%;height:10px;margin-bottom:0}
+    .skeleton-header{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:8px}
+    .skeleton-header .skeleton-line.title{margin-bottom:0}
+    .skeleton-icon{width:32px;height:32px;border-radius:8px;
+      background:linear-gradient(90deg,rgba(255,255,255,.03) 0%,rgba(255,255,255,.08) 50%,rgba(255,255,255,.03) 100%);
+      background-size:200% 100%;animation:skeletonShimmer 1.6s ease-in-out infinite;flex-shrink:0}
+    .skeleton-category{height:12px;width:120px;border-radius:6px;
+      background:linear-gradient(90deg,rgba(184,134,11,.05) 0%,rgba(184,134,11,.15) 50%,rgba(184,134,11,.05) 100%);
+      background-size:200% 100%;animation:skeletonShimmer 1.6s ease-in-out infinite;margin:8px 0 12px}
+    .content-fade-in{animation:contentFadeIn .4s cubic-bezier(.25,1,.5,1)}
+    @keyframes contentFadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+    /* MODAL */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(12px);
+      -webkit-backdrop-filter:blur(12px);z-index:1000;display:flex;align-items:flex-end;justify-content:center;
+      padding:0;opacity:0;visibility:hidden;transition:all .3s cubic-bezier(.25,1,.5,1)}
+    .modal-overlay.show{opacity:1;visibility:visible}
+    .modal{background:var(--bg-surface);border:1px solid rgba(184,134,11,.15);
+      border-radius:24px 24px 0 0;padding:24px 20px;padding-bottom:calc(24px + var(--safe-bottom));
+      max-width:600px;width:100%;max-height:92vh;overflow-y:auto;
+      transform:translateY(100%);transition:transform .4s cubic-bezier(.25,1,.5,1);position:relative}
+    .modal-overlay.show .modal{transform:translateY(0)}
+    .modal::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:24px 24px 0 0;
+      background:linear-gradient(90deg,var(--accent),var(--accent-bright),var(--accent))}
+    .modal-handle{width:40px;height:4px;border-radius:2px;background:rgba(255,255,255,.15);
+      margin:0 auto 16px;cursor:grab;transition:background .2s ease}
+    .modal-handle:hover{background:rgba(224,184,74,.4)}
+    .modal-close{position:absolute;top:16px;right:16px;width:34px;height:34px;border-radius:10px;
+      border:1px solid rgba(255,255,255,.05);background:rgba(255,255,255,.03);color:var(--text-muted);
+      cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;
+      transition:var(--transition);z-index:5}
+    .modal-close:hover{border-color:rgba(184,134,11,.25);color:var(--text-light);background:rgba(184,134,11,.1)}
+
+    .modal-category{font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;
+      letter-spacing:1.5px;margin-bottom:8px;padding-right:50px}
+    .modal-title{font-size:20px;font-weight:700;color:var(--text-light);font-family:var(--font-serif);
+      line-height:1.3;margin-bottom:16px;padding-right:50px}
+
+    .modal-formula-box{
+      background:linear-gradient(135deg,rgba(184,134,11,.08),rgba(184,134,11,.04));
+      border:1px solid rgba(184,134,11,.15);
+      border-radius:14px;
+      padding:24px 20px;
+      margin:14px 0;
+      text-align:center;
+      position:relative;
+      box-shadow:0 4px 20px rgba(184,134,11,.06);
+      overflow-x:auto;
+      overflow-y:hidden;
+      -webkit-overflow-scrolling:touch;
+      min-height:80px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .modal-formula-box::before{
+      content:'';position:absolute;top:0;left:0;right:0;height:2px;
+      border-radius:14px 14px 0 0;
+      background:linear-gradient(90deg,transparent,var(--accent-bright),transparent)
+    }
+    .modal-formula-box .katex{
+      color:var(--accent-bright);
+      font-size:1.4em;
+    }
+    .modal-formula-box .katex-display{
+      margin:0;
+    }
+    .modal-formula-box .katex-display > .katex{
+      font-size:1.5em;
+    }
+
+    .modal-meta{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+    .modal-meta .f-tag{font-size:11px;padding:5px 10px}
+
+    .modal-section{margin-top:20px}
+    .modal-section-title{font-size:12px;font-weight:700;color:var(--accent-bright);text-transform:uppercase;
+      letter-spacing:1px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+    .modal-section-title i{font-size:14px}
+
+    .modal-explanation{font-size:14px;color:var(--text-body);line-height:1.7;padding:14px 16px;
+      background:rgba(255,255,255,.02);border-radius:12px;border-left:3px solid var(--accent)}
+
+    .modal-use-cases{display:flex;flex-direction:column;gap:8px}
+    .modal-use-case{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;
+      background:rgba(74,175,224,.04);border-radius:10px;border-left:3px solid var(--info)}
+    .modal-use-case i{color:var(--info);font-size:14px;margin-top:3px;flex-shrink:0}
+    .modal-use-case span{font-size:13.5px;color:var(--text-body);line-height:1.6}
+
+    .modal-example{background:rgba(45,125,90,.04);border:1px solid rgba(45,125,90,.15);border-radius:12px;
+      padding:14px 16px}
+    .modal-example-title{font-size:13px;font-weight:600;color:var(--success-light);margin-bottom:8px;
+      display:flex;align-items:center;gap:6px}
+    .modal-example-content{font-size:14px;color:var(--text-body);line-height:1.8}
+    .modal-example-content .katex{color:var(--text-light)}
+
+    .modal-warning{background:rgba(184,92,58,.06);border:1px solid rgba(184,92,58,.15);border-radius:12px;
+      padding:14px 16px;display:flex;gap:12px;align-items:flex-start}
+    .modal-warning i{color:var(--danger-light);font-size:16px;margin-top:2px;flex-shrink:0}
+    .modal-warning-content{font-size:13.5px;color:var(--text-body);line-height:1.6}
+    .modal-warning-content ul{list-style:none;padding:0}
+    .modal-warning-content li{margin-bottom:6px}
+
+    .modal-note{font-size:13px;color:var(--text-body);line-height:1.6;margin:12px 0;padding:12px 14px;
+      background:rgba(184,134,11,.04);border-radius:10px;border-left:3px solid var(--accent)}
+    .modal-note i{color:var(--accent-bright);margin-right:6px}
+
+    .modal-actions{display:flex;gap:8px;margin-top:20px;flex-wrap:wrap}
+    .modal-btn{flex:1;min-width:120px;padding:12px 16px;border-radius:12px;border:none;
+      font-size:13px;font-weight:600;cursor:pointer;transition:var(--transition);
+      font-family:var(--font-body);display:flex;align-items:center;justify-content:center;gap:6px}
+    .modal-btn.primary{background:linear-gradient(135deg,var(--accent-bright),var(--accent));color:#0A0A0A}
+    .modal-btn.primary:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(184,134,11,.25)}
+    .modal-btn.secondary{background:rgba(255,255,255,.04);color:var(--text-light);border:1px solid rgba(255,255,255,.06)}
+    .modal-btn.secondary:hover{background:rgba(255,255,255,.08)}
+    .modal-btn.secondary.fav-active{background:rgba(184,134,11,.12);color:var(--accent-bright);border-color:rgba(184,134,11,.2)}
+
+    .modal-nav{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:16px;
+      padding-top:16px;border-top:1px solid rgba(255,255,255,.05)}
+    .modal-nav-btn{display:flex;align-items:center;gap:6px;padding:9px 14px;border-radius:10px;
+      border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.03);color:var(--text-dim);
+      font-size:12px;font-weight:600;cursor:pointer;transition:var(--transition);font-family:var(--font-body)}
+    .modal-nav-btn:hover:not(:disabled){background:rgba(184,134,11,.08);color:var(--text-light);border-color:rgba(184,134,11,.15)}
+    .modal-nav-btn:disabled{opacity:.35;cursor:not-allowed}
+    .modal-nav-btn i{font-size:11px}
+    .modal-nav-position{font-size:11px;color:var(--text-muted);font-weight:600}
+
+    /* TOAST */
+    .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);
+      padding:12px 20px;border-radius:12px;background:var(--bg-card);backdrop-filter:blur(16px);
+      border:1px solid var(--card-border);color:var(--text-light);font-size:13px;z-index:3000;
+      opacity:0;transition:all .5s cubic-bezier(.25,1,.5,1);max-width:90%;text-align:center;
+      box-shadow:var(--shadow);display:flex;align-items:center;gap:8px;pointer-events:none}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    .toast .toast-icon{font-size:14px}
+    .toast.success .toast-icon{color:var(--success-light)}
+    .toast.info .toast-icon{color:var(--accent-bright)}
+    .toast.error .toast-icon{color:var(--danger-light)}
+    .toast.limit{border-color:rgba(184,92,58,.3)}
+
+    /* RESPONSIVE */
+    @media(max-width:480px){
+      .f-card-formula .katex-display > .katex{font-size:1.05em}
+      .container{padding:10px 10px 24px}
+      .tab-btn{font-size:10px;padding:8px 4px;min-width:60px}
+      .modal{padding:20px 16px}
+      .modal-title{font-size:18px;padding-right:44px}
+      .modal-formula-box .katex-display > .katex{font-size:1.2em}
+      .modal-category{padding-right:44px}
+      .modal-section-title{font-size:11px}
+      .modal-explanation,.modal-use-case span,.modal-warning-content{font-size:13px}
+    }
+    @media(max-width:360px){
+      .page-title{font-size:13px}
+      .tab-btn{font-size:9px;padding:7px 3px;min-width:55px}
+      .tab-btn i{font-size:10px}
+      .modal-nav-btn{font-size:11px;padding:8px 10px}
+      .f-card-formula .katex-display > .katex{font-size:.95em}
+      .modal-formula-box .katex-display > .katex{font-size:1.1em}
+    }
+    @media(min-width:768px){
+      .container{padding:16px 16px 32px}
+      .modal-overlay{align-items:center;padding:20px}
+      .modal{border-radius:20px;max-height:88vh}
+      .modal-overlay.show .modal{transform:scale(1) translateY(0)}
+      .modal{transform:scale(.92) translateY(20px)}
+      .modal-handle{display:none}
+    }
+    @media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+    a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+    ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}
+    ::-webkit-scrollbar-thumb{background:rgba(184,134,11,.25);border-radius:10px}
+  </style>
+</head>
+<body>
+
+<div class="gradient-bg"></div>
+<div class="glow glow-1"></div>
+<div class="glow glow-2"></div>
+
+<header class="header">
+  <div class="header-left">
+    <a href="index.html" class="back-btn" aria-label="Retour"><i class="fas fa-arrow-left"></i></a>
+    <div class="page-title">
+      <i class="fas fa-flask"></i>
+      <span>Formulaires</span>
+      <span class="fav-count" id="favCount">0</span>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+  <div class="search-wrap">
+    <i class="fas fa-search"></i>
+    <input type="text" class="search-input" id="searchInput" placeholder="Rechercher une formule...">
+  </div>
+  <div class="tabs" id="tabs"></div>
+  <div class="filters" id="filters"></div>
+  <div class="content" id="content"></div>
+</div>
+
+<div class="modal-overlay" id="formulaModal">
+  <div class="modal" id="formulaModalContent"></div>
+</div>
+
+<div class="toast" id="toast">
+  <span class="toast-icon"><i class="fas fa-check-circle"></i></span>
+  <span class="toast-message"></span>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "firebase/app": "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
+    "firebase/auth": "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js",
+    "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js"
+  }
+}
+</script>
+
+<script type="module">
+// ================================================================
+// FORMULAIRES — Version robuste anti-flash
+// ================================================================
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import {
+  getAuth,
+  onAuthStateChanged,
+  setPersistence,
+  browserLocalPersistence
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import {
+  initializeFirestore,
+  persistentLocalCache,
+  persistentSingleTabManager,
+  doc,
+  getDoc,
+  setDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDHscOXw3rLuhV6z1Cny-bdYCumqpnG7QE",
+  authDomain: "arvexa-fbf10.firebaseapp.com",
+  projectId: "arvexa-fbf10",
+  storageBucket: "arvexa-fbf10.firebasestorage.app",
+  messagingSenderId: "920108330053",
+  appId: "1:920108330053:web:f532d71cbc2c824bc7472c"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+const db = initializeFirestore(app, {
+  localCache: persistentLocalCache({
+    tabManager: persistentSingleTabManager()
+  })
+});
+
+try {
+  await setPersistence(auth, browserLocalPersistence);
+} catch (e) {}
+
+// ================================================================
+// SESSION / CACHE
+// ================================================================
+const SESSION_KEY = 'arvexa_session';
+const USER_DATA_KEY = 'arvexa_user_data';
+const LAST_UID_KEY = 'arvexa_last_uid';
+
+function saveSession(user) {
+  if (!user) return;
+  try {
+    const data = {
+      uid: user.uid,
+      email: user.email,
+      lastActive: Date.now()
+    };
+    localStorage.setItem(SESSION_KEY, JSON.stringify(data));
+    localStorage.setItem(LAST_UID_KEY, user.uid);
+  } catch (e) {}
+}
+
+function clearSession() {
+  try {
+    localStorage.removeItem(SESSION_KEY);
+    localStorage.removeItem(USER_DATA_KEY);
+    localStorage.removeItem(LAST_UID_KEY);
+    sessionStorage.removeItem(SESSION_KEY);
+  } catch (e) {}
+}
+
+// ================================================================
+// DONNÉES
+// ================================================================
+const FORMULAS = [
+  // ════════════════════════════════════════════════════════════
+  // MATHÉMATIQUES — Limites
+  // ════════════════════════════════════════════════════════════
+  {id:'m1',subj:'maths',theme:'Limites',name:'Limite de $e^x / x^n$ en $+\\infty$',
+   formula:'\\lim_{x \\to +\\infty} \\frac{e^x}{x^n} = +\\infty',
+   units:'n entier positif',note:'L\'exponentielle l\'emporte sur toute puissance de $x$.',
+   explication:'Quand $x$ devient très grand, la fonction exponentielle croît beaucoup plus vite que n\'importe quelle puissance de $x$.',
+   usage:['Calculer des limites en $+\\infty$','Comparer les croissances de fonctions'],
+   exemple:'$\\lim_{x \\to +\\infty} \\frac{e^x}{x^2} = +\\infty$',
+   erreurs:['Ne pas confondre avec $x^n/e^x$ qui tend vers 0','Bien vérifier que $n$ est positif']},
+
+  {id:'m2',subj:'maths',theme:'Limites',name:'Limite de $\\ln(x) / x^n$ en $+\\infty$',
+   formula:'\\lim_{x \\to +\\infty} \\frac{\\ln(x)}{x^n} = 0',
+   units:'n entier positif',note:'Le logarithme est négligeable devant toute puissance de $x$.',
+   explication:'Le logarithme népérien croît très lentement comparé à n\'importe quelle puissance positive de $x$.',
+   usage:['Calculer des limites en $+\\infty$','Comparer les croissances'],
+   exemple:'$\\lim_{x \\to +\\infty} \\frac{\\ln(x)}{x} = 0$',
+   erreurs:['Ne s\'applique QUE pour $x \\to +\\infty$','Le numérateur doit être $\\ln(x)$']},
+
+  {id:'m3',subj:'maths',theme:'Limites',name:'Limite de $\\ln(1+x)/x$ en $0$',
+   formula:'\\lim_{x \\to 0} \\frac{\\ln(1+x)}{x} = 1',
+   units:'x \\to 0',note:'',
+   explication:'Le taux d\'accroissement de $\\ln(1+x)$ en $0$ est égal à 1.',
+   usage:['Démontrer des dérivées','Résoudre des exercices de limites'],
+   exemple:'$\\lim_{x \\to 0} \\frac{\\ln(1+2x)}{x} = 2$',
+   erreurs:['Ne pas oublier le facteur multiplicatif']},
+
+  {id:'m4',subj:'maths',theme:'Limites',name:'Limite de $(e^x - 1)/x$ en $0$',
+   formula:'\\lim_{x \\to 0} \\frac{e^x - 1}{x} = 1',
+   units:'x \\to 0',note:'',
+   explication:'Le taux d\'accroissement de $e^x$ en $0$ est égal à 1.',
+   usage:['Démontrer la dérivée de $\\exp$','Résoudre des limites'],
+   exemple:'$\\lim_{x \\to 0} \\frac{e^{3x} - 1}{x} = 3$',
+   erreurs:['Ne pas oublier le facteur multiplicatif']},
+
+  {id:'m5',subj:'maths',theme:'Limites',name:'Croissances comparées',
+   formula:'\\lim_{x \\to +\\infty} x^n e^{-x} = 0 \\quad \\text{et} \\quad \\lim_{x \\to +\\infty} \\ln(x) \\cdot x^{-n} = 0',
+   units:'n entier positif',note:'À retenir pour les comparaisons de fonctions.',
+   explication:'Ces deux limites résument les croissances comparées.',
+   usage:['Calculer des limites de produits','Étudier le comportement asymptotique'],
+   exemple:'$\\lim_{x \\to +\\infty} x^3 e^{-x} = 0$',
+   erreurs:['Ne s\'applique que pour $x \\to +\\infty$']},
+
+  {id:'m6',subj:'maths',theme:'Limites',name:'Nombre de Neper',
+   formula:'\\lim_{n \\to +\\infty} \\left(1 + \\frac{1}{n}\\right)^n = e',
+   units:'n \\to +\\infty',note:'$e \\approx 2{,}71828...$',
+   explication:'Cette limite définit le nombre $e$.',
+   usage:['Calculer des limites de suites','Applications aux intérêts composés'],
+   exemple:'$\\lim_{n \\to +\\infty} \\left(1 + \\frac{3}{n}\\right)^n = e^3$',
+   erreurs:['Ne pas oublier de transformer en $e$']},
+
+  // Continuité
+  {id:'m6b',subj:'maths',theme:'Continuité',name:'Théorème des valeurs intermédiaires',
+   formula:'f \\text{ continue sur } [a,b] \\text{ et } k \\in [f(a), f(b)] \\implies \\exists c \\in [a,b] : f(c) = k',
+   note:'Théorème fondamental d\'existence.',
+   explication:'Si $f$ est continue sur $[a,b]$ et $k$ est entre $f(a)$ et $f(b)$, alors l\'équation $f(x) = k$ a au moins une solution dans $[a,b]$.',
+   usage:['Démontrer l\'existence d\'une solution'],
+   exemple:'$f(x) = x^3 - 1$ sur $[0,2]$, $k = 3 \\implies$ il existe $c$ tel que $f(c) = 3$',
+   erreurs:['La fonction doit être continue']},
+
+  {id:'m6c',subj:'maths',theme:'Continuité',name:'Théorème de la bijection',
+   formula:'f \\text{ continue et strictement monotone sur } I \\implies f \\text{ réalise une bijection de } I \\text{ sur } f(I)',
+   note:'',
+   explication:'Une fonction continue et strictement monotone sur un intervalle réalise une bijection.',
+   usage:['Justifier l\'unicité d\'une solution'],
+   exemple:'$f(x) = e^x$ réalise une bijection de $\\mathbb{R}$ sur $]0, +\\infty[$',
+   erreurs:['Vérifier la stricte monotonie']},
+
+  // Dérivées
+  {id:'m7',subj:'maths',theme:'Dérivées',name:'Dérivées usuelles',
+   formula:'\\begin{aligned} (x^n)\' &= n x^{n-1} \\\\ (1/x)\' &= -\\frac{1}{x^2} \\\\ (\\sqrt{x})\' &= \\frac{1}{2\\sqrt{x}} \\\\ (e^x)\' &= e^x \\\\ (\\ln x)\' &= \\frac{1}{x} \\\\ (\\cos x)\' &= -\\sin x \\\\ (\\sin x)\' &= \\cos x \\\\ (\\tan x)\' &= 1 + \\tan^2 x \\end{aligned}',
+   note:'Les fonctions usuelles à connaître par cœur.',
+   explication:'Ces dérivées forment la base du calcul différentiel.',
+   usage:['Calculer des dérivées','Étudier des variations'],
+   exemple:'$f(x) = 3x^4 + \\frac{2}{x} \\implies f\'(x) = 12x^3 - \\frac{2}{x^2}$',
+   erreurs:['Oublier le coefficient $n$ dans $(x^n)\'$']},
+
+  {id:'m8',subj:'maths',theme:'Dérivées',name:'Opérations sur les dérivées',
+   formula:'\\begin{aligned} (u+v)\' &= u\' + v\' \\\\ (uv)\' &= u\'v + uv\' \\\\ \\left(\\frac{u}{v}\\right)\' &= \\frac{u\'v - uv\'}{v^2} \\\\ (f \\circ g)\' &= g\' \\times (f\' \\circ g) \\end{aligned}',
+   note:'Formules fondamentales de dérivation.',
+   explication:'Ces formules permettent de dériver n\'importe quelle combinaison.',
+   usage:['Dériver des produits','Dériver des quotients'],
+   exemple:'$f(x) = x^2 \\ln(x) \\implies f\'(x) = 2x \\ln(x) + x$',
+   erreurs:['$(uv)\' \\neq u\'v\'$ (erreur classique !)']},
+
+  {id:'m9',subj:'maths',theme:'Dérivées',name:'Dérivée de $\\ln(u)$ et $\\exp(u)$',
+   formula:'(\\ln u)\' = \\frac{u\'}{u} \\quad \\text{et} \\quad (e^u)\' = u\' e^u',
+   units:'u > 0 \\text{ pour } \\ln(u)',note:'',
+   explication:'Pour dériver une fonction composée avec $\\ln$ ou $\\exp$.',
+   usage:['Dériver des fonctions composées'],
+   exemple:'$f(x) = \\ln(3x^2 + 1) \\implies f\'(x) = \\frac{6x}{3x^2 + 1}$',
+   erreurs:['Ne pas oublier $u\'$ au numérateur']},
+
+  // Logarithme
+  {id:'m10',subj:'maths',theme:'Logarithme népérien',name:'Propriétés du logarithme',
+   formula:'\\begin{aligned} \\ln(ab) &= \\ln a + \\ln b \\\\ \\ln(a/b) &= \\ln a - \\ln b \\\\ \\ln(a^n) &= n \\ln a \\\\ \\ln(1) &= 0, \\quad \\ln(e) = 1 \\end{aligned}',
+   units:'a > 0, b > 0',note:'Le logarithme transforme les produits en sommes.',
+   explication:'Le logarithme népérien transforme les produits en sommes.',
+   usage:['Résoudre des équations','Simplifier des expressions'],
+   exemple:'$\\ln(x) + \\ln(x-1) = \\ln(6) \\implies x = 3$',
+   erreurs:['$\\ln(a+b) \\neq \\ln a + \\ln b$']},
+
+  {id:'m11',subj:'maths',theme:'Logarithme népérien',name:'Propriétés de l\'exponentielle',
+   formula:'\\begin{aligned} e^{a+b} &= e^a \\cdot e^b \\\\ e^{a-b} &= \\frac{e^a}{e^b} \\\\ (e^a)^n &= e^{na} \\\\ e^0 &= 1, \\quad e^1 = e \\end{aligned}',
+   note:'',
+   explication:'L\'exponentielle transforme les sommes en produits.',
+   usage:['Simplifier des expressions','Résoudre des équations'],
+   exemple:'$e^{2x} \\cdot e^{3x} = e^{10} \\implies x = 2$',
+   erreurs:['$e^{a+b} \\neq e^a + e^b$']},
+
+  {id:'m12',subj:'maths',theme:'Logarithme népérien',name:'Relation $\\ln$ / $\\exp$',
+   formula:'\\ln(e^x) = x \\quad \\text{et} \\quad e^{\\ln(x)} = x',
+   units:'x \\in \\mathbb{R} \\text{ et } x > 0',note:'Fonctions réciproques.',
+   explication:'$\\ln$ et $\\exp$ sont réciproques.',
+   usage:['Résoudre des équations','Simplifier des expressions'],
+   exemple:'$e^x = 5 \\implies x = \\ln(5)$',
+   erreurs:['$\\ln(e^x + 1) \\neq x + 1$']},
+
+  {id:'m13',subj:'maths',theme:'Logarithme népérien',name:'Logarithme décimal',
+   formula:'\\log(x) = \\frac{\\ln(x)}{\\ln(10)}',
+   note:'$\\log(10) = 1$, utilisé en chimie pour le pH.',
+   explication:'Le logarithme décimal est le logarithme en base 10.',
+   usage:['Calculer le pH','Échelles logarithmiques'],
+   exemple:'$\\log(1000) = 3$',
+   erreurs:['$\\log(0)$ n\'existe pas']},
+
+  // Suites
+  {id:'m14',subj:'maths',theme:'Suites',name:'Suite arithmétique',
+   formula:'\\begin{aligned} u_{n+1} &= u_n + r \\\\ u_n &= u_0 + n r \\\\ S_n &= \\frac{(n+1)(u_0 + u_n)}{2} \\end{aligned}',
+   units:'r = raison',note:'Chaque terme diffère du précédent d\'une constante $r$.',
+   explication:'Une suite arithmétique croît linéairement.',
+   usage:['Modéliser une croissance linéaire','Calculer des sommes'],
+   exemple:'$u_0 = 5$, $r = 3$ : $u_{10} = 35$',
+   erreurs:['Ne pas confondre avec suite géométrique']},
+
+  {id:'m15',subj:'maths',theme:'Suites',name:'Suite géométrique',
+   formula:'\\begin{aligned} u_{n+1} &= u_n \\times q \\\\ u_n &= u_0 \\times q^n \\\\ S_n &= u_0 \\times \\frac{1 - q^{n+1}}{1 - q} \\end{aligned}',
+   units:'q = raison, q ≠ 1',note:'Chaque terme est multiplié par $q$.',
+   explication:'Une suite géométrique croît exponentiellement.',
+   usage:['Modéliser une croissance exponentielle','Intérêts composés'],
+   exemple:'$u_0 = 2$, $q = 3$ : $u_5 = 486$',
+   erreurs:['$u_n = u_0 \\times q^n$ (pas $u_0 + nq$)']},
+
+  {id:'m16',subj:'maths',theme:'Suites',name:'Limite d\'une suite géométrique',
+   formula:'|q| < 1 \\implies \\lim_{n \\to +\\infty} q^n = 0 \\\\ q > 1 \\implies \\lim_{n \\to +\\infty} q^n = +\\infty',
+   note:'',
+   explication:'Le comportement de $q^n$ dépend de la valeur de $q$.',
+   usage:['Calculer des limites de suites'],
+   exemple:'$\\lim_{n \\to +\\infty} (0{,}5)^n = 0$',
+   erreurs:['Si $q < -1$, $q^n$ n\'a pas de limite']},
+
+  {id:'m17',subj:'maths',theme:'Suites',name:'Raisonnement par récurrence',
+   formula:'\\text{1) Initialisation : } P(0) \\\\ \\text{2) Hérédité : } P(n) \\implies P(n+1) \\\\ \\text{3) Conclusion : } P(n) \\text{ vraie } \\forall n',
+   note:'Méthode de démonstration fondamentale.',
+   explication:'Le raisonnement par récurrence permet de démontrer qu\'une propriété est vraie pour tout $n$.',
+   usage:['Démontrer des formules','Démontrer des inégalités'],
+   exemple:'Démontrer $1 + 2 + \\dots + n = \\frac{n(n+1)}{2}$',
+   erreurs:['Oublier l\'initialisation']},
+
+  // Intégrales
+  {id:'m18',subj:'maths',theme:'Intégrales',name:'Définition de l\'intégrale',
+   formula:'\\int_a^b f(x) \\, dx = F(b) - F(a)',
+   units:'F = primitive de f',note:'$F\'(x) = f(x)$.',
+   explication:'L\'intégrale se calcule en trouvant une primitive $F$ de $f$.',
+   usage:['Calculer des aires','Résoudre des problèmes de physique'],
+   exemple:'$\\int_0^1 x^2 \\, dx = \\frac{1}{3}$',
+   erreurs:['Attention au signe de $F(b)-F(a)$']},
+
+  {id:'m19',subj:'maths',theme:'Intégrales',name:'Linéarité de l\'intégrale',
+   formula:'\\int (af + bg) = a\\int f + b\\int g',
+   units:'a, b constantes',note:'',
+   explication:'L\'intégrale est linéaire.',
+   usage:['Calculer des intégrales de sommes'],
+   exemple:'$\\int_0^1 (3x^2 + 2x) \\, dx = 2$',
+   erreurs:['Ne s\'applique QUE pour des constantes']},
+
+  {id:'m20',subj:'maths',theme:'Intégrales',name:'Relation de Chasles',
+   formula:'\\int_a^c f = \\int_a^b f + \\int_b^c f',
+   note:'',
+   explication:'On peut découper une intégrale en plusieurs morceaux.',
+   usage:['Calculer des intégrales avec valeurs absolues'],
+   exemple:'$\\int_0^2 |x-1| \\, dx = 1$',
+   erreurs:['Bien identifier les points de découpage']},
+
+  {id:'m21',subj:'maths',theme:'Intégrales',name:'Intégration par parties',
+   formula:'\\int_a^b u\'v \\, dx = [uv]_a^b - \\int_a^b uv\' \\, dx',
+   note:'Très utile pour intégrer un produit.',
+   explication:'Pour intégrer un produit de deux fonctions.',
+   usage:['Intégrer $x e^x$','Intégrer $x \\ln(x)$'],
+   exemple:'$\\int_1^e \\ln(x) \\, dx = 1$',
+   erreurs:['Bien choisir $u\'$ et $v$']},
+
+  {id:'m22',subj:'maths',theme:'Intégrales',name:'Primitives usuelles',
+   formula:'\\begin{aligned} \\int x^n \\, dx &= \\frac{x^{n+1}}{n+1} \\\\ \\int \\frac{1}{x} \\, dx &= \\ln|x| \\\\ \\int e^x \\, dx &= e^x \\\\ \\int \\cos x \\, dx &= \\sin x \\\\ \\int \\sin x \\, dx &= -\\cos x \\end{aligned}',
+   note:'',
+   explication:'Ces primitives sont l\'inverse des dérivées usuelles.',
+   usage:['Calculer des intégrales simples'],
+   exemple:'$\\int (3x^2 + 2/x) dx = x^3 + 2\\ln|x| + C$',
+   erreurs:['Oublier la constante $C$']},
+
+  {id:'m23',subj:'maths',theme:'Intégrales',name:'Valeur moyenne',
+   formula:'\\bar{f} = \\frac{1}{b-a} \\int_a^b f(x) \\, dx',
+   units:'sur [a, b]',note:'',
+   explication:'La valeur moyenne d\'une fonction sur un intervalle.',
+   usage:['Calculer une valeur moyenne en physique'],
+   exemple:'Valeur moyenne de $x^2$ sur $[0, 2]$ : $\\bar{f} = 4/3$',
+   erreurs:['Ne pas oublier de diviser par $(b-a)$']},
+
+  {id:'m24',subj:'maths',theme:'Intégrales',name:'Aire sous la courbe',
+   formula:'A = \\int_a^b |f(x) - g(x)| \\, dx',
+   units:'en unités d\'aire',note:'L\'aire entre deux courbes.',
+   explication:'L\'aire entre deux courbes se calcule en intégrant la valeur absolue de leur différence.',
+   usage:['Calculer des aires entre deux courbes'],
+   exemple:'Aire entre $y = x^2$ et $y = x$ sur $[0,1]$ : $A = 1/6$',
+   erreurs:['Attention à l\'ordre $(f-g$ ou $g-f)$']},
+
+  // Probabilités
+  {id:'m25',subj:'maths',theme:'Probabilités',name:'Probabilités de base',
+   formula:'P(\\bar{A}) = 1 - P(A) \\\\ P(A \\cup B) = P(A) + P(B) - P(A \\cap B)',
+   note:'$\\bar{A}$ = événement contraire.',
+   explication:'Ces formules sont les fondations du calcul de probabilités.',
+   usage:['Calculer des probabilités simples'],
+   exemple:'$P(A) = 0{,}3$, $P(B) = 0{,}5$, $P(A \\cap B) = 0{,}2 \\implies P(A \\cup B) = 0{,}6$',
+   erreurs:['$P(A \\cup B) \\neq P(A) + P(B)$ si non incompatibles']},
+
+  {id:'m26',subj:'maths',theme:'Probabilités',name:'Probabilité conditionnelle',
+   formula:'P_A(B) = \\frac{P(A \\cap B)}{P(A)}',
+   units:'P(A) ≠ 0',note:'Probabilité de $B$ sachant $A$.',
+   explication:'La probabilité qu\'un événement $B$ se produise sachant que $A$ s\'est produit.',
+   usage:['Résoudre des exercices d\'arbres pondérés'],
+   exemple:'$P(A) = 0{,}4$, $P(A \\cap B) = 0{,}1 \\implies P_A(B) = 0{,}25$',
+   erreurs:['$P_A(B) \\neq P_B(A)$']},
+
+  {id:'m27',subj:'maths',theme:'Probabilités',name:'Formule des probabilités totales',
+   formula:'P(B) = \\sum_i P(A_i) \\times P_{A_i}(B)',
+   units:'(A_i) système complet',note:'',
+   explication:'On peut calculer $P(B)$ en sommant les contributions.',
+   usage:['Résoudre des problèmes avec arbre'],
+   exemple:'Deux urnes : $P(\\text{rouge}) = 17/40$',
+   erreurs:['Bien identifier le système complet']},
+
+  {id:'m27b',subj:'maths',theme:'Probabilités',name:'Formule de Bayes',
+   formula:'P_B(A) = \\frac{P(A) \\cdot P_A(B)}{P(B)}',
+   note:'',
+   explication:'La formule de Bayes permet d\'inverser les probabilités conditionnelles.',
+   usage:['Calculer des probabilités a posteriori'],
+   exemple:'$P(A) = 0{,}5$, $P_A(B) = 0{,}8$, $P(B) = 0{,}5 \\implies P_B(A) = 0{,}8$',
+   erreurs:['Bien identifier $P(B)$ au dénominateur']},
+
+  {id:'m28',subj:'maths',theme:'Probabilités',name:'Loi binomiale',
+   formula:'\\begin{aligned} P(X=k) &= \\binom{n}{k} p^k (1-p)^{n-k} \\\\ E(X) &= np \\\\ V(X) &= np(1-p) \\end{aligned}',
+   units:'$\\binom{n}{k} = n!/(k!(n-k)!)$',note:'Schéma de Bernoulli répété $n$ fois.',
+   explication:'La loi binomiale modélise une expérience aléatoire répétée $n$ fois.',
+   usage:['Calculer la probabilité de $k$ succès sur $n$ essais'],
+   exemple:'$P(X=3) = \\binom{5}{3} (1/2)^3 (1/2)^2 = 10/32$',
+   erreurs:['Ne pas oublier $\\binom{n}{k}$']},
+
+  {id:'m29',subj:'maths',theme:'Probabilités',name:'Loi normale',
+   formula:'f(x) = \\frac{1}{\\sigma\\sqrt{2\\pi}} e^{-\\frac{(x-\\mu)^2}{2\\sigma^2}}',
+   units:'$\\mu$ = espérance, $\\sigma$ = écart-type',note:'Courbe en cloche.',
+   explication:'La loi normale est la plus importante en statistiques.',
+   usage:['Modéliser des mesures physiques','Intervalles de confiance'],
+   exemple:'$X \\sim \\mathcal{N}(100, 15^2)$ : $P(85 < X < 115) \\approx 0{,}68$',
+   erreurs:['Bien identifier $\\mu$ et $\\sigma$']},
+
+  {id:'m30',subj:'maths',theme:'Probabilités',name:'Loi normale centrée réduite',
+   formula:'Z = \\frac{X - \\mu}{\\sigma} \\sim \\mathcal{N}(0, 1)',
+   note:'',
+   explication:'Toute loi normale peut être transformée en loi normale centrée réduite.',
+   usage:['Utiliser la table de la loi normale'],
+   exemple:'$X \\sim \\mathcal{N}(50, 100)$ : $P(X < 60) = P(Z < 1) \\approx 0{,}8413$',
+   erreurs:['Ne pas oublier de diviser par $\\sigma$']},
+
+  {id:'m31',subj:'maths',theme:'Probabilités',name:'Intervalle de confiance',
+   formula:'IC = \\left[f - \\frac{1}{\\sqrt{n}} ; f + \\frac{1}{\\sqrt{n}}\\right]',
+   units:'n ≥ 30, confiance 95%',note:'$f$ = fréquence observée.',
+   explication:'L\'intervalle de confiance à 95%.',
+   usage:['Estimer une proportion','Sondages'],
+   exemple:'$f = 0{,}30$, $n = 400 \\implies IC = [0{,}25 ; 0{,}35]$',
+   erreurs:['Ne s\'applique que pour $n \\geq 30$']},
+
+  // Nombres complexes
+  {id:'m32',subj:'maths',theme:'Nombres complexes',name:'Forme algébrique',
+   formula:'z = a + ib \\\\ |z| = \\sqrt{a^2 + b^2} \\\\ \\bar{z} = a - ib \\\\ z \\bar{z} = |z|^2 = a^2 + b^2',
+   units:'i² = -1',note:'',
+   explication:'Un nombre complexe s\'écrit $z = a + ib$.',
+   usage:['Calculer un module','Calculer un conjugué'],
+   exemple:'$z = 3 + 4i \\implies |z| = 5$',
+   erreurs:['$i^2 = -1$']},
+
+  {id:'m33',subj:'maths',theme:'Nombres complexes',name:'Forme trigonométrique et exponentielle',
+   formula:'z = r(\\cos\\theta + i\\sin\\theta) = r e^{i\\theta}',
+   units:'$r = |z|$, $\\theta = \\arg(z)$',note:'',
+   explication:'Tout nombre complexe peut s\'écrire en forme polaire.',
+   usage:['Multiplier des complexes','Calculer des puissances'],
+   exemple:'$z = 1 + i \\implies z = \\sqrt{2} e^{i\\pi/4}$',
+   erreurs:['$\\theta$ modulo $2\\pi$']},
+
+  {id:'m34',subj:'maths',theme:'Nombres complexes',name:'Formule de Moivre',
+   formula:'(\\cos\\theta + i\\sin\\theta)^n = \\cos(n\\theta) + i\\sin(n\\theta)',
+   units:'n entier relatif',note:'',
+   explication:'Cette formule permet de calculer facilement des puissances.',
+   usage:['Calculer $(1+i)^{10}$','Linéariser'],
+   exemple:'$(1+i)^4 = 4 e^{i\\pi} = -4$',
+   erreurs:['Ne s\'applique que pour $|z| = 1$']},
+
+  {id:'m35',subj:'maths',theme:'Nombres complexes',name:'Formules d\'Euler',
+   formula:'e^{i\\theta} = \\cos\\theta + i\\sin\\theta \\\\ \\cos\\theta = \\frac{e^{i\\theta} + e^{-i\\theta}}{2} \\\\ \\sin\\theta = \\frac{e^{i\\theta} - e^{-i\\theta}}{2i}',
+   note:'',
+   explication:'Les formules d\'Euler relient exponentielle complexe et trigonométrie.',
+   usage:['Linéariser des puissances'],
+   exemple:'$\\cos^2\\theta = \\frac{1 + \\cos(2\\theta)}{2}$',
+   erreurs:['Ne pas oublier le $2i$ pour $\\sin$']},
+
+  {id:'m36',subj:'maths',theme:'Nombres complexes',name:'Affixe et géométrie',
+   formula:'AB = |z_B - z_A| \\\\ \\arg(z_B - z_A) = \\text{angle}(\\vec{u}, \\overrightarrow{AB})',
+   note:'Lien entre complexes et géométrie.',
+   explication:'Les complexes permettent de résoudre des problèmes de géométrie.',
+   usage:['Calculer des distances','Démontrer alignements'],
+   exemple:'$A(1+2i)$, $B(4+6i) \\implies AB = 5$',
+   erreurs:['Bien identifier le point d\'origine']},
+
+  // Similitudes planes
+  {id:'m36b',subj:'maths',theme:'Similitudes planes',name:'Écriture complexe d\'une similitude directe',
+   formula:'z\' = a z + b',
+   units:'$a \\in \\mathbb{C}^*$, $b \\in \\mathbb{C}$',note:'Toute similitude directe a une écriture complexe.',
+   explication:'Une similitude directe transforme un point d\'affixe $z$ en un point d\'affixe $z\' = az + b$.',
+   usage:['Déterminer une similitude','Composer des similitudes'],
+   exemple:'$z\' = 2z + 1$ : similitude directe de rapport 2',
+   erreurs:['$a \\neq 0$ obligatoire']},
+
+  {id:'m36c',subj:'maths',theme:'Similitudes planes',name:'Rapport, angle, centre',
+   formula:'k = |a| \\\\ \\theta = \\arg(a) \\\\ \\text{Centre : } \\omega = \\frac{b}{1-a}',
+   units:'$a \\neq 1$ pour un centre',note:'',
+   explication:'Une similitude directe est caractérisée par son rapport, son angle et son centre.',
+   usage:['Trouver le centre d\'une similitude'],
+   exemple:'$z\' = 2i z + 1 \\implies$ rapport 2, angle $\\pi/2$, centre $\\omega = \\frac{1}{1-2i}$',
+   erreurs:['Si $a = 1$, c\'est une translation']},
+
+  {id:'m36d',subj:'maths',theme:'Similitudes planes',name:'Similitude directe et rotation',
+   formula:'a = e^{i\\theta} \\implies \\text{rotation d\'angle } \\theta',
+   note:'Cas particulier.',
+   explication:'Si $|a| = 1$, la similitude est une rotation (pure).',
+   usage:['Reconnaître une rotation'],
+   exemple:'$z\' = iz$ : rotation d\'angle $\\pi/2$ autour de $O$',
+   erreurs:['Vérifier que $|a| = 1$']},
+
+  {id:'m36e',subj:'maths',theme:'Similitudes planes',name:'Similitude directe et homothétie',
+   formula:'\\arg(a) = 0 \\implies \\text{homothétie de rapport } |a|',
+   note:'Cas particulier.',
+   explication:'Si $a \\in \\mathbb{R}$, la similitude est une homothétie.',
+   usage:['Reconnaître une homothétie'],
+   exemple:'$z\' = 2z + 1$ : homothétie de rapport 2',
+   erreurs:['Vérifier que $a$ est réel']},
+
+  {id:'m36f',subj:'maths',theme:'Similitudes planes',name:'Composition de similitudes',
+   formula:'z \\xrightarrow{S_1} a_1 z + b_1 \\xrightarrow{S_2} a_2(a_1 z + b_1) + b_2 = (a_2 a_1) z + (a_2 b_1 + b_2)',
+   note:'',
+   explication:'La composée de deux similitudes directes est une similitude directe.',
+   usage:['Calculer une composée'],
+   exemple:'$S_1 : z\' = 2z$, $S_2 : z\'\' = iz\' \\implies S_2 \\circ S_1 : z\'\' = 2iz$',
+   erreurs:['Attention à l\'ordre de composition']},
+
+  // Produit vectoriel
+  {id:'m36g',subj:'maths',theme:'Produit vectoriel',name:'Définition du produit vectoriel',
+   formula:'\\vec{u} \\wedge \\vec{v} = \\begin{vmatrix} \\vec{i} & \\vec{j} & \\vec{k} \\\\ u_x & u_y & u_z \\\\ v_x & v_y & v_z \\end{vmatrix}',
+   note:'Le résultat est un VECTEUR.',
+   explication:'Le produit vectoriel de deux vecteurs donne un vecteur perpendiculaire aux deux.',
+   usage:['Calculer une normale','Déterminer une aire'],
+   exemple:'$\\vec{u}(1,0,0) \\wedge \\vec{v}(0,1,0) = \\vec{k}(0,0,1)$',
+   erreurs:['Le résultat est un VECTEUR, pas un scalaire']},
+
+  {id:'m36h',subj:'maths',theme:'Produit vectoriel',name:'Norme du produit vectoriel',
+   formula:'|\\vec{u} \\wedge \\vec{v}| = |\\vec{u}| \\cdot |\\vec{v}| \\cdot \\sin\\theta',
+   note:'',
+   explication:'La norme du produit vectoriel donne l\'aire du parallélogramme.',
+   usage:['Calculer une aire','Tester la colinéarité'],
+   exemple:'Aire du triangle ABC = $\\frac{1}{2}|\\overrightarrow{AB} \\wedge \\overrightarrow{AC}|$',
+   erreurs:['Bien utiliser $\\sin$ et non $\\cos$']},
+
+  {id:'m36i',subj:'maths',theme:'Produit vectoriel',name:'Produit vectoriel et colinéarité',
+   formula:'\\vec{u} \\wedge \\vec{v} = \\vec{0} \\iff \\vec{u} \\text{ et } \\vec{v} \\text{ colinéaires}',
+   note:'',
+   explication:'Deux vecteurs sont colinéaires si et seulement si leur produit vectoriel est nul.',
+   usage:['Tester la colinéarité','Vérifier l\'alignement'],
+   exemple:'$\\vec{u}(1,2,3)$ et $\\vec{v}(2,4,6)$ sont colinéaires',
+   erreurs:['$\\vec{0}$ est le vecteur nul']},
+
+  // Dénombrement
+  {id:'m36j',subj:'maths',theme:'Dénombrement',name:'Factorielle',
+   formula:'n! = n \\times (n-1) \\times \\dots \\times 2 \\times 1',
+   units:'0! = 1',note:'',
+   explication:'La factorielle de $n$ est le produit de tous les entiers de 1 à $n$.',
+   usage:['Calculer des arrangements','Calculer des combinaisons'],
+   exemple:'$5! = 5 \\times 4 \\times 3 \\times 2 \\times 1 = 120$',
+   erreurs:['$0! = 1$ (par convention)']},
+
+  {id:'m36k',subj:'maths',theme:'Dénombrement',name:'Arrangements',
+   formula:'A_n^k = \\frac{n!}{(n-k)!}',
+   units:'n ≥ k',note:'Ordre compte.',
+   explication:'Nombre de façons de choisir $k$ éléments parmi $n$ en tenant compte de l\'ordre.',
+   usage:['Calculer des arrangements','Dénombrer des listes ordonnées'],
+   exemple:'$A_5^2 = \\frac{5!}{3!} = 20$',
+   erreurs:['L\'ordre COMPTE']},
+
+  {id:'m36l',subj:'maths',theme:'Dénombrement',name:'Combinaisons',
+   formula:'\\binom{n}{k} = \\frac{n!}{k!(n-k)!}',
+   units:'n ≥ k',note:'Ordre ne compte pas.',
+   explication:'Nombre de façons de choisir $k$ éléments parmi $n$ sans tenir compte de l\'ordre.',
+   usage:['Calculer des combinaisons','Probabilités'],
+   exemple:'$\\binom{5}{2} = 10$',
+   erreurs:['L\'ordre NE compte PAS']},
+
+  // Fonctions trigonométriques
+  {id:'m37',subj:'maths',theme:'Fonctions trigonométriques',name:'Formules fondamentales',
+   formula:'\\cos^2 x + \\sin^2 x = 1 \\\\ \\cos(2x) = \\cos^2 x - \\sin^2 x \\\\ \\sin(2x) = 2\\sin x \\cos x',
+   note:'',
+   explication:'Ces formules sont essentielles pour simplifier des expressions trigonométriques.',
+   usage:['Linéariser','Résoudre des équations trigonométriques'],
+   exemple:'$\\sin^2 x = \\frac{1 - \\cos(2x)}{2}$',
+   erreurs:['$\\cos(2x) \\neq 2\\cos(x)$']},
+
+  {id:'m38',subj:'maths',theme:'Fonctions trigonométriques',name:'Formules d\'addition',
+   formula:'\\cos(a+b) = \\cos a \\cos b - \\sin a \\sin b \\\\ \\sin(a+b) = \\sin a \\cos b + \\cos a \\sin b',
+   note:'',
+   explication:'Ces formules donnent les fonctions trigonométriques d\'une somme.',
+   usage:['Calculer $\\cos(\\pi/12)$'],
+   exemple:'$\\cos(\\pi/12) = \\frac{\\sqrt{2} + \\sqrt{6}}{4}$',
+   erreurs:['$\\cos(a+b) \\neq \\cos a + \\cos b$']},
+
+  {id:'m39',subj:'maths',theme:'Fonctions trigonométriques',name:'Valeurs remarquables',
+   formula:'\\begin{aligned} \\cos(0) &= 1 & \\sin(0) &= 0 \\\\ \\cos(\\pi/6) &= \\frac{\\sqrt{3}}{2} & \\sin(\\pi/6) &= \\frac{1}{2} \\\\ \\cos(\\pi/4) &= \\frac{\\sqrt{2}}{2} & \\sin(\\pi/4) &= \\frac{\\sqrt{2}}{2} \\\\ \\cos(\\pi/3) &= \\frac{1}{2} & \\sin(\\pi/3) &= \\frac{\\sqrt{3}}{2} \\\\ \\cos(\\pi/2) &= 0 & \\sin(\\pi/2) &= 1 \\end{aligned}',
+   note:'À connaître par cœur pour le BAC.',
+   explication:'Ces valeurs remarquables sont à connaître par cœur.',
+   usage:['Calculer rapidement'],
+   exemple:'$\\cos(\\pi/4) + \\sin(\\pi/6) = \\frac{\\sqrt{2} + 1}{2}$',
+   erreurs:['Confondre $\\cos(\\pi/6)$ et $\\cos(\\pi/3)$']},
+
+  // Équations différentielles
+  {id:'m40',subj:'maths',theme:'Équations différentielles',name:'Équation $y\' = ay$',
+   formula:'y(x) = C e^{ax}',
+   units:'C constante, a réel',note:'Solution générale.',
+   explication:'L\'équation $y\' = ay$ a pour solutions les exponentielles.',
+   usage:['Modéliser des phénomènes de croissance'],
+   exemple:'$y\' = 2y$, $y(0) = 3 \\implies y(x) = 3 e^{2x}$',
+   erreurs:['Ne pas oublier la constante $C$']},
+
+  {id:'m41',subj:'maths',theme:'Équations différentielles',name:'Équation $y\' = ay + b$',
+   formula:'y(x) = C e^{ax} - \\frac{b}{a}',
+   units:'a ≠ 0',note:'Solution particulière : $y_0 = -b/a$.',
+   explication:'Cette équation a une solution particulière constante.',
+   usage:['Modéliser des systèmes avec source constante'],
+   exemple:'$y\' = -y + 2$, $y(0) = 0 \\implies y(x) = 2 - 2e^{-x}$',
+   erreurs:['Ne pas oublier la solution particulière']},
+
+  {id:'m42',subj:'maths',theme:'Équations différentielles',name:'Équation $y\' = ay + f(x)$',
+   formula:'y = y_h + y_p',
+   units:'$y_h$ : solution de $y\'=ay$',note:'Principe de superposition.',
+   explication:'La solution générale est la somme de la solution homogène et d\'une solution particulière.',
+   usage:['Résoudre des équations avec second membre'],
+   exemple:'$y\' = y + x \\implies y = C e^x - x - 1$',
+   erreurs:['Chercher une solution particulière adaptée']},
+
+  // Géométrie dans l'espace
+  {id:'m43',subj:'maths',theme:'Géométrie dans l\'espace',name:'Produit scalaire',
+   formula:'\\vec{u} \\cdot \\vec{v} = xx\' + yy\' + zz\' \\\\ \\vec{u} \\cdot \\vec{v} = |\\vec{u}||\\vec{v}| \\cos\\theta',
+   note:'',
+   explication:'Le produit scalaire donne un nombre réel.',
+   usage:['Calculer un angle','Tester l\'orthogonalité'],
+   exemple:'$\\vec{u}(1,2,3) \\cdot \\vec{v}(4,5,6) = 32$',
+   erreurs:['$\\vec{u} \\cdot \\vec{v} = 0 \\iff \\vec{u} \\perp \\vec{v}$']},
+
+  {id:'m44',subj:'maths',theme:'Géométrie dans l\'espace',name:'Équation cartésienne d\'un plan',
+   formula:'ax + by + cz + d = 0',
+   units:'$\\vec{n}(a, b, c)$ vecteur normal',note:'',
+   explication:'Un plan est déterminé par un point et un vecteur normal.',
+   usage:['Déterminer l\'équation d\'un plan'],
+   exemple:'Plan passant par $A(1,2,3)$, normal $\\vec{n}(1,1,1)$ : $x + y + z - 6 = 0$',
+   erreurs:['Le vecteur normal doit être perpendiculaire au plan']},
+
+  {id:'m45',subj:'maths',theme:'Géométrie dans l\'espace',name:'Distance d\'un point à un plan',
+   formula:'d(A, P) = \\frac{|ax_0 + by_0 + cz_0 + d|}{\\sqrt{a^2 + b^2 + c^2}}',
+   units:'P : ax + by + cz + d = 0',note:'',
+   explication:'La distance d\'un point à un plan.',
+   usage:['Calculer des distances'],
+   exemple:'$d(A(0,0,0), P : x+y+z-6=0) = 2\\sqrt{3}$',
+   erreurs:['Ne pas oublier la valeur absolue']},
+
+  {id:'m46',subj:'maths',theme:'Géométrie dans l\'espace',name:'Représentation paramétrique d\'une droite',
+   formula:'\\begin{cases} x = x_0 + at \\\\ y = y_0 + bt \\\\ z = z_0 + ct \\end{cases}',
+   units:'$\\vec{u}(a, b, c)$ vecteur directeur',note:'',
+   explication:'Une droite dans l\'espace est décrite par un point et un vecteur directeur.',
+   usage:['Décrire une droite','Trouver des intersections'],
+   exemple:'Droite passant par $A(1,2,3)$, direction $\\vec{u}(1,0,-1)$ : $x = 1+t$, $y = 2$, $z = 3-t$',
+   erreurs:['Un vecteur directeur peut être multiplié']},
+
+  // Coniques
+  {id:'m46b',subj:'maths',theme:'Coniques',name:'Ellipse',
+   formula:'\\frac{x^2}{a^2} + \\frac{y^2}{b^2} = 1',
+   units:'a = demi-grand axe, b = demi-petit axe',note:'',
+   explication:'Une ellipse est l\'ensemble des points dont la somme des distances aux deux foyers est constante.',
+   usage:['Étudier les orbites','Optique'],
+   exemple:'$\\frac{x^2}{25} + \\frac{y^2}{9} = 1$',
+   erreurs:['$a > b > 0$']},
+
+  {id:'m46c',subj:'maths',theme:'Coniques',name:'Parabole',
+   formula:'y^2 = 2px',
+   units:'p = paramètre',note:'',
+   explication:'Une parabole est l\'ensemble des points équidistants du foyer et de la directrice.',
+   usage:['Étudier les antennes paraboliques','Balistique'],
+   exemple:'$y^2 = 4x \\implies p = 2$',
+   erreurs:['Le sommet est à l\'origine']},
+
+  {id:'m46d',subj:'maths',theme:'Coniques',name:'Hyperbole',
+   formula:'\\frac{x^2}{a^2} - \\frac{y^2}{b^2} = 1',
+   units:'a, b > 0',note:'',
+   explication:'Une hyperbole est l\'ensemble des points dont la différence des distances aux deux foyers est constante.',
+   usage:['Étudier des trajectoires'],
+   exemple:'$\\frac{x^2}{9} - \\frac{y^2}{16} = 1$',
+   erreurs:['Attention au signe $-$']},
+
+  // ════════════════════════════════════════════════════════════
+  // PHYSIQUE
+  // ════════════════════════════════════════════════════════════
+  {id:'p1',subj:'physique',theme:'Mécanique',name:'Deuxième loi de Newton',
+   formula:'\\sum \\vec{F} = m \\vec{a}',
+   units:'F en N, m en kg, a en m/s²',note:'Principe fondamental de la dynamique.',
+   explication:'La somme vectorielle des forces est égale au produit masse × accélération.',
+   usage:['Calculer une accélération','Étudier un mouvement'],
+   exemple:'$m = 2$ kg, $F = 10$ N $\\implies a = 5$ m/s²',
+   erreurs:['Somme VECTORIELLE','Utiliser le système international']},
+
+  {id:'p2',subj:'physique',theme:'Mécanique',name:'Poids',
+   formula:'\\vec{P} = m \\vec{g}',
+   units:'P en N, m en kg, g ≈ 9,81 m/s²',note:'',
+   explication:'Le poids est la force d\'attraction terrestre.',
+   usage:['Calculer un poids','Étudier la chute libre'],
+   exemple:'$m = 70$ kg $\\implies P \\approx 687$ N',
+   erreurs:['Poids ≠ masse','$g$ varie selon l\'altitude']},
+
+  {id:'p3',subj:'physique',theme:'Mécanique',name:'Énergie cinétique',
+   formula:'E_c = \\frac{1}{2} m v^2',
+   units:'E_c en J, m en kg, v en m/s',note:'',
+   explication:'L\'énergie cinétique est liée au mouvement.',
+   usage:['Calculer une énergie'],
+   exemple:'$m = 2$ kg, $v = 5$ m/s $\\implies E_c = 25$ J',
+   erreurs:['$v$ doit être en m/s','$E_c$ dépend du carré de $v$']},
+
+  {id:'p4',subj:'physique',theme:'Mécanique',name:'Énergie potentielle de pesanteur',
+   formula:'E_{pp} = m g h',
+   units:'E_pp en J, h en m',note:'',
+   explication:'L\'énergie potentielle dépend de l\'altitude.',
+   usage:['Calculer une énergie potentielle'],
+   exemple:'$m = 2$ kg, $h = 5$ m $\\implies E_{pp} = 100$ J',
+   erreurs:['L\'origine de l\'altitude est arbitraire']},
+
+  {id:'p5',subj:'physique',theme:'Mécanique',name:'Énergie potentielle élastique',
+   formula:'E_{pe} = \\frac{1}{2} k x^2',
+   units:'k en N/m, x en m',note:'',
+   explication:'Un ressort comprimé ou étiré stocke de l\'énergie.',
+   usage:['Étudier un système ressort-masse'],
+   exemple:'$k = 200$ N/m, $x = 0{,}1$ m $\\implies E_{pe} = 1$ J',
+   erreurs:['$x$ est l\'allongement']},
+
+  {id:'p6',subj:'physique',theme:'Mécanique',name:'Travail d\'une force',
+   formula:'W = \\vec{F} \\cdot \\overrightarrow{AB} = F \\cdot AB \\cdot \\cos\\alpha',
+   units:'W en J',note:'$W > 0$ : moteur, $W < 0$ : résistant.',
+   explication:'Le travail mesure l\'énergie transférée par une force.',
+   usage:['Calculer un travail'],
+   exemple:'$F = 10$ N, $AB = 5$ m, $\\alpha = 60° \\implies W = 25$ J',
+   erreurs:['Force perpendiculaire $\\implies W = 0$']},
+
+  {id:'p6b',subj:'physique',theme:'Mécanique',name:'Puissance d\'une force',
+   formula:'P = \\frac{W}{\\Delta t} = \\vec{F} \\cdot \\vec{v}',
+   units:'P en W (watt)',note:'',
+   explication:'La puissance est le travail par unité de temps.',
+   usage:['Calculer une puissance','Étudier un moteur'],
+   exemple:'$W = 100$ J en 5 s $\\implies P = 20$ W',
+   erreurs:['Ne pas confondre avec l\'énergie']},
+
+  {id:'p7',subj:'physique',theme:'Mécanique',name:'Théorème de l\'énergie cinétique',
+   formula:'\\Delta E_c = E_c(B) - E_c(A) = \\sum W(\\vec{F})',
+   note:'',
+   explication:'La variation d\'énergie cinétique est égale à la somme des travaux.',
+   usage:['Calculer une vitesse finale'],
+   exemple:'Chute libre de $h = 5$ m $\\implies v = 10$ m/s',
+   erreurs:['Prendre en compte TOUTES les forces']},
+
+  {id:'p8',subj:'physique',theme:'Mécanique',name:'Énergie mécanique',
+   formula:'E_m = E_c + E_{pp} + E_{pe}',
+   units:'E_m en J',note:'Se conserve si forces conservatives uniquement.',
+   explication:'Somme des énergies cinétique et potentielles.',
+   usage:['Étudier la conservation'],
+   exemple:'Chute libre : $\\frac{1}{2}mv^2 = mgh$',
+   erreurs:['Ne se conserve PAS avec frottements']},
+
+  {id:'p9',subj:'physique',theme:'Mécanique',name:'Première loi de Newton (inertie)',
+   formula:'\\sum \\vec{F} = \\vec{0} \\implies \\vec{v} = \\text{constante}',
+   note:'Mouvement rectiligne uniforme.',
+   explication:'Un corps isolé conserve son vecteur vitesse.',
+   usage:['Analyser un équilibre'],
+   exemple:'Palet sur glace sans frottement',
+   erreurs:['Ne s\'applique que si $\\sum F = 0$']},
+
+  {id:'p10',subj:'physique',theme:'Mécanique',name:'Troisième loi de Newton',
+   formula:'\\vec{F}_{A \\to B} = -\\vec{F}_{B \\to A}',
+   note:'Action-réaction.',
+   explication:'Si A exerce une force sur B, B exerce sur A une force opposée.',
+   usage:['Analyser un système'],
+   exemple:'Fusée : gaz éjectés, fusée propulsée',
+   erreurs:['Les forces s\'appliquent sur des objets différents']},
+
+  {id:'p11',subj:'physique',theme:'Mécanique',name:'Chute libre',
+   formula:'v = gt \\\\ h = \\frac{1}{2}gt^2 \\\\ v^2 = 2gh',
+   units:'sans frottement, g ≈ 9,81 m/s²',note:'',
+   explication:'La chute libre est un mouvement uniformément accéléré.',
+   usage:['Étudier la chute d\'un objet'],
+   exemple:'Chute de 20 m : $v = 20$ m/s',
+   erreurs:['Négliger les frottements est une approximation']},
+
+  {id:'p11b',subj:'physique',theme:'Mécanique',name:'Vecteur vitesse',
+   formula:'\\vec{v}(t) = \\frac{d\\overrightarrow{OM}}{dt}',
+   units:'v en m/s',note:'',
+   explication:'Le vecteur vitesse est la dérivée du vecteur position.',
+   usage:['Calculer une vitesse instantanée'],
+   exemple:'$x(t) = t^2 \\implies v(t) = 2t$',
+   erreurs:['C\'est une dérivée VECTORIELLE']},
+
+  {id:'p11c',subj:'physique',theme:'Mécanique',name:'Vecteur accélération',
+   formula:'\\vec{a}(t) = \\frac{d\\vec{v}}{dt} = \\frac{d^2\\overrightarrow{OM}}{dt^2}',
+   units:'a en m/s²',note:'',
+   explication:'L\'accélération est la dérivée du vecteur vitesse.',
+   usage:['Calculer une accélération'],
+   exemple:'$v(t) = 3t \\implies a(t) = 3$ m/s²',
+   erreurs:['Dérivée du vecteur, pas de la norme']},
+
+  {id:'p11d',subj:'physique',theme:'Mécanique',name:'Mouvement circulaire uniforme',
+   formula:'a = \\frac{v^2}{R} = \\omega^2 R',
+   units:'a en m/s², v en m/s, R en m',note:'',
+   explication:'Dans un mouvement circulaire uniforme, l\'accélération est centripète.',
+   usage:['Étudier un mouvement circulaire'],
+   exemple:'$v = 10$ m/s, $R = 5$ m $\\implies a = 20$ m/s²',
+   erreurs:['L\'accélération pointe vers le centre']},
+
+  {id:'p11e',subj:'physique',theme:'Mécanique',name:'Moment d\'une force',
+   formula:'M_{\\vec{F}/O} = \\overrightarrow{OM} \\wedge \\vec{F}',
+   units:'M en N·m',note:'',
+   explication:'Le moment d\'une force mesure sa capacité à faire tourner.',
+   usage:['Étudier un équilibre de rotation'],
+   exemple:'$F = 10$ N à 0,5 m $\\implies M = 5$ N·m',
+   erreurs:['C\'est un produit VECTORIEL']},
+
+  {id:'p11f',subj:'physique',theme:'Mécanique',name:'Théorème du moment cinétique',
+   formula:'\\frac{d\\vec{L}_O}{dt} = \\sum \\vec{M}_{\\vec{F}/O}',
+   units:'L en kg·m²/s',note:'',
+   explication:'La variation du moment cinétique est égale à la somme des moments.',
+   usage:['Étudier une rotation'],
+   exemple:'Patin qui ramène les bras : $L$ constant',
+   erreurs:['Le moment est calculé par rapport à un point fixe']},
+
+  // Électricité
+  {id:'p12',subj:'physique',theme:'Électricité',name:'Loi d\'Ohm',
+   formula:'U = RI',
+   units:'U en V, R en Ω, I en A',note:'',
+   explication:'La tension aux bornes d\'une résistance est proportionnelle au courant.',
+   usage:['Calculer une tension','Étudier un circuit'],
+   exemple:'$R = 100$ Ω, $I = 0{,}5$ A $\\implies U = 50$ V',
+   erreurs:['Valable uniquement pour une résistance']},
+
+  {id:'p13',subj:'physique',theme:'Électricité',name:'Puissance électrique',
+   formula:'P = UI = RI^2 = \\frac{U^2}{R}',
+   units:'P en W',note:'',
+   explication:'La puissance électrique dissipée par une résistance.',
+   usage:['Calculer une puissance'],
+   exemple:'$U = 220$ V, $I = 0{,}5$ A $\\implies P = 110$ W',
+   erreurs:['Attention aux unités']},
+
+  {id:'p14',subj:'physique',theme:'Électricité',name:'Courant alternatif sinusoïdal',
+   formula:'u(t) = U_{\\max} \\sin(\\omega t + \\varphi) \\\\ U_{eff} = \\frac{U_{\\max}}{\\sqrt{2}}',
+   units:'U en V, ω en rad/s',note:'',
+   explication:'Un courant alternatif varie de façon sinusoïdale.',
+   usage:['Étudier un circuit AC'],
+   exemple:'$U_{\\max} = 311$ V $\\implies U_{eff} \\approx 220$ V',
+   erreurs:['La tension efficace est $U_{\\max}/\\sqrt{2}$']},
+
+  {id:'p15',subj:'physique',theme:'Électricité',name:'Condensateur — Charge',
+   formula:'q = CU \\\\ i = C \\frac{du}{dt}',
+   units:'q en C, C en F, U en V',note:'',
+   explication:'Un condensateur stocke de la charge électrique.',
+   usage:['Étudier un circuit RC'],
+   exemple:'$C = 1$ µF, $U = 10$ V $\\implies q = 10$ µC',
+   erreurs:['Le courant est la dérivée de la charge']},
+
+  {id:'p16',subj:'physique',theme:'Électricité',name:'Énergie d\'un condensateur',
+   formula:'E = \\frac{1}{2} C U^2 = \\frac{1}{2} \\frac{q^2}{C}',
+   units:'E en J',note:'',
+   explication:'L\'énergie stockée dans un condensateur.',
+   usage:['Calculer une énergie stockée'],
+   exemple:'$C = 1$ µF, $U = 10$ V $\\implies E = 50$ µJ',
+   erreurs:['Ne pas oublier le $\\frac{1}{2}$']},
+
+  {id:'p17',subj:'physique',theme:'Électricité',name:'Bobine — Auto-induction',
+   formula:'u = L \\frac{di}{dt}',
+   units:'L en H (henry)',note:'',
+   explication:'Une bobine s\'oppose aux variations du courant.',
+   usage:['Étudier un circuit RL'],
+   exemple:'$L = 0{,}1$ H, $di/dt = 10$ A/s $\\implies u = 1$ V',
+   erreurs:['Le courant est continu pour avoir $u = 0$']},
+
+  {id:'p18',subj:'physique',theme:'Électricité',name:'Énergie d\'une bobine',
+   formula:'E = \\frac{1}{2} L i^2',
+   units:'E en J',note:'',
+   explication:'L\'énergie stockée dans une bobine.',
+   usage:['Calculer une énergie stockée'],
+   exemple:'$L = 0{,}1$ H, $i = 2$ A $\\implies E = 0{,}2$ J',
+   erreurs:['Ne pas oublier le $\\frac{1}{2}$']},
+
+  {id:'p19',subj:'physique',theme:'Électricité',name:'Circuit RLC — Pulsation propre',
+   formula:'\\omega_0 = \\frac{1}{\\sqrt{LC}} \\\\ T_0 = 2\\pi\\sqrt{LC}',
+   units:'ω₀ en rad/s, T₀ en s',note:'',
+   explication:'La pulsation propre d\'un circuit LC (libre).',
+   usage:['Étudier les oscillations libres'],
+   exemple:'$L = 0{,}1$ H, $C = 1$ µF $\\implies \\omega_0 \\approx 3162$ rad/s',
+   erreurs:['Valable pour un circuit LC idéal']},
+
+  {id:'p20',subj:'physique',theme:'Électricité',name:'Impédance d\'un circuit RLC',
+   formula:'Z = \\sqrt{R^2 + \\left(L\\omega - \\frac{1}{C\\omega}\\right)^2}',
+   units:'Z en Ω',note:'',
+   explication:'L\'impédance généralise la résistance en AC.',
+   usage:['Étudier un circuit RLC en régime forcé'],
+   exemple:'À la résonance ($L\\omega = 1/C\\omega$) : $Z = R$',
+   erreurs:['L\'impédance dépend de la fréquence']},
+
+  {id:'p21',subj:'physique',theme:'Électricité',name:'Résonance d\'intensité',
+   formula:'L\\omega = \\frac{1}{C\\omega} \\iff \\omega_0 = \\frac{1}{\\sqrt{LC}}',
+   note:'À la résonance, Z est minimale.',
+   explication:'À la résonance, le courant est maximal.',
+   usage:['Accorder un circuit'],
+   exemple:'À la résonance, $I_{\\max} = U/R$',
+   erreurs:['La résonance dépend de $\\omega$']},
+
+  // Ondes
+  {id:'p22',subj:'physique',theme:'Ondes',name:'Vitesse de propagation',
+   formula:'v = \\lambda f = \\frac{\\lambda}{T}',
+   units:'v en m/s, λ en m, f en Hz',note:'',
+   explication:'La vitesse d\'une onde est le produit de sa longueur d\'onde par sa fréquence.',
+   usage:['Calculer une vitesse','Étudier une onde'],
+   exemple:'$\\lambda = 2$ m, $f = 50$ Hz $\\implies v = 100$ m/s',
+   erreurs:['λ et f sont liés par la vitesse']},
+
+  {id:'p23',subj:'physique',theme:'Ondes',name:'Superposition d\'ondes',
+   formula:'y = y_1 + y_2',
+   note:'Principe de superposition.',
+   explication:'Deux ondes qui se croisent s\'additionnent.',
+   usage:['Étudier des interférences'],
+   exemple:'Deux ondes en phase $\\implies$ amplitude doublée',
+   erreurs:['Principe valable en milieu linéaire']},
+
+  {id:'p24',subj:'physique',theme:'Ondes',name:'Interférences constructives/destructives',
+   formula:'\\text{Constructives : } \\delta = k\\lambda \\\\ \\text{Destructives : } \\delta = \\left(k + \\frac{1}{2}\\right)\\lambda',
+   units:'δ = différence de marche',note:'',
+   explication:'Les interférences dépendent de la différence de marche.',
+   usage:['Étudier des franges'],
+   exemple:'$\\delta = \\lambda \\implies$ interférence constructive',
+   erreurs:['$\\delta$ est la différence de chemin optique']},
+
+  {id:'p25',subj:'physique',theme:'Ondes',name:'Diffraction',
+   formula:'\\theta \\approx \\frac{\\lambda}{a}',
+   units:'θ en rad, λ en m, a en m',note:'',
+   explication:'L\'angle de diffraction dépend de la longueur d\'onde et de la taille de l\'ouverture.',
+   usage:['Étudier la diffraction'],
+   exemple:'$\\lambda = 500$ nm, $a = 0{,}1$ mm $\\implies \\theta = 5 \\times 10^{-3}$ rad',
+   erreurs:['Valable pour $a \\gg \\lambda$']},
+
+  // Optique
+  {id:'p26',subj:'physique',theme:'Optique',name:'Loi de Snell-Descartes',
+   formula:'n_1 \\sin i_1 = n_2 \\sin i_2',
+   units:'n = indice de réfraction',note:'',
+   explication:'La réfraction suit la loi de Snell-Descartes.',
+   usage:['Calculer un angle de réfraction'],
+   exemple:'$n_1 = 1$, $i_1 = 30°$, $n_2 = 1{,}5 \\implies i_2 \\approx 19{,}5°$',
+   erreurs:['Les angles sont mesurés par rapport à la normale']},
+
+  {id:'p27',subj:'physique',theme:'Optique',name:'Lentille mince convergente',
+   formula:'\\frac{1}{\\overline{OA\'}} - \\frac{1}{\\overline{OA}} = \\frac{1}{f\'}',
+   units:'$f\'$ = distance focale',note:'Formule de conjugaison.',
+   explication:'Relation entre la position de l\'objet et de l\'image.',
+   usage:['Calculer une position d\'image'],
+   exemple:'$OA = -30$ cm, $f\' = 10$ cm $\\implies OA\' = 15$ cm',
+   erreurs:['Attention aux conventions de signe']},
+
+  {id:'p28',subj:'physique',theme:'Optique',name:'Grandissement',
+   formula:'\\gamma = \\frac{\\overline{A\'B\'}}{\\overline{AB}} = \\frac{\\overline{OA\'}}{\\overline{OA}}',
+   note:'',
+   explication:'Le grandissement mesure le rapport des tailles.',
+   usage:['Calculer la taille d\'une image'],
+   exemple:'$\\gamma = 2$ : image 2× plus grande',
+   erreurs:['$\\gamma < 0$ : image renversée']},
+
+  {id:'p29',subj:'physique',theme:'Optique',name:'Vergence d\'une lentille',
+   formula:'V = \\frac{1}{f\'}',
+   units:'V en dioptries (δ)',note:'',
+   explication:'La vergence mesure la puissance d\'une lentille.',
+   usage:['Calculer une vergence'],
+   exemple:'$f\' = 50$ cm $\\implies V = 2$ δ',
+   erreurs:['$f\'$ en mètres']},
+
+  {id:'p30',subj:'physique',theme:'Optique',name:'Dispersion de la lumière',
+   formula:'n = n(\\lambda)',
+   note:'L\'indice dépend de la longueur d\'onde.',
+   explication:'La lumière blanche se décompose dans un prisme.',
+   usage:['Étudier un prisme'],
+   exemple:'Violet plus dévié que rouge',
+   erreurs:['La dispersion varie selon le milieu']},
+
+  {id:'p31',subj:'physique',theme:'Optique',name:'Longueur d\'onde et fréquence',
+   formula:'\\lambda = \\frac{c}{n f}',
+   units:'c = 3 × 10⁸ m/s',note:'',
+   explication:'La longueur d\'onde dépend du milieu.',
+   usage:['Calculer une longueur d\'onde'],
+   exemple:'$f = 5 \\times 10^{14}$ Hz dans le vide : $\\lambda = 600$ nm',
+   erreurs:['Dans un milieu, $v = c/n$']},
+
+  // Physique moderne
+  {id:'p32',subj:'physique',theme:'Physique moderne',name:'Énergie d\'un photon',
+   formula:'E = h\\nu = \\frac{hc}{\\lambda}',
+   units:'h = 6,626 × 10⁻³⁴ J·s',note:'',
+   explication:'L\'énergie d\'un photon dépend de sa fréquence.',
+   usage:['Étudier l\'effet photoélectrique'],
+   exemple:'$\\lambda = 500$ nm $\\implies E \\approx 4 \\times 10^{-19}$ J',
+   erreurs:['h est la constante de Planck']},
+
+  {id:'p33',subj:'physique',theme:'Physique moderne',name:'Effet photoélectrique — Einstein',
+   formula:'E_c = h\\nu - W_0',
+   units:'W₀ = travail d\'extraction',note:'',
+   explication:'L\'énergie cinétique de l\'électron émis dépend de la fréquence.',
+   usage:['Étudier l\'effet photoélectrique'],
+   exemple:'$h\\nu = 5 \\times 10^{-19}$ J, $W_0 = 2 \\times 10^{-19}$ J $\\implies E_c = 3 \\times 10^{-19}$ J',
+   erreurs:['Il faut $h\\nu > W_0$ pour éjecter un électron']},
+
+  {id:'p34',subj:'physique',theme:'Physique moderne',name:'Fréquence seuil',
+   formula:'\\nu_0 = \\frac{W_0}{h}',
+   units:'ν₀ en Hz',note:'',
+   explication:'Fréquence minimale pour l\'effet photoélectrique.',
+   usage:['Calculer un seuil photoélectrique'],
+   exemple:'$W_0 = 3 \\times 10^{-19}$ J $\\implies \\nu_0 \\approx 4{,}5 \\times 10^{14}$ Hz',
+   erreurs:['En dessous, pas d\'effet']},
+
+  {id:'p35',subj:'physique',theme:'Physique moderne',name:'Énergie de liaison du noyau',
+   formula:'E_l = \\Delta m \\cdot c^2',
+   units:'E_l en J, Δm en kg',note:'',
+   explication:'Le défaut de masse se transforme en énergie de liaison.',
+   usage:['Calculer une énergie de liaison'],
+   exemple:'$\\Delta m = 0{,}1$ u $\\implies E_l \\approx 93$ MeV',
+   erreurs:['Utiliser les bonnes unités']},
+
+  {id:'p36',subj:'physique',theme:'Physique moderne',name:'Décroissance radioactive',
+   formula:'N(t) = N_0 e^{-\\lambda t} \\\\ T_{1/2} = \\frac{\\ln 2}{\\lambda}',
+   units:'λ en s⁻¹',note:'',
+   explication:'Le nombre de noyaux radioactifs décroît exponentiellement.',
+   usage:['Datation','Étudier la radioactivité'],
+   exemple:'$\\lambda = 0{,}1$ s⁻¹ $\\implies T_{1/2} \\approx 6{,}93$ s',
+   erreurs:['λ est positif']},
+
+  // ════════════════════════════════════════════════════════════
+  // CHIMIE
+  // ════════════════════════════════════════════════════════════
+  {id:'c1',subj:'chimie',theme:'Cinétique chimique',name:'Vitesse volumique de réaction',
+   formula:'v = \\frac{1}{V} \\frac{dx}{dt}',
+   units:'v en mol·L⁻¹·s⁻¹',note:'',
+   explication:'La vitesse volumique mesure la variation de l\'avancement par unité de temps.',
+   usage:['Étudier la cinétique'],
+   exemple:'$x(t) = 0{,}01t$, $V = 0{,}5$ L $\\implies v = 0{,}02$ mol·L⁻¹·s⁻¹',
+   erreurs:['Ne pas oublier de diviser par $V$']},
+
+  {id:'c2',subj:'chimie',theme:'Cinétique chimique',name:'Temps de demi-réaction',
+   formula:'x(t_{1/2}) = \\frac{x_{\\max}}{2}',
+   units:'t₁/₂ en s',note:'',
+   explication:'Temps pour atteindre la moitié de l\'avancement final.',
+   usage:['Comparer des cinétiques'],
+   exemple:'$x_{\\max} = 0{,}02$ mol $\\implies x(t_{1/2}) = 0{,}01$ mol',
+   erreurs:['$t_{1/2}$ concerne l\'avancement final']},
+
+  {id:'c3',subj:'chimie',theme:'Cinétique chimique',name:'Loi de vitesse (ordre 1)',
+   formula:'v = k[A] \\\\ [A](t) = [A]_0 e^{-kt} \\\\ t_{1/2} = \\frac{\\ln 2}{k}',
+   units:'k en s⁻¹',note:'',
+   explication:'Pour une réaction d\'ordre 1, la vitesse est proportionnelle à la concentration.',
+   usage:['Étudier une réaction d\'ordre 1'],
+   exemple:'$k = 0{,}1$ s⁻¹ $\\implies t_{1/2} \\approx 6{,}93$ s',
+   erreurs:['Ne s\'applique qu\'aux réactions d\'ordre 1']},
+
+  {id:'c4',subj:'chimie',theme:'Cinétique chimique',name:'Facteurs cinétiques',
+   formula:'v \\text{ augmente avec : } T \\uparrow \\text{, } [\\text{réactifs}] \\uparrow \\text{, catalyseur}',
+   note:'Le catalyseur ne modifie pas l\'état final.',
+   explication:'Certains facteurs accélèrent une réaction chimique.',
+   usage:['Comprendre les leviers cinétiques'],
+   exemple:'Cuisson des aliments (T°)',
+   erreurs:['Un catalyseur ne modifie PAS l\'état final']},
+
+  {id:'c5',subj:'chimie',theme:'Équilibre chimique',name:'Constante d\'équilibre K',
+   formula:'K = \\prod_i [X_i]^{\\nu_i}',
+   note:'',
+   explication:'La constante d\'équilibre caractérise l\'état d\'équilibre.',
+   usage:['Calculer des concentrations à l\'équilibre'],
+   exemple:'$N_2 + 3H_2 \\rightleftharpoons 2NH_3 \\implies K = \\frac{[NH_3]^2}{[N_2][H_2]^3}$',
+   erreurs:['$K$ ne dépend que de la température']},
+
+  {id:'c6',subj:'chimie',theme:'Équilibre chimique',name:'Quotient de réaction Q',
+   formula:'Q = \\prod_i [X_i]^{\\nu_i}',
+   note:'$Q < K$ : sens direct, $Q > K$ : sens inverse',
+   explication:'Le quotient de réaction a la même forme que $K$.',
+   usage:['Déterminer le sens d\'évolution'],
+   exemple:'Si $Q < K$, la réaction évolue dans le sens direct',
+   erreurs:['Ne pas confondre $Q$ et $K$']},
+
+  {id:'c7',subj:'chimie',theme:'Équilibre chimique',name:'Taux d\'avancement final',
+   formula:'\\tau = \\frac{x_f}{x_{\\max}}',
+   note:'τ = 1 si réaction totale.',
+   explication:'Le taux d\'avancement mesure la proportion de réaction réalisée.',
+   usage:['Caractériser une réaction'],
+   exemple:'$x_f = 0{,}008$, $x_{\\max} = 0{,}01 \\implies \\tau = 0{,}8$',
+   erreurs:['Ne pas confondre $x_f$ et $x_{\\max}$']},
+
+  {id:'c8',subj:'chimie',theme:'Acides et Bases',name:'pH d\'une solution',
+   formula:'pH = -\\log[H_3O^+] \\\\ [H_3O^+] = 10^{-pH}',
+   note:'',
+   explication:'Le pH mesure l\'acidité d\'une solution.',
+   usage:['Calculer un pH'],
+   exemple:'$[H_3O^+] = 10^{-3}$ M $\\implies$ pH = 3',
+   erreurs:['pH < 7 : acide, pH > 7 : basique']},
+
+  {id:'c9',subj:'chimie',theme:'Acides et Bases',name:'Constante d\'acidité Ka',
+   formula:'K_a = \\frac{[H_3O^+][A^-]}{[HA]} \\\\ pK_a = -\\log(K_a)',
+   units:'Couple HA/A⁻',note:'',
+   explication:'Ka caractérise la force d\'un acide.',
+   usage:['Comparer la force des acides'],
+   exemple:'Acide acétique : $K_a = 1{,}8 \\times 10^{-5} \\implies pK_a \\approx 4{,}75$',
+   erreurs:['$K_a$ s\'applique au couple $HA/A^-$']},
+
+  {id:'c10',subj:'chimie',theme:'Acides et Bases',name:'Relation pH / pKa',
+   formula:'pH = pK_a + \\log\\frac{[A^-]}{[HA]}',
+   note:'Équation de Henderson-Hasselbalch.',
+   explication:'Cette relation permet de calculer le pH d\'une solution tampon.',
+   usage:['Calculer un pH','Étudier un tampon'],
+   exemple:'$pK_a = 4{,}75$, $[A^-] = [HA] \\implies$ pH = 4,75',
+   erreurs:['Ne pas oublier le $\\log$']},
+
+  {id:'c11',subj:'chimie',theme:'Acides et Bases',name:'pH d\'un acide fort',
+   formula:'pH = -\\log(C)',
+   units:'C > 10⁻⁶ mol/L',note:'',
+   explication:'Un acide fort est totalement dissocié.',
+   usage:['Calculer rapidement un pH'],
+   exemple:'HCl à 0,01 M $\\implies$ pH = 2',
+   erreurs:['Ne s\'applique qu\'aux acides FORTS']},
+
+  {id:'c12',subj:'chimie',theme:'Acides et Bases',name:'pH d\'une base forte',
+   formula:'pH = 14 + \\log(C)',
+   units:'C > 10⁻⁶ mol/L',note:'',
+   explication:'Une base forte est totalement dissociée.',
+   usage:['Calculer le pH d\'une base forte'],
+   exemple:'NaOH à 0,01 M $\\implies$ pH = 12',
+   erreurs:['Ne s\'applique qu\'aux bases FORTES']},
+
+  {id:'c13',subj:'chimie',theme:'Acides et Bases',name:'pH d\'un acide faible',
+   formula:'pH = \\frac{1}{2}(pK_a - \\log C)',
+   units:'Approximation si C >> [H₃O⁺]',note:'',
+   explication:'Pour un acide faible peu dissocié.',
+   usage:['Calculer le pH d\'un acide faible'],
+   exemple:'CH₃COOH à 0,01 M, $pK_a = 4{,}75 \\implies$ pH ≈ 3,375',
+   erreurs:['Approximation valable si l\'acide est peu dissocié']},
+
+  {id:'c14',subj:'chimie',theme:'Acides et Bases',name:'Produit ionique de l\'eau',
+   formula:'K_e = [H_3O^+][OH^-] = 10^{-14} \\\\ pH + pOH = 14',
+   units:'à 25 °C',note:'',
+   explication:'Le produit ionique de l\'eau est constant à T donnée.',
+   usage:['Relier pH et pOH'],
+   exemple:'pH = 3 $\\implies$ pOH = 11 $\\implies [OH^-] = 10^{-11}$ M',
+   erreurs:['$K_e$ dépend de la température']},
+
+  {id:'c15',subj:'chimie',theme:'Acides et Bases',name:'Domaine de prédominance',
+   formula:'\\text{Si } pH < pK_a : HA \\text{ prédomine} \\\\ \\text{Si } pH > pK_a : A^- \\text{ prédomine}',
+   note:'Très utile pour les diagrammes.',
+   explication:'Cette règle permet de savoir quelle espèce est majoritaire.',
+   usage:['Construire des diagrammes'],
+   exemple:'$pK_a = 4{,}75$, pH = 3 $\\implies$ HA prédomine',
+   erreurs:['À pH = pKa, les deux espèces sont à égalité']},
+
+  {id:'c15b',subj:'chimie',theme:'Acides et Bases',name:'Solution tampon',
+   formula:'pH = pK_a + \\log\\frac{[A^-]}{[HA]} \\\\ \\beta = \\frac{dn_{\\text{base}}}{dpH}',
+   note:'Solution qui résiste aux variations de pH.',
+   explication:'Une solution tampon contient un acide faible et sa base conjuguée.',
+   usage:['Préparer une solution tampon','Milieu biologique'],
+   exemple:'Tampon acétique : pH ≈ pKa = 4,75',
+   erreurs:['Le pouvoir tampon est maximal à pH = pKa']},
+
+  {id:'c16',subj:'chimie',theme:'Oxydoréduction',name:'Équation de Nernst',
+   formula:'E = E° + \\frac{0{,}059}{n} \\log\\frac{[ox]}{[red]}',
+   units:'E en V, T = 25 °C',note:'',
+   explication:'La loi de Nernst donne le potentiel d\'un couple redox.',
+   usage:['Calculer un potentiel'],
+   exemple:'Cu²⁺/Cu : $E = 0{,}34 + \\frac{0{,}059}{2}\\log(0{,}01) = 0{,}281$ V',
+   erreurs:['n est le nombre d\'électrons échangés']},
+
+  {id:'c17',subj:'chimie',theme:'Oxydoréduction',name:'Force électromotrice d\'une pile',
+   formula:'E = E°_{cathode} - E°_{anode}',
+   units:'E en V',note:'$E > 0$ : la pile fonctionne.',
+   explication:'La fem est la différence de potentiel entre cathode et anode.',
+   usage:['Calculer la fem d\'une pile'],
+   exemple:'Pile Daniell : $E = 1{,}10$ V',
+   erreurs:['Bien identifier cathode et anode']},
+
+  {id:'c18',subj:'chimie',theme:'Oxydoréduction',name:'Relation de Nernst (générale)',
+   formula:'E = E° + \\frac{RT}{nF} \\ln\\frac{[ox]}{[red]}',
+   units:'R = 8,314, F = 96 485 C/mol',note:'',
+   explication:'Forme générale de la loi de Nernst.',
+   usage:['Calculer E à T quelconque'],
+   exemple:'À 25 °C, $RT/F = 0{,}0257$ V',
+   erreurs:['T doit être en Kelvin']},
+
+  {id:'c19',subj:'chimie',theme:'Oxydoréduction',name:'Équilibrer une demi-équation',
+   formula:'Ox + ne^- = Red',
+   note:'Conserver : éléments, O (avec H₂O), H (avec H⁺)',
+   explication:'Méthode systématique pour équilibrer une demi-équation redox.',
+   usage:['Équilibrer une réaction redox'],
+   exemple:'MnO₄⁻ + 8H⁺ + 5e⁻ → Mn²⁺ + 4H₂O',
+   erreurs:['Vérifier les charges']},
+
+  {id:'c19b',subj:'chimie',theme:'Oxydoréduction',name:'Dosage d\'oxydoréduction',
+   formula:'C_1 V_1 = C_2 V_2 \\text{ (à l\'équivalence)}',
+   note:'Avec coefficients stœchiométriques.',
+   explication:'À l\'équivalence, les quantités de matière sont stœchiométriques.',
+   usage:['Déterminer une concentration'],
+   exemple:'Dosage KMnO₄ / Fe²⁺',
+   erreurs:['Attention aux coefficients']},
+
+  {id:'c19c',subj:'chimie',theme:'Oxydoréduction',name:'Tableau d\'avancement (redox)',
+   formula:'n(\\text{ox}) = n(\\text{red}) \\text{ à l\'équivalence}',
+   note:'',
+   explication:'On écrit les demi-équations puis on égalise les électrons échangés.',
+   usage:['Résoudre un problème de dosage'],
+   exemple:'$5 \\times n(\\text{MnO}_4^-) = 1 \\times n(\\text{Fe}^{2+})$',
+   erreurs:['Bien équilibrer les électrons']},
+
+  {id:'c20',subj:'chimie',theme:'Radioactivité',name:'Loi de décroissance radioactive',
+   formula:'N(t) = N_0 e^{-\\lambda t}',
+   units:'N en noyaux, λ en s⁻¹',note:'',
+   explication:'Le nombre de noyaux radioactifs diminue de façon exponentielle.',
+   usage:['Calculer un nombre de noyaux'],
+   exemple:'$\\lambda = 0{,}1$ s⁻¹, $N_0 = 1000 \\implies N(10) \\approx 368$',
+   erreurs:['λ est positif']},
+
+  {id:'c21',subj:'chimie',theme:'Radioactivité',name:'Temps de demi-vie',
+   formula:'t_{1/2} = \\frac{\\ln 2}{\\lambda}',
+   units:'t₁/₂ en s',note:'',
+   explication:'Temps pour que la moitié des noyaux se désintègrent.',
+   usage:['Caractériser un radioélément'],
+   exemple:'$\\lambda = 0{,}1$ s⁻¹ $\\implies t_{1/2} \\approx 6{,}93$ s',
+   erreurs:['$t_{1/2}$ ne dépend PAS de $N_0$']},
+
+  {id:'c22',subj:'chimie',theme:'Radioactivité',name:'Activité radioactive',
+   formula:'A = \\lambda N = -\\frac{dN}{dt}',
+   units:'A en Bq',note:'',
+   explication:'L\'activité mesure le nombre de désintégrations par seconde.',
+   usage:['Mesurer la radioactivité'],
+   exemple:'$\\lambda = 0{,}1$ s⁻¹, $N = 1000 \\implies A = 100$ Bq',
+   erreurs:['1 Bq = 1 dés/s']},
+
+  {id:'c23',subj:'chimie',theme:'Radioactivité',name:'Loi de conservation (radioactivité)',
+   formula:'\\alpha : A \\to A - 4, Z \\to Z - 2 \\\\ \\beta^- : A \\to A, Z \\to Z + 1',
+   note:'α = noyau d\'hélium ⁴₂He',
+   explication:'Lors d\'une désintégration, il y a conservation de $A$ et $Z$.',
+   usage:['Écrire une équation de désintégration'],
+   exemple:'²³⁸U → ²³⁴Th + ⁴He',
+   erreurs:['Conservation de $A$ et $Z$']},
+
+  {id:'c24',subj:'chimie',theme:'Solutions aqueuses',name:'Concentration molaire',
+   formula:'C = \\frac{n}{V}',
+   units:'C en mol/L, n en mol, V en L',note:'',
+   explication:'La concentration molaire mesure la quantité de matière dissoute.',
+   usage:['Préparer une solution'],
+   exemple:'$n = 0{,}5$ mol, $V = 2$ L $\\implies C = 0{,}25$ M',
+   erreurs:['V en litres']},
+
+  {id:'c25',subj:'chimie',theme:'Solutions aqueuses',name:'Quantité de matière',
+   formula:'n = \\frac{m}{M}',
+   units:'n en mol, m en g, M en g/mol',note:'',
+   explication:'La quantité de matière se calcule en divisant la masse par la masse molaire.',
+   usage:['Calculer une quantité de matière'],
+   exemple:'$m = 18$ g, $M = 18$ g/mol $\\implies n = 1$ mol',
+   erreurs:['M en g/mol']},
+
+  {id:'c26',subj:'chimie',theme:'Solutions aqueuses',name:'Dilution',
+   formula:'C_1 V_1 = C_2 V_2',
+   note:'La quantité de matière se conserve.',
+   explication:'Lors d\'une dilution, la quantité de matière reste constante.',
+   usage:['Préparer une solution diluée'],
+   exemple:'$C_1 = 1$ M, $V_1 = 10$ mL, $V_2 = 100$ mL $\\implies C_2 = 0{,}1$ M',
+   erreurs:['$V_2 = V_1 + V_{\\text{ajouté}}$']},
+
+  {id:'c27',subj:'chimie',theme:'Solutions aqueuses',name:'Concentration massique',
+   formula:'C_m = \\frac{m}{V} = C \\times M',
+   units:'Cm en g/L',note:'',
+   explication:'La concentration massique mesure la masse de soluté par litre.',
+   usage:['Étiquettes commerciales'],
+   exemple:'$C = 0{,}1$ M, $M = 58{,}5$ g/mol $\\implies C_m = 5{,}85$ g/L',
+   erreurs:['Ne pas confondre avec la concentration molaire']},
+
+  {id:'c28',subj:'chimie',theme:'Solutions aqueuses',name:'Titrage (équivalence)',
+   formula:'C_1 V_1 = C_2 V_2 \\text{ (acide-base)}',
+   note:'Quantités stœchiométriques.',
+   explication:'À l\'équivalence, les réactifs sont dans les proportions stœchiométriques.',
+   usage:['Déterminer une concentration'],
+   exemple:'Titrage HCl par NaOH',
+   erreurs:['Attention aux coefficients']},
+
+  {id:'c29',subj:'chimie',theme:'Solutions aqueuses',name:'Volume molaire des gaz',
+   formula:'V_m = \\frac{V}{n}',
+   units:'Vm = 22,4 L/mol (CNTP)',note:'',
+   explication:'Le volume molaire d\'un gaz parfait est constant dans les CNTP.',
+   usage:['Calculer un volume gazeux'],
+   exemple:'2 mol $\\implies V = 44{,}8$ L',
+   erreurs:['22,4 L/mol à 0°C et 1 atm']},
+
+  {id:'c30',subj:'chimie',theme:'Piles électrochimiques',name:'Quantité d\'électricité',
+   formula:'Q = n(e^-) \\times F',
+   units:'Q en C, F = 96 485 C/mol',note:'',
+   explication:'La quantité d\'électricité est proportionnelle à la quantité d\'électrons.',
+   usage:['Calculer une quantité d\'électricité'],
+   exemple:'2 mol d\'électrons $\\implies Q = 193\\,000$ C',
+   erreurs:['F est la constante de Faraday']},
+
+  {id:'c31',subj:'chimie',theme:'Piles électrochimiques',name:'Capacité d\'une pile',
+   formula:'Q_{\\max} = n_{\\max} \\times F',
+   units:'En Coulombs ou Ah',note:'',
+   explication:'La capacité maximale d\'une pile.',
+   usage:['Comparer des piles'],
+   exemple:'$n_{\\max} = 0{,}1$ mol $\\implies Q_{\\max} = 9650$ C',
+   erreurs:['1 Ah = 3600 C']},
+
+  {id:'c32',subj:'chimie',theme:'Piles électrochimiques',name:'Énergie d\'une pile',
+   formula:'E_{elec} = Q \\times U_{\\text{moyenne}}',
+   units:'E en J ou Wh',note:'',
+   explication:'L\'énergie électrique fournie par une pile.',
+   usage:['Calculer une énergie'],
+   exemple:'$Q = 9650$ C, $U = 1{,}5$ V $\\implies E = 14\\,475$ J',
+   erreurs:['U moyenne, pas nominale']},
+
+  {id:'c33',subj:'chimie',theme:'Chimie organique',name:'Alcool — Groupe fonctionnel',
+   formula:'R-OH',
+   note:'Groupe hydroxyle.',
+   explication:'Un alcool possède un groupe hydroxyle -OH sur un carbone saturé.',
+   usage:['Identifier un alcool','Nommer une molécule'],
+   exemple:'Éthanol : CH₃-CH₂-OH',
+   erreurs:['Alcool primaire, secondaire, tertiaire']},
+
+  {id:'c34',subj:'chimie',theme:'Chimie organique',name:'Oxydation des alcools',
+   formula:'\\text{Alcool primaire} \\to \\text{Aldéhyde} \\to \\text{Acide carboxylique}',
+   note:'',
+   explication:'L\'oxydation ménagée des alcools donne aldéhyde puis acide.',
+   usage:['Prévoir les produits d\'oxydation'],
+   exemple:'Éthanol → Éthanal → Acide acétique',
+   erreurs:['Un alcool tertiaire ne s\'oxyde pas']},
+
+  {id:'c35',subj:'chimie',theme:'Chimie organique',name:'Aldéhyde — Groupe fonctionnel',
+   formula:'R-CHO',
+   note:'Groupe carbonyle en bout de chaîne.',
+   explication:'Un aldéhyde possède un groupe -CHO.',
+   usage:['Identifier un aldéhyde'],
+   exemple:'Éthanal : CH₃-CHO',
+   erreurs:['Réducteur (test de Tollens)']},
+
+  {id:'c36',subj:'chimie',theme:'Chimie organique',name:'Cétone — Groupe fonctionnel',
+   formula:'R-CO-R\'',
+   note:'Groupe carbonyle au milieu de la chaîne.',
+   explication:'Une cétone possède un groupe C=O entre deux carbones.',
+   usage:['Identifier une cétone'],
+   exemple:'Propanone : CH₃-CO-CH₃',
+   erreurs:['Pas de test de Tollens positif']},
+
+  {id:'c37',subj:'chimie',theme:'Chimie organique',name:'Acide carboxylique — Groupe fonctionnel',
+   formula:'R-COOH',
+   note:'Groupe carboxyle.',
+   explication:'Un acide carboxylique possède un groupe -COOH.',
+   usage:['Identifier un acide carboxylique'],
+   exemple:'Acide éthanoïque : CH₃-COOH',
+   erreurs:['Acide faible']},
+
+  {id:'c38',subj:'chimie',theme:'Chimie organique',name:'Estérification',
+   formula:'R-COOH + R\'-OH \\rightleftharpoons R-COO-R\' + H_2O',
+   note:'Réaction lente et limitée.',
+   explication:'Un acide carboxylique réagit avec un alcool pour former un ester.',
+   usage:['Synthétiser un ester'],
+   exemple:'Acide + Éthanol → Ester + Eau',
+   erreurs:['Réaction limitée (rendement < 100%)']},
+
+  {id:'c39',subj:'chimie',theme:'Chimie organique',name:'Hydrolyse d\'un ester',
+   formula:'R-COO-R\' + H_2O \\rightleftharpoons R-COOH + R\'-OH',
+   note:'Réaction inverse de l\'estérification.',
+   explication:'L\'hydrolyse d\'un ester redonne l\'acide et l\'alcool.',
+   usage:['Synthétiser un acide'],
+   exemple:'Ester + Eau → Acide + Alcool',
+   erreurs:['Réaction limitée']},
+
+  {id:'c40',subj:'chimie',theme:'Chimie organique',name:'Saponification',
+   formula:'R-COO-R\' + NaOH \\to R-COO^-Na^+ + R\'-OH',
+   note:'Réaction totale.',
+   explication:'La saponification est l\'hydrolyse basique d\'un ester.',
+   usage:['Fabriquer du savon'],
+   exemple:'Triglycéride + Soude → Savon + Glycérol',
+   erreurs:['Réaction totale (contrairement à l\'hydrolyse)']},
+
+  {id:'c41',subj:'chimie',theme:'Chimie organique',name:'Amine — Groupe fonctionnel',
+   formula:'R-NH_2',
+   note:'Groupe amino.',
+   explication:'Une amine possède un groupe -NH₂.',
+   usage:['Identifier une amine'],
+   exemple:'Méthylamine : CH₃-NH₂',
+   erreurs:['Caractère basique']},
+
+  {id:'c42',subj:'chimie',theme:'Chimie organique',name:'Acide α-aminé',
+   formula:'H_2N-CHR-COOH',
+   note:'Groupe amino + carboxyle sur le même carbone.',
+   explication:'Un acide α-aminé possède les deux groupes sur le carbone α.',
+   usage:['Constituants des protéines'],
+   exemple:'Glycine : H₂N-CH₂-COOH',
+   erreurs:['Amphotère (acide et base)']},
+
+  {id:'c43',subj:'chimie',theme:'Chimie organique',name:'Polymères — Addition',
+   formula:'n CH_2=CH_2 \\to (-CH_2-CH_2-)_n',
+   note:'Polymérisation par addition.',
+   explication:'Un monomère insaturé forme un polymère par addition.',
+   usage:['Fabriquer des plastiques'],
+   exemple:'Éthylène → Polyéthylène',
+   erreurs:['Pas de perte d\'atome']},
+
+  {id:'c44',subj:'chimie',theme:'Chimie organique',name:'Polymères — Condensation',
+   formula:'n H_2N-R-COOH \\to (-HN-R-CO-)_n + n H_2O',
+   note:'Polymérisation par condensation.',
+   explication:'Un monomère bifonctionnel forme un polymère avec élimination d\'eau.',
+   usage:['Fabriquer des polyamides'],
+   exemple:'Acide aminé → Polyamide + Eau',
+   erreurs:['Élimination d\'une petite molécule']},
+
+  // ════════════════════════════════════════════════════════════
+  // SVT
+  // ════════════════════════════════════════════════════════════
+  {id:'s1',subj:'svt',theme:'Génétique',name:'Loi de Hardy-Weinberg',
+   formula:'p^2 + 2pq + q^2 = 1',
+   units:'p + q = 1',note:'À l\'équilibre, fréquences stables.',
+   explication:'Dans une population idéale, les fréquences alléliques restent constantes.',
+   usage:['Calculer des fréquences alléliques','Étudier l\'évolution'],
+   exemple:'$p = 0{,}6$, $q = 0{,}4 \\implies$ AA : 0,36, Aa : 0,48, aa : 0,16',
+   erreurs:['Conditions : pas de mutation, migration, sélection']},
+
+  {id:'s2',subj:'svt',theme:'Génétique',name:'Fréquence allélique',
+   formula:'p = \\frac{2 n_{AA} + n_{Aa}}{2N}',
+   units:'N = population totale',note:'',
+   explication:'La fréquence d\'un allèle se calcule à partir des génotypes.',
+   usage:['Calculer une fréquence allélique'],
+   exemple:'AA=30, Aa=40, aa=30 $\\implies p = \\frac{60+40}{200} = 0{,}5$',
+   erreurs:['Compter 2 allèles par homozygote']},
+
+  {id:'s3',subj:'svt',theme:'Génétique',name:'Croisement monohybride',
+   formula:'F_2 : 3 \\text{ dominants} : 1 \\text{ récessif}',
+   note:'Loi de Mendel.',
+   explication:'Croisement de deux hétérozygotes $Aa \\times Aa$ donne 3:1.',
+   usage:['Analyser un croisement'],
+   exemple:'$Aa \\times Aa \\implies$ 3/4 dominants, 1/4 récessifs',
+   erreurs:['Valable si dominance complète']},
+
+  {id:'s4',subj:'svt',theme:'Génétique',name:'Croisement dihybride',
+   formula:'F_2 : 9:3:3:1',
+   note:'Deux gènes indépendants.',
+   explication:'Croisement de deux dihétérozygotes donne 9:3:3:1.',
+   usage:['Analyser un croisement à deux gènes'],
+   exemple:'$AaBb \\times AaBb \\implies$ 9 AB : 3 Ab : 3 aB : 1 ab',
+   erreurs:['Les gènes doivent être indépendants']},
+
+  {id:'s5',subj:'svt',theme:'Immunologie',name:'Réponse immunitaire',
+   formula:'\\text{Antigène} \\to \\text{Lymphocyte B} \\to \\text{Plasmocyte} \\to \\text{Anticorps}',
+   note:'Réponse humorale.',
+   explication:'L\'activation des lymphocytes B produit des anticorps.',
+   usage:['Comprendre la défense immunitaire'],
+   exemple:'Vaccination : production d\'anticorps mémoire',
+   erreurs:['Deux types : humorale et cellulaire']},
+
+  {id:'s6',subj:'svt',theme:'Immunologie',name:'Complexe immun',
+   formula:'\\text{Antigène} + \\text{Anticorps} \\to \\text{Complexe immun}',
+   note:'',
+   explication:'Les anticorps se lient aux antigènes pour former un complexe.',
+   usage:['Comprendre la neutralisation'],
+   exemple:'Test de grossesse (anticorps + hormone)',
+   erreurs:['Spécificité anticorps/antigène']},
+
+  {id:'s7',subj:'svt',theme:'Immunologie',name:'Mémoire immunitaire',
+   formula:'\\text{1er contact} \\to \\text{2e contact} = \\text{réponse plus rapide}',
+   note:'',
+   explication:'La mémoire immunitaire permet une réponse plus rapide au 2e contact.',
+   usage:['Comprendre la vaccination'],
+   exemple:'Rappel vaccinal : production rapide d\'anticorps',
+   erreurs:['Mémoire due aux lymphocytes mémoire']},
+
+  {id:'s8',subj:'svt',theme:'Géologie',name:'Tectonique des plaques',
+   formula:'\\text{Plaques} \\to \\text{mouvements} \\to \\text{séismes, volcans}',
+   note:'',
+   explication:'La tectonique des plaques explique les séismes et volcans.',
+   usage:['Comprendre la dynamique terrestre'],
+   exemple:'Faille de San Andreas',
+   erreurs:['Différents types de frontières']},
+
+  {id:'s9',subj:'svt',theme:'Géologie',name:'Expansion océanique',
+   formula:'\\text{Dorsale} \\to \\text{création de croûte océanique}',
+   note:'',
+   explication:'Aux dorsales, il y a création de nouvelle croûte océanique.',
+   usage:['Comprendre la dynamique des océans'],
+   exemple:'Dorsale médio-atlantique',
+   erreurs:['Vitesse d\'expansion faible']},
+
+  {id:'s10',subj:'svt',theme:'Géologie',name:'Subduction',
+   formula:'\\text{Plaque océanique} \\to \\text{plonge sous plaque continentale}',
+   note:'',
+   explication:'La subduction est l\'enfoncement d\'une plaque sous une autre.',
+   usage:['Comprendre les séismes profonds'],
+   exemple:'Fosse du Pacifique',
+   erreurs:['Zone de séismes et volcans']}
+];
+
+// ================================================================
+// ÉTAT
+// ================================================================
+const TABS = [
+  {id:'maths',label:'Maths',icon:'fa-square-root-variable'},
+  {id:'physique',label:'Physique',icon:'fa-bolt'},
+  {id:'chimie',label:'Chimie',icon:'fa-flask'},
+  {id:'svt',label:'SVT',icon:'fa-dna'},
+  {id:'favs',label:'Favoris',icon:'fa-heart'}
+];
+
+const MAX_FAVORITES = 50;
+let activeTab = 'maths';
+let activeTheme = 'all';
+let searchQuery = '';
+let favorites = [];
+let currentUid = null;
+let isSyncing = false;
+let currentFormulaId = null;
+let searchTimer = null;
+
+const tabsEl = document.getElementById('tabs');
+const filtersEl = document.getElementById('filters');
+const contentEl = document.getElementById('content');
+const searchInput = document.getElementById('searchInput');
+const favCountEl = document.getElementById('favCount');
+const modal = document.getElementById('formulaModal');
+const modalContent = document.getElementById('formulaModalContent');
+const toast = document.getElementById('toast');
+const toastMessage = document.querySelector('.toast-message');
+const toastIcon = document.querySelector('.toast-icon i');
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = String(text || '');
+  return div.innerHTML;
+}
+
+function vibrate(ms) {
+  if (navigator.vibrate) { try { navigator.vibrate(ms); } catch (e) {} }
+}
+
+function renderKaTeX(element) {
+  if (typeof renderMathInElement !== 'function') {
+    setTimeout(() => renderKaTeX(element), 200);
+    return;
+  }
+  try {
+    renderMathInElement(element || document.body, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '\\[', right: '\\]', display: true },
+        { left: '$', right: '$', display: false },
+        { left: '\\(', right: '\\)', display: false }
+      ],
+      throwOnError: false,
+      errorColor: '#f87171',
+      strict: false,
+      trust: false
+    });
+  } catch (e) {}
+}
+
+let toastTimer = null;
+function showToast(message, type = 'success') {
+  const icons = {
+    success: 'fas fa-check-circle',
+    info: 'fas fa-info-circle',
+    error: 'fas fa-exclamation-circle',
+    limit: 'fas fa-lock'
+  };
+  toastMessage.textContent = message;
+  toast.className = `toast ${type}`;
+  toastIcon.className = icons[type] || icons.info;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
+}
+
+function renderSkeleton(count = 4) {
+  let html = `<div class="skeleton-category"></div>`;
+  for (let i = 0; i < count; i++) {
+    html += `<div class="skeleton-card">
+      <div class="skeleton-header"><div class="skeleton-line title"></div><div class="skeleton-icon"></div></div>
+      <div class="skeleton-line formula"></div>
+      <div class="skeleton-line meta"></div>
+    </div>`;
+  }
+  contentEl.innerHTML = html;
+}
+
+function getFavKey() {
+  return currentUid ? `arvexa_fav_formulas_${currentUid}` : 'arvexa_fav_formulas_guest';
+}
+
+function loadFavoritesFromLocal() {
+  try { return JSON.parse(localStorage.getItem(getFavKey()) || '[]'); }
+  catch (e) { return []; }
+}
+
+function saveFavoritesToLocal() {
+  try { localStorage.setItem(getFavKey(), JSON.stringify(favorites)); } catch (e) {}
+}
+
+async function loadFavoritesFromFirestore(uid) {
+  try {
+    const favRef = doc(db, 'users', uid, 'favorites', 'formulas');
+    const snap = await getDoc(favRef);
+    if (snap.exists()) {
+      const data = snap.data();
+      if (Array.isArray(data.ids)) return data.ids;
+    }
+  } catch (e) {}
+  return null;
+}
+
+async function saveFavoritesToFirestore(uid) {
+  if (!uid) return;
+  try {
+    const favRef = doc(db, 'users', uid, 'favorites', 'formulas');
+    await setDoc(favRef, { ids: favorites, updatedAt: serverTimestamp() }, { merge: true });
+  } catch (e) {}
+}
+
+function renderTabs() {
+  tabsEl.innerHTML = TABS.map(t => {
+    const isActive = t.id === activeTab;
+    const favCount = t.id === 'favs' ? favorites.length : 0;
+    const badge = favCount > 0 ? `<span style="font-size:9px;opacity:.7;margin-left:2px">${favCount}</span>` : '';
+    return `<button class="tab-btn ${isActive ? 'active' : ''}" data-tab="${t.id}">
+      <i class="fas ${t.icon}"></i> ${t.label}${badge}
+    </button>`;
+  }).join('');
+
+  tabsEl.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const newTab = btn.dataset.tab;
+      if (newTab === activeTab) return;
+      activeTab = newTab;
+      activeTheme = 'all';
+      searchQuery = '';
+      searchInput.value = '';
+      vibrate(8);
+      renderTabs();
+      renderFilters();
+      renderSkeleton(3);
+      setTimeout(() => renderContent(), 150);
+    });
+  });
+}
+
+function getThemes(subj) {
+  const themes = [...new Set(FORMULAS.filter(f => f.subj === subj).map(f => f.theme))];
+  return ['all', ...themes];
+}
+
+function renderFilters() {
+  if (activeTab === 'favs' || searchQuery) {
+    filtersEl.innerHTML = '';
+    return;
+  }
+  const themes = getThemes(activeTab);
+  const labels = { all: 'Tout' };
+  filtersEl.innerHTML = themes.map(t =>
+    `<button class="filter-btn ${t === activeTheme ? 'active' : ''}" data-theme="${t}">${labels[t] || escapeHtml(t)}</button>`
+  ).join('');
+
+  filtersEl.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeTheme = btn.dataset.theme;
+      vibrate(6);
+      renderFilters();
+      renderContent();
+    });
+  });
+}
+
+function getFiltered() {
+  let list = FORMULAS;
+
+  if (activeTab === 'favs') {
+    list = list.filter(f => favorites.includes(f.id));
+  } else {
+    list = list.filter(f => f.subj === activeTab);
+  }
+
+  if (activeTheme !== 'all' && activeTab !== 'favs') {
+    list = list.filter(f => f.theme === activeTheme);
+  }
+
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    list = list.filter(f =>
+      (f.name || '').toLowerCase().includes(q) ||
+      (f.formula || '').toLowerCase().includes(q) ||
+      (f.theme || '').toLowerCase().includes(q) ||
+      (f.note && f.note.toLowerCase().includes(q)) ||
+      (f.units && f.units.toLowerCase().includes(q)) ||
+      (f.explication && f.explication.toLowerCase().includes(q))
+    );
+  }
+
+  return list;
+}
+
+function renderContent() {
+  const list = getFiltered();
+
+  if (!list.length) {
+    const isFavs = activeTab === 'favs';
+    contentEl.innerHTML = `
+      <div class="empty-state">
+        <i class="fas fa-${isFavs ? 'heart' : 'search'}"></i>
+        <h4>${isFavs ? 'Aucun favori' : 'Aucun résultat'}</h4>
+        <p>${isFavs ? 'Appuie sur le cœur pour sauvegarder une formule.' : 'Essaye un autre terme de recherche.'}</p>
+      </div>
+    `;
+    return;
+  }
+
+  const groups = {};
+  list.forEach(f => { (groups[f.theme] = groups[f.theme] || []).push(f); });
+
+  let html = '';
+  Object.entries(groups).forEach(([theme, items]) => {
+    html += `<div class="category-label">${escapeHtml(theme)} <span class="cat-count">${items.length} formule${items.length > 1 ? 's' : ''}</span></div>`;
+    items.forEach(f => {
+      const isFav = favorites.includes(f.id);
+      const hasExplanation = f.explication || f.exemple || (f.usage && f.usage.length);
+      html += `
+        <div class="f-card" data-id="${f.id}">
+          <div class="f-card-header">
+            <div class="f-card-title" data-action="open">${escapeHtml(f.name)}</div>
+            <div class="f-card-actions">
+              <button class="icon-action copy" data-action="copy" title="Copier"><i class="fas fa-copy"></i></button>
+              <button class="icon-action fav ${isFav ? 'active' : ''}" data-action="fav" title="Favori">
+                <i class="fa${isFav ? 's' : 'r'} fa-heart"></i>
+              </button>
+            </div>
+          </div>
+          <div class="f-card-formula" data-action="open">$$${f.formula}$$</div>
+          <div class="f-card-meta">
+            ${f.units ? `<span class="f-tag units"><i class="fas fa-ruler" style="margin-right:4px;font-size:9px"></i>${escapeHtml(f.units)}</span>` : ''}
+            ${f.condition ? `<span class="f-tag condition"><i class="fas fa-info-circle" style="margin-right:4px;font-size:9px"></i>${escapeHtml(f.condition)}</span>` : ''}
+          </div>
+          ${f.note ? `<div class="f-card-note"><i class="fas fa-lightbulb" style="margin-right:4px;color:var(--accent);font-size:10px"></i>${escapeHtml(f.note)}</div>` : ''}
+          ${hasExplanation ? `<div class="f-card-more" data-action="open"><i class="fas fa-graduation-cap"></i> Voir l'explication complète</div>` : ''}
+        </div>
+      `;
+    });
+  });
+
+  contentEl.innerHTML = html;
+  contentEl.classList.remove('content-fade-in');
+  void contentEl.offsetWidth;
+  contentEl.classList.add('content-fade-in');
+
+  renderKaTeX(contentEl);
+
+  contentEl.querySelectorAll('.f-card').forEach(card => {
+    const id = card.dataset.id;
+    card.querySelectorAll('[data-action]').forEach(el => {
+      el.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const action = el.dataset.action;
+        if (action === 'open') openFormulaModal(id);
+        else if (action === 'copy') copyFormula(id);
+        else if (action === 'fav') toggleFavorite(id, el);
+      });
+    });
+  });
+}
+
+function toggleFavorite(id, btnEl) {
+  const idx = favorites.indexOf(id);
+  if (idx === -1) {
+    if (favorites.length >= MAX_FAVORITES) {
+      showToast(`Limite de ${MAX_FAVORITES} favoris atteinte`, 'limit');
+      vibrate([20, 40, 20]);
+      return;
+    }
+    favorites.push(id);
+    if (btnEl) {
+      btnEl.classList.add('active', 'pop');
+      btnEl.querySelector('i').className = 'fas fa-heart';
+      setTimeout(() => btnEl.classList.remove('pop'), 400);
+    }
+    showToast('Ajouté aux favoris', 'success');
+  } else {
+    favorites.splice(idx, 1);
+    if (btnEl) {
+      btnEl.classList.remove('active');
+      btnEl.querySelector('i').className = 'far fa-heart';
+    }
+    showToast('Retiré des favoris', 'info');
+  }
+  vibrate(10);
+  saveFavoritesToLocal();
+  updateFavCount();
+  if (currentUid) saveFavoritesToFirestore(currentUid);
+  if (activeTab === 'favs') renderContent();
+  renderTabs();
+}
+
+function updateFavCount() {
+  favCountEl.textContent = favorites.length;
+  favCountEl.classList.toggle('visible', favorites.length > 0);
+}
+
+function openFormulaModal(id) {
+  const f = FORMULAS.find(x => x.id === id);
+  if (!f) return;
+  currentFormulaId = id;
+  const isFav = favorites.includes(f.id);
+
+  const sameSubject = FORMULAS.filter(x => x.subj === f.subj);
+  const currentIdx = sameSubject.findIndex(x => x.id === f.id);
+  const prevId = currentIdx > 0 ? sameSubject[currentIdx - 1].id : null;
+  const nextId = currentIdx < sameSubject.length - 1 ? sameSubject[currentIdx + 1].id : null;
+
+  let explanationHTML = '';
+  if (f.explication) {
+    explanationHTML = `<div class="modal-section">
+      <div class="modal-section-title"><i class="fas fa-book-open"></i> Explication</div>
+      <div class="modal-explanation">${escapeHtml(f.explication)}</div>
+    </div>`;
+  }
+
+  let usageHTML = '';
+  if (f.usage && f.usage.length > 0) {
+    usageHTML = `<div class="modal-section">
+      <div class="modal-section-title"><i class="fas fa-tasks"></i> Quand l'utiliser ?</div>
+      <div class="modal-use-cases">
+        ${f.usage.map(u => `<div class="modal-use-case"><i class="fas fa-check-circle"></i><span>${escapeHtml(u)}</span></div>`).join('')}
+      </div>
+    </div>`;
+  }
+
+  let exampleHTML = '';
+  if (f.exemple) {
+    exampleHTML = `<div class="modal-section">
+      <div class="modal-section-title"><i class="fas fa-lightbulb"></i> Exemple concret</div>
+      <div class="modal-example">
+        <div class="modal-example-title"><i class="fas fa-pencil-alt"></i> Application</div>
+        <div class="modal-example-content">${escapeHtml(f.exemple).replace(/\n/g, '<br>')}</div>
+      </div>
+    </div>`;
+  }
+
+  let errorsHTML = '';
+  if (f.erreurs && f.erreurs.length > 0) {
+    errorsHTML = `<div class="modal-section">
+      <div class="modal-section-title"><i class="fas fa-exclamation-triangle"></i> Erreurs fréquentes</div>
+      <div class="modal-warning">
+        <i class="fas fa-exclamation-triangle"></i>
+        <div class="modal-warning-content"><ul>
+          ${f.erreurs.map(err => `<li>• ${escapeHtml(err)}</li>`).join('')}
+        </ul></div>
+      </div>
+    </div>`;
+  }
+
+  modalContent.innerHTML = `
+    <div class="modal-handle"></div>
+    <button class="modal-close" id="modalCloseBtn"><i class="fas fa-xmark"></i></button>
+    <div class="modal-category">${escapeHtml(f.theme)}</div>
+    <div class="modal-title">${escapeHtml(f.name)}</div>
+    <div class="modal-formula-box">$$${f.formula}$$</div>
+    <div class="modal-meta">
+      ${f.units ? `<span class="f-tag units"><i class="fas fa-ruler" style="margin-right:5px;font-size:10px"></i>${escapeHtml(f.units)}</span>` : ''}
+      ${f.condition ? `<span class="f-tag condition"><i class="fas fa-info-circle" style="margin-right:5px;font-size:10px"></i>${escapeHtml(f.condition)}</span>` : ''}
+    </div>
+    ${f.note ? `<div class="modal-note"><i class="fas fa-lightbulb"></i>${escapeHtml(f.note)}</div>` : ''}
+    ${explanationHTML}
+    ${usageHTML}
+    ${exampleHTML}
+    ${errorsHTML}
+    <div class="modal-actions">
+      <button class="modal-btn primary" id="modalCopyBtn"><i class="fas fa-copy"></i> Copier</button>
+      <button class="modal-btn secondary ${isFav ? 'fav-active' : ''}" id="modalFavBtn">
+        <i class="fa${isFav ? 's' : 'r'} fa-heart"></i> ${isFav ? 'Retirer' : 'Favori'}
+      </button>
+    </div>
+    <div class="modal-nav">
+      <button class="modal-nav-btn" id="modalPrevBtn" ${!prevId ? 'disabled' : ''}>
+        <i class="fas fa-chevron-left"></i> Précédent
+      </button>
+      <span class="modal-nav-position">${currentIdx + 1} / ${sameSubject.length}</span>
+      <button class="modal-nav-btn" id="modalNextBtn" ${!nextId ? 'disabled' : ''}>
+        Suivant <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
+  `;
+
+  modal.classList.add('show');
+  document.body.style.overflow = 'hidden';
+  renderKaTeX(modalContent);
+
+  document.getElementById('modalCloseBtn').addEventListener('click', closeFormulaModal);
+  document.getElementById('modalCopyBtn').addEventListener('click', () => copyFormula(f.id));
+  document.getElementById('modalFavBtn').addEventListener('click', () => {
+    toggleFavorite(f.id, null);
+    closeFormulaModal();
+    setTimeout(() => openFormulaModal(f.id), 150);
+  });
+  document.getElementById('modalPrevBtn').addEventListener('click', () => {
+    if (prevId) { closeFormulaModal(); setTimeout(() => openFormulaModal(prevId), 100); }
+  });
+  document.getElementById('modalNextBtn').addEventListener('click', () => {
+    if (nextId) { closeFormulaModal(); setTimeout(() => openFormulaModal(nextId), 100); }
+  });
+
+  setupModalSwipe(modalContent);
+  modalContent.scrollTop = 0;
+  vibrate(10);
+}
+
+function setupModalSwipe(sheet) {
+  let startY = 0, currentY = 0, isDragging = false;
+  sheet.addEventListener('touchstart', (e) => {
+    const rect = sheet.getBoundingClientRect();
+    const touchY = e.touches[0].clientY;
+    if (touchY - rect.top < 80) {
+      startY = touchY;
+      currentY = touchY;
+      isDragging = true;
+      sheet.style.transition = 'none';
+    }
+  }, { passive: true });
+  sheet.addEventListener('touchmove', (e) => {
+    if (!isDragging) return;
+    currentY = e.touches[0].clientY;
+    const diff = currentY - startY;
+    if (diff > 0) {
+      sheet.style.transform = `translateY(${diff}px)`;
+      e.preventDefault();
+    }
+  }, { passive: false });
+  sheet.addEventListener('touchend', () => {
+    if (!isDragging) return;
+    isDragging = false;
+    sheet.style.transition = '';
+    const diff = currentY - startY;
+    if (diff > 100) {
+      sheet.style.transform = `translateY(100%)`;
+      setTimeout(() => {
+        modal.classList.remove('show');
+        sheet.style.transform = '';
+      }, 300);
+    } else {
+      sheet.style.transform = '';
+    }
+    startY = 0;
+    currentY = 0;
+  }, { passive: true });
+}
+
+function closeFormulaModal() {
+  modal.classList.remove('show');
+  document.body.style.overflow = '';
+  currentFormulaId = null;
+}
+
+modal.addEventListener('click', (e) => {
+  if (e.target === modal) closeFormulaModal();
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && modal.classList.contains('show')) {
+    closeFormulaModal();
+  }
+});
+
+async function copyFormula(id) {
+  const f = FORMULAS.find(x => x.id === id);
+  if (!f) return;
+  let text = `${f.name}\n\n${f.formula}`;
+  if (f.note) text += `\n\n${f.note}`;
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      document.execCommand('copy');
+      ta.remove();
+    }
+    showToast('Formule copiée', 'success');
+    vibrate(10);
+  } catch (e) {
+    showToast('Impossible de copier', 'error');
+  }
+}
+
+searchInput.addEventListener('input', () => {
+  searchQuery = searchInput.value.trim();
+  renderFilters();
+  clearTimeout(searchTimer);
+  if (searchQuery.length > 0) {
+    renderSkeleton(3);
+    searchTimer = setTimeout(() => renderContent(), 180);
+  } else {
+    renderContent();
+  }
+});
+
+// ================================================================
+// AUTH ROBUSTE — Anti-flash
+// ================================================================
+let isRedirecting = false;
+let isAuthResolved = false;
+let graceTimer = null;
+let maxTimer = null;
+
+function redirectToLogin() {
+  if (isRedirecting) return;
+  isRedirecting = true;
+  try {
+    sessionStorage.setItem('redirectAfterLogin',
+      window.location.pathname + window.location.search);
+  } catch (e) {}
+  window.location.replace('login.html');
+}
+
+function initAuthGuard(onAuthenticated) {
+  auth.onAuthStateChanged((user) => {
+    if (isAuthResolved) {
+      if (user && user.uid !== currentUid) {
+        currentUid = user.uid;
+        saveSession(user);
+        onAuthenticated(user);
+      } else if (!user && currentUid) {
+        currentUid = null;
+        clearSession();
+        redirectToLogin();
+      }
+      return;
+    }
+
+    if (!user) {
+      if (graceTimer) clearTimeout(graceTimer);
+      graceTimer = setTimeout(() => {
+        if (isAuthResolved) return;
+        if (auth.currentUser) return;
+
+        const hasSession = localStorage.getItem(SESSION_KEY);
+        const hasUserData = localStorage.getItem(USER_DATA_KEY);
+
+        if ((hasSession || hasUserData) && !navigator.onLine) {
+          setTimeout(() => {
+            if (auth.currentUser) return;
+            if (!isAuthResolved) redirectToLogin();
+          }, 1500);
+          return;
+        }
+
+        if (hasSession && hasUserData) {
+          setTimeout(() => {
+            if (auth.currentUser) return;
+            if (!isAuthResolved) redirectToLogin();
+          }, 1500);
+          return;
+        }
+
+        redirectToLogin();
+      }, 600);
+      return;
+    }
+
+    if (graceTimer) { clearTimeout(graceTimer); graceTimer = null; }
+    if (maxTimer) { clearTimeout(maxTimer); maxTimer = null; }
+
+    isAuthResolved = true;
+    currentUid = user.uid;
+    saveSession(user);
+    onAuthenticated(user);
+  });
+
+  maxTimer = setTimeout(() => {
+    if (isAuthResolved) return;
+    if (auth.currentUser) {
+      isAuthResolved = true;
+      currentUid = auth.currentUser.uid;
+      saveSession(auth.currentUser);
+      onAuthenticated(auth.currentUser);
+    } else {
+      redirectToLogin();
+    }
+  }, 5000);
+}
+
+// ================================================================
+// LANCER LA PROTECTION
+// ================================================================
+initAuthGuard(async (user) => {
+  // Cache-first : favoris depuis localStorage
+  favorites = loadFavoritesFromLocal();
+  updateFavCount();
+  renderTabs();
+  renderFilters();
+
+  setTimeout(() => renderContent(), 200);
+
+  // Synchronisation Firestore en arrière-plan
+  if (!isSyncing) {
+    isSyncing = true;
+    try {
+      const remote = await loadFavoritesFromFirestore(user.uid);
+      if (remote && Array.isArray(remote)) {
+        const merged = [...new Set([...favorites, ...remote])].slice(0, MAX_FAVORITES);
+        if (merged.length !== favorites.length || JSON.stringify(merged) !== JSON.stringify(favorites)) {
+          favorites = merged;
+          saveFavoritesToLocal();
+          saveFavoritesToFirestore(user.uid);
+          updateFavCount();
+          renderTabs();
+          renderContent();
+        }
+      } else {
+        if (favorites.length > 0) saveFavoritesToFirestore(user.uid);
+      }
+    } catch (e) {}
+    isSyncing = false;
+  }
+});
+
+// ================================================================
+// INIT
+// ================================================================
+renderTabs();
+renderFilters();
+renderSkeleton(4);
+updateFavCount();
+
+console.log('🚀 ARVEXA — Formulaires (avec session robuste)');
+</script>
+
+</body>
+</html>

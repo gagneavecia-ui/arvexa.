@@ -1,0 +1,113 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return signedIn() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return signedIn() && request.auth.token.admin == true;
+    }
+
+    match /users/{userId} {
+      allow create: if isOwner(userId)
+        && request.resource.data.uid == userId
+        && request.resource.data.role == 'student'
+        && request.resource.data.premium == false
+        && request.resource.data.isUnlocked == false
+        && request.resource.data.hasDeposited == false;
+
+      allow read: if isOwner(userId) || isAdmin();
+
+      // Subscription state, role, account status and timestamps are server-owned.
+      allow update: if isAdmin() || (
+        isOwner(userId)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'firstName', 'lastName', 'fullName', 'email', 'phone', 'establishment',
+          'classId', 'onboardingCompleted', 'onboardingCompletedAt',
+          'totalStudyTime', 'lastStudyUpdate', 'profilePicture', 'updatedAt',
+          'fcmToken', 'fcmTokenUpdatedAt',
+          'subscriptionStatus', 'subscriptionPlan', 'subscriptionPrice',
+          'subscriptionOriginalPrice', 'subscriptionPromoCode',
+          'subscriptionRequestId', 'subscriptionRequestDate',
+          'subscriptionFullName', 'subscriptionWhatsapp',
+          'subscriptionPaymentMethod'
+        ])
+        && (!request.resource.data.keys().hasAny(['totalStudyTime'])
+          || request.resource.data.totalStudyTime >= resource.data.totalStudyTime)
+        && (!request.resource.data.keys().hasAny(['profilePicture'])
+          || request.resource.data.profilePicture.size() <= 500000)
+        && (!request.resource.data.keys().hasAny(['subscriptionStatus'])
+          || request.resource.data.subscriptionStatus == 'pending')
+        && (!request.resource.data.keys().hasAny(['subscriptionPlan', 'subscriptionPrice'])
+          || (request.resource.data.subscriptionPlan == 'monthly'
+            && request.resource.data.subscriptionPrice == 2000)
+          || (request.resource.data.subscriptionPlan == 'annual'
+            && (request.resource.data.subscriptionPrice == 18000
+              || request.resource.data.subscriptionPrice == 13500)))
+      );
+
+      allow delete: if isAdmin();
+
+      match /favorites/{favoriteId} {
+        allow read, write: if isOwner(userId)
+          && favoriteId == 'formulas'
+          && (!request.resource.data.keys().hasAny(['ids'])
+            || request.resource.data.ids.size() <= 500);
+      }
+
+      match /notifications/{notificationId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow update: if isOwner(userId)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']);
+        allow create, delete: if isAdmin();
+      }
+    }
+
+    match /subjects/{subjectId} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+      match /chapters/{chapterId} {
+        allow read: if signedIn();
+        allow write: if isAdmin();
+      }
+    }
+
+    match /groups/{groupId}/messages/{messageId} {
+      allow read: if signedIn();
+      allow create: if signedIn()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.content.size() <= 2000
+        && (!request.resource.data.keys().hasAny(['imageBase64'])
+          || request.resource.data.imageBase64.size() <= 500000);
+      allow update, delete: if isAdmin()
+        || (signedIn() && resource.data.userId == request.auth.uid);
+    }
+
+    match /groups/{groupId}/banned/{userId} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+
+    match /avis/{avisId} {
+      allow create: if signedIn()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.rating is int
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5
+        && request.resource.data.message is string
+        && request.resource.data.message.size() >= 10
+        && request.resource.data.message.size() <= 500;
+      allow read, update, delete: if isAdmin();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

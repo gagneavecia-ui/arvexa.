@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <meta name="theme-color" content="#0A0A0A">
+  <meta name="description" content="ARVEXA School - Sujet BAC">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon.png">
+  <link rel="icon" href="icon.png" type="image/png">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #1A3A2A; --primary-dark: #0A1A12; --primary-light: #2A5A3A;
+      --accent: #B8860B; --accent-bright: #E0B84A; --accent-dim: rgba(184,134,11,0.08);
+      --success: #2D7D5A; --danger: #B85C3A; --warning: #D4A017;
+      --bg-dark: #0A0A0A; --bg-surface: #141414; --bg-card: rgba(20,20,20,0.7);
+      --text-light: #F5F0E8; --text-dim: #8A8A7A; --text-muted: #5A5A4A;
+      --card-border: rgba(184,134,11,0.08);
+      --transition: all 0.3s cubic-bezier(0.25,1,0.5,1);
+      --shadow: 0 8px 32px rgba(0,0,0,0.4); --radius: 16px;
+    }
+    *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html{scroll-behavior:smooth;width:100%;overflow-x:hidden}
+    body{
+      font-family:'Inter','Segoe UI','Helvetica Neue',Arial,sans-serif;
+      background:var(--bg-dark);color:var(--text-light);font-size:14px;line-height:1.6;
+      min-height:100vh;width:100%;overflow-x:hidden;-webkit-overflow-scrolling:touch;
+      display:flex;flex-direction:column;
+    }
+    .gradient-bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-2;
+      background:radial-gradient(ellipse 40% 30% at 30% 15%,rgba(26,58,42,.16) 0%,transparent 70%),
+                  radial-gradient(ellipse 35% 25% at 75% 85%,rgba(184,134,11,.05) 0%,transparent 60%),
+                  linear-gradient(180deg,#0A0A0A 0%,#060606 100%)}
+    .glow{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:-1;
+      opacity:.15;animation:glowMove 10s ease-in-out infinite alternate}
+    .glow-1{width:300px;height:300px;background:rgba(26,58,42,.18);top:-80px;right:-80px}
+    .glow-2{width:180px;height:180px;background:rgba(184,134,11,.05);bottom:0;left:0;animation-delay:-4s}
+    @keyframes glowMove{0%{transform:translate(0,0) scale(1)}100%{transform:translate(30px,-20px) scale(1.1)}}
+
+    .header{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;
+      padding:10px 16px;background:rgba(10,10,10,.92);backdrop-filter:blur(12px);
+      border-bottom:1px solid rgba(184,134,11,.06);gap:12px;min-height:56px}
+    .header-left{display:flex;align-items:center;gap:12px}
+    .back-btn{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:10px;
+      border:1px solid rgba(255,255,255,.05);background:transparent;color:var(--text-dim);cursor:pointer;
+      transition:var(--transition);font-size:16px;text-decoration:none}
+    .back-btn:hover{border-color:rgba(184,134,11,.14);color:var(--text-light)}
+    .page-title{font-size:14px;font-weight:600;color:var(--text-light);font-family:'Playfair Display',serif;
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px}
+    .page-title i{color:var(--accent-bright);margin-right:6px;font-size:13px}
+
+    .container{max-width:640px;margin:0 auto;padding:12px 12px 32px;width:100%;display:flex;flex-direction:column;gap:12px;flex:1}
+
+    .subject-info{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:var(--radius);
+      background:var(--bg-card);backdrop-filter:blur(10px);border:1px solid var(--card-border);position:relative;overflow:hidden}
+    .subject-info::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+      background:linear-gradient(90deg,var(--accent),var(--success),var(--accent))}
+    .si-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+      font-size:16px;flex-shrink:0;background:rgba(184,134,11,.1);color:var(--accent-bright);
+      border:1px solid rgba(184,134,11,.12)}
+    .si-text{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
+    .si-title{font-size:15px;font-weight:600;color:var(--text-light);line-height:1.3}
+    .si-sub{font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+    .si-sub .si-badge{font-size:10px;font-weight:600;padding:2px 10px;border-radius:10px}
+    .si-sub .si-badge.free{background:rgba(45,125,90,.1);color:var(--success)}
+    .si-sub .si-badge.premium{background:rgba(184,134,11,.1);color:var(--accent-bright)}
+    .si-sub .si-badge.locked{background:rgba(184,92,58,.1);color:var(--danger)}
+
+    .tabs{display:flex;gap:4px;background:rgba(255,255,255,.02);border-radius:12px;padding:4px;
+      border:1px solid rgba(255,255,255,.04)}
+    .tab-btn{flex:1;padding:10px 8px;border:none;border-radius:10px;background:transparent;color:var(--text-muted);
+      font-size:12px;font-weight:600;cursor:pointer;transition:var(--transition);font-family:'Inter',sans-serif;
+      display:flex;align-items:center;justify-content:center;gap:6px}
+    .tab-btn i{font-size:12px}
+    .tab-btn.active{background:rgba(184,134,11,.1);color:var(--accent-bright);border:1px solid rgba(184,134,11,.12)}
+    .tab-btn:not(.active){border:1px solid transparent}
+    .tab-btn:hover:not(.active){color:var(--text-dim)}
+    .tab-btn.locked{opacity:.5;cursor:not-allowed}
+
+    .cards-view{display:flex;flex-direction:column;gap:8px;flex:1}
+    .part-card{background:var(--bg-card);backdrop-filter:blur(10px);border:1px solid var(--card-border);
+      border-radius:var(--radius);padding:16px 18px;cursor:pointer;transition:var(--transition);
+      display:flex;align-items:center;gap:14px;position:relative;overflow:hidden;text-decoration:none;color:inherit}
+    .part-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+      background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:0;transition:opacity .3s ease}
+    .part-card:hover{border-color:rgba(184,134,11,.15);transform:translateY(-1px)}
+    .part-card:hover::before{opacity:1}
+    .part-card:active{transform:scale(.98)}
+    .part-card.locked{opacity:.7}
+    .part-card.locked:hover{opacity:.9}
+
+    .pc-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+      font-size:18px;flex-shrink:0;background:rgba(184,134,11,.06);color:var(--accent-bright);
+      border:1px solid rgba(184,134,11,.08)}
+    .pc-icon.exo{background:rgba(45,125,90,.06);color:var(--success);border-color:rgba(45,125,90,.08)}
+    .pc-icon.corr{background:rgba(74,175,224,.06);color:#4AAFE0;border-color:rgba(74,175,224,.08)}
+    .pc-info{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
+    .pc-title{font-size:14px;font-weight:600;color:var(--text-light);line-height:1.4}
+    .pc-sub{font-size:11px;color:var(--text-muted)}
+    .pc-arrow{display:flex;align-items:center;justify-content:center;width:28px;height:28px;
+      border-radius:8px;background:rgba(255,255,255,.03);color:var(--text-muted);flex-shrink:0;
+      transition:var(--transition);font-size:11px}
+    .part-card:hover .pc-arrow{color:var(--accent-bright);background:rgba(184,134,11,.08)}
+    .part-card.locked .pc-arrow{color:var(--text-muted)}
+
+    .badge-free{display:inline-block;font-size:9px;color:var(--success);background:rgba(45,125,90,.1);
+      padding:0 6px;border-radius:10px;border:1px solid rgba(45,125,90,.12)}
+    .badge-premium{display:inline-block;font-size:9px;color:var(--accent-bright);background:rgba(184,134,11,.1);
+      padding:0 6px;border-radius:10px;border:1px solid rgba(184,134,11,.12)}
+    .badge-locked{display:inline-block;font-size:9px;color:var(--danger);background:rgba(184,92,58,.1);
+      padding:0 6px;border-radius:10px;border:1px solid rgba(184,92,58,.12)}
+
+    .loading-state{display:flex;flex-direction:column;align-items:center;justify-content:center;
+      padding:60px 20px;gap:12px;min-height:200px}
+    .spinner{width:32px;height:32px;border:3px solid rgba(184,134,11,.15);border-top-color:var(--accent-bright);
+      border-radius:50%;animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .loading-state p{font-size:13px;color:var(--text-muted)}
+
+    .empty-state{text-align:center;padding:60px 24px;display:flex;flex-direction:column;align-items:center;gap:14px}
+    .empty-state .es-icon{width:64px;height:64px;border-radius:18px;display:flex;align-items:center;justify-content:center;
+      background:rgba(184,134,11,.06);border:1px solid rgba(184,134,11,.08);font-size:24px;color:var(--text-muted)}
+    .empty-state h4{font-size:16px;color:var(--text-dim);font-weight:600}
+    .empty-state p{font-size:13px;color:var(--text-muted);max-width:300px;line-height:1.6}
+
+    .premium-popup-overlay{position:fixed;top:0;left:0;right:0;bottom:0;
+      background:rgba(0,0,0,.85);backdrop-filter:blur(16px);z-index:9999;
+      display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;
+      transition:all .4s ease;padding:16px}
+    .premium-popup-overlay.show{opacity:1;visibility:visible}
+    .premium-popup-overlay.hide{opacity:0;visibility:hidden}
+
+    .premium-popup{background:linear-gradient(145deg,#141414,#0A0A0A);border:1px solid var(--accent);
+      border-radius:var(--radius);padding:28px 24px;max-width:380px;width:100%;
+      transform:scale(.9) translateY(30px);transition:transform .5s cubic-bezier(.34,1.56,.64,1);
+      box-shadow:0 20px 60px rgba(0,0,0,.6);position:relative;overflow:hidden;max-height:90vh;overflow-y:auto}
+    .premium-popup-overlay.show .premium-popup{transform:scale(1) translateY(0)}
+    .premium-popup::-webkit-scrollbar{width:2px}
+    .premium-popup::-webkit-scrollbar-thumb{background:var(--accent);border-radius:4px}
+    .premium-popup::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;
+      background:linear-gradient(90deg,var(--accent),var(--accent-bright),var(--accent))}
+    .premium-popup .popup-close{position:absolute;top:8px;right:8px;width:28px;height:28px;
+      background:rgba(255,255,255,.03);border:1px solid rgba(184,134,11,.06);border-radius:8px;
+      color:var(--text-dim);cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;
+      transition:var(--transition)}
+    .premium-popup .popup-close:hover{border-color:rgba(184,134,11,.15);color:var(--text-light)}
+    .premium-popup .popup-icon{font-size:40px;display:block;text-align:center;margin-bottom:4px}
+    .premium-popup h2{font-size:20px;font-weight:700;font-family:'Playfair Display','Georgia',serif;
+      color:var(--text-light);text-align:center;margin-bottom:2px}
+    .premium-popup h2 span{color:var(--accent);font-style:italic}
+    .premium-popup .popup-subtitle{font-size:12px;color:var(--text-dim);text-align:center;line-height:1.5;margin-bottom:14px}
+    .premium-popup .popup-subtitle strong{color:var(--accent-bright)}
+    .premium-popup .popup-features{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px}
+    .premium-popup .popup-features .feature{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);
+      border-radius:8px;padding:8px 6px;text-align:center;font-size:10px;color:var(--text-dim)}
+    .premium-popup .popup-features .feature i{color:var(--accent-bright);display:block;font-size:14px;margin-bottom:2px}
+    .offers-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+    .offer-card{background:rgba(255,255,255,.02);border:1px solid var(--card-border);border-radius:10px;
+      padding:12px 8px;text-align:center;transition:var(--transition)}
+    .offer-card:hover{border-color:rgba(184,134,11,.15)}
+    .offer-card.popular{border-color:var(--accent);background:rgba(184,134,11,.04);position:relative}
+    .offer-card.popular::before{content:'⭐ Meilleur choix';position:absolute;top:-8px;left:50%;transform:translateX(-50%);
+      font-size:8px;background:var(--accent);color:#0A0A0A;padding:1px 10px;border-radius:10px;font-weight:700;white-space:nowrap}
+    .offer-card .offer-name{font-size:10px;font-weight:600;color:var(--text-light)}
+    .offer-card .offer-price{font-size:18px;font-weight:700;font-family:'Playfair Display',serif;color:var(--accent);margin:1px 0}
+    .offer-card .offer-price small{font-size:10px;font-weight:400;color:var(--text-muted)}
+    .offer-card .offer-save{font-size:8px;color:var(--success);background:rgba(45,125,90,.08);padding:1px 6px;border-radius:8px;display:inline-block}
+    .offer-card .offer-desc{font-size:9px;color:var(--text-muted);margin-top:2px}
+    .premium-popup .popup-buttons{display:flex;flex-direction:column;gap:6px}
+    .premium-popup .popup-buttons .btn-subscribe{padding:10px;border:none;border-radius:10px;
+      background:linear-gradient(135deg,var(--accent-bright),var(--accent));
+      color:var(--bg-dark);font-weight:700;font-size:14px;cursor:pointer;
+      text-decoration:none;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px;
+      font-family:'Inter',sans-serif}
+    .premium-popup .popup-buttons .btn-subscribe:hover{background:#9A7209;box-shadow:0 0 20px rgba(184,134,11,.15)}
+    .premium-popup .popup-buttons .btn-subscribe:active{transform:scale(.96)}
+    .premium-popup .popup-buttons .btn-later{padding:8px;background:transparent;border:none;
+      color:var(--text-muted);font-size:11px;cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif;font-weight:400}
+    .premium-popup .popup-buttons .btn-later:hover{color:var(--text-dim)}
+
+    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);
+      padding:12px 20px;border-radius:12px;background:rgba(20,20,20,.95);backdrop-filter:blur(16px);
+      border:1px solid rgba(184,134,11,.15);color:var(--text-light);font-size:13px;font-weight:500;
+      z-index:300;opacity:0;transition:all .4s cubic-bezier(.25,1,.5,1);display:flex;align-items:center;gap:8px}
+    .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+    .toast i{color:var(--accent-bright)}
+    .toast.success{border-color:rgba(45,125,90,.2)}
+    .toast.success i{color:var(--success)}
+    .toast.error{border-color:rgba(184,92,58,.2)}
+    .toast.error i{color:var(--danger)}
+
+    @media(max-width:480px){
+      .container{padding:10px 10px 24px}
+      .page-title{max-width:140px;font-size:13px}
+      .si-title{font-size:14px}
+      .tab-btn{font-size:11px;padding:9px 6px}
+      .premium-popup{padding:20px 16px;max-width:340px}
+      .premium-popup h2{font-size:17px}
+      .offers-grid{gap:6px}
+      .offer-card{padding:10px 6px}
+      .offer-card .offer-price{font-size:16px}
+      .premium-popup .popup-features{grid-template-columns:1fr 1fr}
+    }
+    @media(max-width:360px){
+      .offers-grid{grid-template-columns:1fr}
+      .premium-popup .popup-features{grid-template-columns:1fr}
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+
+    a:focus-visible, button:focus-visible, input:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+      border-radius: 6px;
+    }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(184, 134, 11, 0.25); border-radius: 10px; }
+  </style>
+</head>
+<body>
+
+  <div class="gradient-bg"></div>
+  <div class="glow glow-1"></div>
+  <div class="glow glow-2"></div>
+
+  <header class="header">
+    <div class="header-left">
+      <a href="sujets.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+      <h1 class="page-title" id="pageTitle">Sujet BAC</h1>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <div class="subject-info">
+      <div class="si-icon"><i class="fas fa-file-lines"></i></div>
+      <div class="si-text">
+        <div class="si-title" id="subjectTitle">Chargement...</div>
+        <div class="si-sub">
+          <span id="subjectSub"></span>
+          <span class="si-badge" id="subjectBadge">Gratuit</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="sujet" id="tabSujet">
+        <i class="fas fa-file-lines"></i> Sujet
+      </button>
+      <button class="tab-btn" data-tab="correction" id="tabCorrection">
+        <i class="fas fa-check-double"></i> Correction
+      </button>
+    </div>
+
+    <!-- CARDS VIEW -->
+    <div class="cards-view" id="cardsView">
+      <div class="loading-state"><div class="spinner"></div><p>Chargement...</p></div>
+    </div>
+
+  </main>
+
+  <!-- POPUP PREMIUM -->
+  <div class="premium-popup-overlay" id="premiumPopup">
+    <div class="premium-popup">
+      <button class="popup-close" id="popupCloseBtn"><i class="fas fa-times"></i></button>
+      <span class="popup-icon">🔓</span>
+      <h2>Accès <span>Premium</span></h2>
+      <p class="popup-subtitle">Débloque <strong>tous</strong> les sujets BAC et leurs corrections !</p>
+      
+      <div class="popup-features">
+        <div class="feature"><i class="fas fa-file-lines"></i> Tous les sujets BAC</div>
+        <div class="feature"><i class="fas fa-check-double"></i> Corrections détaillées</div>
+        <div class="feature"><i class="fas fa-graduation-cap"></i> Programme complet</div>
+        <div class="feature"><i class="fas fa-chart-line"></i> Suivi de progression</div>
+      </div>
+      
+      <div class="offers-grid">
+        <div class="offer-card">
+          <div class="offer-name">📱 Mensuel</div>
+          <div class="offer-price">2 000 <small>FCFA</small></div>
+          <div class="offer-desc">Accès total</div>
+        </div>
+        <div class="offer-card popular">
+          <div class="offer-name">📅 Annuel</div>
+          <div class="offer-price">18 000 <small>FCFA</small></div>
+          <div class="offer-save">Économisez 6 000 FCFA</div>
+          <div class="offer-desc">2 mois offerts</div>
+        </div>
+      </div>
+      
+      <div class="popup-buttons">
+        <a href="abonnement.html" class="btn-subscribe"><i class="fas fa-crown"></i> S'abonner maintenant</a>
+        <button class="btn-later" id="popupLaterBtn">✕ Plus tard</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"><i class="fas fa-info-circle"></i> <span id="toastText"></span></div>
+
+  <script type="importmap">
+  { "imports": { "firebase/app": "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js", "firebase/auth": "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js", "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js" } }
+  </script>
+
+  <script type="module">
+  // ================================================================
+  // sujet-detail.html - Version corrigée (une carte par onglet)
+  // ================================================================
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+  import { protectPage, getAuthInstance } from './auth.js';
+
+  // ================================================================
+  // FIREBASE
+  // ================================================================
+  const firebaseConfig = {
+    apiKey: "AIzaSyDHscOXw3rLuhV6z1Cny-bdYCumqpnG7QE",
+    authDomain: "arvexa-fbf10.firebaseapp.com",
+    projectId: "arvexa-fbf10",
+    storageBucket: "arvexa-fbf10.firebasestorage.app",
+    messagingSenderId: "920108330053",
+    appId: "1:920108330053:web:f532d71cbc2c824bc7472c"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuthInstance();
+
+  // ================================================================
+  // DONNÉES SUJETS BAC
+  // ================================================================
+  const BAC_SUBJECTS_CONFIG = {
+    mathematiques: {
+      name: 'Mathématiques',
+      icon: 'fa-square-root-variable',
+      color: '#E0B84A',
+      subjects: [
+        { year: 2024, isFree: true },
+        { year: 2023, isFree: false },
+        { year: 2022, isFree: false },
+        { year: 2021, isFree: false }
+      ]
+    },
+    physique: {
+      name: 'Physique',
+      icon: 'fa-bolt',
+      color: '#4AAFE0',
+      subjects: [
+        { year: 2024, isFree: true },
+        { year: 2023, isFree: false },
+        { year: 2022, isFree: false }
+      ]
+    },
+    chimie: {
+      name: 'Chimie',
+      icon: 'fa-flask',
+      color: '#E07A4A',
+      subjects: [
+        { year: 2024, isFree: true },
+        { year: 2023, isFree: false },
+        { year: 2022, isFree: false }
+      ]
+    },
+    svt: {
+      name: 'SVT',
+      icon: 'fa-dna',
+      color: '#7AE04A',
+      subjects: [
+        { year: 2024, isFree: true },
+        { year: 2023, isFree: false },
+        { year: 2022, isFree: false }
+      ]
+    }
+  };
+
+  // ================================================================
+  // URL PARAMS
+  // ================================================================
+  const params = new URLSearchParams(window.location.search);
+  const subjectKey = params.get('subject');
+  const year = parseInt(params.get('year'));
+
+  // ================================================================
+  // ÉTAT
+  // ================================================================
+  let isPremium = false;
+  let userData = null;
+  let currentTab = 'sujet';
+  let subjectConfig = null;
+  let subjectData = null;
+
+  // ================================================================
+  // DOM
+  // ================================================================
+  const cardsView = document.getElementById('cardsView');
+  const toast = document.getElementById('toast');
+  const toastText = document.getElementById('toastText');
+
+  // ================================================================
+  // POPUP PREMIUM
+  // ================================================================
+
+  function showPremiumPopup() {
+    const popup = document.getElementById('premiumPopup');
+    if (popup) {
+      popup.classList.remove('hide');
+      popup.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+  }
+
+  function hidePremiumPopup() {
+    const popup = document.getElementById('premiumPopup');
+    if (popup) {
+      popup.classList.remove('show');
+      popup.classList.add('hide');
+      document.body.style.overflow = '';
+    }
+  }
+
+  window.showPremiumPopup = showPremiumPopup;
+
+  // ================================================================
+  // FONCTIONS
+  // ================================================================
+
+  function showToast(message, type = 'info') {
+    toastText.textContent = message;
+    toast.className = 'toast ' + type;
+    toast.classList.add('show');
+    clearTimeout(toast._timeout);
+    toast._timeout = setTimeout(() => toast.classList.remove('show'), 4000);
+  }
+
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  // ================================================================
+  // OUVERTURE EN NOUVEL ONGLET
+  // ================================================================
+
+  function openPart(filePath, title) {
+    window.open(filePath, '_blank');
+  }
+
+  window.openPart = openPart;
+
+  // ================================================================
+  // CHARGEMENT DU CONTENU (UNE CARTE PAR ONGLET)
+  // ================================================================
+
+  function loadContent() {
+    const isFree = subjectData?.isFree === true;
+    const isLocked = !isPremium && !isFree;
+
+    // 🎯 UNE SEULE CARTE PAR ONGLET
+    let part = {};
+
+    if (currentTab === 'sujet') {
+      part = {
+        title: `Sujet BAC ${year} - ${subjectConfig?.name || ''}`,
+        file: `sujets/${subjectKey}/${year}_sujet.html`,
+        icon: 'fa-file-lines',
+        type: 'sujet',
+        locked: false // Le sujet est toujours visible
+      };
+    } else if (currentTab === 'correction') {
+      part = {
+        title: `Correction BAC ${year} - ${subjectConfig?.name || ''}`,
+        file: `sujets/${subjectKey}/${year}_correction.html`,
+        icon: 'fa-check-double',
+        type: 'correction',
+        locked: isLocked // La correction est verrouillée si le sujet est premium
+      };
+    }
+
+    renderCard(part);
+  }
+
+  function renderCard(part) {
+    if (!part || !part.title) {
+      cardsView.innerHTML = `
+        <div class="empty-state">
+          <div class="es-icon"><i class="fas fa-folder-open"></i></div>
+          <h4>Aucun contenu disponible</h4>
+          <p>Le contenu de ce sujet n'est pas encore disponible.</p>
+        </div>
+      `;
+      return;
+    }
+
+    const isLocked = part.locked === true;
+    const isFree = subjectData?.isFree === true;
+    const icon = part.icon || 'fa-file-lines';
+    const label = currentTab === 'sujet' ? 'Sujet' : 'Correction';
+
+    // Badge
+    let badge = '';
+    if (isLocked) {
+      badge = '<span class="badge-locked">🔒 PREMIUM</span>';
+    } else if (isFree && currentTab === 'sujet') {
+      badge = '<span class="badge-free">🎁 GRATUIT</span>';
+    } else if (!isLocked && currentTab === 'correction') {
+      badge = '<span class="badge-free">✅ DISPONIBLE</span>';
+    }
+
+    cardsView.innerHTML = `
+      <div class="part-card ${isLocked ? 'locked' : ''}" 
+           onclick="${isLocked ? 'showPremiumPopup()' : `openPart('${part.file}', '${escapeHtml(part.title)}')`}">
+        <div class="pc-icon ${currentTab === 'correction' ? 'corr' : ''}"><i class="fas ${icon}"></i></div>
+        <div class="pc-info">
+          <div class="pc-title">${escapeHtml(part.title)} ${badge}</div>
+          <div class="pc-sub">${subjectConfig?.name || ''} — ${label}</div>
+        </div>
+        <div class="pc-arrow"><i class="fas fa-external-link-alt"></i></div>
+      </div>
+    `;
+  }
+
+  // ================================================================
+  // RENDU
+  // ================================================================
+
+  function renderPage() {
+    const config = BAC_SUBJECTS_CONFIG[subjectKey];
+    if (!config) {
+      window.location.href = 'sujets.html';
+      return;
+    }
+
+    subjectConfig = config;
+    subjectData = config.subjects.find(s => s.year === year);
+    if (!subjectData) {
+      window.location.href = 'sujets.html';
+      return;
+    }
+
+    const isFree = subjectData.isFree === true;
+    const isLocked = !isPremium && !isFree;
+
+    // Titre
+    document.getElementById('pageTitle').textContent = 'Sujet BAC ' + year;
+    document.title = 'ARVEXA - Sujet BAC ' + year + ' ' + config.name;
+
+    // Info
+    document.getElementById('subjectTitle').textContent = 'Sujet BAC ' + year + ' - ' + config.name;
+    document.getElementById('subjectSub').textContent = config.name + ' — ' + year;
+
+    // Badge
+    const badge = document.getElementById('subjectBadge');
+    if (isFree) {
+      badge.textContent = '🎁 GRATUIT';
+      badge.className = 'si-badge free';
+    } else if (isLocked) {
+      badge.textContent = '🔒 PREMIUM';
+      badge.className = 'si-badge locked';
+    } else {
+      badge.textContent = '👑 PREMIUM';
+      badge.className = 'si-badge premium';
+    }
+
+    // Tabs
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.tab === currentTab);
+    });
+
+    // Verrouiller l'onglet correction si premium
+    const corrTab = document.getElementById('tabCorrection');
+    if (isLocked) {
+      corrTab.classList.add('locked');
+      corrTab.title = 'Correction Premium - Abonnez-vous pour y accéder';
+    } else {
+      corrTab.classList.remove('locked');
+      corrTab.title = '';
+    }
+
+    // Charger le contenu
+    loadContent();
+  }
+
+  // ================================================================
+  // TABS
+  // ================================================================
+
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tab = btn.dataset.tab;
+      if (tab === currentTab) return;
+
+      const isFree = subjectData?.isFree === true;
+      const isLocked = !isPremium && !isFree;
+
+      if (tab === 'correction' && isLocked) {
+        showPremiumPopup();
+        return;
+      }
+
+      currentTab = tab;
+      renderPage();
+    });
+  });
+
+  // ================================================================
+  // POPUP ÉVÉNEMENTS
+  // ================================================================
+
+  document.getElementById('popupCloseBtn').addEventListener('click', hidePremiumPopup);
+  document.getElementById('popupLaterBtn').addEventListener('click', hidePremiumPopup);
+  document.getElementById('premiumPopup').addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) hidePremiumPopup();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') hidePremiumPopup();
+  });
+
+  // ================================================================
+  // PROTECTION + INIT
+  // ================================================================
+
+  protectPage(async (user) => {
+    console.log('📚 Sujet BAC - Utilisateur:', user.uid);
+
+    try {
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      if (userDoc.exists()) {
+        userData = userDoc.data();
+        isPremium = userData.isUnlocked === true || userData.hasDeposited === true || userData.premium === true;
+        console.log('✅ Premium:', isPremium);
+      }
+    } catch(e) {
+      console.log('Erreur chargement user:', e);
+    }
+
+    renderPage();
+  });
+
+  console.log('📚 ARVEXA - Sujet BAC (une carte par onglet)');
+  </script>
+</body>
+</html>

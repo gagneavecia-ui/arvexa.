@@ -1,0 +1,2729 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <meta name="theme-color" content="#0A0A0A">
+  <title>ARV-SCAN - Analyse de document</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0A0A0A;
+      color: #F5F0E8;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 16px;
+    }
+    .gradient-bg {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+      background: radial-gradient(ellipse 40% 30% at 30% 15%, rgba(26,58,42,.16) 0%, transparent 70%),
+                  radial-gradient(ellipse 35% 25% at 75% 85%, rgba(184,134,11,.05) 0%, transparent 60%),
+                  linear-gradient(180deg, #0A0A0A 0%, #060606 100%);
+    }
+    .header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 0 16px;
+    }
+    .header .back { color: #8A8A7A; text-decoration: none; font-size: 18px; }
+    .header .title { font-size: 18px; font-weight: 700; font-family: 'Playfair Display', serif; }
+    .header .title i { color: #E0B84A; margin-right: 6px; }
+
+    .container { max-width: 560px; margin: 0 auto; width: 100%; flex: 1; }
+
+    .card {
+      background: rgba(20,20,20,0.7);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(184,134,11,0.08);
+      border-radius: 16px;
+      padding: 24px 20px;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+    .card .icon { font-size: 48px; display: block; margin-bottom: 8px; }
+    .card h2 { font-size: 20px; font-weight: 700; font-family: 'Playfair Display', serif; }
+    .card p { font-size: 13px; color: #8A8A7A; margin: 4px 0 16px; }
+
+    .btn-group { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+    .btn {
+      padding: 12px 24px; border-radius: 30px; border: none;
+      font-size: 14px; font-weight: 600; cursor: pointer;
+      transition: all 0.3s ease; font-family: 'Inter', sans-serif;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .btn:active { transform: scale(0.95); }
+    .btn-primary {
+      background: linear-gradient(135deg, #E0B84A, #B8860B);
+      color: #0A0A0A;
+    }
+    .btn-primary:hover { box-shadow: 0 6px 24px rgba(184,134,11,0.25); transform: translateY(-2px); }
+    .btn-secondary {
+      background: rgba(255,255,255,0.04);
+      color: #F5F0E8;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .btn-secondary:hover { background: rgba(255,255,255,0.08); }
+
+    .dropzone {
+      border: 2px dashed rgba(255,255,255,0.06);
+      border-radius: 12px;
+      padding: 24px;
+      margin-top: 12px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .dropzone:hover { border-color: rgba(184,134,11,0.2); background: rgba(184,134,11,0.02); }
+    .dropzone p { font-size: 13px; color: #5A5A4A; margin: 0; }
+    .dropzone .hint { font-size: 11px; color: #5A5A4A; display: block; margin-top: 4px; }
+
+    .preview { margin-top: 12px; position: relative; display: none; }
+    .preview img { max-width: 100%; max-height: 250px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.04); }
+    .preview .remove {
+      position: absolute; top: -10px; right: -10px;
+      width: 30px; height: 30px; border-radius: 50%;
+      border: none; background: #B85C3A; color: white;
+      cursor: pointer; font-size: 14px;
+    }
+
+    .loading { display: none; flex-direction: column; align-items: center; gap: 12px; padding: 20px 0; }
+    .loading .spinner {
+      width: 40px; height: 40px; border: 4px solid rgba(184,134,11,0.1);
+      border-top-color: #E0B84A; border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading .steps { display: flex; flex-direction: column; gap: 6px; width: 100%; max-width: 280px; }
+    .loading .step {
+      display: flex; align-items: center; gap: 10px;
+      padding: 6px 12px; border-radius: 8px;
+      font-size: 13px; color: #5A5A4A;
+    }
+    .loading .step.active { background: rgba(184,134,11,0.06); color: #E0B84A; }
+    .loading .step.done { color: #2D7D5A; }
+
+    .analysis { display: none; flex-direction: column; gap: 12px; }
+    .analysis .badges { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+    .analysis .badge {
+      padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 600;
+      background: rgba(184,134,11,0.08); color: #E0B84A;
+      border: 1px solid rgba(184,134,11,0.08);
+    }
+    .analysis .actions {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
+    }
+    .analysis .actions .act {
+      padding: 12px 4px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.04);
+      background: rgba(255,255,255,0.02); color: #8A8A7A;
+      cursor: pointer; transition: 0.3s; font-family: 'Inter', sans-serif;
+      text-align: center; font-size: 11px;
+    }
+    .analysis .actions .act:hover { border-color: rgba(184,134,11,0.12); background: rgba(184,134,11,0.04); color: #F5F0E8; }
+    .analysis .actions .act .emoji { display: block; font-size: 22px; }
+
+    .response { display: none; flex-direction: column; gap: 10px; }
+    .response .resp-header {
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 8px;
+    }
+    .response .resp-header h3 { font-size: 16px; font-weight: 700; font-family: 'Playfair Display', serif; }
+    .response .resp-content {
+      background: rgba(10,10,10,0.5); border-radius: 12px; padding: 16px;
+      max-height: 400px; overflow-y: auto; font-size: 14px; line-height: 1.8;
+      color: #c8d0dc; white-space: pre-wrap;
+    }
+    .response .resp-content::-webkit-scrollbar { width: 3px; }
+    .response .resp-content::-webkit-scrollbar-thumb { background: rgba(184,134,11,0.2); border-radius: 10px; }
+    .response .resp-content strong { color: #F5F0E8; }
+    .response .resp-content .formula {
+      display: block; padding: 8px 12px; border-radius: 8px;
+      background: rgba(184,134,11,0.04); border-left: 3px solid #E0B84A;
+      font-size: 16px; color: #E0B84A; margin: 6px 0; font-family: 'Playfair Display', serif;
+    }
+    .response .resp-content .step {
+      padding: 6px 12px; margin: 4px 0; border-radius: 6px;
+      background: rgba(255,255,255,0.02); border-left: 3px solid #2D7D5A;
+    }
+    .response .resp-content .error { color: #B85C3A; padding: 12px; background: rgba(184,92,58,0.06); border-radius: 8px; }
+
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px);
+      padding: 10px 20px; border-radius: 12px; background: rgba(20,20,20,0.95);
+      border: 1px solid rgba(184,134,11,0.15); color: #F5F0E8;
+      font-size: 13px; z-index: 300; opacity: 0; transition: all 0.4s ease;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+    @media (max-width: 480px) {
+      .card { padding: 18px 14px; }
+      .analysis .actions { grid-template-columns: repeat(2, 1fr); }
+      .btn { padding: 10px 16px; font-size: 13px; }
+    }
+    @media (max-width: 360px) {
+      .analysis .actions { grid-template-columns: 1fr 1fr; }
+      .btn-group { flex-direction: column; }
+      .btn { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="gradient-bg"></div>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <header class="header">
+    <a href="index.html" class="back"><i class="fas fa-arrow-left"></i></a>
+    <span class="title"><i class="fas fa-robot"></i> ARV-SCAN</span>
+    <span style="width:24px;"></span>
+  </header>
+
+  <!-- IMPORT -->
+  <div class="card" id="importCard">
+    <span class="icon">📷</span>
+    <h2>Analyse ton document</h2>
+    <p>Photo de cours, exercice, sujet d'examen...</p>
+    <div class="btn-group">
+      <button class="btn btn-primary" id="cameraBtn"><i class="fas fa-camera"></i> Photo</button>
+      <button class="btn btn-secondary" id="galleryBtn"><i class="fas fa-image"></i> Galerie</button>
+    </div>
+    <div class="dropzone" id="dropzone">
+      <p>📂 Glisse-dépose une image ici</p>
+      <span class="hint">PNG, JPG, JPEG · Max 5MB</span>
+    </div>
+    <div class="preview" id="preview">
+      <img id="previewImage" alt="Aperçu">
+      <button class="remove" id="removeBtn"><i class="fas fa-times"></i></button>
+    </div>
+    <button class="btn btn-primary" id="analyzeBtn" style="width:100%;justify-content:center;margin-top:12px;" disabled>
+      <i class="fas fa-wand-magic-sparkles"></i> Analyser
+    </button>
+    <input type="file" id="fileInput" accept="image/*" style="display:none;">
+    <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none;">
+  </div>
+
+  <!-- LOADING -->
+  <div class="card loading" id="loadingCard">
+    <div class="spinner"></div>
+    <div class="steps">
+      <div class="step" id="s1"><span>📥</span> Lecture de l'image</div>
+      <div class="step" id="s2"><span>🔍</span> Reconnaissance du texte</div>
+      <div class="step" id="s3"><span>🧠</span> Analyse du contenu</div>
+      <div class="step" id="s4"><span>📋</span> Préparation des actions</div>
+    </div>
+    <p id="loadingText" style="font-size:13px;color:#8A8A7A;">Analyse en cours...</p>
+  </div>
+
+  <!-- ANALYSIS -->
+  <div class="analysis" id="analysisCard">
+    <div class="card" style="padding:14px 16px;">
+      <div class="badges">
+        <span class="badge" id="subjectBadge">📐 Mathématiques</span>
+        <span class="badge" id="typeBadge">📝 Exercice</span>
+        <span class="badge" id="confianceBadge">✅ 85%</span>
+      </div>
+    </div>
+    <div class="card" style="padding:14px 12px;">
+      <p style="font-size:12px;color:#8A8A7A;margin-bottom:10px;">Que veux-tu faire ?</p>
+      <div class="actions" id="actionsGrid">
+        <button class="act" data-action="comprendre"><span class="emoji">🧠</span> Comprendre</button>
+        <button class="act" data-action="resoudre"><span class="emoji">✍️</span> Résoudre</button>
+        <button class="act" data-action="resumer"><span class="emoji">📚</span> Résumer</button>
+        <button class="act" data-action="formules"><span class="emoji">📐</span> Formules</button>
+        <button class="act" data-action="quiz"><span class="emoji">❓</span> Quiz</button>
+        <button class="act" data-action="traduire"><span class="emoji">🌍</span> Traduire</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESPONSE -->
+  <div class="card response" id="responseCard">
+    <div class="resp-header">
+      <h3 id="respTitle">Résultat</h3>
+      <div>
+        <button class="btn btn-secondary" style="padding:6px 12px;font-size:11px;" id="copyBtn"><i class="fas fa-copy"></i> Copier</button>
+        <button class="btn btn-secondary" style="padding:6px 12px;font-size:11px;" id="newBtn"><i class="fas fa-redo"></i> Nouveau</button>
+      </div>
+    </div>
+    <div class="resp-content" id="respContent"></div>
+  </div>
+
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><span id="toastMsg"></span></div>
+
+<!-- ============================================================ -->
+<!-- SCRIPT - MODÈLE UNIQUE GROQ                                 -->
+<!-- ============================================================ -->
+<script>
+/* ================================================================
+   ARV-SCAN
+   Vision : Qwen 3.6 27B
+   Texte  : OpenAI GPT-OSS 120B
+   ================================================================ */
+
+/* ================================================================
+   CONFIGURATION GROQ
+   ================================================================ */
+
+const GROQ_API_KEY = '';
+
+const GROQ_ENDPOINT =
+  'https://api.groq.com/openai/v1/chat/completions';
+
+const GROQ_MODEL_VISION =
+  'qwen/qwen3.6-27b';
+
+const GROQ_MODEL_TEXT =
+  'openai/gpt-oss-120b';
+
+/*
+  Limites volontairement basses pour éviter ton problème OTPM.
+*/
+const TOKEN_LIMITS = {
+  analyse: 700,
+  comprendre: 700,
+  resoudre: 950,
+  resumer: 600,
+  formules: 650,
+  quiz: 700,
+  traduire: 600
+};
+
+
+/* ================================================================
+   DOM
+   ================================================================ */
+
+const fileInput =
+  document.getElementById('fileInput');
+
+const cameraInput =
+  document.getElementById('cameraInput');
+
+const cameraBtn =
+  document.getElementById('cameraBtn');
+
+const galleryBtn =
+  document.getElementById('galleryBtn');
+
+const dropzone =
+  document.getElementById('dropzone');
+
+const preview =
+  document.getElementById('preview');
+
+const previewImage =
+  document.getElementById('previewImage');
+
+const removeBtn =
+  document.getElementById('removeBtn');
+
+const analyzeBtn =
+  document.getElementById('analyzeBtn');
+
+const importCard =
+  document.getElementById('importCard');
+
+const loadingCard =
+  document.getElementById('loadingCard');
+
+const analysisCard =
+  document.getElementById('analysisCard');
+
+const responseCard =
+  document.getElementById('responseCard');
+
+const respContent =
+  document.getElementById('respContent');
+
+const respTitle =
+  document.getElementById('respTitle');
+
+const subjectBadge =
+  document.getElementById('subjectBadge');
+
+const typeBadge =
+  document.getElementById('typeBadge');
+
+const confianceBadge =
+  document.getElementById('confianceBadge');
+
+const loadingText =
+  document.getElementById('loadingText');
+
+const copyBtn =
+  document.getElementById('copyBtn');
+
+const newBtn =
+  document.getElementById('newBtn');
+
+const toast =
+  document.getElementById('toast');
+
+const toastMsg =
+  document.getElementById('toastMsg');
+
+
+/* ================================================================
+   VARIABLES
+   ================================================================ */
+
+let currentImage = null;
+let currentAnalysis = null;
+let isProcessing = false;
+
+
+/* ================================================================
+   TOAST
+   ================================================================ */
+
+function showToast(message, type = 'success') {
+
+  toastMsg.textContent = message;
+
+  toast.className = 'toast show';
+
+  clearTimeout(toast._timer);
+
+  toast._timer = setTimeout(() => {
+    toast.classList.remove('show');
+  }, 3500);
+}
+
+
+/* ================================================================
+   ATTENDRE
+   ================================================================ */
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/* ================================================================
+   GROQ - VISION
+   ================================================================ */
+async function callGroqVision(messages) {
+  try {
+    if (!GROQ_API_KEY) {
+      throw new Error('Service IA non configuré côté serveur.');
+    }
+    console.log(`🔄 Vision → ${GROQ_MODEL_VISION}`);
+
+    const response = await fetch(GROQ_ENDPOINT, {
+      method: 'POST',
+
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${GROQ_API_KEY}`
+      },
+
+      body: JSON.stringify({
+        model: GROQ_MODEL_VISION,
+
+        messages: messages,
+
+        temperature: 0.2,
+
+        max_completion_tokens: 700,
+
+        reasoning_effort: 'none',
+
+        response_format: {
+          type: 'json_object'
+        },
+
+        stream: false
+      })
+    });
+
+    const data = await response.json();
+
+    /* ============================================================
+       DEBUG COMPLET
+       ============================================================ */
+
+    console.log('📦 Réponse Groq complète :', data);
+
+    if (!response.ok) {
+      console.error('❌ Réponse erreur Groq :', data);
+
+      const message =
+        data?.error?.message ||
+        `HTTP ${response.status}`;
+
+      if (response.status === 429) {
+        throw new Error(
+          'Limite Groq atteinte. Attends quelques secondes puis réessaie.'
+        );
+      }
+
+      if (response.status === 404) {
+        throw new Error(
+          `Modèle vision introuvable : ${GROQ_MODEL_VISION}`
+        );
+      }
+
+      throw new Error(message);
+    }
+
+    const content =
+      data?.choices?.[0]?.message?.content;
+
+    console.log('🧾 Contenu brut reçu :', content);
+
+    if (!content) {
+      throw new Error(
+        'Groq a renvoyé une réponse vide.'
+      );
+    }
+
+    return content;
+
+  } catch (error) {
+    console.error(
+      '❌ Erreur Groq Vision :',
+      error
+    );
+
+    throw error;
+  }
+}
+
+/* ================================================================
+   GROQ - TEXTE
+   ================================================================ */
+async function callGroqText(messages, maxTokens = 700) {
+  try {
+    console.log(`🔄 Texte → ${GROQ_MODEL_TEXT}`);
+
+    const response = await fetch(GROQ_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${GROQ_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: GROQ_MODEL_TEXT,
+        messages,
+        temperature: 0.2,
+        max_completion_tokens: maxTokens,
+        stream: false,
+        response_format: {
+          type: 'json_object'
+        }
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      const message =
+        data?.error?.message ||
+        `HTTP ${response.status}`;
+
+      if (response.status === 429) {
+        throw new Error(
+          'Limite Groq atteinte. Attends quelques secondes puis réessaie.'
+        );
+      }
+
+      if (response.status === 404) {
+        throw new Error(
+          `Modèle texte introuvable : ${GROQ_MODEL_TEXT}`
+        );
+      }
+
+      throw new Error(message);
+    }
+
+    const content =
+      data?.choices?.[0]?.message?.content;
+
+    if (!content) {
+      throw new Error(
+        'Le modèle texte a renvoyé une réponse vide.'
+      );
+    }
+
+    console.log('✅ Réponse texte reçue');
+
+    return content;
+
+  } catch (error) {
+    console.error('❌ Erreur Groq Texte:', error);
+    throw error;
+  }
+}
+
+/* ================================================================
+   APPEL GROQ - TEXTE
+   ================================================================ */
+
+async function callGroqText(
+  messages,
+  maxTokens = 700
+) {
+
+  try {
+
+    if (!GROQ_API_KEY) {
+      throw new Error('Service IA non configuré côté serveur.');
+    }
+
+    console.log(
+      `🔄 Texte → ${GROQ_MODEL_TEXT}`
+    );
+
+
+    const response = await fetch(
+      GROQ_ENDPOINT,
+      {
+        method: 'POST',
+
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${GROQ_API_KEY}`
+        },
+
+        body: JSON.stringify({
+
+          model: GROQ_MODEL_TEXT,
+
+          messages: messages,
+
+          temperature: 0.2,
+
+          max_completion_tokens:
+            maxTokens,
+
+          response_format: {
+            type: 'json_object'
+          }
+
+        })
+      }
+    );
+
+
+    /* ============================================================
+       ERREURS
+       ============================================================ */
+
+    if (!response.ok) {
+
+      let errorData = null;
+
+      try {
+        errorData = await response.json();
+      } catch (_) {
+        errorData = null;
+      }
+
+      const message =
+        errorData?.error?.message ||
+        `HTTP ${response.status}`;
+
+
+      if (response.status === 429) {
+
+        throw new Error(
+          'Limite Groq atteinte. Attends quelques secondes avant de réessayer.'
+        );
+      }
+
+
+      if (response.status === 404) {
+
+        throw new Error(
+          `Modèle texte introuvable : ${GROQ_MODEL_TEXT}`
+        );
+      }
+
+
+      throw new Error(
+        message
+      );
+    }
+
+
+    const data =
+      await response.json();
+
+
+    const content =
+      data?.choices?.[0]?.message?.content;
+
+
+    if (!content) {
+
+      throw new Error(
+        'Groq a renvoyé une réponse vide.'
+      );
+    }
+
+
+    console.log(
+      '✅ Réponse texte reçue'
+    );
+
+
+    return content;
+
+
+  } catch (error) {
+
+    console.error(
+      '❌ Erreur Groq Texte:',
+      error
+    );
+
+    throw error;
+  }
+}
+
+
+/* ================================================================
+   GESTION IMAGE
+   ================================================================ */
+
+function handleFile(file) {
+
+  if (!file) return;
+
+
+  /* Taille */
+
+  if (
+    file.size >
+    5 * 1024 * 1024
+  ) {
+
+    showToast(
+      '❌ Image trop lourde (max 5MB)',
+      'error'
+    );
+
+    return;
+  }
+
+
+  /* Formats */
+
+  const validTypes = [
+    'image/jpeg',
+    'image/png',
+    'image/webp',
+    'image/heic',
+    'image/heif'
+  ];
+
+
+  if (
+    !validTypes.includes(file.type)
+  ) {
+
+    showToast(
+      '❌ Format non supporté',
+      'error'
+    );
+
+    return;
+  }
+
+
+  const reader =
+    new FileReader();
+
+
+  reader.onload = event => {
+
+    const dataUrl =
+      event.target.result;
+
+
+    compressImage(
+      dataUrl,
+      1200
+    )
+      .then(compressed => {
+
+        currentImage =
+          compressed;
+
+        previewImage.src =
+          compressed;
+
+        preview.style.display =
+          'block';
+
+        analyzeBtn.disabled =
+          false;
+
+        showToast(
+          '✅ Image chargée !'
+        );
+
+      })
+      .catch(error => {
+
+        console.error(error);
+
+        showToast(
+          '❌ Impossible de traiter cette image.',
+          'error'
+        );
+
+      });
+
+  };
+
+
+  reader.onerror = () => {
+
+    showToast(
+      '❌ Erreur lors de la lecture de l’image.',
+      'error'
+    );
+
+  };
+
+
+  reader.readAsDataURL(file);
+}
+
+
+/* ================================================================
+   COMPRESSION
+   ================================================================ */
+
+function compressImage(
+  dataUrl,
+  maxSize
+) {
+
+  return new Promise(
+    (resolve, reject) => {
+
+      const img =
+        new Image();
+
+
+      img.onload = () => {
+
+        try {
+
+          const canvas =
+            document.createElement(
+              'canvas'
+            );
+
+
+          let width =
+            img.width;
+
+          let height =
+            img.height;
+
+
+          /* Redimensionnement */
+
+          if (
+            width > maxSize ||
+            height > maxSize
+          ) {
+
+            const ratio =
+              Math.min(
+                maxSize / width,
+                maxSize / height
+              );
+
+            width =
+              Math.round(
+                width * ratio
+              );
+
+            height =
+              Math.round(
+                height * ratio
+              );
+          }
+
+
+          canvas.width =
+            width;
+
+          canvas.height =
+            height;
+
+
+          const ctx =
+            canvas.getContext(
+              '2d'
+            );
+
+
+          ctx.drawImage(
+            img,
+            0,
+            0,
+            width,
+            height
+          );
+
+
+          const compressed =
+            canvas.toDataURL(
+              'image/jpeg',
+              0.72
+            );
+
+
+          resolve(
+            compressed
+          );
+
+        } catch (error) {
+
+          reject(error);
+
+        }
+      };
+
+
+      img.onerror = () => {
+
+        reject(
+          new Error(
+            'Image illisible.'
+          )
+        );
+
+      };
+
+
+      img.src =
+        dataUrl;
+    }
+  );
+}
+
+
+/* ================================================================
+   RESET UI
+   ================================================================ */
+
+function resetUI() {
+
+  currentImage =
+    null;
+
+  currentAnalysis =
+    null;
+
+  preview.style.display =
+    'none';
+
+  previewImage.src =
+    '';
+
+  analyzeBtn.disabled =
+    true;
+
+  loadingCard.style.display =
+    'none';
+
+  analysisCard.style.display =
+    'none';
+
+  responseCard.style.display =
+    'none';
+
+
+  document
+    .querySelectorAll(
+      '.loading .step'
+    )
+    .forEach(el => {
+
+      el.classList.remove(
+        'active',
+        'done'
+      );
+
+    });
+
+
+  loadingText.textContent =
+    'Analyse en cours...';
+}
+
+
+/* ================================================================
+   LOADING
+   ================================================================ */
+
+function showLoading() {
+
+  loadingCard.style.display =
+    'flex';
+
+  analysisCard.style.display =
+    'none';
+
+  responseCard.style.display =
+    'none';
+
+
+  document
+    .querySelectorAll(
+      '.loading .step'
+    )
+    .forEach(el => {
+
+      el.classList.remove(
+        'active',
+        'done'
+      );
+
+    });
+
+
+  document
+    .getElementById('s1')
+    .classList.add('active');
+
+
+  loadingText.textContent =
+    'Lecture de l’image...';
+}
+
+
+/* ================================================================
+   UPDATE ÉTAPE
+   ================================================================ */
+
+function updateStep(
+  step,
+  text
+) {
+
+  const steps = [
+    's1',
+    's2',
+    's3',
+    's4'
+  ];
+
+
+  const current =
+    document.getElementById(
+      steps[step]
+    );
+
+
+  if (current) {
+
+    current.classList.remove(
+      'active'
+    );
+
+    current.classList.add(
+      'done'
+    );
+  }
+
+
+  if (step < steps.length - 1) {
+
+    const next =
+      document.getElementById(
+        steps[step + 1]
+      );
+
+
+    if (next) {
+
+      next.classList.add(
+        'active'
+      );
+    }
+  }
+
+
+  loadingText.textContent =
+    text;
+}
+
+
+/* ================================================================
+   PROMPT ANALYSE IMAGE
+   ================================================================ */
+
+function buildAnalysisPrompt() {
+  return `
+Analyse l'image scolaire fournie.
+
+Retourne UNIQUEMENT un objet JSON valide.
+Aucun texte avant ou après.
+Aucun markdown.
+Aucun commentaire.
+
+Utilise exactement cette structure :
+
+{
+  "document": {
+    "matiere": "autre",
+    "type": "autre",
+    "langue": "francais",
+    "qualite": "bonne"
+  },
+  "contenu": {
+    "texte": "",
+    "formules": [],
+    "questions": []
+  },
+  "actions": [
+    "comprendre",
+    "resoudre",
+    "resumer",
+    "formules",
+    "quiz",
+    "traduire"
+  ],
+  "confiance": 0.8
+}
+
+Valeurs autorisées pour "matiere" :
+"mathematiques",
+"physique",
+"chimie",
+"svt",
+"francais",
+"anglais",
+"autre"
+
+Valeurs autorisées pour "type" :
+"exercice",
+"cours",
+"sujet_examen",
+"fiche_revision",
+"tableau",
+"schema",
+"autre"
+
+Règles :
+- texte = seulement le texte clairement lisible
+- formules = uniquement les formules visibles
+- questions = uniquement les questions visibles
+- ne rien inventer
+- confiance = nombre entre 0 et 1
+- réponse courte
+- JSON valide uniquement
+`;
+}
+
+/* ================================================================
+   PROMPTS ACTIONS
+   ================================================================ */
+
+function buildActionPrompt(
+  action,
+  analysis
+) {
+
+  const texte =
+    analysis?.contenu?.texte ||
+    'Texte non disponible';
+
+
+  const matiere =
+    analysis?.document?.matiere ||
+    'inconnue';
+
+
+  const type =
+    analysis?.document?.type ||
+    'inconnu';
+
+
+  const formules =
+    Array.isArray(
+      analysis?.contenu?.formules
+    )
+      ? analysis.contenu.formules.join(', ')
+      : 'Aucune';
+
+
+  const prompts = {
+
+    comprendre: `
+Explique le document à un élève de Terminale.
+
+Structure JSON :
+{
+  "titre": "...",
+  "introduction": "...",
+  "explications": [
+    {
+      "concept": "...",
+      "explication": "..."
+    }
+  ],
+  "resume": "..."
+}
+`,
+
+    resoudre: `
+Résous l'exercice étape par étape.
+
+Structure JSON :
+{
+  "titre": "...",
+  "donnees": [],
+  "demande": "...",
+  "methode": "...",
+  "etapes": [
+    {
+      "numero": 1,
+      "description": "...",
+      "calcul": "...",
+      "explication": "..."
+    }
+  ],
+  "resultat": "...",
+  "verification": "..."
+}
+
+Sois rigoureux.
+Ne saute pas les calculs importants.
+`,
+
+    resumer: `
+Résume le document pour réviser rapidement.
+
+Structure JSON :
+{
+  "titre": "...",
+  "points_cles": [
+    {
+      "titre": "...",
+      "contenu": "..."
+    }
+  ],
+  "conclusion": "..."
+}
+`,
+
+    formules: `
+Extrais uniquement les formules réellement présentes ou nécessaires.
+
+Structure JSON :
+{
+  "titre": "...",
+  "formules": [
+    {
+      "formule": "...",
+      "explication": "...",
+      "variables": {},
+      "exemple": "..."
+    }
+  ]
+}
+`,
+
+    quiz: `
+Crée 5 questions de quiz sur le document.
+
+Structure JSON :
+{
+  "titre": "...",
+  "questions": [
+    {
+      "question": "...",
+      "propositions": [
+        "A : ...",
+        "B : ...",
+        "C : ...",
+        "D : ..."
+      ],
+      "bonne_reponse": "A",
+      "feedback": "..."
+    }
+  ]
+}
+`,
+
+    traduire: `
+Traduis le contenu en français.
+
+Structure JSON :
+{
+  "titre": "...",
+  "traduction": "...",
+  "notes": "..."
+}
+`
+  };
+
+
+  return `
+Document analysé :
+
+Matière : ${matiere}
+Type : ${type}
+
+Texte :
+${texte}
+
+Formules :
+${formules}
+
+Action demandée :
+${action}
+
+${prompts[action] || ''}
+
+Réponds UNIQUEMENT en JSON valide.
+Aucun texte hors JSON.
+`;
+}
+
+
+/* ================================================================
+   PARSER JSON ROBUSTE
+   ================================================================ */
+function parseJSONRobust(text) {
+
+  if (typeof text !== 'string') {
+    throw new Error(
+      'La réponse de l’IA n’est pas du texte.'
+    );
+  }
+
+  console.log(
+    '🔍 Texte reçu avant parsing :',
+    text
+  );
+
+  let clean = text.trim();
+
+  /* ------------------------------------------------------------
+     Supprimer les blocs Markdown
+     ------------------------------------------------------------ */
+
+  clean = clean
+    .replace(/```json/gi, '')
+    .replace(/```/g, '')
+    .trim();
+
+  /* ------------------------------------------------------------
+     Tentative directe
+     ------------------------------------------------------------ */
+
+  try {
+    return JSON.parse(clean);
+  } catch (error) {
+    console.warn(
+      '⚠️ JSON direct impossible :',
+      error.message
+    );
+  }
+
+  /* ------------------------------------------------------------
+     Trouver le premier { et le dernier }
+     ------------------------------------------------------------ */
+
+  const firstBrace =
+    clean.indexOf('{');
+
+  const lastBrace =
+    clean.lastIndexOf('}');
+
+  if (
+    firstBrace === -1 ||
+    lastBrace === -1 ||
+    lastBrace <= firstBrace
+  ) {
+    console.error(
+      '❌ Aucun objet JSON détecté :',
+      clean
+    );
+
+    throw new Error(
+      'L’IA n’a pas retourné un JSON valide.'
+    );
+  }
+
+  const possibleJSON =
+    clean.substring(
+      firstBrace,
+      lastBrace + 1
+    );
+
+  console.log(
+    '🧩 JSON extrait :',
+    possibleJSON
+  );
+
+  try {
+
+    return JSON.parse(
+      possibleJSON
+    );
+
+  } catch (error) {
+
+    console.error(
+      '❌ JSON extrait invalide :',
+      error
+    );
+
+    console.error(
+      '📄 Contenu problématique :',
+      possibleJSON
+    );
+
+    throw new Error(
+      'Impossible de parser la réponse JSON de l’IA.'
+    );
+  }
+}
+
+
+/* ================================================================
+   AFFICHER ANALYSE
+   ================================================================ */
+
+function showAnalysis(
+  analysis
+) {
+
+  loadingCard.style.display =
+    'none';
+
+  analysisCard.style.display =
+    'flex';
+
+  responseCard.style.display =
+    'none';
+
+
+  const matiereLabels = {
+
+    mathematiques:
+      '📐 Mathématiques',
+
+    physique:
+      '⚡ Physique',
+
+    chimie:
+      '🧪 Chimie',
+
+    svt:
+      '🧬 SVT',
+
+    francais:
+      '📖 Français',
+
+    anglais:
+      '🌍 Anglais',
+
+    autre:
+      '📄 Autre'
+  };
+
+
+  const typeLabels = {
+
+    exercice:
+      '📝 Exercice',
+
+    cours:
+      '📚 Cours',
+
+    sujet_examen:
+      '📋 Sujet examen',
+
+    fiche_revision:
+      '📌 Fiche',
+
+    tableau:
+      '📊 Tableau',
+
+    schema:
+      '🔬 Schéma',
+
+    autre:
+      '📄 Autre'
+  };
+
+
+  const matiere =
+    analysis?.document?.matiere ||
+    'autre';
+
+
+  const type =
+    analysis?.document?.type ||
+    'autre';
+
+
+  let confidence =
+    Number(
+      analysis?.confiance
+    );
+
+
+  if (
+    Number.isNaN(confidence)
+  ) {
+
+    confidence =
+      0.7;
+  }
+
+
+  if (
+    confidence <= 1
+  ) {
+
+    confidence *= 100;
+  }
+
+
+  confidence =
+    Math.max(
+      0,
+      Math.min(
+        100,
+        Math.round(confidence)
+      )
+    );
+
+
+  subjectBadge.textContent =
+    matiereLabels[matiere] ||
+    '📄 Autre';
+
+
+  typeBadge.textContent =
+    typeLabels[type] ||
+    '📄 Autre';
+
+
+  confianceBadge.textContent =
+    `✅ ${confidence}%`;
+
+
+  const availableActions =
+    Array.isArray(
+      analysis?.actions
+    )
+      ? analysis.actions
+      : [
+          'comprendre',
+          'resoudre',
+          'resumer',
+          'formules',
+          'quiz',
+          'traduire'
+        ];
+
+
+  document
+    .querySelectorAll('.act')
+    .forEach(button => {
+
+      const action =
+        button.dataset.action;
+
+
+      button.style.display =
+        availableActions.includes(
+          action
+        )
+          ? 'block'
+          : 'none';
+    });
+
+
+  currentAnalysis =
+    analysis;
+
+
+  showToast(
+    '✅ Analyse terminée !'
+  );
+}
+
+
+/* ================================================================
+   AFFICHER REPONSE
+   ================================================================ */
+
+function showResponse(
+  title,
+  html
+) {
+
+  responseCard.style.display =
+    'flex';
+
+
+  respTitle.textContent =
+    title;
+
+
+  respContent.innerHTML =
+    html;
+
+
+  responseCard.scrollIntoView({
+    behavior: 'smooth',
+    block: 'start'
+  });
+}
+
+
+/* ================================================================
+   ECHAPPEMENT HTML
+   ================================================================ */
+
+function escapeHtml(
+  value
+) {
+
+  if (
+    value === null ||
+    value === undefined
+  ) {
+
+    return '';
+  }
+
+
+  return String(value)
+
+    .replace(
+      /&/g,
+      '&amp;'
+    )
+
+    .replace(
+      /</g,
+      '&lt;'
+    )
+
+    .replace(
+      />/g,
+      '&gt;'
+    )
+
+    .replace(
+      /"/g,
+      '&quot;'
+    )
+
+    .replace(
+      /'/g,
+      '&#039;'
+    );
+}
+
+
+/* ================================================================
+   FORMATAGE REPONSE
+   ================================================================ */
+
+function formatResponse(
+  data,
+  action
+) {
+
+  let html = '';
+
+
+  try {
+
+    switch (action) {
+
+
+      /* ==========================================================
+         COMPRENDRE
+         ========================================================== */
+
+      case 'comprendre':
+
+        html = `
+
+          ${
+            data.introduction
+              ? `<p><strong>${escapeHtml(
+                  data.introduction
+                )}</strong></p>`
+              : ''
+          }
+
+          ${
+            Array.isArray(
+              data.explications
+            )
+              ? data.explications
+                  .map(item => `
+                    <div class="step">
+
+                      <strong>
+                        ${escapeHtml(
+                          item.concept || ''
+                        )}
+                      </strong>
+
+                      <p>
+                        ${escapeHtml(
+                          item.explication || ''
+                        )}
+                      </p>
+
+                    </div>
+                  `)
+                  .join('')
+              : ''
+          }
+
+          ${
+            data.resume
+              ? `
+                <p>
+                  <strong>📌 Résumé :</strong>
+                  ${escapeHtml(
+                    data.resume
+                  )}
+                </p>
+              `
+              : ''
+          }
+
+        `;
+
+        break;
+
+
+      /* ==========================================================
+         RESOUDRE
+         ========================================================== */
+
+      case 'resoudre':
+
+        html = `
+
+          ${
+            Array.isArray(
+              data.donnees
+            ) &&
+            data.donnees.length
+              ? `
+                <p>
+                  <strong>📊 Données :</strong>
+                  ${data.donnees
+                    .map(escapeHtml)
+                    .join(', ')}
+                </p>
+              `
+              : ''
+          }
+
+          ${
+            data.demande
+              ? `
+                <p>
+                  <strong>❓ Demande :</strong>
+                  ${escapeHtml(
+                    data.demande
+                  )}
+                </p>
+              `
+              : ''
+          }
+
+          ${
+            data.methode
+              ? `
+                <div class="step">
+                  <strong>🧠 Méthode</strong>
+                  <p>
+                    ${escapeHtml(
+                      data.methode
+                    )}
+                  </p>
+                </div>
+              `
+              : ''
+          }
+
+          ${
+            Array.isArray(
+              data.etapes
+            )
+              ? data.etapes
+                  .map(step => `
+
+                    <div class="step">
+
+                      <strong>
+                        Étape ${
+                          escapeHtml(
+                            step.numero
+                          )
+                        }
+                      </strong>
+
+                      <p>
+                        ${escapeHtml(
+                          step.description || ''
+                        )}
+                      </p>
+
+                      ${
+                        step.calcul
+                          ? `
+                            <div class="formula">
+                              ${escapeHtml(
+                                step.calcul
+                              )}
+                            </div>
+                          `
+                          : ''
+                      }
+
+                      ${
+                        step.explication
+                          ? `
+                            <p>
+                              <em>
+                                ${escapeHtml(
+                                  step.explication
+                                )}
+                              </em>
+                            </p>
+                          `
+                          : ''
+                      }
+
+                    </div>
+
+                  `)
+                  .join('')
+              : ''
+          }
+
+          ${
+            data.resultat
+              ? `
+                <p>
+                  <strong>✅ Résultat :</strong>
+                  ${escapeHtml(
+                    data.resultat
+                  )}
+                </p>
+              `
+              : ''
+          }
+
+          ${
+            data.verification
+              ? `
+                <div class="step">
+                  <strong>🔎 Vérification</strong>
+                  <p>
+                    ${escapeHtml(
+                      data.verification
+                    )}
+                  </p>
+                </div>
+              `
+              : ''
+          }
+
+        `;
+
+        break;
+
+
+      /* ==========================================================
+         RESUME
+         ========================================================== */
+
+      case 'resumer':
+
+        html = `
+
+          ${
+            Array.isArray(
+              data.points_cles
+            )
+              ? data.points_cles
+                  .map(point => `
+
+                    <div class="step">
+
+                      <strong>
+                        ${escapeHtml(
+                          point.titre || ''
+                        )}
+                      </strong>
+
+                      <p>
+                        ${escapeHtml(
+                          point.contenu || ''
+                        )}
+                      </p>
+
+                    </div>
+
+                  `)
+                  .join('')
+              : ''
+          }
+
+          ${
+            data.conclusion
+              ? `
+                <p>
+                  <strong>📌 Conclusion :</strong>
+                  ${escapeHtml(
+                    data.conclusion
+                  )}
+                </p>
+              `
+              : ''
+          }
+
+        `;
+
+        break;
+
+
+      /* ==========================================================
+         FORMULES
+         ========================================================== */
+
+      case 'formules':
+
+        html = `
+
+          ${
+            Array.isArray(
+              data.formules
+            )
+              ? data.formules
+                  .map(formula => `
+
+                    <div class="formula">
+                      ${escapeHtml(
+                        formula.formule || ''
+                      )}
+                    </div>
+
+                    ${
+                      formula.explication
+                        ? `
+                          <p>
+                            ${escapeHtml(
+                              formula.explication
+                            )}
+                          </p>
+                        `
+                        : ''
+                    }
+
+                    ${
+                      formula.exemple
+                        ? `
+                          <div class="step">
+                            <strong>Exemple</strong>
+                            <p>
+                              ${escapeHtml(
+                                formula.exemple
+                              )}
+                            </p>
+                          </div>
+                        `
+                        : ''
+                    }
+
+                  `)
+                  .join('')
+              : '<p>Aucune formule trouvée.</p>'
+          }
+
+        `;
+
+        break;
+
+
+      /* ==========================================================
+         QUIZ
+         ========================================================== */
+
+      case 'quiz':
+
+        html = `
+
+          ${
+            Array.isArray(
+              data.questions
+            )
+              ? data.questions
+                  .map(
+                    (question, index) => `
+
+                      <div class="step">
+
+                        <strong>
+                          Question ${index + 1}
+                        </strong>
+
+                        <p>
+                          ${escapeHtml(
+                            question.question || ''
+                          )}
+                        </p>
+
+                        ${
+                          Array.isArray(
+                            question.propositions
+                          )
+                            ? `
+                              <ul>
+                                ${question
+                                  .propositions
+                                  .map(
+                                    option =>
+                                      `<li>${escapeHtml(
+                                        option
+                                      )}</li>`
+                                  )
+                                  .join('')}
+                              </ul>
+                            `
+                            : ''
+                        }
+
+                        ${
+                          question.bonne_reponse
+                            ? `
+                              <p>
+                                <strong>
+                                  ✅ Bonne réponse :
+                                </strong>
+                                ${escapeHtml(
+                                  question.bonne_reponse
+                                )}
+                              </p>
+                            `
+                            : ''
+                        }
+
+                        ${
+                          question.feedback
+                            ? `
+                              <p>
+                                <em>
+                                  ${escapeHtml(
+                                    question.feedback
+                                  )}
+                                </em>
+                              </p>
+                            `
+                            : ''
+                        }
+
+                      </div>
+
+                    `
+                  )
+                  .join('')
+              : ''
+          }
+
+        `;
+
+        break;
+
+
+      /* ==========================================================
+         TRADUIRE
+         ========================================================== */
+
+      case 'traduire':
+
+        html = `
+
+          <div class="step">
+
+            <p>
+              ${escapeHtml(
+                data.traduction || ''
+              )}
+            </p>
+
+          </div>
+
+          ${
+            data.notes
+              ? `
+                <p>
+                  <strong>📝 Notes :</strong>
+                  ${escapeHtml(
+                    data.notes
+                  )}
+                </p>
+              `
+              : ''
+          }
+
+        `;
+
+        break;
+
+
+      default:
+
+        html =
+          `<pre>${escapeHtml(
+            JSON.stringify(
+              data,
+              null,
+              2
+            )
+          )}</pre>`;
+    }
+
+
+  } catch (error) {
+
+    console.error(
+      'Erreur formatage:',
+      error
+    );
+
+
+    html =
+      `<pre>${escapeHtml(
+        JSON.stringify(
+          data,
+          null,
+          2
+        )
+      )}</pre>`;
+  }
+
+
+  return html;
+}
+
+
+/* ================================================================
+   ANALYSE PRINCIPALE
+   ================================================================ */
+
+async function startAnalysis() {
+
+  if (
+    !currentImage ||
+    isProcessing
+  ) {
+    return;
+  }
+
+
+  isProcessing =
+    true;
+
+
+  analyzeBtn.disabled =
+    true;
+
+
+  analyzeBtn.innerHTML = `
+    <span
+      class="spinner"
+      style="
+        display:inline-block;
+        width:18px;
+        height:18px;
+        border:2px solid rgba(10,10,10,.15);
+        border-top-color:#0A0A0A;
+        border-radius:50%;
+        animation:spin .7s linear infinite;
+        margin-right:8px;
+      "
+    ></span>
+    Analyse en cours...
+  `;
+
+
+  showLoading();
+
+
+  try {
+
+    /* ==========================================================
+       ETAPE 1
+       ========================================================== */
+
+    updateStep(
+      0,
+      'Lecture de l’image...'
+    );
+
+
+    await sleep(300);
+
+
+    /* ==========================================================
+       ETAPE 2
+       ========================================================== */
+
+    updateStep(
+      1,
+      'Reconnaissance du texte...'
+    );
+
+
+    await sleep(300);
+
+
+    /* ==========================================================
+       ETAPE 3
+       ========================================================== */
+
+    updateStep(
+      2,
+      'Analyse du contenu...'
+    );
+
+
+    const visionResponse =
+      await callGroqVision([
+
+        {
+          role: 'system',
+
+          content:
+            'Tu es un assistant pédagogique spécialisé dans l’analyse de documents scolaires. Réponds uniquement en JSON valide.'
+        },
+
+        {
+          role: 'user',
+
+          content: [
+
+            {
+              type: 'text',
+
+              text:
+                buildAnalysisPrompt()
+            },
+
+            {
+              type: 'image_url',
+
+              image_url: {
+                url:
+                  currentImage
+              }
+            }
+
+          ]
+        }
+
+      ]);
+
+
+    /* ==========================================================
+       JSON
+       ========================================================== */
+
+    const analysis =
+      parseJSONRobust(
+        visionResponse
+      );
+
+
+    /* ==========================================================
+       ETAPE 4
+       ========================================================== */
+
+    updateStep(
+      3,
+      'Préparation des actions...'
+    );
+
+
+    await sleep(300);
+
+
+    showAnalysis(
+      analysis
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      '❌ Erreur analyse:',
+      error
+    );
+
+
+    loadingCard.style.display =
+      'none';
+
+
+    showToast(
+      `❌ ${error.message}`,
+      'error'
+    );
+
+  } finally {
+
+    isProcessing =
+      false;
+
+
+    analyzeBtn.disabled =
+      !currentImage;
+
+
+    analyzeBtn.innerHTML = `
+      <i class="fas fa-wand-magic-sparkles"></i>
+      Analyser
+    `;
+  }
+}
+
+
+/* ================================================================
+   EXECUTER UNE ACTION
+   ================================================================ */
+
+async function executeAction(
+  action
+) {
+
+  if (
+    !currentAnalysis ||
+    isProcessing
+  ) {
+    return;
+  }
+
+
+  isProcessing =
+    true;
+
+
+  showLoading();
+
+
+  loadingText.textContent =
+    '🧠 Préparation de la réponse...';
+
+
+  try {
+
+    const actionPrompt =
+      buildActionPrompt(
+        action,
+        currentAnalysis
+      );
+
+
+    const maxTokens =
+      TOKEN_LIMITS[action] ||
+      700;
+
+
+    const response =
+      await callGroqText(
+
+        [
+
+          {
+            role: 'system',
+
+            content:
+              'Tu es un professeur expert. Réponds uniquement en JSON valide. Sois clair, rigoureux et concis.'
+          },
+
+          {
+            role: 'user',
+
+            content:
+              actionPrompt
+          }
+
+        ],
+
+        maxTokens
+      );
+
+
+    const result =
+      parseJSONRobust(
+        response
+      );
+
+
+    const actionLabels = {
+
+      comprendre:
+        '🧠 Comprendre',
+
+      resoudre:
+        '✍️ Résolution',
+
+      resumer:
+        '📚 Résumé',
+
+      formules:
+        '📐 Formules',
+
+      quiz:
+        '❓ Quiz',
+
+      traduire:
+        '🌍 Traduction'
+
+    };
+
+
+    const html =
+      formatResponse(
+        result,
+        action
+      );
+
+
+    showResponse(
+
+      actionLabels[action] ||
+        'Résultat',
+
+      html
+    );
+
+
+    loadingCard.style.display =
+      'none';
+
+
+    showToast(
+      '✅ Réponse prête !'
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      '❌ Erreur action:',
+      error
+    );
+
+
+    loadingCard.style.display =
+      'none';
+
+
+    showToast(
+      `❌ ${error.message}`,
+      'error'
+    );
+
+  } finally {
+
+    isProcessing =
+      false;
+  }
+}
+
+
+/* ================================================================
+   EVENEMENTS - GALERIE
+   ================================================================ */
+
+galleryBtn.addEventListener(
+  'click',
+  () => {
+    fileInput.click();
+  }
+);
+
+
+fileInput.addEventListener(
+  'change',
+  event => {
+
+    if (
+      event.target.files &&
+      event.target.files.length
+    ) {
+
+      handleFile(
+        event.target.files[0]
+      );
+
+      fileInput.value =
+        '';
+    }
+  }
+);
+
+
+/* ================================================================
+   EVENEMENTS - CAMERA
+   ================================================================ */
+
+cameraBtn.addEventListener(
+  'click',
+  () => {
+    cameraInput.click();
+  }
+);
+
+
+cameraInput.addEventListener(
+  'change',
+  event => {
+
+    if (
+      event.target.files &&
+      event.target.files.length
+    ) {
+
+      handleFile(
+        event.target.files[0]
+      );
+
+      cameraInput.value =
+        '';
+    }
+  }
+);
+
+
+/* ================================================================
+   DRAG & DROP
+   ================================================================ */
+
+dropzone.addEventListener(
+  'dragover',
+  event => {
+
+    event.preventDefault();
+
+    dropzone.style.borderColor =
+      'rgba(184,134,11,0.35)';
+  }
+);
+
+
+dropzone.addEventListener(
+  'dragleave',
+  () => {
+
+    dropzone.style.borderColor =
+      '';
+  }
+);
+
+
+dropzone.addEventListener(
+  'drop',
+  event => {
+
+    event.preventDefault();
+
+    dropzone.style.borderColor =
+      '';
+
+
+    if (
+      event.dataTransfer.files &&
+      event.dataTransfer.files.length
+    ) {
+
+      handleFile(
+        event.dataTransfer.files[0]
+      );
+    }
+
+  }
+);
+
+
+/* ================================================================
+   SUPPRIMER IMAGE
+   ================================================================ */
+
+removeBtn.addEventListener(
+  'click',
+  resetUI
+);
+
+
+/* ================================================================
+   ANALYSER
+   ================================================================ */
+
+analyzeBtn.addEventListener(
+  'click',
+  startAnalysis
+);
+
+
+/* ================================================================
+   ACTIONS
+   ================================================================ */
+
+document
+  .querySelectorAll('.act')
+  .forEach(button => {
+
+    button.addEventListener(
+      'click',
+      () => {
+
+        executeAction(
+          button.dataset.action
+        );
+
+      }
+    );
+
+  });
+
+
+/* ================================================================
+   COPIER
+   ================================================================ */
+
+copyBtn.addEventListener(
+  'click',
+  async () => {
+
+    try {
+
+      const text =
+        respContent.innerText;
+
+
+      if (
+        navigator.clipboard &&
+        window.isSecureContext
+      ) {
+
+        await navigator.clipboard.writeText(
+          text
+        );
+
+      } else {
+
+        const textarea =
+          document.createElement(
+            'textarea'
+          );
+
+        textarea.value =
+          text;
+
+        textarea.style.position =
+          'fixed';
+
+        textarea.style.opacity =
+          '0';
+
+        document.body.appendChild(
+          textarea
+        );
+
+        textarea.focus();
+
+        textarea.select();
+
+        document.execCommand(
+          'copy'
+        );
+
+        textarea.remove();
+      }
+
+
+      showToast(
+        '📋 Copié !'
+      );
+
+
+    } catch (error) {
+
+      console.error(
+        error
+      );
+
+      showToast(
+        '❌ Impossible de copier.',
+        'error'
+      );
+    }
+
+  }
+);
+
+
+/* ================================================================
+   NOUVEAU
+   ================================================================ */
+
+newBtn.addEventListener(
+  'click',
+  () => {
+
+    resetUI();
+
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+
+  }
+);
+
+
+/* ================================================================
+   INITIALISATION
+   ================================================================ */
+
+console.log(
+  '🚀 ARV-SCAN initialisé'
+);
+
+console.log(
+  '👁️ Vision:',
+  GROQ_MODEL_VISION
+);
+
+console.log(
+  '🧠 Texte:',
+  GROQ_MODEL_TEXT
+);
+
+</script>
+</body>
+</html>

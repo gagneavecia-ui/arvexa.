@@ -1,0 +1,2854 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <meta name="theme-color" content="#0A0A0A">
+  <meta name="description" content="ARVEXA School - Lecture">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon.png">
+  <link rel="icon" href="icon.png" type="image/png">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  <script src="register-sw.js" defer></script>
+
+  <style>
+    /* ============================================================
+       ROOT — Tokens
+       ============================================================ */
+    :root {
+      --primary: #1A3A2A;
+      --accent: #B8860B;
+      --accent-bright: #E0B84A;
+      --success: #2D7D5A;
+      --success-light: #3AB67E;
+      --danger: #B85C3A;
+      --danger-light: #f87171;
+      --warning: #D4A017;
+      --blue: #60a5fa;
+
+      --bg-dark: #0A0A0A;
+      --bg-surface: #141414;
+      --bg-card: rgba(20, 20, 20, 0.7);
+
+      --text-light: #F5F0E8;
+      --text-dim: #8A8A7A;
+      --text-muted: #5A5A4A;
+      --text-body: #cfd0cc;
+
+      --border-soft: rgba(255, 255, 255, 0.05);
+      --border-gold: rgba(224, 184, 74, 0.1);
+      --card-border: rgba(184, 134, 11, 0.08);
+
+      --transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+      --radius: 16px;
+      --content-max: 820px;
+
+      --font-body: 'Inter', 'Segoe UI', Arial, sans-serif;
+      --font-serif: 'Playfair Display', Georgia, serif;
+      --font-mono: 'SF Mono', 'Monaco', 'Consolas', 'Courier New', monospace;
+
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    html[data-theme="light"] {
+      --bg-dark: #FAF7F0;
+      --bg-surface: #FFFFFF;
+      --bg-card: rgba(255, 255, 255, 0.85);
+      --text-light: #1A1A1A;
+      --text-dim: #4A4A4A;
+      --text-muted: #7A7A7A;
+      --text-body: #2A2A2A;
+      --border-soft: rgba(0, 0, 0, 0.08);
+      --border-gold: rgba(184, 134, 11, 0.18);
+      --card-border: rgba(184, 134, 11, 0.15);
+      --accent: #96650A;
+      --accent-bright: #B8860B;
+      --success: #1E6B47;
+      --warning: #B37D00;
+      --blue: #2563EB;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html { scroll-behavior: smooth; width: 100%; overflow-x: hidden; height: 100%; -webkit-text-size-adjust: 100%; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg-dark);
+      color: var(--text-light);
+      font-size: 15px;
+      line-height: 1.8;
+      min-height: 100vh;
+      height: 100%;
+      width: 100%;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* ============================================================
+       FOND
+       ============================================================ */
+    .gradient-bg {
+      position: fixed; inset: 0; z-index: -2;
+      background:
+        radial-gradient(ellipse 40% 30% at 30% 15%, rgba(26, 58, 42, 0.16) 0%, transparent 70%),
+        radial-gradient(ellipse 35% 25% at 75% 85%, rgba(184, 134, 11, 0.05) 0%, transparent 60%),
+        linear-gradient(180deg, #0A0A0A 0%, #060606 100%);
+      transition: opacity 0.3s ease;
+    }
+    html[data-theme="light"] .gradient-bg {
+      background:
+        radial-gradient(ellipse 40% 30% at 30% 15%, rgba(184, 134, 11, 0.06) 0%, transparent 70%),
+        radial-gradient(ellipse 35% 25% at 75% 85%, rgba(26, 58, 42, 0.04) 0%, transparent 60%),
+        linear-gradient(180deg, #FAF7F0 0%, #F0EBE0 100%);
+    }
+
+    /* ============================================================
+       HEADER
+       ============================================================ */
+    .header {
+      position: sticky; top: 0; z-index: 50;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: calc(8px + var(--safe-top)) 12px 8px;
+      background: rgba(10, 10, 10, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(184, 134, 11, 0.06);
+      gap: 8px; min-height: 48px; flex-shrink: 0;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+    html[data-theme="light"] .header {
+      background: rgba(250, 247, 240, 0.94);
+      border-bottom-color: rgba(184, 134, 11, 0.12);
+    }
+
+    .header-left {
+      display: flex; align-items: center; gap: 10px;
+      min-width: 0; flex: 1;
+    }
+
+    .header .back-btn {
+      display: flex; align-items: center; justify-content: center;
+      width: 32px; height: 32px; border-radius: 8px;
+      border: 1px solid var(--border-soft); background: transparent;
+      color: var(--text-dim); cursor: pointer;
+      transition: var(--transition); font-size: 14px;
+      text-decoration: none; flex-shrink: 0;
+    }
+    .header .back-btn:hover {
+      border-color: rgba(184, 134, 11, 0.14);
+      color: var(--text-light);
+    }
+
+    .header .header-title {
+      font-size: 13px; font-weight: 600;
+      color: var(--text-light);
+      white-space: nowrap; overflow: hidden;
+      text-overflow: ellipsis; min-width: 0;
+    }
+    .header .header-title i {
+      color: var(--accent-bright);
+      margin-right: 4px; font-size: 12px;
+    }
+
+    .header-right {
+      display: flex; align-items: center; gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .theme-btn {
+      display: flex; align-items: center; justify-content: center;
+      width: 34px; height: 34px; border-radius: 8px;
+      border: 1px solid var(--border-soft); background: transparent;
+      color: var(--text-dim); cursor: pointer;
+      transition: var(--transition); font-size: 13px;
+      flex-shrink: 0;
+    }
+    .theme-btn:hover {
+      border-color: rgba(184, 134, 11, 0.2);
+      color: var(--accent-bright);
+      background: rgba(184, 134, 11, 0.06);
+    }
+    .theme-btn i { transition: transform 0.3s ease; }
+    .theme-btn:hover i { transform: rotate(15deg); }
+
+    .tts-btn {
+      display: flex; align-items: center; gap: 5px;
+      padding: 5px 11px; border-radius: 20px;
+      border: 1px solid rgba(96, 165, 250, 0.15);
+      background: rgba(96, 165, 250, 0.06);
+      color: var(--blue); font-size: 11px; font-weight: 600;
+      cursor: pointer; transition: var(--transition);
+      font-family: var(--font-body);
+      flex-shrink: 0; white-space: nowrap;
+    }
+    .tts-btn:hover { background: rgba(96, 165, 250, 0.12); }
+    .tts-btn i { font-size: 12px; }
+    .tts-btn.speaking {
+      border-color: rgba(96, 165, 250, 0.4);
+      background: rgba(96, 165, 250, 0.15);
+    }
+    .tts-btn.speaking i { animation: ttsPulse 1.2s ease-in-out infinite; }
+    .tts-btn.paused {
+      border-color: rgba(224, 184, 74, 0.3);
+      background: rgba(224, 184, 74, 0.08);
+      color: var(--accent-bright);
+    }
+    @keyframes ttsPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .notes-btn {
+      display: flex; align-items: center; gap: 5px;
+      padding: 5px 11px; border-radius: 20px;
+      border: 1px solid rgba(184, 134, 11, 0.12);
+      background: rgba(184, 134, 11, 0.06);
+      color: var(--accent-bright); font-size: 11px; font-weight: 600;
+      cursor: pointer; transition: var(--transition);
+      font-family: var(--font-body);
+      flex-shrink: 0; white-space: nowrap;
+      position: relative;
+    }
+    .notes-btn:hover { background: rgba(184, 134, 11, 0.12); }
+    .notes-btn i { font-size: 12px; }
+    .notes-btn .dot {
+      position: absolute; top: 4px; right: 4px;
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--success); display: none;
+    }
+    .notes-btn .dot.show { display: block; }
+
+    /* ============================================================
+       PROGRESSION LECTURE
+       ============================================================ */
+    .read-progress {
+      position: fixed; top: 0; left: 0; right: 0;
+      height: 2px; background: transparent;
+      z-index: 100; pointer-events: none;
+    }
+    .read-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-bright));
+      width: 0%; transition: width 0.15s ease-out;
+      box-shadow: 0 0 8px rgba(224, 184, 74, 0.5);
+    }
+
+    /* ============================================================
+       CONTENT WRAPPER
+       ============================================================ */
+    .content-wrapper {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 16px 16px 80px;
+      max-width: var(--content-max);
+      margin: 0 auto;
+      width: 100%;
+      min-width: 0;
+      transition: background-color 0.3s ease;
+    }
+    .content-wrapper::-webkit-scrollbar { width: 4px; }
+    .content-wrapper::-webkit-scrollbar-track { background: transparent; }
+    .content-wrapper::-webkit-scrollbar-thumb {
+      background: rgba(184, 134, 11, 0.2);
+      border-radius: 10px;
+    }
+
+    #contentBody {
+      background: transparent;
+      min-height: 200px;
+      padding: 0;
+      min-width: 0;
+      max-width: 100%;
+      font-size: 16px;
+      line-height: 1.85;
+      color: var(--text-body);
+      letter-spacing: 0.005em;
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+    }
+
+    /* ============================================================
+       ÉTATS
+       ============================================================ */
+    #contentBody .loading-state {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 60px 20px; gap: 12px;
+    }
+    #contentBody .spinner {
+      width: 32px; height: 32px;
+      border: 3px solid rgba(184, 134, 11, 0.15);
+      border-top-color: var(--accent-bright);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #contentBody .loading-state p {
+      font-size: 13px; color: var(--text-muted);
+    }
+
+    /* ============================================================
+       SABLIER ANIMÉ — Contenu en préparation
+       ============================================================ */
+    .hourglass-wrap {
+      position: relative;
+      width: 100px;
+      height: 100px;
+      margin: 0 auto 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hourglass-wrap::before {
+      content: '';
+      position: absolute;
+      inset: -20%;
+      border-radius: 50%;
+      background: radial-gradient(
+        circle,
+        rgba(224, 184, 74, 0.25) 0%,
+        rgba(224, 184, 74, 0.08) 40%,
+        transparent 70%
+      );
+      animation: hourglassHalo 3s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes hourglassHalo {
+      0%, 100% { transform: scale(1); opacity: 0.6; }
+      50% { transform: scale(1.15); opacity: 1; }
+    }
+
+    .hourglass-svg {
+      width: 72px;
+      height: 72px;
+      position: relative;
+      z-index: 1;
+      animation: hourglassTilt 6s ease-in-out infinite;
+      filter: drop-shadow(0 0 12px rgba(224, 184, 74, 0.4));
+    }
+
+    @keyframes hourglassTilt {
+      0%, 100% { transform: rotate(-3deg); }
+      50% { transform: rotate(3deg); }
+    }
+
+    .hourglass-svg .frame {
+      stroke: var(--accent-bright);
+      stroke-width: 2;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .hourglass-svg .glass {
+      fill: rgba(224, 184, 74, 0.08);
+      stroke: rgba(224, 184, 74, 0.4);
+      stroke-width: 1.5;
+    }
+
+    .hourglass-svg .sand-top {
+      fill: var(--accent-bright);
+      animation: sandTopDrain 4s ease-in-out infinite;
+      transform-origin: center top;
+    }
+
+    @keyframes sandTopDrain {
+      0%, 10% { transform: scaleY(1); opacity: 1; }
+      80%, 90% { transform: scaleY(0.05); opacity: 0.9; }
+      100% { transform: scaleY(1); opacity: 1; }
+    }
+
+    .hourglass-svg .sand-stream {
+      fill: var(--accent-bright);
+      animation: sandStream 4s ease-in-out infinite;
+    }
+
+    @keyframes sandStream {
+      0%, 15% { opacity: 0.9; }
+      75%, 85% { opacity: 0.9; }
+      95%, 100% { opacity: 0; }
+    }
+
+    .hourglass-svg .sand-bottom {
+      fill: var(--accent-bright);
+      animation: sandBottomFill 4s ease-in-out infinite;
+      transform-origin: center bottom;
+    }
+
+    @keyframes sandBottomFill {
+      0%, 10% { transform: scaleY(0.1); opacity: 0.8; }
+      80%, 90% { transform: scaleY(1); opacity: 1; }
+      100% { transform: scaleY(0.1); opacity: 0.8; }
+    }
+
+    .hourglass-particle {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: var(--accent-bright);
+      box-shadow: 0 0 6px var(--accent-bright);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .hourglass-particle:nth-child(1) { left: 50%; top: 35%; animation: particleDrop 2.5s ease-in 0s infinite; }
+    .hourglass-particle:nth-child(2) { left: 48%; top: 35%; animation: particleDrop 2.5s ease-in 0.6s infinite; }
+    .hourglass-particle:nth-child(3) { left: 52%; top: 35%; animation: particleDrop 2.5s ease-in 1.2s infinite; }
+    .hourglass-particle:nth-child(4) { left: 50%; top: 35%; animation: particleDrop 2.5s ease-in 1.8s infinite; }
+
+    @keyframes particleDrop {
+      0% { opacity: 0; transform: translateY(0) scale(0.5); }
+      10% { opacity: 1; transform: translateY(0) scale(1); }
+      80% { opacity: 1; transform: translateY(28px) scale(1); }
+      100% { opacity: 0; transform: translateY(35px) scale(0.4); }
+    }
+
+    html[data-theme="light"] .hourglass-wrap::before {
+      background: radial-gradient(
+        circle,
+        rgba(184, 134, 11, 0.3) 0%,
+        rgba(184, 134, 11, 0.1) 40%,
+        transparent 70%
+      );
+    }
+
+    html[data-theme="light"] .hourglass-svg {
+      filter: drop-shadow(0 0 12px rgba(184, 134, 11, 0.5));
+    }
+
+    .content-unavailable {
+      text-align: center; padding: 60px 24px;
+      display: flex; flex-direction: column;
+      align-items: center; gap: 16px;
+      min-height: 320px; justify-content: center;
+    }
+    .content-unavailable .cu-icon {
+      width: 72px; height: 72px; border-radius: 20px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(184, 134, 11, 0.08);
+      border: 1px solid rgba(184, 134, 11, 0.15);
+      font-size: 32px; color: var(--accent-bright);
+      margin-bottom: 4px;
+    }
+    .content-unavailable h2 {
+      font-family: var(--font-serif);
+      font-size: 22px; font-weight: 700;
+      color: var(--text-light); margin: 0;
+    }
+    .content-unavailable p {
+      font-size: 14px; color: var(--text-dim);
+      max-width: 380px; line-height: 1.7; margin: 0;
+    }
+    .content-unavailable .cu-actions {
+      display: flex; gap: 10px; margin-top: 8px;
+      flex-wrap: wrap; justify-content: center;
+    }
+    .content-unavailable .cu-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 22px; border-radius: 100px;
+      border: 1px solid var(--border-soft); background: transparent;
+      color: var(--text-light); text-decoration: none;
+      font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: var(--transition);
+      font-family: var(--font-body);
+    }
+    .content-unavailable .cu-btn:hover {
+      border-color: rgba(184, 134, 11, 0.3);
+      background: rgba(184, 134, 11, 0.08);
+      color: var(--accent-bright);
+    }
+    .content-unavailable .cu-btn.primary {
+      background: linear-gradient(135deg, var(--accent-bright), var(--accent));
+      color: #0A0A0A; border-color: transparent;
+    }
+    .content-unavailable .cu-btn.primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 22px rgba(184, 134, 11, 0.3);
+    }
+
+    /* ============================================================
+       NAVIGATION BAS DE PAGE
+       ============================================================ */
+    .nav-bar {
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 12px; margin-top: 40px; padding-top: 24px;
+      border-top: 1px solid var(--border-soft);
+      flex-wrap: wrap;
+    }
+    .nav-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 20px; border-radius: 100px;
+      border: 1px solid var(--border-soft);
+      background: var(--bg-card);
+      color: var(--text-dim); font-size: 13px; font-weight: 500;
+      cursor: pointer; transition: var(--transition);
+      font-family: var(--font-body); text-decoration: none;
+    }
+    .nav-btn:hover:not(:disabled) {
+      border-color: rgba(184, 134, 11, 0.2);
+      color: var(--text-light);
+      transform: translateY(-1px);
+    }
+    .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .nav-btn i { font-size: 12px; }
+    .nav-btn.primary {
+      background: linear-gradient(135deg, var(--accent-bright), var(--accent));
+      color: #0A0A0A; border-color: transparent; font-weight: 700;
+    }
+    .nav-btn.primary:hover:not(:disabled) {
+      box-shadow: 0 6px 22px rgba(184, 134, 11, 0.3);
+      color: #0A0A0A;
+    }
+    .nav-counter {
+      font-size: 12px; color: var(--text-muted);
+      font-weight: 500; padding: 0 8px;
+    }
+
+    /* ============================================================
+       MODAL NOTES
+       ============================================================ */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 9999; display: none;
+      align-items: center; justify-content: center;
+      padding: 20px; animation: fadeIn 0.3s ease;
+    }
+    .modal-overlay.show { display: flex; }
+    @keyframes fadeIn {
+      from { opacity: 0; } to { opacity: 1; }
+    }
+    .modal {
+      background: var(--bg-surface);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 24px 20px; max-width: 480px; width: 100%;
+      max-height: 90vh; overflow-y: auto;
+      animation: slideUp 0.3s ease; position: relative;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .modal .modal-close {
+      position: absolute; top: 12px; right: 12px;
+      width: 32px; height: 32px; border-radius: 8px;
+      background: transparent; border: 1px solid transparent;
+      color: var(--text-muted); font-size: 16px;
+      cursor: pointer; transition: var(--transition);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .modal .modal-close:hover {
+      color: var(--text-light);
+      background: rgba(255, 255, 255, 0.05);
+      border-color: var(--border-soft);
+    }
+    .modal .modal-title {
+      font-size: 18px; font-weight: 700;
+      font-family: var(--font-serif);
+      color: var(--text-light);
+      margin-bottom: 4px; padding-right: 30px;
+    }
+    .modal .modal-title span { color: var(--accent-bright); }
+    .modal .modal-sub {
+      font-size: 12px; color: var(--text-dim);
+      margin-bottom: 16px;
+    }
+    .modal textarea {
+      width: 100%; min-height: 180px; max-height: 400px;
+      padding: 14px 16px; border-radius: 12px;
+      border: 1px solid var(--border-soft);
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--text-light); font-size: 14px;
+      font-family: var(--font-body);
+      resize: vertical; outline: none;
+      transition: var(--transition); line-height: 1.7;
+    }
+    html[data-theme="light"] .modal textarea {
+      background: rgba(0, 0, 0, 0.02);
+    }
+    .modal textarea:focus { border-color: rgba(184, 134, 11, 0.3); }
+    .modal textarea::placeholder { color: var(--text-muted); }
+    .modal .modal-actions {
+      display: flex; gap: 10px; margin-top: 14px;
+    }
+    .modal .modal-actions button {
+      flex: 1; padding: 11px; border-radius: 100px;
+      border: none; font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: var(--transition);
+      font-family: var(--font-body);
+    }
+    .modal .modal-actions .btn-save {
+      background: linear-gradient(135deg, var(--accent-bright), var(--accent));
+      color: #0A0A0A;
+    }
+    .modal .modal-actions .btn-save:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 24px rgba(184, 134, 11, 0.25);
+    }
+    .modal .modal-actions .btn-cancel {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-dim);
+      border: 1px solid var(--border-soft);
+    }
+    html[data-theme="light"] .modal .modal-actions .btn-cancel {
+      background: rgba(0, 0, 0, 0.04);
+    }
+    .modal .modal-actions .btn-cancel:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-light);
+    }
+    .modal .note-saved {
+      font-size: 12px; color: var(--success);
+      margin-top: 10px; display: none;
+      align-items: center; gap: 6px;
+    }
+    .modal .note-saved.show { display: flex; }
+
+    .tts-progress {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      height: 3px; background: rgba(96, 165, 250, 0.1);
+      z-index: 100; opacity: 0; pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .tts-progress.active { opacity: 1; }
+    .tts-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--blue), var(--accent-bright));
+      width: 0%; transition: width 0.4s ease;
+      box-shadow: 0 0 12px rgba(96, 165, 250, 0.5);
+    }
+
+    /* ============================================================
+       TYPOGRAPHIE GÉNÉRALE DU CONTENU
+       ============================================================ */
+    #contentBody h1,
+    #contentBody h2,
+    #contentBody h3,
+    #contentBody h4,
+    #contentBody h5,
+    #contentBody h6 {
+      font-family: var(--font-serif);
+      color: var(--text-light);
+      font-weight: 700;
+      line-height: 1.25;
+      letter-spacing: -0.015em;
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+      scroll-margin-top: 80px;
+    }
+
+    #contentBody h1 {
+      font-size: clamp(26px, 3.5vw, 34px);
+      margin: 0 0 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border-gold);
+      position: relative;
+    }
+    #contentBody h1::after {
+      content: ''; position: absolute; bottom: -1px; left: 0;
+      width: 50px; height: 2px;
+      background: linear-gradient(90deg, var(--accent-bright), transparent);
+    }
+
+    #contentBody h2 {
+      font-size: clamp(22px, 3vw, 28px);
+      margin: 44px 0 18px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-soft);
+      position: relative;
+    }
+    #contentBody h2::after {
+      content: ''; position: absolute; bottom: -1px; left: 0;
+      width: 36px; height: 2px;
+      background: var(--accent-bright);
+    }
+
+    #contentBody h3 {
+      font-size: clamp(19px, 2.5vw, 22px);
+      margin: 32px 0 14px;
+    }
+    #contentBody h4 {
+      font-family: var(--font-body);
+      font-size: clamp(16px, 2vw, 18px);
+      font-weight: 600;
+      margin: 26px 0 12px;
+    }
+    #contentBody h5 {
+      font-family: var(--font-body);
+      font-size: 15px; font-weight: 700;
+      margin: 22px 0 10px;
+      color: var(--accent-bright);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    #contentBody h6 {
+      font-family: var(--font-body);
+      font-size: 13px; font-weight: 700;
+      margin: 18px 0 8px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+    }
+
+    #contentBody p {
+      margin: 0 0 18px;
+      color: var(--text-body);
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+    }
+    #contentBody p:last-child { margin-bottom: 0; }
+
+    #contentBody strong { color: var(--text-light); font-weight: 600; }
+    #contentBody em { color: var(--accent-bright); font-style: italic; font-weight: 500; }
+    #contentBody del { color: var(--text-muted); text-decoration: line-through; }
+    #contentBody mark {
+      background: rgba(184, 134, 11, 0.2);
+      color: var(--text-light);
+      padding: 1px 4px; border-radius: 3px;
+    }
+
+    #contentBody a {
+      color: var(--accent-bright);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(224, 184, 74, 0.3);
+      transition: var(--transition);
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+    #contentBody a:hover {
+      border-bottom-color: var(--accent-bright);
+      background: rgba(184, 134, 11, 0.06);
+      padding: 0 2px;
+    }
+
+    #contentBody ul,
+    #contentBody ol {
+      margin: 16px 0 20px;
+      padding-left: 26px;
+    }
+    #contentBody li {
+      margin: 6px 0; line-height: 1.8;
+      overflow-wrap: break-word;
+    }
+
+    sup {
+      font-size: 0.68em;
+      vertical-align: super;
+      line-height: 0;
+      font-family: var(--font-serif);
+      font-weight: 600;
+      margin-left: 1px;
+    }
+    sub {
+      font-size: 0.68em;
+      vertical-align: sub;
+      line-height: 0;
+      font-family: var(--font-serif);
+      font-weight: 600;
+      margin-left: 1px;
+    }
+
+    #contentBody pre {
+      margin: 20px 0; padding: 16px 18px;
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border-soft);
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      font-family: var(--font-mono);
+      font-size: 13px; line-height: 1.6;
+      color: var(--text-body);
+    }
+    html[data-theme="light"] #contentBody pre {
+      background: rgba(0, 0, 0, 0.04);
+    }
+    #contentBody code {
+      font-family: var(--font-mono);
+      font-size: 0.9em;
+      background: rgba(184, 134, 11, 0.1);
+      color: var(--accent-bright);
+      padding: 2px 7px; border-radius: 5px;
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+    #contentBody pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    #contentBody blockquote {
+      margin: 22px 0;
+      padding: 4px 0 4px 20px;
+      border-left: 3px solid var(--accent-bright);
+      color: var(--text-dim);
+      font-style: italic;
+      font-size: 15.5px; line-height: 1.8;
+    }
+    #contentBody blockquote strong { color: var(--text-light); font-style: normal; }
+
+    #contentBody hr {
+      margin: 36px 0; border: none; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border-gold), transparent);
+    }
+
+    #contentBody img {
+      max-width: 100%; height: auto;
+      border-radius: 10px; margin: 16px 0;
+      display: block;
+    }
+    #contentBody svg {
+      max-width: 100%; height: auto;
+      display: block; margin: 16px auto;
+    }
+    #contentBody figure {
+      margin: 24px 0; padding: 0;
+      display: flex; flex-direction: column;
+      align-items: center; min-width: 0;
+    }
+    #contentBody figure img,
+    #contentBody figure svg {
+      max-width: 100%; height: auto;
+      background: rgba(255, 255, 255, 0.015);
+      border: 1px solid var(--border-soft);
+      border-radius: 12px; padding: 8px;
+      box-sizing: border-box;
+    }
+    html[data-theme="light"] #contentBody figure img,
+    html[data-theme="light"] #contentBody figure svg {
+      background: rgba(255, 255, 255, 0.6);
+    }
+    #contentBody figcaption {
+      margin-top: 12px; font-size: 13px;
+      color: var(--text-dim);
+      font-style: italic;
+      text-align: center;
+      line-height: 1.6; max-width: 100%;
+      overflow-wrap: break-word;
+    }
+
+    #contentBody table {
+      width: 100%; border-collapse: collapse;
+      margin: 22px 0; font-size: 14px;
+      border: 1px solid var(--border-soft);
+      border-radius: 10px; overflow: hidden;
+      word-break: break-word;
+    }
+    #contentBody th,
+    #contentBody td {
+      padding: 11px 14px; text-align: left;
+      border-bottom: 1px solid var(--border-soft);
+      overflow-wrap: break-word;
+      word-break: break-word;
+      min-width: 0; vertical-align: top;
+    }
+    #contentBody thead th {
+      background: rgba(224, 184, 74, 0.06);
+      color: var(--accent-bright);
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    #contentBody tbody tr:last-child td { border-bottom: none; }
+    #contentBody tbody tr:hover { background: rgba(184, 134, 11, 0.03); }
+
+    .table-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin: 22px 0; border-radius: 10px;
+      border: 1px solid var(--border-soft);
+    }
+    .table-wrap table {
+      margin: 0; border: none; border-radius: 0;
+      min-width: 100%;
+    }
+
+    /* ============================================================
+       COMPOSANTS DU CONTENU
+       ============================================================ */
+    .lecture-container {
+      min-width: 0; max-width: 100%;
+      display: flex; flex-direction: column; gap: 0;
+    }
+
+    .lecture-hero {
+      margin: 0 0 40px; padding: 0 0 26px;
+      border-bottom: 1px solid var(--border-gold);
+      position: relative; min-width: 0;
+    }
+    .lecture-hero::after {
+      content: ''; position: absolute;
+      bottom: -1px; left: 0;
+      width: 56px; height: 2px;
+      background: linear-gradient(90deg, var(--accent-bright), transparent);
+    }
+    .lecture-hero-badge {
+      display: inline-flex; align-items: center;
+      gap: 10px; margin-bottom: 18px;
+      font-size: 10.5px; font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--accent); flex-wrap: wrap;
+    }
+    .lecture-hero-icon { font-size: 13px; }
+    .lecture-hero-label { color: var(--accent); }
+    .lecture-hero-title {
+      font-family: var(--font-serif);
+      font-size: clamp(26px, 4vw, 38px);
+      font-weight: 700; line-height: 1.15;
+      color: var(--text-light);
+      margin: 0 0 16px;
+      letter-spacing: -0.025em;
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+    .lecture-hero-title em {
+      color: var(--accent-bright);
+      font-style: italic; font-weight: 500;
+    }
+    .lecture-hero-intro {
+      font-size: clamp(15px, 1.7vw, 17px);
+      line-height: 1.7; color: var(--text-dim);
+      margin: 0 0 22px; max-width: 640px;
+      font-weight: 300;
+      overflow-wrap: break-word;
+    }
+    .lecture-hero-meta {
+      display: flex; flex-wrap: wrap;
+      gap: 20px; font-size: 12px;
+      color: var(--text-muted);
+      letter-spacing: 0.03em;
+    }
+    .lecture-hero-meta-item {
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .lecture-hero-meta-item i {
+      color: var(--accent); font-size: 11px;
+    }
+
+    .lecture-toc {
+      margin: 0 0 48px; padding: 0; min-width: 0;
+    }
+    .lecture-toc-header {
+      display: flex; justify-content: space-between;
+      align-items: baseline;
+      padding-bottom: 10px; margin-bottom: 4px;
+      font-size: 10.5px; font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--accent); gap: 12px; flex-wrap: wrap;
+    }
+    .lecture-toc-count {
+      color: var(--text-muted);
+      font-weight: 500;
+      letter-spacing: 1.5px;
+    }
+    .lecture-toc-list {
+      list-style: none; padding: 0; margin: 0;
+    }
+    .lecture-toc-list li {
+      border-bottom: 1px solid var(--border-soft);
+      margin: 0;
+    }
+    .lecture-toc-list li:last-child { border-bottom: none; }
+    .lecture-toc-list a {
+      display: flex; align-items: baseline;
+      gap: 20px; padding: 12px 0;
+      color: var(--text-dim); text-decoration: none;
+      font-size: 14.5px;
+      transition: color 0.2s, padding-left 0.25s;
+      border-bottom: none;
+    }
+    .lecture-toc-list a:hover {
+      color: var(--accent-bright);
+      padding-left: 6px; background: transparent;
+    }
+    .toc-num {
+      font-family: var(--font-serif);
+      font-size: 11px; font-weight: 700;
+      color: var(--accent); letter-spacing: 1px;
+      flex-shrink: 0; min-width: 22px;
+    }
+
+    .lecture-section {
+      margin: 0 0 64px;
+      scroll-margin-top: 80px; min-width: 0;
+    }
+    .lecture-section-header {
+      display: flex; align-items: baseline;
+      gap: 22px; margin-bottom: 26px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border-soft);
+      position: relative; flex-wrap: wrap;
+    }
+    .lecture-section-header::after {
+      content: ''; position: absolute;
+      bottom: -1px; left: 0;
+      width: 36px; height: 2px;
+      background: var(--accent-bright);
+    }
+    .lecture-section-num {
+      font-family: var(--font-serif);
+      font-size: clamp(30px, 4vw, 40px);
+      font-weight: 700; color: var(--accent);
+      opacity: 0.4; line-height: 1;
+      flex-shrink: 0;
+      letter-spacing: -0.03em;
+    }
+    .lecture-section-heading { flex: 1; min-width: 0; }
+    .lecture-section-eyebrow {
+      display: block; font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 2.8px;
+      text-transform: uppercase;
+      color: var(--accent); margin-bottom: 6px;
+    }
+    .lecture-section-title {
+      font-family: var(--font-serif);
+      font-size: clamp(20px, 2.8vw, 26px);
+      font-weight: 700; color: var(--text-light);
+      margin: 0; line-height: 1.2;
+      letter-spacing: -0.02em;
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+    .lecture-section-body { min-width: 0; }
+    .lecture-section-sub { margin: 32px 0 20px; min-width: 0; }
+    .lecture-subtitle {
+      font-family: var(--font-serif);
+      font-size: clamp(17px, 2vw, 19px);
+      font-weight: 700; color: var(--text-light);
+      margin: 0 0 14px;
+      letter-spacing: -0.01em;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-soft);
+      overflow-wrap: break-word;
+    }
+
+    .lecture-text {
+      font-size: 16px; line-height: 1.85;
+      color: var(--text-body);
+      margin: 0 0 18px;
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+    }
+    .lecture-text strong { color: var(--text-light); font-weight: 600; }
+
+    .lecture-list {
+      list-style: none; padding: 0; margin: 18px 0 22px;
+    }
+    .lecture-list li {
+      position: relative;
+      padding: 7px 0 7px 24px;
+      color: var(--text-body);
+      font-size: 15.5px; line-height: 1.8;
+      overflow-wrap: break-word;
+      word-break: break-word; margin: 0;
+    }
+    .lecture-list li::before {
+      content: '—'; position: absolute;
+      left: 0; top: 7px;
+      color: var(--accent); font-weight: 700;
+      font-size: 14px;
+    }
+    .lecture-list li strong { color: var(--text-light); font-weight: 600; }
+
+    .lecture-list-elegant li {
+      display: flex; gap: 18px;
+      padding: 12px 0 12px 24px;
+      border-bottom: 1px solid var(--border-soft);
+      flex-wrap: wrap;
+    }
+    .lecture-list-elegant li:last-child { border-bottom: none; }
+    .lecture-list-elegant li strong {
+      min-width: 80px;
+      font-family: var(--font-serif);
+      color: var(--accent-bright);
+      font-size: 14.5px; flex-shrink: 0;
+    }
+    .lecture-list-elegant li span {
+      color: var(--text-dim);
+      font-size: 15px; line-height: 1.75;
+      flex: 1; min-width: 0;
+    }
+
+    .lecture-callout {
+      margin: 24px 0;
+      padding: 4px 0 4px 20px;
+      border-left: 2px solid var(--accent-bright);
+      min-width: 0;
+    }
+    .lecture-callout-body,
+    .lecture-callout-content { flex: 1; min-width: 0; }
+    .lecture-callout-title,
+    .lecture-callout-label {
+      display: block;
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+    .lecture-callout-body p,
+    .lecture-callout-content p,
+    .lecture-callout p {
+      margin: 0 0 10px;
+      font-size: 15.5px;
+      line-height: 1.85;
+      color: var(--text-body);
+      overflow-wrap: break-word;
+    }
+    .lecture-callout-body p:last-child,
+    .lecture-callout-content p:last-child,
+    .lecture-callout p:last-child { margin-bottom: 0; }
+    .lecture-callout-body strong,
+    .lecture-callout-content strong { color: var(--text-light); }
+
+    .lecture-callout-gold { border-left-color: var(--accent-bright); }
+    .lecture-callout-gold .lecture-callout-title { color: var(--accent-bright); }
+
+    .lecture-callout-key { border-left-color: #4ade80; }
+    .lecture-callout-key .lecture-callout-title { color: #4ade80; }
+
+    .lecture-callout-warning { border-left-color: #fbbf24; }
+    .lecture-callout-warning .lecture-callout-title { color: #fbbf24; }
+
+    .lecture-callout-danger { border-left-color: var(--danger-light); }
+    .lecture-callout-danger .lecture-callout-title { color: var(--danger-light); }
+
+    .lecture-aside {
+      margin: 28px 0;
+      padding: 4px 0 4px 20px;
+      border-left: 2px solid #8B7355;
+      min-width: 0;
+    }
+    .lecture-aside-content { flex: 1; min-width: 0; }
+    .lecture-aside-label {
+      display: block; font-size: 10.5px;
+      font-weight: 700; letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: #c4a882; margin-bottom: 10px;
+    }
+    .lecture-aside-content p {
+      margin: 0; font-size: 15px;
+      line-height: 1.85; color: var(--text-dim);
+      font-style: italic;
+    }
+
+    .lecture-formula-hero {
+      margin: 36px 0; padding: 32px 20px;
+      text-align: center; position: relative;
+      min-width: 0;
+      overflow-x: auto; overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+    }
+    .lecture-formula-hero::before,
+    .lecture-formula-hero::after {
+      content: ''; position: absolute;
+      left: 50%; transform: translateX(-50%);
+      width: 60px; height: 1px;
+      background: rgba(224, 184, 74, 0.3);
+    }
+    .lecture-formula-hero::before { top: 0; }
+    .lecture-formula-hero::after { bottom: 0; }
+    .lecture-formula-hero-label {
+      font-size: 10.5px; font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--accent); margin-bottom: 18px;
+    }
+    .lecture-formula-hero-main {
+      font-family: var(--font-serif);
+      font-size: clamp(28px, 5vw, 42px);
+      font-weight: 700; color: var(--text-light);
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .lecture-formula-hero-desc {
+      font-size: 13.5px; color: var(--text-dim);
+      margin-top: 14px; font-style: italic;
+      letter-spacing: 0.02em;
+    }
+
+    .lecture-formula-box {
+      margin: 22px 0; padding: 16px 20px;
+      border-left: 2px solid var(--accent-bright);
+      background: rgba(224, 184, 74, 0.025);
+      border-radius: 0 8px 8px 0;
+      text-align: left; min-width: 0;
+      overflow-x: auto; overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+    }
+    .lecture-formula-main {
+      font-family: var(--font-serif);
+      font-size: 20px; font-weight: 600;
+      color: var(--text-light);
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .lecture-formula-desc {
+      font-size: 13px; color: var(--text-dim);
+      margin-top: 8px; line-height: 1.6;
+      font-style: italic;
+    }
+
+    .lecture-rule {
+      margin: 30px 0; padding: 24px 20px;
+      text-align: center;
+      border-top: 1px solid var(--border-gold);
+      border-bottom: 1px solid var(--border-gold);
+      min-width: 0;
+    }
+    .lecture-rule-label {
+      font-size: 10.5px; font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--accent-bright);
+      margin-bottom: 16px;
+    }
+    .lecture-rule-body {
+      font-family: var(--font-serif);
+      font-size: 18px; color: var(--text-light);
+      line-height: 2; display: flex;
+      align-items: center; justify-content: center;
+      flex-wrap: wrap; gap: 12px;
+      overflow-wrap: anywhere;
+    }
+    .rule-iff {
+      color: var(--accent-bright); font-size: 20px;
+    }
+    .rule-and {
+      font-family: var(--font-body);
+      font-size: 10.5px; font-weight: 700;
+      letter-spacing: 2.5px;
+      color: var(--accent);
+      padding: 4px 12px;
+      border: 1px solid rgba(224, 184, 74, 0.25);
+      border-radius: 100px;
+    }
+
+    .lecture-example {
+      margin: 26px 0; padding: 0; min-width: 0;
+    }
+    .lecture-example-label {
+      display: block; font-size: 10.5px;
+      font-weight: 700; letter-spacing: 2.8px;
+      text-transform: uppercase;
+      color: var(--accent-bright);
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(224, 184, 74, 0.12);
+    }
+    .lecture-example-content {
+      color: var(--text-body);
+      font-size: 15.5px; line-height: 1.85;
+    }
+    .lecture-example-content p {
+      margin: 0 0 10px;
+      color: var(--text-body);
+      overflow-wrap: break-word;
+    }
+    .lecture-example-content p:last-child { margin-bottom: 0; }
+    .lecture-example-featured .lecture-example-label {
+      color: #4ade80;
+      border-bottom-color: rgba(74, 222, 128, 0.15);
+    }
+
+    .lecture-steps { margin: 22px 0; }
+    .lecture-step {
+      display: flex; gap: 18px;
+      align-items: flex-start;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border-soft);
+      min-width: 0;
+    }
+    .lecture-step:last-child { border-bottom: none; }
+    .lecture-step-number {
+      flex-shrink: 0;
+      font-family: var(--font-serif);
+      font-size: 22px; font-weight: 700;
+      color: var(--accent); opacity: 0.7;
+      line-height: 1; min-width: 32px;
+      padding-top: 4px;
+      letter-spacing: -0.02em;
+    }
+    .lecture-step-content {
+      flex: 1; min-width: 0;
+      overflow-wrap: break-word;
+    }
+    .lecture-step-content strong {
+      display: block; color: var(--text-light);
+      font-size: 15px; font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .lecture-step-content p {
+      margin: 0; font-size: 15px;
+      line-height: 1.75; color: var(--text-dim);
+      overflow-wrap: break-word;
+    }
+
+    .lecture-chain {
+      display: flex; align-items: center;
+      justify-content: center; flex-wrap: wrap;
+      gap: 10px; padding: 28px 12px;
+      margin: 28px 0;
+      border-top: 1px solid var(--border-soft);
+      border-bottom: 1px solid var(--border-soft);
+    }
+    .chain-item {
+      font-family: var(--font-serif);
+      font-size: 22px; font-weight: 700;
+      color: var(--text-muted);
+      padding: 4px 10px;
+      transition: color 0.25s;
+    }
+    .chain-item.active { color: var(--accent-bright); }
+    .chain-arrow {
+      color: var(--text-muted); font-size: 11px;
+    }
+
+    .lecture-powers-cycle {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0; margin: 28px 0;
+      border-top: 1px solid var(--border-soft);
+      border-bottom: 1px solid var(--border-soft);
+    }
+    .power-box {
+      padding: 22px 10px; text-align: center;
+      border-right: 1px solid var(--border-soft);
+      min-width: 0;
+    }
+    .power-box:last-child { border-right: none; }
+    .power-expo {
+      font-size: 10.5px; font-weight: 700;
+      letter-spacing: 2px; color: var(--accent);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+    .power-value {
+      font-family: var(--font-serif);
+      font-size: 26px; font-weight: 700;
+      color: var(--text-light); line-height: 1;
+    }
+
+    .lecture-vocab-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0; margin: 24px 0;
+      border-top: 1px solid var(--border-soft);
+      border-bottom: 1px solid var(--border-soft);
+    }
+    .vocab-card {
+      padding: 20px 18px;
+      border-right: 1px solid var(--border-soft);
+      border-bottom: 1px solid var(--border-soft);
+      min-width: 0;
+    }
+    .vocab-card:nth-child(2n) { border-right: none; }
+    .vocab-card:nth-last-child(-n+2) { border-bottom: none; }
+    .vocab-symbol {
+      font-family: var(--font-serif);
+      font-size: 26px; font-weight: 700;
+      color: var(--accent-bright);
+      line-height: 1; margin-bottom: 10px;
+    }
+    .vocab-name {
+      font-size: 12.5px; font-weight: 600;
+      color: var(--text-light); margin-bottom: 5px;
+    }
+    .vocab-notation {
+      font-size: 12px; color: var(--text-dim);
+      font-family: var(--font-serif);
+    }
+    .vocab-card-success .vocab-symbol { color: #4ade80; }
+    .vocab-card-info .vocab-symbol { color: var(--blue); }
+
+    .lecture-plane-visual {
+      position: relative; height: 260px;
+      margin: 28px 0;
+      border: 1px solid var(--border-soft);
+      border-radius: 4px; overflow: hidden;
+    }
+
+    .lecture-recap {
+      margin: 56px 0 24px;
+      padding: 28px 0 0;
+      border-top: 1px solid var(--border-gold);
+      position: relative; min-width: 0;
+    }
+    .lecture-recap::before {
+      content: ''; position: absolute;
+      top: -1px; left: 0;
+      width: 60px; height: 2px;
+      background: var(--accent-bright);
+    }
+    .lecture-recap-title {
+      font-size: 10.5px; font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--accent-bright);
+      margin-bottom: 18px;
+    }
+    .lecture-recap-list {
+      list-style: none; padding: 0; margin: 0;
+    }
+    .lecture-recap-list li {
+      position: relative;
+      padding: 9px 0 9px 28px;
+      color: var(--text-body);
+      font-size: 15.5px; line-height: 1.8;
+      border-bottom: 1px solid var(--border-soft);
+      overflow-wrap: break-word;
+      word-break: break-word; margin: 0;
+    }
+    .lecture-recap-list li:last-child { border-bottom: none; }
+    .lecture-recap-list li::before {
+      content: '✓'; position: absolute;
+      left: 0; top: 9px;
+      color: #4ade80; font-size: 14px;
+      font-weight: 700;
+    }
+
+    .lecture-end {
+      text-align: center;
+      margin: 64px 0 20px;
+      padding: 40px 16px 28px;
+      border-top: 1px solid var(--border-gold);
+    }
+    .lecture-end-icon {
+      display: block; font-size: 30px;
+      margin-bottom: 14px; opacity: 0.7;
+    }
+    .lecture-end-text {
+      font-family: var(--font-serif);
+      font-size: 22px; font-weight: 700;
+      font-style: italic;
+      color: var(--accent-bright);
+      margin-bottom: 8px;
+      letter-spacing: -0.01em;
+    }
+    .lecture-end-sub {
+      font-size: 13.5px; color: var(--text-dim);
+      margin-bottom: 20px;
+      letter-spacing: 0.02em;
+    }
+    .lecture-end-divider {
+      width: 40px; height: 1px;
+      margin: 0 auto;
+      background: rgba(224, 184, 74, 0.4);
+    }
+
+    .lecture-quiz {
+      display: flex; flex-direction: column;
+      gap: 14px; margin: 20px 0;
+    }
+    .lecture-quiz-item {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(224, 184, 74, 0.15);
+      border-radius: 12px;
+      padding: 18px 20px;
+      transition: var(--transition);
+    }
+    html[data-theme="light"] .lecture-quiz-item {
+      background: rgba(255, 255, 255, 0.7);
+    }
+    .lecture-quiz-item:hover {
+      border-color: rgba(224, 184, 74, 0.25);
+    }
+    .lecture-quiz-q {
+      font-weight: 600; color: var(--text-light);
+      margin-bottom: 10px;
+      font-size: 15px; line-height: 1.6;
+    }
+    .lecture-quiz-options {
+      display: grid; gap: 6px; margin: 10px 0;
+    }
+    .lecture-quiz-options span {
+      color: var(--text-dim);
+      font-size: 14.5px; padding: 2px 0;
+      line-height: 1.6;
+    }
+    .lecture-quiz-answer {
+      margin-top: 12px;
+      background: rgba(74, 222, 128, 0.06);
+      border-left: 3px solid #4ade80;
+      padding: 12px 16px;
+      border-radius: 0 8px 8px 0;
+      color: var(--text-body);
+      font-size: 14.5px; line-height: 1.7;
+    }
+    .lecture-quiz-answer p {
+      margin: 0 0 6px;
+      color: var(--text-body);
+    }
+    .lecture-quiz-answer p:last-child { margin-bottom: 0; }
+    .lecture-quiz-answer strong { color: #4ade80; }
+
+    .lecture-exercise {
+      background: rgba(96, 165, 250, 0.05);
+      border: 1px solid rgba(96, 165, 250, 0.2);
+      border-radius: 14px;
+      padding: 20px 24px; margin: 20px 0;
+      transition: var(--transition);
+    }
+    html[data-theme="light"] .lecture-exercise {
+      background: rgba(96, 165, 250, 0.06);
+    }
+    .lecture-exercise:hover {
+      border-color: rgba(96, 165, 250, 0.3);
+    }
+    .lecture-exercise-label {
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--blue); margin-bottom: 12px;
+    }
+    .lecture-exercise .lecture-text {
+      margin-bottom: 12px; font-size: 15px;
+    }
+
+    details {
+      margin-top: 14px;
+      border-top: 1px dashed var(--border-soft);
+      padding-top: 12px;
+    }
+    details > summary {
+      cursor: pointer;
+      color: var(--accent-bright);
+      font-weight: 600; font-size: 13px;
+      user-select: none;
+      list-style: none;
+      display: inline-flex; align-items: center;
+      gap: 8px; padding: 6px 12px;
+      border-radius: 100px;
+      background: rgba(184, 134, 11, 0.08);
+      border: 1px solid rgba(184, 134, 11, 0.15);
+      transition: var(--transition);
+      -webkit-tap-highlight-color: transparent;
+    }
+    details > summary::-webkit-details-marker { display: none; }
+    details > summary::before {
+      content: '▶'; font-size: 9px;
+      transition: transform 0.25s ease;
+      display: inline-block;
+    }
+    details[open] > summary::before {
+      transform: rotate(90deg);
+    }
+    details > summary:hover {
+      background: rgba(184, 134, 11, 0.15);
+      border-color: rgba(184, 134, 11, 0.25);
+    }
+    details > summary:focus {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .lecture-figure {
+      margin: 32px auto; padding: 0;
+      max-width: 480px; width: 100%;
+      text-align: center;
+      display: flex; flex-direction: column;
+      align-items: center; min-width: 0;
+    }
+    .lecture-figure svg {
+      display: block; width: 100%;
+      max-width: 100%; height: auto;
+      background: rgba(255, 255, 255, 0.015);
+      border: 1px solid var(--border-soft);
+      border-radius: 12px; padding: 8px;
+      box-sizing: border-box;
+    }
+    html[data-theme="light"] .lecture-figure svg {
+      background: rgba(255, 255, 255, 0.6);
+    }
+    .lecture-figure-caption {
+      margin-top: 12px; font-size: 13px;
+      color: var(--text-dim);
+      font-style: italic;
+      line-height: 1.6; text-align: center;
+      max-width: 100%;
+      overflow-wrap: break-word;
+    }
+
+    .katex { font-size: 1.05em; color: var(--text-light); }
+    .katex-display {
+      margin: 22px 0; padding: 0 8px;
+      overflow-x: auto; overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      text-align: center;
+    }
+    .katex-display > .katex {
+      font-size: 1.15em; white-space: normal;
+    }
+    .katex .mathnormal,
+    .katex .mathit {
+      font-style: italic;
+      color: var(--text-light);
+    }
+    .katex .mop,
+    .katex .mord.text {
+      font-family: 'KaTeX_Main', 'Times New Roman', serif;
+      font-style: normal;
+      color: var(--text-light);
+    }
+    .katex .mbin,
+    .katex .mrel { color: var(--text-body); }
+    .katex .frac-line { border-bottom-color: var(--text-light); }
+    .katex .sqrt > .root { color: var(--accent-bright); }
+
+    #contentBody * {
+      min-width: 0; max-width: 100%;
+      box-sizing: border-box;
+    }
+    #contentBody > * {
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+    }
+
+    /* ============================================================
+       RESPONSIVE
+       ============================================================ */
+    @media (max-width: 768px) {
+      :root { --content-max: 100%; }
+      .content-wrapper { padding: 14px 16px 70px; }
+    }
+
+    @media (max-width: 600px) {
+      .content-wrapper { padding: 12px 14px 70px; }
+      #contentBody { font-size: 15.5px; line-height: 1.8; }
+
+      .header .header-title { max-width: 120px; font-size: 12px; }
+      .notes-btn { font-size: 10.5px; padding: 4px 10px; gap: 4px; }
+      .tts-btn { padding: 4px 10px; font-size: 10.5px; gap: 4px; }
+      .theme-btn { width: 30px; height: 30px; font-size: 12px; }
+
+      #contentBody h1 { font-size: 24px; }
+      #contentBody h2 { font-size: 20px; }
+      #contentBody h3 { font-size: 17px; }
+      #contentBody p { font-size: 15px; }
+
+      .lecture-hero { margin-bottom: 32px; padding-bottom: 20px; }
+      .lecture-hero-title { font-size: 26px; }
+      .lecture-hero-intro { font-size: 15px; }
+      .lecture-section { margin-bottom: 48px; }
+      .lecture-section-num { font-size: 30px; }
+      .lecture-section-title { font-size: 20px; }
+      .lecture-subtitle { font-size: 16px; }
+      .lecture-text { font-size: 15px; }
+
+      .lecture-formula-hero { padding: 28px 14px; }
+      .lecture-formula-hero-main { font-size: 28px; }
+      .lecture-formula-main { font-size: 17px; }
+
+      .lecture-powers-cycle { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .power-box { padding: 18px 8px; border-right: none; border-bottom: 1px solid var(--border-soft); }
+      .power-box:nth-child(odd) { border-right: 1px solid var(--border-soft); }
+      .power-box:nth-last-child(-n+2) { border-bottom: none; }
+
+      .chain-item { font-size: 19px; }
+      .lecture-quiz-item { padding: 14px 16px; }
+      .lecture-exercise { padding: 16px 18px; }
+      .lecture-figure { max-width: 100%; }
+      .nav-btn { font-size: 12px; padding: 8px 16px; }
+    }
+
+    @media (max-width: 380px) {
+      .content-wrapper { padding: 10px 12px 60px; }
+      #contentBody { font-size: 15px; }
+      .header .header-title { max-width: 90px; font-size: 11px; }
+      .notes-btn span, .tts-btn span { display: none; }
+
+      #contentBody h1 { font-size: 22px; }
+      #contentBody h2 { font-size: 18px; }
+      #contentBody p { font-size: 14.5px; }
+
+      .lecture-hero-title { font-size: 22px; }
+      .lecture-section-num { font-size: 24px; }
+      .lecture-section-title { font-size: 17px; }
+
+      .lecture-vocab-grid { grid-template-columns: minmax(0, 1fr); }
+      .vocab-card { border-right: none; }
+      .vocab-card:last-child { border-bottom: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    a:focus-visible,
+    button:focus-visible,
+    textarea:focus-visible,
+    summary:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+      border-radius: 6px;
+    }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(184, 134, 11, 0.2);
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="gradient-bg"></div>
+
+  <div class="read-progress">
+    <div class="read-progress-fill" id="readProgressFill"></div>
+  </div>
+
+  <header class="header">
+    <div class="header-left">
+      <button class="back-btn" id="backBtn" aria-label="Retour">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <div class="header-title" id="pageTitle">
+        <i class="fas fa-book-open"></i> <span>Chargement...</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="theme-btn" id="themeBtn" aria-label="Changer de thème">
+        <i class="fas fa-moon" id="themeIcon"></i>
+      </button>
+      <button class="tts-btn" id="ttsBtn" aria-label="Écouter">
+        <i class="fas fa-volume-up"></i>
+        <span>Écouter</span>
+      </button>
+      <button class="notes-btn" id="notesBtn">
+        <i class="fas fa-pen"></i>
+        <span>Notes</span>
+        <span class="dot" id="notesDot"></span>
+      </button>
+    </div>
+  </header>
+
+  <div class="content-wrapper" id="contentWrapper">
+    <div id="contentBody">
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Chargement du contenu...</p>
+      </div>
+    </div>
+
+    <div class="nav-bar" id="navBar">
+      <button class="nav-btn" id="prevBtn" disabled>
+        <i class="fas fa-chevron-left"></i> Précédent
+      </button>
+      <span class="nav-counter" id="partCounter">1 / 1</span>
+      <button class="nav-btn primary" id="nextBtn">
+        Suivant <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="tts-progress" id="ttsProgress">
+    <div class="tts-progress-fill" id="ttsProgressFill"></div>
+  </div>
+
+  <div class="modal-overlay" id="notesModal">
+    <div class="modal">
+      <button class="modal-close" id="modalClose"><i class="fas fa-times"></i></button>
+      <div class="modal-title">📝 Mes <span>notes</span></div>
+      <div class="modal-sub" id="modalSub">Partie 1</div>
+      <textarea id="notesTextarea" placeholder="Écris ici ce que tu as compris, des points importants, des questions..."></textarea>
+      <div class="note-saved" id="noteSaved"><i class="fas fa-check-circle"></i> Notes enregistrées !</div>
+      <div class="modal-actions">
+        <button class="btn-cancel" id="modalCancel">Annuler</button>
+        <button class="btn-save" id="modalSave">💾 Enregistrer</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "firebase/app": "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
+      "firebase/auth": "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js",
+      "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js"
+    }
+  }
+  </script>
+
+  <script type="module">
+  // ================================================================
+  // LECTURE — Version robuste anti-flash
+  // ================================================================
+
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+  import {
+    getAuth,
+    onAuthStateChanged,
+    setPersistence,
+    browserLocalPersistence
+  } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+  import {
+    initializeFirestore,
+    persistentLocalCache,
+    persistentSingleTabManager,
+    doc,
+    onSnapshot,
+    getDoc,
+    updateDoc,
+    serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDHscOXw3rLuhV6z1Cny-bdYCumqpnG7QE",
+    authDomain: "arvexa-fbf10.firebaseapp.com",
+    projectId: "arvexa-fbf10",
+    storageBucket: "arvexa-fbf10.firebasestorage.app",
+    messagingSenderId: "920108330053",
+    appId: "1:920108330053:web:f532d71cbc2c824bc7472c"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  const db = initializeFirestore(app, {
+    localCache: persistentLocalCache({
+      tabManager: persistentSingleTabManager()
+    })
+  });
+
+  try {
+    await setPersistence(auth, browserLocalPersistence);
+  } catch (e) {}
+
+  // ================================================================
+  // THÈME
+  // ================================================================
+  const THEME_KEY = 'arvexa_theme';
+
+  function applyTheme(theme) {
+    if (theme === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+      const icon = document.getElementById('themeIcon');
+      if (icon) icon.className = 'fas fa-sun';
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) meta.setAttribute('content', '#FAF7F0');
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+      const icon = document.getElementById('themeIcon');
+      if (icon) icon.className = 'fas fa-moon';
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) meta.setAttribute('content', '#0A0A0A');
+    }
+  }
+
+  function initTheme() {
+    try {
+      const saved = localStorage.getItem(THEME_KEY);
+      applyTheme(saved === 'light' ? 'light' : 'dark');
+    } catch (e) {
+      applyTheme('dark');
+    }
+  }
+
+  initTheme();
+
+  document.getElementById('themeBtn').addEventListener('click', () => {
+    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+    const newTheme = isLight ? 'dark' : 'light';
+    applyTheme(newTheme);
+    try { localStorage.setItem(THEME_KEY, newTheme); } catch (e) {}
+  });
+
+  // ================================================================
+  // URL PARAMS
+  // ================================================================
+  const params = new URLSearchParams(window.location.search);
+  const subject = params.get('subject') || 'mathematiques';
+  const chapter = parseInt(params.get('chapter')) || 0;
+  const tab = params.get('tab') || 'cours';
+  const partIndex = parseInt(params.get('part')) || 0;
+
+  // ================================================================
+  // DOM
+  // ================================================================
+  const contentBody = document.getElementById('contentBody');
+  const pageTitle = document.querySelector('#pageTitle span');
+  const backBtn = document.getElementById('backBtn');
+  const notesBtn = document.getElementById('notesBtn');
+  const notesDot = document.getElementById('notesDot');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const partCounter = document.getElementById('partCounter');
+  const readProgressFill = document.getElementById('readProgressFill');
+  const contentWrapper = document.getElementById('contentWrapper');
+
+  const notesModal = document.getElementById('notesModal');
+  const modalClose = document.getElementById('modalClose');
+  const modalCancel = document.getElementById('modalCancel');
+  const modalSave = document.getElementById('modalSave');
+  const notesTextarea = document.getElementById('notesTextarea');
+  const modalSub = document.getElementById('modalSub');
+  const noteSaved = document.getElementById('noteSaved');
+
+  const ttsBtn = document.getElementById('ttsBtn');
+  const ttsProgress = document.getElementById('ttsProgress');
+  const ttsProgressFill = document.getElementById('ttsProgressFill');
+
+  // ================================================================
+  // SESSION / CACHE
+  // ================================================================
+  const SESSION_KEY = 'arvexa_session';
+  const USER_DATA_KEY = 'arvexa_user_data';
+  const LAST_UID_KEY = 'arvexa_last_uid';
+  const READ_KEY = 'arvexa_read_parts';
+  const NOTES_KEY = 'arvexa_notes';
+
+  function saveSession(user) {
+    if (!user) return;
+    try {
+      const data = {
+        uid: user.uid,
+        email: user.email,
+        lastActive: Date.now()
+      };
+      localStorage.setItem(SESSION_KEY, JSON.stringify(data));
+      localStorage.setItem(LAST_UID_KEY, user.uid);
+    } catch (e) {}
+  }
+
+  function clearSession() {
+    try {
+      localStorage.removeItem(SESSION_KEY);
+      localStorage.removeItem(USER_DATA_KEY);
+      localStorage.removeItem(LAST_UID_KEY);
+      sessionStorage.removeItem(SESSION_KEY);
+    } catch (e) {}
+  }
+
+  function getCachedUserData(uid) {
+    try {
+      const raw = localStorage.getItem(USER_DATA_KEY);
+      if (!raw) return null;
+      const cached = JSON.parse(raw);
+      if (cached._uid && cached._uid !== uid) {
+        localStorage.removeItem(USER_DATA_KEY);
+        return null;
+      }
+      return cached;
+    } catch (e) { return null; }
+  }
+
+  // ================================================================
+  // UTILITAIRE
+  // ================================================================
+  function toDate(value) {
+    if (!value) return null;
+    if (typeof value.toDate === 'function') return value.toDate();
+    if (value.seconds !== undefined) return new Date(value.seconds * 1000);
+    const date = value instanceof Date ? value : new Date(value);
+    return Number.isNaN(date.getTime()) ? null : date;
+  }
+
+  function isUserPremium(userData) {
+    if (!userData) return false;
+    const hasStatus = userData.premium === true ||
+                      userData.isUnlocked === true ||
+                      userData.hasDeposited === true;
+    if (!hasStatus) return false;
+    const endDate = toDate(userData.subscriptionEndDate);
+    if (!endDate) return true;
+    return endDate.getTime() > Date.now();
+  }
+
+  // ================================================================
+  // STORAGE
+  // ================================================================
+  function getReadParts() {
+    try { return JSON.parse(localStorage.getItem(READ_KEY) || '[]'); }
+    catch (e) { return []; }
+  }
+
+  function markPartAsRead() {
+    const key = `${subject}_${chapter}_${tab}_${partIndex}`;
+    const readParts = getReadParts();
+    if (!readParts.includes(key)) {
+      readParts.push(key);
+      try { localStorage.setItem(READ_KEY, JSON.stringify(readParts)); } catch (e) {}
+    }
+  }
+
+  function getNotesKey() {
+    return `${subject}_${chapter}_${tab}_${partIndex}`;
+  }
+
+  function loadNotes() {
+    try {
+      const notes = JSON.parse(localStorage.getItem(NOTES_KEY) || '{}');
+      const key = getNotesKey();
+      if (notes[key]) {
+        notesTextarea.value = notes[key];
+        notesDot.classList.add('show');
+      } else {
+        notesTextarea.value = '';
+        notesDot.classList.remove('show');
+      }
+    } catch (e) {}
+  }
+
+  function saveNotes() {
+    try {
+      const notes = JSON.parse(localStorage.getItem(NOTES_KEY) || '{}');
+      const key = getNotesKey();
+      const text = notesTextarea.value.trim();
+      if (text) {
+        notes[key] = text;
+        notesDot.classList.add('show');
+      } else {
+        delete notes[key];
+        notesDot.classList.remove('show');
+      }
+      localStorage.setItem(NOTES_KEY, JSON.stringify(notes));
+      noteSaved.classList.add('show');
+      setTimeout(() => noteSaved.classList.remove('show'), 2000);
+    } catch (e) {}
+  }
+
+  // ================================================================
+  // ÉTAT
+  // ================================================================
+  let parts = [];
+  let currentIndex = partIndex;
+  let isPremium = false;
+  let currentUid = null;
+  let unsubscribeUser = null;
+
+  // ================================================================
+  // PRÉ-PROCESSING
+  // ================================================================
+  function preprocessContent(html) {
+    if (!html) return '';
+
+    let processed = html;
+
+    processed = processed.replace(/<style[\s\S]*?<\/style>/gi, '');
+    processed = processed.replace(/<script[\s\S]*?<\/script>/gi, '');
+
+    return processed;
+  }
+
+  // ================================================================
+  // KATEX
+  // ================================================================
+  function renderKaTeX() {
+    if (typeof renderMathInElement !== 'function') {
+      setTimeout(renderKaTeX, 200);
+      return;
+    }
+    try {
+      renderMathInElement(contentBody, {
+        delimiters: [
+          { left: '$$', right: '$$', display: true },
+          { left: '\\[', right: '\\]', display: true },
+          { left: '$', right: '$', display: false },
+          { left: '\\(', right: '\\)', display: false }
+        ],
+        throwOnError: false,
+        errorColor: '#f87171',
+        strict: false,
+        trust: false,
+        macros: {
+          "\\R": "\\mathbb{R}",
+          "\\C": "\\mathbb{C}",
+          "\\N": "\\mathbb{N}",
+          "\\Z": "\\mathbb{Z}",
+          "\\Q": "\\mathbb{Q}",
+          "\\Re": "\\operatorname{Re}",
+          "\\Im": "\\operatorname{Im}",
+          "\\arg": "\\operatorname{arg}"
+        }
+      });
+    } catch (e) {}
+  }
+
+  // ================================================================
+  // CONTENU INDISPONIBLE
+  // ================================================================
+  function showContentUnavailable() {
+    const partNumber = currentIndex + 1;
+
+    const tabConfig = {
+      cours: {
+        titleLabel: 'Partie',
+        tabName: 'Cours',
+        description: `La partie ${partNumber} du cours de ce chapitre sera bientôt disponible.`,
+        backLabel: 'Retour au cours',
+        backIcon: 'fa-arrow-left',
+        listLabel: 'Voir les autres parties',
+        listIcon: 'fa-book'
+      },
+      exercices: {
+        titleLabel: 'Exercice',
+        tabName: 'Exercices',
+        description: `L'exercice ${partNumber} de ce chapitre sera bientôt disponible.`,
+        backLabel: 'Retour aux exercices',
+        backIcon: 'fa-arrow-left',
+        listLabel: 'Voir les autres exercices',
+        listIcon: 'fa-pen-to-square'
+      },
+      corrections: {
+        titleLabel: 'Correction',
+        tabName: 'Corrections',
+        description: `La correction ${partNumber} de ce chapitre sera bientôt disponible.`,
+        backLabel: 'Retour aux corrections',
+        backIcon: 'fa-arrow-left',
+        listLabel: 'Voir les autres corrections',
+        listIcon: 'fa-check-double'
+      }
+    };
+
+    const cfg = tabConfig[tab] || tabConfig.cours;
+
+    let title;
+    if (tab === 'cours') {
+      title = `Partie ${partNumber} — Cours`;
+    } else if (tab === 'exercices') {
+      title = `Exercice ${partNumber}`;
+    } else if (tab === 'corrections') {
+      title = `Correction ${partNumber}`;
+    } else {
+      title = `Partie ${partNumber}`;
+    }
+
+    const hourglassSVG = `
+      <div class="hourglass-wrap">
+        <span class="hourglass-particle"></span>
+        <span class="hourglass-particle"></span>
+        <span class="hourglass-particle"></span>
+        <span class="hourglass-particle"></span>
+        <svg class="hourglass-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <path class="frame" d="M 20 15 L 80 15" />
+          <path class="frame" d="M 20 85 L 80 85" />
+          <path class="glass" d="M 22 17 L 78 17 L 50 50 Z" />
+          <path class="glass" d="M 50 50 L 78 83 L 22 83 Z" />
+          <path class="sand-top" d="M 26 20 L 74 20 L 50 47 Z" />
+          <rect class="sand-stream" x="48.5" y="47" width="3" height="8" />
+          <path class="sand-bottom" d="M 50 53 L 74 80 L 26 80 Z" />
+        </svg>
+      </div>
+    `;
+
+    contentBody.innerHTML = `
+      <div class="content-unavailable">
+        ${hourglassSVG}
+        <h2>${title} en préparation</h2>
+        <p>${cfg.description}</p>
+        <div class="cu-actions">
+          <a href="chapitre.html?subject=${subject}&chapter=${chapter}&tab=${tab}" class="cu-btn primary">
+            <i class="fas ${cfg.backIcon}"></i> ${cfg.backLabel}
+          </a>
+          <a href="matiere.html?subject=${subject}" class="cu-btn">
+            <i class="fas ${cfg.listIcon}"></i> ${cfg.listLabel}
+          </a>
+        </div>
+      </div>
+    `;
+    pageTitle.textContent = `${title} en préparation`;
+    document.title = `ARVEXA - ${title} en préparation`;
+    prevBtn.style.display = 'none';
+    nextBtn.style.display = 'none';
+    partCounter.style.display = 'none';
+    notesBtn.style.display = 'none';
+    if (ttsBtn) ttsBtn.style.display = 'none';
+  }
+
+  // ================================================================
+  // CHARGEMENT
+  // ================================================================
+  function loadContent() {
+    const suffix = tab === 'cours' ? 'cours' : (tab === 'exercices' ? 'exo' : 'corr');
+    const manifestPath = `cours/${subject}/ch${chapter}_${suffix}.json`;
+
+    contentBody.innerHTML = `
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Chargement du contenu...</p>
+      </div>
+    `;
+
+    fetch(manifestPath)
+      .then(r => { if (!r.ok) throw new Error('not found'); return r.json(); })
+      .then(data => {
+        parts = data.parts || [];
+        if (currentIndex >= parts.length) currentIndex = 0;
+        if (parts.length === 0) {
+          showContentUnavailable();
+          return;
+        }
+        renderPart();
+      })
+      .catch(() => {
+        showContentUnavailable();
+      });
+  }
+
+  function renderPart() {
+    if (!parts || parts.length === 0) {
+      showContentUnavailable();
+      return;
+    }
+    if (currentIndex >= parts.length || currentIndex < 0) currentIndex = 0;
+
+    const part = parts[currentIndex];
+    if (!part) {
+      showContentUnavailable();
+      return;
+    }
+
+    stopTTS();
+
+    pageTitle.textContent = part.title || 'Partie ' + (currentIndex + 1);
+    document.title = 'ARVEXA - ' + (part.title || 'Lecture');
+
+    partCounter.textContent = `${currentIndex + 1} / ${parts.length}`;
+    prevBtn.disabled = currentIndex === 0;
+    nextBtn.disabled = currentIndex >= parts.length - 1;
+    modalSub.textContent = part.title || 'Partie ' + (currentIndex + 1);
+
+    const filePath = `cours/${subject}/${part.file}`;
+    contentBody.innerHTML = `
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Chargement...</p>
+      </div>
+    `;
+
+    fetch(filePath)
+      .then(r => { if (!r.ok) throw new Error('not found'); return r.text(); })
+      .then(html => {
+        const cleaned = preprocessContent(html);
+        contentBody.innerHTML = cleaned;
+        markPartAsRead();
+        loadNotes();
+        renderKaTeX();
+        updateReadProgress();
+        resetStudyTimer();
+      })
+      .catch(() => {
+        showContentUnavailable();
+      });
+  }
+
+  // ================================================================
+  // PROGRESSION LECTURE
+  // ================================================================
+  function updateReadProgress() {
+    const scrollTop = contentWrapper.scrollTop;
+    const scrollHeight = contentWrapper.scrollHeight - contentWrapper.clientHeight;
+    const progress = scrollHeight > 0 ? Math.min(100, (scrollTop / scrollHeight) * 100) : 0;
+    readProgressFill.style.width = progress + '%';
+  }
+
+  contentWrapper.addEventListener('scroll', updateReadProgress, { passive: true });
+
+  // ================================================================
+  // NAVIGATION
+  // ================================================================
+  function goToPrev() {
+    if (currentIndex > 0) {
+      saveStudyTimeBeforeChange();
+      currentIndex--;
+      if (notesTextarea.value.trim()) saveNotes();
+      contentWrapper.scrollTop = 0;
+      renderPart();
+    }
+  }
+
+  function goToNext() {
+    if (currentIndex < parts.length - 1) {
+      saveStudyTimeBeforeChange();
+      currentIndex++;
+      if (notesTextarea.value.trim()) saveNotes();
+      contentWrapper.scrollTop = 0;
+      renderPart();
+    }
+  }
+
+  // ================================================================
+  // MODAL NOTES
+  // ================================================================
+  function openModal() {
+    notesModal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+    notesTextarea.focus();
+  }
+
+  function closeModal() {
+    notesModal.classList.remove('show');
+    document.body.style.overflow = '';
+  }
+
+  // ================================================================
+  // ÉVÉNEMENTS
+  // ================================================================
+  backBtn.addEventListener('click', () => {
+    saveStudyTimeBeforeChange();
+    window.location.href = `chapitre.html?subject=${subject}&chapter=${chapter}&tab=${tab}`;
+  });
+
+  prevBtn.addEventListener('click', goToPrev);
+  nextBtn.addEventListener('click', goToNext);
+
+  document.addEventListener('keydown', (e) => {
+    if (notesModal.classList.contains('show')) {
+      if (e.key === 'Escape') closeModal();
+      return;
+    }
+    if (e.key === 'ArrowLeft' && !prevBtn.disabled) goToPrev();
+    if (e.key === 'ArrowRight' && !nextBtn.disabled) goToNext();
+  });
+
+  notesBtn.addEventListener('click', openModal);
+  modalClose.addEventListener('click', closeModal);
+  modalCancel.addEventListener('click', closeModal);
+  notesModal.addEventListener('click', (e) => {
+    if (e.target === notesModal) closeModal();
+  });
+
+  modalSave.addEventListener('click', () => {
+    saveNotes();
+    closeModal();
+  });
+
+  // ================================================================
+  // TTS
+  // ================================================================
+  const TTS_SUPPORTED = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+
+  const tts = {
+    synth: TTS_SUPPORTED ? window.speechSynthesis : null,
+    chunks: [],
+    currentChunk: 0,
+    utterance: null,
+    voice: null,
+    isSpeaking: false,
+    isPaused: false,
+    isActive: false,
+    rate: 0.92,
+    pitch: 1,
+    volume: 1,
+    stopRequested: false
+  };
+
+  function loadTTSVoices() {
+    if (!TTS_SUPPORTED) return;
+    const voices = tts.synth.getVoices();
+    if (!voices || voices.length === 0) return;
+    tts.voice =
+      voices.find(v => v.lang && v.lang.toLowerCase() === 'fr-fr' && v.localService) ||
+      voices.find(v => v.lang && v.lang.toLowerCase() === 'fr-fr') ||
+      voices.find(v => v.lang && v.lang.toLowerCase().startsWith('fr')) ||
+      null;
+  }
+
+  loadTTSVoices();
+  if (TTS_SUPPORTED && 'onvoiceschanged' in window.speechSynthesis) {
+    window.speechSynthesis.onvoiceschanged = loadTTSVoices;
+  }
+
+  function cleanTTS(text) {
+    if (!text) return '';
+    let result = String(text);
+    result = result.replace(/\$\$([^$]+)\$\$/g, (m, f) => convertMathToSpeech(f));
+    result = result.replace(/\$([^$]+)\$/g, (m, f) => convertMathToSpeech(f));
+    result = result.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, ' ');
+    result = result.replace(/⟺/g, ' si et seulement si ');
+    result = result.replace(/⟹/g, ' implique ');
+    result = result.replace(/→/g, ' vers ');
+    result = result.replace(/←/g, ' de ');
+    result = result.replace(/∈/g, ' appartient à ');
+    result = result.replace(/≤/g, ' inférieur ou égal à ');
+    result = result.replace(/≥/g, ' supérieur ou égal à ');
+    result = result.replace(/≠/g, ' différent de ');
+    result = result.replace(/√/g, ' racine carrée de ');
+    result = result.replace(/([A-Za-z0-9])²/g, '$1 au carré');
+    result = result.replace(/([A-Za-z0-9])³/g, '$1 au cube');
+    result = result.replace(/×/g, ' fois ');
+    result = result.replace(/÷/g, ' divisé par ');
+    result = result.replace(/∞/g, ' infini ');
+    result = result.replace(/π/g, ' pi ');
+    result = result.replace(/−/g, ' moins ');
+    return result.replace(/\s+/g, ' ').trim();
+  }
+
+  function convertMathToSpeech(latex) {
+    let s = String(latex);
+    s = s.replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, ' $1 sur $2 ');
+    s = s.replace(/\\sqrt\{([^}]+)\}/g, ' racine de $1 ');
+    s = s.replace(/([a-zA-Z0-9])\^\{([^}]+)\}/g, ' $1 puissance $2 ');
+    s = s.replace(/([a-zA-Z0-9])\^([a-zA-Z0-9])/g, ' $1 puissance $2 ');
+    s = s.replace(/([a-zA-Z0-9])_\{([^}]+)\}/g, ' $1 indice $2 ');
+    s = s.replace(/([a-zA-Z0-9])_([a-zA-Z0-9])/g, ' $1 indice $2 ');
+    s = s.replace(/\\cos/g, ' cosinus ');
+    s = s.replace(/\\sin/g, ' sinus ');
+    s = s.replace(/\\tan/g, ' tangente ');
+    s = s.replace(/\\ln/g, ' logarithme népérien ');
+    s = s.replace(/\\pi/g, ' pi ');
+    s = s.replace(/\\times/g, ' fois ');
+    s = s.replace(/\\div/g, ' divisé par ');
+    s = s.replace(/\\infty/g, ' infini ');
+    s = s.replace(/\\/g, ' ');
+    s = s.replace(/[{}]/g, ' ');
+    return s.replace(/\s+/g, ' ').trim();
+  }
+
+  function extractReadableContent() {
+    const container = document.querySelector('#contentBody .lecture-container') ||
+                      document.querySelector('.lecture-container') ||
+                      document.querySelector('#contentBody');
+    if (!container) return [];
+
+    const parts = [];
+    const selectors = [
+      '.lecture-hero h1', '.lecture-hero p',
+      '.lecture-section h2', '.lecture-section h3', '.lecture-section p',
+      '.lecture-callout', '.lecture-aside',
+      '.lecture-example p', '.lecture-formula-main',
+      '.lecture-step p', '.lecture-container > p'
+    ];
+
+    const elements = container.querySelectorAll(selectors.join(','));
+    const seen = new Set();
+
+    elements.forEach(el => {
+      if (seen.has(el)) return;
+      if (el.closest('button') || el.matches('button')) return;
+      let text = el.innerText || el.textContent || '';
+      text = cleanTTS(text);
+      if (!text) return;
+      if (parts.some(p => p.toLowerCase() === text.toLowerCase())) return;
+      seen.add(el);
+      parts.push(text);
+    });
+
+    if (parts.length === 0) {
+      let fallback = container.innerText || container.textContent || '';
+      fallback = cleanTTS(fallback);
+      if (fallback) parts.push(fallback);
+    }
+
+    const chunks = [];
+    parts.forEach(text => {
+      const sentences = text.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [text];
+      let current = '';
+      sentences.forEach(s => {
+        s = s.trim();
+        if (!s) return;
+        if ((current + ' ' + s).length <= 200) {
+          current += (current ? ' ' : '') + s;
+        } else {
+          if (current) chunks.push(current.trim());
+          current = s;
+        }
+      });
+      if (current) chunks.push(current.trim());
+    });
+
+    return chunks.filter(c => c.length > 1);
+  }
+
+  function updateTTSButton(state) {
+    if (!ttsBtn) return;
+    const icon = ttsBtn.querySelector('i');
+    const text = ttsBtn.querySelector('span');
+    if (state === 'speaking') {
+      ttsBtn.classList.add('speaking');
+      ttsBtn.classList.remove('paused');
+      if (icon) icon.className = 'fas fa-pause';
+      if (text) text.textContent = 'Pause';
+    } else if (state === 'paused') {
+      ttsBtn.classList.remove('speaking');
+      ttsBtn.classList.add('paused');
+      if (icon) icon.className = 'fas fa-play';
+      if (text) text.textContent = 'Reprendre';
+    } else {
+      ttsBtn.classList.remove('speaking', 'paused');
+      if (icon) icon.className = 'fas fa-volume-up';
+      if (text) text.textContent = 'Écouter';
+    }
+  }
+
+  function updateTTSProgress() {
+    if (!ttsProgressFill || !tts.chunks.length) return;
+    const p = ((tts.currentChunk + 1) / tts.chunks.length) * 100;
+    ttsProgressFill.style.width = Math.min(100, p) + '%';
+  }
+
+  function resetTTSProgress() {
+    if (ttsProgressFill) ttsProgressFill.style.width = '0%';
+  }
+
+  function speakChunk(index) {
+    if (!TTS_SUPPORTED) return;
+    if (index >= tts.chunks.length) { finishTTS(); return; }
+    if (tts.stopRequested) return;
+
+    tts.currentChunk = index;
+    const text = tts.chunks[index];
+    if (!text) { speakChunk(index + 1); return; }
+
+    try { tts.synth.cancel(); } catch (e) {}
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    tts.utterance = utterance;
+    utterance.lang = 'fr-FR';
+    utterance.rate = tts.rate;
+    utterance.pitch = tts.pitch;
+    utterance.volume = tts.volume;
+    if (tts.voice) utterance.voice = tts.voice;
+
+    utterance.onstart = () => {
+      tts.isSpeaking = true;
+      tts.isPaused = false;
+      updateTTSButton('speaking');
+      updateTTSProgress();
+    };
+
+    utterance.onend = () => {
+      if (tts.stopRequested) return;
+      const next = index + 1;
+      if (next < tts.chunks.length) {
+        setTimeout(() => {
+          if (tts.isSpeaking && !tts.isPaused && !tts.stopRequested) speakChunk(next);
+        }, 80);
+      } else finishTTS();
+    };
+
+    utterance.onerror = (e) => {
+      if (e.error === 'interrupted' || e.error === 'canceled') return;
+      finishTTS();
+    };
+
+    tts.synth.speak(utterance);
+    setTimeout(() => {
+      if (tts.isSpeaking && !tts.isPaused && !tts.stopRequested) {
+        try { tts.synth.resume(); } catch (e) {}
+      }
+    }, 100);
+  }
+
+  function startTTS() {
+    if (!TTS_SUPPORTED) return;
+    try { tts.synth.cancel(); } catch (e) {}
+    tts.stopRequested = false;
+    tts.chunks = extractReadableContent();
+    if (!tts.chunks.length) return;
+    loadTTSVoices();
+    tts.currentChunk = 0;
+    tts.isSpeaking = true;
+    tts.isPaused = false;
+    tts.isActive = true;
+    ttsProgress.classList.add('active');
+    resetTTSProgress();
+    updateTTSButton('speaking');
+    speakChunk(0);
+  }
+
+  function pauseTTS() {
+    if (!TTS_SUPPORTED || !tts.synth || !tts.isSpeaking) return;
+    try { tts.synth.cancel(); } catch (e) {}
+    tts.isPaused = true;
+    tts.isSpeaking = false;
+    updateTTSButton('paused');
+  }
+
+  function resumeTTS() {
+    if (!TTS_SUPPORTED || !tts.synth || !tts.isPaused) return;
+    tts.isPaused = false;
+    tts.isSpeaking = true;
+    tts.stopRequested = false;
+    updateTTSButton('speaking');
+    setTimeout(() => {
+      if (tts.isSpeaking && !tts.isPaused && !tts.stopRequested) speakChunk(tts.currentChunk);
+    }, 150);
+  }
+
+  function stopTTS() {
+    if (!TTS_SUPPORTED || !tts.synth) return;
+    tts.stopRequested = true;
+    try { tts.synth.cancel(); } catch (e) {}
+    tts.isSpeaking = false;
+    tts.isPaused = false;
+    tts.isActive = false;
+    tts.utterance = null;
+    tts.currentChunk = 0;
+    updateTTSButton('stopped');
+    resetTTSProgress();
+    ttsProgress.classList.remove('active');
+  }
+
+  function finishTTS() {
+    tts.isSpeaking = false;
+    tts.isPaused = false;
+    tts.isActive = false;
+    tts.stopRequested = false;
+    tts.utterance = null;
+    updateTTSButton('stopped');
+    if (ttsProgressFill) {
+      ttsProgressFill.style.width = '100%';
+      setTimeout(() => {
+        if (!tts.isSpeaking) {
+          ttsProgressFill.style.width = '0%';
+          ttsProgress.classList.remove('active');
+        }
+      }, 1000);
+    }
+  }
+
+  if (ttsBtn) {
+    ttsBtn.addEventListener('click', () => {
+      if (!TTS_SUPPORTED) return;
+      if (tts.isSpeaking) pauseTTS();
+      else if (tts.isPaused) resumeTTS();
+      else startTTS();
+    });
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden' && tts.isSpeaking) {
+      try { tts.synth.pause(); } catch (e) {}
+    }
+  });
+
+  window.addEventListener('beforeunload', () => {
+    try { if (tts.synth) tts.synth.cancel(); } catch (e) {}
+  });
+
+  // ================================================================
+  // SUIVI DU TEMPS D'ÉTUDE
+  // ================================================================
+  let studyStartTime = Date.now();
+  let studyTimeActive = true;
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      pauseStudyTime();
+    } else {
+      resumeStudyTime();
+    }
+  });
+
+  function pauseStudyTime() {
+    if (!studyTimeActive) return;
+    const duration = Math.floor((Date.now() - studyStartTime) / 1000);
+    if (duration >= 5) {
+      saveStudyTime(duration);
+    }
+    studyTimeActive = false;
+  }
+
+  function resumeStudyTime() {
+    studyStartTime = Date.now();
+    studyTimeActive = true;
+  }
+
+  window.addEventListener('beforeunload', () => {
+    pauseStudyTime();
+  });
+
+  function saveStudyTimeBeforeChange() {
+    const duration = Math.floor((Date.now() - studyStartTime) / 1000);
+    if (duration >= 5) {
+      saveStudyTime(duration);
+    }
+    studyStartTime = Date.now();
+  }
+
+  async function saveStudyTime(seconds) {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    try {
+      const userRef = doc(db, 'users', user.uid);
+      const snap = await getDoc(userRef);
+      if (snap.exists()) {
+        const current = snap.data().totalStudyTime || 0;
+        await updateDoc(userRef, {
+          totalStudyTime: current + seconds,
+          lastStudyUpdate: serverTimestamp()
+        });
+      }
+    } catch (e) {
+      // Silencieux
+    }
+  }
+
+  function resetStudyTimer() {
+    studyStartTime = Date.now();
+    studyTimeActive = true;
+  }
+
+  // ================================================================
+  // CHARGEMENT UTILISATEUR (temps réel)
+  // ================================================================
+  function loadUserData(user) {
+    if (unsubscribeUser) {
+      unsubscribeUser();
+      unsubscribeUser = null;
+    }
+    const userRef = doc(db, 'users', user.uid);
+    unsubscribeUser = onSnapshot(userRef,
+      (docSnap) => {
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          const newPremium = isUserPremium(data);
+          if (newPremium !== isPremium) isPremium = newPremium;
+          try {
+            localStorage.setItem(USER_DATA_KEY, JSON.stringify({
+              ...data,
+              _uid: user.uid,
+              _cachedAt: Date.now()
+            }));
+          } catch (e) {}
+        } else {
+          const cached = getCachedUserData(user.uid);
+          if (cached) {
+            const newPremium = isUserPremium(cached);
+            if (newPremium !== isPremium) isPremium = newPremium;
+          }
+        }
+      },
+      (error) => {
+        const cached = getCachedUserData(user.uid);
+        if (cached) {
+          const newPremium = isUserPremium(cached);
+          if (newPremium !== isPremium) isPremium = newPremium;
+        }
+      }
+    );
+  }
+
+  // ================================================================
+  // AUTH ROBUSTE — Anti-flash
+  // ================================================================
+  let isRedirecting = false;
+  let isAuthResolved = false;
+  let graceTimer = null;
+  let maxTimer = null;
+
+  function redirectToLogin() {
+    if (isRedirecting) return;
+    isRedirecting = true;
+    try {
+      sessionStorage.setItem('redirectAfterLogin',
+        window.location.pathname + window.location.search);
+    } catch (e) {}
+    window.location.replace('login.html');
+  }
+
+  function initAuthGuard(onAuthenticated) {
+    auth.onAuthStateChanged((user) => {
+      if (isAuthResolved) {
+        if (user && user.uid !== currentUid) {
+          currentUid = user.uid;
+          saveSession(user);
+          onAuthenticated(user);
+        } else if (!user && currentUid) {
+          currentUid = null;
+          clearSession();
+          stopTTS();
+          redirectToLogin();
+        }
+        return;
+      }
+
+      if (!user) {
+        if (graceTimer) clearTimeout(graceTimer);
+        graceTimer = setTimeout(() => {
+          if (isAuthResolved) return;
+          if (auth.currentUser) return;
+
+          const hasSession = localStorage.getItem(SESSION_KEY);
+          const hasUserData = localStorage.getItem(USER_DATA_KEY);
+
+          if ((hasSession || hasUserData) && !navigator.onLine) {
+            setTimeout(() => {
+              if (auth.currentUser) return;
+              if (!isAuthResolved) redirectToLogin();
+            }, 1500);
+            return;
+          }
+
+          if (hasSession && hasUserData) {
+            setTimeout(() => {
+              if (auth.currentUser) return;
+              if (!isAuthResolved) redirectToLogin();
+            }, 1500);
+            return;
+          }
+
+          redirectToLogin();
+        }, 600);
+        return;
+      }
+
+      if (graceTimer) { clearTimeout(graceTimer); graceTimer = null; }
+      if (maxTimer) { clearTimeout(maxTimer); maxTimer = null; }
+
+      isAuthResolved = true;
+      currentUid = user.uid;
+      saveSession(user);
+      onAuthenticated(user);
+    });
+
+    maxTimer = setTimeout(() => {
+      if (isAuthResolved) return;
+      if (auth.currentUser) {
+        isAuthResolved = true;
+        currentUid = auth.currentUser.uid;
+        saveSession(auth.currentUser);
+        onAuthenticated(auth.currentUser);
+      } else {
+        redirectToLogin();
+      }
+    }, 5000);
+  }
+
+  // ================================================================
+  // LANCER LA PROTECTION
+  // ================================================================
+  initAuthGuard(async (user) => {
+    const cached = getCachedUserData(user.uid);
+    isPremium = cached ? isUserPremium(cached) : false;
+
+    loadContent();
+    loadUserData(user);
+  });
+
+  console.log('🚀 ARVEXA — Lecture (avec session robuste)');
+  </script>
+</body>
+</html>

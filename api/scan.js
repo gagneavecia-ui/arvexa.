@@ -1,7 +1,8 @@
 const WINDOW_MS = 60 * 1000;
 const MAX_REQUESTS_PER_WINDOW = 5;
 const requestLog = new Map();
-const MAX_IMAGE_LENGTH = 5 * 1024 * 1024;
+// Vercel limits serverless request bodies; keep room for JSON/base64 overhead.
+const MAX_IMAGE_LENGTH = 3 * 1024 * 1024;
 const ALLOWED_ACTIONS = new Set(['analyze', 'action']);
 
 function clientIp(request) {
@@ -22,7 +23,7 @@ function errorResponse(response, status, error) {
 
 function providers() {
   return [
-    { name: 'Groq', key: process.env.GROQ_API_KEY, endpoint: 'https://api.groq.com/openai/v1/chat/completions', model: process.env.GROQ_VISION_MODEL || 'qwen/qwen3.6-27b' },
+    { name: 'Groq', key: process.env.GROQ_API_KEY, endpoint: 'https://api.groq.com/openai/v1/chat/completions', model: process.env.GROQ_VISION_MODEL || 'meta-llama/llama-4-scout-17b-16e-instruct' },
     { name: 'OpenRouter', key: process.env.OPENROUTER_API_KEY, endpoint: 'https://openrouter.ai/api/v1/chat/completions', model: process.env.OPENROUTER_VISION_MODEL || 'google/gemini-2.0-flash-001' },
     { name: 'Mistral', key: process.env.MISTRAL_API_KEY, endpoint: 'https://api.mistral.ai/v1/chat/completions', model: process.env.MISTRAL_VISION_MODEL || 'pixtral-large-latest' }
   ].filter((provider) => Boolean(provider.key));
@@ -52,7 +53,7 @@ async function callProvider(provider, messages, maxTokens) {
     const result = await fetch(provider.endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${provider.key}`, ...(provider.name === 'OpenRouter' ? { 'HTTP-Referer': process.env.APP_ORIGIN || '', 'X-Title': 'ARVEXA School' } : {}) },
-      body: JSON.stringify({ model: provider.model, messages, temperature: 0.2, max_tokens: Math.min(Number(maxTokens) || 900, 1400), response_format: { type: 'json_object' } }),
+      body: JSON.stringify({ model: provider.model, messages, temperature: 0.2, max_tokens: Math.min(Number(maxTokens) || 900, 1400), ...(provider.name === 'Mistral' ? {} : { response_format: { type: 'json_object' } }) }),
       signal: controller.signal
     });
     const data = await result.json().catch(() => null);

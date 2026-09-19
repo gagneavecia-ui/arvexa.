@@ -2106,6 +2106,7 @@ async function submitAvis() {
   avisSubmit.classList.add('loading');
 
   try {
+    let telegramSent = true;
     const message = avisMessage.value.trim();
     const userEmail = auth.currentUser.email || 'Anonyme';
     const userName = userData?.firstName
@@ -2125,18 +2126,21 @@ async function submitAvis() {
       platform: navigator.userAgent
     });
 
-    // 2. Envoyer à Telegram
-    await sendToTelegram({
-      userName,
-      userEmail,
-      rating: currentRating,
-      category: currentCategory,
-      message
-    });
+    // Telegram est une notification secondaire : Firestore reste la source de vérité.
+    try {
+      await sendToTelegram({ userName, userEmail, rating: currentRating, category: currentCategory, message });
+    } catch (telegramError) {
+      telegramSent = false;
+      console.warn('Notification Telegram indisponible:', telegramError.message);
+    }
 
     // 3. Afficher succès
     avisForm.style.display = 'none';
     avisSuccess.classList.add('show');
+    showToast(
+      telegramSent ? 'Avis envoyé.' : 'Avis enregistré. Notification Telegram différée.',
+      telegramSent ? 'success' : 'info'
+    );
 
   } catch (error) {
     console.error('Erreur envoi avis:', error);
@@ -2152,7 +2156,18 @@ async function submitAvis() {
 // ENVOI À TELEGRAM
 // ═══════════════════════════════════════════════════════════════
 async function sendToTelegram({ userName, userEmail, rating, category, message }) {
-  return null;
+  const response = await fetch('/api/telegram', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userName, userEmail, rating, category, message })
+  });
+
+  const data = await response.json().catch(() => null);
+  if (!response.ok) {
+    throw new Error(data?.error || 'Notification Telegram indisponible.');
+  }
+
+  return data;
 }
 
 // ================================================================

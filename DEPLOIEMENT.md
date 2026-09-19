@@ -61,3 +61,17 @@ Ne pas déployer Storage avec le forfait Spark.
 ## Architecture IA
 
 Les appels IA doivent passer par une fonction backend ou une API Vercel avec variable d'environnement. Une clé IA ne doit jamais être réintroduite dans un fichier HTML ou JavaScript public.
+
+## Notification Telegram
+
+Dans Vercel, ajouter ces variables pour l'environnement Production :
+
+```text
+TELEGRAM_BOT_TOKEN = token privé de BotFather
+TELEGRAM_CHAT_ID = identifiant numérique du chat
+APP_ORIGIN = https://ton-domaine-vercel.vercel.app
+```
+
+`TELEGRAM_BOT_TOKEN` doit être de type `Secret`. Après l'ajout ou la modification d'une variable, relancer un déploiement Vercel.
+
+L'endpoint public est `/api/telegram`. Il valide la note, la catégorie et la longueur du message, limite les appels par adresse IP et applique un délai maximal de huit secondes à Telegram. Firestore reste la source de vérité si Telegram est indisponible.

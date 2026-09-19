@@ -88,8 +88,13 @@ OPENROUTER_MODEL = openai/gpt-oss-120b
 MISTRAL_API_KEY = clé privée Mistral de secours
 MISTRAL_MODEL = mistral-large-latest
 FIREBASE_WEB_API_KEY = clé Web Firebase du projet
+GROQ_VISION_MODEL = qwen/qwen3.6-27b
+OPENROUTER_VISION_MODEL = google/gemini-2.0-flash-001
+MISTRAL_VISION_MODEL = pixtral-large-latest
 ```
 
 `GROQ_API_KEY`, `OPENROUTER_API_KEY` et `MISTRAL_API_KEY` doivent être des variables `Secret`. L'endpoint `/api/exam` refuse les requêtes sans token Firebase valide, limite la génération, génère les deux sujets en un seul appel puis corrige le sujet choisi. Les sujets respectent cinq exercices et dix questions par exercice.
 
 Après chaque changement de variable, lancer un nouveau déploiement Vercel. Ne jamais placer ces valeurs dans `exam.html`.
+
+ARV-SCAN utilise `/api/scan` pour l'analyse d'image et les actions pédagogiques. Les clés restent côté serveur ; ne remets pas de clé dans `scan.html`.

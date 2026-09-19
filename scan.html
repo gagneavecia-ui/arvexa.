@@ -272,8 +272,9 @@
 
 const GROQ_API_KEY = '';
 
-const GROQ_ENDPOINT =
-  'https://api.groq.com/openai/v1/chat/completions';
+const SCAN_ENDPOINT = '/api/scan';
+
+const GROQ_ENDPOINT = SCAN_ENDPOINT;
 
 const GROQ_MODEL_VISION =
   'qwen/qwen3.6-27b';
@@ -686,6 +687,45 @@ async function callGroqText(
   }
 }
 
+
+/* ================================================================
+   MOTEUR BACKEND — aucune clé IA dans le navigateur
+   ================================================================ */
+async function callScanBackend(payload) {
+  const response = await fetch(SCAN_ENDPOINT, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+
+  const data = await response.json().catch(() => null);
+  if (!response.ok) {
+    const error = new Error(data?.error || 'Service ARV-SCAN indisponible.');
+    error.status = response.status;
+    throw error;
+  }
+  if (!data?.success || !data.result) throw new Error('Réponse ARV-SCAN invalide.');
+  return data.result;
+}
+
+async function callGroqVision(messages) {
+  const userMessage = messages?.find((message) => message.role === 'user');
+  return JSON.stringify(await callScanBackend({
+    action: 'analyze',
+    image: currentImage,
+    prompt: userMessage?.content?.find?.((part) => part.type === 'text')?.text || buildAnalysisPrompt()
+  }));
+}
+
+async function callGroqText(messages, maxTokens = 700) {
+  const userMessage = messages?.find((message) => message.role === 'user');
+  return JSON.stringify(await callScanBackend({
+    action: 'action',
+    analysis: currentAnalysis,
+    prompt: userMessage?.content || '',
+    maxTokens
+  }));
+}
 
 /* ================================================================
    GESTION IMAGE
@@ -1583,6 +1623,18 @@ function showResponse(
   respContent.innerHTML =
     html;
 
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(respContent, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '\\(', right: '\\)', display: false },
+        { left: '$', right: '$', display: false }
+      ],
+      throwOnError: false,
+      trust: false
+    });
+  }
+
 
   responseCard.scrollIntoView({
     behavior: 'smooth',
@@ -2288,7 +2340,9 @@ async function startAnalysis() {
 
 
     showToast(
-      `❌ ${error.message}`,
+      error?.status === 429
+        ? '❌ Trop de demandes. Réessaie dans une minute.'
+        : '❌ Impossible d’analyser cette image pour le moment.',
       'error'
     );
 
@@ -2443,7 +2497,9 @@ async function executeAction(
 
 
     showToast(
-      `❌ ${error.message}`,
+      error?.status === 429
+        ? '❌ Trop de demandes. Réessaie dans une minute.'
+        : '❌ Le service est temporairement indisponible.',
       'error'
     );
 

@@ -83,9 +83,13 @@ Ajouter dans Vercel, uniquement pour `Production` :
 ```text
 GROQ_API_KEY = nouvelle clé privée Groq
 GROQ_MODEL = openai/gpt-oss-120b
+OPENROUTER_API_KEY = clé privée OpenRouter de secours
+OPENROUTER_MODEL = openai/gpt-oss-120b
+MISTRAL_API_KEY = clé privée Mistral de secours
+MISTRAL_MODEL = mistral-large-latest
 FIREBASE_WEB_API_KEY = clé Web Firebase du projet
 ```
 
-`GROQ_API_KEY` doit être une variable `Secret`. L'endpoint `/api/exam` refuse les requêtes sans token Firebase valide, limite la génération, génère les deux sujets en un seul appel puis corrige le sujet choisi.
+`GROQ_API_KEY`, `OPENROUTER_API_KEY` et `MISTRAL_API_KEY` doivent être des variables `Secret`. L'endpoint `/api/exam` refuse les requêtes sans token Firebase valide, limite la génération, génère les deux sujets en un seul appel puis corrige le sujet choisi. Les sujets respectent cinq exercices et dix questions par exercice.
 
 Après chaque changement de variable, lancer un nouveau déploiement Vercel. Ne jamais placer ces valeurs dans `exam.html`.

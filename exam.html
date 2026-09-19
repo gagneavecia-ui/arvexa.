@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0A0A0A">
+  <meta name="description" content="ARVEXA School - Mode examen">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <script src="register-sw.js" defer></script>
+  <style>
+    :root { --black:#0A0A0A; --green:#1A3A2A; --gold:#B8860B; --gold-light:#E0B84A; --white:#FFF; --muted:#9b9c91; --danger:#d7654a; --success:#45b47d; --surface:#151715; --line:rgba(255,255,255,.09); --radius:14px; }
+    * { box-sizing:border-box; }
+    html { min-width:320px; background:var(--black); color-scheme:dark; }
+    body { margin:0; min-height:100vh; overflow-x:hidden; background:radial-gradient(circle at 85% 0, rgba(26,58,42,.32), transparent 32rem), linear-gradient(180deg,#0a0a0a,#10130f); color:var(--white); font:15px/1.6 Inter,system-ui,sans-serif; }
+    button, input, select, textarea { font:inherit; }
+    button { cursor:pointer; }
+    button:disabled { cursor:not-allowed; opacity:.55; }
+    .shell { width:min(100% - 28px, 980px); margin:auto; padding:18px 0 46px; }
+    header { display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:24px; }
+    .brand { color:var(--white); text-decoration:none; font:700 22px 'Playfair Display',serif; letter-spacing:.05em; }
+    .brand span { color:var(--gold-light); font-style:italic; }
+    .connection { color:var(--muted); font-size:12px; display:flex; align-items:center; gap:7px; }
+    .connection::before { content:''; width:8px; height:8px; border-radius:50%; background:var(--gold); }
+    .connection.online::before { background:var(--success); }
+    .panel { background:rgba(21,23,21,.88); border:1px solid var(--line); border-radius:var(--radius); padding:22px; box-shadow:0 18px 50px rgba(0,0,0,.2); }
+    .view { display:none; animation:appear .24s ease both; }
+    .view.active { display:block; }
+    @keyframes appear { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+    h1,h2,h3 { margin:0; line-height:1.2; font-family:'Playfair Display',serif; }
+    h1 { font-size:clamp(28px,6vw,46px); max-width:680px; }
+    h2 { font-size:clamp(23px,4vw,32px); }
+    h3 { font-size:19px; }
+    .eyebrow { color:var(--gold-light); font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; margin-bottom:10px; }
+    .lead { color:var(--muted); max-width:650px; margin:12px 0 0; }
+    .form-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; margin-top:24px; }
+    .field { display:flex; flex-direction:column; gap:7px; }
+    .field.full { grid-column:1/-1; }
+    label { color:#e5e5dc; font-size:13px; font-weight:700; }
+    input, select, textarea { width:100%; border:1px solid var(--line); border-radius:10px; background:#0e100e; color:var(--white); padding:12px 13px; outline:none; }
+    input:focus, select:focus, textarea:focus { border-color:var(--gold-light); box-shadow:0 0 0 3px rgba(224,184,74,.12); }
+    .actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:24px; }
+    .btn { min-height:44px; border:1px solid transparent; border-radius:10px; padding:10px 18px; color:var(--white); background:#222722; font-weight:800; transition:transform .16s,background .16s,border-color .16s; }
+    .btn:hover:not(:disabled) { transform:translateY(-1px); border-color:rgba(224,184,74,.55); }
+    .btn.primary { background:linear-gradient(135deg,var(--gold-light),var(--gold)); color:var(--black); }
+    .btn.secondary { background:transparent; border-color:var(--line); }
+    .btn.danger { background:rgba(215,101,74,.16); border-color:rgba(215,101,74,.4); }
+    .status { min-height:22px; margin-top:14px; color:var(--muted); }
+    .status.error { color:#ff9a84; }
+    .status.success { color:#7ce0aa; }
+    .loader { width:20px; height:20px; border:2px solid rgba(10,10,10,.25); border-top-color:currentColor; border-radius:50%; animation:spin .7s linear infinite; display:inline-block; vertical-align:middle; margin-right:8px; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .subject-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin-top:22px; }
+    .subject-card { border:1px solid var(--line); border-radius:12px; padding:18px; background:linear-gradient(145deg,rgba(26,58,42,.5),rgba(10,10,10,.45)); display:flex; flex-direction:column; gap:11px; }
+    .subject-card p { color:var(--muted); margin:0; }
+    .subject-meta { display:flex; gap:12px; flex-wrap:wrap; color:var(--gold-light); font-size:13px; }
+    .exam-top { position:sticky; top:0; z-index:4; background:rgba(10,10,10,.94); backdrop-filter:blur(12px); padding:10px 0 12px; margin-bottom:18px; border-bottom:1px solid var(--line); }
+    .exam-topline { display:flex; justify-content:space-between; gap:12px; align-items:center; }
+    .timer { color:var(--gold-light); font-weight:800; font-variant-numeric:tabular-nums; white-space:nowrap; }
+    .timer.urgent { color:#ff8e72; }
+    .progress { height:6px; border-radius:10px; overflow:hidden; background:#262b26; margin-top:11px; }
+    .progress span { display:block; height:100%; background:linear-gradient(90deg,var(--gold),var(--gold-light)); transition:width .2s; }
+    .exercise-head { display:flex; justify-content:space-between; gap:12px; align-items:start; margin-bottom:14px; }
+    .points { color:var(--gold-light); font-weight:800; white-space:nowrap; }
+    .statement { color:#e2e3dc; white-space:pre-wrap; margin:0 0 20px; }
+    .question { border-top:1px solid var(--line); padding:16px 0 0; margin-top:16px; }
+    .question-title { display:flex; justify-content:space-between; gap:12px; font-weight:700; }
+    .answer { margin-top:10px; min-height:92px; resize:vertical; }
+    .answer[type=number] { min-height:auto; }
+    .question small { color:var(--muted); }
+    .result-summary { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:20px 0; }
+    .metric { border:1px solid var(--line); border-radius:12px; padding:16px; background:#101310; }
+    .metric strong { display:block; color:var(--gold-light); font-size:26px; }
+    .result-exercise { border-top:1px solid var(--line); padding:16px 0; }
+    .correct { color:#7ce0aa; } .wrong { color:#ff9a84; }
+    .modal-backdrop { position:fixed; inset:0; z-index:20; display:none; place-items:center; padding:18px; background:rgba(0,0,0,.78); }
+    .modal-backdrop.show { display:grid; }
+    .modal { max-width:440px; width:100%; background:#171a17; border:1px solid var(--line); border-radius:var(--radius); padding:22px; }
+    .modal p { color:var(--muted); }
+    @media (max-width:620px) { .shell { width:min(100% - 20px,980px); padding-top:12px; } .panel { padding:17px; } .form-grid,.subject-grid { grid-template-columns:1fr; } .field.full { grid-column:auto; } .actions .btn { flex:1 1 100%; } .exam-topline { align-items:flex-start; flex-direction:column; } .result-summary { grid-template-columns:1fr 1fr; } }
+    @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:.01ms!important; transition-duration:.01ms!important; } }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <a class="brand" href="index.html">ARVEX<span>A School</span></a>
+      <div class="connection" id="connectionState">Hors ligne possible</div>
+    </header>
+
+    <section class="view active" id="configView" aria-labelledby="configTitle">
+      <div class="panel">
+        <div class="eyebrow">Mode examen</div>
+        <h1 id="configTitle">Prépare ton examen dans les conditions du BAC.</h1>
+        <p class="lead">Choisis tes paramètres. Le serveur générera deux sujets différents de difficulté comparable.</p>
+        <form id="configForm" class="form-grid">
+          <div class="field"><label for="subject">Matière</label><select id="subject" required><option>Mathématiques</option><option>Physique</option><option>Chimie</option><option>SVT</option><option>Français</option></select></div>
+          <div class="field"><label for="level">Niveau</label><select id="level"><option>Terminale D</option></select></div>
+          <div class="field"><label for="chapter">Chapitre</label><select id="chapter"><option value="all">Tous les chapitres</option><option>Fonctions</option><option>Probabilités</option><option>Suites</option><option>Génétique</option><option>Électricité</option></select></div>
+          <div class="field"><label for="difficulty">Difficulté</label><select id="difficulty"><option value="easy">Facile</option><option value="medium" selected>Moyen</option><option value="hard">Difficile</option><option value="bac">Niveau BAC</option></select></div>
+          <div class="field"><label for="duration">Durée</label><select id="duration"><option value="30">30 min</option><option value="60" selected>1 h</option><option value="90">1 h 30</option><option value="120">2 h</option><option value="180">3 h</option></select></div>
+          <div class="field"><label for="exerciseCount">Nombre d'exercices</label><input id="exerciseCount" type="number" min="1" max="10" value="4" required></div>
+          <div class="field full"><button class="btn primary" id="generateButton" type="submit">Générer mon examen</button></div>
+        </form>
+        <div class="status" id="configStatus" role="status" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section class="view" id="subjectsView" aria-labelledby="subjectsTitle">
+      <div class="panel">
+        <div class="eyebrow">Génération terminée</div><h2 id="subjectsTitle">Votre examen est prêt</h2>
+        <p class="lead">Choisis un seul sujet. L'autre restera disponible si tu souhaites recommencer.</p>
+        <div class="subject-grid" id="subjectsList"></div>
+        <div class="actions"><button class="btn secondary" id="backConfigButton" type="button">Modifier la configuration</button></div>
+      </div>
+    </section>
+
+    <section class="view" id="examView" aria-labelledby="examTitle">
+      <div class="exam-top"><div class="exam-topline"><div><div class="eyebrow">Examen en cours</div><h2 id="examTitle">Sujet</h2></div><div class="timer" id="timer" aria-live="polite">00:00:00</div></div><div class="progress" aria-label="Progression"><span id="progressBar" style="width:0%"></span></div></div>
+      <div class="panel"><div class="exercise-head"><div><h3 id="exerciseTitle">Exercice</h3><small id="exerciseCounter"></small></div><div class="points" id="exercisePoints"></div></div><p class="statement" id="exerciseStatement"></p><div id="questionsList"></div><div class="actions"><button class="btn secondary" id="previousButton" type="button">Précédent</button><button class="btn primary" id="nextButton" type="button">Suivant</button><button class="btn danger" id="finishButton" type="button">Terminer</button></div><div class="status" id="examStatus" role="status" aria-live="polite"></div></div>
+    </section>
+
+    <section class="view" id="resultsView" aria-labelledby="resultsTitle">
+      <div class="panel"><div class="eyebrow">Correction</div><h2 id="resultsTitle">Résultats de l'examen</h2><div class="result-summary"><div class="metric">Note<strong id="resultScore">-- / 20</strong></div><div class="metric">Pourcentage<strong id="resultPercent">-- %</strong></div></div><div id="resultsDetails"></div><div class="actions"><button class="btn primary" id="newExamButton" type="button">Nouvel examen</button></div></div>
+    </section>
+  </main>
+
+  <div class="modal-backdrop" id="confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle"><div class="modal"><h3 id="confirmTitle">Terminer l'examen ?</h3><p>Voulez-vous vraiment terminer votre examen ? Vos réponses seront envoyées pour correction.</p><div class="actions"><button class="btn secondary" id="cancelFinishButton" type="button">Continuer</button><button class="btn danger" id="confirmFinishButton" type="button">Terminer</button></div></div></div>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js';
+    import { getAuth, onAuthStateChanged, getIdToken } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js';
+
+    const app = initializeApp({
+      apiKey: 'AIzaSyDHscOXw3rLuhV6z1Cny-bdYCumqpnG7QE',
+      authDomain: 'arvexa-fbf10.firebaseapp.com',
+      projectId: 'arvexa-fbf10',
+      storageBucket: 'arvexa-fbf10.firebasestorage.app',
+      messagingSenderId: '920108330053',
+      appId: '1:920108330053:web:f532d71cbc2c824bc7472c'
+    });
+    const auth = getAuth(app);
+    const STORAGE_KEY = 'arvexa_exam_draft_v1';
+    const state = { user: null, exam: null, selectedSubject: null, exerciseIndex: 0, answers: {}, startedAt: 0, remainingSeconds: 0, timerId: null, submitting: false };
+    const $ = (id) => document.getElementById(id);
+    const views = ['configView','subjectsView','examView','resultsView'];
+
+    function showView(id) { views.forEach((view) => $(view).classList.toggle('active', view === id)); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    function setStatus(id, message, type = '') { const element = $(id); element.textContent = message; element.className = `status ${type}`; }
+    function escapeHtml(value) { const div = document.createElement('div'); div.textContent = String(value ?? ''); return div.innerHTML; }
+    function renderMath(root) { if (window.renderMathInElement) window.renderMathInElement(root, { delimiters: [{ left:'$$', right:'$$', display:true }, { left:'\\(', right:'\\)', display:false }, { left:'$', right:'$', display:false }], throwOnError:false, trust:false }); }
+    function normalizeExam(payload) {
+      if (!payload?.success || !payload.exam || !Array.isArray(payload.exam.subjects) || payload.exam.subjects.length < 2) throw new Error('Réponse du serveur invalide.');
+      const exam = { ...payload.exam, duration: Number(payload.exam.duration), totalPoints: Number(payload.exam.totalPoints) || 20, subjects: payload.exam.subjects.slice(0, 2) };
+      exam.subjects.forEach((subject, index) => { if (!Array.isArray(subject.exercises)) throw new Error(`Sujet ${index + 1} invalide.`); });
+      return exam;
+    }
+    function readConfig() { return { subject: $('subject').value, level: $('level').value, chapter: $('chapter').value, difficulty: $('difficulty').value, duration: Number($('duration').value), exerciseCount: Number($('exerciseCount').value) }; }
+    function saveDraft() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ exam: state.exam, selectedSubject: state.selectedSubject?.id, exerciseIndex: state.exerciseIndex, answers: state.answers, startedAt: state.startedAt, remainingSeconds: state.remainingSeconds })); } catch (_) {} }
+    function clearDraft() { try { localStorage.removeItem(STORAGE_KEY); } catch (_) {} }
+    function loadDraft() { try { const draft = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null'); if (!draft?.exam || !draft?.selectedSubject) return false; state.exam = draft.exam; state.selectedSubject = state.exam.subjects.find((subject) => subject.id === draft.selectedSubject); state.exerciseIndex = Number(draft.exerciseIndex) || 0; state.answers = draft.answers || {}; state.startedAt = Number(draft.startedAt) || Date.now(); state.remainingSeconds = Number(draft.remainingSeconds) || state.exam.duration * 60; return Boolean(state.selectedSubject); } catch (_) { return false; } }
+    function displaySubjects() { const list = $('subjectsList'); list.replaceChildren(); state.exam.subjects.forEach((subject, index) => { const card = document.createElement('article'); card.className = 'subject-card'; const exerciseCount = subject.exercises.length; const points = subject.exercises.reduce((sum, exercise) => sum + (Number(exercise.points) || 0), 0); card.innerHTML = `<h3>${escapeHtml(subject.title || `Sujet ${index + 1}`)}</h3><p>${escapeHtml(subject.instructions || 'Sujet complet à traiter dans le temps imparti.')}</p><div class="subject-meta"><span>${exerciseCount} exercice${exerciseCount > 1 ? 's' : ''}</span><span>${points || state.exam.totalPoints}/20 points</span></div>`; const button = document.createElement('button'); button.className = 'btn primary'; button.type = 'button'; button.textContent = 'Commencer'; button.addEventListener('click', () => startExam(subject)); card.appendChild(button); list.appendChild(card); }); }
+    async function generateExam(event) { event.preventDefault(); if (!navigator.onLine) return setStatus('configStatus','Votre connexion semble interrompue.','error'); const config = readConfig(); if (!Number.isInteger(config.exerciseCount) || config.exerciseCount < 1 || config.exerciseCount > 10) return setStatus('configStatus','Le nombre d’exercices doit être compris entre 1 et 10.','error'); const button = $('generateButton'); button.disabled = true; button.innerHTML = '<span class="loader"></span>Génération en cours...'; setStatus('configStatus','Le serveur prépare deux sujets complets...'); try { const headers = { 'Content-Type':'application/json' }; if (state.user) headers.Authorization = `Bearer ${await getIdToken(state.user)}`; const response = await fetch('/api/exam', { method:'POST', headers, body:JSON.stringify(config) }); const payload = await response.json().catch(() => null); if (response.status === 429) throw new Error('LIMIT'); if (!response.ok) throw new Error(payload?.error || 'SERVICE'); state.exam = normalizeExam(payload); state.answers = {}; state.exerciseIndex = 0; clearDraft(); displaySubjects(); showView('subjectsView'); } catch (error) { handleError(error, 'configStatus'); } finally { button.disabled = false; button.textContent = 'Générer mon examen'; } }
+    function startExam(subject) { state.selectedSubject = subject; state.exerciseIndex = 0; state.answers = {}; state.startedAt = Date.now(); state.remainingSeconds = Math.max(60, Number(state.exam.duration) * 60); saveDraft(); $('examTitle').textContent = subject.title || 'Sujet'; showView('examView'); renderExercise(); startTimer(); }
+    function flattenQuestions(exercise) { return Array.isArray(exercise.questions) ? exercise.questions : []; }
+    function answerKey(exerciseIndex, questionIndex) { return `${state.selectedSubject.id}:${exerciseIndex}:${questionIndex}`; }
+    function saveAnswer(key, value) { state.answers[key] = value; saveDraft(); }
+    function renderExercise() { const exercise = state.selectedSubject.exercises[state.exerciseIndex]; if (!exercise) return; $('exerciseTitle').textContent = `Exercice ${exercise.number || state.exerciseIndex + 1}${exercise.title ? ` — ${exercise.title}` : ''}`; $('exerciseCounter').textContent = `${state.exerciseIndex + 1} / ${state.selectedSubject.exercises.length}`; $('exercisePoints').textContent = `${Number(exercise.points) || 0} point${Number(exercise.points) === 1 ? '' : 's'}`; $('exerciseStatement').textContent = exercise.statement || ''; const list = $('questionsList'); list.replaceChildren(); flattenQuestions(exercise).forEach((question, questionIndex) => { const key = answerKey(state.exerciseIndex, questionIndex); const wrapper = document.createElement('div'); wrapper.className = 'question'; const title = document.createElement('div'); title.className = 'question-title'; title.innerHTML = `<span>${escapeHtml(question.number || `${state.exerciseIndex + 1}.${questionIndex + 1}`)}. ${escapeHtml(question.text || '')}</span><span class="points">${Number(question.points) || 0} pt</span>`; wrapper.appendChild(title); const input = document.createElement(question.type === 'number' ? 'input' : 'textarea'); input.className = 'answer'; input.placeholder = question.type === 'number' ? 'Ta réponse numérique' : 'Rédige ta réponse ici...'; if (question.type === 'number') { input.type = 'number'; input.step = 'any'; } input.value = state.answers[key] || ''; input.addEventListener('input', () => saveAnswer(key, input.value)); wrapper.appendChild(input); list.appendChild(wrapper); }); $('previousButton').disabled = state.exerciseIndex === 0; $('nextButton').disabled = state.exerciseIndex >= state.selectedSubject.exercises.length - 1; $('progressBar').style.width = `${((state.exerciseIndex + 1) / state.selectedSubject.exercises.length) * 100}%`; renderMath($('examView')); }
+    function nextQuestion() { if (state.exerciseIndex < state.selectedSubject.exercises.length - 1) { state.exerciseIndex += 1; saveDraft(); renderExercise(); } }
+    function previousQuestion() { if (state.exerciseIndex > 0) { state.exerciseIndex -= 1; saveDraft(); renderExercise(); } }
+    function startTimer() { clearInterval(state.timerId); state.timerId = setInterval(() => { state.remainingSeconds -= 1; updateTimer(); if (state.remainingSeconds <= 0) { clearInterval(state.timerId); submitExam(true); } else if (state.remainingSeconds % 5 === 0) saveDraft(); }, 1000); updateTimer(); }
+    function updateTimer() { const seconds = Math.max(0, state.remainingSeconds); const hours = String(Math.floor(seconds / 3600)).padStart(2,'0'); const minutes = String(Math.floor((seconds % 3600) / 60)).padStart(2,'0'); const secs = String(seconds % 60).padStart(2,'0'); $('timer').textContent = `${hours}:${minutes}:${secs}`; $('timer').classList.toggle('urgent', seconds <= 300); }
+    function askFinish() { $('confirmModal').classList.add('show'); $('confirmFinishButton').focus(); }
+    async function submitExam(auto = false) { if (state.submitting || !state.selectedSubject) return; $('confirmModal').classList.remove('show'); state.submitting = true; clearInterval(state.timerId); $('finishButton').disabled = true; setStatus('examStatus', auto ? 'Temps écoulé. Envoi des réponses...' : 'Envoi des réponses...'); try { const headers = { 'Content-Type':'application/json' }; if (state.user) headers.Authorization = `Bearer ${await getIdToken(state.user)}`; const response = await fetch('/api/exam', { method:'POST', headers, body:JSON.stringify({ action:'correct', exam:state.exam, subjectId:state.selectedSubject.id, answers:state.answers }) }); const payload = await response.json().catch(() => null); if (!response.ok) throw new Error(payload?.error || 'SERVICE'); showResults(payload); clearDraft(); } catch (error) { state.submitting = false; $('finishButton').disabled = false; setStatus('examStatus', error instanceof TypeError ? 'Votre connexion semble interrompue.' : 'Impossible de corriger l’examen. Réessaie.','error'); } }
+    function showResults(payload) { const result = payload?.result || payload?.results || payload; const score = Math.max(0, Math.min(20, Number(result?.score ?? result?.totalScore ?? 0))); $('resultScore').textContent = `${score.toFixed(2)} / 20`; $('resultPercent').textContent = `${Math.round(score * 5)} %`; const details = $('resultsDetails'); details.replaceChildren(); const exercises = Array.isArray(result?.exercises) ? result.exercises : []; if (!exercises.length) { const message = document.createElement('p'); message.className = 'lead'; message.textContent = 'Correction reçue. Consulte le détail lorsque le backend le fournit.'; details.appendChild(message); } exercises.forEach((exercise, index) => { const article = document.createElement('article'); article.className = 'result-exercise'; const title = document.createElement('h3'); title.textContent = `Exercice ${exercise.number || index + 1} — ${exercise.score ?? 0} point(s)`; article.appendChild(title); if (exercise.explanation) { const explanation = document.createElement('p'); explanation.textContent = exercise.explanation; article.appendChild(explanation); } if (exercise.advice) { const advice = document.createElement('p'); advice.className = 'lead'; advice.textContent = `Conseil : ${exercise.advice}`; article.appendChild(advice); } details.appendChild(article); }); showView('resultsView'); renderMath($('resultsView')); }
+    function handleError(error, statusId) { const message = error?.message === 'LIMIT' ? 'Vous avez atteint votre limite de génération.' : error?.message === 'SERVICE' ? 'Le service est temporairement indisponible.' : 'Impossible de générer l’examen.'; setStatus(statusId, message, 'error'); }
+    function initExam() { $('configForm').addEventListener('submit', generateExam); $('backConfigButton').addEventListener('click', () => showView('configView')); $('previousButton').addEventListener('click', previousQuestion); $('nextButton').addEventListener('click', nextQuestion); $('finishButton').addEventListener('click', askFinish); $('cancelFinishButton').addEventListener('click', () => $('confirmModal').classList.remove('show')); $('confirmFinishButton').addEventListener('click', () => submitExam(false)); $('newExamButton').addEventListener('click', () => { clearDraft(); state.exam = null; state.selectedSubject = null; state.submitting = false; showView('configView'); }); window.addEventListener('online', () => { $('connectionState').textContent = 'Connexion disponible'; $('connectionState').classList.add('online'); }); window.addEventListener('offline', () => { $('connectionState').textContent = 'Hors ligne'; $('connectionState').classList.remove('online'); }); if (loadDraft()) { displaySubjects(); showView('subjectsView'); } }
+    onAuthStateChanged(auth, (user) => { state.user = user; $('connectionState').textContent = user ? 'Compte connecté' : 'Mode visiteur'; $('connectionState').classList.toggle('online', Boolean(user)); });
+    initExam();
+  </script>
+</body>
+</html>

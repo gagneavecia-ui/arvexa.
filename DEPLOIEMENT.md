@@ -75,3 +75,17 @@ APP_ORIGIN = https://ton-domaine-vercel.vercel.app
 `TELEGRAM_BOT_TOKEN` doit être de type `Secret`. Après l'ajout ou la modification d'une variable, relancer un déploiement Vercel.
 
 L'endpoint public est `/api/telegram`. Il valide la note, la catégorie et la longueur du message, limite les appels par adresse IP et applique un délai maximal de huit secondes à Telegram. Firestore reste la source de vérité si Telegram est indisponible.
+
+## Mode examen IA
+
+Ajouter dans Vercel, uniquement pour `Production` :
+
+```text
+GROQ_API_KEY = nouvelle clé privée Groq
+GROQ_MODEL = openai/gpt-oss-120b
+FIREBASE_WEB_API_KEY = clé Web Firebase du projet
+```
+
+`GROQ_API_KEY` doit être une variable `Secret`. L'endpoint `/api/exam` refuse les requêtes sans token Firebase valide, limite la génération, génère les deux sujets en un seul appel puis corrige le sujet choisi.
+
+Après chaque changement de variable, lancer un nouveau déploiement Vercel. Ne jamais placer ces valeurs dans `exam.html`.

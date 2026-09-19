@@ -88,7 +88,7 @@ OPENROUTER_MODEL = openai/gpt-oss-120b
 MISTRAL_API_KEY = clé privée Mistral de secours
 MISTRAL_MODEL = mistral-large-latest
 FIREBASE_WEB_API_KEY = clé Web Firebase du projet
-GROQ_VISION_MODEL = qwen/qwen3.6-27b
+GROQ_VISION_MODEL = meta-llama/llama-4-scout-17b-16e-instruct
 OPENROUTER_VISION_MODEL = google/gemini-2.0-flash-001
 MISTRAL_VISION_MODEL = pixtral-large-latest
 ```

@@ -6,6 +6,22 @@ const ALLOWED_DIFFICULTIES = new Set(['easy', 'medium', 'hard', 'bac']);
 const ALLOWED_DURATIONS = new Set([30, 60, 90, 120, 180]);
 const REQUIRED_EXERCISES = 5;
 const QUESTIONS_PER_EXERCISE = 10;
+const FREE_EXAM_LIMIT = 2;
+
+let adminServices;
+
+function getAdminServices() {
+  if (adminServices) return adminServices;
+  const credentials = process.env.FIREBASE_ADMIN_CREDENTIALS;
+  if (!credentials) throw new Error('firebase_admin_not_configured');
+  const admin = require('firebase-admin');
+  const serviceAccount = JSON.parse(credentials);
+  if (!admin.apps.length) {
+    admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
+  }
+  adminServices = { auth: admin.auth(), db: admin.firestore(), FieldValue: admin.firestore.FieldValue };
+  return adminServices;
+}
 
 function clientIp(request) {
   return String(request.headers['x-forwarded-for'] || request.socket?.remoteAddress || 'unknown').split(',')[0].trim();
@@ -26,25 +42,51 @@ function jsonError(response, status, error) {
 async function verifyFirebaseToken(request) {
   const authorization = request.headers.authorization || '';
   const match = authorization.match(/^Bearer\s+(.+)$/i);
-  const apiKey = process.env.FIREBASE_WEB_API_KEY;
-  if (!match || !apiKey) return false;
-
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 5000);
+  if (!match) return null;
   try {
-    const result = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${encodeURIComponent(apiKey)}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ idToken: match[1] }),
-      signal: controller.signal
-    });
-    const data = await result.json().catch(() => null);
-    return result.ok && Array.isArray(data?.users) && data.users.length === 1;
+    const { auth } = getAdminServices();
+    return await auth.verifyIdToken(match[1]);
   } catch (_) {
-    return false;
-  } finally {
-    clearTimeout(timeout);
+    return null;
   }
+}
+
+function isPremiumUser(data) {
+  if (!data) return false;
+  const active = data.premium === true || data.isUnlocked === true || data.hasDeposited === true;
+  if (!active) return false;
+  const end = data.subscriptionEndDate?.toDate?.() || (data.subscriptionEndDate?.seconds ? new Date(data.subscriptionEndDate.seconds * 1000) : null);
+  return !end || end.getTime() > Date.now();
+}
+
+function getUsageDate() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+async function reserveFreeGeneration(uid) {
+  const { db, FieldValue } = getAdminServices();
+  const userRef = db.collection('users').doc(uid);
+  const usageDate = getUsageDate();
+  const usageRef = userRef.collection('examUsage').doc(usageDate);
+  return db.runTransaction(async (transaction) => {
+    const [userSnapshot, usageSnapshot] = await Promise.all([transaction.get(userRef), transaction.get(usageRef)]);
+    if (!userSnapshot.exists) throw new Error('profile_missing');
+    if (isPremiumUser(userSnapshot.data())) return { premium: true, reserved: false };
+    const used = Number(usageSnapshot.data()?.count || 0);
+    if (used >= FREE_EXAM_LIMIT) return { premium: false, reserved: false, limitReached: true, used };
+    transaction.set(usageRef, { count: used + 1, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
+    return { premium: false, reserved: true, usageDate, used: used + 1 };
+  });
+}
+
+async function releaseFreeGeneration(uid, usageDate) {
+  const { db, FieldValue } = getAdminServices();
+  const usageRef = db.collection('users').doc(uid).collection('examUsage').doc(usageDate);
+  await db.runTransaction(async (transaction) => {
+    const snapshot = await transaction.get(usageRef);
+    const used = Math.max(0, Number(snapshot.data()?.count || 0) - 1);
+    transaction.set(usageRef, { count: used, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
+  });
 }
 
 function validateConfig(body) {
@@ -142,18 +184,33 @@ async function correctWithFallback(prompt) {
 module.exports = async function handler(request, response) {
   if (request.method !== 'POST') { response.setHeader('Allow', 'POST'); return jsonError(response, 405, 'Méthode non autorisée.'); }
   if (rateLimited(clientIp(request))) return jsonError(response, 429, 'Vous avez atteint votre limite de génération.');
-  if (!(await verifyFirebaseToken(request))) return jsonError(response, 401, 'Connexion requise.');
+  let verifiedUser;
+  try { verifiedUser = await verifyFirebaseToken(request); } catch (error) {
+    return jsonError(response, 503, 'Service d’authentification temporairement indisponible.');
+  }
+  if (!verifiedUser) return jsonError(response, 401, 'Connexion requise.');
 
   const body = request.body && typeof request.body === 'object' ? request.body : {};
   const action = body.action || 'generate';
   if (action === 'generate') {
     const validationError = validateConfig(body);
     if (validationError) return jsonError(response, 400, validationError);
+    let reservation;
+    try {
+      reservation = await reserveFreeGeneration(verifiedUser.uid);
+    } catch (error) {
+      console.error('Exam usage check failed:', error.message);
+      return jsonError(response, 503, 'La vérification de votre quota est temporairement indisponible.');
+    }
+    if (reservation.limitReached) return response.status(429).json({ success: false, error: 'Limite gratuite atteinte.', code: 'FREE_EXAM_LIMIT', used: reservation.used, limit: FREE_EXAM_LIMIT });
     try {
       const exam = await generateWithFallback(generationPrompt(body));
-      if (!validateGeneratedExam(exam)) return jsonError(response, 502, 'Le service a renvoyé un examen invalide.');
+      if (!validateGeneratedExam(exam)) throw new Error('provider_invalid');
       return response.status(200).json({ success: true, exam });
     } catch (error) {
+      if (reservation.reserved) {
+        try { await releaseFreeGeneration(verifiedUser.uid, reservation.usageDate); } catch (releaseError) { console.error('Exam usage release failed:', releaseError.message); }
+      }
       console.error('Exam generation failed:', error.message);
       return jsonError(response, 502, 'Impossible de générer l’examen.');
     }

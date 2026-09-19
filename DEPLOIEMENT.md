@@ -88,12 +88,15 @@ OPENROUTER_MODEL = openai/gpt-oss-120b
 MISTRAL_API_KEY = clé privée Mistral de secours
 MISTRAL_MODEL = mistral-large-latest
 FIREBASE_WEB_API_KEY = clé Web Firebase du projet
+FIREBASE_ADMIN_CREDENTIALS = contenu JSON du compte de service Firebase
 GROQ_VISION_MODEL = meta-llama/llama-4-scout-17b-16e-instruct
 OPENROUTER_VISION_MODEL = google/gemini-2.0-flash-001
 MISTRAL_VISION_MODEL = pixtral-large-latest
 ```
 
 `GROQ_API_KEY`, `OPENROUTER_API_KEY` et `MISTRAL_API_KEY` doivent être des variables `Secret`. L'endpoint `/api/exam` refuse les requêtes sans token Firebase valide, limite la génération, génère les deux sujets en un seul appel puis corrige le sujet choisi. Les sujets respectent cinq exercices et dix questions par exercice.
+
+`FIREBASE_ADMIN_CREDENTIALS` doit également être une variable `Secret`. Colle le contenu complet du fichier de compte de service dans Vercel, sans ajouter ce fichier au dépôt GitHub. Les comptes gratuits sont limités à deux générations réussies par jour ; les comptes Premium actifs ne sont pas limités. Le compteur quotidien est conservé dans `users/{uid}/examUsage/YYYY-MM-DD` côté Firestore.
 
 Après chaque changement de variable, lancer un nouveau déploiement Vercel. Ne jamais placer ces valeurs dans `exam.html`.
 

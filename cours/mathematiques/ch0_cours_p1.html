@@ -1,21 +1,9 @@
 <!-- ============================================================ -->
-<!-- PARTIE 1 : INTRODUCTION & FORME ALGÉBRIQUE (VERSION KATEX)    -->
+<!-- PARTIE 1 : INTRODUCTION & FORME ALGÉBRIQUE                    -->
+<!-- 6 sections · Version KaTeX                                    -->
 <!-- ============================================================ -->
 
 <div class="lecture-container">
-
-  <!-- Styles pour les QCM / exercices dépliables -->
-  <style>
-    .lecture-quiz { display: flex; flex-direction: column; gap: 12px; }
-    .lecture-quiz-item { background: rgba(255,255,255,0.02); border: 1px solid rgba(224,184,74,0.15); border-radius: 12px; padding: 16px 20px; }
-    .lecture-quiz-q { font-weight: 600; color: #F5F0E8; margin-bottom: 8px; }
-    .lecture-quiz-options { display: grid; gap: 5px; margin: 10px 0; }
-    .lecture-quiz-options span { color: #8a8a7a; font-size: 0.95em; }
-    .lecture-quiz summary { cursor: pointer; color: #E0B84A; font-weight: 600; font-size: 0.9em; user-select: none; }
-    .lecture-quiz-answer { margin-top: 10px; background: rgba(74,222,128,0.06); border-left: 3px solid #4ade80; padding: 12px 16px; border-radius: 0 8px 8px 0; color: #d8d8c8; font-size: 0.95em; }
-    .lecture-exercise { background: rgba(96,165,250,0.05); border: 1px solid rgba(96,165,250,0.2); border-radius: 14px; padding: 20px 24px; margin: 20px 0; }
-    .lecture-exercise-label { font-size: 0.75em; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #60a5fa; margin-bottom: 10px; }
-  </style>
 
   <!-- ===== HERO ===== -->
   <header class="lecture-hero">
@@ -27,12 +15,12 @@
       Introduction &amp; <em>Forme algébrique</em>
     </h1>
     <p class="lecture-hero-intro">
-      Pourquoi inventer des nombres qui n'existent pas ? Comment écrire, comparer et manipuler un nombre complexe ? Cette partie pose les fondations de tout le chapitre.
+      Pourquoi inventer des nombres « qui n'existent pas » ? Comment s'écrit un nombre complexe, où se place-t-il dans le plan, et comment calcule-t-on avec ? Cette partie construit toutes les fondations du chapitre — chaque notion est illustrée, schématisée, puis immédiatement mise en pratique avec un exercice corrigé.
     </p>
     <div class="lecture-hero-meta">
-      <span class="lecture-hero-meta-item"><i class="fas fa-clock"></i> 50 min</span>
-      <span class="lecture-hero-meta-item"><i class="fas fa-layer-group"></i> 8 sections</span>
-      <span class="lecture-hero-meta-item"><i class="fas fa-graduation-cap"></i> Terminale</span>
+      <span class="lecture-hero-meta-item"><i class="fas fa-clock"></i> 60 min</span>
+      <span class="lecture-hero-meta-item"><i class="fas fa-layer-group"></i> 6 sections</span>
+      <span class="lecture-hero-meta-item"><i class="fas fa-pen-ruler"></i> Exercices corrigés inclus</span>
     </div>
   </header>
 
@@ -40,17 +28,15 @@
   <nav class="lecture-toc">
     <div class="lecture-toc-header">
       <span>Dans cette partie</span>
-      <span class="lecture-toc-count">8 sections</span>
+      <span class="lecture-toc-count">6 sections</span>
     </div>
     <ol class="lecture-toc-list">
       <li><a href="#s1"><span class="toc-num">01</span><span>Pourquoi les nombres complexes ?</span></a></li>
       <li><a href="#s2"><span class="toc-num">02</span><span>L'ensemble ℂ des nombres complexes</span></a></li>
       <li><a href="#s3"><span class="toc-num">03</span><span>Forme algébrique et vocabulaire</span></a></li>
-      <li><a href="#s4"><span class="toc-num">04</span><span>Propriétés de i et puissances</span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>Le nombre i et ses puissances</span></a></li>
       <li><a href="#s5"><span class="toc-num">05</span><span>Le plan complexe</span></a></li>
       <li><a href="#s6"><span class="toc-num">06</span><span>Opérations et identification</span></a></li>
-      <li><a href="#s7"><span class="toc-num">07</span><span>Fiches méthodes</span></a></li>
-      <li><a href="#s8"><span class="toc-num">08</span><span>Exercices d'entraînement</span></a></li>
     </ol>
   </nav>
 
@@ -66,56 +52,111 @@
 
     <div class="lecture-section-body">
       <p class="lecture-text">
-        Depuis l'Antiquité, on travaille avec les <strong>nombres réels</strong> : ils mesurent des longueurs, des aires, des températures, des vitesses, des durées. Bref, tout ce qui se trouve sur une droite graduée. Mais les réels ont une limite fondamentale : <strong>aucun nombre réel n'a un carré négatif</strong>.
+        Commençons par une question toute simple : <strong>existe-t-il un nombre dont le carré vaut $-1$ ?</strong> Faisons l'inventaire. Un nombre positif au carré donne un résultat positif ($3^2 = 9$). Un nombre négatif au carré donne… aussi un positif ($(-3)^2 = 9$, car le signe $-$ disparaît). Et zéro donne zéro. Conclusion :
       </p>
 
+      <div class="lecture-callout lecture-callout-danger">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Le mur</div>
+          <p><strong>Aucun nombre réel n'a un carré négatif.</strong> L'équation $x^2 = -1$ n'a <em>aucune solution</em> dans $\mathbb{R}$. Il en va de même pour toutes les équations $x^2 = k$ avec $k < 0$.</p>
+        </div>
+      </div>
+
       <p class="lecture-text">
-        Autrement dit, l'équation $x^2 = -1$ n'a <strong>aucune solution</strong> dans $\mathbb{R}$. Ce n'est pas un cas isolé : toute équation du type $x^2 = k$ avec $k < 0$ est insoluble dans $\mathbb{R}$. Pendant des siècles, cela a bloqué les mathématiciens dans la résolution de nombreuses équations, en particulier celles du troisième degré.
+        Visualisons le problème sur la droite des réels. Pour $x^2 = 4$, on trouve $x = 2$ et $x = -2$ : deux points bien présents sur la droite. Mais pour $x^2 = -1$, la droite est « trouée » : aucun point ne convient.
+      </p>
+
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 500 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="La droite des réels et les solutions manquantes">
+          <text x="250" y="24" fill="#E0B84A" font-size="11" font-weight="700" font-family="Inter" text-anchor="middle" letter-spacing="2">LA DROITE DES RÉELS NE SUFFIT PLUS</text>
+          <line x1="30" y1="120" x2="470" y2="120" stroke="#E0B84A" stroke-width="2"/>
+          <polygon points="470,120 460,115 460,125" fill="#E0B84A"/>
+          <text x="478" y="124" fill="#8a8a7a" font-size="12" font-family="Inter">ℝ</text>
+          <g stroke="#E0B84A" stroke-width="1.5">
+            <line x1="150" y1="114" x2="150" y2="126"/>
+            <line x1="250" y1="114" x2="250" y2="126"/>
+            <line x1="350" y1="114" x2="350" y2="126"/>
+          </g>
+          <text x="150" y="145" fill="#8a8a7a" font-size="12" font-family="Inter" text-anchor="middle">−1</text>
+          <text x="250" y="145" fill="#8a8a7a" font-size="12" font-family="Inter" text-anchor="middle">0</text>
+          <text x="350" y="145" fill="#8a8a7a" font-size="12" font-family="Inter" text-anchor="middle">1</text>
+          <circle cx="100" cy="120" r="7" fill="#4ade80"/>
+          <circle cx="400" cy="120" r="7" fill="#4ade80"/>
+          <text x="100" y="100" fill="#4ade80" font-size="11" font-family="Inter" text-anchor="middle">−2 ✔</text>
+          <text x="400" y="100" fill="#4ade80" font-size="11" font-family="Inter" text-anchor="middle">2 ✔</text>
+          <text x="250" y="72" fill="#4ade80" font-size="12" font-weight="700" font-family="Inter" text-anchor="middle">x² = 4 : deux solutions sur la droite</text>
+          <g>
+            <circle cx="150" cy="120" r="10" fill="none" stroke="#f87171" stroke-width="1.5" stroke-dasharray="3 3"/>
+            <line x1="143" y1="113" x2="157" y2="127" stroke="#f87171" stroke-width="1.5"/>
+            <line x1="143" y1="127" x2="157" y2="113" stroke="#f87171" stroke-width="1.5"/>
+          </g>
+          <text x="250" y="180" fill="#f87171" font-size="12" font-weight="700" font-family="Inter" text-anchor="middle">x² = −1 : AUCUNE solution — la droite est « trouée » ici</text>
+        </svg>
+        <figcaption class="lecture-figure-caption">$x^2 = 4$ a ses deux solutions sur la droite des réels. Celles de $x^2 = -1$ n'y figurent nulle part : il faut aller « ailleurs ».</figcaption>
+      </figure>
+
+      <p class="lecture-text">
+        Face à ce mur, deux options : <strong>renoncer</strong>, ou <strong>inventer</strong>. L'histoire a choisi d'inventer — et ce n'est pas la première fois ! Les nombres négatifs ont longtemps paru absurdes (« comment avoir $-3$ moutons ? »). Les irrationnels comme $\sqrt{2}$ ont scandalisé les Grecs. À chaque fois, élargir la notion de nombre a résolu des problèmes jusque-là insolubles.
       </p>
 
       <div class="lecture-callout lecture-callout-gold">
         <div class="lecture-callout-body">
           <div class="lecture-callout-title">L'idée géniale</div>
-          <p>On <strong>invente</strong> un nouveau nombre, noté $i$, tel que $i^2 = -1$. On l'appelle le <strong>nombre imaginaire</strong>. Ce n'est pas un nombre « réel » au sens habituel : c'est un objet mathématique créé de toutes pièces, qui obéit aux mêmes règles de calcul que les réels (addition, multiplication, distributivité, etc.).</p>
+          <p>On <strong>décide</strong> d'inventer un nouveau nombre, noté $i$, et on lui attribue par convention la propriété manquante :</p>
+          <p style="text-align:center; margin-top:8px;">$$i^2 = -1$$</p>
+          <p>Ce nombre s'appelle l'<strong>unité imaginaire</strong>. Ce n'est pas un réel : c'est un objet nouveau, créé exprès pour combler le trou de la droite. La seule règle du jeu : il obéit aux <strong>mêmes lois de calcul</strong> que les réels (addition, multiplication, distributivité…), avec cette seule propriété supplémentaire $i^2 = -1$.</p>
         </div>
       </div>
 
       <p class="lecture-text">
-        Avec ce nombre, l'équation $x^2 = -1$ admet enfin <strong>deux solutions</strong> : $x = i$ et $x = -i$. Mieux : on peut désormais résoudre <strong>toutes</strong> les équations polynomiales, quel que soit leur degré. C'est le <em>théorème fondamental de l'algèbre</em>.
+        Conséquence immédiate : $x^2 = -1$ possède désormais <strong>deux solutions</strong>, $x = i$ et $x = -i$ (vérifie : $(-i)^2 = i^2 = -1$ ✔). Et mieux : nous verrons en Partie 4 que <em>toute</em> équation polynomiale devient résoluble. C'est le <strong>théorème fondamental de l'algèbre</strong>.
       </p>
 
       <div class="lecture-example">
         <div class="lecture-example-label">Le problème qui a tout déclenché</div>
         <div class="lecture-example-content">
-          <p>L'équation $x^3 = 15x + 4$ possède une solution évidente : $x = 4$.</p>
-          <p>Mais la formule de Cardan donne $x = \sqrt[3]{2 + 11i} + \sqrt[3]{2 - 11i}$… avec des racines de nombres <strong>négatifs</strong> à l'intérieur ! Absurde, semblait-il.</p>
-          <p><strong>Bombelli (1572)</strong> remarque que $(2 + i)^3 = 2 + 11i$, donc :</p>
+          <p>En 1545, <strong>Cardan</strong> butte sur une équation étrange : $x^3 = 15x + 4$.</p>
+          <p>Une solution est visible à l'œil nu : $x = 4$ (car $64 = 60 + 4$ ✔). Mais sa formule de résolution produit $\sqrt[3]{2 + 11i} + \sqrt[3]{2 - 11i}$ — des racines cubiques de nombres contenant des imaginaires ! Absurde ?</p>
+          <p><strong>Bombelli (1572)</strong> a l'audace de calculer quand même et remarque que $(2 + i)^3 = 2 + 11i$ :</p>
           <p>$$x = (2 + i) + (2 - i) = 4$$</p>
-          <p>Les « nombres imaginaires » <strong>s'annulent entre eux</strong> pour donner un résultat réel ! C'est ce paradoxe fascinant qui a convaincu les mathématiciens que ces nombres étaient non seulement utiles… mais indispensables.</p>
+          <p>Les parties imaginaires <strong>s'éteignent mutuellement</strong> et laissent un résultat parfaitement réel ! Des nombres « fictifs » qui produisent des résultats vrais : ce paradoxe a convaincu les mathématiciens que ces objets étaient réellement utiles.</p>
         </div>
       </div>
 
       <div class="lecture-callout lecture-callout-key">
         <div class="lecture-callout-body">
-          <div class="lecture-callout-title">Pourquoi c'est utile ?</div>
-          <p>Les nombres complexes ne sont pas une lubie de mathématiciens. On les retrouve partout dans le monde réel :</p>
+          <div class="lecture-callout-title">Pourquoi c'est utile (très loin au-delà du cours)</div>
           <ul class="lecture-list">
-            <li>en <strong>électricité</strong> pour représenter les impédances et les courants alternatifs</li>
-            <li>en <strong>mécanique quantique</strong> pour écrire la fonction d'onde (Schrödinger lui-même a dit que les complexes étaient « inevitables »)</li>
-            <li>en <strong>traitement du signal</strong> pour l'analyse de Fourier</li>
-            <li>en <strong>aéronautique</strong> et en <strong>automatique</strong> pour les systèmes de contrôle</li>
-            <li>en <strong>imagerie médicale</strong> pour l'IRM</li>
-            <li>en <strong>télécommunications</strong> pour le WiFi, la 4G, la 5G…</li>
-            <li>en <strong>informatique graphique</strong> : les fractales de Mandelbrot sont définies dans $\mathbb{C}$ !</li>
-            <li>en <strong>cryptographie</strong> et en <strong>théorie des nombres</strong></li>
+            <li><strong>Électricité</strong> : impédances et courants alternatifs</li>
+            <li><strong>Mécanique quantique</strong> : la fonction d'onde de Schrödinger est complexe</li>
+            <li><strong>Traitement du signal</strong> : analyse de Fourier, compression MP3, JPEG</li>
+            <li><strong>Télécommunications</strong> : WiFi, 4G, 5G</li>
+            <li><strong>Imagerie médicale</strong> : reconstruction des images d'IRM</li>
+            <li><strong>Informatique graphique</strong> : l'ensemble de Mandelbrot vit dans $\mathbb{C}$</li>
           </ul>
         </div>
+      </div>
+
+      <div class="lecture-exercise">
+        <div class="lecture-exercise-label">✏️ Exercice d'application 1 — Solutions dans ℝ ou dans ℂ ?</div>
+        <p class="lecture-text"><strong>Énoncé :</strong> parmi les équations suivantes, lesquelles ont des solutions dans $\mathbb{R}$ ? Lesquelles ont des solutions dans $\mathbb{C}$ ? Donne-les quand elles existent.</p>
+        <p class="lecture-text">a) $x^2 = 16$ &nbsp;&nbsp; b) $x^2 + 1 = 0$ &nbsp;&nbsp; c) $x^2 - 3x = 0$ &nbsp;&nbsp; d) $x^2 = -9$</p>
+        <details>
+          <summary>Voir la solution détaillée</summary>
+          <div class="lecture-quiz-answer">
+            <p><strong>a) $x^2 = 16$.</strong> Le carré de $4$ vaut $16$, et celui de $-4$ aussi. Deux solutions dans $\mathbb{R}$ : $x = 4$ ou $x = -4$ ✔ (elles existent donc aussi dans $\mathbb{C}$, car $\mathbb{R} \subset \mathbb{C}$).</p>
+            <p><strong>b) $x^2 + 1 = 0$</strong>, c'est-à-dire $x^2 = -1$. Un carré n'est jamais négatif dans $\mathbb{R}$ → <strong>aucune solution dans $\mathbb{R}$</strong>. Mais dans $\mathbb{C}$, par définition de $i$ : $x = i$ ou $x = -i$ ✔</p>
+            <p><strong>c) $x^2 - 3x = 0$.</strong> On factorise : $x(x - 3) = 0$. Un produit est nul si un facteur est nul : $x = 0$ ou $x = 3$. Deux solutions dans $\mathbb{R}$ ✔</p>
+            <p><strong>d) $x^2 = -9$.</strong> Aucune solution dans $\mathbb{R}$ (carré négatif impossible). Dans $\mathbb{C}$ : on remarque que $-9 = 9 \times (-1) = 9i^2 = (3i)^2$. Donc $x = 3i$ ou $x = -3i$ ✔</p>
+            <p><strong>Bilan :</strong> dès qu'un carré doit valoir un nombre négatif, $\mathbb{R}$ échoue et $\mathbb{C}$ réussit — toujours avec deux solutions opposées.</p>
+          </div>
+        </details>
       </div>
 
       <aside class="lecture-aside">
         <div class="lecture-aside-content">
           <div class="lecture-aside-label">Un peu d'histoire</div>
-          <p>Les nombres complexes apparaissent au <strong>XVI<sup>e</sup> siècle</strong> chez les mathématiciens italiens <strong>Cardan</strong> et <strong>Bombelli</strong>, qui les utilisent pour résoudre des équations du 3<sup>e</sup> degré. À l'époque, on les appelle « nombres impossibles » ou « nombres fictifs » — le terme <em>imaginaire</em> est <strong>péjoratif</strong>. <strong>Descartes</strong> popularise l'expression « nombres imaginaires » avec une connotation méprisante. Il faut attendre <strong>Gauss</strong> (XVIII<sup>e</sup>–XIX<sup>e</sup> siècle) pour qu'ils soient pleinement acceptés et représentés géométriquement dans le plan, et <strong>Euler</strong> qui introduit la notation $i$ en 1777.</p>
+          <p>À leurs débuts, ces nombres sont appelés « impossibles » ou « fictifs ». <strong>Descartes</strong> forge l'expression « nombres imaginaires » avec une nuance méprisante — et le nom est resté. <strong>Euler</strong> introduit la lettre $i$ en 1777, et <strong>Gauss</strong> leur donne leurs lettres de noblesse avec l'interprétation géométrique du plan.</p>
         </div>
       </aside>
     </div>
@@ -133,63 +174,107 @@
 
     <div class="lecture-section-body">
       <p class="lecture-text">
-        L'ensemble de tous les nombres complexes se note $\mathbb{C}$. Il englobe tous les ensembles de nombres que tu connais déjà. Chaque étape de la construction a été motivée par la volonté de résoudre un nouveau type d'équation.
+        L'ensemble de tous les nombres — réels <em>et</em> imaginaires — se note $\mathbb{C}$. Pour comprendre ce qu'il apporte, remontons le fil de l'histoire des nombres : chaque élargissement a été motivé par un problème précis.
       </p>
 
       <div class="lecture-chain">
-        <div class="chain-item">$\mathbb{N}$</div>
+        <div class="chain-item">ℕ</div>
         <div class="chain-arrow"><i class="fas fa-arrow-right"></i></div>
-        <div class="chain-item">$\mathbb{Z}$</div>
+        <div class="chain-item">ℤ</div>
         <div class="chain-arrow"><i class="fas fa-arrow-right"></i></div>
-        <div class="chain-item">$\mathbb{Q}$</div>
+        <div class="chain-item">ℚ</div>
         <div class="chain-arrow"><i class="fas fa-arrow-right"></i></div>
-        <div class="chain-item">$\mathbb{R}$</div>
+        <div class="chain-item">ℝ</div>
         <div class="chain-arrow"><i class="fas fa-arrow-right"></i></div>
-        <div class="chain-item active">$\mathbb{C}$</div>
+        <div class="chain-item active">ℂ</div>
       </div>
 
-      <p class="lecture-text">
-        À chaque flèche, on agrandit l'ensemble pour résoudre un nouveau type d'équation :
-      </p>
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 500 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ensembles de nombres emboîtés de N à C">
+          <text x="250" y="24" fill="#E0B84A" font-size="11" font-weight="700" font-family="Inter" text-anchor="middle" letter-spacing="2">LES ENSEMBLES DE NOMBRES EMBOÎTÉS</text>
+          <ellipse cx="250" cy="175" rx="230" ry="130" fill="rgba(224,184,74,0.04)" stroke="#E0B84A" stroke-width="1.8"/>
+          <text x="250" y="62" fill="#E0B84A" font-size="15" font-weight="700" font-family="Playfair Display, serif" text-anchor="middle">ℂ</text>
+          <text x="250" y="292" fill="#8a8a7a" font-size="10" font-family="Inter" text-anchor="middle">1 + i, −2 + 3i… vivent uniquement ici</text>
+          <ellipse cx="250" cy="180" rx="170" ry="98" fill="rgba(96,165,250,0.05)" stroke="#60a5fa" stroke-width="1.5"/>
+          <text x="250" y="102" fill="#60a5fa" font-size="14" font-weight="700" font-family="Playfair Display, serif" text-anchor="middle">ℝ</text>
+          <text x="392" y="180" fill="rgba(224,184,74,0.6)" font-size="10" font-family="Inter">zone des</text>
+          <text x="392" y="193" fill="rgba(224,184,74,0.6)" font-size="10" font-family="Inter">imaginaires purs</text>
+          <ellipse cx="250" cy="186" rx="115" ry="70" fill="rgba(74,222,128,0.05)" stroke="#4ade80" stroke-width="1.5"/>
+          <text x="250" y="132" fill="#4ade80" font-size="13" font-weight="700" font-family="Playfair Display, serif" text-anchor="middle">ℚ</text>
+          <ellipse cx="250" cy="192" rx="70" ry="46" fill="rgba(240,128,128,0.06)" stroke="#f87171" stroke-width="1.5"/>
+          <text x="250" y="160" fill="#f87171" font-size="12" font-weight="700" font-family="Playfair Display, serif" text-anchor="middle">ℤ</text>
+          <ellipse cx="250" cy="198" rx="34" ry="24" fill="rgba(255,255,255,0.06)" stroke="#F5F0E8" stroke-width="1.5"/>
+          <text x="250" y="202" fill="#F5F0E8" font-size="12" font-weight="700" font-family="Playfair Display, serif" text-anchor="middle">ℕ</text>
+        </svg>
+        <figcaption class="lecture-figure-caption">Chaque ensemble contient le précédent : $\mathbb{N} \subset \mathbb{Z} \subset \mathbb{Q} \subset \mathbb{R} \subset \mathbb{C}$. La « couronne » entre $\mathbb{R}$ et $\mathbb{C}$ est la zone des nombres réellement nouveaux.</figcaption>
+      </figure>
 
-      <ul class="lecture-list lecture-list-elegant">
-        <li><strong>$\mathbb{N} \to \mathbb{Z}$</strong><span>pour pouvoir <strong>soustraire</strong> — résoudre $x + 3 = 0$</span></li>
-        <li><strong>$\mathbb{Z} \to \mathbb{Q}$</strong><span>pour pouvoir <strong>diviser</strong> — résoudre $3x = 2$</span></li>
-        <li><strong>$\mathbb{Q} \to \mathbb{R}$</strong><span>pour <strong>compléter la droite</strong> — résoudre $x^2 = 2$</span></li>
-        <li><strong>$\mathbb{R} \to \mathbb{C}$</strong><span>pour <strong>extraire les racines de négatifs</strong> — résoudre $x^2 = -1$</span></li>
-      </ul>
+      <div class="lecture-section-sub">
+        <h3 class="lecture-subtitle">Pourquoi chaque étape a été franchie</h3>
 
-      <div class="lecture-example">
-        <div class="lecture-example-label">Exemples d'appartenance</div>
-        <div class="lecture-example-content">
-          <p>$\sqrt{2} \in \mathbb{R}$, donc $\sqrt{2} \in \mathbb{C}$</p>
-          <p>$-7 \in \mathbb{Z} \subset \mathbb{Q} \subset \mathbb{R}$, donc $-7 \in \mathbb{C}$</p>
-          <p>$\dfrac{2}{3} \in \mathbb{Q}$, donc $\dfrac{2}{3} \in \mathbb{C}$</p>
-          <p>$i \in \mathbb{C}$ mais $i \notin \mathbb{R}$</p>
-          <p>$1 + 2i \in \mathbb{C}$ mais n'appartient à <strong>aucun</strong> des ensembles précédents</p>
+        <div class="lecture-steps">
+          <div class="lecture-step">
+            <span class="lecture-step-number">1</span>
+            <div class="lecture-step-content">
+              <strong>ℕ → ℤ : pouvoir soustraire</strong>
+              <p>Dans $\mathbb{N}$, $3 - 5$ est impossible. On invente les négatifs → $x + 5 = 3$ a une solution : $x = -2$</p>
+            </div>
+          </div>
+          <div class="lecture-step">
+            <span class="lecture-step-number">2</span>
+            <div class="lecture-step-content">
+              <strong>ℤ → ℚ : pouvoir diviser</strong>
+              <p>Dans $\mathbb{Z}$, $2 \div 3$ est impossible. On invente les fractions → $3x = 2$ a une solution : $x = \dfrac{2}{3}$</p>
+            </div>
+          </div>
+          <div class="lecture-step">
+            <span class="lecture-step-number">3</span>
+            <div class="lecture-step-content">
+              <strong>ℚ → ℝ : combler les trous de la droite</strong>
+              <p>$\sqrt{2}$ n'est pas une fraction. On invente les irrationnels → $x^2 = 2$ a une solution</p>
+            </div>
+          </div>
+          <div class="lecture-step">
+            <span class="lecture-step-number">4</span>
+            <div class="lecture-step-content">
+              <strong>ℝ → ℂ : extraire les racines des négatifs</strong>
+              <p>$x^2 = -1$ est impossible dans $\mathbb{R}$. On invente $i$ → toutes les équations polynomiales deviennent résolubles</p>
+            </div>
+          </div>
         </div>
       </div>
 
       <div class="lecture-callout lecture-callout-key">
         <div class="lecture-callout-body">
           <div class="lecture-callout-title">À retenir</div>
-          <p>Tout nombre réel est un nombre complexe (avec partie imaginaire nulle), mais <strong>l'inverse est faux</strong> : $i$ est complexe mais pas réel. Autrement dit : $\mathbb{R} \subset \mathbb{C}$, mais $\mathbb{C} \neq \mathbb{R}$.</p>
+          <p>Tout réel est un complexe, mais l'inverse est faux : $\mathbb{R} \subset \mathbb{C}$ et $\mathbb{R} \neq \mathbb{C}$. Un nombre comme $1 + 2i$ appartient à $\mathbb{C}$ sans appartenir à <em>aucun</em> des ensembles précédents : c'est un « nouveau venu » de la couronne extérieure.</p>
         </div>
       </div>
 
       <div class="lecture-callout lecture-callout-warning">
         <div class="lecture-callout-body">
-          <div class="lecture-callout-title">ℂ n'est pas ordonné</div>
-          <p>Contrairement à $\mathbb{R}$, l'ensemble $\mathbb{C}$ n'admet <strong>aucune relation d'ordre</strong> compatible avec ses opérations. On ne peut donc <strong>jamais</strong> écrire $z_1 < z_2$ ou $z > 0$. Seules la <strong>partie réelle</strong> et le <strong>module</strong> peuvent être comparés à des réels.</p>
+          <div class="lecture-callout-title">ℂ n'est pas ordonné — une perte à connaître</div>
+          <p>Dans $\mathbb{R}$, on peut comparer : $2 < 3$. Dans $\mathbb{C}$, <strong>jamais</strong> : on ne peut pas écrire $z_1 < z_2$. Pourquoi ? Si on exigeait $i > 0$, alors $i^2 = -1 > 0$… contradiction. Si on exigeait $i < 0$, alors $-i > 0$ donc $(-i)^2 = -1 > 0$ — même blocage. En revanche, tu pourras toujours comparer des quantités <strong>réelles</strong> liées à un complexe (sa partie réelle, sa partie imaginaire, et bientôt son module).</p>
         </div>
       </div>
 
-      <aside class="lecture-aside">
-        <div class="lecture-aside-content">
-          <div class="lecture-aside-label">Le saviez-vous ?</div>
-          <p>C'est <strong>Euler</strong> qui introduit la lettre $i$ en <strong>1777</strong> (de l'allemand <em>imaginär</em>). Gauss proposera plus tard la lettre $i$ pour « unité imaginaire ». Le symbole $\mathbb{C}$, lui, vient de l'anglais <em>Complex numbers</em>. Gauss dira des complexes qu'ils sont des « ombres des ombres » — avant de devenir leur plus grand défenseur !</p>
-        </div>
-      </aside>
+      <div class="lecture-exercise">
+        <div class="lecture-exercise-label">✏️ Exercice d'application 2 — Qui habite où ?</div>
+        <p class="lecture-text"><strong>Énoncé :</strong> pour chaque nombre, indiquer le <strong>plus petit ensemble</strong> de la chaîne $\mathbb{N} \subset \mathbb{Z} \subset \mathbb{Q} \subset \mathbb{R} \subset \mathbb{C}$ auquel il appartient :</p>
+        <p class="lecture-text">$7$ · $-\dfrac{3}{5}$ · $\sqrt{5}$ · $-8i$ · $2 + 3i$ · $0$ · $\pi$</p>
+        <details>
+          <summary>Voir la solution détaillée</summary>
+          <div class="lecture-quiz-answer">
+            <p><strong>$7$</strong> : entier naturel → $7 \in \mathbb{N}$ (et donc dans tous les autres).</p>
+            <p><strong>$-\dfrac{3}{5}$</strong> : c'est une fraction négative. Pas un entier (pas dans $\mathbb{Z}$), mais rationnel → $\in \mathbb{Q}$.</p>
+            <p><strong>$\sqrt{5}$</strong> : irrationnel (démontré comme $\sqrt{2}$) → pas dans $\mathbb{Q}$, mais réel → $\in \mathbb{R}$.</p>
+            <p><strong>$-8i$</strong> : imaginaire pur, pas un réel → $\in \mathbb{C}$ uniquement.</p>
+            <p><strong>$2 + 3i$</strong> : ni réel ni imaginaire pur → $\in \mathbb{C}$ uniquement.</p>
+            <p><strong>$0$</strong> : attention, piège classique ! En convention française, $0 \in \mathbb{N}$ — c'est le plus petit ensemble qui le contient.</p>
+            <p><strong>$\pi$</strong> : irrationnel célèbre → $\in \mathbb{R}$.</p>
+          </div>
+        </details>
+      </div>
     </div>
   </section>
 
@@ -205,36 +290,52 @@
 
     <div class="lecture-section-body">
       <p class="lecture-text">
-        Tout nombre complexe s'écrit de manière <strong>unique</strong> sous la forme $z = a + ib$, où $a$ et $b$ sont des réels et $i$ est le nombre imaginaire défini par $i^2 = -1$.
+        Comment s'écrit un nombre complexe ? L'idée est simple : <strong>toute quantité contenant des $i$ peut se ramener, après calcul, à une écriture « quelque chose + $i$ fois quelque chose d'autre »</strong>. C'est la <strong>forme algébrique</strong>.
       </p>
 
       <div class="lecture-formula-hero">
         <div class="lecture-formula-hero-label">Forme algébrique</div>
         <div class="lecture-formula-hero-main">$$z = a + ib$$</div>
-        <div class="lecture-formula-hero-desc">avec $a \in \mathbb{R}$, $b \in \mathbb{R}$ et $i^2 = -1$</div>
+        <div class="lecture-formula-hero-desc">avec $a \in \mathbb{R}$, $b \in \mathbb{R}$ et $i^2 = -1$ — cette écriture est unique</div>
       </div>
 
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 520 190" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Anatomie de l'écriture z égale a plus i b">
+          <text x="260" y="24" fill="#E0B84A" font-size="11" font-weight="700" font-family="Inter" text-anchor="middle" letter-spacing="2">ANATOMIE DE L'ÉCRITURE z = a + ib</text>
+          <text x="260" y="78" fill="#F5F0E8" font-size="30" font-weight="700" font-family="Playfair Display, serif" text-anchor="middle">z = a + i b</text>
+          <line x1="208" y1="90" x2="185" y2="125" stroke="#E0B84A" stroke-width="1.2"/>
+          <text x="170" y="140" fill="#E0B84A" font-size="12" font-weight="700" font-family="Inter" text-anchor="middle">a : partie réelle</text>
+          <text x="170" y="156" fill="#8a8a7a" font-size="10" font-family="Inter" text-anchor="middle">un réel quelconque</text>
+          <line x1="243" y1="86" x2="243" y2="125" stroke="#8a8a7a" stroke-width="1" stroke-dasharray="3 3"/>
+          <text x="243" y="140" fill="#8a8a7a" font-size="11" font-family="Inter" text-anchor="middle">le signe qui relie</text>
+          <line x1="273" y1="90" x2="285" y2="125" stroke="#60a5fa" stroke-width="1.2"/>
+          <text x="295" y="140" fill="#60a5fa" font-size="12" font-weight="700" font-family="Inter" text-anchor="middle">i : l'unité imaginaire</text>
+          <text x="295" y="156" fill="#8a8a7a" font-size="10" font-family="Inter" text-anchor="middle">i² = −1</text>
+          <line x1="300" y1="86" x2="360" y2="125" stroke="#4ade80" stroke-width="1.2"/>
+          <text x="400" y="140" fill="#4ade80" font-size="12" font-weight="700" font-family="Inter" text-anchor="middle">b : partie imaginaire</text>
+          <text x="400" y="156" fill="#8a8a7a" font-size="10" font-family="Inter" text-anchor="middle">un RÉEL (coefficient de i)</text>
+          <text x="260" y="180" fill="#8a8a7a" font-size="10" font-family="Inter" text-anchor="middle" font-style="italic">a et b sont toujours des réels — i n'est « collé » qu'à b</text>
+        </svg>
+        <figcaption class="lecture-figure-caption">Un complexe = un réel ($a$) + un multiple de $i$ ($ib$). Les deux « ingrédients » $a$ et $b$ sont toujours des nombres réels.</figcaption>
+      </figure>
+
       <p class="lecture-text">
-        C'est la <strong>forme algébrique</strong>, aussi appelée forme cartésienne. Le mot « unique » est essentiel : un complexe ne peut pas s'écrire de deux manières différentes. C'est ce qui permet de faire de <strong>l'identification</strong> (voir section 6).
+        Le mot <strong>unique</strong> est capital : un complexe donné possède <em>une seule</em> forme algébrique. C'est cette unicité qui rendra possible la méthode d'identification (section 6).
       </p>
 
       <div class="lecture-callout lecture-callout-gold">
         <div class="lecture-callout-body">
-          <div class="lecture-callout-title">Conventions d'écriture</div>
+          <div class="lecture-callout-title">Conventions d'écriture (les usages qui évitent les malentendus)</div>
           <ul class="lecture-list">
-            <li>On écrit toujours la <strong>partie réelle en premier</strong> : $3 + 5i$ et non $5i + 3$.</li>
-            <li>On écrit $5i$ plutôt que $i5$.</li>
-            <li>Si la partie imaginaire est négative, on écrit $a - |b|i$ : par exemple $-3 + (-2)i = -3 - 2i$.</li>
-            <li>Ces conventions sont des usages, pas des obligations mathématiques — mais elles facilitent la lecture !</li>
+            <li>Partie réelle <strong>d'abord</strong> : on écrit $3 + 5i$, pas $5i + 3$</li>
+            <li>On écrit $5i$ plutôt que $i5$ — et $ib$ plutôt que $bi$ (même si $ib = bi$)</li>
+            <li>Partie imaginaire négative : $-3 - 2i$ plutôt que $-3 + (-2)i$</li>
           </ul>
         </div>
       </div>
 
       <div class="lecture-section-sub">
-        <h3 class="lecture-subtitle">Vocabulaire</h3>
-        <p class="lecture-text">
-          Dans l'écriture $z = a + ib$, les deux nombres $a$ et $b$ ont un nom précis :
-        </p>
+        <h3 class="lecture-subtitle">Vocabulaire : les deux « ingrédients » de z</h3>
 
         <div class="lecture-vocab-grid">
           <div class="vocab-card">
@@ -261,9 +362,30 @@
 
         <div class="lecture-callout lecture-callout-danger">
           <div class="lecture-callout-body">
-            <div class="lecture-callout-title">Piège classique</div>
-            <p>La partie imaginaire de $z = 3 + 5i$ est $5$, et <strong>non</strong> $5i$. La partie imaginaire est toujours un <strong>nombre réel</strong>. C'est le coefficient devant $i$.</p>
+            <div class="lecture-callout-title">Le piège n°1 du chapitre</div>
+            <p>La partie imaginaire de $z = 3 + 5i$ est $5$, et <strong>non</strong> $5i$ ! La partie imaginaire est toujours un <strong>nombre réel</strong> — c'est le <em>coefficient</em> qui multiplie $i$. De même $\operatorname{Re}(z)$ et $\operatorname{Im}(z)$ sont des réels.</p>
           </div>
+        </div>
+
+        <div class="lecture-formula-box">
+          <div class="lecture-formula-main">$$z = \operatorname{Re}(z) + i\,\operatorname{Im}(z)$$</div>
+          <div class="lecture-formula-desc">Identité à connaître : un complexe se reconstitue à partir de ses deux parties.</div>
+        </div>
+
+        <div class="lecture-exercise">
+          <div class="lecture-exercise-label">✏️ Exercice d'application 3 — Lire Re et Im</div>
+          <p class="lecture-text"><strong>Énoncé :</strong> donner la partie réelle et la partie imaginaire de :</p>
+          <p class="lecture-text">$z_1 = 5 - 2i$ · $z_2 = -7i$ · $z_3 = \dfrac{1}{2}$ · $z_4 = i^2 + 2i$</p>
+          <details>
+            <summary>Voir la solution détaillée</summary>
+            <div class="lecture-quiz-answer">
+              <p><strong>$z_1 = 5 - 2i$</strong> : directement lisible → $\operatorname{Re}(z_1) = 5$, $\operatorname{Im}(z_1) = -2$ (attention au signe moins !).</p>
+              <p><strong>$z_2 = -7i$</strong> : pas de partie réelle visible, donc elle vaut $0$ → $\operatorname{Re}(z_2) = 0$, $\operatorname{Im}(z_2) = -7$. C'est un <strong>imaginaire pur</strong>.</p>
+              <p><strong>$z_3 = \dfrac{1}{2}$</strong> : réel pur → $\operatorname{Re}(z_3) = \dfrac{1}{2}$, $\operatorname{Im}(z_3) = 0$.</p>
+              <p><strong>$z_4 = i^2 + 2i$</strong> : ⚠️ il faut <strong>d'abord simplifier</strong> ! Comme $i^2 = -1$ : $z_4 = -1 + 2i$. Donc $\operatorname{Re}(z_4) = -1$, $\operatorname{Im}(z_4) = 2$.</p>
+              <p><strong>Règle d'or :</strong> on ne lit $\operatorname{Re}$ et $\operatorname{Im}$ qu'<em>après</em> avoir tout simplifié sous la forme $a + ib$.</p>
+            </div>
+          </details>
         </div>
       </div>
 
@@ -271,9 +393,9 @@
         <h3 class="lecture-subtitle">Cas particuliers</h3>
 
         <ul class="lecture-list">
-          <li><strong>Réel pur</strong> : $z = a + 0i = a$. Exemple : $z = 5$, $z = -3$, $z = \sqrt{2}$.</li>
-          <li><strong>Imaginaire pur</strong> : $z = 0 + ib = ib$. Exemple : $z = 3i$, $z = -i$, $z = 7i$.</li>
-          <li><strong>Le nombre 0</strong> : $z = 0$ est à la fois réel pur et imaginaire pur. C'est le seul dans ce cas.</li>
+          <li><strong>Réel pur</strong> : $z = a + 0i = a$. Exemples : $5$, $-3$, $\sqrt{2}$, $\pi$. Le nombre $5$ <em>est</em> un complexe — sa partie imaginaire vaut simplement zéro.</li>
+          <li><strong>Imaginaire pur</strong> : $z = 0 + ib = ib$. Exemples : $3i$, $-i$, $7i$.</li>
+          <li><strong>Le nombre $0$</strong> : à la fois réel pur et imaginaire pur — c'est le <strong>seul</strong> dans ce cas.</li>
         </ul>
 
         <div class="lecture-formula-box">
@@ -288,36 +410,10 @@
       </div>
 
       <div class="lecture-section-sub">
-        <h3 class="lecture-subtitle">Exemples d'identification de Re(z) et Im(z)</h3>
-
-        <div class="lecture-example">
-          <div class="lecture-example-label">Exemples guidés</div>
-          <div class="lecture-example-content">
-            <p><strong>1.</strong> $z = -3 + 7i$ : $\operatorname{Re}(z) = -3$ et $\operatorname{Im}(z) = 7$.</p>
-            <p><strong>2.</strong> $z = 4$ : $\operatorname{Re}(z) = 4$ et $\operatorname{Im}(z) = 0$ → réel pur.</p>
-            <p><strong>3.</strong> $z = -5i$ : $\operatorname{Re}(z) = 0$ et $\operatorname{Im}(z) = -5$ → imaginaire pur.</p>
-            <p><strong>4.</strong> $z = 2i^2 + 3 - i$ : d'abord on simplifie ! $2i^2 = -2$, donc $z = -2 + 3 - i = 1 - i$. Ainsi $\operatorname{Re}(z) = 1$ et $\operatorname{Im}(z) = -1$.</p>
-          </div>
-        </div>
-
-        <div class="lecture-exercise">
-          <div class="lecture-exercise-label">✏️ À toi de jouer</div>
-          <p class="lecture-text">Déterminer la partie réelle et la partie imaginaire de $z = 3i - 2 + 2i^2 + 5$.</p>
-          <details>
-            <summary>Voir la solution</summary>
-            <div class="lecture-quiz-answer">
-              <p>On remplace $i^2$ par $-1$ : $z = 3i - 2 - 2 + 5 = 1 + 3i$</p>
-              <p>Donc $\operatorname{Re}(z) = 1$ et $\operatorname{Im}(z) = 3$.</p>
-            </div>
-          </details>
-        </div>
-      </div>
-
-      <div class="lecture-section-sub">
-        <h3 class="lecture-subtitle">Règle fondamentale d'égalité</h3>
+        <h3 class="lecture-subtitle">La règle d'égalité : le pont vers les systèmes</h3>
 
         <div class="lecture-rule">
-          <div class="lecture-rule-label">Deux complexes sont égaux si et seulement si…</div>
+          <div class="lecture-rule-label">Règle fondamentale d'égalité</div>
           <div class="lecture-rule-body">
             <span>$a + ib = a' + ib'$</span>
             <span class="rule-iff">$\iff$</span>
@@ -328,16 +424,31 @@
         </div>
 
         <p class="lecture-text">
-          Autrement dit : <strong>deux nombres complexes sont égaux si et seulement si leurs parties réelles sont égales et leurs parties imaginaires sont égales</strong>. Cette règle transforme une égalité entre complexes en un <strong>système de deux équations réelles</strong>.
+          <strong>Deux complexes sont égaux si et seulement si leurs parties réelles coïncident ET leurs parties imaginaires coïncident.</strong> Une seule égalité complexe équivaut à <strong>deux égalités réelles</strong> — c'est cette bascule qui transforme les équations en systèmes, l'un des outils les plus utilisés du chapitre.
         </p>
 
         <div class="lecture-example">
           <div class="lecture-example-label">Conséquence immédiate</div>
           <div class="lecture-example-content">
-            <p><strong>Un complexe est nul</strong> si et seulement si sa partie réelle <strong>et</strong> sa partie imaginaire sont nulles :</p>
-            <p>$$z = 0 \iff \operatorname{Re}(z) = 0 \text{ et } \operatorname{Im}(z) = 0$$</p>
-            <p>Attention : $\operatorname{Re}(z) = 0$ tout seul ne signifie <strong>pas</strong> $z = 0$ — cela signifie seulement que $z$ est imaginaire pur.</p>
+            <p>$z = 0 \iff \operatorname{Re}(z) = 0$ <em>et</em> $\operatorname{Im}(z) = 0$</p>
+            <p>Attention : $\operatorname{Re}(z) = 0$ tout seul signifie seulement que $z$ est imaginaire pur — par exemple $z = 5i$ n'est pas nul pour autant !</p>
           </div>
+        </div>
+
+        <div class="lecture-exercise">
+          <div class="lecture-exercise-label">✏️ Exercice d'application 4 — Utiliser l'égalité</div>
+          <p class="lecture-text"><strong>Énoncé :</strong> déterminer les réels $x$ et $y$ tels que $(2x - 1) + (y + 3)i = 5 - 2i$</p>
+          <details>
+            <summary>Voir la solution détaillée</summary>
+            <div class="lecture-quiz-answer">
+              <p><strong>Étape 1 — Identifier les parties.</strong> À gauche : partie réelle $2x - 1$, partie imaginaire $y + 3$. À droite : partie réelle $5$, partie imaginaire $-2$ (car $5 - 2i = 5 + (-2)i$).</p>
+              <p><strong>Étape 2 — Appliquer la règle d'égalité</strong> (réel = réel ET imaginaire = imaginaire) :</p>
+              <p>$$2x - 1 = 5 \quad \text{et} \quad y + 3 = -2$$</p>
+              <p><strong>Étape 3 — Résoudre :</strong> $2x = 6$ donc $x = 3$ ; $y = -2 - 3 = -5$</p>
+              <p><strong>Étape 4 — Vérifier :</strong> $(2 \times 3 - 1) + (-5 + 3)i = 5 - 2i$ ✔</p>
+              <p style="color:#4ade80;margin-top:10px;"><strong>✅ Solution :</strong> $x = 3$ et $y = -5$</p>
+            </div>
+          </details>
         </div>
       </div>
     </div>
@@ -349,146 +460,120 @@
       <div class="lecture-section-num">04</div>
       <div class="lecture-section-heading">
         <span class="lecture-section-eyebrow">Propriétés</span>
-        <h2 class="lecture-section-title">Propriétés de i et puissances</h2>
+        <h2 class="lecture-section-title">Le nombre i et ses puissances</h2>
       </div>
     </div>
 
     <div class="lecture-section-body">
       <p class="lecture-text">
-        Le nombre $i$ vérifie par définition $i^2 = -1$. En multipliant successivement par $i$, on obtient une <strong>périodicité de période 4</strong>.
+        Le nombre $i$ est défini par $i^2 = -1$. Que se passe-t-il si on le multiplie par lui-même encore et encore ? Chaque ligne se déduit de la précédente :
       </p>
 
-      <!-- SVG : roue des puissances de i -->
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">La construction du cycle, ligne par ligne</div>
+        <div class="lecture-example-content">
+          <p>$i^1 = i$ &nbsp;(par définition)</p>
+          <p>$i^2 = -1$ &nbsp;(la propriété fondatrice)</p>
+          <p>$i^3 = i^2 \times i = (-1) \times i = -i$</p>
+          <p>$i^4 = i^3 \times i = (-i) \times i = -i^2 = -(-1) = 1$</p>
+          <p>$i^5 = i^4 \times i = 1 \times i = i$ &nbsp;← <em>le cycle recommence !</em></p>
+          <p>Les puissances de $i$ tournent en boucle avec une <strong>périodicité de 4</strong>.</p>
+        </div>
+      </div>
+
       <figure class="lecture-figure">
         <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Roue des puissances de i">
+          <defs>
+            <marker id="arrowGoldP1" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto">
+              <path d="M0,0 L7,3.5 L0,7" fill="none" stroke="#E0B84A" stroke-width="1.3"/>
+            </marker>
+          </defs>
           <circle cx="200" cy="200" r="140" fill="none" stroke="rgba(224,184,74,0.15)" stroke-width="1"/>
           <circle cx="200" cy="200" r="100" fill="none" stroke="rgba(224,184,74,0.08)" stroke-width="1" stroke-dasharray="3 4"/>
           <line x1="60" y1="200" x2="340" y2="200" stroke="rgba(224,184,74,0.3)" stroke-width="1"/>
           <line x1="200" y1="60" x2="200" y2="340" stroke="rgba(224,184,74,0.3)" stroke-width="1"/>
           <text x="345" y="205" fill="#8a8a7a" font-size="11" font-family="Inter">Réels</text>
           <text x="205" y="55" fill="#8a8a7a" font-size="11" font-family="Inter">Imaginaires</text>
-          <circle cx="200" cy="100" r="22" fill="rgba(224,184,74,0.1)" stroke="#E0B84A" stroke-width="2"/>
-          <text x="200" y="98" fill="#E0B84A" font-size="14" font-weight="700" font-family="Playfair Display, serif" text-anchor="middle">i¹</text>
-          <text x="200" y="112" fill="#F5F0E8" font-size="11" font-family="Inter" text-anchor="middle">i</text>
-          <circle cx="100" cy="200" r="22" fill="rgba(74,222,128,0.1)" stroke="#4ade80" stroke-width="2"/>
-          <text x="100" y="198" fill="#4ade80" font-size="14" font-weight="700" font-family="Playfair Display, serif" text-anchor="middle">i²</text>
-          <text x="100" y="212" fill="#F5F0E8" font-size="11" font-family="Inter" text-anchor="middle">−1</text>
-          <circle cx="200" cy="300" r="22" fill="rgba(96,165,250,0.1)" stroke="#60a5fa" stroke-width="2"/>
-          <text x="200" y="298" fill="#60a5fa" font-size="14" font-weight="700" font-family="Playfair Display, serif" text-anchor="middle">i³</text>
-          <text x="200" y="312" fill="#F5F0E8" font-size="11" font-family="Inter" text-anchor="middle">−i</text>
-          <circle cx="300" cy="200" r="22" fill="rgba(224,184,74,0.1)" stroke="#E0B84A" stroke-width="2"/>
-          <text x="300" y="198" fill="#E0B84A" font-size="14" font-weight="700" font-family="Playfair Display, serif" text-anchor="middle">i⁴</text>
-          <text x="300" y="212" fill="#F5F0E8" font-size="11" font-family="Inter" text-anchor="middle">1</text>
-          <path d="M 220 100 Q 280 120 300 180" fill="none" stroke="#E0B84A" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.5"/>
-          <path d="M 100 220 Q 120 280 180 300" fill="none" stroke="#E0B84A" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.5"/>
-          <path d="M 180 300 Q 220 320 300 220" fill="none" stroke="#E0B84A" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.5"/>
-          <path d="M 100 180 Q 80 120 180 100" fill="none" stroke="#E0B84A" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.5"/>
-          <text x="200" y="205" fill="#8a8a7a" font-size="14" font-family="Playfair Display, serif" text-anchor="middle" font-style="italic">cycle</text>
+          <circle cx="200" cy="100" r="24" fill="rgba(224,184,74,0.1)" stroke="#E0B84A" stroke-width="2"/>
+          <text x="200" y="97" fill="#E0B84A" font-size="15" font-weight="700" font-family="Playfair Display, serif" text-anchor="middle">i¹</text>
+          <text x="200" y="113" fill="#F5F0E8" font-size="11" font-family="Inter" text-anchor="middle">i</text>
+          <circle cx="100" cy="200" r="24" fill="rgba(74,222,128,0.1)" stroke="#4ade80" stroke-width="2"/>
+          <text x="100" y="197" fill="#4ade80" font-size="15" font-weight="700" font-family="Playfair Display, serif" text-anchor="middle">i²</text>
+          <text x="100" y="213" fill="#F5F0E8" font-size="11" font-family="Inter" text-anchor="middle">−1</text>
+          <circle cx="200" cy="300" r="24" fill="rgba(96,165,250,0.1)" stroke="#60a5fa" stroke-width="2"/>
+          <text x="200" y="297" fill="#60a5fa" font-size="15" font-weight="700" font-family="Playfair Display, serif" text-anchor="middle">i³</text>
+          <text x="200" y="313" fill="#F5F0E8" font-size="11" font-family="Inter" text-anchor="middle">−i</text>
+          <circle cx="300" cy="200" r="24" fill="rgba(224,184,74,0.1)" stroke="#E0B84A" stroke-width="2"/>
+          <text x="300" y="197" fill="#E0B84A" font-size="15" font-weight="700" font-family="Playfair Display, serif" text-anchor="middle">i⁴</text>
+          <text x="300" y="213" fill="#F5F0E8" font-size="11" font-family="Inter" text-anchor="middle">1</text>
+          <path d="M 178 106 Q 120 122 104 172" fill="none" stroke="#E0B84A" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.6" marker-end="url(#arrowGoldP1)"/>
+          <path d="M 104 228 Q 120 278 174 296" fill="none" stroke="#E0B84A" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.6" marker-end="url(#arrowGoldP1)"/>
+          <path d="M 226 296 Q 280 278 296 228" fill="none" stroke="#E0B84A" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.6" marker-end="url(#arrowGoldP1)"/>
+          <path d="M 296 172 Q 280 122 224 106" fill="none" stroke="#E0B84A" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.6" marker-end="url(#arrowGoldP1)"/>
+          <text x="200" y="205" fill="#8a8a7a" font-size="13" font-family="Playfair Display, serif" text-anchor="middle" font-style="italic">cycle</text>
           <text x="200" y="222" fill="#8a8a7a" font-size="11" font-family="Inter" text-anchor="middle">période 4</text>
-          <text x="200" y="30" fill="#E0B84A" font-size="11" font-weight="700" font-family="Inter" text-anchor="middle" letter-spacing="2">ROUE DES PUISSANCES DE i</text>
+          <text x="200" y="30" fill="#E0B84A" font-size="11" font-weight="700" font-family="Inter" text-anchor="middle" letter-spacing="2">LA ROUE DES PUISSANCES DE i</text>
         </svg>
-        <figcaption class="lecture-figure-caption">Les puissances de $i$ suivent un cycle de période 4 : $i$, $-1$, $-i$, $1$, puis $i$, $-1$, $-i$, $1$…</figcaption>
+        <figcaption class="lecture-figure-caption">En multipliant par $i$, on parcourt la roue dans le sens trigonométrique : $i \to -1 \to -i \to 1 \to i$… C'est la même trajectoire que la rotation d'un quart de tour (voir section 6).</figcaption>
       </figure>
 
-      <div class="lecture-example">
-        <div class="lecture-example-label">Démonstration du cycle</div>
-        <div class="lecture-example-content">
-          <p>Partons de $i^2 = -1$ et multiplions progressivement :</p>
-          <p>$$i^3 = i^2 \cdot i = -1 \cdot i = -i$$</p>
-          <p>$$i^4 = i^3 \cdot i = -i \cdot i = -(i^2) = -(-1) = 1$$</p>
-          <p>Puis $i^5 = i^4 \cdot i = 1 \cdot i = i$ : le cycle recommence.</p>
-        </div>
-      </div>
-
-      <p class="lecture-text">
-        Pour calculer n'importe quelle puissance $i^n$, on regarde le <strong>reste de la division de $n$ par 4</strong>. Il y a quatre cas possibles :
-      </p>
-
-      <div class="lecture-formula-box">
-        <div class="lecture-formula-main">$$i^n = i^{n \bmod 4}$$</div>
-        <div class="lecture-formula-desc">Pour tout entier $n$, on regarde le reste de $n$ dans la division euclidienne par 4.</div>
-      </div>
-
-      <ul class="lecture-list">
-        <li>Si $n \equiv 0 \pmod{4}$ alors $i^n = 1$</li>
-        <li>Si $n \equiv 1 \pmod{4}$ alors $i^n = i$</li>
-        <li>Si $n \equiv 2 \pmod{4}$ alors $i^n = -1$</li>
-        <li>Si $n \equiv 3 \pmod{4}$ alors $i^n = -i$</li>
-      </ul>
-
-      <div class="lecture-example">
-        <div class="lecture-example-label">Exemples</div>
-        <div class="lecture-example-content">
-          <p><strong>Exemple 1.</strong> $i^{2025}$ : comme $2025 = 4 \times 506 + 1$, on a $2025 \equiv 1 \pmod{4}$, donc $i^{2025} = i$.</p>
-          <p><strong>Exemple 2.</strong> $i^{100}$ : comme $100 = 4 \times 25 + 0$, on a $100 \equiv 0 \pmod{4}$, donc $i^{100} = 1$.</p>
-          <p><strong>Exemple 3.</strong> $i^{42}$ : comme $42 = 4 \times 10 + 2$, on a $42 \equiv 2 \pmod{4}$, donc $i^{42} = -1$.</p>
-        </div>
-      </div>
-
       <div class="lecture-section-sub">
-        <h3 class="lecture-subtitle">Puissances négatives de i</h3>
+        <h3 class="lecture-subtitle">Calculer $i^n$ pour n'importe quel $n$ : la méthode du reste</h3>
+
         <p class="lecture-text">
-          Le cycle fonctionne aussi « en arrière ». Par identification : $i \cdot (-i) = -i^2 = 1$, donc $\dfrac{1}{i} = -i$. On obtient :
+          La roue fait un tour complet tous les 4 pas. Multiplier par $i^4 = 1$ ne change rien : seuls comptent les pas <em>excédentaires</em> — c'est-à-dire le <strong>reste de la division de $n$ par 4</strong>.
         </p>
 
         <div class="lecture-formula-box">
-          <div class="lecture-formula-main">
-$$\begin{aligned} i^{-1} &= -i & i^{-2} &= -1 \\ i^{-3} &= i & i^{-4} &= 1 \end{aligned}$$
-</div>
-          <div class="lecture-formula-desc">Même cycle, en parcourant la roue dans l'autre sens.</div>
+          <div class="lecture-formula-main">$$i^n = i^r \quad \text{où } r = \text{reste de } n \text{ par } 4$$</div>
+          <div class="lecture-formula-desc">On écrit $n = 4q + r$ avec $r \in \{0, 1, 2, 3\}$, puis $i^n = (i^4)^q \times i^r = 1 \times i^r = i^r$.</div>
         </div>
 
-        <div class="lecture-example">
-          <div class="lecture-example-label">Exemple</div>
-          <div class="lecture-example-content">
-            <p>$i^{-7} = i^{-7} \times i^8 = i^1 = i$ (on multiplie par $i^8 = 1$ pour revenir à un exposant positif).</p>
+        <ul class="lecture-list">
+          <li>Si $n \equiv 0 \pmod{4}$ → $i^n = 1$</li>
+          <li>Si $n \equiv 1 \pmod{4}$ → $i^n = i$</li>
+          <li>Si $n \equiv 2 \pmod{4}$ → $i^n = -1$</li>
+          <li>Si $n \equiv 3 \pmod{4}$ → $i^n = -i$</li>
+        </ul>
+
+        <div class="lecture-callout lecture-callout-gold">
+          <div class="lecture-callout-body">
+            <div class="lecture-callout-title">💡 Astuce bonus : pair/impair</div>
+            <p>Pas besoin du reste exact pour une question de « type » : si $n$ est <strong>pair</strong>, $i^n$ vaut $1$ ou $-1$ ; si $n$ est <strong>impair</strong>, $i^n$ vaut $i$ ou $-i$. Pratique pour éliminer des réponses dans un QCM !</p>
           </div>
         </div>
-      </div>
 
-      <div class="lecture-section-sub">
-        <h3 class="lecture-subtitle">Calculs avec des puissances</h3>
-
-        <div class="lecture-example">
-          <div class="lecture-example-label">Exemples types</div>
-          <div class="lecture-example-content">
-            <p><strong>Produit de puissances :</strong> $i^7 \times i^{13} = i^{20} = 1$ (car $20 \equiv 0 \pmod{4}$)</p>
-            <p><strong>Puissance d'un produit :</strong> $(3i)^2 = 9i^2 = -9$</p>
-            <p><strong>Cube :</strong> $(2i)^3 = 8i^3 = -8i$</p>
-            <p><strong>⚠️ Puissance de $(-i)$ :</strong> $(-i)^2 = (-1)^2 \times i^2 = -1$ et $(-i)^4 = 1$</p>
+        <div class="lecture-callout lecture-callout-gold">
+          <div class="lecture-callout-body">
+            <div class="lecture-callout-title">💡 Bonus : la somme magique</div>
+            <p>Additionne les quatre positions de la roue :</p>
+            <p>$$i + i^2 + i^3 + i^4 = i + (-1) + (-i) + 1 = 0$$</p>
+            <p><strong>Toute somme de 4 puissances consécutives de $i$ vaut zéro</strong> — les termes s'éteignent deux à deux. Très utile pour les sommes longues.</p>
           </div>
         </div>
 
         <div class="lecture-callout lecture-callout-danger">
           <div class="lecture-callout-body">
-            <div class="lecture-callout-title">Erreur classique</div>
-            <p>Beaucoup d'élèves écrivent $(-i)^2 = i^2 = -1$ « par chance », mais pour de mauvaises raisons. Détaille toujours : $(-i)^2 = (-1)^2 \cdot i^2 = 1 \times (-1) = -1$. Et méfie-toi avec les exposants impairs : $(-i)^3 = -i^3 = i$ !</p>
+            <div class="lecture-callout-title">Erreur classique — à bannir définitivement</div>
+            <p>Ne <strong>jamais</strong> écrire $i = \sqrt{-1}$. Ce n'est pas une question de style : c'est <strong>mathématiquement faux</strong>. Les règles de la racine carrée ($\sqrt{ab} = \sqrt{a}\sqrt{b}$) cessent d'être vraies sur les négatifs — les utiliser conduit à des absurdités :</p>
+            <p>$$-1 = i^2 = i \times i = \sqrt{-1} \times \sqrt{-1} = \sqrt{(-1)(-1)} = \sqrt{1} = 1$$</p>
+            <p>Donc $-1 = 1$ ? Absurde. La formulation correcte est toujours : <em>« $i$ est le nombre tel que $i^2 = -1$ »</em>. Et pour $k > 0$, on écrit $i\sqrt{k}$ — le $i$ <strong>devant</strong> la racine, jamais dessous.</p>
           </div>
         </div>
-      </div>
 
-      <div class="lecture-section-sub">
-        <h3 class="lecture-subtitle">Somme de puissances consécutives</h3>
-
-        <div class="lecture-formula-box">
-          <div class="lecture-formula-main">$$i + i^2 + i^3 + i^4 = 0$$</div>
-          <div class="lecture-formula-desc">$i + (-1) + (-i) + 1 = 0$. Toute somme de 4 puissances consécutives de $i$ est nulle.</div>
-        </div>
-
-        <div class="lecture-example">
-          <div class="lecture-example-label">Exemple d'application</div>
-          <div class="lecture-example-content">
-            <p>Calculons $S = i + i^2 + i^3 + \dots + i^{2025}$.</p>
-            <p>Il y a $2025 = 4 \times 506 + 1$ termes : on peut regrouper $506$ paquets de 4 termes consécutifs (chacun valant $0$), et il reste le dernier terme $i^{2025} = i$.</p>
-            <p>Donc $S = i$. 🎯</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="lecture-callout lecture-callout-danger">
-        <div class="lecture-callout-body">
-          <div class="lecture-callout-title">Erreur classique</div>
-          <p>Ne <strong>jamais</strong> écrire $i = \sqrt{-1}$. Cette écriture est <strong>incorrecte</strong> car la racine carrée n'est définie que sur $[0, +\infty[$. On dit simplement : <em>$i$ est le nombre tel que $i^2 = -1$</em>. Cela évite des contradictions du type $1 = -1$.</p>
+        <div class="lecture-exercise">
+          <div class="lecture-exercise-label">✏️ Exercice d'application 5 — Manier les puissances</div>
+          <p class="lecture-text"><strong>Énoncé :</strong> calculer $i^{37}$, $i^{48}$, $(2i)^3$, puis $S = i + i^2 + i^3 + \dots + i^{2025}$</p>
+          <details>
+            <summary>Voir la solution détaillée</summary>
+            <div class="lecture-quiz-answer">
+              <p><strong>$i^{37}$ :</strong> division euclidienne : $37 = 4 \times 9 + 1$ → reste 1 → $i^{37} = i^1 = i$</p>
+              <p><strong>$i^{48}$ :</strong> $48 = 4 \times 12 + 0$ → reste 0 → $i^{48} = 1$</p>
+              <p><strong>$(2i)^3$ :</strong> on sépare le nombre et le $i$ : $(2i)^3 = 2^3 \times i^3 = 8 \times (-i) = -8i$</p>
+              <p><strong>$S$ :</strong> il y a $2025 = 4 \times 506 + 1$ termes. On regroupe $506$ paquets de 4 termes consécutifs — chacun vaut 0 (somme magique !) — et il reste le dernier terme $i^{2025}$.</p>
+              <p>Or $2025 = 4 \times 506 + 1$ → reste 1 → $i^{2025} = i$. Donc $S = i$ 🎯</p>
+            </div>
+          </details>
         </div>
       </div>
     </div>
@@ -506,99 +591,175 @@ $$\begin{aligned} i^{-1} &= -i & i^{-2} &= -1 \\ i^{-3} &= i & i^{-4} &= 1 \end{
 
     <div class="lecture-section-body">
       <p class="lecture-text">
-        À chaque nombre complexe $z = a + ib$, on associe <strong>un unique point $M$</strong> du plan de coordonnées $(a, b)$. Cette représentation, due à Gauss (et à l'arpenteur danois <strong>Argand</strong>, d'où le nom de « plan d'Argand »), permet de <em>voir</em> les complexes.
+        Le pas de géant — franchi par Wessel, Argand et Gauss autour de 1800 — consiste à donner aux complexes <strong>une adresse dans le plan</strong>. L'idée : un complexe $z = a + ib$ est décrit par <strong>deux nombres réels</strong> ($a$ et $b$)… et un point du plan aussi (ses coordonnées) ! L'association est naturelle :
       </p>
+
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-label">L'association fondamentale</div>
+        <div class="lecture-formula-hero-main">$$z = a + ib \longleftrightarrow M(a ; b)$$</div>
+        <div class="lecture-formula-hero-desc">À chaque complexe correspond un unique point du plan — et réciproquement</div>
+      </div>
 
       <ul class="lecture-list">
-        <li>$M$ est le <strong>point image</strong> de $z$</li>
-        <li>$z$ est l'<strong>affixe</strong> de $M$ (on note aussi $z_M$)</li>
+        <li>$M$ s'appelle le <strong>point image</strong> de $z$ — on dit « $M$ est l'image de $z$ »</li>
+        <li>$z$ s'appelle l'<strong>affixe</strong> du point $M$ — on note $z_M$</li>
+        <li>L'axe horizontal porte les <strong>réels</strong> ; l'axe vertical porte les <strong>imaginaires purs</strong></li>
       </ul>
 
-      <!-- SVG : plan complexe avec exemples -->
       <figure class="lecture-figure">
-        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Plan complexe avec points d'exemple">
-          <g stroke="rgba(255,255,255,0.03)" stroke-width="1">
-            <line x1="40" y1="100" x2="360" y2="100"/>
-            <line x1="40" y1="150" x2="360" y2="150"/>
-            <line x1="40" y1="200" x2="360" y2="200"/>
-            <line x1="40" y1="250" x2="360" y2="250"/>
-            <line x1="40" y1="300" x2="360" y2="300"/>
-            <line x1="100" y1="40" x2="100" y2="360"/>
-            <line x1="150" y1="40" x2="150" y2="360"/>
-            <line x1="200" y1="40" x2="200" y2="360"/>
-            <line x1="250" y1="40" x2="250" y2="360"/>
-            <line x1="300" y1="40" x2="300" y2="360"/>
+        <svg viewBox="0 0 460 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Lecture des parties réelle et imaginaire sur le plan complexe">
+          <g stroke="rgba(255,255,255,0.035)" stroke-width="1">
+            <line x1="60" y1="110" x2="420" y2="110"/>
+            <line x1="60" y1="160" x2="420" y2="160"/>
+            <line x1="60" y1="260" x2="420" y2="260"/>
+            <line x1="60" y1="310" x2="420" y2="310"/>
+            <line x1="110" y1="50" x2="110" y2="360"/>
+            <line x1="160" y1="50" x2="160" y2="360"/>
+            <line x1="260" y1="50" x2="260" y2="360"/>
+            <line x1="310" y1="50" x2="310" y2="360"/>
+            <line x1="360" y1="50" x2="360" y2="360"/>
           </g>
-          <line x1="40" y1="200" x2="370" y2="200" stroke="#E0B84A" stroke-width="1.5" opacity="0.4"/>
-          <line x1="200" y1="370" x2="200" y2="30" stroke="#E0B84A" stroke-width="1.5" opacity="0.4"/>
-          <polygon points="370,200 362,196 362,204" fill="#E0B84A" opacity="0.6"/>
-          <polygon points="200,30 196,38 204,38" fill="#E0B84A" opacity="0.6"/>
-          <text x="360" y="220" fill="#8a8a7a" font-size="11" font-family="Inter" text-anchor="end">Réels</text>
-          <text x="215" y="42" fill="#8a8a7a" font-size="11" font-family="Inter">Imaginaires</text>
-          <text x="200" y="220" fill="#5a5a4a" font-size="10" font-family="Inter" text-anchor="middle">O</text>
-          <text x="300" y="220" fill="#5a5a4a" font-size="10" font-family="Inter" text-anchor="middle">1</text>
-          <text x="100" y="220" fill="#5a5a4a" font-size="10" font-family="Inter" text-anchor="middle">−1</text>
-          <text x="215" y="105" fill="#5a5a4a" font-size="10" font-family="Inter">1</text>
-          <text x="215" y="305" fill="#5a5a4a" font-size="10" font-family="Inter">−1</text>
-          <text x="270" y="90" fill="rgba(224,184,74,0.35)" font-size="11" font-family="Playfair Display, serif" font-style="italic">Q1</text>
-          <text x="130" y="90" fill="rgba(224,184,74,0.35)" font-size="11" font-family="Playfair Display, serif" font-style="italic">Q2</text>
-          <text x="130" y="320" fill="rgba(224,184,74,0.35)" font-size="11" font-family="Playfair Display, serif" font-style="italic">Q3</text>
-          <text x="270" y="320" fill="rgba(224,184,74,0.35)" font-size="11" font-family="Playfair Display, serif" font-style="italic">Q4</text>
-          <circle cx="300" cy="150" r="6" fill="#E0B84A"/>
-          <text x="312" y="145" fill="#E0B84A" font-size="12" font-weight="700" font-family="Inter">A(2+i)</text>
-          <circle cx="100" cy="100" r="6" fill="#60a5fa"/>
-          <text x="60" y="90" fill="#60a5fa" font-size="12" font-weight="700" font-family="Inter">B(−1+2i)</text>
-          <circle cx="200" cy="50" r="6" fill="#4ade80"/>
-          <text x="210" y="48" fill="#4ade80" font-size="12" font-weight="700" font-family="Inter">C(3i)</text>
-          <circle cx="50" cy="200" r="6" fill="#f87171"/>
-          <text x="30" y="230" fill="#f87171" font-size="12" font-weight="700" font-family="Inter">D(−2)</text>
-          <text x="200" y="20" fill="#E0B84A" font-size="11" font-weight="700" font-family="Inter" text-anchor="middle" letter-spacing="2">PLAN COMPLEXE</text>
+          <line x1="50" y1="210" x2="435" y2="210" stroke="#E0B84A" stroke-width="1.6" opacity="0.45"/>
+          <line x1="210" y1="370" x2="210" y2="45" stroke="#E0B84A" stroke-width="1.6" opacity="0.45"/>
+          <polygon points="435,210 426,205 426,215" fill="#E0B84A" opacity="0.65"/>
+          <polygon points="210,45 205,54 215,54" fill="#E0B84A" opacity="0.65"/>
+          <text x="425" y="230" fill="#8a8a7a" font-size="11" font-family="Inter" text-anchor="end">axe des réels</text>
+          <text x="222" y="56" fill="#8a8a7a" font-size="11" font-family="Inter">axe des imaginaires</text>
+          <text x="196" y="226" fill="#5a5a4a" font-size="11" font-family="Inter">O</text>
+          <text x="260" y="228" fill="#5a5a4a" font-size="10" font-family="Inter" text-anchor="middle">1</text>
+          <text x="310" y="228" fill="#5a5a4a" font-size="10" font-family="Inter" text-anchor="middle">2</text>
+          <text x="360" y="228" fill="#5a5a4a" font-size="10" font-family="Inter" text-anchor="middle">3</text>
+          <text x="224" y="164" fill="#5a5a4a" font-size="10" font-family="Inter">1</text>
+          <text x="224" y="114" fill="#5a5a4a" font-size="10" font-family="Inter">2</text>
+          <line x1="310" y1="110" x2="310" y2="210" stroke="rgba(96,165,250,0.5)" stroke-width="1.3" stroke-dasharray="5 4"/>
+          <line x1="310" y1="110" x2="210" y2="110" stroke="rgba(96,165,250,0.5)" stroke-width="1.3" stroke-dasharray="5 4"/>
+          <path d="M 310 240 L 310 250 L 210 250 L 210 240" fill="none" stroke="rgba(224,184,74,0.6)" stroke-width="1.2"/>
+          <text x="260" y="266" fill="#E0B84A" font-size="12" font-weight="700" font-family="Inter" text-anchor="middle">a = Re(z) = 2</text>
+          <path d="M 186 210 L 176 210 L 176 110 L 186 110" fill="none" stroke="rgba(74,222,128,0.6)" stroke-width="1.2"/>
+          <text x="170" y="160" fill="#4ade80" font-size="12" font-weight="700" font-family="Inter" text-anchor="end">b = Im(z) = 2</text>
+          <circle cx="310" cy="110" r="7" fill="#E0B84A"/>
+          <text x="322" y="104" fill="#E0B84A" font-size="13" font-weight="700" font-family="Inter">M</text>
+          <text x="322" y="88" fill="#F5F0E8" font-size="12" font-family="Inter">z = 2 + 2i</text>
+          <text x="230" y="30" fill="#E0B84A" font-size="11" font-weight="700" font-family="Inter" text-anchor="middle" letter-spacing="2">ABSCISSE = Re(z) · ORDONNÉE = Im(z)</text>
         </svg>
-        <figcaption class="lecture-figure-caption">Le plan complexe : à chaque complexe correspond un point unique. L'axe horizontal est celui des réels, l'axe vertical celui des imaginaires purs.</figcaption>
+        <figcaption class="lecture-figure-caption">Le point $M(2 ; 2)$ est l'image de $z = 2 + 2i$. Les pointillés « projettent » le point sur les axes pour lire les deux parties.</figcaption>
       </figure>
 
-      <p class="lecture-text">
-        L'axe horizontal est l'<strong>axe des réels</strong> ; l'axe vertical est l'<strong>axe des imaginaires purs</strong>. Tout point de l'axe horizontal représente un réel pur ; tout point de l'axe vertical représente un imaginaire pur.
-      </p>
+      <div class="lecture-section-sub">
+        <h3 class="lecture-subtitle">Les quatre quadrants et les deux axes</h3>
 
-      <div class="lecture-example">
-        <div class="lecture-example-label">Lecture des points sur le schéma</div>
-        <div class="lecture-example-content">
-          <p>$A(2 + i)$ → abscisse $2$, ordonnée $1$ : quadrant 1.</p>
-          <p>$B(-1 + 2i)$ → abscisse $-1$, ordonnée $2$ : quadrant 2.</p>
-          <p>$C(3i)$ → abscisse $0$, ordonnée $3$ : sur l'axe des imaginaires.</p>
-          <p>$D(-2)$ → abscisse $-2$, ordonnée $0$ : sur l'axe des réels.</p>
+        <figure class="lecture-figure">
+          <svg viewBox="0 0 460 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Les quatre quadrants du plan complexe">
+            <line x1="50" y1="210" x2="435" y2="210" stroke="#E0B84A" stroke-width="1.6" opacity="0.45"/>
+            <line x1="210" y1="370" x2="210" y2="45" stroke="#E0B84A" stroke-width="1.6" opacity="0.45"/>
+            <polygon points="435,210 426,205 426,215" fill="#E0B84A" opacity="0.65"/>
+            <polygon points="210,45 205,54 215,54" fill="#E0B84A" opacity="0.65"/>
+            <polygon points="50,210 59,205 59,215" fill="#E0B84A" opacity="0.4"/>
+            <polygon points="210,370 205,361 215,361" fill="#E0B84A" opacity="0.4"/>
+            <text x="425" y="230" fill="#8a8a7a" font-size="11" font-family="Inter" text-anchor="end">Réels →</text>
+            <text x="222" y="56" fill="#8a8a7a" font-size="11" font-family="Inter">Imaginaires ↑</text>
+            <text x="196" y="226" fill="#5a5a4a" font-size="11" font-family="Inter">O</text>
+            <text x="320" y="110" fill="rgba(74,222,128,0.7)" font-size="26" font-weight="700" font-family="Playfair Display, serif" text-anchor="middle">Q1</text>
+            <text x="320" y="132" fill="#8a8a7a" font-size="11" font-family="Inter" text-anchor="middle">a &gt; 0, b &gt; 0</text>
+            <text x="320" y="148" fill="#8a8a7a" font-size="10" font-family="Inter" text-anchor="middle">ex : 2 + 3i</text>
+            <text x="100" y="110" fill="rgba(96,165,250,0.7)" font-size="26" font-weight="700" font-family="Playfair Display, serif" text-anchor="middle">Q2</text>
+            <text x="100" y="132" fill="#8a8a7a" font-size="11" font-family="Inter" text-anchor="middle">a &lt; 0, b &gt; 0</text>
+            <text x="100" y="148" fill="#8a8a7a" font-size="10" font-family="Inter" text-anchor="middle">ex : −1 + 2i</text>
+            <text x="100" y="300" fill="rgba(240,128,128,0.7)" font-size="26" font-weight="700" font-family="Playfair Display, serif" text-anchor="middle">Q3</text>
+            <text x="100" y="322" fill="#8a8a7a" font-size="11" font-family="Inter" text-anchor="middle">a &lt; 0, b &lt; 0</text>
+            <text x="100" y="338" fill="#8a8a7a" font-size="10" font-family="Inter" text-anchor="middle">ex : −1 − i</text>
+            <text x="320" y="300" fill="rgba(224,184,74,0.7)" font-size="26" font-weight="700" font-family="Playfair Display, serif" text-anchor="middle">Q4</text>
+            <text x="320" y="322" fill="#8a8a7a" font-size="11" font-family="Inter" text-anchor="middle">a &gt; 0, b &lt; 0</text>
+            <text x="320" y="338" fill="#8a8a7a" font-size="10" font-family="Inter" text-anchor="middle">ex : 2 − 3i</text>
+            <text x="330" y="196" fill="#4ade80" font-size="10" font-family="Inter">axe horizontal = réels purs</text>
+            <text x="218" y="300" fill="#60a5fa" font-size="10" font-family="Inter" transform="rotate(-90 218 300)">axe vertical = imaginaires purs</text>
+            <text x="230" y="30" fill="#E0B84A" font-size="11" font-weight="700" font-family="Inter" text-anchor="middle" letter-spacing="2">LES QUADRANTS DU PLAN COMPLEXE</text>
+          </svg>
+          <figcaption class="lecture-figure-caption">Le signe de $\operatorname{Re}(z)$ dit « à droite ou à gauche », celui de $\operatorname{Im}(z)$ dit « au-dessus ou en dessous ». Sur l'axe horizontal : réels purs. Sur l'axe vertical : imaginaires purs.</figcaption>
+        </figure>
+
+        <div class="lecture-callout lecture-callout-key">
+          <div class="lecture-callout-body">
+            <div class="lecture-callout-title">La géométrie éclaire l'algèbre</div>
+            <ul class="lecture-list">
+              <li>$z$ réel pur ⟺ son image est <strong>sur l'axe horizontal</strong></li>
+              <li>$z$ imaginaire pur ⟺ son image est <strong>sur l'axe vertical</strong></li>
+              <li>Les définitions de la section 3 deviennent des <strong>positions visibles</strong></li>
+            </ul>
+          </div>
         </div>
       </div>
 
       <div class="lecture-section-sub">
-        <h3 class="lecture-subtitle">Lien avec les vecteurs</h3>
+        <h3 class="lecture-subtitle">Deuxième lecture : le vecteur, et l'image de $-z$</h3>
+
         <p class="lecture-text">
-          Au point $M(a, b)$ correspond le vecteur $OM$ de coordonnées $(a ; b)$. On dit que $z$ est <strong>l'affixe du vecteur</strong> $OM$. Cette double interprétation — point ou vecteur — sera essentielle pour la géométrie avec les complexes (translations, rotations…).
+          Le même complexe $z = a + ib$ décrit aussi le <strong>vecteur</strong> $\overrightarrow{OM}$ de coordonnées $(a ; b)$ : on dit que $z$ est l'<strong>affixe du vecteur</strong> $\overrightarrow{OM}$. Cette double lecture — point ou flèche — sera décisive dans les parties géométriques.
         </p>
+
+        <figure class="lecture-figure">
+          <svg viewBox="0 0 460 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Point image, vecteur et opposé dans le plan complexe">
+            <g stroke="rgba(255,255,255,0.035)" stroke-width="1">
+              <line x1="60" y1="110" x2="420" y2="110"/>
+              <line x1="60" y1="160" x2="420" y2="160"/>
+              <line x1="60" y1="260" x2="420" y2="260"/>
+              <line x1="60" y1="310" x2="420" y2="310"/>
+              <line x1="110" y1="50" x2="110" y2="360"/>
+              <line x1="160" y1="50" x2="160" y2="360"/>
+              <line x1="260" y1="50" x2="260" y2="360"/>
+              <line x1="310" y1="50" x2="310" y2="360"/>
+              <line x1="360" y1="50" x2="360" y2="360"/>
+            </g>
+            <line x1="50" y1="210" x2="435" y2="210" stroke="#E0B84A" stroke-width="1.6" opacity="0.45"/>
+            <line x1="210" y1="370" x2="210" y2="45" stroke="#E0B84A" stroke-width="1.6" opacity="0.45"/>
+            <text x="425" y="230" fill="#8a8a7a" font-size="11" font-family="Inter" text-anchor="end">Réels</text>
+            <text x="222" y="56" fill="#8a8a7a" font-size="11" font-family="Inter">Imaginaires</text>
+            <text x="196" y="226" fill="#5a5a4a" font-size="11" font-family="Inter">O</text>
+            <defs>
+              <marker id="arrowOrP1" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+                <path d="M0,0 L8,4 L0,8" fill="none" stroke="#E0B84A" stroke-width="1.5"/>
+              </marker>
+            </defs>
+            <line x1="210" y1="210" x2="354" y2="112" stroke="#E0B84A" stroke-width="2.2" marker-end="url(#arrowOrP1)"/>
+            <text x="272" y="148" fill="#F5F0E8" font-size="12" font-family="Playfair Display, serif" font-style="italic">vecteur OM d'affixe z</text>
+            <circle cx="360" cy="110" r="7" fill="#E0B84A"/>
+            <text x="372" y="104" fill="#E0B84A" font-size="13" font-weight="700" font-family="Inter">M</text>
+            <text x="372" y="88" fill="#E0B84A" font-size="11" font-family="Inter">z = 3 + 2i</text>
+            <circle cx="60" cy="310" r="7" fill="#f87171"/>
+            <text x="72" y="330" fill="#f87171" font-size="13" font-weight="700" font-family="Inter">M'</text>
+            <text x="72" y="346" fill="#f87171" font-size="11" font-family="Inter">−z = −3 − 2i</text>
+            <line x1="210" y1="210" x2="66" y2="312" stroke="#f87171" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.6"/>
+            <text x="230" y="30" fill="#E0B84A" font-size="11" font-weight="700" font-family="Inter" text-anchor="middle" letter-spacing="2">z COMME POINT, z COMME VECTEUR, −z COMME SYMÉTRIQUE</text>
+          </svg>
+          <figcaption class="lecture-figure-caption">Trois visages d'un même complexe : le point $M(a ; b)$, le vecteur $\overrightarrow{OM}(a ; b)$, et pour $-z$ le symétrique de $M$ par rapport à l'origine $O$.</figcaption>
+        </figure>
 
         <div class="lecture-formula-box">
           <div class="lecture-formula-main">Image de $-z$ : symétrique de $M$ par rapport à $O$</div>
-          <div class="lecture-formula-desc">Si $M$ a pour affixe $z$, alors le point d'affixe $-z$ est le symétrique de $M$ par rapport à l'origine. Exemple : l'image de $-(2 + 3i) = -2 - 3i$ est le point $(-2 ; -3)$.</div>
+          <div class="lecture-formula-desc">Si $M$ a pour affixe $z$, le point d'affixe $-z$ est l'image de $M$ dans la symétrie centrale de centre $O$. Exemple : $z = 3 + 2i \to -z = -3 - 2i$.</div>
         </div>
-      </div>
 
-      <div class="lecture-exercise">
-        <div class="lecture-exercise-label">✏️ À toi de jouer</div>
-        <p class="lecture-text">Placer sur le plan complexe les points $E(-1 - i)$, $F(2i)$ et $G(3)$, puis donner le point symétrique de $E$ par rapport à l'origine.</p>
-        <details>
-          <summary>Voir la solution</summary>
-          <div class="lecture-quiz-answer">
-            <p>$E(-1 ; -1)$ : quadrant 3 · $F(0 ; 2)$ : sur l'axe des imaginaires · $G(3 ; 0)$ : sur l'axe des réels.</p>
-            <p>Le symétrique de $E$ a pour affixe $-(-1 - i) = 1 + i$, c'est le point $E'(1 ; 1)$ dans le quadrant 1.</p>
-          </div>
-        </details>
+        <div class="lecture-exercise">
+          <div class="lecture-exercise-label">✏️ Exercice d'application 6 — Placer et lire</div>
+          <p class="lecture-text"><strong>Énoncé :</strong> a) Placer les images de $A(2 + 3i)$, $B(-1 - i)$, $C(-2i)$ et $D(4)$ en précisant quadrant ou axe. b) Donner l'affixe du symétrique de $B$ par rapport à $O$.</p>
+          <details>
+            <summary>Voir la solution détaillée</summary>
+            <div class="lecture-quiz-answer">
+              <p><strong>a)</strong></p>
+              <p>$A(2 ; 3)$ : $a > 0$ et $b > 0$ → <strong>premier quadrant</strong> (en haut à droite).</p>
+              <p>$B(-1 ; -1)$ : $a < 0$ et $b < 0$ → <strong>troisième quadrant</strong> (en bas à gauche).</p>
+              <p>$C(0 ; -2)$ : abscisse nulle → <strong>sur l'axe vertical</strong>, c'est un imaginaire pur ✔ cohérent.</p>
+              <p>$D(4 ; 0)$ : ordonnée nulle → <strong>sur l'axe horizontal</strong>, c'est un réel pur ✔ cohérent.</p>
+              <p><strong>b)</strong> Le symétrique de $B$ a pour affixe $-z_B = -(-1 - i) = 1 + i$ → point $(1 ; 1)$, premier quadrant.</p>
+            </div>
+          </details>
+        </div>
       </div>
 
       <div class="lecture-callout lecture-callout-gold">
         <div class="lecture-callout-body">
           <div class="lecture-callout-title">Astuce mnémotechnique</div>
-          <p>La partie <strong>RÉELLE</strong> se lit sur l'axe des <strong>Réels</strong> (horizontal). La partie <strong>IMAGINAIRE</strong> se lit sur l'axe des <strong>Imaginaires</strong> (vertical). Un moyen simple : <em>on écrit d'abord la partie réelle, puis la partie imaginaire</em>, comme on lit de gauche à droite puis de bas en haut.</p>
+          <p>Dans l'écriture $a + ib$ comme dans le point $(a ; b)$, l'ordre est celui de la lecture d'un point : <strong>d'abord l'horizontale (réelle), puis la verticale (imaginaire)</strong>.</p>
         </div>
       </div>
     </div>
@@ -616,535 +777,321 @@ $$\begin{aligned} i^{-1} &= -i & i^{-2} &= -1 \\ i^{-3} &= i & i^{-4} &= 1 \end{
 
     <div class="lecture-section-body">
       <p class="lecture-text">
-        On additionne, soustrait et multiplie les complexes comme des expressions algébriques classiques, en utilisant la relation $i^2 = -1$ pour simplifier.
+        Les complexes se calculent avec les <strong>mêmes règles que les expressions algébriques classiques</strong> : on développe, on regroupe, et on remplace chaque $i^2$ par $-1$. Mais chaque opération a aussi un <strong>sens géométrique</strong> — et ce double regard (algèbre + image) fait toute la force de l'outil.
       </p>
 
       <div class="lecture-callout lecture-callout-key">
         <div class="lecture-callout-body">
-          <div class="lecture-callout-title">Propriétés des opérations dans ℂ</div>
-          <p>Les opérations dans $\mathbb{C}$ ont <strong>exactement les mêmes propriétés</strong> que dans $\mathbb{R}$ :</p>
+          <div class="lecture-callout-title">Les règles du jeu (valables dans ℂ)</div>
           <ul class="lecture-list">
             <li><strong>Commutativité</strong> : $z + z' = z' + z$ et $z \times z' = z' \times z$</li>
             <li><strong>Associativité</strong> : $(z + z') + z'' = z + (z' + z'')$</li>
-            <li><strong>Éléments neutres</strong> : $0$ pour l'addition, $1$ pour la multiplication</li>
             <li><strong>Distributivité</strong> : $z(z' + z'') = zz' + zz''$</li>
+            <li><strong>Éléments neutres</strong> : $0$ pour $+$, $1$ pour $\times$</li>
           </ul>
-          <p>Toutes les identités remarquables que tu connais restent valables : $(a+b)^2 = a^2 + 2ab + b^2$, $(a+b)(a-b) = a^2 - b^2$, etc. ✅</p>
+          <p>Toutes tes <strong>identités remarquables</strong> restent valables : $(a + b)^2 = a^2 + 2ab + b^2$, $(a + b)(a - b) = a^2 - b^2$… avec en prime $i^2 = -1$ qui simplifie les carrés.</p>
         </div>
       </div>
 
       <div class="lecture-section-sub">
-        <h3 class="lecture-subtitle">Addition</h3>
-        <p class="lecture-text">On additionne les parties réelles ensemble et les parties imaginaires ensemble.</p>
+        <h3 class="lecture-subtitle">Addition : ingrédient par ingrédient</h3>
 
         <div class="lecture-formula-box">
           <div class="lecture-formula-main">$$(a + ib) + (c + id) = (a + c) + i(b + d)$$</div>
-          <div class="lecture-formula-desc">Addition : parties réelles et imaginaires séparément.</div>
+          <div class="lecture-formula-desc">On additionne les parties réelles entre elles, les parties imaginaires entre elles.</div>
         </div>
 
-        <div class="lecture-example">
-          <div class="lecture-example-label">Exemple</div>
-          <div class="lecture-example-content">
-            <p>$$(2 + 3i) + (5 - i) = (2 + 5) + i(3 - 1) = 7 + 2i$$</p>
-          </div>
+        <p class="lecture-text">
+          <strong>Sens géométrique</strong> : l'image de $z + z'$ est le <strong>quatrième sommet du parallélogramme</strong> construit sur $O$, l'image de $z$ et l'image de $z'$ — la règle du parallélogramme pour additionner des vecteurs.
+        </p>
+
+        <figure class="lecture-figure">
+          <svg viewBox="0 0 460 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Addition géométrique : règle du parallélogramme">
+            <g stroke="rgba(255,255,255,0.035)" stroke-width="1">
+              <line x1="60" y1="110" x2="420" y2="110"/>
+              <line x1="60" y1="160" x2="420" y2="160"/>
+              <line x1="60" y1="260" x2="420" y2="260"/>
+              <line x1="60" y1="310" x2="420" y2="310"/>
+              <line x1="110" y1="50" x2="110" y2="360"/>
+              <line x1="160" y1="50" x2="160" y2="360"/>
+              <line x1="260" y1="50" x2="260" y2="360"/>
+              <line x1="310" y1="50" x2="310" y2="360"/>
+              <line x1="360" y1="50" x2="360" y2="360"/>
+            </g>
+            <line x1="50" y1="210" x2="435" y2="210" stroke="#E0B84A" stroke-width="1.6" opacity="0.45"/>
+            <line x1="210" y1="370" x2="210" y2="45" stroke="#E0B84A" stroke-width="1.6" opacity="0.45"/>
+            <text x="425" y="230" fill="#8a8a7a" font-size="11" font-family="Inter" text-anchor="end">Réels</text>
+            <text x="222" y="56" fill="#8a8a7a" font-size="11" font-family="Inter">Imaginaires</text>
+            <text x="196" y="226" fill="#5a5a4a" font-size="11" font-family="Inter">O</text>
+            <polygon points="210,210 310,160 410,110 310,210" fill="rgba(224,184,74,0.06)" stroke="rgba(224,184,74,0.35)" stroke-width="1.2" stroke-dasharray="4 3"/>
+            <line x1="210" y1="210" x2="304" y2="162" stroke="#E0B84A" stroke-width="2"/>
+            <circle cx="310" cy="160" r="6" fill="#E0B84A"/>
+            <text x="320" y="155" fill="#E0B84A" font-size="12" font-weight="700" font-family="Inter">A : z = 2 + i</text>
+            <line x1="210" y1="210" x2="304" y2="212" stroke="#60a5fa" stroke-width="2"/>
+            <circle cx="310" cy="210" r="6" fill="#60a5fa"/>
+            <text x="320" y="228" fill="#60a5fa" font-size="12" font-weight="700" font-family="Inter">B : z' = 2</text>
+            <line x1="210" y1="210" x2="404" y2="112" stroke="#4ade80" stroke-width="2.4"/>
+            <circle cx="410" cy="110" r="7" fill="#4ade80"/>
+            <text x="395" y="90" fill="#4ade80" font-size="12" font-weight="700" font-family="Inter">S : z + z' = 4 + i</text>
+            <text x="230" y="30" fill="#E0B84A" font-size="11" font-weight="700" font-family="Inter" text-anchor="middle" letter-spacing="2">ADDITIONNER = COMPLÉTER LE PARALLÉLOGRAMME</text>
+          </svg>
+          <figcaption class="lecture-figure-caption">Avec $z = 2 + i$ et $z' = 2$, le point $S(4 ; 1)$ complète le parallélogramme $OASB$ : l'addition des complexes est l'addition des vecteurs.</figcaption>
+        </figure>
+
+        <div class="lecture-exercise">
+          <div class="lecture-exercise-label">✏️ Exercice d'application 7 — Addition et soustraction</div>
+          <p class="lecture-text"><strong>Énoncé :</strong> calculer $A = (3 - 2i) + (-1 + 5i)$ et $B = (5 + 4i) - (2 - 3i)$</p>
+          <details>
+            <summary>Voir la solution détaillée</summary>
+            <div class="lecture-quiz-answer">
+              <p><strong>A :</strong> parties réelles : $3 + (-1) = 2$ · parties imaginaires : $-2 + 5 = 3$ → $A = 2 + 3i$</p>
+              <p><strong>B :</strong> on distribue le signe $-$ : $B = 5 + 4i - 2 + 3i$ (attention : $-(-3i) = +3i$ !). Réelles : $5 - 2 = 3$ · imaginaires : $4 + 3 = 7$ → $B = 3 + 7i$</p>
+              <p><strong>Le piège :</strong> le signe $-$ devant une parenthèse change le signe de <em>tous</em> les termes à l'intérieur.</p>
+            </div>
+          </details>
         </div>
       </div>
 
       <div class="lecture-section-sub">
-        <h3 class="lecture-subtitle">Soustraction</h3>
-        <p class="lecture-text">On soustrait les parties réelles ensemble et les parties imaginaires ensemble.</p>
+        <h3 class="lecture-subtitle">Multiplication : développer puis remplacer $i^2$ par $-1$</h3>
 
-        <div class="lecture-formula-box">
-          <div class="lecture-formula-main">$$(a + ib) - (c + id) = (a - c) + i(b - d)$$</div>
-          <div class="lecture-formula-desc">Soustraction : on distribue le signe $-$ à chaque terme.</div>
-        </div>
-
-        <div class="lecture-example">
-          <div class="lecture-example-label">Exemple</div>
+        <div class="lecture-example lecture-example-featured">
+          <div class="lecture-example-label">Démonstration de la formule générale</div>
           <div class="lecture-example-content">
-            <p>$$(2 + 3i) - (5 - i) = (2 - 5) + i(3 - (-1)) = -3 + 4i$$</p>
+            <p>$(a + ib)(c + id)$</p>
+            <p>$= ac + iad + ibc + i^2 bd$ &nbsp;(distributivité — double développement)</p>
+            <p>$= ac + iad + ibc - bd$ &nbsp;(car $i^2 = -1$)</p>
+            <p>$= (ac - bd) + i(ad + bc)$ &nbsp;(regroupement réel / imaginaire)</p>
           </div>
         </div>
-      </div>
-
-      <div class="lecture-section-sub">
-        <h3 class="lecture-subtitle">Opposé</h3>
-        <p class="lecture-text">L'opposé d'un complexe $z = a + ib$ s'obtient en changeant le signe des deux parties.</p>
-
-        <div class="lecture-formula-box">
-          <div class="lecture-formula-main">$$-z = -a - ib$$</div>
-          <div class="lecture-formula-desc">Opposé d'un complexe.</div>
-        </div>
-
-        <div class="lecture-example">
-          <div class="lecture-example-label">Exemple</div>
-          <div class="lecture-example-content">
-            <p>L'opposé de $z = 3 - 4i$ est $-z = -3 + 4i$.</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="lecture-section-sub">
-        <h3 class="lecture-subtitle">Multiplication</h3>
-        <p class="lecture-text">On développe comme un produit de deux binômes, puis on remplace $i^2$ par $-1$.</p>
 
         <div class="lecture-formula-box">
           <div class="lecture-formula-main">$$(a + ib)(c + id) = (ac - bd) + i(ad + bc)$$</div>
-          <div class="lecture-formula-desc">Formule à connaître par cœur.</div>
-        </div>
-
-        <div class="lecture-example lecture-example-featured">
-          <div class="lecture-example-label">Démonstration pas à pas</div>
-          <div class="lecture-example-content">
-            <p>$$(a + ib)(c + id)$$</p>
-            <p>$$= ac + iad + ibc + i^2 bd \quad \text{(développement)}$$</p>
-            <p>$$= ac + iad + ibc - bd \quad \text{(car } i^2 = -1 \text{)}$$</p>
-            <p>$$= (ac - bd) + i(ad + bc) \quad \text{(regroupement)}$$</p>
-          </div>
-        </div>
-
-        <div class="lecture-example">
-          <div class="lecture-example-label">Exemple</div>
-          <div class="lecture-example-content">
-            <p>$$(2 + 3i)(1 - i) = 2 - 2i + 3i - 3i^2 = 2 + i + 3 = 5 + i$$</p>
-          </div>
+          <div class="lecture-formula-desc">En pratique : on développe normalement, puis chaque $i^2$ devient $-1$.</div>
         </div>
 
         <div class="lecture-callout lecture-callout-gold">
           <div class="lecture-callout-body">
-            <div class="lecture-callout-title">Cas remarquable à repérer</div>
-            <p>$(a + ib)(a - ib) = a^2 + b^2$ — le résultat est un <strong>réel positif</strong> ! Ce produit, appelé « conjugué × lui-même », est la clé du calcul des inverses (tu le verras en partie 2).</p>
-            <p>Exemple : $(3 + 2i)(3 - 2i) = 9 + 4 = 13$.</p>
+            <div class="lecture-callout-title">⭐ Le schéma à connaître par cœur</div>
+            <p>$$(a + ib)(a - ib) = a^2 + b^2$$</p>
+            <p>Le résultat est <strong>toujours un réel positif</strong> ! Les termes en $i$ s'éteignent : $a^2 - iab + iab - i^2 b^2 = a^2 + b^2$.</p>
+            <p>Exemple : $(3 + 2i)(3 - 2i) = 9 + 4 = 13$. Ce schéma sera la clé des inverses et des quotients en Partie 3 — mémorise-le maintenant !</p>
           </div>
+        </div>
+
+        <div class="lecture-exercise">
+          <div class="lecture-exercise-label">✏️ Exercice d'application 8 — Multiplier</div>
+          <p class="lecture-text"><strong>Énoncé :</strong> calculer $A = (3 - i)(2 + 3i)$, $B = (2 + i)^2$ et $C = (5 + 2i)(5 - 2i)$</p>
+          <details>
+            <summary>Voir la solution détaillée</summary>
+            <div class="lecture-quiz-answer">
+              <p><strong>A :</strong> $(3 - i)(2 + 3i) = 6 + 9i - 2i - 3i^2 = 6 + 7i + 3 = 9 + 7i$</p>
+              <p><strong>B :</strong> identité remarquable $(a+b)^2 = a^2 + 2ab + b^2$ : $(2 + i)^2 = 4 + 4i + i^2 = 4 + 4i - 1 = 3 + 4i$</p>
+              <p><strong>C :</strong> schéma $(a + ib)(a - ib)$ : $(5 + 2i)(5 - 2i) = 5^2 + 2^2 = 25 + 4 = 29$ — un réel, comme promis ✔</p>
+            </div>
+          </details>
         </div>
       </div>
 
       <div class="lecture-section-sub">
-        <h3 class="lecture-subtitle">Puissances de z</h3>
-        <p class="lecture-text">Pour calculer $z^2$, $z^3$, etc., on utilise la multiplication répétée.</p>
+        <h3 class="lecture-subtitle">Multiplier par i : un quart de tour</h3>
+
+        <p class="lecture-text">
+          Regarde ce que fait la multiplication par $i$ : $i \times 1 = i$ (le point $(1 ; 0)$ va en $(0 ; 1)$), $i \times i = -1$ (le point $(0 ; 1)$ va en $(-1 ; 0)$), etc. Dans chaque cas, le point <strong>tourne d'un quart de tour</strong> autour de l'origine, dans le sens trigonométrique :
+        </p>
+
+        <figure class="lecture-figure">
+          <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Multiplier par i fait tourner d'un quart de tour">
+            <defs>
+              <marker id="arrowRotP1" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto">
+                <path d="M0,0 L7,3.5 L0,7" fill="none" stroke="#60a5fa" stroke-width="1.3"/>
+              </marker>
+            </defs>
+            <circle cx="200" cy="200" r="110" fill="none" stroke="rgba(224,184,74,0.2)" stroke-width="1" stroke-dasharray="3 4"/>
+            <line x1="50" y1="200" x2="370" y2="200" stroke="#E0B84A" stroke-width="1.4" opacity="0.4"/>
+            <line x1="200" y1="370" x2="200" y2="40" stroke="#E0B84A" stroke-width="1.4" opacity="0.4"/>
+            <text x="360" y="218" fill="#8a8a7a" font-size="10" font-family="Inter" text-anchor="end">Réels</text>
+            <text x="210" y="52" fill="#8a8a7a" font-size="10" font-family="Inter">Imaginaires</text>
+            <text x="188" y="216" fill="#5a5a4a" font-size="10" font-family="Inter">O</text>
+            <circle cx="310" cy="200" r="7" fill="#E0B84A"/>
+            <text x="318" y="196" fill="#E0B84A" font-size="12" font-weight="700" font-family="Inter">1</text>
+            <circle cx="200" cy="90" r="7" fill="#E0B84A"/>
+            <text x="210" y="86" fill="#E0B84A" font-size="12" font-weight="700" font-family="Inter">i</text>
+            <circle cx="90" cy="200" r="7" fill="#E0B84A"/>
+            <text x="58" y="196" fill="#E0B84A" font-size="12" font-weight="700" font-family="Inter">−1</text>
+            <circle cx="200" cy="310" r="7" fill="#E0B84A"/>
+            <text x="210" y="326" fill="#E0B84A" font-size="12" font-weight="700" font-family="Inter">−i</text>
+            <path d="M 330 200 A 130 130 0 0 0 200 70" fill="none" stroke="#60a5fa" stroke-width="1.6" marker-end="url(#arrowRotP1)"/>
+            <path d="M 178 76 A 130 130 0 0 0 70 200" fill="none" stroke="#60a5fa" stroke-width="1.6" marker-end="url(#arrowRotP1)"/>
+            <text x="292" y="106" fill="#60a5fa" font-size="12" font-weight="700" font-family="Inter">× i</text>
+            <text x="98" y="106" fill="#60a5fa" font-size="12" font-weight="700" font-family="Inter">× i</text>
+            <text x="200" y="240" fill="#8a8a7a" font-size="11" font-family="Inter" text-anchor="middle" font-style="italic">chaque multiplication par i = quart de tour (sens trigonométrique)</text>
+            <text x="200" y="28" fill="#E0B84A" font-size="11" font-weight="700" font-family="Inter" text-anchor="middle" letter-spacing="2">× i : LA ROTATION D'ANGLE π/2</text>
+          </svg>
+          <figcaption class="lecture-figure-caption">Multiplier par $i$ fait pivoter d'un quart de tour. D'où le cycle $i, -1, -i, 1$ de la section 4 : c'est la même roue, vue géométriquement !</figcaption>
+        </figure>
+      </div>
+
+      <div class="lecture-section-sub">
+        <h3 class="lecture-subtitle">Puissances d'un complexe</h3>
 
         <div class="lecture-example">
-          <div class="lecture-example-label">Exemple</div>
+          <div class="lecture-example-label">Exemple détaillé</div>
           <div class="lecture-example-content">
-            <p>Soit $z = 1 + i$. Calculons $z^2$ :</p>
-            <p>$$z^2 = (1 + i)^2 = 1 + 2i + i^2 = 1 + 2i - 1 = 2i$$</p>
-            <p>Puis $z^3 = z^2 \cdot z = 2i(1 + i) = 2i + 2i^2 = -2 + 2i$</p>
+            <p>Soit $z = 1 + i$ :</p>
+            <p>$z^2 = (1 + i)^2 = 1 + 2i + i^2 = 1 + 2i - 1 = 2i$</p>
+            <p>$z^3 = z^2 \times z = 2i \times (1 + i) = 2i + 2i^2 = -2 + 2i$</p>
+            <p>$z^4 = z^2 \times z^2 = 2i \times 2i = 4i^2 = -4$ — et hop, un réel !</p>
           </div>
         </div>
       </div>
 
       <div class="lecture-section-sub">
-        <h3 class="lecture-subtitle">La méthode d'identification</h3>
+        <h3 class="lecture-subtitle">La méthode d'identification : l'outil roi</h3>
+
         <p class="lecture-text">
-          C'est <strong>LA</strong> méthode la plus utilisée dans les exercices. Elle consiste à écrire que deux complexes sont égaux en égalant leurs parties réelles et imaginaires.
+          Voici <strong>LA</strong> méthode à maîtriser absolument. Principe : quand une équation contient une inconnue complexe, on pose $z = x + iy$ (avec $x$, $y$ réels), on développe tout, puis on utilise la règle d'égalité de la section 3 pour obtenir un <strong>système de deux équations réelles</strong>.
         </p>
 
         <div class="lecture-steps">
           <div class="lecture-step">
             <span class="lecture-step-number">1</span>
             <div class="lecture-step-content">
-              <strong>Écrire l'égalité</strong>
-              <p>$(2 + 3i)(x + iy) = 5 + i$</p>
+              <strong>Poser l'inconnue sous forme algébrique</strong>
+              <p>on cherche $z = x + iy$, avec $x$ et $y$ réels</p>
             </div>
           </div>
           <div class="lecture-step">
             <span class="lecture-step-number">2</span>
             <div class="lecture-step-content">
-              <strong>Développer à gauche</strong>
-              <p>$(2x - 3y) + i(3x + 2y) = 5 + i$</p>
+              <strong>Développer le membre de gauche</strong>
+              <p>remplacer chaque $i^2$ par $-1$, puis regrouper en (réel) + $i$(réel)</p>
             </div>
           </div>
           <div class="lecture-step">
             <span class="lecture-step-number">3</span>
             <div class="lecture-step-content">
-              <strong>Égaler parties réelles et imaginaires</strong>
-              <p>$2x - 3y = 5$ et $3x + 2y = 1$</p>
+              <strong>Identifier les parties réelles et imaginaires</strong>
+              <p>grâce à : $a + ib = a' + ib' \iff a = a'$ et $b = b'$</p>
             </div>
           </div>
           <div class="lecture-step">
             <span class="lecture-step-number">4</span>
             <div class="lecture-step-content">
-              <strong>Résoudre le système</strong>
-              <p>$x = \dfrac{1}{2}$ et $y = -\dfrac{3}{2}$</p>
+              <strong>Résoudre le système, conclure, vérifier</strong>
+              <p>la vérification dans l'équation de départ valide tout</p>
             </div>
           </div>
         </div>
-      </div>
-
-      <div class="lecture-section-sub">
-        <h3 class="lecture-subtitle">L'inverse d'un complexe par identification</h3>
-        <p class="lecture-text">
-          Pour calculer $\dfrac{1}{z}$, on cherche un complexe $z' = x + iy$ tel que $z \cdot z' = 1$. On procède par identification.
-        </p>
 
         <div class="lecture-example lecture-example-featured">
-          <div class="lecture-example-label">🎓 Exemple complet : calculer $\dfrac{1}{1 + i}$</div>
+          <div class="lecture-example-label">🎓 Exemple complet résolu</div>
           <div class="lecture-example-content">
-            <p>On cherche $(x + iy)$ tel que $(1 + i)(x + iy) = 1$.</p>
-            <p><strong>Développons :</strong> $(1 + i)(x + iy) = x + iy + ix + i^2 y = (x - y) + i(x + y)$</p>
-            <p><strong>Identifions avec $1 = 1 + 0i$ :</strong></p>
-            <p>$x - y = 1$ et $x + y = 0$</p>
-            <p><strong>Résolvons :</strong> en additionnant, $2x = 1$ donc $x = \dfrac{1}{2}$ ; puis $y = -\dfrac{1}{2}$.</p>
-            <p style="color:#4ade80;margin-top:10px;"><strong>✅ Conclusion :</strong> $\dfrac{1}{1 + i} = \dfrac{1}{2} - \dfrac{1}{2}i = \dfrac{1 - i}{2}$</p>
-            <p><strong>Vérification :</strong> $(1 + i) \times \dfrac{1 - i}{2} = \dfrac{1 - i^2}{2} = \dfrac{2}{2} = 1$ ✔</p>
+            <p><strong>Énoncé :</strong> déterminer les réels $x$ et $y$ tels que $(1 + i)(x + iy) = 2 - i$.</p>
+            <p><strong>Étape 1 — Développer :</strong></p>
+            <p>$(1 + i)(x + iy) = x + iy + ix + i^2 y = x + iy + ix - y$</p>
+            <p>$= (x - y) + i(x + y)$</p>
+            <p><strong>Étape 2 — Identifier</strong> avec $2 - i = 2 + (-1)i$ :</p>
+            <p>$$x - y = 2 \quad \text{et} \quad x + y = -1$$</p>
+            <p><strong>Étape 3 — Résoudre :</strong> en additionnant les deux lignes : $2x = 1$, donc $x = \dfrac{1}{2}$ ; en reportant : $y = -\dfrac{3}{2}$</p>
+            <p style="color:#4ade80;margin-top:10px;"><strong>✅ Solution :</strong> $z = \dfrac{1}{2} - \dfrac{3}{2}i$</p>
+            <p><strong>Vérification :</strong> $(1 + i)\left(\dfrac{1}{2} - \dfrac{3i}{2}\right) = \dfrac{1}{2} - \dfrac{3i}{2} + \dfrac{i}{2} + \dfrac{3}{2} = 2 - i$ ✔</p>
           </div>
         </div>
-      </div>
-
-      <div class="lecture-section-sub">
-        <h3 class="lecture-subtitle">Première résolution d'équations</h3>
-        <p class="lecture-text">
-          L'identification permet déjà de résoudre deux grands types d'équations.
-        </p>
-
-        <div class="lecture-example">
-          <div class="lecture-example-label">Type 1 — Équation $z^2 = k$ avec $k < 0$</div>
-          <div class="lecture-example-content">
-            <p>Résolvons $z^2 = -4$ dans $\mathbb{C}$.</p>
-            <p>On cherche $z$ tel que son carré vaille $-4 = 4i^2$.</p>
-            <p>On teste : $(2i)^2 = 4i^2 = -4$ ✔ et $(-2i)^2 = -4$ ✔</p>
-            <p style="color:#4ade80;margin-top:10px;"><strong>✅ Solutions :</strong> $z = 2i$ ou $z = -2i$</p>
-            <p><strong>Règle générale :</strong> $z^2 = -a^2$ (avec $a > 0$) $\iff$ $z = ai$ ou $z = -ai$. Il y a toujours <strong>deux solutions opposées</strong>.</p>
-          </div>
-        </div>
-
-        <div class="lecture-example">
-          <div class="lecture-example-label">Type 2 — Équation du premier degré $(a + ib)z = c$</div>
-          <div class="lecture-example-content">
-            <p>Résolvons $(1 + i)z = 2$.</p>
-            <p>On divise par $(1 + i)$ : $z = \dfrac{2}{1 + i}$.</p>
-            <p>On utilise l'inverse calculé plus haut : $z = 2 \times \dfrac{1 - i}{2} = 1 - i$.</p>
-            <p style="color:#4ade80;margin-top:10px;"><strong>✅ Solution :</strong> $z = 1 - i$</p>
-            <p><strong>Vérification :</strong> $(1 + i)(1 - i) = 1 - i^2 = 2$ ✔</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="lecture-example lecture-example-featured">
-        <div class="lecture-example-label">🎓 Exemple complet résolu</div>
-        <div class="lecture-example-content">
-          <p><strong>Énoncé :</strong> déterminer les réels $x$ et $y$ tels que $(1 + i)(x + iy) = 2 - i$.</p>
-          <p><strong>Étape 1 — Développer :</strong></p>
-          <p>$$(1 + i)(x + iy) = x + iy + ix + i^2 y$$</p>
-          <p>$$= x + iy + ix - y$$</p>
-          <p>$$= (x - y) + i(x + y)$$</p>
-          <p><strong>Étape 2 — Identifier :</strong></p>
-          <p>$$x - y = 2 \quad \text{et} \quad x + y = -1$$</p>
-          <p><strong>Étape 3 — Résoudre :</strong></p>
-          <p>En additionnant : $2x = 1$, donc $x = \dfrac{1}{2}$</p>
-          <p>En soustrayant : $-2y = 3$, donc $y = -\dfrac{3}{2}$</p>
-          <p style="color:#4ade80;margin-top:10px;"><strong>✅ Solution :</strong> $x = \dfrac{1}{2}$ et $y = -\dfrac{3}{2}$</p>
-        </div>
-      </div>
-
-      <div class="lecture-example">
-        <div class="lecture-example-label">🎓 Deuxième exemple</div>
-        <div class="lecture-example-content">
-          <p><strong>Énoncé :</strong> déterminer les réels $x$ et $y$ tels que $(x + iy)(2 - i) = 4 + 3i$.</p>
-          <p><strong>Étape 1 — Développer :</strong></p>
-          <p>$$(x + iy)(2 - i) = 2x - ix + 2iy - i^2 y$$</p>
-          <p>$$= 2x - ix + 2iy + y$$</p>
-          <p>$$= (2x + y) + i(-x + 2y)$$</p>
-          <p><strong>Étape 2 — Identifier :</strong></p>
-          <p>$$2x + y = 4 \quad \text{et} \quad -x + 2y = 3$$</p>
-          <p><strong>Étape 3 — Résoudre :</strong></p>
-          <p>De la première équation : $y = 4 - 2x$.</p>
-          <p>En remplaçant dans la seconde : $-x + 2(4 - 2x) = 3$</p>
-          <p>$-x + 8 - 4x = 3$, donc $-5x = -5$, donc $x = 1$.</p>
-          <p>Puis $y = 4 - 2(1) = 2$.</p>
-          <p style="color:#4ade80;margin-top:10px;"><strong>✅ Solution :</strong> $x = 1$ et $y = 2$</p>
-        </div>
-      </div>
-
-      <div class="lecture-callout lecture-callout-key">
-        <div class="lecture-callout-body">
-          <div class="lecture-callout-title">Conseil pratique</div>
-          <p>L'identification est utilisée partout : équations, décomposition en parties réelle/imaginaire, calcul d'inverses, problèmes de géométrie… <strong>Maîtrise-la à fond !</strong> C'est le réflexe numéro 1 face à un exercice sur les complexes.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== SECTION 7 : FICHES MÉTHODES ===== -->
-  <section class="lecture-section" id="s7">
-    <div class="lecture-section-header">
-      <div class="lecture-section-num">07</div>
-      <div class="lecture-section-heading">
-        <span class="lecture-section-eyebrow">Méthodologie</span>
-        <h2 class="lecture-section-title">Fiches méthodes</h2>
-      </div>
-    </div>
-
-    <div class="lecture-section-body">
-      <p class="lecture-text">
-        Trois procédés à automatiser. Le jour du contrôle, ils doivent venir sans réfléchir.
-      </p>
-
-      <div class="lecture-section-sub">
-        <h3 class="lecture-subtitle">📋 Méthode 1 — Mettre un complexe sous forme algébrique</h3>
-        <div class="lecture-steps">
-          <div class="lecture-step">
-            <span class="lecture-step-number">1</span>
-            <div class="lecture-step-content">
-              <strong>Développer tous les produits</strong>
-              <p>et remplacer chaque $i^2$ par $-1$</p>
-            </div>
-          </div>
-          <div class="lecture-step">
-            <span class="lecture-step-number">2</span>
-            <div class="lecture-step-content">
-              <strong>Regrouper les réels entre eux, les termes en $i$ entre eux</strong>
-              <p>$z = (\text{réels}) + i(\text{coefficients})$</p>
-            </div>
-          </div>
-          <div class="lecture-step">
-            <span class="lecture-step-number">3</span>
-            <div class="lecture-step-content">
-              <strong>Conclure : lire $\operatorname{Re}(z)$ et $\operatorname{Im}(z)$</strong>
-              <p>simplifier si possible</p>
-            </div>
-          </div>
-        </div>
-        <div class="lecture-example">
-          <div class="lecture-example-label">Application</div>
-          <div class="lecture-example-content">
-            <p>$$z = (2 + i) + 3i(2 - i)$$</p>
-            <p>$$3i(2 - i) = 6i - 3i^2 = 3 + 6i$$</p>
-            <p>$$z = (2 + 3) + i(1 + 6) = 5 + 7i$$</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="lecture-section-sub">
-        <h3 class="lecture-subtitle">📋 Méthode 2 — Résoudre $(a + ib)z = c$ (inconnue complexe)</h3>
-        <div class="lecture-steps">
-          <div class="lecture-step">
-            <span class="lecture-step-number">1</span>
-            <div class="lecture-step-content">
-              <strong>Isoler $z$</strong>
-              <p>$z = \dfrac{c}{a + ib}$ (possible car $a + ib \neq 0$)</p>
-            </div>
-          </div>
-          <div class="lecture-step">
-            <span class="lecture-step-number">2</span>
-            <div class="lecture-step-content">
-              <strong>Poser $z = x + iy$ et identifier</strong>
-              <p>$(a + ib)(x + iy) = c$ → système 2×2</p>
-            </div>
-          </div>
-          <div class="lecture-step">
-            <span class="lecture-step-number">3</span>
-            <div class="lecture-step-content">
-              <strong>Résoudre le système, puis vérifier</strong>
-              <p>la vérification est rapide et évite 90 % des erreurs !</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="lecture-section-sub">
-        <h3 class="lecture-subtitle">📋 Méthode 3 — Calculer $1/z$ par identification</h3>
-        <div class="lecture-steps">
-          <div class="lecture-step">
-            <span class="lecture-step-number">1</span>
-            <div class="lecture-step-content">
-              <strong>Poser l'inconnue</strong>
-              <p>chercher $(x + iy)$ tel que $z(x + iy) = 1$</p>
-            </div>
-          </div>
-          <div class="lecture-step">
-            <span class="lecture-step-number">2</span>
-            <div class="lecture-step-content">
-              <strong>Développer et identifier avec $1 = 1 + 0i$</strong>
-              <p>système : $ax - by = 1$ et $bx + ay = 0$</p>
-            </div>
-          </div>
-          <div class="lecture-step">
-            <span class="lecture-step-number">3</span>
-            <div class="lecture-step-content">
-              <strong>Résoudre et vérifier que $z \times (1/z) = 1$</strong>
-              <p>la vérification prend 10 secondes</p>
-            </div>
-          </div>
-        </div>
-        <div class="lecture-example">
-          <div class="lecture-example-label">Résultat utile (à savoir refaire)</div>
-          <div class="lecture-example-content">
-            <p>$\dfrac{1}{3 + 4i} = \dfrac{3 - 4i}{25}$ — en effet $(3 + 4i)(3 - 4i) = 9 + 16 = 25$.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== SECTION 8 : EXERCICES ===== -->
-  <section class="lecture-section" id="s8">
-    <div class="lecture-section-header">
-      <div class="lecture-section-num">08</div>
-      <div class="lecture-section-heading">
-        <span class="lecture-section-eyebrow">Entraînement</span>
-        <h2 class="lecture-section-title">Exercices d'entraînement</h2>
-      </div>
-    </div>
-
-    <div class="lecture-section-body">
-      <div class="lecture-section-sub">
-        <h3 class="lecture-subtitle">🎯 QCM — Teste tes réflexes</h3>
-
-        <div class="lecture-quiz">
-          <div class="lecture-quiz-item">
-            <p class="lecture-quiz-q">Q1 — La partie imaginaire de $z = 4 - 7i$ est :</p>
-            <div class="lecture-quiz-options">
-              <span>A) $4i$</span>
-              <span>B) $-7i$</span>
-              <span>C) $-7$</span>
-              <span>D) $7$</span>
-            </div>
-            <details>
-              <summary>Voir la réponse</summary>
-              <div class="lecture-quiz-answer"><strong>C) $-7$.</strong> La partie imaginaire est le coefficient réel devant $i$. Réponse B est le piège classique !</div>
-            </details>
-          </div>
-
-          <div class="lecture-quiz-item">
-            <p class="lecture-quiz-q">Q2 — $i^{2026}$ est égal à :</p>
-            <div class="lecture-quiz-options">
-              <span>A) $i$</span>
-              <span>B) $-1$</span>
-              <span>C) $-i$</span>
-              <span>D) $1$</span>
-            </div>
-            <details>
-              <summary>Voir la réponse</summary>
-              <div class="lecture-quiz-answer"><strong>B) $-1$.</strong> $2026 = 4 \times 506 + 2$, donc $i^{2026} = i^2 = -1$.</div>
-            </details>
-          </div>
-
-          <div class="lecture-quiz-item">
-            <p class="lecture-quiz-q">Q3 — $(2 + i)(2 - i)$ est :</p>
-            <div class="lecture-quiz-options">
-              <span>A) un imaginaire pur</span>
-              <span>B) un réel</span>
-              <span>C) égal à $4$</span>
-              <span>D) égal à $4 + 2i$</span>
-            </div>
-            <details>
-              <summary>Voir la réponse</summary>
-              <div class="lecture-quiz-answer"><strong>B) un réel.</strong> $(2 + i)(2 - i) = 4 - i^2 = 4 + 1 = 5$. (L'identité $(a+ib)(a-ib) = a^2 + b^2$ donne toujours un réel !)</div>
-            </details>
-          </div>
-
-          <div class="lecture-quiz-item">
-            <p class="lecture-quiz-q">Q4 — Si $\operatorname{Im}(z) = 0$, alors :</p>
-            <div class="lecture-quiz-options">
-              <span>A) $z = 0$</span>
-              <span>B) $z$ est imaginaire pur</span>
-              <span>C) $z$ est un réel</span>
-              <span>D) $z = i$</span>
-            </div>
-            <details>
-              <summary>Voir la réponse</summary>
-              <div class="lecture-quiz-answer"><strong>C) $z$ est un réel.</strong> $\operatorname{Im}(z) = 0 \iff z \in \mathbb{R}$. Attention : $z$ n'est pas forcément nul (il faudrait aussi $\operatorname{Re}(z) = 0$).</div>
-            </details>
-          </div>
-
-          <div class="lecture-quiz-item">
-            <p class="lecture-quiz-q">Q5 — $(1 + i)^2$ est égal à :</p>
-            <div class="lecture-quiz-options">
-              <span>A) $1 + 2i$</span>
-              <span>B) $2i$</span>
-              <span>C) $2$</span>
-              <span>D) $2 + 2i$</span>
-            </div>
-            <details>
-              <summary>Voir la réponse</summary>
-              <div class="lecture-quiz-answer"><strong>B) $2i$.</strong> $(1 + i)^2 = 1 + 2i + i^2 = 1 + 2i - 1 = 2i$.</div>
-            </details>
-          </div>
-        </div>
-      </div>
-
-      <div class="lecture-section-sub">
-        <h3 class="lecture-subtitle">💪 Exercices d'application</h3>
 
         <div class="lecture-exercise">
-          <div class="lecture-exercise-label">Exercice 1 — Forme algébrique</div>
-          <p class="lecture-text">Écrire sous forme algébrique : $z = (3 + i) + (2 - 5i) - (1 - i)$</p>
+          <div class="lecture-exercise-label">✏️ Exercice d'application 9 — Identification standard</div>
+          <p class="lecture-text"><strong>Énoncé :</strong> déterminer les réels $x$ et $y$ tels que $(x + iy)(1 + i) = 3 + i$</p>
           <details>
-            <summary>Voir la solution</summary>
+            <summary>Voir la solution détaillée</summary>
             <div class="lecture-quiz-answer">
-              <p>$z = 3 + i + 2 - 5i - 1 + i$</p>
-              <p>$z = (3 + 2 - 1) + i(1 - 5 + 1) = 4 - 3i$</p>
+              <p><strong>Étape 1 — Développer :</strong> $(x + iy)(1 + i) = x + ix + iy + i^2 y = (x - y) + i(x + y)$</p>
+              <p><strong>Étape 2 — Identifier :</strong> $x - y = 3$ et $x + y = 1$</p>
+              <p><strong>Étape 3 — Résoudre :</strong> en additionnant : $2x = 4$ → $x = 2$ ; en reportant : $2 + y = 1$ → $y = -1$</p>
+              <p><strong>Étape 4 — Vérifier :</strong> $(2 - i)(1 + i) = 2 + 2i - i - i^2 = 3 + i$ ✔</p>
+              <p style="color:#4ade80;margin-top:10px;"><strong>✅ Solution :</strong> $x = 2$ et $y = -1$</p>
             </div>
           </details>
         </div>
 
         <div class="lecture-exercise">
-          <div class="lecture-exercise-label">Exercice 2 — Développement</div>
-          <p class="lecture-text">Écrire sous forme algébrique : $z = (2 + i)^2 + 3i(1 - i)$</p>
+          <div class="lecture-exercise-label">✏️ Exercice d'application 10 — Identification « type division »</div>
+          <p class="lecture-text"><strong>Énoncé :</strong> résoudre dans ℂ : $(1 + i)z = 4 + 2i$ <em>(indice : même méthode — pose $z = x + iy$)</em></p>
           <details>
-            <summary>Voir la solution</summary>
+            <summary>Voir la solution détaillée</summary>
             <div class="lecture-quiz-answer">
-              <p>$(2 + i)^2 = 4 + 4i + i^2 = 3 + 4i$</p>
-              <p>$3i(1 - i) = 3i - 3i^2 = 3 + 3i$</p>
-              <p>$z = (3 + 3) + i(4 + 3) = 6 + 7i$</p>
+              <p><strong>Étape 1 — Poser $z = x + iy$ :</strong> $(1 + i)(x + iy) = 4 + 2i$</p>
+              <p><strong>Étape 2 — Développer :</strong> $(x - y) + i(x + y) = 4 + 2i$</p>
+              <p><strong>Étape 3 — Identifier :</strong> $x - y = 4$ et $x + y = 2$</p>
+              <p><strong>Étape 4 — Résoudre :</strong> addition : $2x = 6$ → $x = 3$ ; puis $y = 2 - 3 = -1$</p>
+              <p><strong>Vérification :</strong> $(1 + i)(3 - i) = 3 - i + 3i - i^2 = 4 + 2i$ ✔</p>
+              <p style="color:#4ade80;margin-top:10px;"><strong>✅ Solution :</strong> $z = 3 - i$</p>
+              <p>Remarque : cette équation ressemble à une division $z = \dfrac{4 + 2i}{1 + i}$ — l'identification permet de la résoudre sans connaître de formule d'inverse (celle-ci viendra en Partie 3) !</p>
             </div>
           </details>
         </div>
 
         <div class="lecture-exercise">
-          <div class="lecture-exercise-label">Exercice 3 — Puissances de i</div>
-          <p class="lecture-text">Calculer $i^{123}$ et $S = i + i^2 + i^3 + \dots + i^{1000}$</p>
+          <div class="lecture-exercise-label">✏️ Exercice d'application 11 — Décomposition réelle</div>
+          <p class="lecture-text"><strong>Énoncé :</strong> déterminer les réels $a$ et $b$ tels que $a(1 + i) + b(1 - i) = 4 + 2i$</p>
           <details>
-            <summary>Voir la solution</summary>
+            <summary>Voir la solution détaillée</summary>
             <div class="lecture-quiz-answer">
-              <p>$123 = 4 \times 30 + 3$, donc $i^{123} = i^3 = -i$.</p>
-              <p>$S$ contient $1000 = 4 \times 250$ termes : exactement 250 paquets de 4 puissances consécutives, chacun valant 0.</p>
-              <p>Donc $S = 0$.</p>
+              <p><strong>Étape 1 — Développer :</strong> $a + ai + b - bi = (a + b) + i(a - b)$</p>
+              <p><strong>Étape 2 — Identifier :</strong> $a + b = 4$ et $a - b = 2$</p>
+              <p><strong>Étape 3 — Résoudre :</strong> en additionnant : $2a = 6$ → $a = 3$ ; en reportant : $b = 4 - 3 = 1$</p>
+              <p><strong>Vérification :</strong> $3(1 + i) + 1(1 - i) = 3 + 3i + 1 - i = 4 + 2i$ ✔</p>
+              <p style="color:#4ade80;margin-top:10px;"><strong>✅ Solution :</strong> $a = 3$ et $b = 1$</p>
             </div>
           </details>
         </div>
 
         <div class="lecture-exercise">
-          <div class="lecture-exercise-label">Exercice 4 — Identification</div>
-          <p class="lecture-text">Déterminer les réels $x$ et $y$ tels que $(2 + i)(x + iy) = 3 + i$</p>
+          <div class="lecture-exercise-label">✏️ Exercice d'application 12 — Produit remarquable et géométrie ★★</div>
+          <p class="lecture-text"><strong>Énoncé :</strong> Soit $A$ l'image de $3 + 4i$ et $B$ celle de $3 - 4i$.<br>1) Calculer $(3 + 4i)(3 - 4i)$.<br>2) Où se trouvent $A$ et $B$ ? Que peut-on dire de leurs positions ?<br>3) Donner l'affixe du symétrique de $A$ par rapport à $O$.</p>
           <details>
-            <summary>Voir la solution</summary>
+            <summary>Voir la solution détaillée</summary>
             <div class="lecture-quiz-answer">
-              <p><strong>Développement :</strong> $(2x - y) + i(2y + x) = 3 + i$</p>
-              <p><strong>Identification :</strong> $2x - y = 3$ et $x + 2y = 1$</p>
-              <p>De la première : $y = 2x - 3$. En remplaçant : $x + 4x - 6 = 1$, donc $5x = 7$, donc $x = \dfrac{7}{5}$ et $y = -\dfrac{1}{5}$.</p>
-              <p><strong>Vérification :</strong> $(2 + i)\left(\dfrac{7}{5} - \dfrac{i}{5}\right) = \dfrac{14}{5} - \dfrac{2i}{5} + \dfrac{7i}{5} + \dfrac{1}{5} = 3 + i$ ✔</p>
+              <p><strong>1)</strong> Schéma $(a + ib)(a - ib)$ : $(3 + 4i)(3 - 4i) = 3^2 + 4^2 = 9 + 16 = 25$ — un réel ✔</p>
+              <p><strong>2)</strong> $A(3 ; 4)$ : premier quadrant · $B(3 ; -4)$ : quatrième quadrant. Même abscisse, ordonnées opposées → $A$ et $B$ sont <strong>symétriques par rapport à l'axe des réels</strong>. C'est exactement la situation du <em>conjugué</em>, héros de la Partie 3…</p>
+              <p><strong>3)</strong> Symétrique de $A$ par rapport à $O$ : affixe $-(3 + 4i) = -3 - 4i$ → point $(-3 ; -4)$, troisième quadrant.</p>
             </div>
           </details>
         </div>
+      </div>
 
-        <div class="lecture-exercise">
-          <div class="lecture-exercise-label">Exercice 5 — Équation du second degré simple</div>
-          <p class="lecture-text">Résoudre dans $\mathbb{C}$ : $z^2 = -9$</p>
-          <details>
-            <summary>Voir la solution</summary>
-            <div class="lecture-quiz-answer">
-              <p>$-9 = 9i^2$, donc on cherche $z$ tel que $z^2 = (3i)^2$.</p>
-              <p><strong>Solutions :</strong> $z = 3i$ ou $z = -3i$ (deux solutions opposées).</p>
-              <p><strong>Vérification :</strong> $(3i)^2 = 9i^2 = -9$ ✔</p>
-            </div>
-          </details>
+      <div class="lecture-section-sub">
+        <h3 class="lecture-subtitle">📋 Fiches méthodes — les 3 gestes à automatiser</h3>
+
+        <div class="lecture-callout lecture-callout-gold">
+          <div class="lecture-callout-body">
+            <div class="lecture-callout-title">Méthode 1 — Mettre une expression sous forme algébrique</div>
+            <p><strong>1.</strong> Développer tous les produits, remplacer chaque $i^2$ par $-1$<br>
+            <strong>2.</strong> Regrouper : réels ensemble, termes en $i$ ensemble<br>
+            <strong>3.</strong> Lire $\operatorname{Re}(z)$ et $\operatorname{Im}(z)$<br>
+            <em>Exemple :</em> $z = (2 + i) + 3i(2 - i) = 2 + i + 6i - 3i^2 = 5 + 7i$</p>
+          </div>
         </div>
 
-        <div class="lecture-exercise">
-          <div class="lecture-exercise-label">Exercice 6 — Inverse (défi ★)</div>
-          <p class="lecture-text">Déterminer par identification l'inverse de $z = 3 + 4i$, puis en déduire la solution de $(3 + 4i)z = 2 + i$.</p>
-          <details>
-            <summary>Voir la solution</summary>
-            <div class="lecture-quiz-answer">
-              <p><strong>Inverse :</strong> on cherche $(x + iy)$ tel que $(3 + 4i)(x + iy) = 1$.</p>
-              <p>$(3x - 4y) + i(4x + 3y) = 1$, donc $3x - 4y = 1$ et $4x + 3y = 0$.</p>
-              <p>De la seconde : $y = -\dfrac{4x}{3}$. En remplaçant : $3x + \dfrac{16x}{3} = 1$, donc $\dfrac{25x}{3} = 1$, donc $x = \dfrac{3}{25}$ et $y = -\dfrac{4}{25}$.</p>
-              <p>$\dfrac{1}{3 + 4i} = \dfrac{3 - 4i}{25}$</p>
-              <p><strong>Équation :</strong> $z = (2 + i) \times \dfrac{3 - 4i}{25} = \dfrac{6 + 4 + i(3 - 8)}{25} = \dfrac{10 - 5i}{25} = \dfrac{2 - i}{5}$</p>
-            </div>
-          </details>
+        <div class="lecture-callout lecture-callout-gold">
+          <div class="lecture-callout-body">
+            <div class="lecture-callout-title">Méthode 2 — Résoudre $(a + ib)z = c$ par identification</div>
+            <p><strong>1.</strong> Poser $z = x + iy$ avec $x$, $y$ réels<br>
+            <strong>2.</strong> Développer le produit et regrouper<br>
+            <strong>3.</strong> Identifier puis résoudre le système 2×2<br>
+            <strong>4.</strong> Conclure $z = x + iy$ et vérifier<br>
+            <em>Exemple :</em> $(1 + i)z = 4 + 2i \to z = 3 - i$ (exo 10)</p>
+          </div>
+        </div>
+
+        <div class="lecture-callout lecture-callout-gold">
+          <div class="lecture-callout-body">
+            <div class="lecture-callout-title">Méthode 3 — Calculer une puissance de $i$ (ou de $bi$)</div>
+            <p><strong>1.</strong> Division euclidienne de l'exposant par 4 : $n = 4q + r$<br>
+            <strong>2.</strong> Lire le résultat sur la roue : $i^n = i^r$<br>
+            <strong>3.</strong> Pour $(bi)^n$ : séparer $b^n$ et $i^n$<br>
+            <em>Exemple :</em> $i^{2025} = i^1 = i$ ; $(2i)^5 = 2^5 \times i^5 = 32i$</p>
+          </div>
         </div>
       </div>
     </div>
@@ -1154,24 +1101,23 @@ $$\begin{aligned} i^{-1} &= -i & i^{-2} &= -1 \\ i^{-3} &= i & i^{-4} &= 1 \end{
   <div class="lecture-recap">
     <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
     <ul class="lecture-recap-list">
-      <li>Un nombre complexe s'écrit $z = a + ib$ avec $a, b \in \mathbb{R}$ et $i^2 = -1$</li>
-      <li>$\operatorname{Re}(z) = a$ (partie réelle) et $\operatorname{Im}(z) = b$ (partie imaginaire, toujours un réel !)</li>
-      <li>Deux complexes sont égaux ⟺ même partie réelle et même partie imaginaire</li>
-      <li>Les puissances de $i$ sont périodiques de période 4 : $i^1 = i$, $i^2 = -1$, $i^3 = -i$, $i^4 = 1$ (et $i + i^2 + i^3 + i^4 = 0$)</li>
-      <li>Le plan complexe associe à chaque $z$ un point $M(a, b)$ et un vecteur $OM$</li>
-      <li>L'image de $-z$ est le symétrique de $M$ par rapport à l'origine $O$</li>
-      <li>Dans $\mathbb{C}$, les inégalités n'ont pas de sens</li>
-      <li>Addition, soustraction, multiplication : mêmes règles que dans $\mathbb{R}$, avec $i^2 = -1$</li>
-      <li>$(a + ib)(a - ib) = a^2 + b^2$ (produit donnant un réel — clé des inverses)</li>
-      <li>La méthode d'identification transforme une égalité complexe en un système réel</li>
-      <li>$z^2 = -a^2$ ($a > 0$) a deux solutions opposées : $z = \pm ai$</li>
-      <li>On n'écrit <strong>jamais</strong> $\sqrt{-1}$ : on dit « $i$ est le nombre tel que $i^2 = -1$ »</li>
+      <li>Aucun réel n'a un carré négatif : on invente $i$ tel que $i^2 = -1$ — et désormais toute équation polynomiale a des solutions</li>
+      <li>Chaîne des ensembles : $\mathbb{N} \subset \mathbb{Z} \subset \mathbb{Q} \subset \mathbb{R} \subset \mathbb{C}$ — chaque élargissement résout un nouveau type d'équation</li>
+      <li>Dans ℂ, on ne compare pas : pas de $z_1 < z_2$</li>
+      <li>Forme algébrique <strong>unique</strong> : $z = a + ib$, avec $\operatorname{Re}(z) = a$ et $\operatorname{Im}(z) = b$ — deux <strong>réels</strong> (piège : $\operatorname{Im}(3 + 5i) = 5$, pas $5i$ !)</li>
+      <li>$z$ réel pur ⟺ $\operatorname{Im}(z) = 0$ · $z$ imaginaire pur ⟺ $\operatorname{Re}(z) = 0$ · $0$ est les deux à la fois</li>
+      <li>Identité : $z = \operatorname{Re}(z) + i\,\operatorname{Im}(z)$</li>
+      <li>Égalité : $a + ib = a' + ib' \iff a = a'$ ET $b = b'$ — une équation complexe = un système de deux équations réelles</li>
+      <li>Puissances de $i$ : cycle de période 4 — $i, -1, -i, 1$ — et $i^n = i^{\text{reste de } n \text{ par } 4}$ ; somme de 4 puissances consécutives = 0</li>
+      <li>On écrit <strong>jamais</strong> $\sqrt{-1}$ ni $\sqrt{-k}$ : le $i$ se place devant la racine</li>
+      <li>Plan complexe : $z = a + ib \longleftrightarrow M(a ; b)$ — point image, affixe, vecteur $OM$ ; image de $-z$ = symétrique par rapport à $O$</li>
+      <li>Additionner = compléter le parallélogramme · multiplier par $i$ = quart de tour</li>
+      <li>Schéma précieux : $(a + ib)(a - ib) = a^2 + b^2$ — toujours un réel positif (clé de la Partie 3)</li>
+      <li>L'identification (poser $z = x + iy$, développer, égaler, vérifier) est le réflexe n°1 du chapitre</li>
     </ul>
   </div>
 
   <!-- ===== FIN ===== -->
-  <div class="lecture-end">
-    <span class="lecture-end-icon">🎯</span>
     <div class="lecture-end-text">Partie 1 terminée !</div>
     <div class="lecture-end-sub">Passe à la partie suivante : Module, Argument &amp; Formes</div>
     <div class="lecture-end-divider"></div>

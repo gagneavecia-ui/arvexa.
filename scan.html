@@ -55,11 +55,12 @@
       display: flex; align-items: center; gap: 8px;
     }
     .btn:active { transform: scale(0.95); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
     .btn-primary {
       background: linear-gradient(135deg, #E0B84A, #B8860B);
       color: #0A0A0A;
     }
-    .btn-primary:hover { box-shadow: 0 6px 24px rgba(184,134,11,0.25); transform: translateY(-2px); }
+    .btn-primary:hover:not(:disabled) { box-shadow: 0 6px 24px rgba(184,134,11,0.25); transform: translateY(-2px); }
     .btn-secondary {
       background: rgba(255,255,255,0.04);
       color: #F5F0E8;
@@ -76,6 +77,7 @@
       transition: 0.3s;
     }
     .dropzone:hover { border-color: rgba(184,134,11,0.2); background: rgba(184,134,11,0.02); }
+    .dropzone.dragover { border-color: rgba(184,134,11,0.4); background: rgba(184,134,11,0.05); }
     .dropzone p { font-size: 13px; color: #5A5A4A; margin: 0; }
     .dropzone .hint { font-size: 11px; color: #5A5A4A; display: block; margin-top: 4px; }
 
@@ -89,6 +91,7 @@
     }
 
     .loading { display: none; flex-direction: column; align-items: center; gap: 12px; padding: 20px 0; }
+    .loading.show { display: flex; }
     .loading .spinner {
       width: 40px; height: 40px; border: 4px solid rgba(184,134,11,0.1);
       border-top-color: #E0B84A; border-radius: 50%;
@@ -105,6 +108,7 @@
     .loading .step.done { color: #2D7D5A; }
 
     .analysis { display: none; flex-direction: column; gap: 12px; }
+    .analysis.show { display: flex; }
     .analysis .badges { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
     .analysis .badge {
       padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 600;
@@ -124,6 +128,7 @@
     .analysis .actions .act .emoji { display: block; font-size: 22px; }
 
     .response { display: none; flex-direction: column; gap: 10px; }
+    .response.show { display: flex; }
     .response .resp-header {
       display: flex; justify-content: space-between; align-items: center;
       flex-wrap: wrap; gap: 8px;
@@ -153,8 +158,11 @@
       padding: 10px 20px; border-radius: 12px; background: rgba(20,20,20,0.95);
       border: 1px solid rgba(184,134,11,0.15); color: #F5F0E8;
       font-size: 13px; z-index: 300; opacity: 0; transition: all 0.4s ease;
+      max-width: 90%;
     }
     .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    .toast.error { border-color: rgba(184,92,58,0.4); color: #E07A5F; }
+    .toast.success { border-color: rgba(45,125,90,0.4); color: #3AB67E; }
 
     @media (max-width: 480px) {
       .card { padding: 18px 14px; }
@@ -256,13 +264,29 @@
 <!-- TOAST -->
 <div class="toast" id="toast"><span id="toastMsg"></span></div>
 
-<!-- ============================================================ -->
-<!-- SCRIPT - MODÈLE UNIQUE GROQ                                 -->
-<!-- ============================================================ -->
-<script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js';
-import { getAuth, getIdToken } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js';
+<!-- ═══════════════════════════════════════════════════════════════
+     SCRIPT — Version CORRIGÉE
+     Toute la logique passe par /api/scan (backend sécurisé)
+     ═══════════════════════════════════════════════════════════════ -->
+<script type="importmap">
+{
+  "imports": {
+    "firebase/app": "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
+    "firebase/auth": "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js"
+  }
+}
+</script>
 
+<script type="module">
+// ═══════════════════════════════════════════════════════════════
+// 1. IMPORTS
+// ═══════════════════════════════════════════════════════════════
+import { initializeApp } from "firebase/app";
+import { getAuth, getIdToken, onAuthStateChanged } from "firebase/auth";
+
+// ═══════════════════════════════════════════════════════════════
+// 2. FIREBASE CONFIG
+// ═══════════════════════════════════════════════════════════════
 const firebaseApp = initializeApp({
   apiKey: 'AIzaSyDHscOXw3rLuhV6z1Cny-bdYCumqpnG7QE',
   authDomain: 'arvexa-fbf10.firebaseapp.com',
@@ -271,32 +295,14 @@ const firebaseApp = initializeApp({
   messagingSenderId: '920108330053',
   appId: '1:920108330053:web:f532d71cbc2c824bc7472c'
 });
-const scanAuth = getAuth(firebaseApp);
-/* ================================================================
-   ARV-SCAN
-   Vision : Qwen 3.6 27B
-   Texte  : OpenAI GPT-OSS 120B
-   ================================================================ */
 
-/* ================================================================
-   CONFIGURATION GROQ
-   ================================================================ */
+const auth = getAuth(firebaseApp);
 
-const GROQ_API_KEY = '';
-
+// ═══════════════════════════════════════════════════════════════
+// 3. CONFIGURATION
+// ═══════════════════════════════════════════════════════════════
 const SCAN_ENDPOINT = '/api/scan';
 
-const GROQ_ENDPOINT = SCAN_ENDPOINT;
-
-const GROQ_MODEL_VISION =
-  'qwen/qwen3.6-27b';
-
-const GROQ_MODEL_TEXT =
-  'openai/gpt-oss-120b';
-
-/*
-  Limites volontairement basses pour éviter ton problème OTPM.
-*/
 const TOKEN_LIMITS = {
   analyse: 700,
   comprendre: 700,
@@ -307,818 +313,568 @@ const TOKEN_LIMITS = {
   traduire: 600
 };
 
+// ═══════════════════════════════════════════════════════════════
+// 4. DOM
+// ═══════════════════════════════════════════════════════════════
+const fileInput = document.getElementById('fileInput');
+const cameraInput = document.getElementById('cameraInput');
+const cameraBtn = document.getElementById('cameraBtn');
+const galleryBtn = document.getElementById('galleryBtn');
+const dropzone = document.getElementById('dropzone');
+const preview = document.getElementById('preview');
+const previewImage = document.getElementById('previewImage');
+const removeBtn = document.getElementById('removeBtn');
+const analyzeBtn = document.getElementById('analyzeBtn');
+const importCard = document.getElementById('importCard');
+const loadingCard = document.getElementById('loadingCard');
+const analysisCard = document.getElementById('analysisCard');
+const responseCard = document.getElementById('responseCard');
+const respContent = document.getElementById('respContent');
+const respTitle = document.getElementById('respTitle');
+const subjectBadge = document.getElementById('subjectBadge');
+const typeBadge = document.getElementById('typeBadge');
+const confianceBadge = document.getElementById('confianceBadge');
+const loadingText = document.getElementById('loadingText');
+const copyBtn = document.getElementById('copyBtn');
+const newBtn = document.getElementById('newBtn');
+const toast = document.getElementById('toast');
+const toastMsg = document.getElementById('toastMsg');
 
-/* ================================================================
-   DOM
-   ================================================================ */
-
-const fileInput =
-  document.getElementById('fileInput');
-
-const cameraInput =
-  document.getElementById('cameraInput');
-
-const cameraBtn =
-  document.getElementById('cameraBtn');
-
-const galleryBtn =
-  document.getElementById('galleryBtn');
-
-const dropzone =
-  document.getElementById('dropzone');
-
-const preview =
-  document.getElementById('preview');
-
-const previewImage =
-  document.getElementById('previewImage');
-
-const removeBtn =
-  document.getElementById('removeBtn');
-
-const analyzeBtn =
-  document.getElementById('analyzeBtn');
-
-const importCard =
-  document.getElementById('importCard');
-
-const loadingCard =
-  document.getElementById('loadingCard');
-
-const analysisCard =
-  document.getElementById('analysisCard');
-
-const responseCard =
-  document.getElementById('responseCard');
-
-const respContent =
-  document.getElementById('respContent');
-
-const respTitle =
-  document.getElementById('respTitle');
-
-const subjectBadge =
-  document.getElementById('subjectBadge');
-
-const typeBadge =
-  document.getElementById('typeBadge');
-
-const confianceBadge =
-  document.getElementById('confianceBadge');
-
-const loadingText =
-  document.getElementById('loadingText');
-
-const copyBtn =
-  document.getElementById('copyBtn');
-
-const newBtn =
-  document.getElementById('newBtn');
-
-const toast =
-  document.getElementById('toast');
-
-const toastMsg =
-  document.getElementById('toastMsg');
-
-
-/* ================================================================
-   VARIABLES
-   ================================================================ */
-
+// ═══════════════════════════════════════════════════════════════
+// 5. ÉTAT
+// ═══════════════════════════════════════════════════════════════
 let currentImage = null;
 let currentAnalysis = null;
 let isProcessing = false;
+let currentUser = null;
 
-
-/* ================================================================
-   TOAST
-   ================================================================ */
-
+// ═══════════════════════════════════════════════════════════════
+// 6. HELPERS
+// ═══════════════════════════════════════════════════════════════
 function showToast(message, type = 'success') {
-
   toastMsg.textContent = message;
-
-  toast.className = 'toast show';
-
+  toast.className = 'toast show ' + (type !== 'success' ? type : '');
   clearTimeout(toast._timer);
-
   toast._timer = setTimeout(() => {
     toast.classList.remove('show');
   }, 3500);
 }
 
-
-/* ================================================================
-   ATTENDRE
-   ================================================================ */
-
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-/* ================================================================
-   GROQ - VISION
-   ================================================================ */
-async function callGroqVision(messages) {
-  try {
-    if (!GROQ_API_KEY) {
-      throw new Error('Service IA non configuré côté serveur.');
-    }
-    console.log(`🔄 Vision → ${GROQ_MODEL_VISION}`);
-
-    const response = await fetch(GROQ_ENDPOINT, {
-      method: 'POST',
-
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${GROQ_API_KEY}`
-      },
-
-      body: JSON.stringify({
-        model: GROQ_MODEL_VISION,
-
-        messages: messages,
-
-        temperature: 0.2,
-
-        max_completion_tokens: 700,
-
-        reasoning_effort: 'none',
-
-        response_format: {
-          type: 'json_object'
-        },
-
-        stream: false
-      })
-    });
-
-    const data = await response.json();
-
-    /* ============================================================
-       DEBUG COMPLET
-       ============================================================ */
-
-    console.log('📦 Réponse Groq complète :', data);
-
-    if (!response.ok) {
-      console.error('❌ Réponse erreur Groq :', data);
-
-      const message =
-        data?.error?.message ||
-        `HTTP ${response.status}`;
-
-      if (response.status === 429) {
-        throw new Error(
-          'Limite Groq atteinte. Attends quelques secondes puis réessaie.'
-        );
-      }
-
-      if (response.status === 404) {
-        throw new Error(
-          `Modèle vision introuvable : ${GROQ_MODEL_VISION}`
-        );
-      }
-
-      throw new Error(message);
-    }
-
-    const content =
-      data?.choices?.[0]?.message?.content;
-
-    console.log('🧾 Contenu brut reçu :', content);
-
-    if (!content) {
-      throw new Error(
-        'Groq a renvoyé une réponse vide.'
-      );
-    }
-
-    return content;
-
-  } catch (error) {
-    console.error(
-      '❌ Erreur Groq Vision :',
-      error
-    );
-
-    throw error;
-  }
+function escapeHtml(value) {
+  if (value === null || value === undefined) return '';
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
 
-/* ================================================================
-   GROQ - TEXTE
-   ================================================================ */
-async function callGroqText(messages, maxTokens = 700) {
-  try {
-    console.log(`🔄 Texte → ${GROQ_MODEL_TEXT}`);
-
-    const response = await fetch(GROQ_ENDPOINT, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${GROQ_API_KEY}`
-      },
-      body: JSON.stringify({
-        model: GROQ_MODEL_TEXT,
-        messages,
-        temperature: 0.2,
-        max_completion_tokens: maxTokens,
-        stream: false,
-        response_format: {
-          type: 'json_object'
-        }
-      })
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      const message =
-        data?.error?.message ||
-        `HTTP ${response.status}`;
-
-      if (response.status === 429) {
-        throw new Error(
-          'Limite Groq atteinte. Attends quelques secondes puis réessaie.'
-        );
-      }
-
-      if (response.status === 404) {
-        throw new Error(
-          `Modèle texte introuvable : ${GROQ_MODEL_TEXT}`
-        );
-      }
-
-      throw new Error(message);
-    }
-
-    const content =
-      data?.choices?.[0]?.message?.content;
-
-    if (!content) {
-      throw new Error(
-        'Le modèle texte a renvoyé une réponse vide.'
-      );
-    }
-
-    console.log('✅ Réponse texte reçue');
-
-    return content;
-
-  } catch (error) {
-    console.error('❌ Erreur Groq Texte:', error);
-    throw error;
-  }
-}
-
-/* ================================================================
-   APPEL GROQ - TEXTE
-   ================================================================ */
-
-async function callGroqText(
-  messages,
-  maxTokens = 700
-) {
-
-  try {
-
-    if (!GROQ_API_KEY) {
-      throw new Error('Service IA non configuré côté serveur.');
-    }
-
-    console.log(
-      `🔄 Texte → ${GROQ_MODEL_TEXT}`
-    );
-
-
-    const response = await fetch(
-      GROQ_ENDPOINT,
-      {
-        method: 'POST',
-
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${GROQ_API_KEY}`
-        },
-
-        body: JSON.stringify({
-
-          model: GROQ_MODEL_TEXT,
-
-          messages: messages,
-
-          temperature: 0.2,
-
-          max_completion_tokens:
-            maxTokens,
-
-          response_format: {
-            type: 'json_object'
-          }
-
-        })
-      }
-    );
-
-
-    /* ============================================================
-       ERREURS
-       ============================================================ */
-
-    if (!response.ok) {
-
-      let errorData = null;
-
-      try {
-        errorData = await response.json();
-      } catch (_) {
-        errorData = null;
-      }
-
-      const message =
-        errorData?.error?.message ||
-        `HTTP ${response.status}`;
-
-
-      if (response.status === 429) {
-
-        throw new Error(
-          'Limite Groq atteinte. Attends quelques secondes avant de réessayer.'
-        );
-      }
-
-
-      if (response.status === 404) {
-
-        throw new Error(
-          `Modèle texte introuvable : ${GROQ_MODEL_TEXT}`
-        );
-      }
-
-
-      throw new Error(
-        message
-      );
-    }
-
-
-    const data =
-      await response.json();
-
-
-    const content =
-      data?.choices?.[0]?.message?.content;
-
-
-    if (!content) {
-
-      throw new Error(
-        'Groq a renvoyé une réponse vide.'
-      );
-    }
-
-
-    console.log(
-      '✅ Réponse texte reçue'
-    );
-
-
-    return content;
-
-
-  } catch (error) {
-
-    console.error(
-      '❌ Erreur Groq Texte:',
-      error
-    );
-
-    throw error;
-  }
-}
-
-
-/* ================================================================
-   MOTEUR BACKEND — aucune clé IA dans le navigateur
-   ================================================================ */
+// ═══════════════════════════════════════════════════════════════
+// 7. APPEL BACKEND SÉCURISÉ
+// ═══════════════════════════════════════════════════════════════
 async function callScanBackend(payload) {
-  const user = scanAuth.currentUser;
-  if (!user) throw new Error('Connecte-toi pour utiliser ARV-SCAN.');
+  const user = auth.currentUser;
+  if (!user) {
+    throw new Error('Connecte-toi pour utiliser ARV-SCAN.');
+  }
+
+  const token = await getIdToken(user);
+
   const response = await fetch(SCAN_ENDPOINT, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${await getIdToken(user)}` },
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
     body: JSON.stringify(payload)
   });
 
   const data = await response.json().catch(() => null);
+
   if (!response.ok) {
     const error = new Error(data?.error || 'Service ARV-SCAN indisponible.');
     error.status = response.status;
     throw error;
   }
-  if (!data?.success || !data.result) throw new Error('Réponse ARV-SCAN invalide.');
+
+  if (!data?.success || !data.result) {
+    throw new Error('Réponse ARV-SCAN invalide.');
+  }
+
   return data.result;
 }
 
-async function callGroqVision(messages) {
-  const userMessage = messages?.find((message) => message.role === 'user');
-  return JSON.stringify(await callScanBackend({
-    action: 'analyze',
-    image: currentImage,
-    prompt: userMessage?.content?.find?.((part) => part.type === 'text')?.text || buildAnalysisPrompt()
-  }));
-}
-
-async function callGroqText(messages, maxTokens = 700) {
-  const userMessage = messages?.find((message) => message.role === 'user');
-  return JSON.stringify(await callScanBackend({
-    action: 'action',
-    analysis: currentAnalysis,
-    prompt: userMessage?.content || '',
-    maxTokens
-  }));
-}
-
-/* ================================================================
-   GESTION IMAGE
-   ================================================================ */
-
+// ═══════════════════════════════════════════════════════════════
+// 8. GESTION IMAGE
+// ═══════════════════════════════════════════════════════════════
 function handleFile(file) {
-
   if (!file) return;
 
-
-  /* Taille */
-
-  if (
-    file.size >
-    5 * 1024 * 1024
-  ) {
-
-    showToast(
-      '❌ Image trop lourde (max 5MB)',
-      'error'
-    );
-
+  // Taille max 5MB
+  if (file.size > 5 * 1024 * 1024) {
+    showToast('❌ Image trop lourde (max 5MB)', 'error');
     return;
   }
 
-
-  /* Formats */
-
-  const validTypes = [
-    'image/jpeg',
-    'image/png',
-    'image/webp',
-    'image/heic',
-    'image/heif'
-  ];
-
-
-  if (
-    !validTypes.includes(file.type)
-  ) {
-
-    showToast(
-      '❌ Format non supporté',
-      'error'
-    );
-
+  // Formats acceptés
+  const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif'];
+  if (!validTypes.includes(file.type)) {
+    showToast('❌ Format non supporté', 'error');
     return;
   }
 
-
-  const reader =
-    new FileReader();
-
+  const reader = new FileReader();
 
   reader.onload = event => {
-
-    const dataUrl =
-      event.target.result;
-
-
-    compressImage(
-      dataUrl,
-      1200
-    )
+    const dataUrl = event.target.result;
+    compressImage(dataUrl, 1200)
       .then(compressed => {
-
-        currentImage =
-          compressed;
-
-        previewImage.src =
-          compressed;
-
-        preview.style.display =
-          'block';
-
-        analyzeBtn.disabled =
-          false;
-
-        showToast(
-          '✅ Image chargée !'
-        );
-
+        currentImage = compressed;
+        previewImage.src = compressed;
+        preview.style.display = 'block';
+        analyzeBtn.disabled = false;
+        showToast('✅ Image chargée !');
       })
       .catch(error => {
-
         console.error(error);
-
-        showToast(
-          '❌ Impossible de traiter cette image.',
-          'error'
-        );
-
+        showToast('❌ Impossible de traiter cette image.', 'error');
       });
-
   };
-
 
   reader.onerror = () => {
-
-    showToast(
-      '❌ Erreur lors de la lecture de l’image.',
-      'error'
-    );
-
+    showToast('❌ Erreur lors de la lecture de l\'image.', 'error');
   };
-
 
   reader.readAsDataURL(file);
 }
 
+function compressImage(dataUrl, maxSize) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
 
-/* ================================================================
-   COMPRESSION
-   ================================================================ */
+    img.onload = () => {
+      try {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
 
-function compressImage(
-  dataUrl,
-  maxSize
-) {
-
-  return new Promise(
-    (resolve, reject) => {
-
-      const img =
-        new Image();
-
-
-      img.onload = () => {
-
-        try {
-
-          const canvas =
-            document.createElement(
-              'canvas'
-            );
-
-
-          let width =
-            img.width;
-
-          let height =
-            img.height;
-
-
-          /* Redimensionnement */
-
-          if (
-            width > maxSize ||
-            height > maxSize
-          ) {
-
-            const ratio =
-              Math.min(
-                maxSize / width,
-                maxSize / height
-              );
-
-            width =
-              Math.round(
-                width * ratio
-              );
-
-            height =
-              Math.round(
-                height * ratio
-              );
-          }
-
-
-          canvas.width =
-            width;
-
-          canvas.height =
-            height;
-
-
-          const ctx =
-            canvas.getContext(
-              '2d'
-            );
-
-
-          ctx.drawImage(
-            img,
-            0,
-            0,
-            width,
-            height
-          );
-
-
-          const compressed =
-            canvas.toDataURL(
-              'image/jpeg',
-              0.72
-            );
-
-
-          resolve(
-            compressed
-          );
-
-        } catch (error) {
-
-          reject(error);
-
+        if (width > maxSize || height > maxSize) {
+          const ratio = Math.min(maxSize / width, maxSize / height);
+          width = Math.round(width * ratio);
+          height = Math.round(height * ratio);
         }
-      };
 
+        canvas.width = width;
+        canvas.height = height;
 
-      img.onerror = () => {
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
 
-        reject(
-          new Error(
-            'Image illisible.'
-          )
-        );
+        const compressed = canvas.toDataURL('image/jpeg', 0.72);
+        resolve(compressed);
+      } catch (error) {
+        reject(error);
+      }
+    };
 
-      };
-
-
-      img.src =
-        dataUrl;
-    }
-  );
+    img.onerror = () => reject(new Error('Image illisible.'));
+    img.src = dataUrl;
+  });
 }
 
-
-/* ================================================================
-   RESET UI
-   ================================================================ */
-
+// ═══════════════════════════════════════════════════════════════
+// 9. RESET UI
+// ═══════════════════════════════════════════════════════════════
 function resetUI() {
+  currentImage = null;
+  currentAnalysis = null;
+  preview.style.display = 'none';
+  previewImage.src = '';
+  analyzeBtn.disabled = true;
+  loadingCard.style.display = 'none';
+  loadingCard.classList.remove('show');
+  analysisCard.classList.remove('show');
+  analysisCard.style.display = 'none';
+  responseCard.classList.remove('show');
+  responseCard.style.display = 'none';
 
-  currentImage =
-    null;
+  document.querySelectorAll('.loading .step').forEach(el => {
+    el.classList.remove('active', 'done');
+  });
 
-  currentAnalysis =
-    null;
-
-  preview.style.display =
-    'none';
-
-  previewImage.src =
-    '';
-
-  analyzeBtn.disabled =
-    true;
-
-  loadingCard.style.display =
-    'none';
-
-  analysisCard.style.display =
-    'none';
-
-  responseCard.style.display =
-    'none';
-
-
-  document
-    .querySelectorAll(
-      '.loading .step'
-    )
-    .forEach(el => {
-
-      el.classList.remove(
-        'active',
-        'done'
-      );
-
-    });
-
-
-  loadingText.textContent =
-    'Analyse en cours...';
+  loadingText.textContent = 'Analyse en cours...';
 }
 
-
-/* ================================================================
-   LOADING
-   ================================================================ */
-
+// ═══════════════════════════════════════════════════════════════
+// 10. LOADING
+// ═══════════════════════════════════════════════════════════════
 function showLoading() {
+  loadingCard.style.display = 'flex';
+  loadingCard.classList.add('show');
+  analysisCard.classList.remove('show');
+  analysisCard.style.display = 'none';
+  responseCard.classList.remove('show');
+  responseCard.style.display = 'none';
 
-  loadingCard.style.display =
-    'flex';
+  document.querySelectorAll('.loading .step').forEach(el => {
+    el.classList.remove('active', 'done');
+  });
 
-  analysisCard.style.display =
-    'none';
-
-  responseCard.style.display =
-    'none';
-
-
-  document
-    .querySelectorAll(
-      '.loading .step'
-    )
-    .forEach(el => {
-
-      el.classList.remove(
-        'active',
-        'done'
-      );
-
-    });
-
-
-  document
-    .getElementById('s1')
-    .classList.add('active');
-
-
-  loadingText.textContent =
-    'Lecture de l’image...';
+  document.getElementById('s1').classList.add('active');
+  loadingText.textContent = 'Lecture de l\'image...';
 }
 
-
-/* ================================================================
-   UPDATE ÉTAPE
-   ================================================================ */
-
-function updateStep(
-  step,
-  text
-) {
-
-  const steps = [
-    's1',
-    's2',
-    's3',
-    's4'
-  ];
-
-
-  const current =
-    document.getElementById(
-      steps[step]
-    );
-
+function updateStep(step, text) {
+  const steps = ['s1', 's2', 's3', 's4'];
+  const current = document.getElementById(steps[step]);
 
   if (current) {
-
-    current.classList.remove(
-      'active'
-    );
-
-    current.classList.add(
-      'done'
-    );
+    current.classList.remove('active');
+    current.classList.add('done');
   }
-
 
   if (step < steps.length - 1) {
-
-    const next =
-      document.getElementById(
-        steps[step + 1]
-      );
-
-
-    if (next) {
-
-      next.classList.add(
-        'active'
-      );
-    }
+    const next = document.getElementById(steps[step + 1]);
+    if (next) next.classList.add('active');
   }
 
-
-  loadingText.textContent =
-    text;
+  loadingText.textContent = text;
 }
 
+// ═══════════════════════════════════════════════════════════════
+// 11. PARSER JSON ROBUSTE
+// ═══════════════════════════════════════════════════════════════
+function parseJSONRobust(text) {
+  if (typeof text !== 'string') {
+    throw new Error('La réponse de l\'IA n\'est pas du texte.');
+  }
 
-/* ================================================================
-   PROMPT ANALYSE IMAGE
-   ================================================================ */
+  let clean = text.trim();
 
+  // Si c'est déjà un objet (backend a déjà parsé)
+  if (text.startsWith('{') && text.endsWith('}')) {
+    try {
+      return JSON.parse(text);
+    } catch (e) { /* continue */ }
+  }
+
+  clean = clean.replace(/```json/gi, '').replace(/```/g, '').trim();
+
+  try {
+    return JSON.parse(clean);
+  } catch (error) {
+    // Silencieux
+  }
+
+  const firstBrace = clean.indexOf('{');
+  const lastBrace = clean.lastIndexOf('}');
+
+  if (firstBrace === -1 || lastBrace === -1 || lastBrace <= firstBrace) {
+    throw new Error('L\'IA n\'a pas retourné un JSON valide.');
+  }
+
+  const possibleJSON = clean.substring(firstBrace, lastBrace + 1);
+
+  try {
+    return JSON.parse(possibleJSON);
+  } catch (error) {
+    throw new Error('Impossible de parser la réponse JSON de l\'IA.');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 12. AFFICHER ANALYSE
+// ═══════════════════════════════════════════════════════════════
+function showAnalysis(analysis) {
+  loadingCard.style.display = 'none';
+  loadingCard.classList.remove('show');
+
+  analysisCard.style.display = 'flex';
+  analysisCard.classList.add('show');
+
+  responseCard.classList.remove('show');
+  responseCard.style.display = 'none';
+
+  const matiereLabels = {
+    mathematiques: '📐 Mathématiques',
+    physique: '⚡ Physique',
+    chimie: '🧪 Chimie',
+    svt: '🧬 SVT',
+    francais: '📖 Français',
+    anglais: '🌍 Anglais',
+    autre: '📄 Autre'
+  };
+
+  const typeLabels = {
+    exercice: '📝 Exercice',
+    cours: '📚 Cours',
+    sujet_examen: '📋 Sujet examen',
+    fiche_revision: '📌 Fiche',
+    tableau: '📊 Tableau',
+    schema: '🔬 Schéma',
+    autre: '📄 Autre'
+  };
+
+  const matiere = analysis?.document?.matiere || 'autre';
+  const type = analysis?.document?.type || 'autre';
+
+  let confidence = Number(analysis?.confiance);
+  if (Number.isNaN(confidence)) confidence = 0.7;
+  if (confidence <= 1) confidence *= 100;
+  confidence = Math.max(0, Math.min(100, Math.round(confidence)));
+
+  subjectBadge.textContent = matiereLabels[matiere] || '📄 Autre';
+  typeBadge.textContent = typeLabels[type] || '📄 Autre';
+  confianceBadge.textContent = `✅ ${confidence}%`;
+
+  const availableActions = Array.isArray(analysis?.actions)
+    ? analysis.actions
+    : ['comprendre', 'resoudre', 'resumer', 'formules', 'quiz', 'traduire'];
+
+  document.querySelectorAll('.act').forEach(button => {
+    const action = button.dataset.action;
+    button.style.display = availableActions.includes(action) ? 'block' : 'none';
+  });
+
+  currentAnalysis = analysis;
+  showToast('✅ Analyse terminée !');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 13. AFFICHER RÉPONSE
+// ═══════════════════════════════════════════════════════════════
+function showResponse(title, html) {
+  responseCard.style.display = 'flex';
+  responseCard.classList.add('show');
+  respTitle.textContent = title;
+  respContent.innerHTML = html;
+
+  responseCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 14. FORMATAGE RÉPONSE
+// ═══════════════════════════════════════════════════════════════
+function formatResponse(data, action) {
+  let html = '';
+
+  try {
+    switch (action) {
+      case 'comprendre':
+        html = `
+          ${data.introduction ? `<p><strong>${escapeHtml(data.introduction)}</strong></p>` : ''}
+          ${Array.isArray(data.explications)
+            ? data.explications.map(item => `
+                <div class="step">
+                  <strong>${escapeHtml(item.concept || '')}</strong>
+                  <p>${escapeHtml(item.explication || '')}</p>
+                </div>
+              `).join('')
+            : ''}
+          ${data.resume ? `<p><strong>📌 Résumé :</strong> ${escapeHtml(data.resume)}</p>` : ''}
+        `;
+        break;
+
+      case 'resoudre':
+        html = `
+          ${Array.isArray(data.donnees) && data.donnees.length
+            ? `<p><strong>📊 Données :</strong> ${data.donnees.map(escapeHtml).join(', ')}</p>`
+            : ''}
+          ${data.demande ? `<p><strong>❓ Demande :</strong> ${escapeHtml(data.demande)}</p>` : ''}
+          ${data.methode ? `<div class="step"><strong>🧠 Méthode</strong><p>${escapeHtml(data.methode)}</p></div>` : ''}
+          ${Array.isArray(data.etapes)
+            ? data.etapes.map(step => `
+                <div class="step">
+                  <strong>Étape ${escapeHtml(step.numero)}</strong>
+                  <p>${escapeHtml(step.description || '')}</p>
+                  ${step.calcul ? `<div class="formula">${escapeHtml(step.calcul)}</div>` : ''}
+                  ${step.explication ? `<p><em>${escapeHtml(step.explication)}</em></p>` : ''}
+                </div>
+              `).join('')
+            : ''}
+          ${data.resultat ? `<p><strong>✅ Résultat :</strong> ${escapeHtml(data.resultat)}</p>` : ''}
+          ${data.verification ? `<div class="step"><strong>🔎 Vérification</strong><p>${escapeHtml(data.verification)}</p></div>` : ''}
+        `;
+        break;
+
+      case 'resumer':
+        html = `
+          ${Array.isArray(data.points_cles)
+            ? data.points_cles.map(point => `
+                <div class="step">
+                  <strong>${escapeHtml(point.titre || '')}</strong>
+                  <p>${escapeHtml(point.contenu || '')}</p>
+                </div>
+              `).join('')
+            : ''}
+          ${data.conclusion ? `<p><strong>📌 Conclusion :</strong> ${escapeHtml(data.conclusion)}</p>` : ''}
+        `;
+        break;
+
+      case 'formules':
+        html = `
+          ${Array.isArray(data.formules)
+            ? data.formules.map(formula => `
+                <div class="formula">${escapeHtml(formula.formule || '')}</div>
+                ${formula.explication ? `<p>${escapeHtml(formula.explication)}</p>` : ''}
+                ${formula.exemple ? `<div class="step"><strong>Exemple</strong><p>${escapeHtml(formula.exemple)}</p></div>` : ''}
+              `).join('')
+            : '<p>Aucune formule trouvée.</p>'}
+        `;
+        break;
+
+      case 'quiz':
+        html = `
+          ${Array.isArray(data.questions)
+            ? data.questions.map((question, index) => `
+                <div class="step">
+                  <strong>Question ${index + 1}</strong>
+                  <p>${escapeHtml(question.question || '')}</p>
+                  ${Array.isArray(question.propositions)
+                    ? `<ul>${question.propositions.map(opt => `<li>${escapeHtml(opt)}</li>`).join('')}</ul>`
+                    : ''}
+                  ${question.bonne_reponse ? `<p><strong>✅ Bonne réponse :</strong> ${escapeHtml(question.bonne_reponse)}</p>` : ''}
+                  ${question.feedback ? `<p><em>${escapeHtml(question.feedback)}</em></p>` : ''}
+                </div>
+              `).join('')
+            : ''}
+        `;
+        break;
+
+      case 'traduire':
+        html = `
+          <div class="step">
+            <p>${escapeHtml(data.traduction || '')}</p>
+          </div>
+          ${data.notes ? `<p><strong>📝 Notes :</strong> ${escapeHtml(data.notes)}</p>` : ''}
+        `;
+        break;
+
+      default:
+        html = `<pre>${escapeHtml(JSON.stringify(data, null, 2))}</pre>`;
+    }
+  } catch (error) {
+    console.error('Erreur formatage:', error);
+    html = `<pre>${escapeHtml(JSON.stringify(data, null, 2))}</pre>`;
+  }
+
+  return html;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 15. ANALYSE PRINCIPALE
+// ═══════════════════════════════════════════════════════════════
+async function startAnalysis() {
+  if (!currentImage || isProcessing) return;
+
+  isProcessing = true;
+  analyzeBtn.disabled = true;
+  analyzeBtn.innerHTML = `
+    <span style="display:inline-block;width:18px;height:18px;border:2px solid rgba(10,10,10,.15);border-top-color:#0A0A0A;border-radius:50%;animation:spin .7s linear infinite;margin-right:8px;"></span>
+    Analyse en cours...
+  `;
+
+  showLoading();
+
+  try {
+    updateStep(0, 'Lecture de l\'image...');
+    await sleep(300);
+
+    updateStep(1, 'Reconnaissance du texte...');
+    await sleep(300);
+
+    updateStep(2, 'Analyse du contenu...');
+
+    // ⚡ UN SEUL APPEL BACKEND
+    const analysis = await callScanBackend({
+      action: 'analyze',
+      image: currentImage,
+      prompt: buildAnalysisPrompt()
+    });
+
+    updateStep(3, 'Préparation des actions...');
+    await sleep(300);
+
+    showAnalysis(analysis);
+
+  } catch (error) {
+    console.error('❌ Erreur analyse:', error);
+    loadingCard.style.display = 'none';
+    loadingCard.classList.remove('show');
+
+    let message = '❌ Impossible d\'analyser cette image.';
+    if (error.status === 401) message = '🔒 Connecte-toi pour utiliser ARV-SCAN.';
+    else if (error.status === 429) message = '⏱️ Trop de demandes. Réessaie dans une minute.';
+    else if (error.status === 413) message = '📦 Image trop lourde.';
+    else if (error.status === 503) message = '🔧 Service IA temporairement indisponible.';
+
+    showToast(message, 'error');
+  } finally {
+    isProcessing = false;
+    analyzeBtn.disabled = !currentImage;
+    analyzeBtn.innerHTML = '<i class="fas fa-wand-magic-sparkles"></i> Analyser';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 16. EXÉCUTER UNE ACTION
+// ═══════════════════════════════════════════════════════════════
+async function executeAction(action) {
+  if (!currentAnalysis || isProcessing) return;
+
+  isProcessing = true;
+  showLoading();
+  loadingText.textContent = '🧠 Préparation de la réponse...';
+
+  try {
+    const maxTokens = TOKEN_LIMITS[action] || 700;
+
+    const result = await callScanBackend({
+      action: 'action',
+      analysis: currentAnalysis,
+      prompt: buildActionPrompt(action, currentAnalysis),
+      maxTokens
+    });
+
+    const actionLabels = {
+      comprendre: '🧠 Comprendre',
+      resoudre: '✍️ Résolution',
+      resumer: '📚 Résumé',
+      formules: '📐 Formules',
+      quiz: '❓ Quiz',
+      traduire: '🌍 Traduction'
+    };
+
+    const html = formatResponse(result, action);
+    showResponse(actionLabels[action] || 'Résultat', html);
+
+    loadingCard.style.display = 'none';
+    loadingCard.classList.remove('show');
+    showToast('✅ Réponse prête !');
+
+  } catch (error) {
+    console.error('❌ Erreur action:', error);
+    loadingCard.style.display = 'none';
+    loadingCard.classList.remove('show');
+
+    let message = '❌ Service temporairement indisponible.';
+    if (error.status === 401) message = '🔒 Connecte-toi.';
+    else if (error.status === 429) message = '⏱️ Trop de demandes. Réessaie.';
+
+    showToast(message, 'error');
+  } finally {
+    isProcessing = false;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 17. PROMPTS
+// ═══════════════════════════════════════════════════════════════
 function buildAnalysisPrompt() {
   return `
 Analyse l'image scolaire fournie.
@@ -1142,34 +898,15 @@ Utilise exactement cette structure :
     "formules": [],
     "questions": []
   },
-  "actions": [
-    "comprendre",
-    "resoudre",
-    "resumer",
-    "formules",
-    "quiz",
-    "traduire"
-  ],
+  "actions": ["comprendre", "resoudre", "resumer", "formules", "quiz", "traduire"],
   "confiance": 0.8
 }
 
 Valeurs autorisées pour "matiere" :
-"mathematiques",
-"physique",
-"chimie",
-"svt",
-"francais",
-"anglais",
-"autre"
+"mathematiques", "physique", "chimie", "svt", "francais", "anglais", "autre"
 
 Valeurs autorisées pour "type" :
-"exercice",
-"cours",
-"sujet_examen",
-"fiche_revision",
-"tableau",
-"schema",
-"autre"
+"exercice", "cours", "sujet_examen", "fiche_revision", "tableau", "schema", "autre"
 
 Règles :
 - texte = seulement le texte clairement lisible
@@ -1182,152 +919,36 @@ Règles :
 `;
 }
 
-/* ================================================================
-   PROMPTS ACTIONS
-   ================================================================ */
-
-function buildActionPrompt(
-  action,
-  analysis
-) {
-
-  const texte =
-    analysis?.contenu?.texte ||
-    'Texte non disponible';
-
-
-  const matiere =
-    analysis?.document?.matiere ||
-    'inconnue';
-
-
-  const type =
-    analysis?.document?.type ||
-    'inconnu';
-
-
-  const formules =
-    Array.isArray(
-      analysis?.contenu?.formules
-    )
-      ? analysis.contenu.formules.join(', ')
-      : 'Aucune';
-
+function buildActionPrompt(action, analysis) {
+  const texte = analysis?.contenu?.texte || 'Texte non disponible';
+  const matiere = analysis?.document?.matiere || 'inconnue';
+  const type = analysis?.document?.type || 'inconnu';
+  const formules = Array.isArray(analysis?.contenu?.formules)
+    ? analysis.contenu.formules.join(', ')
+    : 'Aucune';
 
   const prompts = {
+    comprendre: `Explique le document à un élève de Terminale.
+Structure JSON : {"titre":"...","introduction":"...","explications":[{"concept":"...","explication":"..."}],"resume":"..."}`,
 
-    comprendre: `
-Explique le document à un élève de Terminale.
+    resoudre: `Résous l'exercice étape par étape.
+Structure JSON : {"titre":"...","donnees":[],"demande":"...","methode":"...","etapes":[{"numero":1,"description":"...","calcul":"...","explication":"..."}],"resultat":"...","verification":"..."}
+Sois rigoureux. Ne saute pas les calculs importants.`,
 
-Structure JSON :
-{
-  "titre": "...",
-  "introduction": "...",
-  "explications": [
-    {
-      "concept": "...",
-      "explication": "..."
-    }
-  ],
-  "resume": "..."
-}
-`,
+    resumer: `Résume le document pour réviser rapidement.
+Structure JSON : {"titre":"...","points_cles":[{"titre":"...","contenu":"..."}],"conclusion":"..."}`,
 
-    resoudre: `
-Résous l'exercice étape par étape.
+    formules: `Extrais uniquement les formules réellement présentes ou nécessaires.
+Structure JSON : {"titre":"...","formules":[{"formule":"...","explication":"...","variables":{},"exemple":"..."}]}`,
 
-Structure JSON :
-{
-  "titre": "...",
-  "donnees": [],
-  "demande": "...",
-  "methode": "...",
-  "etapes": [
-    {
-      "numero": 1,
-      "description": "...",
-      "calcul": "...",
-      "explication": "..."
-    }
-  ],
-  "resultat": "...",
-  "verification": "..."
-}
+    quiz: `Crée 5 questions de quiz sur le document.
+Structure JSON : {"titre":"...","questions":[{"question":"...","propositions":["A : ...","B : ...","C : ...","D : ..."],"bonne_reponse":"A","feedback":"..."}]}`,
 
-Sois rigoureux.
-Ne saute pas les calculs importants.
-`,
-
-    resumer: `
-Résume le document pour réviser rapidement.
-
-Structure JSON :
-{
-  "titre": "...",
-  "points_cles": [
-    {
-      "titre": "...",
-      "contenu": "..."
-    }
-  ],
-  "conclusion": "..."
-}
-`,
-
-    formules: `
-Extrais uniquement les formules réellement présentes ou nécessaires.
-
-Structure JSON :
-{
-  "titre": "...",
-  "formules": [
-    {
-      "formule": "...",
-      "explication": "...",
-      "variables": {},
-      "exemple": "..."
-    }
-  ]
-}
-`,
-
-    quiz: `
-Crée 5 questions de quiz sur le document.
-
-Structure JSON :
-{
-  "titre": "...",
-  "questions": [
-    {
-      "question": "...",
-      "propositions": [
-        "A : ...",
-        "B : ...",
-        "C : ...",
-        "D : ..."
-      ],
-      "bonne_reponse": "A",
-      "feedback": "..."
-    }
-  ]
-}
-`,
-
-    traduire: `
-Traduis le contenu en français.
-
-Structure JSON :
-{
-  "titre": "...",
-  "traduction": "...",
-  "notes": "..."
-}
-`
+    traduire: `Traduis le contenu en français.
+Structure JSON : {"titre":"...","traduction":"...","notes":"..."}`
   };
 
-
-  return `
-Document analysé :
+  return `Document analysé :
 
 Matière : ${matiere}
 Type : ${type}
@@ -1344,1456 +965,98 @@ ${action}
 ${prompts[action] || ''}
 
 Réponds UNIQUEMENT en JSON valide.
-Aucun texte hors JSON.
-`;
+Aucun texte hors JSON.`;
 }
 
+// ═══════════════════════════════════════════════════════════════
+// 18. ÉVÉNEMENTS
+// ═══════════════════════════════════════════════════════════════
+galleryBtn.addEventListener('click', () => fileInput.click());
+cameraBtn.addEventListener('click', () => cameraInput.click());
 
-/* ================================================================
-   PARSER JSON ROBUSTE
-   ================================================================ */
-function parseJSONRobust(text) {
-
-  if (typeof text !== 'string') {
-    throw new Error(
-      'La réponse de l’IA n’est pas du texte.'
-    );
+fileInput.addEventListener('change', event => {
+  if (event.target.files && event.target.files.length) {
+    handleFile(event.target.files[0]);
+    fileInput.value = '';
   }
+});
 
-  console.log(
-    '🔍 Texte reçu avant parsing :',
-    text
-  );
-
-  let clean = text.trim();
-
-  /* ------------------------------------------------------------
-     Supprimer les blocs Markdown
-     ------------------------------------------------------------ */
-
-  clean = clean
-    .replace(/```json/gi, '')
-    .replace(/```/g, '')
-    .trim();
-
-  /* ------------------------------------------------------------
-     Tentative directe
-     ------------------------------------------------------------ */
-
-  try {
-    return JSON.parse(clean);
-  } catch (error) {
-    console.warn(
-      '⚠️ JSON direct impossible :',
-      error.message
-    );
+cameraInput.addEventListener('change', event => {
+  if (event.target.files && event.target.files.length) {
+    handleFile(event.target.files[0]);
+    cameraInput.value = '';
   }
+});
 
-  /* ------------------------------------------------------------
-     Trouver le premier { et le dernier }
-     ------------------------------------------------------------ */
+dropzone.addEventListener('dragover', event => {
+  event.preventDefault();
+  dropzone.classList.add('dragover');
+});
 
-  const firstBrace =
-    clean.indexOf('{');
+dropzone.addEventListener('dragleave', () => {
+  dropzone.classList.remove('dragover');
+});
 
-  const lastBrace =
-    clean.lastIndexOf('}');
-
-  if (
-    firstBrace === -1 ||
-    lastBrace === -1 ||
-    lastBrace <= firstBrace
-  ) {
-    console.error(
-      '❌ Aucun objet JSON détecté :',
-      clean
-    );
-
-    throw new Error(
-      'L’IA n’a pas retourné un JSON valide.'
-    );
+dropzone.addEventListener('drop', event => {
+  event.preventDefault();
+  dropzone.classList.remove('dragover');
+  if (event.dataTransfer.files && event.dataTransfer.files.length) {
+    handleFile(event.dataTransfer.files[0]);
   }
+});
 
-  const possibleJSON =
-    clean.substring(
-      firstBrace,
-      lastBrace + 1
-    );
+removeBtn.addEventListener('click', resetUI);
+analyzeBtn.addEventListener('click', startAnalysis);
 
-  console.log(
-    '🧩 JSON extrait :',
-    possibleJSON
-  );
-
-  try {
-
-    return JSON.parse(
-      possibleJSON
-    );
-
-  } catch (error) {
-
-    console.error(
-      '❌ JSON extrait invalide :',
-      error
-    );
-
-    console.error(
-      '📄 Contenu problématique :',
-      possibleJSON
-    );
-
-    throw new Error(
-      'Impossible de parser la réponse JSON de l’IA.'
-    );
-  }
-}
-
-
-/* ================================================================
-   AFFICHER ANALYSE
-   ================================================================ */
-
-function showAnalysis(
-  analysis
-) {
-
-  loadingCard.style.display =
-    'none';
-
-  analysisCard.style.display =
-    'flex';
-
-  responseCard.style.display =
-    'none';
-
-
-  const matiereLabels = {
-
-    mathematiques:
-      '📐 Mathématiques',
-
-    physique:
-      '⚡ Physique',
-
-    chimie:
-      '🧪 Chimie',
-
-    svt:
-      '🧬 SVT',
-
-    francais:
-      '📖 Français',
-
-    anglais:
-      '🌍 Anglais',
-
-    autre:
-      '📄 Autre'
-  };
-
-
-  const typeLabels = {
-
-    exercice:
-      '📝 Exercice',
-
-    cours:
-      '📚 Cours',
-
-    sujet_examen:
-      '📋 Sujet examen',
-
-    fiche_revision:
-      '📌 Fiche',
-
-    tableau:
-      '📊 Tableau',
-
-    schema:
-      '🔬 Schéma',
-
-    autre:
-      '📄 Autre'
-  };
-
-
-  const matiere =
-    analysis?.document?.matiere ||
-    'autre';
-
-
-  const type =
-    analysis?.document?.type ||
-    'autre';
-
-
-  let confidence =
-    Number(
-      analysis?.confiance
-    );
-
-
-  if (
-    Number.isNaN(confidence)
-  ) {
-
-    confidence =
-      0.7;
-  }
-
-
-  if (
-    confidence <= 1
-  ) {
-
-    confidence *= 100;
-  }
-
-
-  confidence =
-    Math.max(
-      0,
-      Math.min(
-        100,
-        Math.round(confidence)
-      )
-    );
-
-
-  subjectBadge.textContent =
-    matiereLabels[matiere] ||
-    '📄 Autre';
-
-
-  typeBadge.textContent =
-    typeLabels[type] ||
-    '📄 Autre';
-
-
-  confianceBadge.textContent =
-    `✅ ${confidence}%`;
-
-
-  const availableActions =
-    Array.isArray(
-      analysis?.actions
-    )
-      ? analysis.actions
-      : [
-          'comprendre',
-          'resoudre',
-          'resumer',
-          'formules',
-          'quiz',
-          'traduire'
-        ];
-
-
-  document
-    .querySelectorAll('.act')
-    .forEach(button => {
-
-      const action =
-        button.dataset.action;
-
-
-      button.style.display =
-        availableActions.includes(
-          action
-        )
-          ? 'block'
-          : 'none';
-    });
-
-
-  currentAnalysis =
-    analysis;
-
-
-  showToast(
-    '✅ Analyse terminée !'
-  );
-}
-
-
-/* ================================================================
-   AFFICHER REPONSE
-   ================================================================ */
-
-function showResponse(
-  title,
-  html
-) {
-
-  responseCard.style.display =
-    'flex';
-
-
-  respTitle.textContent =
-    title;
-
-
-  respContent.innerHTML =
-    html;
-
-  if (typeof renderMathInElement === 'function') {
-    renderMathInElement(respContent, {
-      delimiters: [
-        { left: '$$', right: '$$', display: true },
-        { left: '\\(', right: '\\)', display: false },
-        { left: '$', right: '$', display: false }
-      ],
-      throwOnError: false,
-      trust: false
-    });
-  }
-
-
-  responseCard.scrollIntoView({
-    behavior: 'smooth',
-    block: 'start'
+document.querySelectorAll('.act').forEach(button => {
+  button.addEventListener('click', () => {
+    executeAction(button.dataset.action);
   });
-}
+});
 
-
-/* ================================================================
-   ECHAPPEMENT HTML
-   ================================================================ */
-
-function escapeHtml(
-  value
-) {
-
-  if (
-    value === null ||
-    value === undefined
-  ) {
-
-    return '';
-  }
-
-
-  return String(value)
-
-    .replace(
-      /&/g,
-      '&amp;'
-    )
-
-    .replace(
-      /</g,
-      '&lt;'
-    )
-
-    .replace(
-      />/g,
-      '&gt;'
-    )
-
-    .replace(
-      /"/g,
-      '&quot;'
-    )
-
-    .replace(
-      /'/g,
-      '&#039;'
-    );
-}
-
-
-/* ================================================================
-   FORMATAGE REPONSE
-   ================================================================ */
-
-function formatResponse(
-  data,
-  action
-) {
-
-  let html = '';
-
-
+copyBtn.addEventListener('click', async () => {
   try {
-
-    switch (action) {
-
-
-      /* ==========================================================
-         COMPRENDRE
-         ========================================================== */
-
-      case 'comprendre':
-
-        html = `
-
-          ${
-            data.introduction
-              ? `<p><strong>${escapeHtml(
-                  data.introduction
-                )}</strong></p>`
-              : ''
-          }
-
-          ${
-            Array.isArray(
-              data.explications
-            )
-              ? data.explications
-                  .map(item => `
-                    <div class="step">
-
-                      <strong>
-                        ${escapeHtml(
-                          item.concept || ''
-                        )}
-                      </strong>
-
-                      <p>
-                        ${escapeHtml(
-                          item.explication || ''
-                        )}
-                      </p>
-
-                    </div>
-                  `)
-                  .join('')
-              : ''
-          }
-
-          ${
-            data.resume
-              ? `
-                <p>
-                  <strong>📌 Résumé :</strong>
-                  ${escapeHtml(
-                    data.resume
-                  )}
-                </p>
-              `
-              : ''
-          }
-
-        `;
-
-        break;
-
-
-      /* ==========================================================
-         RESOUDRE
-         ========================================================== */
-
-      case 'resoudre':
-
-        html = `
-
-          ${
-            Array.isArray(
-              data.donnees
-            ) &&
-            data.donnees.length
-              ? `
-                <p>
-                  <strong>📊 Données :</strong>
-                  ${data.donnees
-                    .map(escapeHtml)
-                    .join(', ')}
-                </p>
-              `
-              : ''
-          }
-
-          ${
-            data.demande
-              ? `
-                <p>
-                  <strong>❓ Demande :</strong>
-                  ${escapeHtml(
-                    data.demande
-                  )}
-                </p>
-              `
-              : ''
-          }
-
-          ${
-            data.methode
-              ? `
-                <div class="step">
-                  <strong>🧠 Méthode</strong>
-                  <p>
-                    ${escapeHtml(
-                      data.methode
-                    )}
-                  </p>
-                </div>
-              `
-              : ''
-          }
-
-          ${
-            Array.isArray(
-              data.etapes
-            )
-              ? data.etapes
-                  .map(step => `
-
-                    <div class="step">
-
-                      <strong>
-                        Étape ${
-                          escapeHtml(
-                            step.numero
-                          )
-                        }
-                      </strong>
-
-                      <p>
-                        ${escapeHtml(
-                          step.description || ''
-                        )}
-                      </p>
-
-                      ${
-                        step.calcul
-                          ? `
-                            <div class="formula">
-                              ${escapeHtml(
-                                step.calcul
-                              )}
-                            </div>
-                          `
-                          : ''
-                      }
-
-                      ${
-                        step.explication
-                          ? `
-                            <p>
-                              <em>
-                                ${escapeHtml(
-                                  step.explication
-                                )}
-                              </em>
-                            </p>
-                          `
-                          : ''
-                      }
-
-                    </div>
-
-                  `)
-                  .join('')
-              : ''
-          }
-
-          ${
-            data.resultat
-              ? `
-                <p>
-                  <strong>✅ Résultat :</strong>
-                  ${escapeHtml(
-                    data.resultat
-                  )}
-                </p>
-              `
-              : ''
-          }
-
-          ${
-            data.verification
-              ? `
-                <div class="step">
-                  <strong>🔎 Vérification</strong>
-                  <p>
-                    ${escapeHtml(
-                      data.verification
-                    )}
-                  </p>
-                </div>
-              `
-              : ''
-          }
-
-        `;
-
-        break;
-
-
-      /* ==========================================================
-         RESUME
-         ========================================================== */
-
-      case 'resumer':
-
-        html = `
-
-          ${
-            Array.isArray(
-              data.points_cles
-            )
-              ? data.points_cles
-                  .map(point => `
-
-                    <div class="step">
-
-                      <strong>
-                        ${escapeHtml(
-                          point.titre || ''
-                        )}
-                      </strong>
-
-                      <p>
-                        ${escapeHtml(
-                          point.contenu || ''
-                        )}
-                      </p>
-
-                    </div>
-
-                  `)
-                  .join('')
-              : ''
-          }
-
-          ${
-            data.conclusion
-              ? `
-                <p>
-                  <strong>📌 Conclusion :</strong>
-                  ${escapeHtml(
-                    data.conclusion
-                  )}
-                </p>
-              `
-              : ''
-          }
-
-        `;
-
-        break;
-
-
-      /* ==========================================================
-         FORMULES
-         ========================================================== */
-
-      case 'formules':
-
-        html = `
-
-          ${
-            Array.isArray(
-              data.formules
-            )
-              ? data.formules
-                  .map(formula => `
-
-                    <div class="formula">
-                      ${escapeHtml(
-                        formula.formule || ''
-                      )}
-                    </div>
-
-                    ${
-                      formula.explication
-                        ? `
-                          <p>
-                            ${escapeHtml(
-                              formula.explication
-                            )}
-                          </p>
-                        `
-                        : ''
-                    }
-
-                    ${
-                      formula.exemple
-                        ? `
-                          <div class="step">
-                            <strong>Exemple</strong>
-                            <p>
-                              ${escapeHtml(
-                                formula.exemple
-                              )}
-                            </p>
-                          </div>
-                        `
-                        : ''
-                    }
-
-                  `)
-                  .join('')
-              : '<p>Aucune formule trouvée.</p>'
-          }
-
-        `;
-
-        break;
-
-
-      /* ==========================================================
-         QUIZ
-         ========================================================== */
-
-      case 'quiz':
-
-        html = `
-
-          ${
-            Array.isArray(
-              data.questions
-            )
-              ? data.questions
-                  .map(
-                    (question, index) => `
-
-                      <div class="step">
-
-                        <strong>
-                          Question ${index + 1}
-                        </strong>
-
-                        <p>
-                          ${escapeHtml(
-                            question.question || ''
-                          )}
-                        </p>
-
-                        ${
-                          Array.isArray(
-                            question.propositions
-                          )
-                            ? `
-                              <ul>
-                                ${question
-                                  .propositions
-                                  .map(
-                                    option =>
-                                      `<li>${escapeHtml(
-                                        option
-                                      )}</li>`
-                                  )
-                                  .join('')}
-                              </ul>
-                            `
-                            : ''
-                        }
-
-                        ${
-                          question.bonne_reponse
-                            ? `
-                              <p>
-                                <strong>
-                                  ✅ Bonne réponse :
-                                </strong>
-                                ${escapeHtml(
-                                  question.bonne_reponse
-                                )}
-                              </p>
-                            `
-                            : ''
-                        }
-
-                        ${
-                          question.feedback
-                            ? `
-                              <p>
-                                <em>
-                                  ${escapeHtml(
-                                    question.feedback
-                                  )}
-                                </em>
-                              </p>
-                            `
-                            : ''
-                        }
-
-                      </div>
-
-                    `
-                  )
-                  .join('')
-              : ''
-          }
-
-        `;
-
-        break;
-
-
-      /* ==========================================================
-         TRADUIRE
-         ========================================================== */
-
-      case 'traduire':
-
-        html = `
-
-          <div class="step">
-
-            <p>
-              ${escapeHtml(
-                data.traduction || ''
-              )}
-            </p>
-
-          </div>
-
-          ${
-            data.notes
-              ? `
-                <p>
-                  <strong>📝 Notes :</strong>
-                  ${escapeHtml(
-                    data.notes
-                  )}
-                </p>
-              `
-              : ''
-          }
-
-        `;
-
-        break;
-
-
-      default:
-
-        html =
-          `<pre>${escapeHtml(
-            JSON.stringify(
-              data,
-              null,
-              2
-            )
-          )}</pre>`;
+    const text = respContent.innerText;
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+      document.execCommand('copy');
+      textarea.remove();
     }
-
-
+    showToast('📋 Copié !');
   } catch (error) {
-
-    console.error(
-      'Erreur formatage:',
-      error
-    );
-
-
-    html =
-      `<pre>${escapeHtml(
-        JSON.stringify(
-          data,
-          null,
-          2
-        )
-      )}</pre>`;
+    showToast('❌ Impossible de copier.', 'error');
   }
+});
 
+newBtn.addEventListener('click', () => {
+  resetUI();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
 
-  return html;
-}
-
-
-/* ================================================================
-   ANALYSE PRINCIPALE
-   ================================================================ */
-
-async function startAnalysis() {
-
-  if (
-    !currentImage ||
-    isProcessing
-  ) {
-    return;
+// ═══════════════════════════════════════════════════════════════
+// 19. AUTH STATE
+// ═══════════════════════════════════════════════════════════════
+onAuthStateChanged(auth, (user) => {
+  currentUser = user;
+  if (!user) {
+    showToast('🔒 Connecte-toi pour utiliser ARV-SCAN', 'error');
   }
-
-
-  isProcessing =
-    true;
-
-
-  analyzeBtn.disabled =
-    true;
-
-
-  analyzeBtn.innerHTML = `
-    <span
-      class="spinner"
-      style="
-        display:inline-block;
-        width:18px;
-        height:18px;
-        border:2px solid rgba(10,10,10,.15);
-        border-top-color:#0A0A0A;
-        border-radius:50%;
-        animation:spin .7s linear infinite;
-        margin-right:8px;
-      "
-    ></span>
-    Analyse en cours...
-  `;
-
-
-  showLoading();
-
-
-  try {
-
-    /* ==========================================================
-       ETAPE 1
-       ========================================================== */
-
-    updateStep(
-      0,
-      'Lecture de l’image...'
-    );
-
-
-    await sleep(300);
-
-
-    /* ==========================================================
-       ETAPE 2
-       ========================================================== */
-
-    updateStep(
-      1,
-      'Reconnaissance du texte...'
-    );
-
-
-    await sleep(300);
-
-
-    /* ==========================================================
-       ETAPE 3
-       ========================================================== */
-
-    updateStep(
-      2,
-      'Analyse du contenu...'
-    );
-
-
-    const visionResponse =
-      await callGroqVision([
-
-        {
-          role: 'system',
-
-          content:
-            'Tu es un assistant pédagogique spécialisé dans l’analyse de documents scolaires. Réponds uniquement en JSON valide.'
-        },
-
-        {
-          role: 'user',
-
-          content: [
-
-            {
-              type: 'text',
-
-              text:
-                buildAnalysisPrompt()
-            },
-
-            {
-              type: 'image_url',
-
-              image_url: {
-                url:
-                  currentImage
-              }
-            }
-
-          ]
-        }
-
-      ]);
-
-
-    /* ==========================================================
-       JSON
-       ========================================================== */
-
-    const analysis =
-      parseJSONRobust(
-        visionResponse
-      );
-
-
-    /* ==========================================================
-       ETAPE 4
-       ========================================================== */
-
-    updateStep(
-      3,
-      'Préparation des actions...'
-    );
-
-
-    await sleep(300);
-
-
-    showAnalysis(
-      analysis
-    );
-
-
-  } catch (error) {
-
-    console.error(
-      '❌ Erreur analyse:',
-      error
-    );
-
-
-    loadingCard.style.display =
-      'none';
-
-
-    showToast(
-      error?.status === 429
-        ? '❌ Trop de demandes. Réessaie dans une minute.'
-        : '❌ Impossible d’analyser cette image pour le moment.',
-      'error'
-    );
-
-  } finally {
-
-    isProcessing =
-      false;
-
-
-    analyzeBtn.disabled =
-      !currentImage;
-
-
-    analyzeBtn.innerHTML = `
-      <i class="fas fa-wand-magic-sparkles"></i>
-      Analyser
-    `;
-  }
-}
-
-
-/* ================================================================
-   EXECUTER UNE ACTION
-   ================================================================ */
-
-async function executeAction(
-  action
-) {
-
-  if (
-    !currentAnalysis ||
-    isProcessing
-  ) {
-    return;
-  }
-
-
-  isProcessing =
-    true;
-
-
-  showLoading();
-
-
-  loadingText.textContent =
-    '🧠 Préparation de la réponse...';
-
-
-  try {
-
-    const actionPrompt =
-      buildActionPrompt(
-        action,
-        currentAnalysis
-      );
-
-
-    const maxTokens =
-      TOKEN_LIMITS[action] ||
-      700;
-
-
-    const response =
-      await callGroqText(
-
-        [
-
-          {
-            role: 'system',
-
-            content:
-              'Tu es un professeur expert. Réponds uniquement en JSON valide. Sois clair, rigoureux et concis.'
-          },
-
-          {
-            role: 'user',
-
-            content:
-              actionPrompt
-          }
-
-        ],
-
-        maxTokens
-      );
-
-
-    const result =
-      parseJSONRobust(
-        response
-      );
-
-
-    const actionLabels = {
-
-      comprendre:
-        '🧠 Comprendre',
-
-      resoudre:
-        '✍️ Résolution',
-
-      resumer:
-        '📚 Résumé',
-
-      formules:
-        '📐 Formules',
-
-      quiz:
-        '❓ Quiz',
-
-      traduire:
-        '🌍 Traduction'
-
-    };
-
-
-    const html =
-      formatResponse(
-        result,
-        action
-      );
-
-
-    showResponse(
-
-      actionLabels[action] ||
-        'Résultat',
-
-      html
-    );
-
-
-    loadingCard.style.display =
-      'none';
-
-
-    showToast(
-      '✅ Réponse prête !'
-    );
-
-
-  } catch (error) {
-
-    console.error(
-      '❌ Erreur action:',
-      error
-    );
-
-
-    loadingCard.style.display =
-      'none';
-
-
-    showToast(
-      error?.status === 429
-        ? '❌ Trop de demandes. Réessaie dans une minute.'
-        : '❌ Le service est temporairement indisponible.',
-      'error'
-    );
-
-  } finally {
-
-    isProcessing =
-      false;
-  }
-}
-
-
-/* ================================================================
-   EVENEMENTS - GALERIE
-   ================================================================ */
-
-galleryBtn.addEventListener(
-  'click',
-  () => {
-    fileInput.click();
-  }
-);
-
-
-fileInput.addEventListener(
-  'change',
-  event => {
-
-    if (
-      event.target.files &&
-      event.target.files.length
-    ) {
-
-      handleFile(
-        event.target.files[0]
-      );
-
-      fileInput.value =
-        '';
-    }
-  }
-);
-
-
-/* ================================================================
-   EVENEMENTS - CAMERA
-   ================================================================ */
-
-cameraBtn.addEventListener(
-  'click',
-  () => {
-    cameraInput.click();
-  }
-);
-
-
-cameraInput.addEventListener(
-  'change',
-  event => {
-
-    if (
-      event.target.files &&
-      event.target.files.length
-    ) {
-
-      handleFile(
-        event.target.files[0]
-      );
-
-      cameraInput.value =
-        '';
-    }
-  }
-);
-
-
-/* ================================================================
-   DRAG & DROP
-   ================================================================ */
-
-dropzone.addEventListener(
-  'dragover',
-  event => {
-
-    event.preventDefault();
-
-    dropzone.style.borderColor =
-      'rgba(184,134,11,0.35)';
-  }
-);
-
-
-dropzone.addEventListener(
-  'dragleave',
-  () => {
-
-    dropzone.style.borderColor =
-      '';
-  }
-);
-
-
-dropzone.addEventListener(
-  'drop',
-  event => {
-
-    event.preventDefault();
-
-    dropzone.style.borderColor =
-      '';
-
-
-    if (
-      event.dataTransfer.files &&
-      event.dataTransfer.files.length
-    ) {
-
-      handleFile(
-        event.dataTransfer.files[0]
-      );
-    }
-
-  }
-);
-
-
-/* ================================================================
-   SUPPRIMER IMAGE
-   ================================================================ */
-
-removeBtn.addEventListener(
-  'click',
-  resetUI
-);
-
-
-/* ================================================================
-   ANALYSER
-   ================================================================ */
-
-analyzeBtn.addEventListener(
-  'click',
-  startAnalysis
-);
-
-
-/* ================================================================
-   ACTIONS
-   ================================================================ */
-
-document
-  .querySelectorAll('.act')
-  .forEach(button => {
-
-    button.addEventListener(
-      'click',
-      () => {
-
-        executeAction(
-          button.dataset.action
-        );
-
-      }
-    );
-
-  });
-
-
-/* ================================================================
-   COPIER
-   ================================================================ */
-
-copyBtn.addEventListener(
-  'click',
-  async () => {
-
-    try {
-
-      const text =
-        respContent.innerText;
-
-
-      if (
-        navigator.clipboard &&
-        window.isSecureContext
-      ) {
-
-        await navigator.clipboard.writeText(
-          text
-        );
-
-      } else {
-
-        const textarea =
-          document.createElement(
-            'textarea'
-          );
-
-        textarea.value =
-          text;
-
-        textarea.style.position =
-          'fixed';
-
-        textarea.style.opacity =
-          '0';
-
-        document.body.appendChild(
-          textarea
-        );
-
-        textarea.focus();
-
-        textarea.select();
-
-        document.execCommand(
-          'copy'
-        );
-
-        textarea.remove();
-      }
-
-
-      showToast(
-        '📋 Copié !'
-      );
-
-
-    } catch (error) {
-
-      console.error(
-        error
-      );
-
-      showToast(
-        '❌ Impossible de copier.',
-        'error'
-      );
-    }
-
-  }
-);
-
-
-/* ================================================================
-   NOUVEAU
-   ================================================================ */
-
-newBtn.addEventListener(
-  'click',
-  () => {
-
-    resetUI();
-
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
-
-  }
-);
-
-
-/* ================================================================
-   INITIALISATION
-   ================================================================ */
-
-console.log(
-  '🚀 ARV-SCAN initialisé'
-);
-
-console.log(
-  '👁️ Vision:',
-  GROQ_MODEL_VISION
-);
-
-console.log(
-  '🧠 Texte:',
-  GROQ_MODEL_TEXT
-);
-
+});
+
+// ═══════════════════════════════════════════════════════════════
+// 20. INIT
+// ═══════════════════════════════════════════════════════════════
+console.log('🚀 ARV-SCAN initialisé');
+console.log('📡 Endpoint :', SCAN_ENDPOINT);
+console.log('🔒 Auth : Firebase (token vérifié côté serveur)');
 </script>
 </body>
 </html>

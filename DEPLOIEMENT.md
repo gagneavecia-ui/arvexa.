@@ -98,6 +98,8 @@ MISTRAL_VISION_MODEL = pixtral-large-latest
 
 `FIREBASE_ADMIN_CREDENTIALS` doit également être une variable `Secret`. Colle le contenu complet du fichier de compte de service dans Vercel, sans ajouter ce fichier au dépôt GitHub. Les comptes gratuits sont limités à deux générations réussies par jour ; les comptes Premium actifs ne sont pas limités. Le compteur quotidien est conservé dans `users/{uid}/examUsage/YYYY-MM-DD` côté Firestore.
 
+Les sujets générés sont archivés côté serveur dans `users/{uid}/examCache`. Les corrections sont enregistrées dans `users/{uid}/examResults`. Le planificateur Premium est disponible via `/planificateur.html` et utilise la route `/api/planner` pour analyser ces résultats. Après modification des règles, redéployer avec `firebase deploy --only firestore:rules --project arvexa-fbf10`.
+
 Après chaque changement de variable, lancer un nouveau déploiement Vercel. Ne jamais placer ces valeurs dans `exam.html`.
 
 ARV-SCAN utilise `/api/scan` pour l'analyse d'image et les actions pédagogiques. Les clés restent côté serveur ; ne remets pas de clé dans `scan.html`.

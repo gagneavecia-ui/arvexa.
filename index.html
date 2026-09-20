@@ -1147,7 +1147,7 @@
             <div class="icon-badge"><i class="fas fa-table-cells"></i></div>
             <div class="name">Table périodique</div>
           </a>
-         <a href="outils.html" class="tool-card">
+          <a href="outils.html" class="tool-card">
             <div class="icon-badge"><i class="fas fa-wand-sparkles"></i></div>
             <div class="name">Plus d'outils</div>
           </a>
@@ -1975,8 +1975,6 @@ let unsubscribeUser = null;
 let currentUid = null;
 let isRedirecting = false;
 let isAuthResolved = false;
-let graceTimer = null;
-let maxTimer = null;
 
 // ================================================================
 // MODALE AVIS
@@ -2243,76 +2241,25 @@ function redirectToLogin() {
   if (isRedirecting) return;
   isRedirecting = true;
   try {
-    sessionStorage.setItem('redirectAfterLogin', window.location.pathname);
+    sessionStorage.setItem('redirectAfterAuth', window.location.pathname + window.location.search);
   } catch (e) {}
-  window.location.replace('login.html');
+  window.location.replace('auth-choice.html');
 }
 
 function initAuthGuard(onAuthenticated) {
   auth.onAuthStateChanged((user) => {
-    if (isAuthResolved) {
-      if (user && user.uid !== currentUid) {
-        currentUid = user.uid;
-        saveSession(user);
-        onAuthenticated(user);
-      } else if (!user && currentUid) {
-        currentUid = null;
-        clearSession();
-        redirectToLogin();
-      }
-      return;
-    }
-
+    if (!isAuthResolved) isAuthResolved = true;
     if (!user) {
-      if (graceTimer) clearTimeout(graceTimer);
-      graceTimer = setTimeout(() => {
-        if (isAuthResolved) return;
-        if (auth.currentUser) return;
-
-        const hasSession = localStorage.getItem(SESSION_KEY);
-        const hasUserData = localStorage.getItem(USER_DATA_KEY);
-
-        if ((hasSession || hasUserData) && !navigator.onLine) {
-          setTimeout(() => {
-            if (auth.currentUser) return;
-            if (!isAuthResolved) redirectToLogin();
-          }, 1500);
-          return;
-        }
-
-        if (hasSession && hasUserData) {
-          setTimeout(() => {
-            if (auth.currentUser) return;
-            if (!isAuthResolved) redirectToLogin();
-          }, 1500);
-          return;
-        }
-
-        redirectToLogin();
-      }, 600);
+      currentUid = null;
+      clearSession();
+      redirectToLogin();
       return;
     }
-
-    if (graceTimer) { clearTimeout(graceTimer); graceTimer = null; }
-    if (maxTimer) { clearTimeout(maxTimer); maxTimer = null; }
-
-    isAuthResolved = true;
+    if (user.uid === currentUid) return;
     currentUid = user.uid;
     saveSession(user);
     onAuthenticated(user);
   });
-
-  maxTimer = setTimeout(() => {
-    if (isAuthResolved) return;
-    if (auth.currentUser) {
-      isAuthResolved = true;
-      currentUid = auth.currentUser.uid;
-      saveSession(auth.currentUser);
-      onAuthenticated(auth.currentUser);
-    } else {
-      redirectToLogin();
-    }
-  }, 5000);
 }
 
 // ================================================================

@@ -1,30 +1,25 @@
-# ARVEXA - projet prêt pour le déploiement
+# ARVEXA School - version corrigée
 
-Ce dossier regroupe le site complet en version propre pour le déploiement.
+Ce dossier est la livraison finale destinée à Vercel/Firebase. Il contient une seule copie du site, les pages frontend, les routes API, les règles Firebase et les assets nécessaires.
 
-## Structure
+## Points principaux
 
-- api/ : fonctions backend Vercel
-- fichiers HTML de la plateforme
-- Firebase configuration et règles
-- variables secrètes à définir dans Vercel uniquement
+- Auth Firebase avec persistence locale.
+- Page `auth-choice.html` pour distinguer inscription et connexion sans deviner le statut du visiteur.
+- Dashboard et pages privées protégés après résolution de l'état Auth.
+- API IA côté serveur uniquement.
+- Quota et statut Premium vérifiés côté serveur.
+- Cache des sujets et résultats dans Firestore.
+- Planificateur Premium via `planificateur.html` et `/api/planner`.
+- Règles Firestore et Storage incluses.
+
+## Fichiers de référence
+
+- `AUTH-FLOW.md` : parcours Auth et états de session.
+- `SECURITY-AUDIT.md` : risques et corrections.
+- `CORRECTIONS.md` : liste des modifications.
+- `DEPLOYMENT.md` : configuration Vercel/Firebase et tests production.
 
 ## Sécurité
 
-- Ne jamais ajoutter de clés dans les fichiers HTML ou JavaScript publics.
-- Ne jamais committer les variables d'environnement.
-- Utiliser Vercel > Settings > Environment Variables.
-
-## Variables requises
-
-```env
-FIREBASE_ADMIN_CREDENTIALS={...}
-FIREBASE_WEB_API_KEY=...
-GROQ_API_KEY=...
-GROQ_MODEL=openai/gpt-oss-120b
-OPENROUTER_API_KEY=...
-OPENROUTER_MODEL=openai/gpt-oss-120b
-MISTRAL_API_KEY=...
-MISTRAL_MODEL=mistral-large-latest
-APP_ORIGIN=https://votre-domaine.vercel.app
-```
+Ne committe jamais `.env`, un compte de service Firebase, une clé IA, un fichier `.pem` ou un fichier `.key`. Les secrets doivent rester dans Vercel Environment Variables.

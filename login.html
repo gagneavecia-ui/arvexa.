@@ -1197,8 +1197,10 @@
     saveSession(user);
 
     // ⚡ Récupérer la page de destination
-    const redirectPath = sessionStorage.getItem('redirectAfterLogin') || 'index.html';
+    const requestedRedirect = sessionStorage.getItem('redirectAfterLogin') || sessionStorage.getItem('redirectAfterAuth') || 'index.html';
+    const redirectPath = requestedRedirect.startsWith('/') || (!requestedRedirect.includes(':') && !requestedRedirect.startsWith('//')) ? requestedRedirect : 'index.html';
     sessionStorage.removeItem('redirectAfterLogin');
+    sessionStorage.removeItem('redirectAfterAuth');
 
     // ⚡ Redirection immédiate avec replace
     setTimeout(() => {

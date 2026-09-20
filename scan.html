@@ -259,7 +259,19 @@
 <!-- ============================================================ -->
 <!-- SCRIPT - MODÈLE UNIQUE GROQ                                 -->
 <!-- ============================================================ -->
-<script>
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js';
+import { getAuth, getIdToken } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js';
+
+const firebaseApp = initializeApp({
+  apiKey: 'AIzaSyDHscOXw3rLuhV6z1Cny-bdYCumqpnG7QE',
+  authDomain: 'arvexa-fbf10.firebaseapp.com',
+  projectId: 'arvexa-fbf10',
+  storageBucket: 'arvexa-fbf10.firebasestorage.app',
+  messagingSenderId: '920108330053',
+  appId: '1:920108330053:web:f532d71cbc2c824bc7472c'
+});
+const scanAuth = getAuth(firebaseApp);
 /* ================================================================
    ARV-SCAN
    Vision : Qwen 3.6 27B
@@ -692,9 +704,11 @@ async function callGroqText(
    MOTEUR BACKEND — aucune clé IA dans le navigateur
    ================================================================ */
 async function callScanBackend(payload) {
+  const user = scanAuth.currentUser;
+  if (!user) throw new Error('Connecte-toi pour utiliser ARV-SCAN.');
   const response = await fetch(SCAN_ENDPOINT, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${await getIdToken(user)}` },
     body: JSON.stringify(payload)
   });
 

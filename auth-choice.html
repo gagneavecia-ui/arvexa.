@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>ARVEXA | Accès</title>
+  <style>
+    :root { color-scheme: dark; --bg:#0a0d0b; --panel:#151a15; --line:rgba(255,255,255,.1); --text:#f5f5f1; --muted:#a9ad9d; --gold:#e0b84a; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; display:grid; place-items:center; padding:20px; background:radial-gradient(circle at top right,rgba(28,70,52,.38),transparent 32rem),linear-gradient(180deg,#0a0d0b,#101511); color:var(--text); font:15px/1.6 Inter,system-ui,sans-serif; }
+    main { width:min(100%,480px); padding:28px; border:1px solid var(--line); border-radius:18px; background:rgba(21,26,21,.94); box-shadow:0 20px 60px rgba(0,0,0,.3); text-align:center; }
+    h1 { margin:0; font:700 clamp(28px,7vw,42px)/1.1 Georgia,serif; }
+    p { color:var(--muted); }
+    .actions { display:grid; gap:10px; margin-top:22px; }
+    a { display:block; padding:12px 16px; border-radius:10px; text-decoration:none; font-weight:800; }
+    .primary { background:linear-gradient(135deg,#f3d778,var(--gold)); color:#0a0d0b; }
+    .secondary { border:1px solid var(--line); color:var(--text); }
+    #loading { color:var(--muted); }
+    [hidden] { display:none; }
+  </style>
+</head>
+<body>
+  <main>
+    <div id="loading">Vérification de ta session...</div>
+    <div id="choice" hidden>
+      <h1>Bienvenue sur ARVEXA</h1>
+      <p>Choisis ton parcours. Un visiteur non connecté n’est pas automatiquement considéré comme déjà inscrit.</p>
+      <div class="actions">
+        <a class="primary" id="registerLink" href="register.html">Créer un compte</a>
+        <a class="secondary" id="loginLink" href="login.html">J’ai déjà un compte</a>
+      </div>
+    </div>
+  </main>
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js';
+    import { getAuth, onAuthStateChanged, setPersistence, browserLocalPersistence } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js';
+    const app = initializeApp({ apiKey:'AIzaSyDHscOXw3rLuhV6z1Cny-bdYCumqpnG7QE', authDomain:'arvexa-fbf10.firebaseapp.com', projectId:'arvexa-fbf10', storageBucket:'arvexa-fbf10.firebasestorage.app', messagingSenderId:'920108330053', appId:'1:920108330053:web:f532d71cbc2c824bc7472c' });
+    const auth = getAuth(app);
+    const redirect = sessionStorage.getItem('redirectAfterAuth') || 'index.html';
+    const target = encodeURIComponent(redirect);
+    document.getElementById('registerLink').href = `register.html?redirect=${target}`;
+    document.getElementById('loginLink').href = `login.html?redirect=${target}`;
+    try { await setPersistence(auth, browserLocalPersistence); } catch (_) {}
+    onAuthStateChanged(auth, (user) => {
+      if (user) { sessionStorage.removeItem('redirectAfterAuth'); window.location.replace(redirect); return; }
+      document.getElementById('loading').hidden = true;
+      document.getElementById('choice').hidden = false;
+    });
+  </script>
+</body>
+</html>

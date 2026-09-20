@@ -4,6 +4,25 @@ const requestLog = new Map();
 // Vercel limits serverless request bodies; keep room for JSON/base64 overhead.
 const MAX_IMAGE_LENGTH = 3 * 1024 * 1024;
 const ALLOWED_ACTIONS = new Set(['analyze', 'action']);
+let adminAuth;
+
+function getAdminAuth() {
+  if (adminAuth) return adminAuth;
+  const credentials = process.env.FIREBASE_ADMIN_CREDENTIALS;
+  if (!credentials) throw new Error('firebase_admin_not_configured');
+  const admin = require('firebase-admin');
+  const serviceAccount = JSON.parse(credentials);
+  if (!admin.apps.length) admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
+  adminAuth = admin.auth();
+  return adminAuth;
+}
+
+async function verifyFirebaseToken(request) {
+  const authorization = request.headers.authorization || '';
+  const match = authorization.match(/^Bearer\s+(.+)$/i);
+  if (!match) return null;
+  try { return await getAdminAuth().verifyIdToken(match[1]); } catch (_) { return null; }
+}
 
 function clientIp(request) {
   return String(request.headers['x-forwarded-for'] || request.socket?.remoteAddress || 'unknown').split(',')[0].trim();
@@ -69,6 +88,12 @@ async function callProvider(provider, messages, maxTokens) {
 module.exports = async function handler(request, response) {
   if (request.method !== 'POST') { response.setHeader('Allow', 'POST'); return errorResponse(response, 405, 'Méthode non autorisée.'); }
   if (rateLimited(clientIp(request))) return errorResponse(response, 429, 'Trop de demandes. Réessaie dans une minute.');
+  let verifiedUser;
+  try { verifiedUser = await verifyFirebaseToken(request); } catch (error) {
+    console.error('ARV-SCAN auth configuration failed:', error.message);
+    return errorResponse(response, 503, 'Service d’authentification temporairement indisponible.');
+  }
+  if (!verifiedUser) return errorResponse(response, 401, 'Connexion requise.');
 
   const body = request.body && typeof request.body === 'object' ? request.body : {};
   if (!ALLOWED_ACTIONS.has(body.action)) return errorResponse(response, 400, 'Action ARV-SCAN invalide.');

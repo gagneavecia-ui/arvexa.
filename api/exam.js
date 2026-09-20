@@ -69,7 +69,8 @@ async function reserveFreeGeneration(uid) {
   const usageDate = getUsageDate();
   const usageRef = userRef.collection('examUsage').doc(usageDate);
   return db.runTransaction(async (transaction) => {
-    const [userSnapshot, usageSnapshot] = await Promise.all([transaction.get(userRef), transaction.get(usageRef)]);
+    const userSnapshot = await transaction.get(userRef);
+    const usageSnapshot = await transaction.get(usageRef);
     if (!userSnapshot.exists) throw new Error('profile_missing');
     if (isPremiumUser(userSnapshot.data())) return { premium: true, reserved: false };
     const used = Number(usageSnapshot.data()?.count || 0);
@@ -212,6 +213,7 @@ module.exports = async function handler(request, response) {
         try { await releaseFreeGeneration(verifiedUser.uid, reservation.usageDate); } catch (releaseError) { console.error('Exam usage release failed:', releaseError.message); }
       }
       console.error('Exam generation failed:', error.message);
+      if (error.message === 'provider_missing') return jsonError(response, 503, 'Aucun fournisseur IA n’est configuré.');
       return jsonError(response, 502, 'Impossible de générer l’examen.');
     }
   }

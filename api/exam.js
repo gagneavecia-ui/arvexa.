@@ -116,11 +116,15 @@ function validateCorrection(body) {
 }
 
 function generationPrompt(config) {
+  const choiceSubjects = new Set(['Mathématiques', 'Physique', 'Chimie']);
+  const questionFormat = choiceSubjects.has(config.subject)
+    ? 'Pour chaque question, utilise obligatoirement type "choice" et ajoute exactement quatre propositions dans options: [{"id":"A","text":"..."},{"id":"B","text":"..."},{"id":"C","text":"..."},{"id":"D","text":"..."}]. Ajoute aussi correctAnswer avec une seule valeur parmi A, B, C ou D.'
+    : 'Pour chaque question, utilise type text, number ou formula selon le besoin.';
   return `Tu es un professeur expert du BAC au Niger. Génère exactement deux sujets différents mais de difficulté comparable.
 Matière: ${config.subject}; niveau: ${config.level}; chapitre: ${config.chapter}; difficulté: ${config.difficulty}; durée: ${config.duration} minutes.
 Réponds uniquement avec un objet JSON valide, sans markdown, selon ce schéma:
-{"subject":"${config.subject}","level":"${config.level}","duration":${config.duration},"totalPoints":20,"subjects":[{"id":"subject_1","title":"Sujet 1","instructions":"...","exercises":[{"number":1,"title":"...","points":4,"statement":"...","questions":[{"number":"1.a","text":"...","points":0.4,"type":"text"}]}]},{"id":"subject_2","title":"Sujet 2","instructions":"...","exercises":[]}]}
-Chaque sujet doit contenir exactement 5 exercices et chaque exercice exactement 10 questions. Le total de chaque sujet est 20 points. Utilise type text, number ou formula et entoure les formules LaTeX avec $...$ ou $$...$$. N’inclus aucune clé, aucun commentaire et aucune donnée personnelle.`;
+{"subject":"${config.subject}","level":"${config.level}","duration":${config.duration},"totalPoints":20,"subjects":[{"id":"subject_1","title":"Sujet 1","instructions":"...","exercises":[{"number":1,"title":"...","points":4,"statement":"...","questions":[{"number":"1.a","text":"...","points":0.4,"type":"choice","options":[{"id":"A","text":"..."},{"id":"B","text":"..."},{"id":"C","text":"..."},{"id":"D","text":"..."}],"correctAnswer":"A"}]}]},{"id":"subject_2","title":"Sujet 2","instructions":"...","exercises":[]}]}
+Chaque sujet doit contenir exactement 5 exercices et chaque exercice exactement 10 questions. Le total de chaque sujet est 20 points. ${questionFormat} Entoure les formules LaTeX avec $...$ ou $$...$$. N’inclus aucune clé, aucun commentaire et aucune donnée personnelle.`;
 }
 
 function correctionPrompt(body) {
@@ -136,6 +140,8 @@ function getProviders() {
 }
 
 function buildLocalExam(config) {
+  const useChoices = ['Mathématiques', 'Physique', 'Chimie'].includes(config.subject);
+  const options = useChoices ? [{ id: 'A', text: 'Réponse A' }, { id: 'B', text: 'Réponse B' }, { id: 'C', text: 'Réponse C' }, { id: 'D', text: 'Réponse D' }] : null;
   const subjects = [
     {
       id: 'subject_1',
@@ -150,7 +156,8 @@ function buildLocalExam(config) {
           number: `${exerciseIndex + 1}.${questionIndex + 1}`,
           text: `Question ${questionIndex + 1} : expliquez la démarche pertinente pour le thème ${config.chapter === 'all' ? 'principal' : config.chapter}.`,
           points: 0.4,
-          type: 'text'
+          type: useChoices ? 'choice' : 'text',
+          ...(options ? { options, correctAnswer: 'A' } : {})
         }))
       }))
     },
@@ -167,7 +174,8 @@ function buildLocalExam(config) {
           number: `${exerciseIndex + 1}.${questionIndex + 1}`,
           text: `Question ${questionIndex + 1} : répondez avec une méthode rigoureuse sur le thème ${config.chapter === 'all' ? 'principal' : config.chapter}.`,
           points: 0.4,
-          type: 'text'
+          type: useChoices ? 'choice' : 'text',
+          ...(options ? { options, correctAnswer: 'A' } : {})
         }))
       }))
     }
@@ -222,17 +230,18 @@ async function callProvider(provider, prompt) {
   }
 }
 
-function validateGeneratedExam(exam) {
-  return exam && typeof exam === 'object' && Array.isArray(exam.subjects) && exam.subjects.length === 2 && exam.subjects.every((subject) => Array.isArray(subject.exercises) && subject.exercises.length === REQUIRED_EXERCISES && subject.exercises.every((exercise) => Array.isArray(exercise.questions) && exercise.questions.length === QUESTIONS_PER_EXERCISE));
+function validateGeneratedExam(exam, subjectName) {
+  const requiresChoices = ['Mathématiques', 'Physique', 'Chimie'].includes(subjectName);
+  return exam && typeof exam === 'object' && Array.isArray(exam.subjects) && exam.subjects.length === 2 && exam.subjects.every((subject) => Array.isArray(subject.exercises) && subject.exercises.length === REQUIRED_EXERCISES && subject.exercises.every((exercise) => Array.isArray(exercise.questions) && exercise.questions.length === QUESTIONS_PER_EXERCISE && (!requiresChoices || exercise.questions.every((question) => question.type === 'choice' && Array.isArray(question.options) && question.options.length === 4 && question.options.every((option) => option?.id && option?.text) && ['A', 'B', 'C', 'D'].includes(question.correctAnswer)))));
 }
 
-async function generateWithFallback(prompt) {
+async function generateWithFallback(prompt, subjectName) {
   const providers = getProviders();
   if (!providers.length) throw new Error('provider_missing');
   for (const provider of providers) {
     try {
       const exam = await callProvider(provider, prompt);
-      if (validateGeneratedExam(exam)) return exam;
+      if (validateGeneratedExam(exam, subjectName)) return exam;
       console.warn(`${provider.name} a renvoyé une structure invalide.`);
     } catch (error) {
       console.warn(`${provider.name} indisponible:`, error.message);
@@ -289,13 +298,10 @@ module.exports = async function handler(request, response) {
     try {
       const providers = getProviders();
       if (!providers.length) return response.status(200).json({ success: true, exam: buildLocalExam(body) });
-      const exam = await generateWithFallback(generationPrompt(body));
-      if (!validateGeneratedExam(exam)) throw new Error('provider_invalid');
+      const exam = await generateWithFallback(generationPrompt(body), body.subject);
+      if (!validateGeneratedExam(exam, body.subject)) throw new Error('provider_invalid');
       return response.status(200).json({ success: true, exam });
     } catch (error) {
-      if (reservation.reserved) {
-        try { await releaseFreeGeneration(verifiedUser.uid, reservation.usageDate); } catch (releaseError) { console.error('Exam usage release failed:', releaseError.message); }
-      }
       console.error('Exam generation failed:', error.message);
       return response.status(200).json({ success: true, exam: buildLocalExam(body) });
     }

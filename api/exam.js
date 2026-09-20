@@ -91,6 +91,57 @@ async function releaseFreeGeneration(uid, usageDate) {
   });
 }
 
+async function saveExamCache(uid, config, exam, source = 'ai') {
+  const { db, FieldValue } = getAdminServices();
+  await db.collection('users').doc(uid).collection('examCache').add({
+    subject: config.subject,
+    level: config.level,
+    chapter: config.chapter,
+    difficulty: config.difficulty,
+    duration: config.duration,
+    exam,
+    source,
+    createdAt: FieldValue.serverTimestamp()
+  });
+}
+
+async function findCachedExam(uid, config) {
+  const { db } = getAdminServices();
+  const snapshot = await db.collection('users').doc(uid).collection('examCache').orderBy('createdAt', 'desc').limit(30).get();
+  const match = snapshot.docs.find((document) => {
+    const cached = document.data();
+    return cached.subject === config.subject
+      && cached.level === config.level
+      && cached.chapter === config.chapter
+      && cached.difficulty === config.difficulty
+      && Number(cached.duration) === Number(config.duration)
+      && cached.exam;
+  });
+  return match?.data()?.exam || null;
+}
+
+async function saveExamResult(uid, body, result) {
+  const { db, FieldValue } = getAdminServices();
+  const selected = body.exam.subjects.find((subject) => subject.id === body.subjectId) || body.exam.subjects[0];
+  const difficulties = Array.isArray(result?.exercises) ? result.exercises.map((exercise) => ({
+    number: exercise.number,
+    score: Number(exercise.score || 0),
+    maxScore: Number(exercise.maxScore || 5),
+    advice: String(exercise.advice || '').slice(0, 500)
+  })) : [];
+  await db.collection('users').doc(uid).collection('examResults').add({
+    subject: body.exam.subject,
+    subjectId: body.subjectId,
+    chapter: body.exam.chapter || 'all',
+    score: Number(result?.score ?? result?.totalScore ?? 0),
+    result: { ...result, exercises: difficulties },
+    difficulties,
+    answerCount: Object.values(body.answers || {}).filter(Boolean).length,
+    examTitle: selected?.title || 'Examen',
+    createdAt: FieldValue.serverTimestamp()
+  });
+}
+
 function validateConfig(body) {
   const config = {
     subject: String(body.subject || ''),
@@ -118,7 +169,7 @@ function validateCorrection(body) {
 function generationPrompt(config) {
   const choiceSubjects = new Set(['Mathématiques', 'Physique', 'Chimie']);
   const questionFormat = choiceSubjects.has(config.subject)
-    ? 'Pour chaque question, utilise obligatoirement type "choice" et ajoute exactement quatre propositions dans options: [{"id":"A","text":"..."},{"id":"B","text":"..."},{"id":"C","text":"..."},{"id":"D","text":"..."}]. Ajoute aussi correctAnswer avec une seule valeur parmi A, B, C ou D.'
+    ? 'Pour les questions de calcul, utilise type "choice" avec exactement quatre propositions dans options: [{"id":"A","text":"..."},{"id":"B","text":"..."},{"id":"C","text":"..."},{"id":"D","text":"..."}] et correctAnswer parmi A, B, C ou D. Pour les questions de raisonnement, démonstration ou rédaction, utilise type "text" sans options afin que l’élève saisisse sa réponse.'
     : 'Pour chaque question, utilise type text, number ou formula selon le besoin.';
   return `Tu es un professeur expert du BAC au Niger. Génère exactement deux sujets différents mais de difficulté comparable.
 Matière: ${config.subject}; niveau: ${config.level}; chapitre: ${config.chapter}; difficulté: ${config.difficulty}; durée: ${config.duration} minutes.
@@ -231,8 +282,14 @@ async function callProvider(provider, prompt) {
 }
 
 function validateGeneratedExam(exam, subjectName) {
-  const requiresChoices = ['Mathématiques', 'Physique', 'Chimie'].includes(subjectName);
-  return exam && typeof exam === 'object' && Array.isArray(exam.subjects) && exam.subjects.length === 2 && exam.subjects.every((subject) => Array.isArray(subject.exercises) && subject.exercises.length === REQUIRED_EXERCISES && subject.exercises.every((exercise) => Array.isArray(exercise.questions) && exercise.questions.length === QUESTIONS_PER_EXERCISE && (!requiresChoices || exercise.questions.every((question) => question.type === 'choice' && Array.isArray(question.options) && question.options.length === 4 && question.options.every((option) => option?.id && option?.text) && ['A', 'B', 'C', 'D'].includes(question.correctAnswer)))));
+  const supportsChoices = ['Mathématiques', 'Physique', 'Chimie'].includes(subjectName);
+  const validQuestion = (question) => {
+    if (!supportsChoices || question.type !== 'choice') return question.type === 'text' || question.type === 'number' || question.type === 'formula';
+    return Array.isArray(question.options) && question.options.length === 4
+      && question.options.every((option) => option?.id && option?.text)
+      && ['A', 'B', 'C', 'D'].includes(question.correctAnswer);
+  };
+  return exam && typeof exam === 'object' && Array.isArray(exam.subjects) && exam.subjects.length === 2 && exam.subjects.every((subject) => Array.isArray(subject.exercises) && subject.exercises.length === REQUIRED_EXERCISES && subject.exercises.every((exercise) => Array.isArray(exercise.questions) && exercise.questions.length === QUESTIONS_PER_EXERCISE && exercise.questions.every(validQuestion)));
 }
 
 async function generateWithFallback(prompt, subjectName) {
@@ -297,13 +354,28 @@ module.exports = async function handler(request, response) {
     if (reservation.limitReached) return response.status(429).json({ success: false, error: 'Limite gratuite atteinte.', code: 'FREE_EXAM_LIMIT', used: reservation.used, limit: FREE_EXAM_LIMIT });
     try {
       const providers = getProviders();
-      if (!providers.length) return response.status(200).json({ success: true, exam: buildLocalExam(body) });
+      if (!providers.length) {
+        const cachedExam = await findCachedExam(verifiedUser.uid, body);
+        const exam = { ...(cachedExam || buildLocalExam(body)), chapter: body.chapter };
+        await saveExamCache(verifiedUser.uid, body, exam, cachedExam ? 'cache' : 'local');
+        return response.status(200).json({ success: true, exam });
+      }
       const exam = await generateWithFallback(generationPrompt(body), body.subject);
       if (!validateGeneratedExam(exam, body.subject)) throw new Error('provider_invalid');
-      return response.status(200).json({ success: true, exam });
+      const examWithMetadata = { ...exam, chapter: body.chapter };
+      await saveExamCache(verifiedUser.uid, body, examWithMetadata, 'ai');
+      return response.status(200).json({ success: true, exam: examWithMetadata });
     } catch (error) {
       console.error('Exam generation failed:', error.message);
-      return response.status(200).json({ success: true, exam: buildLocalExam(body) });
+      try {
+        const cachedExam = await findCachedExam(verifiedUser.uid, body);
+        const exam = { ...(cachedExam || buildLocalExam(body)), chapter: body.chapter };
+        await saveExamCache(verifiedUser.uid, body, exam, cachedExam ? 'cache' : 'local');
+        return response.status(200).json({ success: true, exam });
+      } catch (cacheError) {
+        console.error('Exam cache fallback failed:', cacheError.message);
+        return response.status(200).json({ success: true, exam: buildLocalExam(body) });
+      }
     }
   }
 
@@ -313,13 +385,20 @@ module.exports = async function handler(request, response) {
     try {
       const providers = getProviders();
       if (!providers.length || !firebaseConfigured) {
-        return response.status(200).json({ success: true, result: buildLocalCorrection(body) });
+        const result = buildLocalCorrection(body);
+        if (firebaseConfigured) {
+          try { await saveExamResult(verifiedUser.uid, body, result); } catch (saveError) { console.error('Exam result save failed:', saveError.message); }
+        }
+        return response.status(200).json({ success: true, result });
       }
       const result = await correctWithFallback(correctionPrompt(body));
+      await saveExamResult(verifiedUser.uid, body, result);
       return response.status(200).json({ success: true, result });
     } catch (error) {
       console.error('Exam correction failed:', error.message);
-      return response.status(200).json({ success: true, result: buildLocalCorrection(body) });
+      const result = buildLocalCorrection(body);
+      try { await saveExamResult(verifiedUser.uid, body, result); } catch (saveError) { console.error('Exam result save failed:', saveError.message); }
+      return response.status(200).json({ success: true, result });
     }
   }
 

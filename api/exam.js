@@ -136,19 +136,20 @@ function getProviders() {
 
 async function callProvider(provider, prompt) {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 30000);
+  const timeout = setTimeout(() => controller.abort(), 60000);
   try {
     const result = await fetch(provider.endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${provider.key}`, ...provider.headers },
-      body: JSON.stringify({ model: provider.model, temperature: 0.2, max_tokens: 9000, response_format: { type: 'json_object' }, messages: [{ role: 'system', content: 'Tu produis exclusivement du JSON valide.' }, { role: 'user', content: prompt }] }),
+      body: JSON.stringify({ model: provider.model, temperature: 0.2, max_tokens: 14000, response_format: { type: 'json_object' }, messages: [{ role: 'system', content: 'Tu produis exclusivement du JSON valide.' }, { role: 'user', content: prompt }] }),
       signal: controller.signal
     });
     const data = await result.json().catch(() => null);
     if (!result.ok) throw new Error('provider_error');
     const content = data?.choices?.[0]?.message?.content;
     if (!content) throw new Error('provider_empty');
-    return JSON.parse(content);
+    const normalizedContent = content.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+    return JSON.parse(normalizedContent);
   } finally {
     clearTimeout(timeout);
   }
@@ -214,6 +215,7 @@ module.exports = async function handler(request, response) {
       }
       console.error('Exam generation failed:', error.message);
       if (error.message === 'provider_missing') return jsonError(response, 503, 'Aucun fournisseur IA n’est configuré.');
+      if (error.message === 'all_providers_failed') return jsonError(response, 502, 'Les fournisseurs IA sont indisponibles ou ont renvoyé un examen invalide.');
       return jsonError(response, 502, 'Impossible de générer l’examen.');
     }
   }

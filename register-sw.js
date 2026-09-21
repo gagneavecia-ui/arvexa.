@@ -1,112 +1,81 @@
 // ================================================================
 // REGISTER SERVICE WORKER — ARVEXA School
-// Version : 2.0.0 — Anti-cache agressif
+// Version : 2.0.1 — Anti-boucle
 // ================================================================
 
 (function() {
   'use strict';
 
-  // Vérifier le support
   if (!('serviceWorker' in navigator)) {
-    console.log('[SW] Service Worker non supporté');
+    console.log('[SW] Non supporté');
     return;
   }
 
-  // ═══════════════════════════════════════════════════════════════
-  // ÉTAT GLOBAL
-  // ═══════════════════════════════════════════════════════════════
-  let isRefreshing = false;
+  // ⚡ État global anti-boucle
+  let isReloading = false;
   let registrationRef = null;
 
-  // ═══════════════════════════════════════════════════════════════
-  // ENREGISTREMENT
-  // ═══════════════════════════════════════════════════════════════
   window.addEventListener('load', () => {
-    // ⚡ Version horodatée pour forcer la détection de mise à jour
-    const swUrl = 'service-worker.js?v=' + Date.now();
+    // ⚡ URL FIXE — pas de timestamp (sinon boucle infinie)
+    const swUrl = 'service-worker.js';
 
     navigator.serviceWorker.register(swUrl, {
       scope: './',
-      updateViaCache: 'none'  // ⚡ N'utilise JAMAIS le cache HTTP pour le SW
+      updateViaCache: 'none'
     })
     .then((registration) => {
       registrationRef = registration;
-      console.log('[SW] ✅ Service Worker enregistré. Scope:', registration.scope);
+      console.log('[SW] ✅ Enregistré. Scope:', registration.scope);
 
-      // ⚡ Force la vérification immédiate d'une mise à jour
-      registration.update().catch(() => {});
+      // ⚡ Vérifie MAJ une fois au démarrage (sans forcer le rechargement)
+      setTimeout(() => {
+        registration.update().catch(() => {});
+      }, 1000);
 
-      // ⚡ Vérifie périodiquement (toutes les 30 min)
+      // ⚡ Vérifie périodiquement (1h)
       setInterval(() => {
         registration.update().catch(() => {});
-      }, 30 * 60 * 1000);
+      }, 60 * 60 * 1000);
 
       // ═══════════════════════════════════════════════════════════
-      // DÉTECTION D'UNE NOUVELLE VERSION
+      // DÉTECTION NOUVELLE VERSION
       // ═══════════════════════════════════════════════════════════
       registration.addEventListener('updatefound', () => {
         const newWorker = registration.installing;
         if (!newWorker) return;
 
-        console.log('[SW] 🔄 Nouvelle version détectée, installation...');
+        console.log('[SW] 🔄 Nouvelle version en cours d\'installation');
 
         newWorker.addEventListener('statechange', () => {
           if (newWorker.state === 'installed') {
             if (navigator.serviceWorker.controller) {
-              // ⚡ Une ancienne version est active → nouvelle version prête
+              // ⚡ Une nouvelle version est prête → proposer MAJ
               console.log('[SW] 📦 Nouvelle version prête');
-              activateNewVersion(newWorker);
+              showUpdateNotification(newWorker);
             } else {
-              // ⚡ Première installation
-              console.log('[SW] 🆕 Première installation terminée');
+              console.log('[SW] 🆕 Première installation');
             }
           }
         });
       });
-
-      // ⚡ Si un SW est déjà en attente (cas rare)
-      if (registration.waiting && navigator.serviceWorker.controller) {
-        console.log('[SW] ⏳ Un SW est déjà en attente');
-        activateNewVersion(registration.waiting);
-      }
-
     })
     .catch((error) => {
-      console.error('[SW] ❌ Erreur d\'enregistrement:', error);
+      console.error('[SW] ❌ Erreur:', error);
     });
   });
 
   // ═══════════════════════════════════════════════════════════════
-  // ACTIVATION AUTOMATIQUE D'UNE NOUVELLE VERSION
-  // ═══════════════════════════════════════════════════════════════
-  function activateNewVersion(worker) {
-    // ⚡ Demande au nouveau SW de prendre le contrôle immédiatement
-    worker.postMessage({ type: 'SKIP_WAITING' });
-
-    // ⚡ Notification visuelle à l'utilisateur
-    showUpdateNotification();
-  }
-
-  // ═══════════════════════════════════════════════════════════════
-  // DÉTECTION DU CHANGEMENT DE CONTRÔLEUR → RECHARGEMENT
+  // RECHARGEMENT UNIQUEMENT QUAND L'UTILISATEUR CLIQUE
   // ═══════════════════════════════════════════════════════════════
   navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (isRefreshing) return;
-    isRefreshing = true;
-
-    console.log('[SW] 🔄 Contrôleur changé, rechargement...');
-
-    // ⚡ Petit délai pour laisser le SW s'installer proprement
-    setTimeout(() => {
-      window.location.reload();
-    }, 200);
+    // ⚡ Ne PAS recharger automatiquement — laisse l'utilisateur décider
+    console.log('[SW] 🔄 Contrôleur changé (rechargement manuel uniquement)');
   });
 
   // ═══════════════════════════════════════════════════════════════
   // NOTIFICATION VISUELLE DE MISE À JOUR
   // ═══════════════════════════════════════════════════════════════
-  function showUpdateNotification() {
-    // ⚡ Éviter les doublons
+  function showUpdateNotification(worker) {
     if (document.getElementById('arvexa-sw-update-toast')) return;
 
     const toast = document.createElement('div');
@@ -138,63 +107,60 @@
         <polyline points="23 4 23 10 17 10"></polyline>
         <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
       </svg>
-      <span>Nouvelle version disponible</span>
+      <span>Mise à jour disponible</span>
       <span style="opacity:.7;">• Appuie pour actualiser</span>
     `;
 
     toast.addEventListener('click', () => {
-      if (navigator.serviceWorker.controller) {
-        navigator.serviceWorker.controller.postMessage({ type: 'SKIP_WAITING' });
-      }
-      setTimeout(() => window.location.reload(), 300);
+      if (isReloading) return;
+      isReloading = true;
+
+      // ⚡ Envoie SKIP_WAITING au nouveau SW
+      worker.postMessage({ type: 'SKIP_WAITING' });
+
+      // ⚡ Attends que le contrôleur change, puis recharge UNE FOIS
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        window.location.reload();
+      }, { once: true });
+
+      // ⚡ Filet de sécurité : recharge après 1s si pas de controllerchange
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     });
 
     document.body.appendChild(toast);
 
-    // ⚡ Animation d'entrée
     requestAnimationFrame(() => {
       toast.style.transform = 'translateX(-50%) translateY(0)';
     });
 
-    // ⚡ Disparaît après 12 secondes
+    // ⚡ Disparaît après 15 secondes (mais reste cliquable dans le temps)
     setTimeout(() => {
       if (toast.parentNode) {
         toast.style.transform = 'translateX(-50%) translateY(120px)';
         setTimeout(() => toast.remove(), 500);
       }
-    }, 12000);
+    }, 15000);
   }
 
   // ═══════════════════════════════════════════════════════════════
-  // DÉTECTION ONLINE/OFFLINE
+  // ONLINE / OFFLINE
   // ═══════════════════════════════════════════════════════════════
-  window.addEventListener('online', () => {
-    console.log('[SW] 🟢 Connexion rétablie');
-  });
-
-  window.addEventListener('offline', () => {
-    console.log('[SW] 🔴 Connexion perdue');
-  });
+  window.addEventListener('online', () => console.log('[SW] 🟢 En ligne'));
+  window.addEventListener('offline', () => console.log('[SW] 🔴 Hors ligne'));
 
   // ═══════════════════════════════════════════════════════════════
-  // EXPOSITION API PUBLIQUE (optionnel)
+  // API PUBLIQUE
   // ═══════════════════════════════════════════════════════════════
   window.arvexaSW = {
-    // ⚡ Force une vérification de mise à jour
     checkForUpdate: () => {
-      if (registrationRef) {
-        registrationRef.update().catch(() => {});
-      }
+      if (registrationRef) registrationRef.update().catch(() => {});
     },
-    // ⚡ Force la purge de tout le cache
     clearCache: () => {
       if (navigator.serviceWorker.controller) {
         navigator.serviceWorker.controller.postMessage({ type: 'CLEAR_CACHE' });
       }
-    },
-    // ⚡ Force le rechargement
-    reload: () => {
-      window.location.reload();
     }
   };
 

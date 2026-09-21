@@ -32,6 +32,21 @@ self.addEventListener('install', (event) => {
   );
 });
 
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+  if (event.data && event.data.type === 'CLEAR_CACHE') {
+    caches.keys().then((names) => {
+      names.forEach((name) => caches.delete(name));
+    }).then(() => {
+      self.clients.matchAll().then((clients) => {
+        clients.forEach((client) => client.postMessage({ type: 'CACHE_CLEARED' }));
+      });
+    });
+  }
+});
+
 // ================================================================
 // ACTIVATION — Supprime TOUS les anciens caches
 // ================================================================

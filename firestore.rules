@@ -104,6 +104,17 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+match /users/{userId} {
+  // ... règles existantes ...
+
+  // Sessions de révision (Réviseur)
+  match /revisionSessions/{sessionId} {
+    allow read: if request.auth != null && request.auth.uid == userId;
+    allow create: if request.auth != null && request.auth.uid == userId;
+    allow update, delete: if false; // Immutable
+  }
+}
+
     match /avis/{avisId} {
       allow create: if signedIn()
         && request.resource.data.userId == request.auth.uid

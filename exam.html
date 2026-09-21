@@ -10,6 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
@@ -47,7 +48,7 @@
     input, select, textarea { width:100%; border:1px solid var(--line); border-radius:10px; background:#0e100e; color:var(--white); padding:12px 13px; outline:none; }
     input:focus, select:focus, textarea:focus { border-color:var(--gold-light); box-shadow:0 0 0 3px rgba(224,184,74,.12); }
     .actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:24px; }
-    .btn { min-height:44px; border:1px solid transparent; border-radius:10px; padding:10px 18px; color:var(--white); background:#222722; font-weight:800; transition:transform .16s,background .16s,border-color .16s; font-family:inherit; }
+    .btn { min-height:44px; border:1px solid transparent; border-radius:10px; padding:10px 18px; color:var(--white); background:#222722; font-weight:800; transition:transform .16s,background .16s,border-color .16s; font-family:inherit; display:inline-flex; align-items:center; justify-content:center; gap:8px; }
     .btn:hover:not(:disabled) { transform:translateY(-1px); border-color:rgba(224,184,74,.55); }
     .btn.primary { background:linear-gradient(135deg,var(--gold-light),var(--gold)); color:var(--black); }
     .btn.secondary { background:transparent; border-color:var(--line); }
@@ -66,7 +67,6 @@
       border-radius: 50%;
       animation: spin .7s linear infinite;
       vertical-align: middle;
-      margin-right: 8px;
     }
     .btn.loading .loader { display: inline-block; }
     .btn.loading .btn-text { display: none; }
@@ -74,7 +74,157 @@
     @keyframes spin { to { transform:rotate(360deg); } }
 
     /* ═══════════════════════════════════════════════════════════
-       LOADING STEPS — Vue de chargement avec progression détaillée
+       CUSTOM SELECT — Menus déroulants personnalisés
+       ═══════════════════════════════════════════════════════════ */
+    .custom-select {
+      position: relative;
+      width: 100%;
+      user-select: none;
+    }
+
+    .custom-select-trigger {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      width: 100%;
+      min-height: 46px;
+      padding: 12px 14px;
+      background: #0e100e;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      color: var(--white);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all .16s ease;
+      text-align: left;
+      font-family: inherit;
+    }
+
+    .custom-select-trigger:hover:not(.disabled) {
+      border-color: rgba(224, 184, 74, .3);
+      background: #121612;
+    }
+
+    .custom-select.open .custom-select-trigger {
+      border-color: var(--gold-light);
+      box-shadow: 0 0 0 3px rgba(224, 184, 74, .12);
+      background: #121612;
+    }
+
+    .custom-select.disabled .custom-select-trigger {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
+    .custom-select-value {
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .custom-select-value .icon-prefix {
+      color: var(--gold-light);
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+
+    .custom-select-arrow {
+      color: var(--muted);
+      font-size: 12px;
+      flex-shrink: 0;
+      transition: transform .25s cubic-bezier(.25, 1, .5, 1);
+    }
+
+    .custom-select.open .custom-select-arrow {
+      transform: rotate(180deg);
+      color: var(--gold-light);
+    }
+
+    .custom-select-options {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      z-index: 50;
+      max-height: 280px;
+      overflow-y: auto;
+      background: linear-gradient(145deg, #171a17, #101310);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, .5), 0 0 0 1px rgba(224, 184, 74, .05);
+      padding: 6px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-8px) scale(.98);
+      transition: opacity .2s ease, visibility .2s ease, transform .2s cubic-bezier(.25, 1, .5, 1);
+      transform-origin: top center;
+    }
+
+    .custom-select.open .custom-select-options {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0) scale(1);
+    }
+
+    .custom-select-options::-webkit-scrollbar { width: 4px; }
+    .custom-select-options::-webkit-scrollbar-track { background: transparent; }
+    .custom-select-options::-webkit-scrollbar-thumb {
+      background: rgba(224, 184, 74, .2);
+      border-radius: 10px;
+    }
+
+    .custom-select-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 14px;
+      border-radius: 8px;
+      color: #e2e3dc;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all .15s ease;
+      position: relative;
+    }
+
+    .custom-select-option:hover,
+    .custom-select-option.focused {
+      background: rgba(224, 184, 74, .08);
+      color: var(--white);
+    }
+
+    .custom-select-option.selected {
+      background: rgba(224, 184, 74, .12);
+      color: var(--gold-light);
+      font-weight: 700;
+    }
+
+    .custom-select-option.selected::after {
+      content: '✓';
+      margin-left: auto;
+      color: var(--gold-light);
+      font-size: 12px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .custom-select-option .option-prefix {
+      color: var(--gold-light);
+      font-size: 13px;
+      flex-shrink: 0;
+      width: 18px;
+      text-align: center;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       LOADING STEPS
        ═══════════════════════════════════════════════════════════ */
     .loading-steps {
       margin-top: 28px;
@@ -199,6 +349,9 @@
       font-weight: 600;
     }
 
+    /* ═══════════════════════════════════════════════════════════
+       SUBJECT CARDS / EXAM / RESULTS
+       ═══════════════════════════════════════════════════════════ */
     .subject-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin-top:22px; }
     .subject-card { border:1px solid var(--line); border-radius:12px; padding:18px; background:linear-gradient(145deg,rgba(26,58,42,.5),rgba(10,10,10,.45)); display:flex; flex-direction:column; gap:11px; }
     .subject-card:nth-child(2) { background:linear-gradient(145deg,rgba(184,134,11,.2),rgba(10,10,10,.5)); }
@@ -267,6 +420,8 @@
       .step-label { font-size:13px; }
       .step-desc { font-size:11px; }
       .loading-status { font-size:12px; }
+      .custom-select-trigger { padding:11px 12px; min-height:44px; font-size:13.5px; }
+      .custom-select-option { padding:12px 12px; font-size:14px; }
     }
 
     @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:.01ms!important; transition-duration:.01ms!important; } }
@@ -287,13 +442,127 @@
         <div class="eyebrow">Mode examen</div>
         <h1 id="configTitle">Prépare ton examen dans les conditions du BAC.</h1>
         <p class="lead">Choisis tes paramètres. Le serveur générera deux sujets différents de difficulté comparable.</p>
+
         <form id="configForm" class="form-grid">
-          <div class="field"><label for="subject">Matière</label><select id="subject" required><option>Mathématiques</option><option>Physique</option><option>Chimie</option><option>SVT</option><option>Français</option></select></div>
-          <div class="field"><label for="level">Niveau</label><select id="level"><option>Terminale D</option></select></div>
-          <div class="field"><label for="chapter">Chapitre</label><select id="chapter"></select></div>
-          <div class="field"><label for="difficulty">Difficulté</label><select id="difficulty"><option value="easy">Facile</option><option value="medium" selected>Moyen</option><option value="hard">Difficile</option><option value="bac">Niveau BAC</option></select></div>
-          <div class="field"><label for="duration">Durée</label><select id="duration"><option value="30">30 min</option><option value="60" selected>1 h</option><option value="90">1 h 30</option><option value="120">2 h</option><option value="180">3 h</option></select></div>
-          <div class="field"><label for="exerciseCount">Nombre d'exercices</label><input id="exerciseCount" type="number" min="5" max="5" value="5" readonly required><small>Chaque sujet contient 5 exercices et 10 questions par exercice.</small></div>
+          <!-- Matière -->
+          <div class="field">
+            <label>Matière</label>
+            <div class="custom-select" id="subjectSelect" data-name="subject">
+              <button type="button" class="custom-select-trigger" aria-haspopup="listbox" aria-expanded="false">
+                <span class="custom-select-value"></span>
+                <i class="fas fa-chevron-down custom-select-arrow"></i>
+              </button>
+              <div class="custom-select-options" role="listbox">
+                <div class="custom-select-option" data-value="Mathématiques" role="option">
+                  <span class="option-prefix">📐</span> Mathématiques
+                </div>
+                <div class="custom-select-option" data-value="Physique" role="option">
+                  <span class="option-prefix">⚡</span> Physique
+                </div>
+                <div class="custom-select-option" data-value="Chimie" role="option">
+                  <span class="option-prefix">🧪</span> Chimie
+                </div>
+                <div class="custom-select-option" data-value="SVT" role="option">
+                  <span class="option-prefix">🧬</span> SVT
+                </div>
+                <div class="custom-select-option" data-value="Français" role="option">
+                  <span class="option-prefix">📖</span> Français
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Niveau -->
+          <div class="field">
+            <label>Niveau</label>
+            <div class="custom-select" id="levelSelect" data-name="level">
+              <button type="button" class="custom-select-trigger" aria-haspopup="listbox" aria-expanded="false">
+                <span class="custom-select-value"></span>
+                <i class="fas fa-chevron-down custom-select-arrow"></i>
+              </button>
+              <div class="custom-select-options" role="listbox">
+                <div class="custom-select-option" data-value="Terminale D" role="option">
+                  <span class="option-prefix">🎓</span> Terminale D
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chapitre -->
+          <div class="field">
+            <label>Chapitre</label>
+            <div class="custom-select" id="chapterSelect" data-name="chapter">
+              <button type="button" class="custom-select-trigger" aria-haspopup="listbox" aria-expanded="false">
+                <span class="custom-select-value"></span>
+                <i class="fas fa-chevron-down custom-select-arrow"></i>
+              </button>
+              <div class="custom-select-options" role="listbox" id="chapterOptions">
+                <!-- Rempli dynamiquement -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Difficulté -->
+          <div class="field">
+            <label>Difficulté</label>
+            <div class="custom-select" id="difficultySelect" data-name="difficulty">
+              <button type="button" class="custom-select-trigger" aria-haspopup="listbox" aria-expanded="false">
+                <span class="custom-select-value"></span>
+                <i class="fas fa-chevron-down custom-select-arrow"></i>
+              </button>
+              <div class="custom-select-options" role="listbox">
+                <div class="custom-select-option" data-value="easy" role="option">
+                  <span class="option-prefix">🟢</span> Facile
+                </div>
+                <div class="custom-select-option" data-value="medium" role="option">
+                  <span class="option-prefix">🟡</span> Moyen
+                </div>
+                <div class="custom-select-option" data-value="hard" role="option">
+                  <span class="option-prefix">🟠</span> Difficile
+                </div>
+                <div class="custom-select-option" data-value="bac" role="option">
+                  <span class="option-prefix">🔴</span> Niveau BAC
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Durée -->
+          <div class="field">
+            <label>Durée</label>
+            <div class="custom-select" id="durationSelect" data-name="duration">
+              <button type="button" class="custom-select-trigger" aria-haspopup="listbox" aria-expanded="false">
+                <span class="custom-select-value"></span>
+                <i class="fas fa-chevron-down custom-select-arrow"></i>
+              </button>
+              <div class="custom-select-options" role="listbox">
+                <div class="custom-select-option" data-value="30" role="option">
+                  <span class="option-prefix">⏱️</span> 30 min
+                </div>
+                <div class="custom-select-option" data-value="60" role="option">
+                  <span class="option-prefix">⏱️</span> 1 heure
+                </div>
+                <div class="custom-select-option" data-value="90" role="option">
+                  <span class="option-prefix">⏱️</span> 1 h 30
+                </div>
+                <div class="custom-select-option" data-value="120" role="option">
+                  <span class="option-prefix">⏱️</span> 2 heures
+                </div>
+                <div class="custom-select-option" data-value="180" role="option">
+                  <span class="option-prefix">⏱️</span> 3 heures
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Nombre d'exercices -->
+          <div class="field">
+            <label for="exerciseCount">Nombre d'exercices</label>
+            <input id="exerciseCount" type="number" min="5" max="5" value="5" readonly required>
+            <small style="color:var(--muted);font-size:12px;">Chaque sujet contient 5 exercices et 10 questions par exercice.</small>
+          </div>
+
+          <!-- Submit -->
           <div class="field full">
             <button class="btn primary" id="generateButton" type="submit">
               <span class="btn-text">Générer mon examen</span>
@@ -306,15 +575,13 @@
     </section>
 
     <!-- ═══════════════════════════════════════════════════════════
-         VUE 2 : CHARGEMENT DE LA GÉNÉRATION (5 étapes)
+         VUE 2 : CHARGEMENT GÉNÉRATION
          ═══════════════════════════════════════════════════════════ -->
     <section class="view" id="loadingView" aria-labelledby="loadingTitle">
       <div class="panel">
         <div class="eyebrow">Génération en cours</div>
         <h2 id="loadingTitle">L'IA prépare tes deux sujets d'examen...</h2>
-        <p class="lead">
-          Cela prend généralement 30 à 60 secondes. Chaque étape indique la progression exacte.
-        </p>
+        <p class="lead">Cela prend généralement 30 à 60 secondes. Chaque étape indique la progression exacte.</p>
 
         <div class="loading-steps">
           <div class="loader-spinner"></div>
@@ -361,9 +628,7 @@
             </div>
           </div>
 
-          <div class="loading-status" id="genLoadingStatus">
-            Préparation...
-          </div>
+          <div class="loading-status" id="genLoadingStatus">Préparation...</div>
         </div>
       </div>
     </section>
@@ -415,15 +680,13 @@
     </section>
 
     <!-- ═══════════════════════════════════════════════════════════
-         VUE 5 : CHARGEMENT DE LA CORRECTION (5 étapes)
+         VUE 5 : CHARGEMENT CORRECTION
          ═══════════════════════════════════════════════════════════ -->
     <section class="view" id="loadingCorrectionView" aria-labelledby="loadingCorrTitle">
       <div class="panel">
         <div class="eyebrow">Correction en cours</div>
         <h2 id="loadingCorrTitle">L'IA corrige ta copie...</h2>
-        <p class="lead">
-          L'analyse de chaque exercice peut prendre 30 à 45 secondes. Les étapes s'affichent en temps réel.
-        </p>
+        <p class="lead">L'analyse de chaque exercice peut prendre 30 à 45 secondes. Les étapes s'affichent en temps réel.</p>
 
         <div class="loading-steps">
           <div class="loader-spinner"></div>
@@ -470,9 +733,7 @@
             </div>
           </div>
 
-          <div class="loading-status" id="corrLoadingStatus">
-            Préparation...
-          </div>
+          <div class="loading-status" id="corrLoadingStatus">Préparation...</div>
         </div>
       </div>
     </section>
@@ -573,9 +834,184 @@
       { id: 'corrStep5', label: 'Finalisation...' }
     ];
 
+    // ═══════════════════════════════════════════════════════════════
+    // CUSTOM SELECT — Composant dropdown personnalisé
+    // ═══════════════════════════════════════════════════════════════
+    class CustomSelect {
+      constructor(element) {
+        this.element = element;
+        this.name = element.dataset.name;
+        this.trigger = element.querySelector('.custom-select-trigger');
+        this.valueEl = element.querySelector('.custom-select-value');
+        this.optionsContainer = element.querySelector('.custom-select-options');
+        this.options = [];
+        this.value = null;
+        this.focusedIndex = -1;
+        this.isOpen = false;
+
+        this.init();
+      }
+
+      init() {
+        this.trigger.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.toggle();
+        });
+
+        this.trigger.addEventListener('keydown', (e) => this.handleKeydown(e));
+
+        document.addEventListener('click', (e) => {
+          if (!this.element.contains(e.target)) this.close();
+        });
+
+        this.refreshOptions();
+      }
+
+      refreshOptions() {
+        this.options = Array.from(this.optionsContainer.querySelectorAll('.custom-select-option'));
+        this.options.forEach((opt) => {
+          opt.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.select(opt.dataset.value);
+          });
+          opt.addEventListener('mouseenter', () => {
+            this.focusedIndex = this.options.indexOf(opt);
+            this.updateFocus();
+          });
+        });
+
+        // Sélectionner la première option si aucune valeur
+        if (!this.value && this.options.length > 0) {
+          this.select(this.options[0].dataset.value, true);
+        }
+      }
+
+      setOptions(options) {
+        this.optionsContainer.innerHTML = '';
+        options.forEach((opt) => {
+          const div = document.createElement('div');
+          div.className = 'custom-select-option';
+          div.dataset.value = opt.value;
+          div.setAttribute('role', 'option');
+          if (opt.prefix) {
+            div.innerHTML = `<span class="option-prefix">${opt.prefix}</span> ${opt.label}`;
+          } else {
+            div.textContent = opt.label;
+          }
+          this.optionsContainer.appendChild(div);
+        });
+        this.value = null;
+        this.refreshOptions();
+      }
+
+      select(value, silent = false) {
+        this.value = value;
+        const selectedOption = this.options.find((o) => o.dataset.value === String(value));
+        if (!selectedOption) return;
+
+        const prefix = selectedOption.querySelector('.option-prefix');
+        const prefixHTML = prefix ? prefix.outerHTML : '';
+        const label = selectedOption.textContent.replace(prefix?.textContent || '', '').trim();
+        this.valueEl.innerHTML = `${prefixHTML} <span>${label}</span>`;
+
+        this.options.forEach((o) => {
+          o.classList.toggle('selected', o.dataset.value === String(value));
+        });
+
+        this.close();
+
+        if (!silent) {
+          const event = new CustomEvent('change', {
+            detail: { name: this.name, value: this.value }
+          });
+          this.element.dispatchEvent(event);
+        }
+      }
+
+      toggle() {
+        if (this.isOpen) this.close();
+        else this.open();
+      }
+
+      open() {
+        document.querySelectorAll('.custom-select.open').forEach((el) => {
+          if (el !== this.element) el.classList.remove('open');
+        });
+        this.element.classList.add('open');
+        this.trigger.setAttribute('aria-expanded', 'true');
+        this.isOpen = true;
+        this.focusedIndex = this.options.findIndex((o) => o.classList.contains('selected'));
+      }
+
+      close() {
+        this.element.classList.remove('open');
+        this.trigger.setAttribute('aria-expanded', 'false');
+        this.isOpen = false;
+        this.updateFocus();
+      }
+
+      handleKeydown(e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          this.toggle();
+        } else if (e.key === 'Escape') {
+          this.close();
+        } else if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          if (!this.isOpen) this.open();
+          else {
+            this.focusedIndex = Math.min(this.focusedIndex + 1, this.options.length - 1);
+            this.updateFocus();
+          }
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          if (this.isOpen) {
+            this.focusedIndex = Math.max(this.focusedIndex - 1, 0);
+            this.updateFocus();
+          }
+        } else if (e.key === 'Enter' && this.isOpen && this.focusedIndex >= 0) {
+          e.preventDefault();
+          const option = this.options[this.focusedIndex];
+          if (option) this.select(option.dataset.value);
+        }
+      }
+
+      updateFocus() {
+        this.options.forEach((opt, idx) => {
+          opt.classList.toggle('focused', idx === this.focusedIndex);
+        });
+      }
+
+      getValue() {
+        return this.value;
+      }
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // INITIALISATION DES DROPDOWNS
+    // ═══════════════════════════════════════════════════════════════
+    const customSelects = {
+      subject: null,
+      level: null,
+      chapter: null,
+      difficulty: null,
+      duration: null
+    };
+
+    function initCustomSelects() {
+      customSelects.subject = new CustomSelect($('subjectSelect'));
+      customSelects.level = new CustomSelect($('levelSelect'));
+      customSelects.chapter = new CustomSelect($('chapterSelect'));
+      customSelects.difficulty = new CustomSelect($('difficultySelect'));
+      customSelects.duration = new CustomSelect($('durationSelect'));
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // GESTION DES ÉTAPES
+    // ═══════════════════════════════════════════════════════════════
     function resetSteps(steps) {
       steps.forEach((step) => {
-        const el = document.getElementById(step.id);
+        const el = $(step.id);
         if (el) el.classList.remove('active', 'done');
       });
     }
@@ -599,7 +1035,7 @@
 
     function finishAllSteps(steps, statusEl, finalLabel = 'Terminé !') {
       steps.forEach((step) => {
-        const el = document.getElementById(step.id);
+        const el = $(step.id);
         if (el) {
           el.classList.remove('active');
           el.classList.add('done');
@@ -611,41 +1047,111 @@
       }
     }
 
-    function showView(id) { views.forEach((view) => $(view).classList.toggle('active', view === id)); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-    function setStatus(id, message, type = '') { const element = $(id); element.textContent = message; element.className = `status ${type}`; }
-    function escapeHtml(value) { const div = document.createElement('div'); div.textContent = String(value ?? ''); return div.innerHTML; }
+    // ═══════════════════════════════════════════════════════════════
+    // UTILITAIRES
+    // ═══════════════════════════════════════════════════════════════
+    function showView(id) {
+      views.forEach((view) => $(view).classList.toggle('active', view === id));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    function setStatus(id, message, type = '') {
+      const element = $(id);
+      element.textContent = message;
+      element.className = `status ${type}`;
+    }
+    function escapeHtml(value) {
+      const div = document.createElement('div');
+      div.textContent = String(value ?? '');
+      return div.innerHTML;
+    }
     function renderMath(root) {
-      if (window.KaTeXUtils) { window.KaTeXUtils.renderMath(root); return; }
-      if (window.renderMathInElement) window.renderMathInElement(root, { delimiters: [{ left:'$$', right:'$$', display:true }, { left:'\\(', right:'\\)', display:false }, { left:'$', right:'$', display:false }], throwOnError:false, trust:false });
+      if (window.KaTeXUtils) {
+        window.KaTeXUtils.renderMath(root);
+        return;
+      }
+      if (window.renderMathInElement) {
+        window.renderMathInElement(root, {
+          delimiters: [
+            { left:'$$', right:'$$', display:true },
+            { left:'\\(', right:'\\)', display:false },
+            { left:'$', right:'$', display:false }
+          ],
+          throwOnError: false,
+          trust: false
+        });
+      }
     }
 
     function normalizeExam(payload) {
-      if (!payload?.success || !payload.exam || !Array.isArray(payload.exam.subjects) || payload.exam.subjects.length < 2) throw new Error('Réponse du serveur invalide.');
-      const exam = { ...payload.exam, duration: Number(payload.exam.duration), totalPoints: Number(payload.exam.totalPoints) || 20, subjects: payload.exam.subjects.slice(0, 2) };
-      exam.subjects.forEach((subject, index) => { if (!Array.isArray(subject.exercises) || subject.exercises.length !== 5 || subject.exercises.some((exercise) => !Array.isArray(exercise.questions) || exercise.questions.length !== 10)) throw new Error(`Sujet ${index + 1} invalide.`); });
+      if (!payload?.success || !payload.exam || !Array.isArray(payload.exam.subjects) || payload.exam.subjects.length < 2) {
+        throw new Error('Réponse du serveur invalide.');
+      }
+      const exam = {
+        ...payload.exam,
+        duration: Number(payload.exam.duration),
+        totalPoints: Number(payload.exam.totalPoints) || 20,
+        subjects: payload.exam.subjects.slice(0, 2)
+      };
+      exam.subjects.forEach((subject, index) => {
+        if (!Array.isArray(subject.exercises) || subject.exercises.length !== 5 ||
+            subject.exercises.some((exercise) => !Array.isArray(exercise.questions) || exercise.questions.length !== 10)) {
+          throw new Error(`Sujet ${index + 1} invalide.`);
+        }
+      });
       return exam;
     }
 
     function updateChapters() {
-      const select = $('chapter');
-      select.replaceChildren();
-      const all = document.createElement('option');
-      all.value = 'all';
-      all.textContent = 'Tous les chapitres';
-      select.appendChild(all);
-      (CHAPTERS[$('subject').value] || []).forEach((chapter) => {
-        const option = document.createElement('option');
-        option.value = chapter;
-        option.textContent = chapter;
-        select.appendChild(option);
-      });
+      const subject = customSelects.subject.getValue();
+      const chapters = CHAPTERS[subject] || [];
+
+      const options = [
+        { value: 'all', label: 'Tous les chapitres', prefix: '📚' },
+        ...chapters.map((ch) => ({ value: ch, label: ch, prefix: '📖' }))
+      ];
+
+      customSelects.chapter.setOptions(options);
     }
 
-    function readConfig() { return { subject: $('subject').value, level: $('level').value, chapter: $('chapter').value, difficulty: $('difficulty').value, duration: Number($('duration').value), exerciseCount: 5 }; }
+    function readConfig() {
+      return {
+        subject: customSelects.subject.getValue(),
+        level: customSelects.level.getValue(),
+        chapter: customSelects.chapter.getValue(),
+        difficulty: customSelects.difficulty.getValue(),
+        duration: Number(customSelects.duration.getValue()),
+        exerciseCount: 5
+      };
+    }
 
-    function saveDraft() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ exam: state.exam, selectedSubject: state.selectedSubject?.id, exerciseIndex: state.exerciseIndex, answers: state.answers, startedAt: state.startedAt, remainingSeconds: state.remainingSeconds })); } catch (_) {} }
-    function clearDraft() { try { localStorage.removeItem(STORAGE_KEY); } catch (_) {} }
-    function loadDraft() { try { const draft = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null'); if (!draft?.exam || !draft?.selectedSubject) return false; state.exam = draft.exam; state.selectedSubject = state.exam.subjects.find((subject) => subject.id === draft.selectedSubject); state.exerciseIndex = Number(draft.exerciseIndex) || 0; state.answers = draft.answers || {}; state.startedAt = Number(draft.startedAt) || Date.now(); state.remainingSeconds = Number(draft.remainingSeconds) || state.exam.duration * 60; return Boolean(state.selectedSubject); } catch (_) { return false; } }
+    function saveDraft() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({
+          exam: state.exam,
+          selectedSubject: state.selectedSubject?.id,
+          exerciseIndex: state.exerciseIndex,
+          answers: state.answers,
+          startedAt: state.startedAt,
+          remainingSeconds: state.remainingSeconds
+        }));
+      } catch (_) {}
+    }
+    function clearDraft() {
+      try { localStorage.removeItem(STORAGE_KEY); } catch (_) {}
+    }
+    function loadDraft() {
+      try {
+        const draft = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+        if (!draft?.exam || !draft?.selectedSubject) return false;
+        state.exam = draft.exam;
+        state.selectedSubject = state.exam.subjects.find((subject) => subject.id === draft.selectedSubject);
+        state.exerciseIndex = Number(draft.exerciseIndex) || 0;
+        state.answers = draft.answers || {};
+        state.startedAt = Number(draft.startedAt) || Date.now();
+        state.remainingSeconds = Number(draft.remainingSeconds) || state.exam.duration * 60;
+        return Boolean(state.selectedSubject);
+      } catch (_) { return false; }
+    }
 
     function displaySubjects() {
       const list = $('subjectsList');
@@ -714,9 +1220,9 @@
       return { success: true, result: { score: total, totalScore: total, exercises: perExercise, revisionTopics: ['Méthode de résolution', 'Vérification des calculs', 'Conclusion claire'] } };
     }
 
-    // ═══════════════════════════════════════════════════════════
+    // ═══════════════════════════════════════════════════════════════
     // GÉNÉRATION AVEC ÉTAPES
-    // ═══════════════════════════════════════════════════════════
+    // ═══════════════════════════════════════════════════════════════
     async function generateExam(event) {
       event.preventDefault();
 
@@ -734,7 +1240,6 @@
       button.classList.add('loading');
       setStatus('configStatus', '');
 
-      // Afficher la vue de chargement
       showView('loadingView');
       resetSteps(GENERATION_STEPS);
       const statusEl = $('genLoadingStatus');
@@ -805,7 +1310,6 @@
         showView('subjectsView');
 
       } catch (error) {
-        // Fallback local
         if (error?.code === 'CONFIGURATION' || error instanceof TypeError) {
           activateStep('genStep2', statusEl, 'Génération locale de secours...');
 
@@ -836,9 +1340,9 @@
       }
     }
 
-    // ═══════════════════════════════════════════════════════════
+    // ═══════════════════════════════════════════════════════════════
     // EXAMEN
-    // ═══════════════════════════════════════════════════════════
+    // ═══════════════════════════════════════════════════════════════
     function startExam(subject) {
       state.selectedSubject = subject;
       state.exerciseIndex = 0;
@@ -914,8 +1418,20 @@
       renderMath($('examView'));
     }
 
-    function nextQuestion() { if (state.exerciseIndex < state.selectedSubject.exercises.length - 1) { state.exerciseIndex += 1; saveDraft(); renderExercise(); } }
-    function previousQuestion() { if (state.exerciseIndex > 0) { state.exerciseIndex -= 1; saveDraft(); renderExercise(); } }
+    function nextQuestion() {
+      if (state.exerciseIndex < state.selectedSubject.exercises.length - 1) {
+        state.exerciseIndex += 1;
+        saveDraft();
+        renderExercise();
+      }
+    }
+    function previousQuestion() {
+      if (state.exerciseIndex > 0) {
+        state.exerciseIndex -= 1;
+        saveDraft();
+        renderExercise();
+      }
+    }
 
     function startTimer() {
       clearInterval(state.timerId);
@@ -941,11 +1457,14 @@
       $('timer').classList.toggle('urgent', seconds <= 300);
     }
 
-    function askFinish() { $('confirmModal').classList.add('show'); $('confirmFinishButton').focus(); }
+    function askFinish() {
+      $('confirmModal').classList.add('show');
+      $('confirmFinishButton').focus();
+    }
 
-    // ═══════════════════════════════════════════════════════════
+    // ═══════════════════════════════════════════════════════════════
     // CORRECTION AVEC ÉTAPES
-    // ═══════════════════════════════════════════════════════════
+    // ═══════════════════════════════════════════════════════════════
     async function submitExam(auto = false) {
       if (state.submitting || !state.selectedSubject) return;
 
@@ -954,13 +1473,11 @@
       clearInterval(state.timerId);
       $('finishButton').disabled = true;
 
-      // Afficher la vue de correction
       showView('loadingCorrectionView');
       resetSteps(CORRECTION_STEPS);
       const statusEl = $('corrLoadingStatus');
 
       try {
-        // ══ ÉTAPE 1 ══
         activateStep('corrStep1', statusEl, 'Envoi de ta copie au correcteur...');
         await sleep(600);
 
@@ -969,7 +1486,6 @@
           headers.Authorization = `Bearer ${await getIdToken(state.user)}`;
         }
 
-        // ══ ÉTAPE 2 ══
         activateStep('corrStep2', statusEl, 'Analyse des exercices...');
 
         const responsePromise = fetch('/api/exam', {
@@ -985,7 +1501,6 @@
 
         await sleep(1500);
 
-        // ══ ÉTAPE 3 ══
         activateStep('corrStep3', statusEl, 'Évaluation pédagogique...');
 
         const response = await responsePromise;
@@ -993,11 +1508,9 @@
 
         if (!response.ok) throw new Error(payload?.error || 'SERVICE');
 
-        // ══ ÉTAPE 4 ══
         activateStep('corrStep4', statusEl, 'Calcul du score...');
         await sleep(900);
 
-        // ══ ÉTAPE 5 ══
         activateStep('corrStep5', statusEl, 'Finalisation de la correction...');
         await sleep(600);
 
@@ -1008,7 +1521,6 @@
         clearDraft();
 
       } catch (error) {
-        // Fallback : correction locale
         activateStep('corrStep2', statusEl, 'Correction locale de secours...');
         await sleep(500);
         activateStep('corrStep3', statusEl, 'Évaluation locale...');
@@ -1086,12 +1598,34 @@
       setStatus(statusId, message, 'error');
     }
 
-    function showPremiumPopup() { $('premiumPopup').classList.add('show'); $('popupCloseBtn').focus(); }
-    function hidePremiumPopup() { $('premiumPopup').classList.remove('show'); }
+    function showPremiumPopup() {
+      $('premiumPopup').classList.add('show');
+      $('popupCloseBtn').focus();
+    }
+    function hidePremiumPopup() {
+      $('premiumPopup').classList.remove('show');
+    }
 
+    // ═══════════════════════════════════════════════════════════════
+    // INITIALISATION
+    // ═══════════════════════════════════════════════════════════════
     function initExam() {
+      // Initialiser les dropdowns
+      initCustomSelects();
+
+      // Définir les valeurs par défaut
+      customSelects.subject.select('Mathématiques', true);
+      customSelects.level.select('Terminale D', true);
+      customSelects.difficulty.select('medium', true);
+      customSelects.duration.select('60', true);
+
+      // Générer les chapitres
       updateChapters();
-      $('subject').addEventListener('change', updateChapters);
+
+      // Écouter les changements de matière
+      customSelects.subject.element.addEventListener('change', updateChapters);
+
+      // Autres listeners
       $('configForm').addEventListener('submit', generateExam);
       $('backConfigButton').addEventListener('click', () => showView('configView'));
       $('previousButton').addEventListener('click', previousQuestion);
@@ -1101,7 +1635,9 @@
       $('confirmFinishButton').addEventListener('click', () => submitExam(false));
       $('popupCloseBtn').addEventListener('click', hidePremiumPopup);
       $('popupLaterBtn').addEventListener('click', hidePremiumPopup);
-      $('premiumPopup').addEventListener('click', (event) => { if (event.target === $('premiumPopup')) hidePremiumPopup(); });
+      $('premiumPopup').addEventListener('click', (event) => {
+        if (event.target === $('premiumPopup')) hidePremiumPopup();
+      });
       $('newExamButton').addEventListener('click', () => {
         clearDraft();
         state.exam = null;

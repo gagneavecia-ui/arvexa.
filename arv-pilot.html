@@ -991,89 +991,62 @@
   // ═══════════════════════════════════════════════════════════════
   // CHARGEMENT DES DONNÉES
   // ═══════════════════════════════════════════════════════════════
-  async function loadAllData(uid) {
-    const [examsSnap, revisionsSnap, gradesSnap] = await Promise.all([
-      getDocs(query(collection(db, 'users', uid, 'examResults'), orderBy('createdAt', 'desc'))).catch(() => ({ docs: [] })),
-      getDocs(query(collection(db, 'users', uid, 'revisionSessions'), orderBy('createdAt', 'desc'))).catch(() => ({ docs: [] })),
-      getDocs(query(collection(db, 'users', uid, 'grades'), orderBy('date', 'desc'))).catch(() => ({ docs: [] }))
-    ]);
+ async function loadAllData(uid) {
+  // ⚡ Appel à /api/pilot (comme le planificateur appelle /api/planner)
+  const token = await getIdToken(state.user);
 
-    state.examResults = examsSnap.docs.map((d) => ({ id: d.id, ...d.data(), _createdAt: d.data().createdAt?.toDate?.() }));
-    state.revisionSessions = revisionsSnap.docs.map((d) => ({ id: d.id, ...d.data(), _createdAt: d.data().createdAt?.toDate?.() }));
-    state.grades = gradesSnap.docs.map((d) => ({ id: d.id, ...d.data(), _date: d.data().date?.toDate?.() || d.data().createdAt?.toDate?.() }));
+  const response = await fetch('/api/pilot', {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  });
+
+  const payload = await response.json().catch(() => null);
+
+  if (!response.ok || !payload?.success) {
+    throw new Error(payload?.error || 'Impossible de charger les données.');
   }
+
+  // ⚡ Stocker la réponse complète
+  state.pilotData = payload;
+}
 
   // ═══════════════════════════════════════════════════════════════
   // CALCUL GLOBAL
   // ═══════════════════════════════════════════════════════════════
   function computeAll() {
-    const subjectKeys = Object.keys(SUBJECTS);
-    const subjectAverages = {};
-    const priorityBySubject = {};
-    const exerciseStatsBySubject = {};
-    const evolutionBySubject = {};
-    const evaluationsBySubject = {};
-    const revisionTimeBySubject = {};
-    const chaptersBySubject = {};
+  const data = state.pilotData;
+  if (!data) return;
 
-    subjectKeys.forEach((subject) => {
-      const ctx = {
-        examResults: state.examResults,
-        revisionSessions: state.revisionSessions,
-        grades: state.grades
-      };
+  state.generalAverage = data.generalAverage;
+  state.subjectAverages = {};
+  state.priorityBySubject = {};
+  state.exerciseStatsBySubject = {};
+  state.evolutionBySubject = {};
+  state.evaluationsBySubject = {};
+  state.revisionTimeBySubject = {};
+  state.chaptersBySubject = {};
 
-      const avg = computeSubjectAverage(subject, ctx);
-      subjectAverages[subject] = avg;
+  Object.entries(data.subjectStats || {}).forEach(([subject, stats]) => {
+    state.subjectAverages[subject] = stats.average;
+    state.priorityBySubject[subject] = stats.priority;
+    state.exerciseStatsBySubject[subject] = {
+      total: stats.exercisesTotal,
+      success: stats.exercisesSuccess,
+      rate: stats.successRate
+    };
+    state.evolutionBySubject[subject] = stats.evolution;
+    state.evaluationsBySubject[subject] = stats.evaluations;
+    state.revisionTimeBySubject[subject] = stats.revisionTime;
+    state.chaptersBySubject[subject] = stats.chaptersCount;
+  });
 
-      const stats = computeExerciseStats(subject, ctx);
-      exerciseStatsBySubject[subject] = stats;
-
-      const evals = countEvaluations(subject, ctx);
-      evaluationsBySubject[subject] = evals;
-
-      const time = computeRevisionTime(subject, { revisionSessions: state.revisionSessions });
-      revisionTimeBySubject[subject] = time;
-
-      const chapters = countChaptersRevised(subject, { revisionSessions: state.revisionSessions, examResults: state.examResults });
-      chaptersBySubject[subject] = chapters;
-
-      // Évolution (30 derniers jours vs avant)
-      const allItems = [
-        ...state.examResults.filter((r) => normalizeSubjectName(r.subject) === subject).map((r) => ({
-          score: Number(r.score) || null,
-          date: r._createdAt || r.createdAt
-        })),
-        ...state.revisionSessions.filter((s) => s.type === 'quiz_result' && normalizeSubjectName(s.subject) === subject).map((s) => ({
-          score: Number(s.score) || null,
-          date: s._createdAt || s.createdAt
-        }))
-      ];
-
-      evolutionBySubject[subject] = computeEvolutionLocal(allItems, 30);
-
-      // Priorité
-      const errorCount = countErrorsForSubject(subject);
-      const lastWorkDate = allItems.sort((a, b) => new Date(b.date) - new Date(a.date))[0]?.date;
-      const daysSinceWork = lastWorkDate ? daysSince(lastWorkDate) : 999;
-
-      priorityBySubject[subject] = computePriority(subject, {
-        average: avg,
-        exerciseRate: stats.rate,
-        errorCount,
-        daysSinceLastWork: daysSinceWork
-      });
-    });
-
-    state.subjectAverages = subjectAverages;
-    state.priorityBySubject = priorityBySubject;
-    state.exerciseStatsBySubject = exerciseStatsBySubject;
-    state.evolutionBySubject = evolutionBySubject;
-    state.evaluationsBySubject = evaluationsBySubject;
-    state.revisionTimeBySubject = revisionTimeBySubject;
-    state.chaptersBySubject = chaptersBySubject;
-    state.generalAverage = computeGeneralAverage(subjectAverages);
-  }
+  state.globalStats = data.globalStats;
+  state.readiness = data.readiness;
+  state.dataPoints = data.dataPoints;
+  state.actionPlan = data.actionPlan;
+}
 
   function computeEvolutionLocal(items, periodDays) {
     if (items.length < 2) return null;
@@ -1300,60 +1273,52 @@
   // ═══════════════════════════════════════════════════════════════
   // HERO
   // ═══════════════════════════════════════════════════════════════
-  function renderHero() {
-    const avg = state.generalAverage;
-    $('heroGeneralAvg').textContent = avg !== null ? `${avg.toFixed(2)} / 20` : '—';
+ function renderHero() {
+  const avg = state.generalAverage;
+  $('heroGeneralAvg').textContent = avg !== null ? `${avg.toFixed(2)} / 20` : '—';
 
-    // Évolution globale
-    const evolutionValues = Object.values(state.evolutionBySubject).filter((v) => v !== null);
-    if (evolutionValues.length > 0) {
-      const evoAvg = evolutionValues.reduce((a, b) => a + b, 0) / evolutionValues.length;
-      const el = $('heroEvolution');
-      el.textContent = `${formatEvolution(round2(evoAvg))} pts (30 jours)`;
-      el.className = 'sub ' + (evoAvg > 0 ? 'positive' : evoAvg < 0 ? 'negative' : '');
-    } else {
-      $('heroEvolution').textContent = 'Pas assez de données';
-    }
-
-    // Objectif
-    const target = 12;
-    $('heroTarget').textContent = `${target} / 20`;
-    if (avg !== null) {
-      const gap = round2(target - avg);
-      const el = $('heroGap');
-      el.textContent = gap > 0 ? `Écart : +${gap.toFixed(2)} pt` : `Objectif atteint (${Math.abs(gap).toFixed(2)} pt au-dessus)`;
-      el.className = 'sub ' + (gap > 0 ? 'negative' : 'positive');
-    }
-
-    // Préparation
-    const dataPoints = state.examResults.length + state.revisionSessions.length + state.grades.length;
-    const readiness = computeReadiness(dataPoints, avg);
-    $('heroReadiness').textContent = readiness.label;
-
-    const readinessEl = $('heroReadiness');
-    readinessEl.className = 'value ' + (
-      readiness.level === 'solid' ? 'success' :
-      readiness.level === 'progressing' ? 'warning' :
-      readiness.level === 'reinforce' ? 'danger' : ''
-    );
-
-    $('heroDataPoints').innerHTML = `Basé sur <strong>${dataPoints}</strong> données`;
-
-    // Exercices réussis (global)
-    let totalEx = 0, successEx = 0;
-    Object.values(state.exerciseStatsBySubject).forEach((s) => {
-      totalEx += s.total || 0;
-      successEx += s.success || 0;
-    });
-    if (totalEx > 0) {
-      const rate = Math.round((successEx / totalEx) * 100);
-      $('heroSuccessRate').textContent = `${rate}%`;
-      $('heroExerciseCount').textContent = `${successEx} / ${totalEx} exercices`;
-    } else {
-      $('heroSuccessRate').textContent = '—';
-      $('heroExerciseCount').textContent = 'Aucun exercice';
-    }
+  // Évolution globale
+  const evolutionValues = Object.values(state.evolutionBySubject).filter((v) => v !== null);
+  if (evolutionValues.length > 0) {
+    const evoAvg = evolutionValues.reduce((a, b) => a + b, 0) / evolutionValues.length;
+    const el = $('heroEvolution');
+    el.textContent = `${evoAvg > 0 ? '+' : ''}${evoAvg.toFixed(2)} pts (30 jours)`;
+    el.className = 'sub ' + (evoAvg > 0 ? 'positive' : evoAvg < 0 ? 'negative' : '');
+  } else {
+    $('heroEvolution').textContent = 'Pas assez de données';
   }
+
+  // Objectif
+  const target = 12;
+  $('heroTarget').textContent = `${target} / 20`;
+  if (avg !== null) {
+    const gap = Math.round((target - avg) * 100) / 100;
+    const el = $('heroGap');
+    el.textContent = gap > 0 ? `Écart : +${gap.toFixed(2)} pt` : `Objectif atteint`;
+    el.className = 'sub ' + (gap > 0 ? 'negative' : 'positive');
+  }
+
+  // Préparation
+  const readiness = state.readiness;
+  $('heroReadiness').textContent = readiness.label;
+  $('heroReadiness').className = 'value ' + (
+    readiness.level === 'solid' ? 'success' :
+    readiness.level === 'progressing' ? 'warning' :
+    readiness.level === 'reinforce' ? 'danger' : ''
+  );
+
+  $('heroDataPoints').innerHTML = `Basé sur <strong>${state.dataPoints}</strong> données`;
+
+  // Exercices réussis
+  const gs = state.globalStats;
+  if (gs && gs.exercisesTotal > 0) {
+    $('heroSuccessRate').textContent = `${gs.successRate}%`;
+    $('heroExerciseCount').textContent = `${gs.exercisesSuccess} / ${gs.exercisesTotal} exercices`;
+  } else {
+    $('heroSuccessRate').textContent = '—';
+    $('heroExerciseCount').textContent = 'Aucun exercice';
+  }
+}
 
   // ═══════════════════════════════════════════════════════════════
   // ONGLET CONSEILS

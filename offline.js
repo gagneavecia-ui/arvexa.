@@ -1,150 +1,24 @@
 // ================================================================
-// OFFLINE.JS - Mode hors ligne global pour ARVEXA School
+// OFFLINE.JS — ARVEXA School
+// Version : 2.0.0 — Bannière + indicateur + sync
 // ================================================================
 
-(function() {
+(function () {
   'use strict';
 
-  // ================================================================
-  // ÉTAT
-  // ================================================================
+  if (window.__arvexaOfflineInit) return;
+  window.__arvexaOfflineInit = true;
+
+  const STORAGE_KEY = 'arvexa_pending_sync';
+  const FCM_DISMISSED_KEY = 'arvexa_offline_dismissed';
+
   let isOnline = navigator.onLine;
   let pendingSync = [];
-  const STORAGE_KEY = 'arvexa_pending_sync';
-  const CACHE_KEY = 'arvexa_page_cache';
+  let bannerEl = null;
+  let indicatorEl = null;
 
   // ================================================================
-  // INIT
-  // ================================================================
-  function init() {
-    // Charger les données en attente
-    loadPendingData();
-    
-    // Créer la bannière
-    createOfflineBanner();
-    
-    // Ajouter l'indicateur dans le header
-    addStatusIndicator();
-    
-    // Écouter les changements réseau
-    window.addEventListener('online', () => {
-      isOnline = true;
-      updateUI();
-      syncPendingData();
-      showToast('🔄 Connexion rétablie ! Synchronisation...', 'success');
-    });
-    
-    window.addEventListener('offline', () => {
-      isOnline = false;
-      updateUI();
-      showToast('📶 Mode hors ligne activé', 'info');
-    });
-    
-    // État initial
-    updateUI();
-    updateHeaderIndicator();
-    
-    // Styles dynamiques
-    injectStyles();
-    
-    // Cacher la bannière après quelques secondes si en ligne
-    if (isOnline) {
-      setTimeout(() => {
-        const banner = document.getElementById('offlineBanner');
-        if (banner) banner.classList.remove('show');
-      }, 3000);
-    }
-    
-    console.log('📶 Mode hors ligne initialisé');
-  }
-
-  // ================================================================
-  // BANNIÈRE HORS LIGNE
-  // ================================================================
-  function createOfflineBanner() {
-    // Vérifier si la bannière existe déjà
-    if (document.getElementById('offlineBanner')) return;
-    
-    const banner = document.createElement('div');
-    banner.id = 'offlineBanner';
-    banner.className = 'offline-banner';
-    banner.innerHTML = `
-      <span class="status-dot offline"></span>
-      <span>📶 Mode hors ligne — Les modifications seront synchronisées automatiquement à la reconnexion.</span>
-    `;
-    
-    // Insérer après le header ou en haut de la page
-    const header = document.querySelector('.header');
-    if (header && header.parentNode) {
-      header.parentNode.insertBefore(banner, header.nextSibling);
-    } else {
-      document.body.prepend(banner);
-    }
-    
-    return banner;
-  }
-
-  // ================================================================
-  // INDICATEUR DANS LE HEADER
-  // ================================================================
-  function addStatusIndicator() {
-    // Vérifier si l'indicateur existe déjà
-    if (document.getElementById('statusIndicator')) return;
-    
-    const headerActions = document.querySelector('.header-actions');
-    if (!headerActions) return;
-    
-    const indicator = document.createElement('button');
-    indicator.id = 'statusIndicator';
-    indicator.className = 'status-indicator-btn';
-    indicator.setAttribute('aria-label', 'Statut de connexion');
-    indicator.title = isOnline ? 'Connecté' : 'Hors ligne';
-    indicator.innerHTML = `<i class="fas fa-wifi"></i>`;
-    
-    // Insérer en premier dans les actions
-    headerActions.prepend(indicator);
-    
-    return indicator;
-  }
-
-  // ================================================================
-  // MISE À JOUR DE L'UI
-  // ================================================================
-  function updateUI() {
-    const banner = document.getElementById('offlineBanner');
-    const indicator = document.getElementById('statusIndicator');
-    const dot = document.querySelector('.status-dot');
-    
-    if (banner) {
-      if (!isOnline) {
-        banner.classList.add('show');
-      } else {
-        banner.classList.remove('show');
-      }
-    }
-    
-    if (indicator) {
-      indicator.innerHTML = isOnline ? '<i class="fas fa-wifi"></i>' : '<i class="fas fa-wifi-slash"></i>';
-      indicator.title = isOnline ? 'Connecté' : 'Hors ligne';
-    }
-    
-    if (dot) {
-      dot.className = 'status-dot ' + (isOnline ? 'online' : 'offline');
-    }
-  }
-
-  function updateHeaderIndicator() {
-    // Pour les pages où le header est déjà chargé
-    const indicator = document.getElementById('statusIndicator');
-    if (indicator) {
-      indicator.innerHTML = isOnline ? '<i class="fas fa-wifi"></i>' : '<i class="fas fa-wifi-slash"></i>';
-      indicator.title = isOnline ? 'Connecté' : 'Hors ligne';
-      indicator.style.color = isOnline ? 'var(--success, #2D7D5A)' : 'var(--danger, #E74C3C)';
-    }
-  }
-
-  // ================================================================
-  // GESTION DES DONNÉES EN ATTENTE
+  // DONNÉES EN ATTENTE
   // ================================================================
   function loadPendingData() {
     try {
@@ -161,190 +35,373 @@
     } catch (e) {}
   }
 
-  function syncPendingData() {
-    if (pendingSync.length === 0) return;
-    
-    console.log('📤 Synchronisation des données en attente:', pendingSync.length);
-    
-    // Ici, on pourrait envoyer les données vers Firestore
-    // Pour l'instant, on les marque comme synchronisées
-    pendingSync = [];
-    savePendingData();
-    
-    // Afficher un toast si disponible
-    if (window.showToast) {
-      window.showToast('✅ Données synchronisées', 'success');
+  // ================================================================
+  // BANNIÈRE
+  // ================================================================
+  function createBanner() {
+    if (bannerEl) return bannerEl;
+
+    bannerEl = document.createElement('div');
+    bannerEl.id = 'arvexaOfflineBanner';
+    bannerEl.className = 'arvexa-offline-banner';
+    bannerEl.innerHTML = `
+      <span class="arvexa-offline-dot"></span>
+      <span class="arvexa-offline-text">
+        Mode hors ligne — consultation uniquement
+      </span>
+      <button class="arvexa-offline-retry" type="button" aria-label="Réessayer">
+        <i class="fas fa-rotate-right"></i>
+      </button>
+    `;
+
+    // Insérer juste après le header, ou au début du body
+    const header = document.querySelector('.header, .site-header');
+    if (header && header.parentNode) {
+      header.parentNode.insertBefore(bannerEl, header.nextSibling);
+    } else {
+      document.body.insertBefore(bannerEl, document.body.firstChild);
     }
+
+    // Bouton réessayer
+    bannerEl.querySelector('.arvexa-offline-retry')
+      .addEventListener('click', () => {
+        window.location.reload();
+      });
+
+    return bannerEl;
   }
 
   // ================================================================
-  // API PUBLIQUE
+  // INDICATEUR (dans le header)
   // ================================================================
-  window.offline = {
-    isOnline: () => isOnline,
-    
-    // Sauvegarder une action pour plus tard
-    saveForLater: function(data) {
-      pendingSync.push({
-        data: data,
-        timestamp: new Date().toISOString(),
-        url: window.location.href
-      });
-      savePendingData();
-      
-      if (window.showToast) {
-        window.showToast('💾 Données sauvegardées localement', 'success');
-      }
-    },
-    
-    // Vérifier si une action peut être effectuée
-    canPerform: function(action) {
-      if (isOnline) return true;
-      
-      // Actions autorisées hors ligne
-      const allowedOffline = ['read', 'navigate', 'notes'];
-      return allowedOffline.includes(action);
-    },
-    
-    // Forcer la synchronisation
-    sync: function() {
-      if (isOnline) {
-        syncPendingData();
+  function createIndicator() {
+    if (indicatorEl) return indicatorEl;
+
+    // Chercher les header-actions (index, profil, abonnement, notifs)
+    const actions = document.querySelector('.header-actions')
+      || document.querySelector('.header-right')
+      || document.querySelector('.site-header');
+
+    if (!actions) return null;
+
+    indicatorEl = document.createElement('button');
+    indicatorEl.id = 'arvexaOfflineIndicator';
+    indicatorEl.className = 'arvexa-offline-indicator';
+    indicatorEl.type = 'button';
+    indicatorEl.setAttribute('aria-label', 'Statut de connexion');
+    indicatorEl.title = 'Statut de connexion';
+    indicatorEl.innerHTML = '<i class="fas fa-wifi"></i>';
+
+    indicatorEl.addEventListener('click', () => {
+      if (!navigator.onLine) {
+        showToast('📶 Tu es hors ligne', 'error');
       } else {
-        if (window.showToast) {
-          window.showToast('📶 Impossible de synchroniser hors ligne', 'error');
-        }
+        showToast('✅ Connecté', 'success');
       }
-    }
-  };
+    });
+
+    // Insérer au début de header-actions
+    actions.insertBefore(indicatorEl, actions.firstChild);
+    return indicatorEl;
+  }
 
   // ================================================================
-  // TOAST (fallback si la fonction n'existe pas)
+  // MISE À JOUR UI
   // ================================================================
+  function updateUI() {
+    // Bannière
+    if (bannerEl) {
+      bannerEl.classList.toggle('show', !isOnline);
+    }
+
+    // Indicateur
+    if (indicatorEl) {
+      indicatorEl.classList.toggle('online', isOnline);
+      indicatorEl.classList.toggle('offline', !isOnline);
+      indicatorEl.innerHTML = isOnline
+        ? '<i class="fas fa-wifi"></i>'
+        : '<i class="fas fa-wifi-slash"></i>';
+      indicatorEl.title = isOnline ? 'Connecté' : 'Hors ligne';
+    }
+
+    // Attribut global pour le CSS
+    document.documentElement.setAttribute(
+      'data-online',
+      isOnline ? 'true' : 'false'
+    );
+  }
+
+  // ================================================================
+  // TOAST LOCAL (évite d'écraser un toast global)
+  // ================================================================
+  let toastTimer = null;
   function showToast(message, type = 'info') {
-    // Si la fonction toast existe déjà, l'utiliser
-    if (window.showToast) {
-      window.showToast(message, type);
+    // Si la page a déjà une fonction showToast, l'utiliser
+    if (typeof window.arvexaShowToast === 'function') {
+      window.arvexaShowToast(message, type);
       return;
     }
-    
-    // Sinon, créer un toast temporaire
-    const toast = document.createElement('div');
-    toast.className = 'toast ' + type;
-    toast.style.cssText = `
-      position: fixed;
-      bottom: 30px;
-      left: 50%;
-      transform: translateX(-50%) translateY(100px);
-      padding: 12px 20px;
-      border-radius: 12px;
-      background: rgba(20,20,20,0.95);
-      backdrop-filter: blur(16px);
-      border: 1px solid rgba(184,134,11,0.15);
-      color: #F5F0E8;
-      font-size: 13px;
-      z-index: 300;
-      opacity: 0;
-      transition: all 0.5s ease;
-      max-width: 90%;
-      text-align: center;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-    `;
+
+    let toast = document.getElementById('arvexaOfflineToast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'arvexaOfflineToast';
+      toast.className = 'arvexa-offline-toast';
+      document.body.appendChild(toast);
+    }
+
     toast.textContent = message;
-    document.body.appendChild(toast);
-    
-    setTimeout(() => {
-      toast.style.opacity = '1';
-      toast.style.transform = 'translateX(-50%) translateY(0)';
-    }, 100);
-    
-    setTimeout(() => {
-      toast.style.opacity = '0';
-      toast.style.transform = 'translateX(-50%) translateY(100px)';
-      setTimeout(() => toast.remove(), 500);
-    }, 3000);
+    toast.classList.remove('success', 'error', 'info');
+    toast.classList.add(type, 'show');
+
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+      toast.classList.remove('show');
+    }, 2500);
   }
 
   // ================================================================
-  // STYLES DYNAMIQUES
+  // ÉVÉNEMENTS RÉSEAU
+  // ================================================================
+  function bindNetworkEvents() {
+    window.addEventListener('online', () => {
+      isOnline = true;
+      updateUI();
+      showToast('✅ Connexion rétablie', 'success');
+      // Tenter une sync
+      setTimeout(syncPendingData, 500);
+    });
+
+    window.addEventListener('offline', () => {
+      isOnline = false;
+      updateUI();
+      showToast('📶 Mode hors ligne activé', 'info');
+    });
+  }
+
+  // ================================================================
+  // SYNCHRONISATION
+  // ================================================================
+  async function syncPendingData() {
+    loadPendingData();
+    if (pendingSync.length === 0) return;
+
+    const items = [...pendingSync];
+    const failed = [];
+
+    for (const item of items) {
+      try {
+        const success = await trySyncItem(item);
+        if (!success) failed.push(item);
+      } catch (e) {
+        failed.push(item);
+      }
+    }
+
+    pendingSync = failed;
+    savePendingData();
+
+    const successCount = items.length - failed.length;
+    if (successCount > 0) {
+      showToast(
+        `✅ ${successCount} élément${successCount > 1 ? 's' : ''} synchronisé${successCount > 1 ? 's' : ''}`,
+        'success'
+      );
+    }
+  }
+
+  // Tentative d'envoi vers Firestore si dispo
+  async function trySyncItem(item) {
+    // Seulement si Firestore est disponible dans la page
+    if (!window.__arvexaSync) return false;
+    try {
+      return await window.__arvexaSync(item);
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // ================================================================
+  // STYLES
   // ================================================================
   function injectStyles() {
+    if (document.getElementById('arvexaOfflineStyles')) return;
+
     const style = document.createElement('style');
+    style.id = 'arvexaOfflineStyles';
     style.textContent = `
-      /* Bannière hors ligne */
-      .offline-banner {
+      /* === BANNIÈRE HORS LIGNE === */
+      .arvexa-offline-banner {
         display: none;
         position: sticky;
         top: 0;
-        z-index: 60;
-        background: rgba(184, 92, 58, 0.15);
-        backdrop-filter: blur(12px);
-        border-bottom: 1px solid rgba(184, 92, 58, 0.15);
-        padding: 8px 16px;
+        z-index: 999;
         align-items: center;
-        justify-content: center;
         gap: 10px;
-        font-size: clamp(12px, 1.2vw, 14px);
-        color: #E74C3C;
-        text-align: center;
-        flex-wrap: wrap;
-        transition: all 0.3s ease;
+        padding: 8px 14px;
+        background: linear-gradient(90deg, rgba(184,92,58,.18), rgba(184,92,58,.10));
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-bottom: 1px solid rgba(184,92,58,.2);
+        color: #FFB8A0;
+        font-family: 'Inter', sans-serif;
+        font-size: 12.5px;
+        font-weight: 600;
+        letter-spacing: 0.2px;
+        animation: arvexaBannerIn 0.3s cubic-bezier(0.25,1,0.5,1);
       }
-      .offline-banner.show {
+      .arvexa-offline-banner.show {
         display: flex;
       }
-      .offline-banner .status-dot {
+      .arvexa-offline-banner .arvexa-offline-dot {
         width: 8px;
         height: 8px;
         border-radius: 50%;
-        display: inline-block;
+        background: #E74C3C;
+        box-shadow: 0 0 8px #E74C3C;
+        flex-shrink: 0;
+        animation: arvexaPulseDot 1.5s ease-in-out infinite;
+      }
+      .arvexa-offline-banner .arvexa-offline-text {
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .arvexa-offline-banner .arvexa-offline-retry {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        border: 1px solid rgba(255,184,160,.25);
+        background: rgba(255,255,255,.04);
+        color: #FFB8A0;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        transition: all 0.2s ease;
         flex-shrink: 0;
       }
-      .offline-banner .status-dot.offline {
-        background: #E74C3C;
-        animation: pulseDot 1.5s ease-in-out infinite;
+      .arvexa-offline-banner .arvexa-offline-retry:hover {
+        background: rgba(255,184,160,.15);
+        border-color: rgba(255,184,160,.5);
       }
-      .offline-banner .status-dot.online {
-        background: #2D7D5A;
-      }
-      
-      /* Indicateur dans le header */
-      .status-indicator-btn {
+
+      /* === INDICATEUR HEADER === */
+      .arvexa-offline-indicator {
         width: 36px;
         height: 36px;
         border-radius: 50%;
         border: none;
-        background: rgba(255,255,255,0.04);
-        color: var(--text-dim, #8A8A7A);
+        background: rgba(255,255,255,.04);
+        color: #8A8A7A;
         cursor: pointer;
-        transition: all 0.3s ease;
-        font-size: 15px;
         display: flex;
         align-items: center;
         justify-content: center;
+        font-size: 14px;
+        transition: all 0.25s ease;
+        flex-shrink: 0;
         position: relative;
       }
-      .status-indicator-btn:hover {
-        background: rgba(255,255,255,0.07);
+      .arvexa-offline-indicator.online {
+        color: #3AB67E;
       }
-      .status-indicator-btn i {
-        transition: all 0.3s ease;
+      .arvexa-offline-indicator.offline {
+        color: #E74C3C;
+        animation: arvexaPulseIndicator 2s ease-in-out infinite;
       }
-      
-      @keyframes pulseDot {
+      .arvexa-offline-indicator:hover {
+        background: rgba(255,255,255,.08);
+      }
+      .arvexa-offline-indicator::after {
+        content: '';
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: transparent;
+        transition: background 0.3s ease;
+      }
+      .arvexa-offline-indicator.online::after {
+        background: #3AB67E;
+        box-shadow: 0 0 6px #3AB67E;
+      }
+      .arvexa-offline-indicator.offline::after {
+        background: #E74C3C;
+        box-shadow: 0 0 6px #E74C3C;
+      }
+
+      /* === TOAST LOCAL === */
+      .arvexa-offline-toast {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%) translateY(-80px);
+        padding: 12px 20px;
+        border-radius: 12px;
+        background: rgba(20,22,20,.96);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(224,184,74,.3);
+        color: #F5F0E8;
+        font-family: 'Inter', sans-serif;
+        font-size: 13px;
+        font-weight: 500;
+        z-index: 10000;
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.4s cubic-bezier(0.25,1,0.5,1);
+        max-width: 90%;
+        box-shadow: 0 12px 40px rgba(0,0,0,.5);
+        text-align: center;
+      }
+      .arvexa-offline-toast.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+      .arvexa-offline-toast.success { border-color: rgba(58,182,126,.5); }
+      .arvexa-offline-toast.error { border-color: rgba(231,76,60,.5); }
+      .arvexa-offline-toast.info { border-color: rgba(224,184,74,.5); }
+
+      /* === ANIMATIONS === */
+      @keyframes arvexaBannerIn {
+        from { opacity: 0; transform: translateY(-100%); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes arvexaPulseDot {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.5; transform: scale(1.3); }
+      }
+      @keyframes arvexaPulseIndicator {
         0%, 100% { opacity: 1; }
-        50% { opacity: 0.3; }
+        50% { opacity: 0.6; }
       }
-      
-      /* Adaptation responsive */
-      @media (max-width: 480px) {
-        .offline-banner {
-          font-size: 11px;
-          padding: 6px 12px;
+
+      /* === RÉDUCTION MOTION === */
+      @media (prefers-reduced-motion: reduce) {
+        .arvexa-offline-banner,
+        .arvexa-offline-dot,
+        .arvexa-offline-indicator,
+        .arvexa-offline-toast {
+          animation: none !important;
+          transition: none !important;
         }
-        .status-indicator-btn {
-          width: 30px;
-          height: 30px;
+      }
+
+      /* === RESPONSIVE === */
+      @media (max-width: 480px) {
+        .arvexa-offline-banner {
+          font-size: 11.5px;
+          padding: 7px 10px;
+        }
+        .arvexa-offline-indicator {
+          width: 32px;
+          height: 32px;
           font-size: 13px;
         }
       }
@@ -353,45 +410,92 @@
   }
 
   // ================================================================
-  // CACHE DES PAGES VISITÉES
+  // INIT
   // ================================================================
-  function cacheCurrentPage() {
-    try {
-      const cache = JSON.parse(localStorage.getItem(CACHE_KEY) || '{}');
-      const url = window.location.pathname + window.location.search;
-      cache[url] = {
-        html: document.documentElement.outerHTML,
-        timestamp: new Date().toISOString()
-      };
-      // Limiter le cache à 20 pages
-      const keys = Object.keys(cache);
-      if (keys.length > 20) {
-        const oldest = keys.sort((a, b) => new Date(cache[a].timestamp) - new Date(cache[b].timestamp))[0];
-        delete cache[oldest];
+  function init() {
+    injectStyles();
+    loadPendingData();
+
+    const boot = () => {
+      createBanner();
+      createIndicator();
+      bindNetworkEvents();
+      updateUI();
+
+      // Sync automatique au démarrage si en ligne
+      if (isOnline && pendingSync.length > 0) {
+        setTimeout(syncPendingData, 1500);
       }
-      localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
-    } catch (e) {}
-  }
+    };
 
-  // ================================================================
-  // INITIALISATION
-  // ================================================================
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
-
-  // Cacher la bannière après 5s si en ligne
-  setTimeout(() => {
-    if (isOnline) {
-      const banner = document.getElementById('offlineBanner');
-      if (banner) banner.classList.remove('show');
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', boot);
+    } else {
+      boot();
     }
-  }, 5000);
+  }
 
-  // Cache de la page au chargement
-  setTimeout(cacheCurrentPage, 1000);
+  // ================================================================
+  // API PUBLIQUE
+  // ================================================================
+  window.arvexaOffline = {
+    isOnline: () => isOnline,
 
-  console.log('✅ Mode hors ligne global activé');
+    /**
+     * File une action pour sync ultérieure.
+     * @param {object} data — payload à synchroniser
+     */
+    queue: function (data) {
+      pendingSync.push({
+        data: data,
+        url: window.location.href,
+        timestamp: new Date().toISOString()
+      });
+      savePendingData();
+    },
+
+    /**
+     * Vérifie si une action peut être effectuée hors ligne.
+     */
+    canPerform: function (action) {
+      if (isOnline) return true;
+      const allowed = ['read', 'navigate', 'notes', 'calculator', 'formula'];
+      return allowed.includes(action);
+    },
+
+    /**
+     * Force la synchronisation manuelle.
+     */
+    sync: function () {
+      if (isOnline) {
+        syncPendingData();
+      } else {
+        showToast('📶 Impossible de synchroniser hors ligne', 'error');
+      }
+    },
+
+    /**
+     * Récupère la liste des actions en attente.
+     */
+    pending: function () {
+      loadPendingData();
+      return [...pendingSync];
+    },
+
+    /**
+     * Enregistre un handler de sync personnalisé.
+     * Usage : window.__arvexaSync = async (item) => { ... return true/false; }
+     */
+    setSyncHandler: function (fn) {
+      window.__arvexaSync = fn;
+    },
+
+    // Exposer le toast
+    toast: showToast
+  };
+
+  // Boot immédiat
+  init();
+
+  console.log('✅ ARVEXA — Mode hors ligne prêt');
 })();

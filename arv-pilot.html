@@ -1,0 +1,1641 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+  <meta name="theme-color" content="#0A0A0A">
+  <meta name="description" content="ARVEXA School - ARV-PILOT">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <script src="register-sw.js" defer></script>
+
+  <style>
+    :root {
+      --black: #0A0A0A;
+      --surface: #151715;
+      --card: #101410;
+      --gold: #B8860B;
+      --gold-light: #E0B84A;
+      --white: #FFF;
+      --muted: #9b9c91;
+      --danger: #d7654a;
+      --warning: #E0B84A;
+      --success: #45b47d;
+      --info: #4AAFE0;
+      --line: rgba(255, 255, 255, .09);
+      --line-strong: rgba(255, 255, 255, .18);
+      --radius: 14px;
+
+      /* ⚡ TABLEAU XL */
+      --cell-w: 180px;
+      --cell-w-first: 160px;
+      --cell-h: 82px;
+      --cell-h-header: 100px;
+      --grid-min-width: 1780px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    html {
+      min-width: 320px;
+      background: var(--black);
+      color-scheme: dark;
+      touch-action: manipulation;
+    }
+
+    body {
+      min-height: 100vh;
+      overflow-x: hidden;
+      background:
+        radial-gradient(circle at 85% 0, rgba(26, 58, 42, .32), transparent 32rem),
+        linear-gradient(180deg, #0a0a0a, #10130f);
+      color: var(--white);
+      font: 15px/1.5 Inter, system-ui, sans-serif;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    .shell {
+      width: min(100%, 1400px);
+      margin: auto;
+      padding: 16px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       HEADER
+       ═══════════════════════════════════════════════════════════ */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      color: var(--white);
+      text-decoration: none;
+      font: 700 22px 'Playfair Display', serif;
+      letter-spacing: .05em;
+    }
+    .brand span { color: var(--gold-light); font-style: italic; }
+
+    .header-right { display: flex; align-items: center; gap: 10px; }
+
+    .connection {
+      color: var(--muted);
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .connection::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--gold);
+    }
+    .connection.online::before { background: var(--success); }
+
+    /* ═══════════════════════════════════════════════════════════
+       TITRE
+       ═══════════════════════════════════════════════════════════ */
+    .page-title { margin-bottom: 16px; }
+
+    .eyebrow {
+      color: var(--gold-light);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .page-title h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(22px, 4vw, 32px);
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    .page-title p {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 6px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       ONGLETS
+       ═══════════════════════════════════════════════════════════ */
+    .tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 20px;
+      padding: 4px;
+      background: rgba(255, 255, 255, .02);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .tab-btn {
+      flex: 1;
+      min-width: 140px;
+      padding: 12px 16px;
+      border: none;
+      border-radius: 10px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .16s ease;
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+    .tab-btn:hover:not(.active) { color: var(--white); }
+    .tab-btn.active {
+      background: linear-gradient(135deg, rgba(224, 184, 74, .15), rgba(184, 134, 11, .08));
+      color: var(--gold-light);
+      border: 1px solid rgba(224, 184, 74, .25);
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; animation: appear .3s ease; }
+    @keyframes appear {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: none; }
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       HERO — résumé en haut
+       ═══════════════════════════════════════════════════════════ */
+    .hero {
+      background: rgba(21, 23, 21, .88);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 16px;
+    }
+
+    .hero-item { display: flex; flex-direction: column; gap: 6px; }
+
+    .hero-item .label {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      font-weight: 700;
+    }
+    .hero-item .value {
+      font-family: 'Playfair Display', serif;
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1.1;
+    }
+    .hero-item .value.gold { color: var(--gold-light); }
+    .hero-item .value.success { color: var(--success); }
+    .hero-item .value.danger { color: var(--danger); }
+    .hero-item .value.warning { color: var(--warning); }
+    .hero-item .sub {
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .hero-item .sub strong { color: var(--gold-light); }
+    .hero-item .sub.positive { color: var(--success); }
+    .hero-item .sub.negative { color: var(--danger); }
+
+    /* ═══════════════════════════════════════════════════════════
+       HINT DÉFILEMENT
+       ═══════════════════════════════════════════════════════════ */
+    .scroll-hint {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
+      background: rgba(224, 184, 74, .06);
+      border: 1px solid rgba(224, 184, 74, .18);
+      border-radius: 10px;
+      font-size: 12px;
+      color: var(--gold-light);
+      font-weight: 600;
+      animation: pulseHint 2.5s ease-in-out infinite;
+    }
+    @keyframes pulseHint {
+      0%, 100% { opacity: .75; }
+      50% { opacity: 1; }
+    }
+    @media (min-width: 900px) {
+      .scroll-hint { display: none; }
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       ⚡ TABLEAU TYPE EXCEL
+       ═══════════════════════════════════════════════════════════ */
+    .table-wrap {
+      border: 1px solid var(--line-strong);
+      border-radius: var(--radius);
+      background: rgba(21, 23, 21, .88);
+      overflow: hidden;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, .25);
+      margin-bottom: 20px;
+    }
+
+    .table-scroll {
+      overflow-x: auto;
+      overflow-y: visible;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+    }
+    .table-scroll::-webkit-scrollbar { height: 10px; width: 10px; }
+    .table-scroll::-webkit-scrollbar-track { background: rgba(255, 255, 255, .03); }
+    .table-scroll::-webkit-scrollbar-thumb {
+      background: rgba(224, 184, 74, .35);
+      border-radius: 10px;
+      border: 2px solid transparent;
+      background-clip: padding-box;
+    }
+    .table-scroll::-webkit-scrollbar-thumb:hover {
+      background: rgba(224, 184, 74, .55);
+      background-clip: padding-box;
+    }
+
+    .grid {
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: var(--cell-w);
+      grid-template-rows: var(--cell-h-header) repeat(11, var(--cell-h));
+      min-width: var(--grid-min-width);
+      width: max-content;
+    }
+
+    .cell {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 12px 14px;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      background: var(--card);
+      min-width: 0;
+      transition: background .15s ease;
+      position: relative;
+    }
+    .cell:hover { background: rgba(224, 184, 74, .03); }
+
+    /* ⚡ Colonne 1 : labels (figée) */
+    .cell.header-label,
+    .cell.row-label {
+      position: sticky;
+      left: 0;
+      z-index: 5;
+      background: linear-gradient(90deg, #131713 0%, #101410 88%, rgba(16, 20, 16, .6) 100%);
+      border-right: 2px solid rgba(224, 184, 74, .3);
+      width: var(--cell-w-first);
+      box-shadow: 6px 0 16px rgba(0, 0, 0, .35);
+      align-items: flex-start;
+      justify-content: center;
+      padding: 12px 16px;
+    }
+
+    /* ⚡ Header (1ère ligne, figé) */
+    .cell.header {
+      position: sticky;
+      top: 0;
+      z-index: 4;
+      height: var(--cell-h-header);
+      background: linear-gradient(180deg, #1a1e1a, #141814);
+      color: var(--gold-light);
+      font-weight: 800;
+      font-size: 14px;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      text-align: center;
+      border-bottom: 3px solid var(--gold);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, .3);
+      padding: 14px 10px;
+    }
+    .cell.header .header-label-main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .cell.header .header-icon { font-size: 22px; line-height: 1; }
+    .cell.header .header-name { font-size: 13px; font-weight: 800; }
+    .cell.header .header-coef {
+      font-size: 10px;
+      color: var(--muted);
+      text-transform: none;
+      letter-spacing: 0;
+      font-weight: 600;
+    }
+    .cell.header .header-coef strong { color: var(--gold-light); }
+
+    .cell.header-label {
+      z-index: 6;
+      border-bottom: 3px solid var(--gold);
+      background: linear-gradient(135deg, #1a1e1a, #101410);
+    }
+
+    /* ⚡ Labels de lignes */
+    .cell.row-label {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #e2e3dc;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+    .cell.row-label .row-icon {
+      font-size: 18px;
+      flex-shrink: 0;
+      width: 24px;
+      text-align: center;
+    }
+    .cell.row-label .row-name {
+      flex: 1;
+      min-width: 0;
+      line-height: 1.2;
+    }
+
+    /* ⚡ Cellules data */
+    .cell.data {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--white);
+      letter-spacing: -.02em;
+    }
+
+    /* Colonne TOTAL */
+    .cell.data.total-col {
+      background: rgba(224, 184, 74, .06);
+      border-right: 2px solid rgba(224, 184, 74, .25);
+      font-weight: 800;
+      font-size: 22px;
+      color: var(--gold-light);
+    }
+    .cell.total-col { background: rgba(224, 184, 74, .04); }
+
+    /* Valeurs colorées */
+    .val-success { color: var(--success); }
+    .val-danger { color: var(--danger); }
+    .val-warning { color: var(--warning); }
+    .val-info { color: var(--info); }
+    .val-gold { color: var(--gold-light); }
+    .val-muted { color: var(--muted); }
+
+    /* Badge priorité */
+    .priority-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 800;
+      font-family: Inter, sans-serif;
+      letter-spacing: .03em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .priority-badge.high {
+      background: rgba(215, 101, 74, .15);
+      color: #ff9a84;
+      border: 1px solid rgba(215, 101, 74, .3);
+    }
+    .priority-badge.medium {
+      background: rgba(224, 184, 74, .12);
+      color: var(--gold-light);
+      border: 1px solid rgba(224, 184, 74, .3);
+    }
+    .priority-badge.low {
+      background: rgba(69, 180, 125, .12);
+      color: #7ce0aa;
+      border: 1px solid rgba(69, 180, 125, .3);
+    }
+    .priority-badge.none {
+      background: rgba(255, 255, 255, .03);
+      color: var(--muted);
+      border: 1px solid var(--line);
+    }
+
+    /* Cellule focus */
+    .cell.data.focus-cell {
+      font-family: Inter, sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      color: #e2e3dc;
+      padding: 10px 12px;
+      line-height: 1.3;
+      text-align: center;
+    }
+
+    /* Cellule "ajouter" pour matières manuelles */
+    .cell.data.add-cell {
+      cursor: pointer;
+    }
+    .cell.data.add-cell .add-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 20px;
+      background: rgba(224, 184, 74, .08);
+      border: 1px solid rgba(224, 184, 74, .25);
+      color: var(--gold-light);
+      font-size: 12px;
+      font-weight: 700;
+      font-family: Inter, sans-serif;
+      text-transform: none;
+      letter-spacing: 0;
+      transition: all .16s ease;
+    }
+    .cell.data.add-cell:hover .add-btn {
+      background: rgba(224, 184, 74, .15);
+      transform: scale(1.05);
+    }
+
+    /* Séparateurs entre blocs */
+    .cell.separator-bottom { border-bottom: 2px solid var(--line-strong); }
+
+    /* ═══════════════════════════════════════════════════════════
+       ONGLET CONSEILS
+       ═══════════════════════════════════════════════════════════ */
+    .conseils-section { display: flex; flex-direction: column; gap: 16px; }
+
+    .conseil-card {
+      background: rgba(21, 23, 21, .88);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 22px;
+    }
+    .conseil-card.trajectory {
+      background: linear-gradient(135deg, rgba(224, 184, 74, .08), rgba(26, 58, 42, .06));
+      border-color: rgba(224, 184, 74, .2);
+    }
+    .conseil-card h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .conseil-card h2 .icon { font-size: 22px; }
+    .conseil-card p {
+      color: #cfd0cc;
+      font-size: 15px;
+      line-height: 1.7;
+      margin-bottom: 10px;
+    }
+    .conseil-card p:last-child { margin-bottom: 0; }
+    .conseil-card p strong { color: var(--gold-light); }
+
+    .conseil-list {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .conseil-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 14px;
+      background: rgba(255, 255, 255, .02);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      font-size: 14px;
+      line-height: 1.5;
+      color: #e2e3dc;
+    }
+    .conseil-list li .bullet {
+      font-size: 16px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .conseil-list li strong { color: var(--gold-light); }
+
+    .action-plan {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .action-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 16px;
+      background: rgba(255, 255, 255, .02);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      transition: all .16s ease;
+    }
+    .action-item:hover {
+      border-color: rgba(224, 184, 74, .3);
+      background: rgba(224, 184, 74, .03);
+    }
+    .action-item .num {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(224, 184, 74, .12);
+      color: var(--gold-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    .action-item .content { flex: 1; min-width: 0; }
+    .action-item .title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 2px;
+    }
+    .action-item .desc {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       ÉTATS
+       ═══════════════════════════════════════════════════════════ */
+    .loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      padding: 60px 20px;
+      color: var(--muted);
+    }
+    .loading-spinner {
+      width: 42px;
+      height: 42px;
+      border: 3px solid rgba(224, 184, 74, .15);
+      border-top-color: var(--gold-light);
+      border-radius: 50%;
+      animation: spin .9s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .empty {
+      text-align: center;
+      padding: 60px 24px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+    }
+    .empty-icon {
+      font-size: 48px;
+      display: block;
+      margin-bottom: 14px;
+      opacity: .6;
+    }
+    .empty h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+    .empty p {
+      color: var(--muted);
+      font-size: 14px;
+      max-width: 380px;
+      margin: 0 auto 20px;
+      line-height: 1.6;
+    }
+
+    .btn {
+      min-height: 44px;
+      border: 1px solid transparent;
+      border-radius: 10px;
+      padding: 10px 18px;
+      color: var(--white);
+      background: #222722;
+      font-weight: 700;
+      font-size: 13px;
+      transition: all .16s ease;
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      border-color: rgba(224, 184, 74, .55);
+    }
+    .btn.primary {
+      background: linear-gradient(135deg, var(--gold-light), var(--gold));
+      color: var(--black);
+    }
+    .btn.secondary {
+      background: transparent;
+      border-color: var(--line);
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       MODAL AJOUT NOTE
+       ═══════════════════════════════════════════════════════════ */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: grid;
+      place-items: center;
+      padding: 16px;
+      background: rgba(0, 0, 0, .85);
+      backdrop-filter: blur(16px);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .25s ease, visibility .25s ease;
+    }
+    .modal-overlay.show { opacity: 1; visibility: visible; }
+
+    .modal {
+      position: relative;
+      width: min(100%, 420px);
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 26px 22px;
+      border: 1px solid var(--line-strong);
+      border-radius: var(--radius);
+      background: linear-gradient(145deg, #141414, #0a0a0a);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, .6);
+      transform: scale(.94) translateY(16px);
+      transition: transform .25s ease;
+    }
+    .modal-overlay.show .modal { transform: scale(1) translateY(0); }
+
+    .modal-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 32px;
+      height: 32px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .03);
+      color: var(--muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-close:hover { color: var(--white); }
+
+    .modal h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      margin-bottom: 18px;
+      padding-right: 30px;
+    }
+
+    .field { margin-bottom: 14px; }
+    .field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin-bottom: 6px;
+    }
+    .field input, .field select {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: #0e100e;
+      color: var(--white);
+      font-size: 15px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color .16s;
+    }
+    .field input:focus, .field select:focus {
+      border-color: var(--gold-light);
+      box-shadow: 0 0 0 3px rgba(224, 184, 74, .12);
+    }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    /* ═══════════════════════════════════════════════════════════
+       RESPONSIVE
+       ═══════════════════════════════════════════════════════════ */
+    @media (max-width: 620px) {
+      .shell { padding: 12px; }
+      .hero { padding: 16px; gap: 12px; }
+      .hero-item .value { font-size: 22px; }
+      .conseil-card { padding: 18px; }
+      .tab-btn { min-width: 120px; padding: 10px 12px; font-size: 13px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+
+    <!-- HEADER -->
+    <header>
+      <a class="brand" href="index.html">ARVEX<span>A School</span></a>
+      <div class="header-right">
+        <div class="connection" id="connectionState">Vérification...</div>
+      </div>
+    </header>
+
+    <!-- TITRE -->
+    <div class="page-title">
+      <div class="eyebrow">ARV-PILOT · Centre de pilotage</div>
+      <h1>Où j'en suis ? Que dois-je travailler ?</h1>
+      <p>Analyse basée sur tes examens, tes quiz et tes notes de classe.</p>
+    </div>
+
+    <!-- ONGLETS -->
+    <div class="tabs" role="tablist">
+      <button class="tab-btn active" data-tab="tableau" role="tab">
+        <i class="fas fa-table"></i> Tableau
+      </button>
+      <button class="tab-btn" data-tab="conseils" role="tab">
+        <i class="fas fa-lightbulb"></i> Conseils
+      </button>
+    </div>
+
+    <!-- CHARGEMENT -->
+    <div class="loading" id="loadingState">
+      <div class="loading-spinner"></div>
+      <div>Analyse de tes données...</div>
+    </div>
+
+    <!-- EMPTY STATE -->
+    <div class="empty" id="emptyState" style="display:none;">
+      <span class="empty-icon">📊</span>
+      <h3>Pas encore de données</h3>
+      <p>
+        Fais un examen ou une révision pour qu'ARV-PILOT puisse analyser ton niveau.
+        Tu peux aussi ajouter manuellement des notes (Anglais, Philosophie, etc.).
+      </p>
+      <a href="exam.html" class="btn primary"><i class="fas fa-file-circle-plus"></i> Faire un examen</a>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         ONGLET 1 — TABLEAU
+         ═══════════════════════════════════════════════════════════ -->
+    <section class="tab-content active" id="tab-tableau" style="display:none;">
+      <!-- HERO -->
+      <div class="hero" id="heroSummary">
+        <div class="hero-item">
+          <span class="label">Moyenne générale</span>
+          <span class="value gold" id="heroGeneralAvg">—</span>
+          <span class="sub" id="heroEvolution">—</span>
+        </div>
+        <div class="hero-item">
+          <span class="label">Objectif</span>
+          <span class="value" id="heroTarget">12 / 20</span>
+          <span class="sub" id="heroGap">—</span>
+        </div>
+        <div class="hero-item">
+          <span class="label">Préparation actuelle</span>
+          <span class="value" id="heroReadiness">—</span>
+          <span class="sub" id="heroDataPoints">—</span>
+        </div>
+        <div class="hero-item">
+          <span class="label">Exercices réussis</span>
+          <span class="value success" id="heroSuccessRate">—</span>
+          <span class="sub" id="heroExerciseCount">—</span>
+        </div>
+      </div>
+
+      <!-- HINT défilement -->
+      <div class="scroll-hint">
+        <i class="fas fa-arrows-left-right"></i>
+        <span>Glisse horizontalement pour voir toutes les matières</span>
+      </div>
+
+      <!-- TABLEAU -->
+      <div class="table-wrap">
+        <div class="table-scroll">
+          <div class="grid" id="pilotGrid"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         ONGLET 2 — CONSEILS
+         ═══════════════════════════════════════════════════════════ -->
+    <section class="tab-content" id="tab-conseils">
+      <div class="conseils-section" id="conseilsContent">
+        <!-- Rempli dynamiquement -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL AJOUT NOTE -->
+  <div class="modal-overlay" id="noteModal">
+    <div class="modal">
+      <button class="modal-close" id="modalClose"><i class="fas fa-times"></i></button>
+      <h2 id="modalTitle">Ajouter une note</h2>
+
+      <form id="noteForm">
+        <div class="field">
+          <label for="noteSubject">Matière</label>
+          <select id="noteSubject" required></select>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="noteScore">Note</label>
+            <input type="number" id="noteScore" min="0" step="0.25" required placeholder="12">
+          </div>
+          <div class="field">
+            <label for="noteMax">Sur</label>
+            <input type="number" id="noteMax" min="1" value="20" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="noteType">Type d'évaluation</label>
+          <select id="noteType" required></select>
+        </div>
+
+        <div class="field">
+          <label for="noteChapter">Chapitre (optionnel)</label>
+          <input type="text" id="noteChapter" placeholder="Ex: Nombres complexes">
+        </div>
+
+        <div class="field">
+          <label for="noteComment">Commentaire (optionnel)</label>
+          <input type="text" id="noteComment" placeholder="Ex: Devoir maison">
+        </div>
+
+        <div style="display:flex;gap:10px;margin-top:20px;">
+          <button type="button" class="btn secondary" id="modalCancel" style="flex:1;">Annuler</button>
+          <button type="submit" class="btn primary" id="modalSubmit" style="flex:1;">
+            <i class="fas fa-check"></i> Enregistrer
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "firebase/app": "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
+      "firebase/auth": "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js",
+      "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js"
+    }
+  }
+  </script>
+
+  <script type="module">
+  import { initializeApp } from 'firebase/app';
+  import { getAuth, onAuthStateChanged } from 'firebase/auth';
+  import {
+    getFirestore, doc, getDoc, collection, addDoc,
+    query, orderBy, getDocs, serverTimestamp
+  } from 'firebase/firestore';
+
+  import { SUBJECTS, COEFFICIENTS, PRIORITY_LEVELS, EVALUATION_TYPES, normalizeSubjectName, getSubjectConfig } from './js/arv-pilot/config.js';
+  import {
+    computeSubjectAverage,
+    computeGeneralAverage,
+    countEvaluations,
+    computeExerciseStats,
+    computeRevisionTime,
+    countChaptersRevised,
+    computePriority,
+    detectTrend,
+    computeReadiness,
+    formatTime,
+    formatEvolution,
+    daysSince,
+    round2
+  } from './js/arv-pilot/calculators.js';
+
+  // ═══════════════════════════════════════════════════════════════
+  // FIREBASE
+  // ═══════════════════════════════════════════════════════════════
+  const app = initializeApp({
+    apiKey: 'AIzaSyDHscOXw3rLuhV6z1Cny-bdYCumqpnG7QE',
+    authDomain: 'arvexa-fbf10.firebaseapp.com',
+    projectId: 'arvexa-fbf10',
+    storageBucket: 'arvexa-fbf10.firebasestorage.app',
+    messagingSenderId: '920108330053',
+    appId: '1:920108330053:web:f532d71cbc2c824bc7472c'
+  });
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  const $ = (id) => document.getElementById(id);
+
+  const state = {
+    user: null,
+    examResults: [],
+    revisionSessions: [],
+    grades: [],
+    subjectAverages: {},
+    generalAverage: null,
+    priorityBySubject: {},
+    exerciseStatsBySubject: {},
+    evolutionBySubject: {}
+  };
+
+  // ═══════════════════════════════════════════════════════════════
+  // ONGLETS
+  // ═══════════════════════════════════════════════════════════════
+  document.querySelectorAll('.tab-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach((b) => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach((c) => c.classList.remove('active'));
+      btn.classList.add('active');
+      const tabId = `tab-${btn.dataset.tab}`;
+      const content = $(tabId);
+      content.classList.add('active');
+      if (tabId === 'tab-tableau') content.style.display = 'block';
+      else if (tabId === 'tab-conseils') content.style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+
+  // ═══════════════════════════════════════════════════════════════
+  // CHARGEMENT DES DONNÉES
+  // ═══════════════════════════════════════════════════════════════
+  async function loadAllData(uid) {
+    const [examsSnap, revisionsSnap, gradesSnap] = await Promise.all([
+      getDocs(query(collection(db, 'users', uid, 'examResults'), orderBy('createdAt', 'desc'))).catch(() => ({ docs: [] })),
+      getDocs(query(collection(db, 'users', uid, 'revisionSessions'), orderBy('createdAt', 'desc'))).catch(() => ({ docs: [] })),
+      getDocs(query(collection(db, 'users', uid, 'grades'), orderBy('date', 'desc'))).catch(() => ({ docs: [] }))
+    ]);
+
+    state.examResults = examsSnap.docs.map((d) => ({ id: d.id, ...d.data(), _createdAt: d.data().createdAt?.toDate?.() }));
+    state.revisionSessions = revisionsSnap.docs.map((d) => ({ id: d.id, ...d.data(), _createdAt: d.data().createdAt?.toDate?.() }));
+    state.grades = gradesSnap.docs.map((d) => ({ id: d.id, ...d.data(), _date: d.data().date?.toDate?.() || d.data().createdAt?.toDate?.() }));
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // CALCUL GLOBAL
+  // ═══════════════════════════════════════════════════════════════
+  function computeAll() {
+    const subjectKeys = Object.keys(SUBJECTS);
+    const subjectAverages = {};
+    const priorityBySubject = {};
+    const exerciseStatsBySubject = {};
+    const evolutionBySubject = {};
+    const evaluationsBySubject = {};
+    const revisionTimeBySubject = {};
+    const chaptersBySubject = {};
+
+    subjectKeys.forEach((subject) => {
+      const ctx = {
+        examResults: state.examResults,
+        revisionSessions: state.revisionSessions,
+        grades: state.grades
+      };
+
+      const avg = computeSubjectAverage(subject, ctx);
+      subjectAverages[subject] = avg;
+
+      const stats = computeExerciseStats(subject, ctx);
+      exerciseStatsBySubject[subject] = stats;
+
+      const evals = countEvaluations(subject, ctx);
+      evaluationsBySubject[subject] = evals;
+
+      const time = computeRevisionTime(subject, { revisionSessions: state.revisionSessions });
+      revisionTimeBySubject[subject] = time;
+
+      const chapters = countChaptersRevised(subject, { revisionSessions: state.revisionSessions, examResults: state.examResults });
+      chaptersBySubject[subject] = chapters;
+
+      // Évolution (30 derniers jours vs avant)
+      const allItems = [
+        ...state.examResults.filter((r) => normalizeSubjectName(r.subject) === subject).map((r) => ({
+          score: Number(r.score) || null,
+          date: r._createdAt || r.createdAt
+        })),
+        ...state.revisionSessions.filter((s) => s.type === 'quiz_result' && normalizeSubjectName(s.subject) === subject).map((s) => ({
+          score: Number(s.score) || null,
+          date: s._createdAt || s.createdAt
+        }))
+      ];
+
+      evolutionBySubject[subject] = computeEvolutionLocal(allItems, 30);
+
+      // Priorité
+      const errorCount = countErrorsForSubject(subject);
+      const lastWorkDate = allItems.sort((a, b) => new Date(b.date) - new Date(a.date))[0]?.date;
+      const daysSinceWork = lastWorkDate ? daysSince(lastWorkDate) : 999;
+
+      priorityBySubject[subject] = computePriority(subject, {
+        average: avg,
+        exerciseRate: stats.rate,
+        errorCount,
+        daysSinceLastWork: daysSinceWork
+      });
+    });
+
+    state.subjectAverages = subjectAverages;
+    state.priorityBySubject = priorityBySubject;
+    state.exerciseStatsBySubject = exerciseStatsBySubject;
+    state.evolutionBySubject = evolutionBySubject;
+    state.evaluationsBySubject = evaluationsBySubject;
+    state.revisionTimeBySubject = revisionTimeBySubject;
+    state.chaptersBySubject = chaptersBySubject;
+    state.generalAverage = computeGeneralAverage(subjectAverages);
+  }
+
+  function computeEvolutionLocal(items, periodDays) {
+    if (items.length < 2) return null;
+    const now = Date.now();
+    const cutoff = now - periodDays * 24 * 60 * 60 * 1000;
+    const recent = [];
+    const previous = [];
+    items.forEach((item) => {
+      if (item.score === null || !item.date) return;
+      const time = new Date(item.date).getTime();
+      if (isNaN(time)) return;
+      if (time >= cutoff) recent.push(item.score);
+      else previous.push(item.score);
+    });
+    if (!recent.length || !previous.length) return null;
+    const avgR = recent.reduce((a, b) => a + b, 0) / recent.length;
+    const avgP = previous.reduce((a, b) => a + b, 0) / previous.length;
+    return round2(avgR - avgP);
+  }
+
+  function countErrorsForSubject(subject) {
+    let count = 0;
+    state.examResults.forEach((r) => {
+      if (normalizeSubjectName(r.subject) !== subject) return;
+      const difficulties = Array.isArray(r.difficulties) ? r.difficulties : [];
+      difficulties.forEach((d) => {
+        const errors = Array.isArray(d.errors) ? d.errors : [];
+        count += errors.length;
+      });
+    });
+    return count;
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // RENDU DU TABLEAU
+  // ═══════════════════════════════════════════════════════════════
+  function buildTable() {
+    const grid = $('pilotGrid');
+    grid.innerHTML = '';
+
+    const subjectKeys = Object.keys(SUBJECTS);
+
+    // ─── LIGNE 1 : HEADER ───
+    // Coin haut-gauche
+    const cornerCell = document.createElement('div');
+    cornerCell.className = 'cell header-label';
+    cornerCell.innerHTML = `<div class="row-name" style="font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--gold-light);">Indicateur</div>`;
+    grid.appendChild(cornerCell);
+
+    // Cellule TOTAL
+    const totalHeader = document.createElement('div');
+    totalHeader.className = 'cell header';
+    totalHeader.innerHTML = `
+      <div class="header-label-main">
+        <span class="header-icon">📊</span>
+        <span class="header-name">TOTAL</span>
+        <span class="header-coef">Moyenne pondérée</span>
+      </div>
+    `;
+    grid.appendChild(totalHeader);
+
+    // Cellules des matières
+    subjectKeys.forEach((subject) => {
+      const cfg = SUBJECTS[subject];
+      const cell = document.createElement('div');
+      cell.className = 'cell header';
+      cell.innerHTML = `
+        <div class="header-label-main">
+          <span class="header-icon">${cfg.icon}</span>
+          <span class="header-name">${cfg.label}</span>
+          <span class="header-coef">coef <strong>${cfg.coef}</strong></span>
+        </div>
+      `;
+      grid.appendChild(cell);
+    });
+
+    // ─── ROWS ───
+    const rows = [
+      { id: 'moyenne', icon: '📊', label: 'Moyenne', render: renderScoreCell, separator: false },
+      { id: 'evolution', icon: '📈', label: 'Évolution', render: renderEvolutionCell, separator: false },
+      { id: 'evaluations', icon: '📝', label: 'Évaluations', render: renderCountCell, separator: false },
+      { id: 'exercices', icon: '🏋️', label: 'Exercices', render: renderExerciseCountCell, separator: false },
+      { id: 'reussite', icon: '✅', label: 'Taux réussite', render: renderSuccessRateCell, separator: true },
+      { id: 'temps', icon: '⏱️', label: 'Temps révision', render: renderTimeCell, separator: false },
+      { id: 'chapitres', icon: '📚', label: 'Chapitres', render: renderCountCell2, separator: true },
+      { id: 'priorite', icon: '🚨', label: 'Priorité', render: renderPriorityCell, separator: false },
+      { id: 'focus', icon: '🎯', label: 'Focus', render: renderFocusCell, separator: false }
+    ];
+
+    rows.forEach((row) => {
+      // Label
+      const labelCell = document.createElement('div');
+      labelCell.className = 'cell row-label' + (row.separator ? ' separator-bottom' : '');
+      labelCell.innerHTML = `
+        <span class="row-icon">${row.icon}</span>
+        <span class="row-name">${row.label}</span>
+      `;
+      grid.appendChild(labelCell);
+
+      // Cellule TOTAL
+      const totalCell = document.createElement('div');
+      totalCell.className = 'cell data total-col' + (row.separator ? ' separator-bottom' : '');
+      const totalValue = row.render('total');
+      totalCell.innerHTML = totalValue;
+      grid.appendChild(totalCell);
+
+      // Cellules matières
+      subjectKeys.forEach((subject) => {
+        const cell = document.createElement('div');
+        cell.className = 'cell data' + (row.separator ? ' separator-bottom' : '');
+        const value = row.render(subject);
+        cell.innerHTML = value;
+        grid.appendChild(cell);
+      });
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // RENDERERS DE CELLULES
+  // ═══════════════════════════════════════════════════════════════
+  function renderScoreCell(subject) {
+    if (subject === 'total') {
+      const v = state.generalAverage;
+      if (v === null) return `<span class="val-muted">—</span>`;
+      const cls = v >= 14 ? 'val-success' : v >= 10 ? 'val-gold' : 'val-danger';
+      return `<span class="${cls}">${v.toFixed(2)}</span>`;
+    }
+    const v = state.subjectAverages[subject];
+    if (v === null || v === undefined) {
+      const cfg = SUBJECTS[subject];
+      if (cfg.mode === 'manual') {
+        return `<span class="add-btn" data-subject="${subject}">➕ Ajouter</span>`;
+      }
+      return `<span class="val-muted">—</span>`;
+    }
+    const cls = v >= 14 ? 'val-success' : v >= 10 ? 'val-gold' : 'val-danger';
+    return `<span class="${cls}">${v.toFixed(2)}</span>`;
+  }
+
+  function renderEvolutionCell(subject) {
+    if (subject === 'total') return `<span class="val-muted">—</span>`;
+    const v = state.evolutionBySubject[subject];
+    if (v === null || v === undefined) return `<span class="val-muted">—</span>`;
+    const cls = v > 0.1 ? 'val-success' : v < -0.1 ? 'val-danger' : 'val-muted';
+    return `<span class="${cls}">${formatEvolution(v)}</span>`;
+  }
+
+  function renderCountCell(subject) {
+    if (subject === 'total') {
+      const total = Object.values(state.evaluationsBySubject || {}).reduce((a, b) => a + b, 0);
+      return total > 0 ? `<span class="val-gold">${total}</span>` : `<span class="val-muted">0</span>`;
+    }
+    const v = state.evaluationsBySubject?.[subject] || 0;
+    return v > 0 ? `<span class="val-gold">${v}</span>` : `<span class="val-muted">0</span>`;
+  }
+
+  function renderExerciseCountCell(subject) {
+    if (subject === 'total') {
+      const total = Object.values(state.exerciseStatsBySubject || {}).reduce((a, b) => a + (b.total || 0), 0);
+      return total > 0 ? `<span class="val-gold">${total}</span>` : `<span class="val-muted">0</span>`;
+    }
+    const stats = state.exerciseStatsBySubject?.[subject];
+    const v = stats?.total || 0;
+    return v > 0 ? `<span class="val-gold">${v}</span>` : `<span class="val-muted">0</span>`;
+  }
+
+  function renderSuccessRateCell(subject) {
+    if (subject === 'total') {
+      let total = 0, success = 0;
+      Object.values(state.exerciseStatsBySubject || {}).forEach((s) => {
+        total += s.total || 0;
+        success += s.success || 0;
+      });
+      if (total === 0) return `<span class="val-muted">—</span>`;
+      const rate = Math.round((success / total) * 100);
+      const cls = rate >= 75 ? 'val-success' : rate >= 50 ? 'val-warning' : 'val-danger';
+      return `<span class="${cls}">${rate}%</span>`;
+    }
+    const stats = state.exerciseStatsBySubject?.[subject];
+    if (!stats || stats.rate === null) return `<span class="val-muted">—</span>`;
+    const rate = stats.rate;
+    const cls = rate >= 75 ? 'val-success' : rate >= 50 ? 'val-warning' : 'val-danger';
+    return `<span class="${cls}">${rate}%</span>`;
+  }
+
+  function renderTimeCell(subject) {
+    if (subject === 'total') {
+      const total = Object.values(state.revisionTimeBySubject || {}).reduce((a, b) => a + b, 0);
+      return total > 0 ? `<span class="val-gold">${formatTime(total)}</span>` : `<span class="val-muted">—</span>`;
+    }
+    const v = state.revisionTimeBySubject?.[subject] || 0;
+    return v > 0 ? `<span class="val-gold">${formatTime(v)}</span>` : `<span class="val-muted">—</span>`;
+  }
+
+  function renderCountCell2(subject) {
+    if (subject === 'total') {
+      const total = Object.values(state.chaptersBySubject || {}).reduce((a, b) => a + b, 0);
+      return total > 0 ? `<span class="val-gold">${total}</span>` : `<span class="val-muted">0</span>`;
+    }
+    const v = state.chaptersBySubject?.[subject] || 0;
+    return v > 0 ? `<span class="val-gold">${v}</span>` : `<span class="val-muted">0</span>`;
+  }
+
+  function renderPriorityCell(subject) {
+    if (subject === 'total') return `<span class="val-muted">—</span>`;
+    const p = state.priorityBySubject?.[subject];
+    if (!p || p.level === 'none') {
+      return `<span class="priority-badge none">Pas de données</span>`;
+    }
+    const levels = { high: 'Élevée', medium: 'Renforcer', low: 'Solide' };
+    const emojis = { high: '🔴', medium: '🟠', low: '🟢' };
+    return `<span class="priority-badge ${p.level}">${emojis[p.level]} ${levels[p.level]}</span>`;
+  }
+
+  function renderFocusCell(subject) {
+    if (subject === 'total') return `<span class="val-muted">—</span>`;
+    const p = state.priorityBySubject?.[subject];
+    if (!p || !p.reasons || p.reasons.length === 0) {
+      return `<span class="val-muted">—</span>`;
+    }
+    return `<span style="font-size:11px;color:#cfd0cc;">${p.reasons[0]}</span>`;
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // HERO
+  // ═══════════════════════════════════════════════════════════════
+  function renderHero() {
+    const avg = state.generalAverage;
+    $('heroGeneralAvg').textContent = avg !== null ? `${avg.toFixed(2)} / 20` : '—';
+
+    // Évolution globale
+    const evolutionValues = Object.values(state.evolutionBySubject).filter((v) => v !== null);
+    if (evolutionValues.length > 0) {
+      const evoAvg = evolutionValues.reduce((a, b) => a + b, 0) / evolutionValues.length;
+      const el = $('heroEvolution');
+      el.textContent = `${formatEvolution(round2(evoAvg))} pts (30 jours)`;
+      el.className = 'sub ' + (evoAvg > 0 ? 'positive' : evoAvg < 0 ? 'negative' : '');
+    } else {
+      $('heroEvolution').textContent = 'Pas assez de données';
+    }
+
+    // Objectif
+    const target = 12;
+    $('heroTarget').textContent = `${target} / 20`;
+    if (avg !== null) {
+      const gap = round2(target - avg);
+      const el = $('heroGap');
+      el.textContent = gap > 0 ? `Écart : +${gap.toFixed(2)} pt` : `Objectif atteint (${Math.abs(gap).toFixed(2)} pt au-dessus)`;
+      el.className = 'sub ' + (gap > 0 ? 'negative' : 'positive');
+    }
+
+    // Préparation
+    const dataPoints = state.examResults.length + state.revisionSessions.length + state.grades.length;
+    const readiness = computeReadiness(dataPoints, avg);
+    $('heroReadiness').textContent = readiness.label;
+
+    const readinessEl = $('heroReadiness');
+    readinessEl.className = 'value ' + (
+      readiness.level === 'solid' ? 'success' :
+      readiness.level === 'progressing' ? 'warning' :
+      readiness.level === 'reinforce' ? 'danger' : ''
+    );
+
+    $('heroDataPoints').innerHTML = `Basé sur <strong>${dataPoints}</strong> données`;
+
+    // Exercices réussis (global)
+    let totalEx = 0, successEx = 0;
+    Object.values(state.exerciseStatsBySubject).forEach((s) => {
+      totalEx += s.total || 0;
+      successEx += s.success || 0;
+    });
+    if (totalEx > 0) {
+      const rate = Math.round((successEx / totalEx) * 100);
+      $('heroSuccessRate').textContent = `${rate}%`;
+      $('heroExerciseCount').textContent = `${successEx} / ${totalEx} exercices`;
+    } else {
+      $('heroSuccessRate').textContent = '—';
+      $('heroExerciseCount').textContent = 'Aucun exercice';
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // ONGLET CONSEILS
+  // ═══════════════════════════════════════════════════════════════
+  function buildConseils() {
+    const container = $('conseilsContent');
+    container.innerHTML = '';
+
+    const avg = state.generalAverage;
+    const dataPoints = state.examResults.length + state.revisionSessions.length + state.grades.length;
+
+    // 1. Trajectoire actuelle
+    const trajectory = document.createElement('div');
+    trajectory.className = 'conseil-card trajectory';
+    let trajectoryText = '';
+
+    if (dataPoints < 3) {
+      trajectoryText = `Tu n'as pas encore assez de données pour une analyse fiable. Fais un examen ou une révision pour commencer.`;
+    } else if (avg === null) {
+      trajectoryText = `Tes données sont enregistrées mais pas encore assez complètes pour calculer une moyenne.`;
+    } else {
+      const evolutionValues = Object.values(state.evolutionBySubject).filter((v) => v !== null);
+      const evoAvg = evolutionValues.length > 0 ? evolutionValues.reduce((a, b) => a + b, 0) / evolutionValues.length : 0;
+
+      if (evoAvg > 0.5) {
+        trajectoryText = `Tu montres une <strong>progression régulière</strong> récente (+${evoAvg.toFixed(2)} pt en moyenne sur 30 jours). Ta moyenne générale actuelle est de <strong>${avg.toFixed(2)}/20</strong>.`;
+      } else if (evoAvg < -0.5) {
+        trajectoryText = `Ta moyenne a <strong>légèrement baissé</strong> récemment (${evoAvg.toFixed(2)} pt sur 30 jours). Ta moyenne actuelle est de <strong>${avg.toFixed(2)}/20</strong>. Il est temps de te reconcentrer.`;
+      } else {
+        trajectoryText = `Ta moyenne est <strong>stable</strong> autour de <strong>${avg.toFixed(2)}/20</strong>. Continue ton travail régulier pour progresser.`;
+      }
+    }
+
+    trajectory.innerHTML = `
+      <h2><span class="icon">🎯</span> Trajectoire actuelle</h2>
+      <p>${trajectoryText}</p>
+      <p style="font-size:12px;color:var(--muted);">Basé sur ${dataPoints} données (${state.examResults.length} examens, ${state.revisionSessions.length} révisions, ${state.grades.length} notes manuelles).</p>
+    `;
+    container.appendChild(trajectory);
+
+    // 2. Indicateurs favorables / À renforcer
+    const priorities = Object.entries(state.priorityBySubject)
+      .filter(([_, p]) => p.level === 'high' || p.level === 'medium')
+      .sort((a, b) => b[1].score - a[1].score);
+
+    const strengths = Object.entries(state.priorityBySubject)
+      .filter(([_, p]) => p.level === 'low')
+      .sort((a, b) => a[1].score - b[1].score);
+
+    if (priorities.length > 0) {
+      const card = document.createElement('div');
+      card.className = 'conseil-card';
+      card.innerHTML = `
+        <h2><span class="icon">⚠️</span> Points à renforcer</h2>
+        <ul class="conseil-list">
+          ${priorities.slice(0, 4).map(([subject, p]) => {
+            const cfg = SUBJECTS[subject];
+            return `<li>
+              <span class="bullet">${p.level === 'high' ? '🔴' : '🟠'}</span>
+              <div>
+                <strong>${cfg.icon} ${cfg.label}</strong> — ${p.reasons[0] || 'À travailler'}
+                ${p.reasons.length > 1 ? `<br><span style="color:var(--muted);font-size:12px;">${p.reasons.slice(1, 3).join(' · ')}</span>` : ''}
+              </div>
+            </li>`;
+          }).join('')}
+        </ul>
+      `;
+      container.appendChild(card);
+    }
+
+    if (strengths.length > 0) {
+      const card = document.createElement('div');
+      card.className = 'conseil-card';
+      card.innerHTML = `
+        <h2><span class="icon">✅</span> Indicateurs favorables</h2>
+        <ul class="conseil-list">
+          ${strengths.slice(0, 4).map(([subject]) => {
+            const cfg = SUBJECTS[subject];
+            const avgS = state.subjectAverages[subject];
+            return `<li>
+              <span class="bullet">🟢</span>
+              <div><strong>${cfg.icon} ${cfg.label}</strong> — Moyenne ${avgS !== null ? avgS.toFixed(2) : '—'}/20 · Solide</div>
+            </li>`;
+          }).join('')}
+        </ul>
+      `;
+      container.appendChild(card);
+    }
+
+    // 3. Plan d'action
+    const actionItems = [];
+
+    priorities.slice(0, 3).forEach(([subject, p]) => {
+      const cfg = SUBJECTS[subject];
+      actionItems.push({
+        title: `${cfg.icon} ${cfg.label}`,
+        desc: p.level === 'high' ? 'Priorité élevée — travaille cette matière' : 'Revoir les notions faibles'
+      });
+    });
+
+    if (state.examResults.length === 0) {
+      actionItems.push({ title: '🎓 Examen blanc', desc: 'Programmer une première session' });
+    } else {
+      const lastExam = state.examResults[0];
+      const days = daysSince(lastExam._createdAt || lastExam.createdAt);
+      if (days !== null && days > 7) {
+        actionItems.push({ title: '🎓 Examen blanc', desc: `Dernier il y a ${days} jours — reprogramme une session` });
+      }
+    }
+
+    if (actionItems.length > 0) {
+      const card = document.createElement('div');
+      card.className = 'conseil-card';
+      card.innerHTML = `
+        <h2><span class="icon">📋</span> Que travailler maintenant ?</h2>
+        <div class="action-plan">
+          ${actionItems.map((item, i) => `
+            <div class="action-item">
+              <div class="num">${i + 1}</div>
+              <div class="content">
+                <div class="title">${item.title}</div>
+                <div class="desc">${item.desc}</div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      container.appendChild(card);
+    }
+
+    // 4. Objectif
+    if (avg !== null) {
+      const target = 12;
+      const gap = round2(target - avg);
+      const card = document.createElement('div');
+      card.className = 'conseil-card';
+      card.innerHTML = `
+        <h2><span class="icon">🎓</span> Objectif</h2>
+        <p>Objectif : <strong>${target}/20</strong> · Actuel : <strong>${avg.toFixed(2)}/20</strong> · Écart : <strong>${gap > 0 ? '+' + gap.toFixed(2) : gap.toFixed(2)} pt</strong></p>
+        <p style="font-size:13px;color:var(--muted);">
+          ${gap > 0
+            ? `Selon les données disponibles, ton objectif est <strong>atteignable</strong>. Concentre-toi sur les matières en priorité élevée ci-dessus.`
+            : `Tu es <strong>au-dessus de ton objectif</strong>. Continue ton travail régulier pour maintenir ce niveau.`}
+        </p>
+      `;
+      container.appendChild(card);
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // MODAL AJOUT NOTE
+  // ═══════════════════════════════════════════════════════════════
+  const noteModal = $('noteModal');
+  const noteForm = $('noteForm');
+  const noteSubject = $('noteSubject');
+  const noteType = $('noteType');
+  let currentAddSubject = null;
+
+  function fillModalSelects() {
+    noteSubject.innerHTML = '';
+    Object.entries(SUBJECTS).forEach(([key, cfg]) => {
+      const opt = document.createElement('option');
+      opt.value = key;
+      opt.textContent = `${cfg.icon} ${cfg.label}`;
+      noteSubject.appendChild(opt);
+    });
+
+    noteType.innerHTML = '';
+    Object.entries(EVALUATION_TYPES).forEach(([key, cfg]) => {
+      const opt = document.createElement('option');
+      opt.value = key;
+      opt.textContent = `${cfg.icon} ${cfg.label}`;
+      noteType.appendChild(opt);
+    });
+  }
+
+  function openNoteModal(subject = null) {
+    currentAddSubject = subject;
+    fillModalSelects();
+    if (subject) noteSubject.value = subject;
+    $('modalTitle').textContent = `Ajouter une note — ${subject ? SUBJECTS[subject].label : 'Matière'}`;
+    noteForm.reset();
+    if (subject) noteSubject.value = subject;
+    noteModal.classList.add('show');
+  }
+
+  function closeNoteModal() {
+    noteModal.classList.remove('show');
+    currentAddSubject = null;
+  }
+
+  noteForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!state.user) return;
+
+    const subject = noteSubject.value;
+    const score = parseFloat($('noteScore').value);
+    const maxScore = parseFloat($('noteMax').value) || 20;
+    const type = noteType.value;
+    const chapter = $('noteChapter').value.trim();
+    const comment = $('noteComment').value.trim();
+
+    if (isNaN(score) || score < 0 || score > maxScore) {
+      alert('Note invalide');
+      return;
+    }
+
+    try {
+      await addDoc(collection(db, 'users', state.user.uid, 'grades'), {
+        subject,
+        score,
+        maxScore,
+        type,
+        chapter: chapter || null,
+        comment: comment || null,
+        date: serverTimestamp(),
+        createdAt: serverTimestamp()
+      });
+
+      closeNoteModal();
+      // Recharger les données
+      await loadAllData(state.user.uid);
+      computeAll();
+      buildTable();
+      renderHero();
+      buildConseils();
+    } catch (error) {
+      console.error('Erreur ajout note:', error);
+      alert('Impossible d\'enregistrer la note.');
+    }
+  });
+
+  $('modalClose').addEventListener('click', closeNoteModal);
+  $('modalCancel').addEventListener('click', closeNoteModal);
+  noteModal.addEventListener('click', (e) => {
+    if (e.target === noteModal) closeNoteModal();
+  });
+
+  // Délégation pour les boutons "Ajouter" dans le tableau
+  document.addEventListener('click', (e) => {
+    const addBtn = e.target.closest('.add-btn');
+    if (addBtn) {
+      openNoteModal(addBtn.dataset.subject);
+    }
+  });
+
+  // ═══════════════════════════════════════════════════════════════
+  // AUTH
+  // ═══════════════════════════════════════════════════════════════
+  onAuthStateChanged(auth, async (user) => {
+    const conn = $('connectionState');
+
+    if (!user) {
+      window.location.replace('auth-choice.html');
+      return;
+    }
+
+    state.user = user;
+    conn.textContent = 'Connecté';
+    conn.classList.add('online');
+
+    try {
+      await loadAllData(user.uid);
+      computeAll();
+
+      $('loadingState').style.display = 'none';
+
+      if (state.examResults.length === 0 && state.revisionSessions.length === 0 && state.grades.length === 0) {
+        $('emptyState').style.display = 'block';
+      } else {
+        $('tab-tableau').style.display = 'block';
+        buildTable();
+        renderHero();
+        buildConseils();
+      }
+    } catch (error) {
+      console.error('Erreur chargement:', error);
+      $('loadingState').innerHTML = '<p style="color:#ff9a84;">Erreur de chargement. Réessaie.</p>';
+    }
+  });
+
+  console.log('🎓 ARVEXA — ARV-PILOT initialisé');
+  </script>
+</body>
+</html>

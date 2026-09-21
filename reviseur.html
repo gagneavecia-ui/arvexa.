@@ -1,0 +1,1822 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0A0A0A">
+  <meta name="description" content="ARVEXA School - Réviseur intelligent">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <script src="register-sw.js" defer></script>
+  <style>
+    /* ═══════════════════════════════════════════════════════════
+       DESIGN SYSTEM — Identique à exam.html et planificateur.html
+       ═══════════════════════════════════════════════════════════ */
+    :root {
+      --black: #0A0A0A;
+      --green: #1A3A2A;
+      --gold: #B8860B;
+      --gold-light: #E0B84A;
+      --white: #FFF;
+      --muted: #9b9c91;
+      --danger: #d7654a;
+      --success: #45b47d;
+      --surface: #151715;
+      --line: rgba(255, 255, 255, .09);
+      --radius: 14px;
+    }
+
+    * { box-sizing: border-box; }
+    html { min-width: 320px; background: var(--black); color-scheme: dark; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      background:
+        radial-gradient(circle at 85% 0, rgba(26, 58, 42, .32), transparent 32rem),
+        linear-gradient(180deg, #0a0a0a, #10130f);
+      color: var(--white);
+      font: 15px/1.6 Inter, system-ui, sans-serif;
+    }
+
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+    button:disabled { cursor: not-allowed; opacity: .55; }
+
+    /* ═══════════════════════════════════════════════════════════
+       SHELL
+       ═══════════════════════════════════════════════════════════ */
+    .shell {
+      width: min(100% - 28px, 980px);
+      margin: auto;
+      padding: 18px 0 46px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       HEADER
+       ═══════════════════════════════════════════════════════════ */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .brand {
+      color: var(--white);
+      text-decoration: none;
+      font: 700 22px 'Playfair Display', serif;
+      letter-spacing: .05em;
+    }
+    .brand span { color: var(--gold-light); font-style: italic; }
+
+    .connection {
+      color: var(--muted);
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .connection::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--gold);
+    }
+    .connection.online::before { background: var(--success); }
+
+    /* ═══════════════════════════════════════════════════════════
+       PANEL (carte principale)
+       ═══════════════════════════════════════════════════════════ */
+    .panel {
+      background: rgba(21, 23, 21, .88);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, .2);
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       VUES
+       ═══════════════════════════════════════════════════════════ */
+    .view { display: none; animation: appear .24s ease both; }
+    .view.active { display: block; }
+    @keyframes appear {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: none; }
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       TYPOGRAPHIE
+       ═══════════════════════════════════════════════════════════ */
+    h1, h2, h3 {
+      margin: 0;
+      line-height: 1.2;
+      font-family: 'Playfair Display', serif;
+    }
+    h1 { font-size: clamp(28px, 6vw, 46px); max-width: 680px; }
+    h2 { font-size: clamp(23px, 4vw, 32px); }
+    h3 { font-size: 19px; }
+
+    .eyebrow {
+      color: var(--gold-light);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .lead {
+      color: var(--muted);
+      max-width: 650px;
+      margin: 12px 0 0;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       FORMULAIRE
+       ═══════════════════════════════════════════════════════════ */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 24px;
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+    .field.full { grid-column: 1 / -1; }
+    label {
+      color: #e5e5dc;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #0e100e;
+      color: var(--white);
+      padding: 12px 13px;
+      outline: none;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--gold-light);
+      box-shadow: 0 0 0 3px rgba(224, 184, 74, .12);
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       BOUTONS
+       ═══════════════════════════════════════════════════════════ */
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 24px;
+    }
+    .btn {
+      min-height: 44px;
+      border: 1px solid transparent;
+      border-radius: 10px;
+      padding: 10px 18px;
+      color: var(--white);
+      background: #222722;
+      font-weight: 800;
+      transition: transform .16s, background .16s, border-color .16s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      border-color: rgba(224, 184, 74, .55);
+    }
+    .btn.primary {
+      background: linear-gradient(135deg, var(--gold-light), var(--gold));
+      color: var(--black);
+    }
+    .btn.secondary {
+      background: transparent;
+      border-color: var(--line);
+    }
+    .btn.danger {
+      background: rgba(215, 101, 74, .16);
+      border-color: rgba(215, 101, 74, .4);
+    }
+    .btn.full { width: 100%; }
+
+    /* ═══════════════════════════════════════════════════════════
+       STATUS / LOADER
+       ═══════════════════════════════════════════════════════════ */
+    .status {
+      min-height: 22px;
+      margin-top: 14px;
+      color: var(--muted);
+    }
+    .status.error { color: #ff9a84; }
+    .status.success { color: #7ce0aa; }
+
+    .loader {
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(10, 10, 10, .25);
+      border-top-color: currentColor;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ═══════════════════════════════════════════════════════════
+       CHIPS (sélecteur matière)
+       ═══════════════════════════════════════════════════════════ */
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .chip {
+      padding: 9px 16px;
+      border-radius: 20px;
+      border: 1px solid var(--line);
+      background: transparent;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .16s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-family: inherit;
+    }
+    .chip:hover { color: var(--white); border-color: rgba(224, 184, 74, .3); }
+    .chip.active {
+      background: rgba(224, 184, 74, .12);
+      color: var(--gold-light);
+      border-color: var(--gold-light);
+    }
+    .chip i { font-size: 12px; }
+
+    /* ═══════════════════════════════════════════════════════════
+       MODES (Fiche / Flashcards)
+       ═══════════════════════════════════════════════════════════ */
+    .modes {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 8px;
+    }
+    .mode-card {
+      padding: 18px 16px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: #0e100e;
+      cursor: pointer;
+      transition: all .16s ease;
+      text-align: left;
+    }
+    .mode-card:hover { border-color: rgba(224, 184, 74, .3); }
+    .mode-card.active {
+      border-color: var(--gold-light);
+      background: rgba(224, 184, 74, .06);
+    }
+    .mode-card .mode-emoji {
+      font-size: 24px;
+      display: block;
+      margin-bottom: 8px;
+    }
+    .mode-card .mode-name {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--white);
+      display: block;
+      margin-bottom: 2px;
+    }
+    .mode-card .mode-desc {
+      font-size: 12px;
+      color: var(--muted);
+      display: block;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       LOADING STATE (steps)
+       ═══════════════════════════════════════════════════════════ */
+    .loading-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+      padding: 40px 0;
+    }
+    .loading-state .big-spinner {
+      width: 44px;
+      height: 44px;
+      border: 3px solid rgba(224, 184, 74, .15);
+      border-top-color: var(--gold-light);
+      border-radius: 50%;
+      animation: spin .9s linear infinite;
+    }
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+      max-width: 340px;
+    }
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 14px;
+      color: var(--muted);
+      transition: all .25s ease;
+    }
+    .step.active {
+      background: rgba(224, 184, 74, .08);
+      color: var(--gold-light);
+      border-left: 3px solid var(--gold-light);
+    }
+    .step.done { color: var(--success); }
+    .step.done::after { content: '✓'; margin-left: auto; }
+
+    /* ═══════════════════════════════════════════════════════════
+       SESSION HEADER (Fiche / Flashcards / Quiz)
+       ═══════════════════════════════════════════════════════════ */
+    .session-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .session-head h2 { font-size: 26px; }
+    .count { color: var(--muted); font-size: 13px; }
+
+    .session-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+    .session-meta span {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, .03);
+      border: 1px solid var(--line);
+    }
+    .session-meta i { color: var(--gold-light); font-size: 11px; }
+
+    /* ═══════════════════════════════════════════════════════════
+       PROGRESS BAR
+       ═══════════════════════════════════════════════════════════ */
+    .progress {
+      height: 6px;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #262b26;
+      margin: 14px 0 22px;
+    }
+    .progress span {
+      display: block;
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold), var(--gold-light));
+      transition: width .2s;
+      width: 0%;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       FICHE DE RÉVISION
+       ═══════════════════════════════════════════════════════════ */
+    .fiche-section {
+      background: #101410;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--gold-light);
+      border-radius: 12px;
+      padding: 18px 20px;
+      margin-bottom: 12px;
+      transition: all .16s ease;
+    }
+    .fiche-section:hover {
+      border-color: rgba(224, 184, 74, .3);
+      border-left-color: var(--gold-light);
+      transform: translateX(3px);
+    }
+    .fiche-section-title {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--gold-light);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .fiche-section-title i { font-size: 12px; }
+    .fiche-section-body {
+      font-size: 15px;
+      line-height: 1.75;
+      color: #e2e3dc;
+    }
+    .fiche-section-body strong { color: var(--gold-light); font-weight: 700; }
+    .fiche-section-body ul { padding-left: 20px; margin: 8px 0; }
+    .fiche-section-body li { margin-bottom: 6px; }
+    .fiche-section-body code {
+      background: rgba(224, 184, 74, .1);
+      color: var(--gold-light);
+      padding: 2px 7px;
+      border-radius: 5px;
+      font-family: 'Consolas', monospace;
+      font-size: 13px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       FLASHCARDS
+       ═══════════════════════════════════════════════════════════ */
+    .flashcard {
+      perspective: 1200px;
+      margin-bottom: 20px;
+      min-height: 240px;
+    }
+    .flashcard-inner {
+      position: relative;
+      width: 100%;
+      height: 240px;
+      transition: transform .7s cubic-bezier(.25, 1, .5, 1);
+      transform-style: preserve-3d;
+      cursor: pointer;
+    }
+    .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+
+    .flashcard-face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      border-radius: 14px;
+      padding: 30px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      border: 1px solid var(--line);
+    }
+    .flashcard-front {
+      background: linear-gradient(145deg, rgba(26, 58, 42, .5), rgba(10, 10, 10, .6));
+    }
+    .flashcard-back {
+      background: linear-gradient(145deg, rgba(184, 134, 11, .15), rgba(10, 10, 10, .6));
+      transform: rotateY(180deg);
+      border-color: rgba(224, 184, 74, .3);
+    }
+    .flashcard-label {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--gold-light);
+      margin-bottom: 16px;
+    }
+    .flashcard-text {
+      font-size: 17px;
+      line-height: 1.6;
+      color: var(--white);
+      font-weight: 500;
+    }
+    .flashcard-hint {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 18px;
+      font-style: italic;
+    }
+
+    .flashcard-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+    .flashcard-counter {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       QUIZ
+       ═══════════════════════════════════════════════════════════ */
+    .quiz-question {
+      background: #101410;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 20px 22px;
+      margin-bottom: 14px;
+      transition: border-color .16s ease;
+    }
+    .quiz-question:hover { border-color: rgba(224, 184, 74, .2); }
+    .quiz-q-number {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--gold-light);
+      margin-bottom: 10px;
+    }
+    .quiz-q-text {
+      font-size: 16px;
+      line-height: 1.65;
+      color: var(--white);
+      font-weight: 500;
+      margin-bottom: 16px;
+    }
+    .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+    .quiz-option {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: #0e100e;
+      cursor: pointer;
+      transition: all .16s ease;
+      font-size: 14px;
+      color: #e2e3dc;
+    }
+    .quiz-option:hover:not(.disabled) {
+      border-color: rgba(224, 184, 74, .4);
+      background: rgba(224, 184, 74, .04);
+    }
+    .quiz-option.selected {
+      border-color: var(--gold-light);
+      background: rgba(224, 184, 74, .1);
+      color: var(--white);
+    }
+    .quiz-option.correct {
+      border-color: var(--success);
+      background: rgba(69, 180, 125, .12);
+      color: #7ce0aa;
+    }
+    .quiz-option.wrong {
+      border-color: var(--danger);
+      background: rgba(215, 101, 74, .12);
+      color: #ff9a84;
+    }
+    .quiz-option.disabled { cursor: not-allowed; }
+    .quiz-option-letter {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .04);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 800;
+      flex-shrink: 0;
+      color: var(--muted);
+    }
+    .quiz-option.selected .quiz-option-letter {
+      background: var(--gold-light);
+      color: var(--black);
+    }
+    .quiz-option.correct .quiz-option-letter {
+      background: var(--success);
+      color: var(--white);
+    }
+    .quiz-option.wrong .quiz-option-letter {
+      background: var(--danger);
+      color: var(--white);
+    }
+
+    .quiz-explanation {
+      margin-top: 12px;
+      padding: 12px 14px;
+      background: rgba(74, 175, 224, .08);
+      border-left: 3px solid #4AAFE0;
+      border-radius: 0 10px 10px 0;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #cfd0cc;
+      display: none;
+    }
+    .quiz-explanation.show { display: block; }
+    .quiz-explanation strong { color: #4AAFE0; }
+
+    /* ═══════════════════════════════════════════════════════════
+       RÉSULTATS
+       ═══════════════════════════════════════════════════════════ */
+    .result-summary {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin: 20px 0;
+    }
+    .metric {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 16px;
+      background: #101310;
+      text-align: center;
+    }
+    .metric strong {
+      display: block;
+      color: var(--gold-light);
+      font-size: 26px;
+      font-family: 'Playfair Display', serif;
+      line-height: 1.2;
+    }
+    .metric small {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin-top: 4px;
+      font-weight: 700;
+    }
+
+    .result-hero {
+      text-align: center;
+      padding: 26px 20px;
+      background: linear-gradient(145deg, rgba(26, 58, 42, .4), rgba(184, 134, 11, .06));
+      border: 1px solid rgba(224, 184, 74, .2);
+      border-radius: 14px;
+      margin-bottom: 16px;
+    }
+    .result-hero .emoji { font-size: 56px; display: block; margin-bottom: 10px; }
+    .result-hero h2 { font-size: 26px; margin-bottom: 8px; }
+    .result-hero h2 em { color: var(--gold-light); font-style: italic; }
+    .result-hero p { color: var(--muted); margin: 0; font-size: 14px; }
+
+    /* ═══════════════════════════════════════════════════════════
+       HISTORIQUE
+       ═══════════════════════════════════════════════════════════ */
+    .history-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 16px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: #101410;
+      margin-bottom: 8px;
+      transition: all .16s ease;
+    }
+    .history-item:hover {
+      border-color: rgba(224, 184, 74, .3);
+      transform: translateX(3px);
+    }
+    .history-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      background: rgba(224, 184, 74, .12);
+      color: var(--gold-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .history-info { flex: 1; min-width: 0; }
+    .history-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 2px;
+    }
+    .history-sub {
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .history-score {
+      font-size: 20px;
+      font-weight: 800;
+      font-family: 'Playfair Display', serif;
+      color: var(--gold-light);
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       MODAL PREMIUM (identique à exam.html)
+       ═══════════════════════════════════════════════════════════ */
+    .premium-popup-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: grid;
+      place-items: center;
+      padding: 16px;
+      background: rgba(0, 0, 0, .85);
+      backdrop-filter: blur(16px);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .25s ease, visibility .25s ease;
+    }
+    .premium-popup-overlay.show { opacity: 1; visibility: visible; }
+
+    .premium-popup {
+      position: relative;
+      width: min(100%, 400px);
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 28px 22px 20px;
+      border: 1px solid var(--gold);
+      border-radius: var(--radius);
+      background: linear-gradient(145deg, #141414, #0a0a0a);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, .6);
+      transform: scale(.94) translateY(16px);
+      transition: transform .25s ease;
+    }
+    .premium-popup-overlay.show .premium-popup {
+      transform: scale(1) translateY(0);
+    }
+    .premium-popup::before {
+      content: '';
+      position: absolute;
+      inset: 0 0 auto;
+      height: 3px;
+      background: linear-gradient(90deg, var(--gold), var(--gold-light), var(--gold));
+    }
+    .popup-close {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 28px;
+      height: 28px;
+      border: 1px solid rgba(184, 134, 11, .2);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .03);
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .popup-close:hover { color: var(--white); }
+    .popup-icon {
+      display: block;
+      text-align: center;
+      font-size: 44px;
+      margin-bottom: 6px;
+    }
+    .premium-popup h2 {
+      text-align: center;
+      font-size: 22px;
+      margin-bottom: 6px;
+    }
+    .premium-popup h2 span { color: var(--gold-light); font-style: italic; }
+    .popup-subtitle {
+      color: var(--muted);
+      text-align: center;
+      font-size: 13px;
+      line-height: 1.6;
+      margin: 0 0 18px;
+    }
+    .popup-subtitle strong { color: var(--gold-light); }
+    .popup-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .btn-subscribe {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 12px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--gold-light), var(--gold));
+      color: var(--black);
+      font-weight: 800;
+      text-decoration: none;
+      font-size: 14px;
+      min-height: 44px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       EMPTY STATE
+       ═══════════════════════════════════════════════════════════ */
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--muted);
+    }
+    .empty-state .empty-icon {
+      font-size: 44px;
+      margin-bottom: 12px;
+      display: block;
+      opacity: .5;
+    }
+    .empty-state h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .empty-state p { font-size: 13px; }
+
+    /* ═══════════════════════════════════════════════════════════
+       KATEX
+       ═══════════════════════════════════════════════════════════ */
+    .katex { color: var(--white); font-size: 1.05em; }
+    .katex-display {
+      max-width: 100%;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 6px 0;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       RESPONSIVE
+       ═══════════════════════════════════════════════════════════ */
+    @media (max-width: 620px) {
+      .shell { width: min(100% - 20px, 980px); padding-top: 12px; }
+      .panel { padding: 17px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .field.full { grid-column: auto; }
+      .actions .btn { flex: 1 1 100%; }
+      .modes { grid-template-columns: 1fr; }
+      .result-summary { grid-template-columns: 1fr 1fr; }
+      .session-head {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .flashcard, .flashcard-inner { height: 220px; min-height: 220px; }
+      .flashcard-text { font-size: 15px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+
+    <!-- ═══════════════════════════════════════════════════════════
+         HEADER
+         ═══════════════════════════════════════════════════════════ -->
+    <header>
+      <a class="brand" href="index.html">ARVEX<span>A School</span></a>
+      <div class="connection" id="connectionState">Vérification...</div>
+    </header>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         VUE 1 : CONFIGURATION
+         ═══════════════════════════════════════════════════════════ -->
+    <section class="view active" id="configView">
+      <div class="panel">
+        <div class="eyebrow">Réviseur intelligent · Premium</div>
+        <h1>Génère des <em>fiches</em>, <em>flashcards</em> et <em>quiz</em> sur mesure.</h1>
+        <p class="lead">
+          Choisis une matière, un chapitre et un mode. L'IA construit un contenu de révision
+          adapté à ton programme pour t'aider à maîtriser les notions essentielles.
+        </p>
+
+        <!-- Matière -->
+        <div class="field" style="margin-top:24px;">
+          <label>Matière</label>
+          <div class="chips" id="subjectChips">
+            <button class="chip active" data-subject="mathematiques"><i class="fas fa-square-root-variable"></i> Maths</button>
+            <button class="chip" data-subject="physique"><i class="fas fa-bolt"></i> Physique</button>
+            <button class="chip" data-subject="chimie"><i class="fas fa-flask"></i> Chimie</button>
+            <button class="chip" data-subject="svt"><i class="fas fa-dna"></i> SVT</button>
+          </div>
+        </div>
+
+        <!-- Chapitre -->
+        <div class="field" style="margin-top:18px;">
+          <label for="chapterSelect">Chapitre</label>
+          <select id="chapterSelect">
+            <option value="all">📚 Tous les chapitres</option>
+          </select>
+        </div>
+
+        <!-- Mode -->
+        <div class="field" style="margin-top:18px;">
+          <label>Mode de révision</label>
+          <div class="modes">
+            <div class="mode-card active" data-mode="fiche">
+              <span class="mode-emoji">📝</span>
+              <span class="mode-name">Fiche de révision</span>
+              <span class="mode-desc">Résumé structuré en sections</span>
+            </div>
+            <div class="mode-card" data-mode="flashcard">
+              <span class="mode-emoji">⚡</span>
+              <span class="mode-name">Flashcards</span>
+              <span class="mode-desc">Questions / Réponses pour mémoriser</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action -->
+        <div class="actions">
+          <button class="btn primary full" id="generateBtn">
+            <i class="fas fa-wand-sparkles"></i>
+            <span class="btn-text">Générer ma révision</span>
+            <span class="loader"></span>
+          </button>
+        </div>
+        <div class="status" id="configStatus" role="status" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         VUE 2 : CHARGEMENT
+         ═══════════════════════════════════════════════════════════ -->
+    <section class="view" id="loadingView">
+      <div class="panel">
+        <div class="eyebrow">Génération en cours</div>
+        <h2>Préparation de ta révision...</h2>
+        <div class="loading-state">
+          <div class="big-spinner"></div>
+          <div class="steps">
+            <div class="step" id="step1"><span>🔍</span> Analyse du chapitre</div>
+            <div class="step" id="step2"><span>🧠</span> Extraction des notions clés</div>
+            <div class="step" id="step3"><span>✍️</span> Rédaction du contenu</div>
+            <div class="step" id="step4"><span>✨</span> Finalisation</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         VUE 3 : FICHE
+         ═══════════════════════════════════════════════════════════ -->
+    <section class="view" id="ficheView">
+      <div class="panel">
+        <div class="session-head">
+          <div>
+            <div class="eyebrow">Fiche de révision</div>
+            <h2 id="ficheTitle">📝 Fiche</h2>
+            <div class="session-meta" id="ficheMeta"></div>
+          </div>
+          <button class="btn secondary" id="newFicheBtn">
+            <i class="fas fa-plus"></i> Nouvelle
+          </button>
+        </div>
+        <div id="ficheContent"></div>
+        <div class="actions">
+          <button class="btn primary full" id="startQuizBtn">
+            <i class="fas fa-question-circle"></i>
+            <span class="btn-text">Tester mes connaissances (Quiz)</span>
+            <span class="loader"></span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         VUE 4 : FLASHCARDS
+         ═══════════════════════════════════════════════════════════ -->
+    <section class="view" id="flashcardView">
+      <div class="panel">
+        <div class="session-head">
+          <div>
+            <div class="eyebrow">Flashcards</div>
+            <h2>⚡ Cartes de <em>mémorisation</em></h2>
+            <div class="session-meta" id="flashMeta"></div>
+          </div>
+          <button class="btn secondary" id="newFlashBtn">
+            <i class="fas fa-plus"></i> Nouvelle
+          </button>
+        </div>
+
+        <div class="flashcard" id="flashcardEl">
+          <div class="flashcard-inner">
+            <div class="flashcard-face flashcard-front">
+              <div class="flashcard-label">Question</div>
+              <div class="flashcard-text" id="flashFront"></div>
+              <div class="flashcard-hint">👆 Clique pour voir la réponse</div>
+            </div>
+            <div class="flashcard-face flashcard-back">
+              <div class="flashcard-label">Réponse</div>
+              <div class="flashcard-text" id="flashBack"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flashcard-nav">
+          <button class="btn secondary" id="flashPrev">
+            <i class="fas fa-chevron-left"></i> Précédente
+          </button>
+          <span class="flashcard-counter" id="flashCounter">1 / 10</span>
+          <button class="btn secondary" id="flashNext">
+            Suivante <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+
+        <div class="actions">
+          <button class="btn primary full" id="finishFlashBtn">
+            <i class="fas fa-check"></i> Terminer la révision
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         VUE 5 : QUIZ
+         ═══════════════════════════════════════════════════════════ -->
+    <section class="view" id="quizView">
+      <div class="panel">
+        <div class="session-head">
+          <div>
+            <div class="eyebrow">Quiz de vérification</div>
+            <h2>❓ Teste tes <em>connaissances</em></h2>
+            <div class="session-meta" id="quizMeta"></div>
+          </div>
+        </div>
+
+        <div class="progress"><span id="quizProgress"></span></div>
+
+        <div id="quizContent"></div>
+
+        <div class="actions">
+          <button class="btn primary full" id="validateQuizBtn" disabled>
+            <i class="fas fa-check-circle"></i>
+            <span class="btn-text">Valider mes réponses</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         VUE 6 : RÉSULTATS
+         ═══════════════════════════════════════════════════════════ -->
+    <section class="view" id="resultsView">
+      <div class="panel">
+        <div class="result-hero">
+          <span class="emoji" id="resultsEmoji">🎉</span>
+          <h2 id="resultsTitle">Bravo !</h2>
+          <p id="resultsSub">Continue comme ça !</p>
+        </div>
+
+        <div class="result-summary">
+          <div class="metric">
+            <strong id="metricCorrect">0</strong>
+            <small>Bonnes réponses</small>
+          </div>
+          <div class="metric">
+            <strong id="metricScore">0/20</strong>
+            <small>Score</small>
+          </div>
+        </div>
+
+        <div class="eyebrow" style="margin-top:20px;">Conseils de révision</div>
+        <div id="resultsAdvice" style="margin-top:10px;"></div>
+
+        <div class="actions">
+          <button class="btn primary full" id="restartBtn">
+            <i class="fas fa-redo"></i> Nouvelle révision
+          </button>
+          <a href="index.html" class="btn secondary full">
+            <i class="fas fa-home"></i> Retour à l'accueil
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         VUE 7 : HISTORIQUE
+         ═══════════════════════════════════════════════════════════ -->
+    <section class="view" id="historyView">
+      <div class="panel">
+        <div class="session-head">
+          <div>
+            <div class="eyebrow">Historique</div>
+            <h2>📜 Mes <em>révisions</em></h2>
+          </div>
+          <button class="btn secondary" id="backToConfigBtn">
+            <i class="fas fa-arrow-left"></i> Retour
+          </button>
+        </div>
+        <div id="historyList"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       MODAL PREMIUM
+       ═══════════════════════════════════════════════════════════ -->
+  <div class="premium-popup-overlay" id="premiumOverlay" role="dialog" aria-modal="true">
+    <div class="premium-popup">
+      <button class="popup-close" id="premiumClose" aria-label="Fermer">
+        <i class="fas fa-times"></i>
+      </button>
+      <span class="popup-icon">👑</span>
+      <h2>Réviseur <span>Premium</span></h2>
+      <p class="popup-subtitle">
+        Le Réviseur intelligent est réservé aux comptes <strong>Premium</strong>.
+        Débloque les fiches IA, les flashcards et les quiz personnalisés.
+      </p>
+      <div class="popup-buttons">
+        <a href="abonnement.html" class="btn-subscribe">
+          <i class="fas fa-crown"></i> S'abonner maintenant
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       SCRIPTS
+       ═══════════════════════════════════════════════════════════ -->
+  <script type="importmap">
+  {
+    "imports": {
+      "firebase/app": "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
+      "firebase/auth": "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js",
+      "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js"
+    }
+  }
+  </script>
+
+  <script type="module">
+  import { initializeApp } from "firebase/app";
+  import { getAuth, onAuthStateChanged, getIdToken } from "firebase/auth";
+  import {
+    getFirestore, doc, getDoc, collection, addDoc,
+    query, orderBy, limit, getDocs, serverTimestamp
+  } from "firebase/firestore";
+
+  const app = initializeApp({
+    apiKey: "AIzaSyDHscOXw3rLuhV6z1Cny-bdYCumqpnG7QE",
+    authDomain: "arvexa-fbf10.firebaseapp.com",
+    projectId: "arvexa-fbf10",
+    storageBucket: "arvexa-fbf10.firebasestorage.app",
+    messagingSenderId: "920108330053",
+    appId: "1:920108330053:web:f532d71cbc2c824bc7472c"
+  });
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  // ─────────────────────────────────────────────────────────────
+  // CONFIG
+  // ─────────────────────────────────────────────────────────────
+  const CHAPTERS = {
+    mathematiques: [
+      'Nombres complexes', 'Probabilités - Variable aléatoire',
+      'Fonction logarithme', 'Fonction exponentielle',
+      'Étude des fonctions numériques', 'Calcul intégral',
+      'Suites numériques', 'Équations différentielles'
+    ],
+    physique: [
+      'Cinématique', 'Mouvement du centre d\'inertie',
+      'Champ de pesanteur', 'Particules chargées',
+      'Oscillateurs mécaniques', 'Vibrations',
+      'Propagation des ondes', 'Superposition',
+      'Interférences lumineuses', 'Champ magnétique',
+      'Force de Lorentz', 'Force de Laplace',
+      'Induction électromagnétique', 'Auto-Induction',
+      'Circuit LC', 'Régime sinusoïdal', 'Radioactivité'
+    ],
+    chimie: [
+      'Solutions aqueuses', 'Acide chlorhydrique / Soude',
+      'Couples acide/base', 'Réaction acide-base',
+      'Solution tampon', 'Alcools', 'Acides carboxyliques',
+      'Amines', 'Acides α-aminés'
+    ],
+    svt: ['Génétique', 'Immunologie', 'Écologie', 'Évolution']
+  };
+
+  const SUBJECT_LABELS = {
+    mathematiques: 'Mathématiques',
+    physique: 'Physique',
+    chimie: 'Chimie',
+    svt: 'SVT'
+  };
+
+  // ─────────────────────────────────────────────────────────────
+  // ÉTAT
+  // ─────────────────────────────────────────────────────────────
+  const state = {
+    subject: 'mathematiques',
+    chapter: 'all',
+    mode: 'fiche',
+    user: null,
+    isPremium: false,
+    currentSession: null,
+    flashcards: [],
+    currentFlashIndex: 0,
+    quiz: [],
+    quizAnswers: {},
+    isGenerating: false
+  };
+
+  // ─────────────────────────────────────────────────────────────
+  // DOM
+  // ─────────────────────────────────────────────────────────────
+  const $ = (id) => document.getElementById(id);
+  const views = ['configView', 'loadingView', 'ficheView', 'flashcardView', 'quizView', 'resultsView', 'historyView'];
+
+  function showView(id) {
+    views.forEach((v) => $(v).classList.toggle('active', v === id));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function setStatus(id, msg, type = '') {
+    const el = $(id);
+    if (!el) return;
+    el.textContent = msg;
+    el.className = `status ${type}`;
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // CHAPITRES
+  // ─────────────────────────────────────────────────────────────
+  function renderChapters() {
+    const select = $('chapterSelect');
+    select.innerHTML = '<option value="all">📚 Tous les chapitres</option>';
+    (CHAPTERS[state.subject] || []).forEach((chap) => {
+      const opt = document.createElement('option');
+      opt.value = chap;
+      opt.textContent = chap;
+      select.appendChild(opt);
+    });
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // EVENT LISTENERS
+  // ─────────────────────────────────────────────────────────────
+  $('subjectChips').querySelectorAll('.chip').forEach((chip) => {
+    chip.addEventListener('click', () => {
+      $('subjectChips').querySelectorAll('.chip').forEach((c) => c.classList.remove('active'));
+      chip.classList.add('active');
+      state.subject = chip.dataset.subject;
+      renderChapters();
+    });
+  });
+
+  $('chapterSelect').addEventListener('change', (e) => {
+    state.chapter = e.target.value;
+  });
+
+  document.querySelectorAll('.mode-card').forEach((card) => {
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.mode-card').forEach((c) => c.classList.remove('active'));
+      card.classList.add('active');
+      state.mode = card.dataset.mode;
+    });
+  });
+
+  // ─────────────────────────────────────────────────────────────
+  // GÉNÉRATION
+  // ─────────────────────────────────────────────────────────────
+  $('generateBtn').addEventListener('click', generateRevision);
+
+  async function generateRevision() {
+    if (state.isGenerating) return;
+
+    if (!state.isPremium) {
+      $('premiumOverlay').classList.add('show');
+      return;
+    }
+    if (!state.user) {
+      setStatus('configStatus', 'Connecte-toi pour utiliser le Réviseur.', 'error');
+      return;
+    }
+
+    state.isGenerating = true;
+    const btn = $('generateBtn');
+    btn.disabled = true;
+    btn.classList.add('loading');
+
+    showView('loadingView');
+    resetLoadingSteps();
+
+    try {
+      setStep(1, 'Analyse du chapitre...');
+      await sleep(400);
+      setStep(2, 'Extraction des notions clés...');
+      await sleep(400);
+      setStep(3, 'Rédaction du contenu...');
+
+      const token = await getIdToken(state.user);
+      const response = await fetch('/api/reviseur', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          subject: state.subject,
+          chapter: state.chapter,
+          mode: state.mode
+        })
+      });
+
+      const payload = await response.json().catch(() => null);
+
+      if (response.status === 403 && payload?.code === 'PREMIUM_REQUIRED') {
+        showView('configView');
+        $('premiumOverlay').classList.add('show');
+        throw new Error('Premium requis');
+      }
+      if (!response.ok || !payload?.success) {
+        throw new Error(payload?.error || 'Service temporairement indisponible.');
+      }
+
+      setStep(4, 'Finalisation...');
+      await sleep(400);
+
+      state.currentSession = payload.session;
+      await saveSession(payload.session);
+
+      if (state.mode === 'flashcard' && Array.isArray(payload.session.flashcards)) {
+        state.flashcards = payload.session.flashcards;
+        state.currentFlashIndex = 0;
+        renderFlashcard();
+        showView('flashcardView');
+      } else {
+        renderFiche();
+        showView('ficheView');
+      }
+
+    } catch (error) {
+      console.error('Erreur révision:', error);
+      showView('configView');
+      setStatus('configStatus', error.message || 'Erreur inconnue.', 'error');
+    } finally {
+      state.isGenerating = false;
+      btn.disabled = false;
+      btn.classList.remove('loading');
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // LOADING STEPS
+  // ─────────────────────────────────────────────────────────────
+  function resetLoadingSteps() {
+    [1, 2, 3, 4].forEach((n) => {
+      const el = $(`step${n}`);
+      if (el) el.classList.remove('active', 'done');
+    });
+    const s1 = $('step1');
+    if (s1) s1.classList.add('active');
+  }
+
+  function setStep(n, text) {
+    document.querySelectorAll('.step').forEach((s) => {
+      if (s.id !== `step${n}`) s.classList.remove('active');
+    });
+    const current = $(`step${n}`);
+    if (current) {
+      current.classList.remove('active');
+      current.classList.add('done');
+    }
+    const next = $(`step${n + 1}`);
+    if (next) next.classList.add('active');
+  }
+
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+  // ─────────────────────────────────────────────────────────────
+  // RENDU FICHE
+  // ─────────────────────────────────────────────────────────────
+  function renderFiche() {
+    const session = state.currentSession;
+    if (!session) return;
+
+    $('ficheMeta').innerHTML = `
+      <span><i class="fas fa-book"></i> ${SUBJECT_LABELS[state.subject]}</span>
+      <span><i class="fas fa-list"></i> ${session.chapterTitle || state.chapter}</span>
+      <span><i class="fas fa-clock"></i> ${session.sections?.length || 0} sections</span>
+    `;
+
+    const container = $('ficheContent');
+    container.innerHTML = '';
+
+    if (!Array.isArray(session.sections) || session.sections.length === 0) {
+      container.innerHTML = '<div class="empty-state"><span class="empty-icon">📭</span><h3>Aucune section</h3></div>';
+      return;
+    }
+
+    session.sections.forEach((section) => {
+      const div = document.createElement('div');
+      div.className = 'fiche-section';
+
+      let body = '';
+      if (section.content) {
+        body = section.content
+          .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+          .replace(/`(.+?)`/g, '<code>$1</code>')
+          .replace(/\n/g, '<br>');
+      }
+
+      div.innerHTML = `
+        <div class="fiche-section-title">
+          <i class="fas fa-bookmark"></i> ${escapeHtml(section.title || 'Section')}
+        </div>
+        <div class="fiche-section-body">${body}</div>
+      `;
+      container.appendChild(div);
+    });
+
+    renderKaTeX(container);
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // RENDU FLASHCARDS
+  // ─────────────────────────────────────────────────────────────
+  function renderFlashcard() {
+    const session = state.currentSession;
+    if (!state.flashcards || state.flashcards.length === 0) {
+      showView('configView');
+      return;
+    }
+
+    $('flashMeta').innerHTML = `
+      <span><i class="fas fa-book"></i> ${SUBJECT_LABELS[state.subject]}</span>
+      <span><i class="fas fa-layer-group"></i> ${state.flashcards.length} cartes</span>
+    `;
+
+    updateFlashcardContent();
+  }
+
+  function updateFlashcardContent() {
+    const card = state.flashcards[state.currentFlashIndex];
+    if (!card) return;
+
+    $('flashFront').innerHTML = escapeHtml(card.question || '');
+    $('flashBack').innerHTML = escapeHtml(card.answer || '');
+    $('flashCounter').textContent = `${state.currentFlashIndex + 1} / ${state.flashcards.length}`;
+
+    $('flashcardEl').classList.remove('flipped');
+
+    renderKaTeX($('flashFront'));
+    renderKaTeX($('flashBack'));
+
+    $('flashPrev').disabled = state.currentFlashIndex === 0;
+    $('flashNext').disabled = state.currentFlashIndex >= state.flashcards.length - 1;
+  }
+
+  $('flashcardEl').addEventListener('click', () => {
+    $('flashcardEl').classList.toggle('flipped');
+  });
+
+  $('flashPrev').addEventListener('click', () => {
+    if (state.currentFlashIndex > 0) {
+      state.currentFlashIndex--;
+      updateFlashcardContent();
+    }
+  });
+
+  $('flashNext').addEventListener('click', () => {
+    if (state.currentFlashIndex < state.flashcards.length - 1) {
+      state.currentFlashIndex++;
+      updateFlashcardContent();
+    }
+  });
+
+  $('finishFlashBtn').addEventListener('click', startQuiz);
+
+  // ─────────────────────────────────────────────────────────────
+  // QUIZ
+  // ─────────────────────────────────────────────────────────────
+  async function startQuiz() {
+    if (!state.currentSession) return;
+
+    if (Array.isArray(state.currentSession.quiz) && state.currentSession.quiz.length > 0) {
+      state.quiz = state.currentSession.quiz;
+      state.quizAnswers = {};
+      renderQuiz();
+      showView('quizView');
+      return;
+    }
+
+    const btn = $('startQuizBtn');
+    btn.disabled = true;
+    btn.classList.add('loading');
+
+    try {
+      const token = await getIdToken(state.user);
+      const response = await fetch('/api/reviseur', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          action: 'quiz',
+          subject: state.subject,
+          chapter: state.chapter,
+          session: state.currentSession
+        })
+      });
+
+      const payload = await response.json().catch(() => null);
+      if (!response.ok || !payload?.success) {
+        throw new Error(payload?.error || 'Impossible de générer le quiz.');
+      }
+
+      state.quiz = payload.quiz;
+      state.quizAnswers = {};
+      renderQuiz();
+      showView('quizView');
+    } catch (error) {
+      alert(error.message || 'Erreur');
+    } finally {
+      btn.disabled = false;
+      btn.classList.remove('loading');
+    }
+  }
+
+  $('startQuizBtn').addEventListener('click', startQuiz);
+
+  function renderQuiz() {
+    const container = $('quizContent');
+    container.innerHTML = '';
+
+    $('quizMeta').innerHTML = `
+      <span><i class="fas fa-question-circle"></i> ${state.quiz.length} questions</span>
+      <span><i class="fas fa-book"></i> ${SUBJECT_LABELS[state.subject]}</span>
+    `;
+
+    state.quiz.forEach((q, index) => {
+      const div = document.createElement('div');
+      div.className = 'quiz-question';
+      div.dataset.index = index;
+
+      const optionsHtml = (q.options || []).map((opt) => `
+        <div class="quiz-option" data-option="${opt.id}" data-qindex="${index}">
+          <span class="quiz-option-letter">${opt.id}</span>
+          <span>${escapeHtml(opt.text)}</span>
+        </div>
+      `).join('');
+
+      div.innerHTML = `
+        <div class="quiz-q-number">Question ${index + 1}</div>
+        <div class="quiz-q-text">${escapeHtml(q.question)}</div>
+        <div class="quiz-options">${optionsHtml}</div>
+        <div class="quiz-explanation" id="explanation-${index}"></div>
+      `;
+
+      container.appendChild(div);
+    });
+
+    container.querySelectorAll('.quiz-option').forEach((opt) => {
+      opt.addEventListener('click', () => {
+        const qIndex = parseInt(opt.dataset.qindex);
+        if (state.quizAnswers[qIndex]) return;
+
+        const q = state.quiz[qIndex];
+        const selected = opt.dataset.option;
+        state.quizAnswers[qIndex] = selected;
+
+        const question = container.querySelector(`[data-index="${qIndex}"]`);
+        question.querySelectorAll('.quiz-option').forEach((o) => {
+          o.classList.add('disabled');
+          if (o.dataset.option === q.correctAnswer) o.classList.add('correct');
+          else if (o.dataset.option === selected) o.classList.add('wrong');
+        });
+
+        const exp = $(`explanation-${qIndex}`);
+        if (q.explanation) {
+          exp.innerHTML = `<strong>💡 Explication :</strong> ${escapeHtml(q.explanation)}`;
+          exp.classList.add('show');
+        }
+
+        if (Object.keys(state.quizAnswers).length === state.quiz.length) {
+          $('validateQuizBtn').disabled = false;
+        }
+
+        const percent = (Object.keys(state.quizAnswers).length / state.quiz.length) * 100;
+        $('quizProgress').style.width = percent + '%';
+      });
+    });
+
+    renderKaTeX(container);
+  }
+
+  $('validateQuizBtn').addEventListener('click', showQuizResults);
+
+  // ─────────────────────────────────────────────────────────────
+  // RÉSULTATS
+  // ─────────────────────────────────────────────────────────────
+  function showQuizResults() {
+    let correct = 0;
+    state.quiz.forEach((q, i) => {
+      if (state.quizAnswers[i] === q.correctAnswer) correct++;
+    });
+
+    const total = state.quiz.length;
+    const score = Math.round((correct / total) * 20);
+    const percent = Math.round((correct / total) * 100);
+
+    $('metricCorrect').textContent = `${correct}/${total}`;
+    $('metricScore').textContent = `${score}/20`;
+
+    let emoji, title, sub;
+    if (percent >= 90) { emoji = '🏆'; title = 'Excellent !'; sub = 'Tu maîtrises ce chapitre !'; }
+    else if (percent >= 70) { emoji = '🎉'; title = 'Bravo !'; sub = 'Tu es sur la bonne voie.'; }
+    else if (percent >= 50) { emoji = '📚'; title = 'Pas mal'; sub = 'Continue à réviser.'; }
+    else { emoji = '💪'; title = 'Courage'; sub = 'Retravaille ce chapitre.'; }
+
+    $('resultsEmoji').textContent = emoji;
+    $('resultsTitle').innerHTML = title;
+    $('resultsSub').textContent = sub;
+
+    const wrongQuestions = state.quiz.filter((q, i) => state.quizAnswers[i] !== q.correctAnswer);
+    if (wrongQuestions.length === 0) {
+      $('resultsAdvice').innerHTML = '<p style="color:var(--success);">✅ Tu as tout juste ! Passe au chapitre suivant pour continuer ta progression.</p>';
+    } else {
+      $('resultsAdvice').innerHTML = wrongQuestions.slice(0, 3).map((q) =>
+        `<p style="margin-bottom:8px;"><strong style="color:#ff9a84;">❌ ${escapeHtml(q.question)}</strong><br><span style="color:var(--muted);font-size:13px;">${escapeHtml(q.explanation || 'Revois cette notion dans la fiche.')}</span></p>`
+      ).join('');
+    }
+
+    saveQuizResult(correct, total);
+    showView('resultsView');
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // SAUVEGARDE FIRESTORE
+  // ─────────────────────────────────────────────────────────────
+  async function saveSession(session) {
+    if (!state.user) return;
+    try {
+      await addDoc(collection(db, 'users', state.user.uid, 'revisionSessions'), {
+        subject: state.subject,
+        chapter: state.chapter,
+        chapterTitle: session.chapterTitle || state.chapter,
+        mode: state.mode,
+        session,
+        createdAt: serverTimestamp()
+      });
+    } catch (e) { console.warn('Save session error:', e); }
+  }
+
+  async function saveQuizResult(correct, total) {
+    if (!state.user) return;
+    try {
+      await addDoc(collection(db, 'users', state.user.uid, 'revisionSessions'), {
+        subject: state.subject,
+        chapter: state.chapter,
+        type: 'quiz_result',
+        score: Math.round((correct / total) * 20),
+        correct,
+        total,
+        createdAt: serverTimestamp()
+      });
+    } catch (e) { console.warn('Save quiz error:', e); }
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // HISTORIQUE
+  // ─────────────────────────────────────────────────────────────
+  async function loadHistory() {
+    if (!state.user) return;
+    try {
+      const q = query(
+        collection(db, 'users', state.user.uid, 'revisionSessions'),
+        orderBy('createdAt', 'desc'),
+        limit(20)
+      );
+      const snap = await getDocs(q);
+
+      const list = $('historyList');
+      if (snap.empty) {
+        list.innerHTML = '<div class="empty-state"><span class="empty-icon">📭</span><h3>Aucune révision</h3><p>Commence une première révision pour la voir ici.</p></div>';
+      } else {
+        list.innerHTML = snap.docs.map((d) => {
+          const data = d.data();
+          const date = data.createdAt?.toDate?.() || new Date();
+          const isQuiz = data.type === 'quiz_result';
+          const score = isQuiz ? data.score : null;
+
+          return `
+            <div class="history-item">
+              <div class="history-icon">${isQuiz ? '✅' : '📝'}</div>
+              <div class="history-info">
+                <div class="history-title">${escapeHtml(SUBJECT_LABELS[data.subject] || data.subject)} — ${escapeHtml(data.chapterTitle || data.chapter || 'Tous')}</div>
+                <div class="history-sub">${isQuiz ? 'Quiz' : 'Fiche'} · ${date.toLocaleDateString('fr-FR')}</div>
+              </div>
+              ${score !== null ? `<div class="history-score">${score}/20</div>` : ''}
+            </div>
+          `;
+        }).join('');
+      }
+
+      showView('historyView');
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  // Boutons navigation
+  $('newFicheBtn').addEventListener('click', () => showView('configView'));
+  $('newFlashBtn').addEventListener('click', () => showView('configView'));
+  $('restartBtn').addEventListener('click', () => showView('configView'));
+  $('backToConfigBtn').addEventListener('click', () => showView('configView'));
+
+  // ─────────────────────────────────────────────────────────────
+  // MODAL PREMIUM
+  // ─────────────────────────────────────────────────────────────
+  $('premiumClose').addEventListener('click', () => $('premiumOverlay').classList.remove('show'));
+  $('premiumOverlay').addEventListener('click', (e) => {
+    if (e.target === $('premiumOverlay')) $('premiumOverlay').classList.remove('show');
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') $('premiumOverlay').classList.remove('show');
+  });
+
+  // ─────────────────────────────────────────────────────────────
+  // HELPERS
+  // ─────────────────────────────────────────────────────────────
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = String(text || '');
+    return div.innerHTML;
+  }
+
+  function renderKaTeX(root) {
+    if (typeof renderMathInElement !== 'function') {
+      setTimeout(() => renderKaTeX(root), 200);
+      return;
+    }
+    try {
+      renderMathInElement(root, {
+        delimiters: [
+          { left: '$$', right: '$$', display: true },
+          { left: '\\[', right: '\\]', display: true },
+          { left: '$', right: '$', display: false },
+          { left: '\\(', right: '\\)', display: false }
+        ],
+        throwOnError: false,
+        strict: false
+      });
+    } catch (e) {}
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // AUTH
+  // ─────────────────────────────────────────────────────────────
+  function isUserPremium(data) {
+    if (!data) return false;
+    const active = data.premium === true || data.isUnlocked === true || data.hasDeposited === true;
+    if (!active) return false;
+    const end = data.subscriptionEndDate?.toDate?.() ||
+      (data.subscriptionEndDate?.seconds ? new Date(data.subscriptionEndDate.seconds * 1000) : null);
+    return !end || end.getTime() > Date.now();
+  }
+
+  onAuthStateChanged(auth, async (user) => {
+    const conn = $('connectionState');
+
+    if (!user) {
+      window.location.replace('auth-choice.html');
+      return;
+    }
+
+    state.user = user;
+    conn.textContent = 'Connecté';
+    conn.classList.add('online');
+
+    try {
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      if (userDoc.exists()) {
+        const data = userDoc.data();
+        state.isPremium = isUserPremium(data);
+        conn.textContent = state.isPremium ? 'Premium actif' : 'Compte gratuit';
+        conn.classList.toggle('online', state.isPremium);
+      }
+    } catch (e) {
+      console.warn('Load user error:', e);
+    }
+  });
+
+  // INIT
+  renderChapters();
+  console.log('🎓 ARVEXA — Réviseur (design aligné exam/planificateur)');
+  </script>
+</body>
+</html>

@@ -101,11 +101,11 @@ service cloud.firestore {
         allow write: if isAdmin();
       }
 
-      // ─── Résultats des examens (Admin SDK) ─────────────────
-      match /examResults/{resultId} {
-        allow read: if isOwner(userId) || isAdmin();
-        allow write: if isAdmin();
-      }
+    match /examResults/{docId} {
+  allow read: if request.auth != null && request.auth.uid == userId;
+  allow create: if request.auth != null && request.auth.uid == userId;
+  allow update, delete: if false;
+}
 
       // ─── ⚡ Quota journalier de l'Examen ────────────────────
       // users/{uid}/examUsage/{YYYY-MM-DD}

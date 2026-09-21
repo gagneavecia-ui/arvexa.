@@ -650,6 +650,29 @@
       box-shadow: 0 4px 20px rgba(184, 92, 58, 0.2);
     }
 
+    /* Badge hors ligne sur le bouton */
+.btn-profile .offline-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 20px;
+  padding: 0 7px;
+  border-radius: 10px;
+  background: rgba(224, 184, 74, 0.15);
+  color: var(--accent-bright);
+  font-size: 10.5px;
+  font-weight: 700;
+  border: 1px solid rgba(224, 184, 74, 0.25);
+  margin-left: 4px;
+}
+
+.btn-profile .offline-badge.full {
+  background: rgba(58, 182, 126, 0.15);
+  color: #3AB67E;
+  border-color: rgba(58, 182, 126, 0.3);
+}
+    
     /* ============================================================
        SKELETON
        ============================================================ */
@@ -1159,18 +1182,25 @@
             </div>
           </div>
 
-          <!-- ACTIONS -->
-          <div class="profile-actions">
-            <a href="abonnement.html" class="btn-profile primary" id="premiumBtn">
-              <i class="fas fa-crown"></i> Voir les offres Premium
-            </a>
-            <a href="index.html" class="btn-profile secondary">
-              <i class="fas fa-home"></i> Retour à l'accueil
-            </a>
-            <button class="btn-profile danger" id="logoutProfileBtn">
-              <i class="fas fa-sign-out-alt"></i> Se déconnecter
-            </button>
-          </div>
+         <!-- ACTIONS -->
+<div class="profile-actions">
+  <a href="abonnement.html" class="btn-profile primary" id="premiumBtn">
+    <i class="fas fa-crown"></i> Voir les offres Premium
+  </a>
+
+  <button class="btn-profile secondary" id="offlineManagerBtn">
+    <i class="fas fa-cloud-arrow-down"></i> Contenu hors ligne
+    <span class="offline-badge" id="offlineBadge" style="display:none"></span>
+  </button>
+
+  <a href="index.html" class="btn-profile secondary">
+    <i class="fas fa-home"></i> Retour à l'accueil
+  </a>
+
+  <button class="btn-profile danger" id="logoutProfileBtn">
+    <i class="fas fa-sign-out-alt"></i> Se déconnecter
+  </button>
+</div>
 
         </div>
       </div>
@@ -1934,6 +1964,86 @@
     window.location.href = 'notifications.html';
   });
 
+    // ================================================================
+// BOUTON CONTENU HORS LIGNE
+// ================================================================
+const offlineManagerBtn = document.getElementById('offlineManagerBtn');
+const offlineBadge = document.getElementById('offlineBadge');
+
+if (offlineManagerBtn) {
+  offlineManagerBtn.addEventListener('click', () => {
+    if (window.arvexaOffline && window.arvexaOffline.openManager) {
+      window.arvexaOffline.openManager();
+    } else {
+      if (window.arvexaOffline?.toast) {
+        window.arvexaOffline.toast('⚠️ Module hors ligne en cours de chargement...', 'info');
+      }
+      // Retenter après 1 seconde
+      setTimeout(() => {
+        window.arvexaOffline?.openManager?.();
+      }, 1000);
+    }
+  });
+}
+
+// ================================================================
+// BADGE : nombre de fichiers en cache
+// ================================================================
+async function refreshOfflineBadge() {
+  if (!offlineBadge) return;
+  if (!window.arvexaOffline?.getStats) return;
+
+  try {
+    const stats = await window.arvexaOffline.getStats();
+    const total = (stats.cours || 0) + (stats.manifests || 0);
+
+    if (total === 0) {
+      offlineBadge.style.display = 'none';
+    } else {
+      offlineBadge.style.display = 'inline-flex';
+      offlineBadge.textContent = total;
+
+      // Vérifier si tout est téléchargé
+      try {
+        const res = await fetch('cache-manifest.json');
+        if (res.ok) {
+          const manifest = await res.json();
+          const totalFiles = manifest.totalFiles || 0;
+          if (totalFiles > 0 && total >= totalFiles) {
+            offlineBadge.classList.add('full');
+            offlineBadge.title = 'Tout est disponible hors ligne';
+          } else {
+            offlineBadge.classList.remove('full');
+            offlineBadge.title = `${total} / ${totalFiles} fichiers en cache`;
+          }
+        }
+      } catch (e) {}
+    }
+  } catch (e) {
+    offlineBadge.style.display = 'none';
+  }
+}
+
+// Rafraîchir le badge au chargement + après un download
+if (offlineManagerBtn) {
+  setTimeout(refreshOfflineBadge, 1500);
+
+  // Re-vérifier quand la modale se ferme (polling léger)
+  let pollInterval = setInterval(refreshOfflineBadge, 5000);
+
+  // Nettoyer si on quitte
+  window.addEventListener('beforeunload', () => clearInterval(pollInterval));
+}
+
+// Écouter les événements de téléchargement terminé
+if (navigator.serviceWorker) {
+  navigator.serviceWorker.addEventListener('message', (event) => {
+    if (event.data?.type === 'DOWNLOAD_COMPLETE') {
+      setTimeout(refreshOfflineBadge, 500);
+    }
+  });
+}
+    
   console.log('🚀 ARVEXA — Profil (avec session robuste)');
   </script>
 </body>

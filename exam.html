@@ -1206,9 +1206,93 @@
     }
 
     // ═══════════════════════════════════════════════════════════════
+// ⚡ SAUVEGARDE DIRECTE DANS FIRESTORE (depuis le frontend)
+// Ne dépend PAS du backend → fonctionne toujours
+// ═══════════════════════════════════════════════════════════════
+async function saveExamResultDirect(payload) {
+  if (!state.user) {
+    console.warn('⚠️ Pas d\'utilisateur connecté, impossible de sauvegarder');
+    return;
+  }
+
+  try {
+    // ⚡ Imports dynamiques pour éviter de tout charger au démarrage
+    const { getFirestore, collection, addDoc, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js');
+
+    const db = getFirestore(app);
+    const result = payload?.result || payload?.results || payload;
+
+    // ⚡ Normaliser le nom de la matière pour ARV-PILOT
+    const normalizedSubject = String(state.exam.subject || '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/\s+/g, '_')
+      .replace(/[^a-z_]/g, '');
+
+    const subjectMap = {
+      mathematiques: 'mathematiques',
+      maths: 'mathematiques',
+      math: 'mathematiques',
+      physique: 'physique',
+      chimie: 'chimie',
+      svt: 'svt',
+      francais: 'francais'
+    };
+
+    const subjectKey = subjectMap[normalizedSubject] || normalizedSubject;
+
+    const examResultData = {
+      // Identifiants
+      subject: state.exam.subject,          // Garde l'original ("Mathématiques")
+      subjectKey: subjectKey,               // Version normalisée ("mathematiques") ← pour ARV-PILOT
+      subjectId: state.selectedSubject.id,
+      chapter: state.exam.chapter || 'all',
+      chapterTitle: state.selectedSubject.title || 'Sujet',
+      
+      // Score
+      score: Number(result?.score ?? result?.totalScore ?? 0),
+      totalScore: 20,
+      percentage: Number(result?.percentage ?? Math.round((Number(result?.score ?? 0) / 20) * 100)),
+      grade: result?.grade || null,
+      
+      // Détails
+      difficulties: result?.exercises?.map((ex) => ({
+        number: ex.number,
+        score: Number(ex.score || 0),
+        maxScore: Number(ex.maxScore || 5),
+        advice: String(ex.advice || '').slice(0, 500),
+        errors: Array.isArray(ex.errors) ? ex.errors : []
+      })) || [],
+      
+      // Métadonnées
+      answerCount: Object.values(state.answers).filter(Boolean).length,
+      examTitle: state.selectedSubject.title || 'Examen',
+      
+      // Timestamp
+      createdAt: serverTimestamp(),
+      date: serverTimestamp()
+    };
+
+    const docRef = await addDoc(
+      collection(db, 'users', state.user.uid, 'examResults'),
+      examResultData
+    );
+
+    console.log('✅ Examen enregistré dans Firestore ! ID:', docRef.id);
+    console.log('   Matière:', examResultData.subject, '| Score:', examResultData.score);
+
+  } catch (error) {
+    console.error('❌ Erreur sauvegarde examen:', error);
+    console.error('   Code:', error.code);
+    console.error('   Message:', error.message);
+  }
+}
+    
+    // ═══════════════════════════════════════════════════════════════
     // RÉSULTATS
     // ═══════════════════════════════════════════════════════════════
-    function showResults(payload) {
+   async function showResults(payload) {
       const result = payload?.result || payload;
       state.lastResult = result;
 
@@ -1275,9 +1359,12 @@
         details.appendChild(topicsSection);
       }
 
-      showView('resultsView');
-      renderMath($('resultsView'));
-    }
+       showView('resultsView');
+  renderMath($('resultsView'));
+
+  // ⚡ Sauvegarder DIRECTEMENT dans Firestore
+  await saveExamResultDirect(payload);
+}
 
     function showExerciseDetail(exercise, exerciseIndex) {
       const details = $('resultsDetails');

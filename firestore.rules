@@ -2,202 +2,97 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-
+    
     // ═══════════════════════════════════════════════════════════════
-    // FONCTIONS UTILITAIRES
+    // RÈGLES ARVEXA SCHOOL — Version complète
     // ═══════════════════════════════════════════════════════════════
-    function signedIn() {
-      return request.auth != null;
-    }
 
-    function isOwner(userId) {
-      return signedIn() && request.auth.uid == userId;
-    }
-
-    function isAdmin() {
-      return signedIn() && request.auth.token.admin == true;
-    }
-
-    // ═══════════════════════════════════════════════════════════════
-    // USERS
-    // ═══════════════════════════════════════════════════════════════
+    // ─── Profil utilisateur + toutes les sous-collections ─────────
     match /users/{userId} {
-
-      // ─── Création du compte ────────────────────────────────
-      allow create: if isOwner(userId)
-        && request.resource.data.uid == userId
-        && request.resource.data.role == 'student'
-        && request.resource.data.premium == false
-        && request.resource.data.isUnlocked == false
-        && request.resource.data.hasDeposited == false;
-
-      // ─── Lecture du profil ─────────────────────────────────
-      allow read: if isOwner(userId) || isAdmin();
-
-      // ─── Mise à jour du profil ─────────────────────────────
-      // Les champs sensibles (premium, role, accountStatus, etc.)
-      // ne peuvent être modifiés que par un admin.
-      allow update: if isAdmin() || (
-        isOwner(userId)
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-          // Identité
-          'firstName', 'lastName', 'fullName', 'email', 'phone', 'establishment',
-          'classId', 'onboardingCompleted', 'onboardingCompletedAt',
-          // Étude
-          'totalStudyTime', 'lastStudyUpdate', 'profilePicture', 'updatedAt',
-          // Notifications
-          'fcmToken', 'fcmTokenUpdatedAt',
-          // Abonnement (seul l'utilisateur peut DEMANDER un abonnement)
-          'subscriptionStatus', 'subscriptionPlan', 'subscriptionPrice',
-          'subscriptionOriginalPrice', 'subscriptionPromoCode',
-          'subscriptionRequestId', 'subscriptionRequestDate',
-          'subscriptionFullName', 'subscriptionWhatsapp',
-          'subscriptionPaymentMethod'
-        ])
-        // totalStudyTime ne peut qu'augmenter
-        && (!request.resource.data.keys().hasAny(['totalStudyTime'])
-          || request.resource.data.totalStudyTime >= resource.data.totalStudyTime)
-        // profilePicture ≤ 500 KB
-        && (!request.resource.data.keys().hasAny(['profilePicture'])
-          || request.resource.data.profilePicture.size() <= 500000)
-        // subscriptionStatus ne peut devenir que 'pending'
-        && (!request.resource.data.keys().hasAny(['subscriptionStatus'])
-          || request.resource.data.subscriptionStatus == 'pending')
-        // Le prix doit correspondre au plan (mensuel=2000, annuel=18000 ou 13500 avec promo)
-        && (!request.resource.data.keys().hasAny(['subscriptionPlan', 'subscriptionPrice'])
-          || (request.resource.data.subscriptionPlan == 'monthly'
-            && request.resource.data.subscriptionPrice == 2000)
-          || (request.resource.data.subscriptionPlan == 'annual'
-            && (request.resource.data.subscriptionPrice == 18000
-              || request.resource.data.subscriptionPrice == 13500)))
-      );
-
-      // ─── Suppression du compte (admin uniquement) ──────────
-      allow delete: if isAdmin();
-
-      // ════════════════════════════════════════════════════════
-      // SOUS-COLLECTIONS DE L'UTILISATEUR
-      // ════════════════════════════════════════════════════════
-
-      // ─── Favoris (Formulaires) ─────────────────────────────
-      match /favorites/{favoriteId} {
-        allow read, write: if isOwner(userId)
-          && favoriteId == 'formulas'
-          && (!request.resource.data.keys().hasAny(['ids'])
-            || request.resource.data.ids.size() <= 500);
+      
+      // Lecture/écriture du profil : propriétaire uniquement
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow create: if request.auth != null && request.auth.uid == userId;
+      allow update: if request.auth != null && request.auth.uid == userId
+        && !(request.resource.data.diff(resource.data).affectedKeys().hasAny(['premium', 'role', 'accountStatus']));
+      allow delete: if false;
+      
+      // ─── examResults : examens blancs ───────────────────────────
+      match /examResults/{docId} {
+        allow read: if request.auth != null && request.auth.uid == userId;
+        allow create: if request.auth != null && request.auth.uid == userId;
+        allow update, delete: if false;
       }
-
-      // ─── Notifications ─────────────────────────────────────
-      match /notifications/{notificationId} {
-        allow read: if isOwner(userId) || isAdmin();
-        allow update: if isOwner(userId)
-          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']);
-        allow create, delete: if isAdmin();
+      
+      // ─── revisionSessions : sessions du Réviseur ────────────────
+      match /revisionSessions/{docId} {
+        allow read: if request.auth != null && request.auth.uid == userId;
+        allow create: if request.auth != null && request.auth.uid == userId;
+        allow update, delete: if false;
       }
-
-      // ─── Cache des examens générés (Admin SDK) ─────────────
-      match /examCache/{examId} {
-        allow read: if isOwner(userId) || isAdmin();
-        allow write: if isAdmin();
+      
+      // ─── grades : notes manuelles ───────────────────────────────
+      match /grades/{docId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
       }
-
-    match /examResults/{docId} {
-  allow read: if request.auth != null && request.auth.uid == userId;
-  allow create: if request.auth != null && request.auth.uid == userId;
-  allow update, delete: if false;
-}
-
-      // ─── ⚡ Quota journalier de l'Examen ────────────────────
-      // users/{uid}/examUsage/{YYYY-MM-DD}
-      match /examUsage/{date} {
-        allow read: if isOwner(userId) || isAdmin();
-        allow write: if isAdmin();
+      
+      // ─── notifications ──────────────────────────────────────────
+      match /notifications/{docId} {
+        allow read: if request.auth != null && request.auth.uid == userId;
+        allow update: if request.auth != null && request.auth.uid == userId;
+        allow create, delete: if false;
       }
-
-      // ─── ⚡ Session d'examen active ─────────────────────────
-      // users/{uid}/activeExam/current
+      
+      // ─── examCache, examUsage, reviseurUsage (écriture serveur) ─
+      match /examCache/{docId} {
+        allow read: if false;
+        allow write: if false;
+      }
+      match /examUsage/{docId} {
+        allow read: if request.auth != null && request.auth.uid == userId;
+        allow write: if false;
+      }
+      match /reviseurUsage/{docId} {
+        allow read: if request.auth != null && request.auth.uid == userId;
+        allow write: if false;
+      }
+      
+      // ─── Session d'examen / révision active ─────────────────────
       match /activeExam/{docId} {
-        allow read: if isOwner(userId);
-        allow write: if isOwner(userId);
+        allow read, write: if request.auth != null && request.auth.uid == userId;
       }
-
-      // ─── ⚡ Quota journalier du Réviseur ────────────────────
-      // users/{uid}/reviseurUsage/{YYYY-MM-DD}
-      match /reviseurUsage/{date} {
-        allow read: if isOwner(userId) || isAdmin();
-        allow write: if isAdmin();
-      }
-
-      // ─── ⚡ Session de révision active ──────────────────────
-      // users/{uid}/activeRevision/current
       match /activeRevision/{docId} {
-        allow read: if isOwner(userId);
-        allow write: if isOwner(userId);
+        allow read, write: if request.auth != null && request.auth.uid == userId;
       }
-
-      // ─── ⚡ Historique des révisions ────────────────────────
-      // users/{uid}/revisionSessions/{sessionId}
-      match /revisionSessions/{sessionId} {
-        allow read: if isOwner(userId) || isAdmin();
-        allow create: if isOwner(userId);
-        allow update, delete: if false; // Immutable
+      
+      // ─── Favoris ────────────────────────────────────────────────
+      match /favorites/{docId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
       }
     }
-
-    // ═══════════════════════════════════════════════════════════════
-    // SUBJECTS (matières + chapitres)
-    // ═══════════════════════════════════════════════════════════════
-    match /subjects/{subjectId} {
-      allow read: if signedIn();
-      allow write: if isAdmin();
-
-      match /chapters/{chapterId} {
-        allow read: if signedIn();
-        allow write: if isAdmin();
-      }
+    
+    // ─── Sujets (cours) : lecture pour tous les connectés ─────────
+    match /subjects/{document=**} {
+      allow read: if request.auth != null;
+      allow write: if false;
     }
-
-    // ═══════════════════════════════════════════════════════════════
-    // GROUPES (chat communautaire)
-    // ═══════════════════════════════════════════════════════════════
-    match /groups/{groupId} {
-      match /messages/{messageId} {
-        allow read: if signedIn();
-        allow create: if signedIn()
-          && request.resource.data.userId == request.auth.uid
-          && request.resource.data.content.size() <= 2000
-          && (!request.resource.data.keys().hasAny(['imageBase64'])
-            || request.resource.data.imageBase64.size() <= 500000);
-        allow update, delete: if isAdmin()
-          || (signedIn() && resource.data.userId == request.auth.uid);
-      }
-
-      match /banned/{bannedUserId} {
-        allow read: if signedIn();
-        allow write: if isAdmin();
-      }
+    
+    // ─── Avis utilisateurs ─────────────────────────────────────────
+    match /avis/{docId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update, delete: if false;
     }
-
-    // ═══════════════════════════════════════════════════════════════
-    // AVIS (feedback utilisateurs)
-    // ═══════════════════════════════════════════════════════════════
-    match /avis/{avisId} {
-      allow create: if signedIn()
-        && request.resource.data.userId == request.auth.uid
-        && request.resource.data.rating is int
-        && request.resource.data.rating >= 1
-        && request.resource.data.rating <= 5
-        && request.resource.data.message is string
-        && request.resource.data.message.size() >= 10
-        && request.resource.data.message.size() <= 500;
-      allow read, update, delete: if isAdmin();
+    
+    // ─── Groupes (chat) ────────────────────────────────────────────
+    match /groups/{groupId}/{document=**} {
+      allow read, write: if request.auth != null;
     }
-
-    // ═══════════════════════════════════════════════════════════════
-    // FALLBACK — tout le reste est interdit
-    // ═══════════════════════════════════════════════════════════════
-    match /{document=**} {
-      allow read, write: if false;
+    
+    // ─── Admin notifications ───────────────────────────────────────
+    match /admin_notifications/{docId} {
+      allow read: if request.auth != null;
+      allow write: if false;
     }
   }
 }

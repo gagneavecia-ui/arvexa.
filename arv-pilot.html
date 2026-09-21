@@ -30,7 +30,6 @@
       --line-strong: rgba(255, 255, 255, .18);
       --radius: 14px;
 
-      /* ⚡ TABLEAU XL */
       --cell-w: 180px;
       --cell-w-first: 160px;
       --cell-h: 82px;
@@ -65,9 +64,6 @@
       padding: 16px;
     }
 
-    /* ═══════════════════════════════════════════════════════════
-       HEADER
-       ═══════════════════════════════════════════════════════════ */
     header {
       display: flex;
       align-items: center;
@@ -103,9 +99,6 @@
     }
     .connection.online::before { background: var(--success); }
 
-    /* ═══════════════════════════════════════════════════════════
-       TITRE
-       ═══════════════════════════════════════════════════════════ */
     .page-title { margin-bottom: 16px; }
 
     .eyebrow {
@@ -128,9 +121,6 @@
       margin-top: 6px;
     }
 
-    /* ═══════════════════════════════════════════════════════════
-       ONGLETS
-       ═══════════════════════════════════════════════════════════ */
     .tabs {
       display: flex;
       gap: 6px;
@@ -174,9 +164,6 @@
       to { opacity: 1; transform: none; }
     }
 
-    /* ═══════════════════════════════════════════════════════════
-       HERO — résumé en haut
-       ═══════════════════════════════════════════════════════════ */
     .hero {
       background: rgba(21, 23, 21, .88);
       border: 1px solid var(--line);
@@ -216,9 +203,6 @@
     .hero-item .sub.positive { color: var(--success); }
     .hero-item .sub.negative { color: var(--danger); }
 
-    /* ═══════════════════════════════════════════════════════════
-       HINT DÉFILEMENT
-       ═══════════════════════════════════════════════════════════ */
     .scroll-hint {
       display: flex;
       align-items: center;
@@ -242,9 +226,6 @@
       .scroll-hint { display: none; }
     }
 
-    /* ═══════════════════════════════════════════════════════════
-       ⚡ TABLEAU TYPE EXCEL
-       ═══════════════════════════════════════════════════════════ */
     .table-wrap {
       border: 1px solid var(--line-strong);
       border-radius: var(--radius);
@@ -265,12 +246,9 @@
     .table-scroll::-webkit-scrollbar-thumb {
       background: rgba(224, 184, 74, .35);
       border-radius: 10px;
-      border: 2px solid transparent;
-      background-clip: padding-box;
     }
     .table-scroll::-webkit-scrollbar-thumb:hover {
       background: rgba(224, 184, 74, .55);
-      background-clip: padding-box;
     }
 
     .grid {
@@ -297,7 +275,6 @@
     }
     .cell:hover { background: rgba(224, 184, 74, .03); }
 
-    /* ⚡ Colonne 1 : labels (figée) */
     .cell.header-label,
     .cell.row-label {
       position: sticky;
@@ -312,7 +289,6 @@
       padding: 12px 16px;
     }
 
-    /* ⚡ Header (1ère ligne, figé) */
     .cell.header {
       position: sticky;
       top: 0;
@@ -352,7 +328,6 @@
       background: linear-gradient(135deg, #1a1e1a, #101410);
     }
 
-    /* ⚡ Labels de lignes */
     .cell.row-label {
       display: flex;
       flex-direction: row;
@@ -376,7 +351,6 @@
       line-height: 1.2;
     }
 
-    /* ⚡ Cellules data */
     .cell.data {
       font-family: 'JetBrains Mono', monospace;
       font-size: 20px;
@@ -385,7 +359,6 @@
       letter-spacing: -.02em;
     }
 
-    /* Colonne TOTAL */
     .cell.data.total-col {
       background: rgba(224, 184, 74, .06);
       border-right: 2px solid rgba(224, 184, 74, .25);
@@ -395,7 +368,6 @@
     }
     .cell.total-col { background: rgba(224, 184, 74, .04); }
 
-    /* Valeurs colorées */
     .val-success { color: var(--success); }
     .val-danger { color: var(--danger); }
     .val-warning { color: var(--warning); }
@@ -403,7 +375,6 @@
     .val-gold { color: var(--gold-light); }
     .val-muted { color: var(--muted); }
 
-    /* Badge priorité */
     .priority-badge {
       display: inline-flex;
       align-items: center;
@@ -438,7 +409,6 @@
       border: 1px solid var(--line);
     }
 
-    /* Cellule focus */
     .cell.data.focus-cell {
       font-family: Inter, sans-serif;
       font-size: 12px;
@@ -447,9 +417,54 @@
       padding: 10px 12px;
       line-height: 1.3;
       text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      flex-direction: column;
+    }
+    .cell.data.focus-cell .focus-label {
+      font-size: 16px;
+      color: var(--gold-light);
+      font-weight: 700;
+      line-height: 1;
+    }
+    .cell.data.focus-cell .focus-value {
+      font-size: 11px;
+      color: #e2e3dc;
+      font-weight: 600;
+      line-height: 1.3;
+      word-break: break-word;
     }
 
-    /* Cellule "ajouter" pour matières manuelles */
+    .cell-bar {
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, .08);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+    .cell-bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width .4s cubic-bezier(.25, 1, .5, 1);
+    }
+    .cell-bar-fill.high { background: linear-gradient(90deg, #d7654a, #e88a72); }
+    .cell-bar-fill.medium { background: linear-gradient(90deg, #E0B84A, #F0CC65); }
+    .cell-bar-fill.low { background: linear-gradient(90deg, #45b47d, #6fd99a); }
+
+    .evo-arrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 14px;
+      font-weight: 800;
+    }
+    .evo-arrow.up { color: #7ce0aa; }
+    .evo-arrow.down { color: #ff9a84; }
+    .evo-arrow.flat { color: var(--muted); }
+
     .cell.data.add-cell {
       cursor: pointer;
     }
@@ -474,11 +489,10 @@
       transform: scale(1.05);
     }
 
-    /* Séparateurs entre blocs */
     .cell.separator-bottom { border-bottom: 2px solid var(--line-strong); }
 
     /* ═══════════════════════════════════════════════════════════
-       ONGLET CONSEILS
+       ONGLET CONSEILS AMÉLIORÉ
        ═══════════════════════════════════════════════════════════ */
     .conseils-section { display: flex; flex-direction: column; gap: 16px; }
 
@@ -486,16 +500,30 @@
       background: rgba(21, 23, 21, .88);
       border: 1px solid var(--line);
       border-radius: var(--radius);
-      padding: 22px;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .conseil-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--gold-light), transparent);
+      opacity: 0.5;
     }
     .conseil-card.trajectory {
       background: linear-gradient(135deg, rgba(224, 184, 74, .08), rgba(26, 58, 42, .06));
       border-color: rgba(224, 184, 74, .2);
     }
+    .conseil-card.trajectory::before {
+      background: linear-gradient(90deg, var(--gold-light), var(--gold), var(--gold-light));
+      opacity: 1;
+    }
     .conseil-card h2 {
       font-family: 'Playfair Display', serif;
       font-size: 20px;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
       display: flex;
       align-items: center;
       gap: 10px;
@@ -505,10 +533,143 @@
       color: #cfd0cc;
       font-size: 15px;
       line-height: 1.7;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
     .conseil-card p:last-child { margin-bottom: 0; }
     .conseil-card p strong { color: var(--gold-light); }
+
+    .readiness-circle-wrap {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .readiness-circle {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      flex-shrink: 0;
+    }
+    .readiness-circle svg {
+      transform: rotate(-90deg);
+      width: 100%;
+      height: 100%;
+    }
+    .readiness-circle .circle-bg {
+      fill: none;
+      stroke: rgba(255, 255, 255, .08);
+      stroke-width: 8;
+    }
+    .readiness-circle .circle-progress {
+      fill: none;
+      stroke-width: 8;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 1.2s cubic-bezier(.25, 1, .5, 1);
+    }
+    .readiness-circle .circle-progress.solid { stroke: #45b47d; }
+    .readiness-circle .circle-progress.progressing { stroke: #E0B84A; }
+    .readiness-circle .circle-progress.reinforce { stroke: #d7654a; }
+    .readiness-circle .circle-progress.insufficient { stroke: #5A5A4A; }
+    .readiness-circle-value {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: 'Playfair Display', serif;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1;
+    }
+    .readiness-info {
+      flex: 1;
+      min-width: 200px;
+    }
+    .readiness-label {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 6px;
+    }
+    .readiness-label.solid { color: #7ce0aa; }
+    .readiness-label.progressing { color: var(--gold-light); }
+    .readiness-label.reinforce { color: #ff9a84; }
+    .readiness-sub {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .goal-bar-wrap {
+      margin: 20px 0;
+    }
+    .goal-bar-labels {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .goal-bar-labels .current {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--gold-light);
+    }
+    .goal-bar-labels .target {
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .goal-bar-labels .target strong { color: var(--white); font-size: 16px; }
+    .goal-bar-track {
+      height: 10px;
+      background: rgba(255, 255, 255, .06);
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+    }
+    .goal-bar-fill {
+      height: 100%;
+      border-radius: 10px;
+      background: linear-gradient(90deg, var(--gold), var(--gold-light));
+      transition: width 1.2s cubic-bezier(.25, 1, .5, 1);
+      position: relative;
+    }
+    .goal-bar-fill::after {
+      content: '';
+      position: absolute;
+      top: 0; right: 0;
+      width: 4px; height: 100%;
+      background: rgba(255, 255, 255, .4);
+      box-shadow: 0 0 12px var(--gold-light);
+    }
+    .goal-bar-marker {
+      position: absolute;
+      top: -4px;
+      width: 2px;
+      height: 18px;
+      background: var(--white);
+      border-radius: 2px;
+      transform: translateX(-50%);
+    }
+    .goal-bar-marker::before {
+      content: '🎯';
+      position: absolute;
+      top: -22px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 14px;
+    }
+    .goal-bar-stats {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--muted);
+    }
 
     .conseil-list {
       list-style: none;
@@ -520,69 +681,151 @@
     .conseil-list li {
       display: flex;
       align-items: flex-start;
-      gap: 12px;
-      padding: 12px 14px;
-      background: rgba(255, 255, 255, .02);
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      font-size: 14px;
-      line-height: 1.5;
-      color: #e2e3dc;
-    }
-    .conseil-list li .bullet {
-      font-size: 16px;
-      flex-shrink: 0;
-      margin-top: 1px;
-    }
-    .conseil-list li strong { color: var(--gold-light); }
-
-    .action-plan {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .action-item {
-      display: flex;
-      align-items: center;
       gap: 14px;
       padding: 14px 16px;
       background: rgba(255, 255, 255, .02);
       border: 1px solid var(--line);
       border-radius: 12px;
-      transition: all .16s ease;
+      font-size: 14px;
+      line-height: 1.5;
+      color: #e2e3dc;
+      transition: all .2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .conseil-list li:hover {
+      border-color: rgba(224, 184, 74, .3);
+      background: rgba(224, 184, 74, .03);
+      transform: translateX(3px);
+    }
+    .conseil-list li .bullet {
+      font-size: 20px;
+      flex-shrink: 0;
+      margin-top: 1px;
+      width: 28px;
+      text-align: center;
+    }
+    .conseil-list li .content {
+      flex: 1;
+      min-width: 0;
+    }
+    .conseil-list li .title {
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 4px;
+      font-size: 15px;
+    }
+    .conseil-list li .reason {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .conseil-list li .mini-bar {
+      height: 3px;
+      background: rgba(255, 255, 255, .08);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .conseil-list li .mini-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width .8s ease;
+    }
+    .conseil-list li .mini-bar-fill.high { background: linear-gradient(90deg, #d7654a, #e88a72); }
+    .conseil-list li .mini-bar-fill.medium { background: linear-gradient(90deg, #E0B84A, #F0CC65); }
+    .conseil-list li .mini-bar-fill.low { background: linear-gradient(90deg, #45b47d, #6fd99a); }
+
+    .action-plan {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .action-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 18px;
+      background: rgba(255, 255, 255, .02);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      transition: all .2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .action-item::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: linear-gradient(180deg, var(--gold-light), var(--gold));
+      opacity: 0;
+      transition: opacity .2s ease;
     }
     .action-item:hover {
       border-color: rgba(224, 184, 74, .3);
       background: rgba(224, 184, 74, .03);
+      transform: translateX(4px);
     }
+    .action-item:hover::before { opacity: 1; }
     .action-item .num {
-      width: 32px;
-      height: 32px;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
-      background: rgba(224, 184, 74, .12);
+      background: linear-gradient(135deg, rgba(224, 184, 74, .15), rgba(184, 134, 11, .08));
       color: var(--gold-light);
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 800;
-      font-size: 14px;
+      font-size: 15px;
       flex-shrink: 0;
+      border: 1px solid rgba(224, 184, 74, .2);
     }
     .action-item .content { flex: 1; min-width: 0; }
     .action-item .title {
-      font-size: 14px;
+      font-size: 15px;
       font-weight: 700;
       color: var(--white);
-      margin-bottom: 2px;
+      margin-bottom: 3px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .action-item .title .priority-tag {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+    .action-item .title .priority-tag.high {
+      background: rgba(215, 101, 74, .15);
+      color: #ff9a84;
+    }
+    .action-item .title .priority-tag.medium {
+      background: rgba(224, 184, 74, .12);
+      color: var(--gold-light);
     }
     .action-item .desc {
-      font-size: 12px;
+      font-size: 13px;
       color: var(--muted);
+      line-height: 1.4;
+    }
+    .action-item .time-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      background: rgba(74, 175, 224, .1);
+      color: #4AAFE0;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      flex-shrink: 0;
     }
 
-    /* ═══════════════════════════════════════════════════════════
-       ÉTATS
-       ═══════════════════════════════════════════════════════════ */
     .loading {
       display: flex;
       flex-direction: column;
@@ -658,9 +901,6 @@
       border-color: var(--line);
     }
 
-    /* ═══════════════════════════════════════════════════════════
-       MODAL AJOUT NOTE
-       ═══════════════════════════════════════════════════════════ */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -743,15 +983,16 @@
     }
     .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
-    /* ═══════════════════════════════════════════════════════════
-       RESPONSIVE
-       ═══════════════════════════════════════════════════════════ */
     @media (max-width: 620px) {
       .shell { padding: 12px; }
       .hero { padding: 16px; gap: 12px; }
       .hero-item .value { font-size: 22px; }
       .conseil-card { padding: 18px; }
       .tab-btn { min-width: 120px; padding: 10px 12px; font-size: 13px; }
+      .readiness-circle { width: 90px; height: 90px; }
+      .readiness-circle-value { font-size: 20px; }
+      .readiness-label { font-size: 17px; }
+      .goal-bar-labels .current { font-size: 18px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -765,7 +1006,6 @@
 <body>
   <main class="shell">
 
-    <!-- HEADER -->
     <header>
       <a class="brand" href="index.html">ARVEX<span>A School</span></a>
       <div class="header-right">
@@ -773,45 +1013,30 @@
       </div>
     </header>
 
-    <!-- TITRE -->
     <div class="page-title">
       <div class="eyebrow">ARV-PILOT · Centre de pilotage</div>
       <h1>Où j'en suis ? Que dois-je travailler ?</h1>
       <p>Analyse basée sur tes examens, tes quiz et tes notes de classe.</p>
     </div>
 
-    <!-- ONGLETS -->
-    <div class="tabs" role="tablist">
-      <button class="tab-btn active" data-tab="tableau" role="tab">
-        <i class="fas fa-table"></i> Tableau
-      </button>
-      <button class="tab-btn" data-tab="conseils" role="tab">
-        <i class="fas fa-lightbulb"></i> Conseils
-      </button>
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="tableau"><i class="fas fa-table"></i> Tableau</button>
+      <button class="tab-btn" data-tab="conseils"><i class="fas fa-lightbulb"></i> Conseils</button>
     </div>
 
-    <!-- CHARGEMENT -->
     <div class="loading" id="loadingState">
       <div class="loading-spinner"></div>
       <div>Analyse de tes données...</div>
     </div>
 
-    <!-- EMPTY STATE -->
     <div class="empty" id="emptyState" style="display:none;">
       <span class="empty-icon">📊</span>
       <h3>Pas encore de données</h3>
-      <p>
-        Fais un examen ou une révision pour qu'ARV-PILOT puisse analyser ton niveau.
-        Tu peux aussi ajouter manuellement des notes (Anglais, Philosophie, etc.).
-      </p>
+      <p>Fais un examen ou une révision pour qu'ARV-PILOT puisse analyser ton niveau.</p>
       <a href="exam.html" class="btn primary"><i class="fas fa-file-circle-plus"></i> Faire un examen</a>
     </div>
 
-    <!-- ═══════════════════════════════════════════════════════════
-         ONGLET 1 — TABLEAU
-         ═══════════════════════════════════════════════════════════ -->
     <section class="tab-content active" id="tab-tableau" style="display:none;">
-      <!-- HERO -->
       <div class="hero" id="heroSummary">
         <div class="hero-item">
           <span class="label">Moyenne générale</span>
@@ -835,13 +1060,11 @@
         </div>
       </div>
 
-      <!-- HINT défilement -->
       <div class="scroll-hint">
         <i class="fas fa-arrows-left-right"></i>
         <span>Glisse horizontalement pour voir toutes les matières</span>
       </div>
 
-      <!-- TABLEAU -->
       <div class="table-wrap">
         <div class="table-scroll">
           <div class="grid" id="pilotGrid"></div>
@@ -849,18 +1072,12 @@
       </div>
     </section>
 
-    <!-- ═══════════════════════════════════════════════════════════
-         ONGLET 2 — CONSEILS
-         ═══════════════════════════════════════════════════════════ -->
     <section class="tab-content" id="tab-conseils">
-      <div class="conseils-section" id="conseilsContent">
-        <!-- Rempli dynamiquement -->
-      </div>
+      <div class="conseils-section" id="conseilsContent"></div>
     </section>
 
   </main>
 
-  <!-- MODAL AJOUT NOTE -->
   <div class="modal-overlay" id="noteModal">
     <div class="modal">
       <button class="modal-close" id="modalClose"><i class="fas fa-times"></i></button>
@@ -893,16 +1110,9 @@
           <input type="text" id="noteChapter" placeholder="Ex: Nombres complexes">
         </div>
 
-        <div class="field">
-          <label for="noteComment">Commentaire (optionnel)</label>
-          <input type="text" id="noteComment" placeholder="Ex: Devoir maison">
-        </div>
-
         <div style="display:flex;gap:10px;margin-top:20px;">
           <button type="button" class="btn secondary" id="modalCancel" style="flex:1;">Annuler</button>
-          <button type="submit" class="btn primary" id="modalSubmit" style="flex:1;">
-            <i class="fas fa-check"></i> Enregistrer
-          </button>
+          <button type="submit" class="btn primary" id="modalSubmit" style="flex:1;"><i class="fas fa-check"></i> Enregistrer</button>
         </div>
       </form>
     </div>
@@ -920,28 +1130,100 @@
 
   <script type="module">
   import { initializeApp } from 'firebase/app';
-  import { getAuth, onAuthStateChanged, getIdToken } from 'firebase/auth';
+  import { getAuth, onAuthStateChanged } from 'firebase/auth';
   import {
-    getFirestore, doc, getDoc, collection, addDoc,
-    query, orderBy, getDocs, serverTimestamp
+    getFirestore, collection, addDoc,
+    getDocs, serverTimestamp
   } from 'firebase/firestore';
 
-  import { SUBJECTS, COEFFICIENTS, PRIORITY_LEVELS, EVALUATION_TYPES, normalizeSubjectName, getSubjectConfig } from './js/arv-pilot/config.js';
-  import {
-    computeSubjectAverage,
-    computeGeneralAverage,
-    countEvaluations,
-    computeExerciseStats,
-    computeRevisionTime,
-    countChaptersRevised,
-    computePriority,
-    detectTrend,
-    computeReadiness,
-    formatTime,
-    formatEvolution,
-    daysSince,
-    round2
-  } from './js/arv-pilot/calculators.js';
+  // ═══════════════════════════════════════════════════════════════
+  // CONFIG
+  // ═══════════════════════════════════════════════════════════════
+  const COEFFICIENTS = {
+    mathematiques: 5,
+    physique: 3,
+    chimie: 2,
+    svt: 5,
+    francais: 3,
+    anglais: 2,
+    philosophie: 2,
+    histoire_geo: 2,
+    eps: 1
+  };
+
+  const SUBJECTS = {
+    mathematiques: { label: 'Mathématiques', shortLabel: 'Maths',  icon: '📐', coef: 5, mode: 'auto' },
+    physique:       { label: 'Physique',      shortLabel: 'Phys.',  icon: '⚡', coef: 3, mode: 'auto' },
+    chimie:         { label: 'Chimie',        shortLabel: 'Chim.',  icon: '🧪', coef: 2, mode: 'auto' },
+    svt:            { label: 'SVT',           shortLabel: 'SVT',   icon: '🧬', coef: 5, mode: 'auto' },
+    francais:       { label: 'Français',      shortLabel: 'Fran.', icon: '📖', coef: 3, mode: 'auto' },
+    anglais:        { label: 'Anglais',       shortLabel: 'Angl.', icon: '🌍', coef: 2, mode: 'manual' },
+    philosophie:    { label: 'Philosophie',   shortLabel: 'Philo', icon: '🤔', coef: 2, mode: 'manual' },
+    histoire_geo:   { label: 'Histoire-Géo',  shortLabel: 'H-G',   icon: '🗺️', coef: 2, mode: 'manual' },
+    eps:            { label: 'EPS',           shortLabel: 'EPS',   icon: '🏃', coef: 1, mode: 'manual' }
+  };
+
+  const EVALUATION_TYPES = {
+    interro:      { label: 'Interrogation', icon: '📝' },
+    devoir:       { label: 'Devoir',        icon: '📄' },
+    composition:  { label: 'Composition',   icon: '📋' },
+    exam_blanc:   { label: 'Examen blanc',  icon: '🎓' },
+    bac_blanc:    { label: 'BAC blanc',     icon: '🏆' },
+    autre:        { label: 'Autre',         icon: '📌' }
+  };
+
+  // ═══════════════════════════════════════════════════════════════
+  // UTILITAIRES
+  // ═══════════════════════════════════════════════════════════════
+  function normalizeSubjectName(raw) {
+    if (!raw) return null;
+    const s = String(raw)
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/\s+/g, '_')
+      .replace(/[^a-z_]/g, '');
+
+    const map = {
+      mathematiques: 'mathematiques', maths: 'mathematiques', math: 'mathematiques',
+      physique: 'physique', physiques: 'physique',
+      chimie: 'chimie',
+      svt: 'svt',
+      francais: 'francais',
+      anglais: 'anglais',
+      philosophie: 'philosophie', philo: 'philosophie',
+      histoire_geo: 'histoire_geo', histoiregeo: 'histoire_geo',
+      eps: 'eps'
+    };
+    return map[s] || s;
+  }
+
+  function round2(n) {
+    if (n === null || n === undefined || isNaN(n)) return null;
+    return Math.round(n * 100) / 100;
+  }
+
+  function formatTime(seconds) {
+    if (!seconds || seconds < 60) return '0 min';
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    if (h === 0) return `${m} min`;
+    if (m === 0) return `${h}h`;
+    return `${h}h${String(m).padStart(2, '0')}`;
+  }
+
+  function formatEvolution(delta) {
+    if (delta === null || delta === undefined) return '—';
+    const sign = delta > 0 ? '+' : '';
+    return `${sign}${delta.toFixed(2)}`;
+  }
+
+  function daysSince(dateValue) {
+    if (!dateValue) return null;
+    const d = dateValue instanceof Date ? dateValue : new Date(dateValue);
+    if (isNaN(d.getTime())) return null;
+    return Math.floor((Date.now() - d.getTime()) / (24 * 60 * 60 * 1000));
+  }
 
   // ═══════════════════════════════════════════════════════════════
   // FIREBASE
@@ -965,10 +1247,14 @@
     revisionSessions: [],
     grades: [],
     subjectAverages: {},
-    generalAverage: null,
     priorityBySubject: {},
     exerciseStatsBySubject: {},
-    evolutionBySubject: {}
+    evolutionBySubject: {},
+    evaluationsBySubject: {},
+    revisionTimeBySubject: {},
+    chaptersBySubject: {},
+    generalAverage: null,
+    readiness: { level: 'insufficient', label: 'Données insuffisantes' }
   };
 
   // ═══════════════════════════════════════════════════════════════
@@ -979,200 +1265,316 @@
       document.querySelectorAll('.tab-btn').forEach((b) => b.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach((c) => c.classList.remove('active'));
       btn.classList.add('active');
-      const tabId = `tab-${btn.dataset.tab}`;
-      const content = $(tabId);
+      const content = $(`tab-${btn.dataset.tab}`);
       content.classList.add('active');
-      if (tabId === 'tab-tableau') content.style.display = 'block';
-      else if (tabId === 'tab-conseils') content.style.display = 'block';
+      content.style.display = 'block';
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   });
 
   // ═══════════════════════════════════════════════════════════════
-  // CHARGEMENT DES DONNÉES
+  // CHARGEMENT
   // ═══════════════════════════════════════════════════════════════
- async function loadAllData(uid) {
-  // ⚡ Appel à /api/pilot (comme le planificateur appelle /api/planner)
-  const token = await getIdToken(state.user);
+  async function loadAllData(uid) {
+    console.log('📥 Chargement pour:', uid);
 
-  const response = await fetch('/api/pilot', {
-    method: 'GET',
-    headers: {
-      'Authorization': `Bearer ${token}`
-    }
-  });
+    const [examsSnap, revisionsSnap, gradesSnap] = await Promise.all([
+      getDocs(collection(db, 'users', uid, 'examResults')).catch(() => ({ docs: [] })),
+      getDocs(collection(db, 'users', uid, 'revisionSessions')).catch(() => ({ docs: [] })),
+      getDocs(collection(db, 'users', uid, 'grades')).catch(() => ({ docs: [] }))
+    ]);
 
-  const payload = await response.json().catch(() => null);
+    state.examResults = examsSnap.docs.map((d) => ({ id: d.id, ...d.data(), _createdAt: d.data().createdAt?.toDate?.() || null }));
+    state.revisionSessions = revisionsSnap.docs.map((d) => ({ id: d.id, ...d.data(), _createdAt: d.data().createdAt?.toDate?.() || null }));
+    state.grades = gradesSnap.docs.map((d) => ({ id: d.id, ...d.data(), _date: d.data().date?.toDate?.() || d.data().createdAt?.toDate?.() || null }));
 
-  if (!response.ok || !payload?.success) {
-    throw new Error(payload?.error || 'Impossible de charger les données.');
+    console.log(`✅ ${state.examResults.length} examens, ${state.revisionSessions.length} révisions, ${state.grades.length} notes`);
   }
 
-  // ⚡ Stocker la réponse complète
-  state.pilotData = payload;
-}
-
   // ═══════════════════════════════════════════════════════════════
-  // CALCUL GLOBAL
+  // CALCULS
   // ═══════════════════════════════════════════════════════════════
-  function computeAll() {
-  const data = state.pilotData;
-  if (!data) return;
+  function computeSubjectAverage(subject) {
+    const scores = [];
 
-  state.generalAverage = data.generalAverage;
-  state.subjectAverages = {};
-  state.priorityBySubject = {};
-  state.exerciseStatsBySubject = {};
-  state.evolutionBySubject = {};
-  state.evaluationsBySubject = {};
-  state.revisionTimeBySubject = {};
-  state.chaptersBySubject = {};
-
-  Object.entries(data.subjectStats || {}).forEach(([subject, stats]) => {
-    state.subjectAverages[subject] = stats.average;
-    state.priorityBySubject[subject] = stats.priority;
-    state.exerciseStatsBySubject[subject] = {
-      total: stats.exercisesTotal,
-      success: stats.exercisesSuccess,
-      rate: stats.successRate
-    };
-    state.evolutionBySubject[subject] = stats.evolution;
-    state.evaluationsBySubject[subject] = stats.evaluations;
-    state.revisionTimeBySubject[subject] = stats.revisionTime;
-    state.chaptersBySubject[subject] = stats.chaptersCount;
-  });
-
-  state.globalStats = data.globalStats;
-  state.readiness = data.readiness;
-  state.dataPoints = data.dataPoints;
-  state.actionPlan = data.actionPlan;
-}
-
-  function computeEvolutionLocal(items, periodDays) {
-    if (items.length < 2) return null;
-    const now = Date.now();
-    const cutoff = now - periodDays * 24 * 60 * 60 * 1000;
-    const recent = [];
-    const previous = [];
-    items.forEach((item) => {
-      if (item.score === null || !item.date) return;
-      const time = new Date(item.date).getTime();
-      if (isNaN(time)) return;
-      if (time >= cutoff) recent.push(item.score);
-      else previous.push(item.score);
+    state.examResults.forEach((r) => {
+      if (normalizeSubjectName(r.subjectKey || r.subject) === subject) {
+        const s = Number(r.score);
+        if (!isNaN(s) && s >= 0 && s <= 20) scores.push(s);
+      }
     });
-    if (!recent.length || !previous.length) return null;
+
+    state.revisionSessions.forEach((s) => {
+      if (s.type !== 'quiz_result') return;
+      if (normalizeSubjectName(s.subjectKey || s.subject) === subject) {
+        const score = Number(s.score);
+        if (!isNaN(score) && score >= 0 && score <= 20) scores.push(score);
+      }
+    });
+
+    state.grades.forEach((g) => {
+      if (normalizeSubjectName(g.subjectKey || g.subject) === subject) {
+        const score = Number(g.score);
+        const max = Number(g.maxScore) || 20;
+        if (!isNaN(score) && score >= 0 && max > 0) {
+          scores.push((score / max) * 20);
+        }
+      }
+    });
+
+    if (scores.length === 0) return null;
+    return round2(scores.reduce((a, b) => a + b, 0) / scores.length);
+  }
+
+  function computeExerciseStats(subject) {
+    let total = 0, success = 0;
+
+    state.examResults.forEach((r) => {
+      if (normalizeSubjectName(r.subjectKey || r.subject) !== subject) return;
+      const difficulties = Array.isArray(r.difficulties) ? r.difficulties : [];
+      difficulties.forEach((d) => {
+        total++;
+        const s = Number(d.score) || 0;
+        const max = Number(d.maxScore) || 5;
+        if (s / max >= 0.5) success++;
+      });
+    });
+
+    state.revisionSessions.forEach((s) => {
+      if (s.type !== 'quiz_result') return;
+      if (normalizeSubjectName(s.subjectKey || s.subject) !== subject) return;
+      total += Number(s.total) || 0;
+      success += Number(s.correct) || 0;
+    });
+
+    if (total === 0) return { total: 0, success: 0, rate: null };
+    return { total, success, rate: Math.round((success / total) * 100) };
+  }
+
+  function countEvaluations(subject) {
+    let count = 0;
+    state.examResults.forEach((r) => {
+      if (normalizeSubjectName(r.subjectKey || r.subject) === subject) count++;
+    });
+    state.revisionSessions.forEach((s) => {
+      if (s.type === 'quiz_result' && normalizeSubjectName(s.subjectKey || s.subject) === subject) count++;
+    });
+    state.grades.forEach((g) => {
+      if (normalizeSubjectName(g.subjectKey || g.subject) === subject) count++;
+    });
+    return count;
+  }
+
+  function computeRevisionTime(subject) {
+    let total = 0;
+    state.revisionSessions.forEach((s) => {
+      if (normalizeSubjectName(s.subjectKey || s.subject) !== subject) return;
+      total += Number(s.duration) || 0;
+    });
+    return total;
+  }
+
+  function countChaptersRevised(subject) {
+    const chapters = new Set();
+    state.revisionSessions.forEach((s) => {
+      if (normalizeSubjectName(s.subjectKey || s.subject) !== subject) return;
+      if (s.chapter) chapters.add(s.chapter);
+    });
+    state.examResults.forEach((r) => {
+      if (normalizeSubjectName(r.subjectKey || r.subject) !== subject) return;
+      if (r.chapter && r.chapter !== 'all') chapters.add(r.chapter);
+    });
+    return chapters.size;
+  }
+
+  function computeEvolution(subject) {
+    const items = [];
+    state.examResults.forEach((r) => {
+      if (normalizeSubjectName(r.subjectKey || r.subject) !== subject) return;
+      const score = Number(r.score);
+      if (!isNaN(score) && r._createdAt) items.push({ score, time: r._createdAt.getTime() });
+    });
+    state.revisionSessions.forEach((s) => {
+      if (s.type !== 'quiz_result') return;
+      if (normalizeSubjectName(s.subjectKey || s.subject) !== subject) return;
+      const score = Number(s.score);
+      if (!isNaN(score) && s._createdAt) items.push({ score, time: s._createdAt.getTime() });
+    });
+
+    if (items.length < 2) return null;
+
+    const now = Date.now();
+    const cutoff = now - 30 * 24 * 60 * 60 * 1000;
+    const recent = items.filter((x) => x.time >= cutoff).map((x) => x.score);
+    const previous = items.filter((x) => x.time < cutoff).map((x) => x.score);
+
+    if (recent.length === 0 || previous.length === 0) return null;
+
     const avgR = recent.reduce((a, b) => a + b, 0) / recent.length;
     const avgP = previous.reduce((a, b) => a + b, 0) / previous.length;
     return round2(avgR - avgP);
   }
 
-  function countErrorsForSubject(subject) {
-    let count = 0;
-    state.examResults.forEach((r) => {
-      if (normalizeSubjectName(r.subject) !== subject) return;
-      const difficulties = Array.isArray(r.difficulties) ? r.difficulties : [];
-      difficulties.forEach((d) => {
-        const errors = Array.isArray(d.errors) ? d.errors : [];
-        count += errors.length;
+  function computePriority(subject, average, exerciseRate, lastWorkDate) {
+    if (average === null && exerciseRate === null) {
+      return { level: 'none', score: 0, reasons: ['Aucune donnée'] };
+    }
+
+    let score = 0;
+    const reasons = [];
+
+    if (average !== null && average < 12) {
+      score += Math.min(40, (12 - average) * 5);
+      reasons.push(`Moyenne faible (${average.toFixed(2)}/20)`);
+    }
+
+    if (exerciseRate !== null && exerciseRate < 70) {
+      score += Math.min(30, (70 - exerciseRate) * 0.6);
+      reasons.push(`Taux réussite faible (${exerciseRate}%)`);
+    }
+
+    if (lastWorkDate) {
+      const days = daysSince(lastWorkDate);
+      if (days !== null && days > 10) {
+        score += Math.min(15, (days - 10) * 0.5);
+        reasons.push(`Non travaillé depuis ${days} jours`);
+      }
+    }
+
+    let level = 'low';
+    if (score >= 55) level = 'high';
+    else if (score >= 25) level = 'medium';
+
+    if (reasons.length === 0) reasons.push('Bon niveau');
+
+    return { level, score: Math.round(score), reasons };
+  }
+
+  function computeAll() {
+    const subjectKeys = Object.keys(SUBJECTS);
+
+    state.subjectAverages = {};
+    state.priorityBySubject = {};
+    state.exerciseStatsBySubject = {};
+    state.evolutionBySubject = {};
+    state.evaluationsBySubject = {};
+    state.revisionTimeBySubject = {};
+    state.chaptersBySubject = {};
+
+    subjectKeys.forEach((subject) => {
+      const avg = computeSubjectAverage(subject);
+      state.subjectAverages[subject] = avg;
+
+      const stats = computeExerciseStats(subject);
+      state.exerciseStatsBySubject[subject] = stats;
+
+      state.evaluationsBySubject[subject] = countEvaluations(subject);
+      state.revisionTimeBySubject[subject] = computeRevisionTime(subject);
+      state.chaptersBySubject[subject] = countChaptersRevised(subject);
+      state.evolutionBySubject[subject] = computeEvolution(subject);
+
+      const lastDates = [];
+      state.examResults.forEach((r) => {
+        if (normalizeSubjectName(r.subjectKey || r.subject) === subject && r._createdAt) lastDates.push(r._createdAt.getTime());
       });
+      state.revisionSessions.forEach((s) => {
+        if (normalizeSubjectName(s.subjectKey || s.subject) === subject && s._createdAt) lastDates.push(s._createdAt.getTime());
+      });
+      const lastWork = lastDates.length > 0 ? new Date(Math.max(...lastDates)) : null;
+
+      state.priorityBySubject[subject] = computePriority(subject, avg, stats.rate, lastWork);
     });
-    return count;
+
+    let totalWeighted = 0, totalCoef = 0;
+    subjectKeys.forEach((subject) => {
+      const avg = state.subjectAverages[subject];
+      if (avg === null) return;
+      const coef = COEFFICIENTS[subject] || 1;
+      totalWeighted += avg * coef;
+      totalCoef += coef;
+    });
+    state.generalAverage = totalCoef > 0 ? round2(totalWeighted / totalCoef) : null;
+
+    const dataPoints = state.examResults.length + state.revisionSessions.length + state.grades.length;
+    if (dataPoints >= 5 && state.generalAverage !== null) {
+      if (state.generalAverage >= 14) state.readiness = { level: 'solid', label: 'Préparation solide' };
+      else if (state.generalAverage >= 11) state.readiness = { level: 'progressing', label: 'En progression' };
+      else state.readiness = { level: 'reinforce', label: 'À renforcer' };
+    } else {
+      state.readiness = { level: 'insufficient', label: 'Données insuffisantes' };
+    }
   }
 
   // ═══════════════════════════════════════════════════════════════
-  // RENDU DU TABLEAU
+  // TABLEAU
   // ═══════════════════════════════════════════════════════════════
   function buildTable() {
     const grid = $('pilotGrid');
     grid.innerHTML = '';
-
     const subjectKeys = Object.keys(SUBJECTS);
 
-    // ─── LIGNE 1 : HEADER ───
-    // Coin haut-gauche
-    const cornerCell = document.createElement('div');
-    cornerCell.className = 'cell header-label';
-    cornerCell.innerHTML = `<div class="row-name" style="font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--gold-light);">Indicateur</div>`;
-    grid.appendChild(cornerCell);
+    // Coin
+    const corner = document.createElement('div');
+    corner.className = 'cell header-label';
+    corner.innerHTML = `<div class="row-name" style="font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--gold-light);">Indicateur</div>`;
+    grid.appendChild(corner);
 
-    // Cellule TOTAL
+    // Header TOTAL
     const totalHeader = document.createElement('div');
     totalHeader.className = 'cell header';
-    totalHeader.innerHTML = `
-      <div class="header-label-main">
-        <span class="header-icon">📊</span>
-        <span class="header-name">TOTAL</span>
-        <span class="header-coef">Moyenne pondérée</span>
-      </div>
-    `;
+    totalHeader.innerHTML = `<div class="header-label-main"><span class="header-icon">📊</span><span class="header-name">TOTAL</span><span class="header-coef">Moyenne pondérée</span></div>`;
     grid.appendChild(totalHeader);
 
-    // Cellules des matières
+    // Headers matières
     subjectKeys.forEach((subject) => {
       const cfg = SUBJECTS[subject];
       const cell = document.createElement('div');
       cell.className = 'cell header';
-      cell.innerHTML = `
-        <div class="header-label-main">
-          <span class="header-icon">${cfg.icon}</span>
-          <span class="header-name">${cfg.label}</span>
-          <span class="header-coef">coef <strong>${cfg.coef}</strong></span>
-        </div>
-      `;
+      cell.innerHTML = `<div class="header-label-main"><span class="header-icon">${cfg.icon}</span><span class="header-name">${cfg.label}</span><span class="header-coef">coef <strong>${cfg.coef}</strong></span></div>`;
       grid.appendChild(cell);
     });
 
-    // ─── ROWS ───
     const rows = [
-      { id: 'moyenne', icon: '📊', label: 'Moyenne', render: renderScoreCell, separator: false },
-      { id: 'evolution', icon: '📈', label: 'Évolution', render: renderEvolutionCell, separator: false },
-      { id: 'evaluations', icon: '📝', label: 'Évaluations', render: renderCountCell, separator: false },
-      { id: 'exercices', icon: '🏋️', label: 'Exercices', render: renderExerciseCountCell, separator: false },
-      { id: 'reussite', icon: '✅', label: 'Taux réussite', render: renderSuccessRateCell, separator: true },
-      { id: 'temps', icon: '⏱️', label: 'Temps révision', render: renderTimeCell, separator: false },
-      { id: 'chapitres', icon: '📚', label: 'Chapitres', render: renderCountCell2, separator: true },
-      { id: 'priorite', icon: '🚨', label: 'Priorité', render: renderPriorityCell, separator: false },
-      { id: 'focus', icon: '🎯', label: 'Focus', render: renderFocusCell, separator: false }
+      { icon: '📊', label: 'Moyenne',        render: renderScore,       separator: false },
+      { icon: '📈', label: 'Évolution',      render: renderEvolution,   separator: false },
+      { icon: '📝', label: 'Évaluations',    render: renderEvaluations, separator: false },
+      { icon: '🏋️', label: 'Exercices',     render: renderExercises,   separator: false },
+      { icon: '✅', label: 'Taux réussite',  render: renderSuccessRate, separator: true  },
+      { icon: '⏱️', label: 'Temps révision', render: renderTime,        separator: false },
+      { icon: '📚', label: 'Chapitres',      render: renderChapters,    separator: true  },
+      { icon: '🚨', label: 'Priorité',       render: renderPriority,    separator: false },
+      { icon: '🎯', label: 'Focus',          render: renderFocus,       separator: false }
     ];
 
     rows.forEach((row) => {
-      // Label
       const labelCell = document.createElement('div');
       labelCell.className = 'cell row-label' + (row.separator ? ' separator-bottom' : '');
-      labelCell.innerHTML = `
-        <span class="row-icon">${row.icon}</span>
-        <span class="row-name">${row.label}</span>
-      `;
+      labelCell.innerHTML = `<span class="row-icon">${row.icon}</span><span class="row-name">${row.label}</span>`;
       grid.appendChild(labelCell);
 
-      // Cellule TOTAL
       const totalCell = document.createElement('div');
       totalCell.className = 'cell data total-col' + (row.separator ? ' separator-bottom' : '');
-      const totalValue = row.render('total');
-      totalCell.innerHTML = totalValue;
+      totalCell.innerHTML = row.render('total');
       grid.appendChild(totalCell);
 
-      // Cellules matières
       subjectKeys.forEach((subject) => {
         const cell = document.createElement('div');
         cell.className = 'cell data' + (row.separator ? ' separator-bottom' : '');
-        const value = row.render(subject);
-        cell.innerHTML = value;
+        cell.innerHTML = row.render(subject);
         grid.appendChild(cell);
       });
     });
   }
 
   // ═══════════════════════════════════════════════════════════════
-  // RENDERERS DE CELLULES
+  // RENDERERS
   // ═══════════════════════════════════════════════════════════════
-  function renderScoreCell(subject) {
+  function renderScore(subject) {
     if (subject === 'total') {
       const v = state.generalAverage;
       if (v === null) return `<span class="val-muted">—</span>`;
       const cls = v >= 14 ? 'val-success' : v >= 10 ? 'val-gold' : 'val-danger';
-      return `<span class="${cls}">${v.toFixed(2)}</span>`;
+      return `<strong class="${cls}">${v.toFixed(2)}</strong>`;
     }
     const v = state.subjectAverages[subject];
     if (v === null || v === undefined) {
@@ -1183,145 +1585,167 @@
       return `<span class="val-muted">—</span>`;
     }
     const cls = v >= 14 ? 'val-success' : v >= 10 ? 'val-gold' : 'val-danger';
-    return `<span class="${cls}">${v.toFixed(2)}</span>`;
+    const percent = (v / 20) * 100;
+    const barClass = v >= 14 ? 'low' : v >= 10 ? 'medium' : 'high';
+    return `
+      <span class="${cls}" style="font-size:18px;">${v.toFixed(2)}</span>
+      <div class="cell-bar">
+        <div class="cell-bar-fill ${barClass}" style="width:${percent}%"></div>
+      </div>
+    `;
   }
 
-  function renderEvolutionCell(subject) {
+  function renderEvolution(subject) {
     if (subject === 'total') return `<span class="val-muted">—</span>`;
     const v = state.evolutionBySubject[subject];
     if (v === null || v === undefined) return `<span class="val-muted">—</span>`;
-    const cls = v > 0.1 ? 'val-success' : v < -0.1 ? 'val-danger' : 'val-muted';
-    return `<span class="${cls}">${formatEvolution(v)}</span>`;
+    let arrow, cls;
+    if (v > 0.1) { arrow = '↗'; cls = 'up'; }
+    else if (v < -0.1) { arrow = '↘'; cls = 'down'; }
+    else { arrow = '→'; cls = 'flat'; }
+    return `<span class="evo-arrow ${cls}">${arrow} ${formatEvolution(v)}</span>`;
   }
 
-  function renderCountCell(subject) {
+  function renderEvaluations(subject) {
     if (subject === 'total') {
-      const total = Object.values(state.evaluationsBySubject || {}).reduce((a, b) => a + b, 0);
+      const total = Object.values(state.evaluationsBySubject).reduce((a, b) => a + b, 0);
       return total > 0 ? `<span class="val-gold">${total}</span>` : `<span class="val-muted">0</span>`;
     }
-    const v = state.evaluationsBySubject?.[subject] || 0;
+    const v = state.evaluationsBySubject[subject] || 0;
     return v > 0 ? `<span class="val-gold">${v}</span>` : `<span class="val-muted">0</span>`;
   }
 
-  function renderExerciseCountCell(subject) {
+  function renderExercises(subject) {
     if (subject === 'total') {
-      const total = Object.values(state.exerciseStatsBySubject || {}).reduce((a, b) => a + (b.total || 0), 0);
+      const total = Object.values(state.exerciseStatsBySubject).reduce((a, b) => a + (b.total || 0), 0);
       return total > 0 ? `<span class="val-gold">${total}</span>` : `<span class="val-muted">0</span>`;
     }
-    const stats = state.exerciseStatsBySubject?.[subject];
-    const v = stats?.total || 0;
+    const v = state.exerciseStatsBySubject[subject]?.total || 0;
     return v > 0 ? `<span class="val-gold">${v}</span>` : `<span class="val-muted">0</span>`;
   }
 
-  function renderSuccessRateCell(subject) {
+  function renderSuccessRate(subject) {
     if (subject === 'total') {
       let total = 0, success = 0;
-      Object.values(state.exerciseStatsBySubject || {}).forEach((s) => {
+      Object.values(state.exerciseStatsBySubject).forEach((s) => {
         total += s.total || 0;
         success += s.success || 0;
       });
       if (total === 0) return `<span class="val-muted">—</span>`;
       const rate = Math.round((success / total) * 100);
       const cls = rate >= 75 ? 'val-success' : rate >= 50 ? 'val-warning' : 'val-danger';
-      return `<span class="${cls}">${rate}%</span>`;
+      return `<strong class="${cls}">${rate}%</strong>`;
     }
-    const stats = state.exerciseStatsBySubject?.[subject];
+    const stats = state.exerciseStatsBySubject[subject];
     if (!stats || stats.rate === null) return `<span class="val-muted">—</span>`;
     const rate = stats.rate;
     const cls = rate >= 75 ? 'val-success' : rate >= 50 ? 'val-warning' : 'val-danger';
-    return `<span class="${cls}">${rate}%</span>`;
+    const barClass = rate >= 75 ? 'low' : rate >= 50 ? 'medium' : 'high';
+    return `
+      <span class="${cls}" style="font-size:18px;">${rate}%</span>
+      <div class="cell-bar">
+        <div class="cell-bar-fill ${barClass}" style="width:${rate}%"></div>
+      </div>
+    `;
   }
 
-  function renderTimeCell(subject) {
+  function renderTime(subject) {
     if (subject === 'total') {
-      const total = Object.values(state.revisionTimeBySubject || {}).reduce((a, b) => a + b, 0);
+      const total = Object.values(state.revisionTimeBySubject).reduce((a, b) => a + b, 0);
       return total > 0 ? `<span class="val-gold">${formatTime(total)}</span>` : `<span class="val-muted">—</span>`;
     }
-    const v = state.revisionTimeBySubject?.[subject] || 0;
+    const v = state.revisionTimeBySubject[subject] || 0;
     return v > 0 ? `<span class="val-gold">${formatTime(v)}</span>` : `<span class="val-muted">—</span>`;
   }
 
-  function renderCountCell2(subject) {
+  function renderChapters(subject) {
     if (subject === 'total') {
-      const total = Object.values(state.chaptersBySubject || {}).reduce((a, b) => a + b, 0);
+      const total = Object.values(state.chaptersBySubject).reduce((a, b) => a + b, 0);
       return total > 0 ? `<span class="val-gold">${total}</span>` : `<span class="val-muted">0</span>`;
     }
-    const v = state.chaptersBySubject?.[subject] || 0;
+    const v = state.chaptersBySubject[subject] || 0;
     return v > 0 ? `<span class="val-gold">${v}</span>` : `<span class="val-muted">0</span>`;
   }
 
-  function renderPriorityCell(subject) {
+  function renderPriority(subject) {
     if (subject === 'total') return `<span class="val-muted">—</span>`;
-    const p = state.priorityBySubject?.[subject];
+    const p = state.priorityBySubject[subject];
     if (!p || p.level === 'none') {
       return `<span class="priority-badge none">Pas de données</span>`;
     }
-    const levels = { high: 'Élevée', medium: 'Renforcer', low: 'Solide' };
+    const labels = { high: 'Élevée', medium: 'Renforcer', low: 'Solide' };
     const emojis = { high: '🔴', medium: '🟠', low: '🟢' };
-    return `<span class="priority-badge ${p.level}">${emojis[p.level]} ${levels[p.level]}</span>`;
+    return `<span class="priority-badge ${p.level}">${emojis[p.level]} ${labels[p.level]}</span>`;
   }
 
-  function renderFocusCell(subject) {
+  function renderFocus(subject) {
     if (subject === 'total') return `<span class="val-muted">—</span>`;
-    const p = state.priorityBySubject?.[subject];
-    if (!p || !p.reasons || p.reasons.length === 0) {
-      return `<span class="val-muted">—</span>`;
-    }
-    return `<span style="font-size:11px;color:#cfd0cc;">${p.reasons[0]}</span>`;
+    const p = state.priorityBySubject[subject];
+    if (!p || !p.reasons || p.reasons.length === 0) return `<span class="val-muted">—</span>`;
+    const reason = p.reasons[0];
+    let icon = '🎯';
+    if (reason.includes('Moyenne')) icon = '📊';
+    else if (reason.includes('Taux') || reason.includes('réussite')) icon = '✅';
+    else if (reason.includes('jours')) icon = '⏱️';
+    else if (reason.includes('Bon niveau')) icon = '🏆';
+    return `
+      <div class="focus-label">${icon}</div>
+      <div class="focus-value">${reason}</div>
+    `;
   }
 
   // ═══════════════════════════════════════════════════════════════
   // HERO
   // ═══════════════════════════════════════════════════════════════
- function renderHero() {
-  const avg = state.generalAverage;
-  $('heroGeneralAvg').textContent = avg !== null ? `${avg.toFixed(2)} / 20` : '—';
+  function renderHero() {
+    const avg = state.generalAverage;
+    $('heroGeneralAvg').textContent = avg !== null ? `${avg.toFixed(2)} / 20` : '—';
 
-  // Évolution globale
-  const evolutionValues = Object.values(state.evolutionBySubject).filter((v) => v !== null);
-  if (evolutionValues.length > 0) {
-    const evoAvg = evolutionValues.reduce((a, b) => a + b, 0) / evolutionValues.length;
-    const el = $('heroEvolution');
-    el.textContent = `${evoAvg > 0 ? '+' : ''}${evoAvg.toFixed(2)} pts (30 jours)`;
-    el.className = 'sub ' + (evoAvg > 0 ? 'positive' : evoAvg < 0 ? 'negative' : '');
-  } else {
-    $('heroEvolution').textContent = 'Pas assez de données';
+    const evoValues = Object.values(state.evolutionBySubject).filter((v) => v !== null);
+    if (evoValues.length > 0) {
+      const evoAvg = evoValues.reduce((a, b) => a + b, 0) / evoValues.length;
+      const el = $('heroEvolution');
+      el.textContent = `${formatEvolution(round2(evoAvg))} pts (30j)`;
+      el.className = 'sub ' + (evoAvg > 0 ? 'positive' : evoAvg < 0 ? 'negative' : '');
+    } else {
+      $('heroEvolution').textContent = 'Pas assez de données';
+    }
+
+    const target = 12;
+    $('heroTarget').textContent = `${target} / 20`;
+    if (avg !== null) {
+      const gap = round2(target - avg);
+      const el = $('heroGap');
+      el.textContent = gap > 0 ? `Écart : +${gap.toFixed(2)} pt` : `Objectif atteint`;
+      el.className = 'sub ' + (gap > 0 ? 'negative' : 'positive');
+    }
+
+    $('heroReadiness').textContent = state.readiness.label;
+    $('heroReadiness').className = 'value ' + (
+      state.readiness.level === 'solid' ? 'success' :
+      state.readiness.level === 'progressing' ? 'warning' :
+      state.readiness.level === 'reinforce' ? 'danger' : ''
+    );
+
+    const dataPoints = state.examResults.length + state.revisionSessions.length + state.grades.length;
+    $('heroDataPoints').innerHTML = `Basé sur <strong>${dataPoints}</strong> données`;
+
+    let totalEx = 0, successEx = 0;
+    Object.values(state.exerciseStatsBySubject).forEach((s) => {
+      totalEx += s.total || 0;
+      successEx += s.success || 0;
+    });
+    if (totalEx > 0) {
+      $('heroSuccessRate').textContent = `${Math.round((successEx / totalEx) * 100)}%`;
+      $('heroExerciseCount').textContent = `${successEx} / ${totalEx} exercices`;
+    } else {
+      $('heroSuccessRate').textContent = '—';
+      $('heroExerciseCount').textContent = 'Aucun exercice';
+    }
   }
-
-  // Objectif
-  const target = 12;
-  $('heroTarget').textContent = `${target} / 20`;
-  if (avg !== null) {
-    const gap = Math.round((target - avg) * 100) / 100;
-    const el = $('heroGap');
-    el.textContent = gap > 0 ? `Écart : +${gap.toFixed(2)} pt` : `Objectif atteint`;
-    el.className = 'sub ' + (gap > 0 ? 'negative' : 'positive');
-  }
-
-  // Préparation
-  const readiness = state.readiness;
-  $('heroReadiness').textContent = readiness.label;
-  $('heroReadiness').className = 'value ' + (
-    readiness.level === 'solid' ? 'success' :
-    readiness.level === 'progressing' ? 'warning' :
-    readiness.level === 'reinforce' ? 'danger' : ''
-  );
-
-  $('heroDataPoints').innerHTML = `Basé sur <strong>${state.dataPoints}</strong> données`;
-
-  // Exercices réussis
-  const gs = state.globalStats;
-  if (gs && gs.exercisesTotal > 0) {
-    $('heroSuccessRate').textContent = `${gs.successRate}%`;
-    $('heroExerciseCount').textContent = `${gs.exercisesSuccess} / ${gs.exercisesTotal} exercices`;
-  } else {
-    $('heroSuccessRate').textContent = '—';
-    $('heroExerciseCount').textContent = 'Aucun exercice';
-  }
-}
 
   // ═══════════════════════════════════════════════════════════════
-  // ONGLET CONSEILS
+  // CONSEILS AMÉLIORÉS
   // ═══════════════════════════════════════════════════════════════
   function buildConseils() {
     const container = $('conseilsContent');
@@ -1330,43 +1754,97 @@
     const avg = state.generalAverage;
     const dataPoints = state.examResults.length + state.revisionSessions.length + state.grades.length;
 
-    // 1. Trajectoire actuelle
+    // ═══ 1. Trajectoire + cercle de préparation ═══
     const trajectory = document.createElement('div');
     trajectory.className = 'conseil-card trajectory';
+
+    const readinessLevel = state.readiness.level;
+    const avgPercent = avg !== null ? Math.min(100, (avg / 20) * 100) : 0;
+    const circumference = 2 * Math.PI * 52;
+    const offset = circumference - (avgPercent / 100) * circumference;
+
     let trajectoryText = '';
-
     if (dataPoints < 3) {
-      trajectoryText = `Tu n'as pas encore assez de données pour une analyse fiable. Fais un examen ou une révision pour commencer.`;
+      trajectoryText = `Tu n'as pas encore assez de données. Fais <strong>un examen</strong> ou <strong>une révision</strong> pour lancer l'analyse.`;
     } else if (avg === null) {
-      trajectoryText = `Tes données sont enregistrées mais pas encore assez complètes pour calculer une moyenne.`;
+      trajectoryText = `Tes données existent mais ne permettent pas encore de calculer une moyenne fiable.`;
     } else {
-      const evolutionValues = Object.values(state.evolutionBySubject).filter((v) => v !== null);
-      const evoAvg = evolutionValues.length > 0 ? evolutionValues.reduce((a, b) => a + b, 0) / evolutionValues.length : 0;
-
+      const evos = Object.values(state.evolutionBySubject).filter((v) => v !== null);
+      const evoAvg = evos.length > 0 ? evos.reduce((a, b) => a + b, 0) / evos.length : 0;
       if (evoAvg > 0.5) {
-        trajectoryText = `Tu montres une <strong>progression régulière</strong> récente (+${evoAvg.toFixed(2)} pt en moyenne sur 30 jours). Ta moyenne générale actuelle est de <strong>${avg.toFixed(2)}/20</strong>.`;
+        trajectoryText = `Tu montres une <strong>progression régulière</strong> (+${evoAvg.toFixed(2)} pt sur 30 jours). Continue sur cette lancée !`;
       } else if (evoAvg < -0.5) {
-        trajectoryText = `Ta moyenne a <strong>légèrement baissé</strong> récemment (${evoAvg.toFixed(2)} pt sur 30 jours). Ta moyenne actuelle est de <strong>${avg.toFixed(2)}/20</strong>. Il est temps de te reconcentrer.`;
+        trajectoryText = `Ta moyenne a <strong>légèrement baissé</strong> (${evoAvg.toFixed(2)} pt sur 30 jours). Il est temps de te reconcentrer.`;
       } else {
-        trajectoryText = `Ta moyenne est <strong>stable</strong> autour de <strong>${avg.toFixed(2)}/20</strong>. Continue ton travail régulier pour progresser.`;
+        trajectoryText = `Ta moyenne est <strong>stable</strong>. Un travail régulier te permettra de progresser.`;
       }
     }
 
     trajectory.innerHTML = `
       <h2><span class="icon">🎯</span> Trajectoire actuelle</h2>
-      <p>${trajectoryText}</p>
-      <p style="font-size:12px;color:var(--muted);">Basé sur ${dataPoints} données (${state.examResults.length} examens, ${state.revisionSessions.length} révisions, ${state.grades.length} notes manuelles).</p>
+      <div class="readiness-circle-wrap">
+        <div class="readiness-circle">
+          <svg viewBox="0 0 120 120">
+            <circle class="circle-bg" cx="60" cy="60" r="52"></circle>
+            <circle class="circle-progress ${readinessLevel}" cx="60" cy="60" r="52"
+              stroke-dasharray="${circumference}"
+              stroke-dashoffset="${offset}"></circle>
+          </svg>
+          <div class="readiness-circle-value">${avg !== null ? avg.toFixed(1) : '—'}</div>
+        </div>
+        <div class="readiness-info">
+          <div class="readiness-label ${readinessLevel}">${state.readiness.label}</div>
+          <div class="readiness-sub">${trajectoryText}</div>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--muted);margin-top:12px;">
+        Basé sur <strong style="color:var(--gold-light);">${dataPoints}</strong> données :
+        ${state.examResults.length} examens ·
+        ${state.revisionSessions.filter(s => s.type === 'quiz_result').length} quiz ·
+        ${state.grades.length} notes
+      </p>
     `;
     container.appendChild(trajectory);
 
-    // 2. Indicateurs favorables / À renforcer
+    // ═══ 2. Objectif avec barre ═══
+    if (avg !== null) {
+      const target = 12;
+      const gap = round2(target - avg);
+      const currentPercent = Math.min(100, (avg / 20) * 100);
+      const targetPercent = Math.min(100, (target / 20) * 100);
+
+      const card = document.createElement('div');
+      card.className = 'conseil-card';
+      card.innerHTML = `
+        <h2><span class="icon">🎓</span> Objectif ${target}/20</h2>
+        <div class="goal-bar-wrap">
+          <div class="goal-bar-labels">
+            <span class="current">${avg.toFixed(2)} / 20</span>
+            <span class="target">Objectif : <strong>${target} / 20</strong></span>
+          </div>
+          <div class="goal-bar-track">
+            <div class="goal-bar-fill" style="width:${currentPercent}%"></div>
+            <div class="goal-bar-marker" style="left:${targetPercent}%"></div>
+          </div>
+          <div class="goal-bar-stats">
+            <span>0</span>
+            <span>${gap > 0 ? `Il te manque <strong style="color:var(--gold-light);">${gap.toFixed(2)} pt</strong>` : `<strong style="color:#7ce0aa;">Objectif atteint !</strong>`}</span>
+            <span>20</span>
+          </div>
+        </div>
+        <p style="font-size:13px;color:var(--muted);margin-top:12px;">
+          ${gap > 0 
+            ? `Selon les données disponibles, ton objectif est <strong>atteignable</strong>. Concentre-toi sur les matières en priorité ci-dessous.`
+            : `Tu es <strong>au-dessus de ton objectif</strong>. Continue ton travail régulier.`}
+        </p>
+      `;
+      container.appendChild(card);
+    }
+
+    // ═══ 3. Points à renforcer ═══
     const priorities = Object.entries(state.priorityBySubject)
       .filter(([_, p]) => p.level === 'high' || p.level === 'medium')
       .sort((a, b) => b[1].score - a[1].score);
-
-    const strengths = Object.entries(state.priorityBySubject)
-      .filter(([_, p]) => p.level === 'low')
-      .sort((a, b) => a[1].score - b[1].score);
 
     if (priorities.length > 0) {
       const card = document.createElement('div');
@@ -1374,20 +1852,33 @@
       card.innerHTML = `
         <h2><span class="icon">⚠️</span> Points à renforcer</h2>
         <ul class="conseil-list">
-          ${priorities.slice(0, 4).map(([subject, p]) => {
+          ${priorities.slice(0, 5).map(([subject, p]) => {
             const cfg = SUBJECTS[subject];
-            return `<li>
-              <span class="bullet">${p.level === 'high' ? '🔴' : '🟠'}</span>
-              <div>
-                <strong>${cfg.icon} ${cfg.label}</strong> — ${p.reasons[0] || 'À travailler'}
-                ${p.reasons.length > 1 ? `<br><span style="color:var(--muted);font-size:12px;">${p.reasons.slice(1, 3).join(' · ')}</span>` : ''}
-              </div>
-            </li>`;
+            const a = state.subjectAverages[subject];
+            const barPercent = Math.min(100, (p.score / 70) * 100);
+            const barClass = p.level === 'high' ? 'high' : 'medium';
+            return `
+              <li>
+                <span class="bullet">${p.level === 'high' ? '🔴' : '🟠'}</span>
+                <div class="content">
+                  <div class="title">${cfg.icon} ${cfg.label}</div>
+                  <div class="reason">${p.reasons[0] || 'À travailler'}${a !== null ? ` · Moyenne : ${a.toFixed(2)}/20` : ''}</div>
+                  <div class="mini-bar">
+                    <div class="mini-bar-fill ${barClass}" style="width:${barPercent}%"></div>
+                  </div>
+                </div>
+              </li>
+            `;
           }).join('')}
         </ul>
       `;
       container.appendChild(card);
     }
+
+    // ═══ 4. Indicateurs favorables ═══
+    const strengths = Object.entries(state.priorityBySubject)
+      .filter(([_, p]) => p.level === 'low')
+      .sort((a, b) => a[1].score - b[1].score);
 
     if (strengths.length > 0) {
       const card = document.createElement('div');
@@ -1397,51 +1888,80 @@
         <ul class="conseil-list">
           ${strengths.slice(0, 4).map(([subject]) => {
             const cfg = SUBJECTS[subject];
-            const avgS = state.subjectAverages[subject];
-            return `<li>
-              <span class="bullet">🟢</span>
-              <div><strong>${cfg.icon} ${cfg.label}</strong> — Moyenne ${avgS !== null ? avgS.toFixed(2) : '—'}/20 · Solide</div>
-            </li>`;
+            const a = state.subjectAverages[subject];
+            const stats = state.exerciseStatsBySubject[subject];
+            return `
+              <li>
+                <span class="bullet">🟢</span>
+                <div class="content">
+                  <div class="title">${cfg.icon} ${cfg.label}</div>
+                  <div class="reason">Moyenne : ${a !== null ? a.toFixed(2) : '—'}/20${stats.rate !== null ? ` · Réussite : ${stats.rate}%` : ''}</div>
+                </div>
+              </li>
+            `;
           }).join('')}
         </ul>
       `;
       container.appendChild(card);
     }
 
-    // 3. Plan d'action
-    const actionItems = [];
-
+    // ═══ 5. Plan d'action ═══
+    const actions = [];
     priorities.slice(0, 3).forEach(([subject, p]) => {
       const cfg = SUBJECTS[subject];
-      actionItems.push({
-        title: `${cfg.icon} ${cfg.label}`,
-        desc: p.level === 'high' ? 'Priorité élevée — travaille cette matière' : 'Revoir les notions faibles'
+      const a = state.subjectAverages[subject];
+      const stats = state.exerciseStatsBySubject[subject];
+
+      let desc = '';
+      let time = '';
+
+      if (a !== null && a < 8) {
+        desc = 'Revoir les bases et faire des exercices simples';
+        time = '45 min';
+      } else if (stats.rate !== null && stats.rate < 50) {
+        desc = 'Faire 5 exercices ciblés sur les chapitres faibles';
+        time = '40 min';
+      } else {
+        desc = 'Réviser les notions clés et s\'entraîner';
+        time = '30 min';
+      }
+
+      actions.push({
+        subject: cfg.label,
+        icon: cfg.icon,
+        level: p.level,
+        desc,
+        time
       });
     });
 
     if (state.examResults.length === 0) {
-      actionItems.push({ title: '🎓 Examen blanc', desc: 'Programmer une première session' });
-    } else {
-      const lastExam = state.examResults[0];
-      const days = daysSince(lastExam._createdAt || lastExam.createdAt);
-      if (days !== null && days > 7) {
-        actionItems.push({ title: '🎓 Examen blanc', desc: `Dernier il y a ${days} jours — reprogramme une session` });
-      }
+      actions.push({
+        subject: 'Examen blanc',
+        icon: '🎓',
+        level: 'medium',
+        desc: 'Programmer une première session',
+        time: '1h'
+      });
     }
 
-    if (actionItems.length > 0) {
+    if (actions.length > 0) {
       const card = document.createElement('div');
       card.className = 'conseil-card';
       card.innerHTML = `
         <h2><span class="icon">📋</span> Que travailler maintenant ?</h2>
         <div class="action-plan">
-          ${actionItems.map((item, i) => `
+          ${actions.map((a, i) => `
             <div class="action-item">
               <div class="num">${i + 1}</div>
               <div class="content">
-                <div class="title">${item.title}</div>
-                <div class="desc">${item.desc}</div>
+                <div class="title">
+                  ${a.icon} ${a.subject}
+                  ${a.level ? `<span class="priority-tag ${a.level}">${a.level === 'high' ? 'Priorité' : 'À renforcer'}</span>` : ''}
+                </div>
+                <div class="desc">${a.desc}</div>
               </div>
+              <div class="time-badge"><i class="fas fa-clock"></i> ${a.time}</div>
             </div>
           `).join('')}
         </div>
@@ -1449,19 +1969,20 @@
       container.appendChild(card);
     }
 
-    // 4. Objectif
-    if (avg !== null) {
-      const target = 12;
-      const gap = round2(target - avg);
+    // ═══ 6. Conclusion ═══
+    if (avg !== null && dataPoints >= 5) {
       const card = document.createElement('div');
       card.className = 'conseil-card';
+      const target = 12;
+      const gap = round2(target - avg);
       card.innerHTML = `
-        <h2><span class="icon">🎓</span> Objectif</h2>
-        <p>Objectif : <strong>${target}/20</strong> · Actuel : <strong>${avg.toFixed(2)}/20</strong> · Écart : <strong>${gap > 0 ? '+' + gap.toFixed(2) : gap.toFixed(2)} pt</strong></p>
-        <p style="font-size:13px;color:var(--muted);">
-          ${gap > 0
-            ? `Selon les données disponibles, ton objectif est <strong>atteignable</strong>. Concentre-toi sur les matières en priorité élevée ci-dessus.`
-            : `Tu es <strong>au-dessus de ton objectif</strong>. Continue ton travail régulier pour maintenir ce niveau.`}
+        <h2><span class="icon">💡</span> En résumé</h2>
+        <p>
+          ${state.readiness.level === 'solid'
+            ? `<strong>Félicitations !</strong> Ton niveau actuel est solide. Continue à travailler régulièrement pour maintenir cette dynamique.`
+            : state.readiness.level === 'progressing'
+            ? `<strong>Bonne dynamique !</strong> Tu es sur la bonne voie. Reste concentré sur les matières en priorité pour atteindre ton objectif.`
+            : `<strong>Concentre-toi sur les priorités.</strong> Les matières ci-dessus ont besoin de ton attention. Commence par la première et avance étape par étape.`}
         </p>
       `;
       container.appendChild(card);
@@ -1473,73 +1994,63 @@
   // ═══════════════════════════════════════════════════════════════
   const noteModal = $('noteModal');
   const noteForm = $('noteForm');
-  const noteSubject = $('noteSubject');
-  const noteType = $('noteType');
-  let currentAddSubject = null;
 
   function fillModalSelects() {
-    noteSubject.innerHTML = '';
+    const subSel = $('noteSubject');
+    subSel.innerHTML = '';
     Object.entries(SUBJECTS).forEach(([key, cfg]) => {
       const opt = document.createElement('option');
       opt.value = key;
       opt.textContent = `${cfg.icon} ${cfg.label}`;
-      noteSubject.appendChild(opt);
+      subSel.appendChild(opt);
     });
 
-    noteType.innerHTML = '';
+    const typeSel = $('noteType');
+    typeSel.innerHTML = '';
     Object.entries(EVALUATION_TYPES).forEach(([key, cfg]) => {
       const opt = document.createElement('option');
       opt.value = key;
       opt.textContent = `${cfg.icon} ${cfg.label}`;
-      noteType.appendChild(opt);
+      typeSel.appendChild(opt);
     });
   }
 
   function openNoteModal(subject = null) {
-    currentAddSubject = subject;
     fillModalSelects();
-    if (subject) noteSubject.value = subject;
+    if (subject) $('noteSubject').value = subject;
     $('modalTitle').textContent = `Ajouter une note — ${subject ? SUBJECTS[subject].label : 'Matière'}`;
     noteForm.reset();
-    if (subject) noteSubject.value = subject;
+    if (subject) $('noteSubject').value = subject;
     noteModal.classList.add('show');
   }
 
-  function closeNoteModal() {
-    noteModal.classList.remove('show');
-    currentAddSubject = null;
-  }
+  function closeNoteModal() { noteModal.classList.remove('show'); }
 
   noteForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (!state.user) return;
 
-    const subject = noteSubject.value;
+    const subject = $('noteSubject').value;
     const score = parseFloat($('noteScore').value);
     const maxScore = parseFloat($('noteMax').value) || 20;
-    const type = noteType.value;
+    const type = $('noteType').value;
     const chapter = $('noteChapter').value.trim();
-    const comment = $('noteComment').value.trim();
 
-    if (isNaN(score) || score < 0 || score > maxScore) {
-      alert('Note invalide');
-      return;
-    }
+    if (isNaN(score) || score < 0 || score > maxScore) { alert('Note invalide'); return; }
 
     try {
       await addDoc(collection(db, 'users', state.user.uid, 'grades'), {
         subject,
+        subjectKey: subject,
         score,
         maxScore,
         type,
         chapter: chapter || null,
-        comment: comment || null,
         date: serverTimestamp(),
         createdAt: serverTimestamp()
       });
 
       closeNoteModal();
-      // Recharger les données
       await loadAllData(state.user.uid);
       computeAll();
       buildTable();
@@ -1553,16 +2064,11 @@
 
   $('modalClose').addEventListener('click', closeNoteModal);
   $('modalCancel').addEventListener('click', closeNoteModal);
-  noteModal.addEventListener('click', (e) => {
-    if (e.target === noteModal) closeNoteModal();
-  });
+  noteModal.addEventListener('click', (e) => { if (e.target === noteModal) closeNoteModal(); });
 
-  // Délégation pour les boutons "Ajouter" dans le tableau
   document.addEventListener('click', (e) => {
     const addBtn = e.target.closest('.add-btn');
-    if (addBtn) {
-      openNoteModal(addBtn.dataset.subject);
-    }
+    if (addBtn) openNoteModal(addBtn.dataset.subject);
   });
 
   // ═══════════════════════════════════════════════════════════════
@@ -1577,7 +2083,7 @@
     }
 
     state.user = user;
-    conn.textContent = 'Connecté';
+    conn.textContent = 'Connecté · ' + (user.email || '');
     conn.classList.add('online');
 
     try {
@@ -1586,7 +2092,9 @@
 
       $('loadingState').style.display = 'none';
 
-      if (state.examResults.length === 0 && state.revisionSessions.length === 0 && state.grades.length === 0) {
+      const hasData = state.examResults.length > 0 || state.revisionSessions.length > 0 || state.grades.length > 0;
+
+      if (!hasData) {
         $('emptyState').style.display = 'block';
       } else {
         $('tab-tableau').style.display = 'block';
@@ -1594,13 +2102,17 @@
         renderHero();
         buildConseils();
       }
+
+      console.log('🎓 ARV-PILOT initialisé');
+      console.log('   Examens:', state.examResults.length);
+      console.log('   Révisions:', state.revisionSessions.length);
+      console.log('   Notes:', state.grades.length);
+      console.log('   Moyenne générale:', state.generalAverage);
     } catch (error) {
-      console.error('Erreur chargement:', error);
+      console.error('Erreur:', error);
       $('loadingState').innerHTML = '<p style="color:#ff9a84;">Erreur de chargement. Réessaie.</p>';
     }
   });
-
-  console.log('🎓 ARVEXA — ARV-PILOT initialisé');
   </script>
 </body>
 </html>

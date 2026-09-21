@@ -1,11 +1,10 @@
 // ================================================================
 // API PILOT — ARVEXA School
-// Agrège toutes les données de l'élève pour ARV-PILOT
-// Lit : examResults, revisionSessions, grades
-// Renvoie : statistiques complètes par matière
+// Analyse les données de l'élève et génère un rapport structuré
+// Lecture : examResults, revisionSessions, grades
 // ================================================================
 
-const MAX_REQUESTS_PER_WINDOW = 15;
+const MAX_REQUESTS_PER_WINDOW = 20;
 const requestLog = new Map();
 
 let adminServices;
@@ -16,7 +15,9 @@ function getAdminServices() {
   if (!credentials) throw new Error('firebase_admin_not_configured');
   const admin = require('firebase-admin');
   const serviceAccount = JSON.parse(credentials);
-  if (!admin.apps.length) admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
+  if (!admin.apps.length) {
+    admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
+  }
   adminServices = { auth: admin.auth(), db: admin.firestore() };
   return adminServices;
 }
@@ -49,7 +50,7 @@ async function verifyFirebaseToken(request) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// COEFFICIENTS
+// CONFIGURATION
 // ═══════════════════════════════════════════════════════════════
 const COEFFICIENTS = {
   mathematiques: 5,
@@ -63,9 +64,6 @@ const COEFFICIENTS = {
   eps: 1
 };
 
-// ═══════════════════════════════════════════════════════════════
-// NORMALISATION MATIÈRE
-// ═══════════════════════════════════════════════════════════════
 function normalizeSubjectName(raw) {
   if (!raw) return null;
   const s = String(raw)
@@ -88,6 +86,18 @@ function normalizeSubjectName(raw) {
   return map[s] || s;
 }
 
+function round2(n) {
+  if (n === null || n === undefined || isNaN(n)) return null;
+  return Math.round(n * 100) / 100;
+}
+
+function daysSince(dateValue) {
+  if (!dateValue) return null;
+  const d = dateValue instanceof Date ? dateValue : new Date(dateValue);
+  if (isNaN(d.getTime())) return null;
+  return Math.floor((Date.now() - d.getTime()) / (24 * 60 * 60 * 1000));
+}
+
 // ═══════════════════════════════════════════════════════════════
 // AGRÉGATION
 // ═══════════════════════════════════════════════════════════════
@@ -104,9 +114,8 @@ function buildPilotData(examResults, revisionSessions, grades) {
     const chapters = new Set();
     const dates = [];
 
-    // ── Examens ─────────────────────────────
     examResults.forEach((r) => {
-      if (normalizeSubjectName(r.subject) !== subject) return;
+      if (normalizeSubjectName(r.subjectKey || r.subject) !== subject) return;
 
       const score = Number(r.score);
       if (!isNaN(score) && score >= 0 && score <= 20) {
@@ -128,10 +137,9 @@ function buildPilotData(examResults, revisionSessions, grades) {
       if (date) dates.push(new Date(date).getTime());
     });
 
-    // ── Quiz (reviseur) ─────────────────────
     revisionSessions.forEach((s) => {
       if (s.type !== 'quiz_result') return;
-      if (normalizeSubjectName(s.subject) !== subject) return;
+      if (normalizeSubjectName(s.subjectKey || s.subject) !== subject) return;
 
       const score = Number(s.score);
       if (!isNaN(score) && score >= 0 && score <= 20) {
@@ -148,15 +156,13 @@ function buildPilotData(examResults, revisionSessions, grades) {
       if (date) dates.push(new Date(date).getTime());
     });
 
-    // ── Temps de révision ────────────────────
     revisionSessions.forEach((s) => {
-      if (normalizeSubjectName(s.subject) !== subject) return;
+      if (normalizeSubjectName(s.subjectKey || s.subject) !== subject) return;
       revisionTime += Number(s.duration) || 0;
     });
 
-    // ── Notes manuelles ─────────────────────
     grades.forEach((g) => {
-      if (normalizeSubjectName(g.subject) !== subject) return;
+      if (normalizeSubjectName(g.subjectKey || g.subject) !== subject) return;
 
       const score = Number(g.score);
       const max = Number(g.maxScore) || 20;
@@ -171,50 +177,44 @@ function buildPilotData(examResults, revisionSessions, grades) {
       if (date) dates.push(new Date(date).getTime());
     });
 
-    // ── Moyennes ────────────────────────────
     const average = scores.length > 0
-      ? Math.round((scores.reduce((a, b) => a + b, 0) / scores.length) * 100) / 100
+      ? round2(scores.reduce((a, b) => a + b, 0) / scores.length)
       : null;
 
     const successRate = exercisesTotal > 0
       ? Math.round((exercisesSuccess / exercisesTotal) * 100)
       : null;
 
-    // ── Évolution 30 jours ──────────────────
+    // Évolution 30 jours
     const now = Date.now();
     const cutoff = now - 30 * 24 * 60 * 60 * 1000;
-    const recent = [];
-    const previous = [];
 
-    // ⚠️ On regroupe les scores avec leur date
     const datedScores = [];
     examResults.forEach((r) => {
-      if (normalizeSubjectName(r.subject) !== subject) return;
+      if (normalizeSubjectName(r.subjectKey || r.subject) !== subject) return;
       const score = Number(r.score);
       const date = r.createdAt?.toDate?.() || r.createdAt;
       if (!isNaN(score) && date) datedScores.push({ score, time: new Date(date).getTime() });
     });
     revisionSessions.forEach((s) => {
       if (s.type !== 'quiz_result') return;
-      if (normalizeSubjectName(s.subject) !== subject) return;
+      if (normalizeSubjectName(s.subjectKey || s.subject) !== subject) return;
       const score = Number(s.score);
       const date = s.createdAt?.toDate?.() || s.createdAt;
       if (!isNaN(score) && date) datedScores.push({ score, time: new Date(date).getTime() });
     });
 
-    datedScores.forEach((x) => {
-      if (x.time >= cutoff) recent.push(x.score);
-      else previous.push(x.score);
-    });
+    const recent = datedScores.filter((x) => x.time >= cutoff).map((x) => x.score);
+    const previous = datedScores.filter((x) => x.time < cutoff).map((x) => x.score);
 
     let evolution = null;
     if (recent.length > 0 && previous.length > 0) {
       const avgR = recent.reduce((a, b) => a + b, 0) / recent.length;
       const avgP = previous.reduce((a, b) => a + b, 0) / previous.length;
-      evolution = Math.round((avgR - avgP) * 100) / 100;
+      evolution = round2(avgR - avgP);
     }
 
-    // ── Priorité ────────────────────────────
+    // Priorité
     let priorityScore = 0;
     const reasons = [];
 
@@ -222,19 +222,18 @@ function buildPilotData(examResults, revisionSessions, grades) {
       priorityScore += Math.min(40, (12 - average) * 5);
       reasons.push(`Moyenne faible (${average.toFixed(2)}/20)`);
     }
+
     if (successRate !== null && successRate < 70) {
       priorityScore += Math.min(30, (70 - successRate) * 0.6);
       reasons.push(`Taux de réussite faible (${successRate}%)`);
     }
-    if (evaluations === 0) {
-      reasons.push('Aucune évaluation');
-    }
+
     const lastDate = dates.length > 0 ? Math.max(...dates) : null;
     if (lastDate) {
-      const daysSince = Math.floor((now - lastDate) / (24 * 60 * 60 * 1000));
-      if (daysSince > 10) {
-        priorityScore += Math.min(15, (daysSince - 10) * 0.5);
-        reasons.push(`Non travaillé depuis ${daysSince} jours`);
+      const days = Math.floor((now - lastDate) / (24 * 60 * 60 * 1000));
+      if (days > 10) {
+        priorityScore += Math.min(15, (days - 10) * 0.5);
+        reasons.push(`Non travaillé depuis ${days} jours`);
       }
     }
 
@@ -243,6 +242,8 @@ function buildPilotData(examResults, revisionSessions, grades) {
     else if (priorityScore >= 55) priorityLevel = 'high';
     else if (priorityScore >= 25) priorityLevel = 'medium';
     else priorityLevel = 'low';
+
+    if (reasons.length === 0) reasons.push('Niveau satisfaisant');
 
     subjectStats[subject] = {
       subject,
@@ -259,7 +260,7 @@ function buildPilotData(examResults, revisionSessions, grades) {
     };
   });
 
-  // ── Moyenne générale pondérée ─────────────
+  // Moyenne générale pondérée
   let totalWeighted = 0;
   let totalCoef = 0;
   Object.entries(subjectStats).forEach(([subject, stats]) => {
@@ -268,11 +269,9 @@ function buildPilotData(examResults, revisionSessions, grades) {
     totalWeighted += stats.average * coef;
     totalCoef += coef;
   });
-  const generalAverage = totalCoef > 0
-    ? Math.round((totalWeighted / totalCoef) * 100) / 100
-    : null;
+  const generalAverage = totalCoef > 0 ? round2(totalWeighted / totalCoef) : null;
 
-  // ── Stats globales ────────────────────────
+  // Stats globales
   let globalExercises = 0;
   let globalSuccess = 0;
   let globalTime = 0;
@@ -286,32 +285,15 @@ function buildPilotData(examResults, revisionSessions, grades) {
     ? Math.round((globalSuccess / globalExercises) * 100)
     : null;
 
-  // ── Data points ───────────────────────────
   const dataPoints = examResults.length + revisionSessions.length + grades.length;
 
-  // ── Préparation ───────────────────────────
+  // Niveau de préparation
   let readiness = { level: 'insufficient', label: 'Données insuffisantes' };
   if (dataPoints >= 5 && generalAverage !== null) {
     if (generalAverage >= 14) readiness = { level: 'solid', label: 'Préparation solide' };
     else if (generalAverage >= 11) readiness = { level: 'progressing', label: 'En progression' };
     else readiness = { level: 'reinforce', label: 'À renforcer' };
   }
-
-  // ── Plan d'action ─────────────────────────
-  const priorities = Object.values(subjectStats)
-    .filter((s) => s.priority.level === 'high' || s.priority.level === 'medium')
-    .sort((a, b) => b.priority.score - a.priority.score);
-
-  const actionPlan = priorities.slice(0, 3).map((s) => ({
-    subject: s.subject,
-    level: s.priority.level,
-    reason: s.priority.reasons[0] || 'À travailler',
-    action: s.average !== null && s.average < 10
-      ? 'Revoir les bases'
-      : s.successRate !== null && s.successRate < 60
-        ? 'Faire 5 exercices ciblés'
-        : 'Réviser les notions clés'
-  }));
 
   return {
     generalAverage,
@@ -325,7 +307,6 @@ function buildPilotData(examResults, revisionSessions, grades) {
     },
     dataPoints,
     readiness,
-    actionPlan,
     meta: {
       examCount: examResults.length,
       quizCount: revisionSessions.filter((s) => s.type === 'quiz_result').length,
@@ -362,7 +343,6 @@ module.exports = async function handler(request, response) {
     const { db } = getAdminServices();
     const uid = user.uid;
 
-    // ─── Récupérer les 3 collections en parallèle ───
     const [examSnap, revisionSnap, gradesSnap] = await Promise.all([
       db.collection('users').doc(uid).collection('examResults')
         .orderBy('createdAt', 'desc').limit(100).get().catch(() => ({ docs: [] })),
@@ -376,7 +356,6 @@ module.exports = async function handler(request, response) {
     const revisionSessions = revisionSnap.docs.map((d) => d.data());
     const grades = gradesSnap.docs.map((d) => d.data());
 
-    // ─── Agréger ───
     const pilotData = buildPilotData(examResults, revisionSessions, grades);
 
     return response.status(200).json({

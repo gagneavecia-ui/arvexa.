@@ -200,16 +200,53 @@ Schéma exact :
   "sections": [
     {
       "title": "Titre de la section",
-      "content": "Contenu avec **mots-clés** en gras et formules en LaTeX entre $...$. Utilise \\n pour les sauts de ligne."
+      "content": "Contenu avec **mots-clés** en gras et formules LaTeX."
     }
   ]
 }
 
-Règles :
+═══ RÈGLES LATEX — TRÈS IMPORTANTES ═══
+
+1. TOUTE formule mathématique doit être entourée de délimiteurs :
+   - Formule INLINE (dans une phrase) : $...$
+     Exemple : "La fonction $f(x) = x^2$ est croissante."
+   - Formule DISPLAY (isolée, centrée) : $$...$$
+     Exemple : "$$\\lim_{x \\to 0} \\frac{\\sin x}{x} = 1$$"
+
+2. Utilise UNIQUEMENT la syntaxe LaTeX valide. Jamais de symboles Unicode :
+   ❌ "π" → ✅ "$\\pi$"
+   ❌ "√2" → ✅ "$\\sqrt{2}$"
+   ❌ "x²" → ✅ "$x^{2}$"
+   ❌ "lim x→0" → ✅ "$\\lim_{x \\to 0}$"
+   ❌ "1/2" → ✅ "$\\frac{1}{2}$"
+   ❌ "×" → ✅ "$\\times$"
+   ❌ "≤" → ✅ "$\\leq$"
+   ❌ "∞" → ✅ "$\\infty$"
+   ❌ "∫" → ✅ "$\\int$"
+   ❌ "∑" → ✅ "$\\sum$"
+
+3. Commandes LaTeX autorisées :
+   - Fractions : \\frac{a}{b}
+   - Racines : \\sqrt{x}, \\sqrt[n]{x}
+   - Exposants : x^{n}, e^{x}
+   - Indices : x_{n}, u_{n+1}
+   - Fonctions : \\sin, \\cos, \\tan, \\ln, \\log, \\exp
+   - Limites : \\lim_{x \\to a}
+   - Sommes : \\sum_{i=1}^{n}
+   - Intégrales : \\int_{a}^{b}
+   - Grecques : \\alpha, \\beta, \\gamma, \\theta, \\pi, \\lambda, \\mu, \\sigma
+   - Relation : \\leq, \\geq, \\neq, \\approx, \\equiv
+   - Ensemble : \\in, \\notin, \\subset, \\cup, \\cap
+   - Flèches : \\to, \\Rightarrow, \\Leftrightarrow
+
+4. Ne mets JAMAIS de formule dans un bloc de code markdown (\`\`\`).
+5. Ne mets JAMAIS de formule entre simples quotes ou guillemets.
+6. Chaque formule doit être TESTÉE mentalement — vérifie les accolades.
+
+═══ CONTENU ═══
 - Exactement 5 à 7 sections
 - Chaque section traite un point clé (définitions, propriétés, formules, méthodes)
 - Utilise **gras** pour les termes importants
-- Formules LaTeX entre $...$ ou $$...$$
 - Contenu concis mais complet
 - Pas de données personnelles
 - Pas de commentaires hors JSON`;
@@ -229,16 +266,22 @@ Schéma exact :
   "flashcards": [
     {
       "question": "Question courte et claire",
-      "answer": "Réponse concise avec formules LaTeX entre $...$ si nécessaire"
+      "answer": "Réponse concise avec formules LaTeX."
     }
   ]
 }
 
-Règles :
+═══ RÈGLES LATEX ═══
+- Formule inline : $...$ → "La dérivée de $x^2$ est $2x$."
+- Formule display : $$...$$ → "$$\\frac{d}{dx}(x^2) = 2x$$"
+- JAMAIS de symboles Unicode (π, √, ×, ≤, ∞, etc.)
+- Toujours utiliser \\frac, \\sqrt, ^{}, _{}, \\pi, \\times, \\leq, \\infty
+- Fonctions : \\sin, \\cos, \\tan, \\ln, \\log, \\lim, \\int, \\sum
+
+═══ CONTENU ═══
 - Exactement 10 flashcards
 - Questions directes (définitions, formules, propriétés)
 - Réponses concises (1-3 lignes max)
-- Formules LaTeX entre $...$
 - Pas de données personnelles
 - Pas de commentaires hors JSON`;
 }
@@ -257,25 +300,38 @@ Schéma exact :
 {
   "quiz": [
     {
-      "question": "Énoncé de la question",
+      "question": "Énoncé avec formules LaTeX si nécessaire",
       "options": [
-        { "id": "A", "text": "Proposition A" },
-        { "id": "B", "text": "Proposition B" },
-        { "id": "C", "text": "Proposition C" },
-        { "id": "D", "text": "Proposition D" }
+        { "id": "A", "text": "Proposition avec LaTeX si nécessaire" },
+        { "id": "B", "text": "Proposition avec LaTeX si nécessaire" },
+        { "id": "C", "text": "Proposition avec LaTeX si nécessaire" },
+        { "id": "D", "text": "Proposition avec LaTeX si nécessaire" }
       ],
       "correctAnswer": "A",
-      "explanation": "Explication de la bonne réponse"
+      "explanation": "Explication avec LaTeX si nécessaire"
     }
   ]
 }
 
-Règles :
+═══ RÈGLES LATEX ═══
+- Chaque formule mathématique doit être entre $...$ (inline) ou $$...$$ (display)
+- JAMAIS de symboles Unicode bruts
+- Exemples :
+  ✅ "Quelle est la dérivée de $f(x) = x^3$ ?"
+  ✅ Options : "$3x^2$", "$x^2$", "$3x$", "$x^4$"
+  ✅ Explication : "En utilisant $\\frac{d}{dx}(x^n) = nx^{n-1}$..."
+  ❌ "Quelle est la dérivée de f(x) = x³ ?"
+  ❌ Options : "3x²", "x²", "3x"
+
+- Nombres et variables : toujours en LaTeX ($x$, $3$, $\\pi$)
+- Unités : utiliser \\, pour l'espace → "$9,81\\,m/s^2$"
+
+═══ CONTENU ═══
 - Exactement 5 questions
 - 4 options par question (A, B, C, D)
 - Une seule bonne réponse
 - Niveau Terminale D
-- Explications claires avec formules LaTeX entre $...$
+- Explications claires
 - Pas de données personnelles
 - Pas de commentaires hors JSON`;
 }

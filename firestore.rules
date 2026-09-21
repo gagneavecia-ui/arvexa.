@@ -2,6 +2,10 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    // ═══════════════════════════════════════════════════════════════
+    // FONCTIONS UTILITAIRES
+    // ═══════════════════════════════════════════════════════════════
     function signedIn() {
       return request.auth != null;
     }
@@ -14,7 +18,12 @@ service cloud.firestore {
       return signedIn() && request.auth.token.admin == true;
     }
 
+    // ═══════════════════════════════════════════════════════════════
+    // USERS
+    // ═══════════════════════════════════════════════════════════════
     match /users/{userId} {
+
+      // ─── Création du compte ────────────────────────────────
       allow create: if isOwner(userId)
         && request.resource.data.uid == userId
         && request.resource.data.role == 'student'
@@ -22,28 +31,39 @@ service cloud.firestore {
         && request.resource.data.isUnlocked == false
         && request.resource.data.hasDeposited == false;
 
+      // ─── Lecture du profil ─────────────────────────────────
       allow read: if isOwner(userId) || isAdmin();
 
-      // Subscription state, role, account status and timestamps are server-owned.
+      // ─── Mise à jour du profil ─────────────────────────────
+      // Les champs sensibles (premium, role, accountStatus, etc.)
+      // ne peuvent être modifiés que par un admin.
       allow update: if isAdmin() || (
         isOwner(userId)
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          // Identité
           'firstName', 'lastName', 'fullName', 'email', 'phone', 'establishment',
           'classId', 'onboardingCompleted', 'onboardingCompletedAt',
+          // Étude
           'totalStudyTime', 'lastStudyUpdate', 'profilePicture', 'updatedAt',
+          // Notifications
           'fcmToken', 'fcmTokenUpdatedAt',
+          // Abonnement (seul l'utilisateur peut DEMANDER un abonnement)
           'subscriptionStatus', 'subscriptionPlan', 'subscriptionPrice',
           'subscriptionOriginalPrice', 'subscriptionPromoCode',
           'subscriptionRequestId', 'subscriptionRequestDate',
           'subscriptionFullName', 'subscriptionWhatsapp',
           'subscriptionPaymentMethod'
         ])
+        // totalStudyTime ne peut qu'augmenter
         && (!request.resource.data.keys().hasAny(['totalStudyTime'])
           || request.resource.data.totalStudyTime >= resource.data.totalStudyTime)
+        // profilePicture ≤ 500 KB
         && (!request.resource.data.keys().hasAny(['profilePicture'])
           || request.resource.data.profilePicture.size() <= 500000)
+        // subscriptionStatus ne peut devenir que 'pending'
         && (!request.resource.data.keys().hasAny(['subscriptionStatus'])
           || request.resource.data.subscriptionStatus == 'pending')
+        // Le prix doit correspondre au plan (mensuel=2000, annuel=18000 ou 13500 avec promo)
         && (!request.resource.data.keys().hasAny(['subscriptionPlan', 'subscriptionPrice'])
           || (request.resource.data.subscriptionPlan == 'monthly'
             && request.resource.data.subscriptionPrice == 2000)
@@ -52,8 +72,14 @@ service cloud.firestore {
               || request.resource.data.subscriptionPrice == 13500)))
       );
 
+      // ─── Suppression du compte (admin uniquement) ──────────
       allow delete: if isAdmin();
 
+      // ════════════════════════════════════════════════════════
+      // SOUS-COLLECTIONS DE L'UTILISATEUR
+      // ════════════════════════════════════════════════════════
+
+      // ─── Favoris (Formulaires) ─────────────────────────────
       match /favorites/{favoriteId} {
         allow read, write: if isOwner(userId)
           && favoriteId == 'formulas'
@@ -61,6 +87,7 @@ service cloud.firestore {
             || request.resource.data.ids.size() <= 500);
       }
 
+      // ─── Notifications ─────────────────────────────────────
       match /notifications/{notificationId} {
         allow read: if isOwner(userId) || isAdmin();
         allow update: if isOwner(userId)
@@ -68,75 +95,92 @@ service cloud.firestore {
         allow create, delete: if isAdmin();
       }
 
+      // ─── Cache des examens générés (Admin SDK) ─────────────
       match /examCache/{examId} {
         allow read: if isOwner(userId) || isAdmin();
         allow write: if isAdmin();
       }
 
+      // ─── Résultats des examens (Admin SDK) ─────────────────
       match /examResults/{resultId} {
         allow read: if isOwner(userId) || isAdmin();
         allow write: if isAdmin();
       }
+
+      // ─── ⚡ Quota journalier de l'Examen ────────────────────
+      // users/{uid}/examUsage/{YYYY-MM-DD}
+      match /examUsage/{date} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow write: if isAdmin();
+      }
+
+      // ─── ⚡ Session d'examen active ─────────────────────────
+      // users/{uid}/activeExam/current
+      match /activeExam/{docId} {
+        allow read: if isOwner(userId);
+        allow write: if isOwner(userId);
+      }
+
+      // ─── ⚡ Quota journalier du Réviseur ────────────────────
+      // users/{uid}/reviseurUsage/{YYYY-MM-DD}
+      match /reviseurUsage/{date} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow write: if isAdmin();
+      }
+
+      // ─── ⚡ Session de révision active ──────────────────────
+      // users/{uid}/activeRevision/current
+      match /activeRevision/{docId} {
+        allow read: if isOwner(userId);
+        allow write: if isOwner(userId);
+      }
+
+      // ─── ⚡ Historique des révisions ────────────────────────
+      // users/{uid}/revisionSessions/{sessionId}
+      match /revisionSessions/{sessionId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow create: if isOwner(userId);
+        allow update, delete: if false; // Immutable
+      }
     }
 
-match /users/{userId} {
-  // ... règles existantes ...
-
-  // ⚡ Session d'examen active (lecture/écriture par l'utilisateur)
-  match /activeExam/{docId} {
-    allow read: if request.auth != null && request.auth.uid == userId;
-    allow write: if request.auth != null && request.auth.uid == userId;
-  }
-
-  // Cache des examens (écriture serveur uniquement)
-  match /examCache/{docId} {
-    allow read: if false;
-    allow write: if false;
-  }
-
-  // Résultats (lecture par l'utilisateur, écriture serveur)
-  match /examResults/{docId} {
-    allow read: if request.auth != null && request.auth.uid == userId;
-    allow write: if false;
-  }
-}
-
+    // ═══════════════════════════════════════════════════════════════
+    // SUBJECTS (matières + chapitres)
+    // ═══════════════════════════════════════════════════════════════
     match /subjects/{subjectId} {
       allow read: if signedIn();
       allow write: if isAdmin();
+
       match /chapters/{chapterId} {
         allow read: if signedIn();
         allow write: if isAdmin();
       }
     }
 
-    match /groups/{groupId}/messages/{messageId} {
-      allow read: if signedIn();
-      allow create: if signedIn()
-        && request.resource.data.userId == request.auth.uid
-        && request.resource.data.content.size() <= 2000
-        && (!request.resource.data.keys().hasAny(['imageBase64'])
-          || request.resource.data.imageBase64.size() <= 500000);
-      allow update, delete: if isAdmin()
-        || (signedIn() && resource.data.userId == request.auth.uid);
+    // ═══════════════════════════════════════════════════════════════
+    // GROUPES (chat communautaire)
+    // ═══════════════════════════════════════════════════════════════
+    match /groups/{groupId} {
+      match /messages/{messageId} {
+        allow read: if signedIn();
+        allow create: if signedIn()
+          && request.resource.data.userId == request.auth.uid
+          && request.resource.data.content.size() <= 2000
+          && (!request.resource.data.keys().hasAny(['imageBase64'])
+            || request.resource.data.imageBase64.size() <= 500000);
+        allow update, delete: if isAdmin()
+          || (signedIn() && resource.data.userId == request.auth.uid);
+      }
+
+      match /banned/{bannedUserId} {
+        allow read: if signedIn();
+        allow write: if isAdmin();
+      }
     }
 
-    match /groups/{groupId}/banned/{userId} {
-      allow read: if signedIn();
-      allow write: if isAdmin();
-    }
-
-match /users/{userId} {
-  // ... règles existantes ...
-
-  // Sessions de révision (Réviseur)
-  match /revisionSessions/{sessionId} {
-    allow read: if request.auth != null && request.auth.uid == userId;
-    allow create: if request.auth != null && request.auth.uid == userId;
-    allow update, delete: if false; // Immutable
-  }
-}
-
+    // ═══════════════════════════════════════════════════════════════
+    // AVIS (feedback utilisateurs)
+    // ═══════════════════════════════════════════════════════════════
     match /avis/{avisId} {
       allow create: if signedIn()
         && request.resource.data.userId == request.auth.uid
@@ -149,6 +193,9 @@ match /users/{userId} {
       allow read, update, delete: if isAdmin();
     }
 
+    // ═══════════════════════════════════════════════════════════════
+    // FALLBACK — tout le reste est interdit
+    // ═══════════════════════════════════════════════════════════════
     match /{document=**} {
       allow read, write: if false;
     }

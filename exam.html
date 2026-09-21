@@ -57,307 +57,58 @@
     .status.error { color:#ff9a84; }
     .status.success { color:#7ce0aa; }
 
-    /* ⚡ LOADER — Caché par défaut */
-    .loader {
-      display: none;
-      width: 18px;
-      height: 18px;
-      border: 2px solid rgba(10, 10, 10, .25);
-      border-top-color: currentColor;
-      border-radius: 50%;
-      animation: spin .7s linear infinite;
-      vertical-align: middle;
-    }
-    .btn.loading .loader { display: inline-block; }
-    .btn.loading .btn-text { display: none; }
-
+    /* LOADER */
+    .loader { display:none; width:18px; height:18px; border:2px solid rgba(10,10,10,.25); border-top-color:currentColor; border-radius:50%; animation:spin .7s linear infinite; vertical-align:middle; }
+    .btn.loading .loader { display:inline-block; }
+    .btn.loading .btn-text { display:none; }
     @keyframes spin { to { transform:rotate(360deg); } }
 
-    /* ═══════════════════════════════════════════════════════════
-       CUSTOM SELECT — Menus déroulants personnalisés
-       ═══════════════════════════════════════════════════════════ */
-    .custom-select {
-      position: relative;
-      width: 100%;
-      user-select: none;
-    }
+    /* CUSTOM SELECT */
+    .custom-select { position:relative; width:100%; user-select:none; }
+    .custom-select-trigger { display:flex; align-items:center; justify-content:space-between; gap:10px; width:100%; min-height:46px; padding:12px 14px; background:#0e100e; border:1px solid var(--line); border-radius:10px; color:var(--white); font-size:14px; font-weight:500; cursor:pointer; transition:all .16s ease; text-align:left; font-family:inherit; }
+    .custom-select-trigger:hover:not(.disabled) { border-color:rgba(224,184,74,.3); background:#121612; }
+    .custom-select.open .custom-select-trigger { border-color:var(--gold-light); box-shadow:0 0 0 3px rgba(224,184,74,.12); background:#121612; }
+    .custom-select-value { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:flex; align-items:center; gap:8px; }
+    .custom-select-arrow { color:var(--muted); font-size:12px; flex-shrink:0; transition:transform .25s cubic-bezier(.25,1,.5,1); }
+    .custom-select.open .custom-select-arrow { transform:rotate(180deg); color:var(--gold-light); }
+    .custom-select-options { position:absolute; top:calc(100% + 6px); left:0; right:0; z-index:50; max-height:280px; overflow-y:auto; background:linear-gradient(145deg,#171a17,#101310); border:1px solid var(--line); border-radius:12px; box-shadow:0 20px 40px rgba(0,0,0,.5), 0 0 0 1px rgba(224,184,74,.05); padding:6px; opacity:0; visibility:hidden; transform:translateY(-8px) scale(.98); transition:opacity .2s ease,visibility .2s ease,transform .2s cubic-bezier(.25,1,.5,1); transform-origin:top center; }
+    .custom-select.open .custom-select-options { opacity:1; visibility:visible; transform:translateY(0) scale(1); }
+    .custom-select-options::-webkit-scrollbar { width:4px; }
+    .custom-select-options::-webkit-scrollbar-thumb { background:rgba(224,184,74,.2); border-radius:10px; }
+    .custom-select-option { display:flex; align-items:center; gap:10px; padding:11px 14px; border-radius:8px; color:#e2e3dc; font-size:14px; font-weight:500; cursor:pointer; transition:all .15s ease; position:relative; }
+    .custom-select-option:hover, .custom-select-option.focused { background:rgba(224,184,74,.08); color:var(--white); }
+    .custom-select-option.selected { background:rgba(224,184,74,.12); color:var(--gold-light); font-weight:700; }
+    .custom-select-option.selected::after { content:'✓'; margin-left:auto; color:var(--gold-light); font-size:12px; font-weight:800; flex-shrink:0; }
+    .custom-select-option .option-prefix { color:var(--gold-light); font-size:13px; flex-shrink:0; width:18px; text-align:center; }
 
-    .custom-select-trigger {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      width: 100%;
-      min-height: 46px;
-      padding: 12px 14px;
-      background: #0e100e;
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      color: var(--white);
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all .16s ease;
-      text-align: left;
-      font-family: inherit;
-    }
+    /* LOADING STEPS */
+    .loading-steps { margin-top:28px; display:flex; flex-direction:column; align-items:center; gap:24px; }
+    .loader-spinner { width:56px; height:56px; border:3px solid rgba(224,184,74,.15); border-top-color:var(--gold-light); border-radius:50%; animation:spin 0.9s linear infinite; flex-shrink:0; }
+    .steps-list { display:flex; flex-direction:column; gap:10px; width:100%; max-width:480px; }
+    .loading-step { display:flex; align-items:flex-start; gap:14px; padding:12px 16px; border-radius:12px; background:#101410; border:1px solid var(--line); border-left:3px solid transparent; transition:all .35s cubic-bezier(.25,1,.5,1); opacity:.5; }
+    .loading-step.active { opacity:1; background:rgba(224,184,74,.06); border-left-color:var(--gold-light); border-color:rgba(224,184,74,.2); transform:translateX(4px); box-shadow:0 4px 20px rgba(224,184,74,.08); }
+    .loading-step.done { opacity:.85; background:rgba(69,180,125,.04); border-left-color:var(--success); border-color:rgba(69,180,125,.15); }
+    .loading-step.done::after { content:'✓'; margin-left:auto; color:var(--success); font-weight:800; font-size:16px; flex-shrink:0; }
+    .step-icon { font-size:22px; line-height:1; flex-shrink:0; width:28px; text-align:center; filter:grayscale(0.6); transition:filter .3s ease; }
+    .loading-step.active .step-icon { filter:none; animation:pulseStep 1.5s ease-in-out infinite; }
+    @keyframes pulseStep { 0%,100% { transform:scale(1); } 50% { transform:scale(1.15); } }
+    .step-content { display:flex; flex-direction:column; gap:2px; min-width:0; flex:1; }
+    .step-label { font-size:14px; font-weight:700; color:var(--white); line-height:1.3; }
+    .loading-step.active .step-label { color:var(--gold-light); }
+    .loading-step.done .step-label { color:var(--success); }
+    .step-desc { font-size:12px; color:var(--muted); line-height:1.4; }
+    .loading-status { font-size:13px; color:var(--muted); text-align:center; font-style:italic; min-height:20px; transition:color .3s ease; }
+    .loading-status.active { color:var(--gold-light); font-style:normal; font-weight:600; }
 
-    .custom-select-trigger:hover:not(.disabled) {
-      border-color: rgba(224, 184, 74, .3);
-      background: #121612;
-    }
-
-    .custom-select.open .custom-select-trigger {
-      border-color: var(--gold-light);
-      box-shadow: 0 0 0 3px rgba(224, 184, 74, .12);
-      background: #121612;
-    }
-
-    .custom-select.disabled .custom-select-trigger {
-      opacity: .5;
-      cursor: not-allowed;
-    }
-
-    .custom-select-value {
-      flex: 1;
-      min-width: 0;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .custom-select-value .icon-prefix {
-      color: var(--gold-light);
-      font-size: 13px;
-      flex-shrink: 0;
-    }
-
-    .custom-select-arrow {
-      color: var(--muted);
-      font-size: 12px;
-      flex-shrink: 0;
-      transition: transform .25s cubic-bezier(.25, 1, .5, 1);
-    }
-
-    .custom-select.open .custom-select-arrow {
-      transform: rotate(180deg);
-      color: var(--gold-light);
-    }
-
-    .custom-select-options {
-      position: absolute;
-      top: calc(100% + 6px);
-      left: 0;
-      right: 0;
-      z-index: 50;
-      max-height: 280px;
-      overflow-y: auto;
-      background: linear-gradient(145deg, #171a17, #101310);
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, .5), 0 0 0 1px rgba(224, 184, 74, .05);
-      padding: 6px;
-      opacity: 0;
-      visibility: hidden;
-      transform: translateY(-8px) scale(.98);
-      transition: opacity .2s ease, visibility .2s ease, transform .2s cubic-bezier(.25, 1, .5, 1);
-      transform-origin: top center;
-    }
-
-    .custom-select.open .custom-select-options {
-      opacity: 1;
-      visibility: visible;
-      transform: translateY(0) scale(1);
-    }
-
-    .custom-select-options::-webkit-scrollbar { width: 4px; }
-    .custom-select-options::-webkit-scrollbar-track { background: transparent; }
-    .custom-select-options::-webkit-scrollbar-thumb {
-      background: rgba(224, 184, 74, .2);
-      border-radius: 10px;
-    }
-
-    .custom-select-option {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 11px 14px;
-      border-radius: 8px;
-      color: #e2e3dc;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all .15s ease;
-      position: relative;
-    }
-
-    .custom-select-option:hover,
-    .custom-select-option.focused {
-      background: rgba(224, 184, 74, .08);
-      color: var(--white);
-    }
-
-    .custom-select-option.selected {
-      background: rgba(224, 184, 74, .12);
-      color: var(--gold-light);
-      font-weight: 700;
-    }
-
-    .custom-select-option.selected::after {
-      content: '✓';
-      margin-left: auto;
-      color: var(--gold-light);
-      font-size: 12px;
-      font-weight: 800;
-      flex-shrink: 0;
-    }
-
-    .custom-select-option .option-prefix {
-      color: var(--gold-light);
-      font-size: 13px;
-      flex-shrink: 0;
-      width: 18px;
-      text-align: center;
-    }
-
-    /* ═══════════════════════════════════════════════════════════
-       LOADING STEPS
-       ═══════════════════════════════════════════════════════════ */
-    .loading-steps {
-      margin-top: 28px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 24px;
-    }
-
-    .loader-spinner {
-      width: 56px;
-      height: 56px;
-      border: 3px solid rgba(224, 184, 74, .15);
-      border-top-color: var(--gold-light);
-      border-radius: 50%;
-      animation: spin 0.9s linear infinite;
-      flex-shrink: 0;
-    }
-
-    .steps-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      width: 100%;
-      max-width: 480px;
-    }
-
-    .loading-step {
-      display: flex;
-      align-items: flex-start;
-      gap: 14px;
-      padding: 12px 16px;
-      border-radius: 12px;
-      background: #101410;
-      border: 1px solid var(--line);
-      border-left: 3px solid transparent;
-      transition: all .35s cubic-bezier(.25, 1, .5, 1);
-      opacity: 0.5;
-    }
-
-    .loading-step.active {
-      opacity: 1;
-      background: rgba(224, 184, 74, .06);
-      border-left-color: var(--gold-light);
-      border-color: rgba(224, 184, 74, .2);
-      transform: translateX(4px);
-      box-shadow: 0 4px 20px rgba(224, 184, 74, .08);
-    }
-
-    .loading-step.done {
-      opacity: 0.85;
-      background: rgba(69, 180, 125, .04);
-      border-left-color: var(--success);
-      border-color: rgba(69, 180, 125, .15);
-    }
-
-    .loading-step.done::after {
-      content: '✓';
-      margin-left: auto;
-      color: var(--success);
-      font-weight: 800;
-      font-size: 16px;
-      flex-shrink: 0;
-    }
-
-    .step-icon {
-      font-size: 22px;
-      line-height: 1;
-      flex-shrink: 0;
-      width: 28px;
-      text-align: center;
-      filter: grayscale(0.6);
-      transition: filter .3s ease;
-    }
-
-    .loading-step.active .step-icon {
-      filter: none;
-      animation: pulseStep 1.5s ease-in-out infinite;
-    }
-
-    @keyframes pulseStep {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.15); }
-    }
-
-    .step-content {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      min-width: 0;
-      flex: 1;
-    }
-
-    .step-label {
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--white);
-      line-height: 1.3;
-    }
-
-    .loading-step.active .step-label { color: var(--gold-light); }
-    .loading-step.done .step-label { color: var(--success); }
-
-    .step-desc {
-      font-size: 12px;
-      color: var(--muted);
-      line-height: 1.4;
-    }
-
-    .loading-status {
-      font-size: 13px;
-      color: var(--muted);
-      text-align: center;
-      font-style: italic;
-      min-height: 20px;
-      transition: color .3s ease;
-    }
-
-    .loading-status.active {
-      color: var(--gold-light);
-      font-style: normal;
-      font-weight: 600;
-    }
-
-    /* ═══════════════════════════════════════════════════════════
-       SUBJECT CARDS / EXAM / RESULTS
-       ═══════════════════════════════════════════════════════════ */
+    /* SUBJECT CARDS */
     .subject-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin-top:22px; }
     .subject-card { border:1px solid var(--line); border-radius:12px; padding:18px; background:linear-gradient(145deg,rgba(26,58,42,.5),rgba(10,10,10,.45)); display:flex; flex-direction:column; gap:11px; }
     .subject-card:nth-child(2) { background:linear-gradient(145deg,rgba(184,134,11,.2),rgba(10,10,10,.5)); }
     .subject-card .subject-kicker { color:var(--gold-light); font-size:11px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; }
     .subject-card p { color:var(--muted); margin:0; }
     .subject-meta { display:flex; gap:12px; flex-wrap:wrap; color:var(--gold-light); font-size:13px; }
+
+    /* EXAM */
     .exam-top { position:sticky; top:0; z-index:4; background:rgba(10,10,10,.94); backdrop-filter:blur(12px); padding:10px 0 12px; margin-bottom:18px; border-bottom:1px solid var(--line); }
     .exam-topline { display:flex; justify-content:space-between; gap:12px; align-items:center; }
     .timer { color:var(--gold-light); font-weight:800; font-variant-numeric:tabular-nums; white-space:nowrap; }
@@ -375,6 +126,8 @@
     .answer-option { display:flex; align-items:flex-start; gap:10px; padding:11px 12px; border:1px solid var(--line); border-radius:10px; background:#0e100e; cursor:pointer; }
     .answer-option:has(input:checked) { border-color:var(--gold-light); background:rgba(224,184,74,.1); }
     .answer-option input { width:auto; margin-top:4px; accent-color:var(--gold-light); }
+
+    /* PREMIUM */
     .premium-popup-overlay { position:fixed; inset:0; z-index:20; display:grid; place-items:center; padding:16px; background:rgba(0,0,0,.85); backdrop-filter:blur(16px); opacity:0; visibility:hidden; transition:opacity .25s ease,visibility .25s ease; }
     .premium-popup-overlay.show { opacity:1; visibility:visible; }
     .premium-popup { position:relative; width:min(100%,400px); max-height:90vh; overflow-y:auto; padding:28px 22px 20px; border:1px solid var(--gold); border-radius:var(--radius); background:linear-gradient(145deg,#141414,#0a0a0a); box-shadow:0 20px 60px rgba(0,0,0,.6); transform:scale(.94) translateY(16px); transition:transform .25s ease; }
@@ -392,14 +145,94 @@
     .popup-buttons { display:flex; flex-direction:column; gap:6px; }
     .btn-subscribe { display:flex; align-items:center; justify-content:center; gap:6px; padding:12px; border-radius:10px; background:linear-gradient(135deg,var(--gold-light),var(--gold)); color:var(--black); font-weight:800; text-decoration:none; }
     .btn-later { padding:8px; border:0; background:transparent; color:var(--muted); font-size:12px; }
-    .question small { color:var(--muted); }
+
+    /* KATEX */
     .katex-display { max-width:100%; overflow-x:auto; overflow-y:hidden; padding:6px 0; }
     .katex { font-size:1.05em; }
+
+    /* ═══════════════════════════════════════════════════════════
+       RÉSULTATS DÉTAILLÉS
+       ═══════════════════════════════════════════════════════════ */
     .result-summary { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:20px 0; }
-    .metric { border:1px solid var(--line); border-radius:12px; padding:16px; background:#101310; }
-    .metric strong { display:block; color:var(--gold-light); font-size:26px; }
-    .result-exercise { border-top:1px solid var(--line); padding:16px 0; }
-    .correct { color:#7ce0aa; } .wrong { color:#ff9a84; }
+    .metric { border:1px solid var(--line); border-radius:12px; padding:16px; background:#101310; text-align:center; }
+    .metric small { display:block; color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:.05em; font-weight:700; margin-bottom:6px; }
+    .metric strong { display:block; color:var(--gold-light); font-size:26px; font-family:'Playfair Display',serif; }
+
+    /* Grade banner */
+    .grade-banner { display:flex; align-items:center; gap:16px; padding:20px 22px; border-radius:14px; margin-bottom:20px; border:1px solid var(--line); }
+    .grade-banner.grade-success { background:linear-gradient(135deg,rgba(69,180,125,.12),rgba(69,180,125,.04)); border-color:rgba(69,180,125,.3); }
+    .grade-banner.grade-warning { background:linear-gradient(135deg,rgba(224,184,74,.12),rgba(224,184,74,.04)); border-color:rgba(224,184,74,.3); }
+    .grade-banner.grade-danger { background:linear-gradient(135deg,rgba(215,101,74,.12),rgba(215,101,74,.04)); border-color:rgba(215,101,74,.3); }
+    .grade-banner .grade-emoji { font-size:44px; line-height:1; flex-shrink:0; }
+    .grade-banner .grade-info { flex:1; min-width:0; }
+    .grade-banner .grade-title { font-family:'Playfair Display',serif; font-size:22px; font-weight:700; color:var(--white); margin-bottom:4px; }
+    .grade-banner .grade-sub { font-size:13px; color:var(--muted); line-height:1.5; }
+
+    /* Récapitulatif */
+    .recap-section { margin-bottom:24px; }
+    .recap-title { font-family:'Playfair Display',serif; font-size:18px; font-weight:700; color:var(--white); margin-bottom:14px; }
+    .exercise-card { display:flex; align-items:center; gap:14px; width:100%; padding:16px 18px; border-radius:12px; border:1px solid var(--line); background:#101410; margin-bottom:10px; cursor:pointer; transition:all .16s ease; text-align:left; font-family:inherit; color:inherit; }
+    .exercise-card:hover { border-color:rgba(224,184,74,.3); transform:translateX(4px); background:rgba(224,184,74,.03); }
+    .exercise-card-icon { font-size:24px; line-height:1; flex-shrink:0; width:32px; text-align:center; }
+    .exercise-card-body { flex:1; min-width:0; }
+    .exercise-card-title { font-size:14px; font-weight:700; color:var(--white); margin-bottom:4px; }
+    .exercise-card-meta { font-size:12px; color:var(--muted); margin-bottom:8px; }
+    .exercise-card-progress { height:4px; border-radius:4px; background:#262b26; overflow:hidden; }
+    .exercise-card-fill { height:100%; border-radius:4px; transition:width .3s ease; }
+    .exercise-card-arrow { color:var(--muted); font-size:16px; flex-shrink:0; transition:all .16s ease; }
+    .exercise-card:hover .exercise-card-arrow { color:var(--gold-light); transform:translateX(4px); }
+
+    /* Topics */
+    .topics-section { margin-top:24px; padding:20px; border-radius:14px; background:rgba(74,175,224,.06); border:1px solid rgba(74,175,224,.2); }
+    .topics-title { font-family:'Playfair Display',serif; font-size:16px; font-weight:700; color:#4AAFE0; margin-bottom:12px; }
+    .topics-list { list-style:none; padding:0; display:flex; flex-direction:column; gap:8px; margin:0; }
+    .topics-list li { display:flex; align-items:flex-start; gap:10px; font-size:13.5px; color:#cfd0cc; line-height:1.5; }
+    .topics-list li::before { content:'→'; color:#4AAFE0; font-weight:700; flex-shrink:0; }
+
+    /* Détail exercice */
+    .exercise-detail-header { margin-bottom:20px; }
+    .back-btn-detail { display:inline-flex; align-items:center; gap:8px; padding:8px 14px; border-radius:8px; border:1px solid var(--line); background:transparent; color:var(--muted); font-size:13px; font-weight:600; cursor:pointer; transition:all .16s ease; font-family:inherit; margin-bottom:16px; }
+    .back-btn-detail:hover { color:var(--white); border-color:var(--gold-light); }
+    .exercise-detail-title { display:flex; align-items:center; gap:14px; }
+    .exercise-detail-icon { font-size:32px; line-height:1; flex-shrink:0; }
+    .exercise-detail-title h3 { font-family:'Playfair Display',serif; font-size:20px; font-weight:700; color:var(--white); margin:0 0 4px; }
+    .exercise-detail-meta { font-size:13px; color:var(--muted); }
+
+    /* Question detail */
+    .question-detail { padding:18px 20px; border-radius:12px; border:1px solid var(--line); background:#101410; margin-bottom:12px; transition:all .16s ease; }
+    .question-detail.q-correct { border-left:3px solid var(--success); }
+    .question-detail.q-wrong { border-left:3px solid var(--danger); }
+    .question-detail.q-unanswered { border-left:3px solid var(--muted); opacity:.85; }
+    .question-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; gap:10px; flex-wrap:wrap; }
+    .question-number { display:flex; align-items:center; gap:8px; font-size:14px; font-weight:700; color:var(--white); }
+    .question-number .q-icon { font-size:16px; }
+    .question-points { font-size:12px; font-weight:700; color:var(--gold-light); padding:3px 10px; border-radius:12px; background:rgba(224,184,74,.1); border:1px solid rgba(224,184,74,.2); white-space:nowrap; }
+    .q-wrong .question-points { color:#ff9a84; background:rgba(215,101,74,.1); border-color:rgba(215,101,74,.2); }
+    .q-correct .question-points { color:#7ce0aa; background:rgba(69,180,125,.1); border-color:rgba(69,180,125,.2); }
+    .question-text { font-size:14px; line-height:1.6; color:#e2e3dc; margin-bottom:14px; }
+    .question-text strong { color:var(--gold-light); }
+    .answers-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; }
+    .answer-block { padding:12px 14px; border-radius:10px; border:1px solid var(--line); background:rgba(255,255,255,.02); }
+    .answer-block .answer-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; color:var(--muted); }
+    .answer-block.student-answer .answer-label { color:#E0B84A; }
+    .answer-block.correct-answer .answer-label { color:#7ce0aa; }
+    .answer-block .answer-value { font-size:14px; font-weight:600; color:var(--white); word-break:break-word; }
+    .answer-block .answer-value.unanswered { color:var(--muted); font-style:italic; font-weight:400; }
+    .feedback-block { padding:12px 14px; border-radius:10px; background:rgba(255,255,255,.02); border-left:3px solid var(--gold-light); margin-bottom:10px; }
+    .q-correct .feedback-block { border-left-color:var(--success); background:rgba(69,180,125,.04); }
+    .q-wrong .feedback-block { border-left-color:var(--danger); background:rgba(215,101,74,.04); }
+    .feedback-text { font-size:13.5px; line-height:1.6; color:#e2e3dc; }
+    .method-block { padding:12px 14px; border-radius:10px; background:rgba(224,184,74,.04); border-left:3px solid var(--gold-light); margin-bottom:10px; }
+    .method-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--gold-light); margin-bottom:6px; }
+    .method-text { font-size:13.5px; line-height:1.6; color:#e2e3dc; }
+    .review-block { padding:12px 14px; border-radius:10px; background:rgba(74,175,224,.06); border-left:3px solid #4AAFE0; }
+    .review-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:#4AAFE0; margin-bottom:6px; }
+    .review-text { font-size:13.5px; line-height:1.6; color:#cfd0cc; }
+    .exercise-explanation { margin-top:20px; padding:18px 20px; border-radius:12px; background:rgba(224,184,74,.04); border:1px solid rgba(224,184,74,.15); }
+    .explanation-label { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--gold-light); margin-bottom:8px; }
+    .explanation-text { font-size:14px; line-height:1.6; color:#e2e3dc; }
+
+    /* MODAL */
     .modal-backdrop { position:fixed; inset:0; z-index:20; display:none; place-items:center; padding:18px; background:rgba(0,0,0,.78); }
     .modal-backdrop.show { display:grid; }
     .modal { max-width:440px; width:100%; background:#171a17; border:1px solid var(--line); border-radius:var(--radius); padding:22px; }
@@ -419,9 +252,10 @@
       .step-icon { font-size:20px; width:24px; }
       .step-label { font-size:13px; }
       .step-desc { font-size:11px; }
-      .loading-status { font-size:12px; }
       .custom-select-trigger { padding:11px 12px; min-height:44px; font-size:13.5px; }
-      .custom-select-option { padding:12px 12px; font-size:14px; }
+      .answers-row { grid-template-columns:1fr; }
+      .exercise-detail-title h3 { font-size:17px; }
+      .question-detail { padding:14px 16px; }
     }
 
     @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:.01ms!important; transition-duration:.01ms!important; } }
@@ -434,9 +268,7 @@
       <div class="connection" id="connectionState">Hors ligne possible</div>
     </header>
 
-    <!-- ═══════════════════════════════════════════════════════════
-         VUE 1 : CONFIGURATION
-         ═══════════════════════════════════════════════════════════ -->
+    <!-- VUE 1 : CONFIGURATION -->
     <section class="view active" id="configView" aria-labelledby="configTitle">
       <div class="panel">
         <div class="eyebrow">Mode examen</div>
@@ -444,7 +276,6 @@
         <p class="lead">Choisis tes paramètres. Le serveur générera deux sujets différents de difficulté comparable.</p>
 
         <form id="configForm" class="form-grid">
-          <!-- Matière -->
           <div class="field">
             <label>Matière</label>
             <div class="custom-select" id="subjectSelect" data-name="subject">
@@ -453,26 +284,15 @@
                 <i class="fas fa-chevron-down custom-select-arrow"></i>
               </button>
               <div class="custom-select-options" role="listbox">
-                <div class="custom-select-option" data-value="Mathématiques" role="option">
-                  <span class="option-prefix">📐</span> Mathématiques
-                </div>
-                <div class="custom-select-option" data-value="Physique" role="option">
-                  <span class="option-prefix">⚡</span> Physique
-                </div>
-                <div class="custom-select-option" data-value="Chimie" role="option">
-                  <span class="option-prefix">🧪</span> Chimie
-                </div>
-                <div class="custom-select-option" data-value="SVT" role="option">
-                  <span class="option-prefix">🧬</span> SVT
-                </div>
-                <div class="custom-select-option" data-value="Français" role="option">
-                  <span class="option-prefix">📖</span> Français
-                </div>
+                <div class="custom-select-option" data-value="Mathématiques" role="option"><span class="option-prefix">📐</span> Mathématiques</div>
+                <div class="custom-select-option" data-value="Physique" role="option"><span class="option-prefix">⚡</span> Physique</div>
+                <div class="custom-select-option" data-value="Chimie" role="option"><span class="option-prefix">🧪</span> Chimie</div>
+                <div class="custom-select-option" data-value="SVT" role="option"><span class="option-prefix">🧬</span> SVT</div>
+                <div class="custom-select-option" data-value="Français" role="option"><span class="option-prefix">📖</span> Français</div>
               </div>
             </div>
           </div>
 
-          <!-- Niveau -->
           <div class="field">
             <label>Niveau</label>
             <div class="custom-select" id="levelSelect" data-name="level">
@@ -481,14 +301,11 @@
                 <i class="fas fa-chevron-down custom-select-arrow"></i>
               </button>
               <div class="custom-select-options" role="listbox">
-                <div class="custom-select-option" data-value="Terminale D" role="option">
-                  <span class="option-prefix">🎓</span> Terminale D
-                </div>
+                <div class="custom-select-option" data-value="Terminale D" role="option"><span class="option-prefix">🎓</span> Terminale D</div>
               </div>
             </div>
           </div>
 
-          <!-- Chapitre -->
           <div class="field">
             <label>Chapitre</label>
             <div class="custom-select" id="chapterSelect" data-name="chapter">
@@ -496,13 +313,10 @@
                 <span class="custom-select-value"></span>
                 <i class="fas fa-chevron-down custom-select-arrow"></i>
               </button>
-              <div class="custom-select-options" role="listbox" id="chapterOptions">
-                <!-- Rempli dynamiquement -->
-              </div>
+              <div class="custom-select-options" role="listbox" id="chapterOptions"></div>
             </div>
           </div>
 
-          <!-- Difficulté -->
           <div class="field">
             <label>Difficulté</label>
             <div class="custom-select" id="difficultySelect" data-name="difficulty">
@@ -511,23 +325,14 @@
                 <i class="fas fa-chevron-down custom-select-arrow"></i>
               </button>
               <div class="custom-select-options" role="listbox">
-                <div class="custom-select-option" data-value="easy" role="option">
-                  <span class="option-prefix">🟢</span> Facile
-                </div>
-                <div class="custom-select-option" data-value="medium" role="option">
-                  <span class="option-prefix">🟡</span> Moyen
-                </div>
-                <div class="custom-select-option" data-value="hard" role="option">
-                  <span class="option-prefix">🟠</span> Difficile
-                </div>
-                <div class="custom-select-option" data-value="bac" role="option">
-                  <span class="option-prefix">🔴</span> Niveau BAC
-                </div>
+                <div class="custom-select-option" data-value="easy" role="option"><span class="option-prefix">🟢</span> Facile</div>
+                <div class="custom-select-option" data-value="medium" role="option"><span class="option-prefix">🟡</span> Moyen</div>
+                <div class="custom-select-option" data-value="hard" role="option"><span class="option-prefix">🟠</span> Difficile</div>
+                <div class="custom-select-option" data-value="bac" role="option"><span class="option-prefix">🔴</span> Niveau BAC</div>
               </div>
             </div>
           </div>
 
-          <!-- Durée -->
           <div class="field">
             <label>Durée</label>
             <div class="custom-select" id="durationSelect" data-name="duration">
@@ -536,33 +341,21 @@
                 <i class="fas fa-chevron-down custom-select-arrow"></i>
               </button>
               <div class="custom-select-options" role="listbox">
-                <div class="custom-select-option" data-value="30" role="option">
-                  <span class="option-prefix">⏱️</span> 30 min
-                </div>
-                <div class="custom-select-option" data-value="60" role="option">
-                  <span class="option-prefix">⏱️</span> 1 heure
-                </div>
-                <div class="custom-select-option" data-value="90" role="option">
-                  <span class="option-prefix">⏱️</span> 1 h 30
-                </div>
-                <div class="custom-select-option" data-value="120" role="option">
-                  <span class="option-prefix">⏱️</span> 2 heures
-                </div>
-                <div class="custom-select-option" data-value="180" role="option">
-                  <span class="option-prefix">⏱️</span> 3 heures
-                </div>
+                <div class="custom-select-option" data-value="30" role="option"><span class="option-prefix">⏱️</span> 30 min</div>
+                <div class="custom-select-option" data-value="60" role="option"><span class="option-prefix">⏱️</span> 1 heure</div>
+                <div class="custom-select-option" data-value="90" role="option"><span class="option-prefix">⏱️</span> 1 h 30</div>
+                <div class="custom-select-option" data-value="120" role="option"><span class="option-prefix">⏱️</span> 2 heures</div>
+                <div class="custom-select-option" data-value="180" role="option"><span class="option-prefix">⏱️</span> 3 heures</div>
               </div>
             </div>
           </div>
 
-          <!-- Nombre d'exercices -->
           <div class="field">
             <label for="exerciseCount">Nombre d'exercices</label>
             <input id="exerciseCount" type="number" min="5" max="5" value="5" readonly required>
             <small style="color:var(--muted);font-size:12px;">Chaque sujet contient 5 exercices et 10 questions par exercice.</small>
           </div>
 
-          <!-- Submit -->
           <div class="field full">
             <button class="btn primary" id="generateButton" type="submit">
               <span class="btn-text">Générer mon examen</span>
@@ -574,9 +367,7 @@
       </div>
     </section>
 
-    <!-- ═══════════════════════════════════════════════════════════
-         VUE 2 : CHARGEMENT GÉNÉRATION
-         ═══════════════════════════════════════════════════════════ -->
+    <!-- VUE 2 : CHARGEMENT GÉNÉRATION -->
     <section class="view" id="loadingView" aria-labelledby="loadingTitle">
       <div class="panel">
         <div class="eyebrow">Génération en cours</div>
@@ -585,57 +376,19 @@
 
         <div class="loading-steps">
           <div class="loader-spinner"></div>
-
           <div class="steps-list">
-            <div class="loading-step" id="genStep1">
-              <span class="step-icon">🔍</span>
-              <div class="step-content">
-                <span class="step-label">Analyse de la configuration</span>
-                <span class="step-desc">Matière, chapitre, difficulté et durée</span>
-              </div>
-            </div>
-
-            <div class="loading-step" id="genStep2">
-              <span class="step-icon">🎲</span>
-              <div class="step-content">
-                <span class="step-label">Génération des sujets</span>
-                <span class="step-desc">L'IA crée 2 sujets de difficulté comparable</span>
-              </div>
-            </div>
-
-            <div class="loading-step" id="genStep3">
-              <span class="step-icon">📝</span>
-              <div class="step-content">
-                <span class="step-label">Rédaction des exercices</span>
-                <span class="step-desc">5 exercices × 10 questions par sujet</span>
-              </div>
-            </div>
-
-            <div class="loading-step" id="genStep4">
-              <span class="step-icon">🧮</span>
-              <div class="step-content">
-                <span class="step-label">Vérification des questions</span>
-                <span class="step-desc">Contrôle de la cohérence et des réponses</span>
-              </div>
-            </div>
-
-            <div class="loading-step" id="genStep5">
-              <span class="step-icon">✨</span>
-              <div class="step-content">
-                <span class="step-label">Finalisation</span>
-                <span class="step-desc">Préparation de l'affichage des sujets</span>
-              </div>
-            </div>
+            <div class="loading-step" id="genStep1"><span class="step-icon">🔍</span><div class="step-content"><span class="step-label">Analyse de la configuration</span><span class="step-desc">Matière, chapitre, difficulté et durée</span></div></div>
+            <div class="loading-step" id="genStep2"><span class="step-icon">🎲</span><div class="step-content"><span class="step-label">Génération des sujets</span><span class="step-desc">L'IA crée 2 sujets de difficulté comparable</span></div></div>
+            <div class="loading-step" id="genStep3"><span class="step-icon">📝</span><div class="step-content"><span class="step-label">Rédaction des exercices</span><span class="step-desc">5 exercices × 10 questions par sujet</span></div></div>
+            <div class="loading-step" id="genStep4"><span class="step-icon">🧮</span><div class="step-content"><span class="step-label">Vérification des questions</span><span class="step-desc">Contrôle de la cohérence et des réponses</span></div></div>
+            <div class="loading-step" id="genStep5"><span class="step-icon">✨</span><div class="step-content"><span class="step-label">Finalisation</span><span class="step-desc">Préparation de l'affichage des sujets</span></div></div>
           </div>
-
           <div class="loading-status" id="genLoadingStatus">Préparation...</div>
         </div>
       </div>
     </section>
 
-    <!-- ═══════════════════════════════════════════════════════════
-         VUE 3 : CHOIX DU SUJET
-         ═══════════════════════════════════════════════════════════ -->
+    <!-- VUE 3 : CHOIX DU SUJET -->
     <section class="view" id="subjectsView" aria-labelledby="subjectsTitle">
       <div class="panel">
         <div class="eyebrow">Génération terminée</div>
@@ -646,9 +399,7 @@
       </div>
     </section>
 
-    <!-- ═══════════════════════════════════════════════════════════
-         VUE 4 : EXAMEN
-         ═══════════════════════════════════════════════════════════ -->
+    <!-- VUE 4 : EXAMEN -->
     <section class="view" id="examView" aria-labelledby="examTitle">
       <div class="exam-top">
         <div class="exam-topline">
@@ -679,9 +430,7 @@
       </div>
     </section>
 
-    <!-- ═══════════════════════════════════════════════════════════
-         VUE 5 : CHARGEMENT CORRECTION
-         ═══════════════════════════════════════════════════════════ -->
+    <!-- VUE 5 : CHARGEMENT CORRECTION -->
     <section class="view" id="loadingCorrectionView" aria-labelledby="loadingCorrTitle">
       <div class="panel">
         <div class="eyebrow">Correction en cours</div>
@@ -690,67 +439,31 @@
 
         <div class="loading-steps">
           <div class="loader-spinner"></div>
-
           <div class="steps-list">
-            <div class="loading-step" id="corrStep1">
-              <span class="step-icon">📥</span>
-              <div class="step-content">
-                <span class="step-label">Réception des réponses</span>
-                <span class="step-desc">Envoi de ta copie au correcteur</span>
-              </div>
-            </div>
-
-            <div class="loading-step" id="corrStep2">
-              <span class="step-icon">🔍</span>
-              <div class="step-content">
-                <span class="step-label">Analyse des exercices</span>
-                <span class="step-desc">Vérification de chaque réponse</span>
-              </div>
-            </div>
-
-            <div class="loading-step" id="corrStep3">
-              <span class="step-icon">🧠</span>
-              <div class="step-content">
-                <span class="step-label">Évaluation pédagogique</span>
-                <span class="step-desc">Identification des erreurs et points forts</span>
-              </div>
-            </div>
-
-            <div class="loading-step" id="corrStep4">
-              <span class="step-icon">📊</span>
-              <div class="step-content">
-                <span class="step-label">Calcul du score</span>
-                <span class="step-desc">Attribution des points par exercice</span>
-              </div>
-            </div>
-
-            <div class="loading-step" id="corrStep5">
-              <span class="step-icon">✅</span>
-              <div class="step-content">
-                <span class="step-label">Finalisation</span>
-                <span class="step-desc">Préparation du bilan détaillé</span>
-              </div>
-            </div>
+            <div class="loading-step" id="corrStep1"><span class="step-icon">📥</span><div class="step-content"><span class="step-label">Réception des réponses</span><span class="step-desc">Envoi de ta copie au correcteur</span></div></div>
+            <div class="loading-step" id="corrStep2"><span class="step-icon">🔍</span><div class="step-content"><span class="step-label">Analyse des exercices</span><span class="step-desc">Vérification de chaque réponse</span></div></div>
+            <div class="loading-step" id="corrStep3"><span class="step-icon">🧠</span><div class="step-content"><span class="step-label">Évaluation pédagogique</span><span class="step-desc">Identification des erreurs et points forts</span></div></div>
+            <div class="loading-step" id="corrStep4"><span class="step-icon">📊</span><div class="step-content"><span class="step-label">Calcul du score</span><span class="step-desc">Attribution des points par exercice</span></div></div>
+            <div class="loading-step" id="corrStep5"><span class="step-icon">✅</span><div class="step-content"><span class="step-label">Finalisation</span><span class="step-desc">Préparation du bilan détaillé</span></div></div>
           </div>
-
           <div class="loading-status" id="corrLoadingStatus">Préparation...</div>
         </div>
       </div>
     </section>
 
-    <!-- ═══════════════════════════════════════════════════════════
-         VUE 6 : RÉSULTATS
-         ═══════════════════════════════════════════════════════════ -->
+    <!-- VUE 6 : RÉSULTATS -->
     <section class="view" id="resultsView" aria-labelledby="resultsTitle">
       <div class="panel">
         <div class="eyebrow">Correction</div>
         <h2 id="resultsTitle">Résultats de l'examen</h2>
         <div class="result-summary">
-          <div class="metric">Note<strong id="resultScore">-- / 20</strong></div>
-          <div class="metric">Pourcentage<strong id="resultPercent">-- %</strong></div>
+          <div class="metric"><small>Note</small><strong id="resultScore">-- / 20</strong></div>
+          <div class="metric"><small>Pourcentage</small><strong id="resultPercent">-- %</strong></div>
         </div>
         <div id="resultsDetails"></div>
-        <div class="actions"><button class="btn primary" id="newExamButton" type="button">Nouvel examen</button></div>
+        <div class="actions">
+          <button class="btn primary" id="newExamButton" type="button">Nouvel examen</button>
+        </div>
       </div>
     </section>
   </main>
@@ -801,7 +514,7 @@
     });
     const auth = getAuth(app);
     const STORAGE_KEY = 'arvexa_exam_draft_v1';
-    const state = { user: null, exam: null, selectedSubject: null, exerciseIndex: 0, answers: {}, startedAt: 0, remainingSeconds: 0, timerId: null, submitting: false };
+    const state = { user: null, exam: null, selectedSubject: null, exerciseIndex: 0, answers: {}, startedAt: 0, remainingSeconds: 0, timerId: null, submitting: false, lastResult: null };
     let resolveAuthReady;
     const authReady = new Promise((resolve) => { resolveAuthReady = resolve; });
 
@@ -815,27 +528,19 @@
 
     const $ = (id) => document.getElementById(id);
     const views = ['configView','loadingView','subjectsView','examView','loadingCorrectionView','resultsView'];
-
     const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
     const GENERATION_STEPS = [
-      { id: 'genStep1', label: 'Analyse de la configuration...' },
-      { id: 'genStep2', label: 'Génération des deux sujets...' },
-      { id: 'genStep3', label: 'Rédaction des exercices...' },
-      { id: 'genStep4', label: 'Vérification des questions...' },
-      { id: 'genStep5', label: 'Finalisation...' }
+      { id: 'genStep1' }, { id: 'genStep2' }, { id: 'genStep3' },
+      { id: 'genStep4' }, { id: 'genStep5' }
     ];
-
     const CORRECTION_STEPS = [
-      { id: 'corrStep1', label: 'Réception de tes réponses...' },
-      { id: 'corrStep2', label: 'Analyse des exercices...' },
-      { id: 'corrStep3', label: 'Évaluation pédagogique...' },
-      { id: 'corrStep4', label: 'Calcul du score...' },
-      { id: 'corrStep5', label: 'Finalisation...' }
+      { id: 'corrStep1' }, { id: 'corrStep2' }, { id: 'corrStep3' },
+      { id: 'corrStep4' }, { id: 'corrStep5' }
     ];
 
     // ═══════════════════════════════════════════════════════════════
-    // CUSTOM SELECT — Composant dropdown personnalisé
+    // CUSTOM SELECT
     // ═══════════════════════════════════════════════════════════════
     class CustomSelect {
       constructor(element) {
@@ -848,44 +553,25 @@
         this.value = null;
         this.focusedIndex = -1;
         this.isOpen = false;
-
         this.init();
       }
-
       init() {
-        this.trigger.addEventListener('click', (e) => {
-          e.stopPropagation();
-          this.toggle();
-        });
-
+        this.trigger.addEventListener('click', (e) => { e.stopPropagation(); this.toggle(); });
         this.trigger.addEventListener('keydown', (e) => this.handleKeydown(e));
-
-        document.addEventListener('click', (e) => {
-          if (!this.element.contains(e.target)) this.close();
-        });
-
+        document.addEventListener('click', (e) => { if (!this.element.contains(e.target)) this.close(); });
         this.refreshOptions();
       }
-
       refreshOptions() {
         this.options = Array.from(this.optionsContainer.querySelectorAll('.custom-select-option'));
         this.options.forEach((opt) => {
-          opt.addEventListener('click', (e) => {
-            e.stopPropagation();
-            this.select(opt.dataset.value);
-          });
+          opt.addEventListener('click', (e) => { e.stopPropagation(); this.select(opt.dataset.value); });
           opt.addEventListener('mouseenter', () => {
             this.focusedIndex = this.options.indexOf(opt);
             this.updateFocus();
           });
         });
-
-        // Sélectionner la première option si aucune valeur
-        if (!this.value && this.options.length > 0) {
-          this.select(this.options[0].dataset.value, true);
-        }
+        if (!this.value && this.options.length > 0) this.select(this.options[0].dataset.value, true);
       }
-
       setOptions(options) {
         this.optionsContainer.innerHTML = '';
         options.forEach((opt) => {
@@ -893,111 +579,59 @@
           div.className = 'custom-select-option';
           div.dataset.value = opt.value;
           div.setAttribute('role', 'option');
-          if (opt.prefix) {
-            div.innerHTML = `<span class="option-prefix">${opt.prefix}</span> ${opt.label}`;
-          } else {
-            div.textContent = opt.label;
-          }
+          if (opt.prefix) div.innerHTML = `<span class="option-prefix">${opt.prefix}</span> ${opt.label}`;
+          else div.textContent = opt.label;
           this.optionsContainer.appendChild(div);
         });
         this.value = null;
         this.refreshOptions();
       }
-
       select(value, silent = false) {
         this.value = value;
         const selectedOption = this.options.find((o) => o.dataset.value === String(value));
         if (!selectedOption) return;
-
         const prefix = selectedOption.querySelector('.option-prefix');
         const prefixHTML = prefix ? prefix.outerHTML : '';
         const label = selectedOption.textContent.replace(prefix?.textContent || '', '').trim();
         this.valueEl.innerHTML = `${prefixHTML} <span>${label}</span>`;
-
-        this.options.forEach((o) => {
-          o.classList.toggle('selected', o.dataset.value === String(value));
-        });
-
+        this.options.forEach((o) => { o.classList.toggle('selected', o.dataset.value === String(value)); });
         this.close();
-
         if (!silent) {
-          const event = new CustomEvent('change', {
-            detail: { name: this.name, value: this.value }
-          });
+          const event = new CustomEvent('change', { detail: { name: this.name, value: this.value } });
           this.element.dispatchEvent(event);
         }
       }
-
-      toggle() {
-        if (this.isOpen) this.close();
-        else this.open();
-      }
-
+      toggle() { if (this.isOpen) this.close(); else this.open(); }
       open() {
-        document.querySelectorAll('.custom-select.open').forEach((el) => {
-          if (el !== this.element) el.classList.remove('open');
-        });
+        document.querySelectorAll('.custom-select.open').forEach((el) => { if (el !== this.element) el.classList.remove('open'); });
         this.element.classList.add('open');
         this.trigger.setAttribute('aria-expanded', 'true');
         this.isOpen = true;
         this.focusedIndex = this.options.findIndex((o) => o.classList.contains('selected'));
       }
-
       close() {
         this.element.classList.remove('open');
         this.trigger.setAttribute('aria-expanded', 'false');
         this.isOpen = false;
         this.updateFocus();
       }
-
       handleKeydown(e) {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          this.toggle();
-        } else if (e.key === 'Escape') {
-          this.close();
-        } else if (e.key === 'ArrowDown') {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.toggle(); }
+        else if (e.key === 'Escape') this.close();
+        else if (e.key === 'ArrowDown') {
           e.preventDefault();
           if (!this.isOpen) this.open();
-          else {
-            this.focusedIndex = Math.min(this.focusedIndex + 1, this.options.length - 1);
-            this.updateFocus();
-          }
+          else { this.focusedIndex = Math.min(this.focusedIndex + 1, this.options.length - 1); this.updateFocus(); }
         } else if (e.key === 'ArrowUp') {
           e.preventDefault();
-          if (this.isOpen) {
-            this.focusedIndex = Math.max(this.focusedIndex - 1, 0);
-            this.updateFocus();
-          }
-        } else if (e.key === 'Enter' && this.isOpen && this.focusedIndex >= 0) {
-          e.preventDefault();
-          const option = this.options[this.focusedIndex];
-          if (option) this.select(option.dataset.value);
+          if (this.isOpen) { this.focusedIndex = Math.max(this.focusedIndex - 1, 0); this.updateFocus(); }
         }
       }
-
-      updateFocus() {
-        this.options.forEach((opt, idx) => {
-          opt.classList.toggle('focused', idx === this.focusedIndex);
-        });
-      }
-
-      getValue() {
-        return this.value;
-      }
+      updateFocus() { this.options.forEach((opt, idx) => { opt.classList.toggle('focused', idx === this.focusedIndex); }); }
+      getValue() { return this.value; }
     }
 
-    // ═══════════════════════════════════════════════════════════════
-    // INITIALISATION DES DROPDOWNS
-    // ═══════════════════════════════════════════════════════════════
-    const customSelects = {
-      subject: null,
-      level: null,
-      chapter: null,
-      difficulty: null,
-      duration: null
-    };
-
+    const customSelects = { subject: null, level: null, chapter: null, difficulty: null, duration: null };
     function initCustomSelects() {
       customSelects.subject = new CustomSelect($('subjectSelect'));
       customSelects.level = new CustomSelect($('levelSelect'));
@@ -1007,96 +641,39 @@
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // GESTION DES ÉTAPES
+    // ÉTAPES
     // ═══════════════════════════════════════════════════════════════
     function resetSteps(steps) {
-      steps.forEach((step) => {
-        const el = $(step.id);
-        if (el) el.classList.remove('active', 'done');
-      });
+      steps.forEach((step) => { const el = $(step.id); if (el) el.classList.remove('active', 'done'); });
     }
-
     function activateStep(stepId, statusEl, label) {
-      const allSteps = document.querySelectorAll('.loading-step');
-      allSteps.forEach((s) => {
-        if (s.id === stepId) {
-          s.classList.add('active');
-          s.classList.remove('done');
-        } else if (s.classList.contains('active')) {
-          s.classList.remove('active');
-          s.classList.add('done');
-        }
+      document.querySelectorAll('.loading-step').forEach((s) => {
+        if (s.id === stepId) { s.classList.add('active'); s.classList.remove('done'); }
+        else if (s.classList.contains('active')) { s.classList.remove('active'); s.classList.add('done'); }
       });
-      if (statusEl) {
-        statusEl.textContent = label;
-        statusEl.classList.add('active');
-      }
+      if (statusEl) { statusEl.textContent = label; statusEl.classList.add('active'); }
     }
-
     function finishAllSteps(steps, statusEl, finalLabel = 'Terminé !') {
-      steps.forEach((step) => {
-        const el = $(step.id);
-        if (el) {
-          el.classList.remove('active');
-          el.classList.add('done');
-        }
-      });
-      if (statusEl) {
-        statusEl.textContent = finalLabel;
-        statusEl.classList.remove('active');
-      }
+      steps.forEach((step) => { const el = $(step.id); if (el) { el.classList.remove('active'); el.classList.add('done'); } });
+      if (statusEl) { statusEl.textContent = finalLabel; statusEl.classList.remove('active'); }
     }
 
     // ═══════════════════════════════════════════════════════════════
     // UTILITAIRES
     // ═══════════════════════════════════════════════════════════════
-    function showView(id) {
-      views.forEach((view) => $(view).classList.toggle('active', view === id));
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-    function setStatus(id, message, type = '') {
-      const element = $(id);
-      element.textContent = message;
-      element.className = `status ${type}`;
-    }
-    function escapeHtml(value) {
-      const div = document.createElement('div');
-      div.textContent = String(value ?? '');
-      return div.innerHTML;
-    }
+    function showView(id) { views.forEach((view) => $(view).classList.toggle('active', view === id)); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    function setStatus(id, message, type = '') { const element = $(id); element.textContent = message; element.className = `status ${type}`; }
+    function escapeHtml(value) { const div = document.createElement('div'); div.textContent = String(value ?? ''); return div.innerHTML; }
     function renderMath(root) {
-      if (window.KaTeXUtils) {
-        window.KaTeXUtils.renderMath(root);
-        return;
-      }
-      if (window.renderMathInElement) {
-        window.renderMathInElement(root, {
-          delimiters: [
-            { left:'$$', right:'$$', display:true },
-            { left:'\\(', right:'\\)', display:false },
-            { left:'$', right:'$', display:false }
-          ],
-          throwOnError: false,
-          trust: false
-        });
-      }
+      if (window.KaTeXUtils) { window.KaTeXUtils.renderMath(root); return; }
+      if (window.renderMathInElement) window.renderMathInElement(root, { delimiters: [{ left:'$$', right:'$$', display:true }, { left:'\\(', right:'\\)', display:false }, { left:'$', right:'$', display:false }], throwOnError:false, trust:false });
     }
 
     function normalizeExam(payload) {
-      if (!payload?.success || !payload.exam || !Array.isArray(payload.exam.subjects) || payload.exam.subjects.length < 2) {
-        throw new Error('Réponse du serveur invalide.');
-      }
-      const exam = {
-        ...payload.exam,
-        duration: Number(payload.exam.duration),
-        totalPoints: Number(payload.exam.totalPoints) || 20,
-        subjects: payload.exam.subjects.slice(0, 2)
-      };
+      if (!payload?.success || !payload.exam || !Array.isArray(payload.exam.subjects) || payload.exam.subjects.length < 2) throw new Error('Réponse du serveur invalide.');
+      const exam = { ...payload.exam, duration: Number(payload.exam.duration), totalPoints: Number(payload.exam.totalPoints) || 20, subjects: payload.exam.subjects.slice(0, 2) };
       exam.subjects.forEach((subject, index) => {
-        if (!Array.isArray(subject.exercises) || subject.exercises.length !== 5 ||
-            subject.exercises.some((exercise) => !Array.isArray(exercise.questions) || exercise.questions.length !== 10)) {
-          throw new Error(`Sujet ${index + 1} invalide.`);
-        }
+        if (!Array.isArray(subject.exercises) || subject.exercises.length !== 5 || subject.exercises.some((exercise) => !Array.isArray(exercise.questions) || exercise.questions.length !== 10)) throw new Error(`Sujet ${index + 1} invalide.`);
       });
       return exam;
     }
@@ -1104,12 +681,10 @@
     function updateChapters() {
       const subject = customSelects.subject.getValue();
       const chapters = CHAPTERS[subject] || [];
-
       const options = [
         { value: 'all', label: 'Tous les chapitres', prefix: '📚' },
         ...chapters.map((ch) => ({ value: ch, label: ch, prefix: '📖' }))
       ];
-
       customSelects.chapter.setOptions(options);
     }
 
@@ -1125,20 +700,9 @@
     }
 
     function saveDraft() {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({
-          exam: state.exam,
-          selectedSubject: state.selectedSubject?.id,
-          exerciseIndex: state.exerciseIndex,
-          answers: state.answers,
-          startedAt: state.startedAt,
-          remainingSeconds: state.remainingSeconds
-        }));
-      } catch (_) {}
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ exam: state.exam, selectedSubject: state.selectedSubject?.id, exerciseIndex: state.exerciseIndex, answers: state.answers, startedAt: state.startedAt, remainingSeconds: state.remainingSeconds })); } catch (_) {}
     }
-    function clearDraft() {
-      try { localStorage.removeItem(STORAGE_KEY); } catch (_) {}
-    }
+    function clearDraft() { try { localStorage.removeItem(STORAGE_KEY); } catch (_) {} }
     function loadDraft() {
       try {
         const draft = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
@@ -1172,6 +736,9 @@
       });
     }
 
+    // ═══════════════════════════════════════════════════════════════
+    // FALLBACKS LOCAUX
+    // ═══════════════════════════════════════════════════════════════
     function buildLocalExam(config) {
       const subjectNames = [config.subject, config.subject + ' - Variante'];
       const chapter = config.chapter === 'all' ? (CHAPTERS[config.subject] || [])[0] || 'Thème principal' : config.chapter;
@@ -1180,7 +747,7 @@
       const created = subjectNames.map((title, idx) => ({
         id: `subject_${idx + 1}`,
         title: idx === 0 ? `Sujet ${idx + 1}` : `Sujet ${idx + 1} - Variante`,
-        instructions: `Traite l’ensemble des exercices sur le thème ${chapter}. Rédige clairement les démarches et vérifie chaque résultat.`,
+        instructions: `Traite l'ensemble des exercices sur le thème ${chapter}. Rédige clairement les démarches et vérifie chaque résultat.`,
         exercises: Array.from({ length: 5 }, (_, exerciseIndex) => ({
           number: exerciseIndex + 1,
           title: `Exercice ${exerciseIndex + 1}`,
@@ -1204,37 +771,58 @@
       const perExercise = [];
       for (let i = 0; i < totalExercises; i += 1) {
         const exercise = selected.exercises[i];
-        const score = 4;
-        const answered = Object.keys(body.answers || {}).filter((key) => key.startsWith(`${selected.id}:${i}:`)).length;
+        const questions = exercise.questions.map((q, qIdx) => {
+          const key = `${selected.id}:${i}:${qIdx}`;
+          const studentAnswer = body.answers[key] || null;
+          return {
+            number: q.number || `${i + 1}.${qIdx + 1}`,
+            questionText: q.text,
+            type: q.type || 'text',
+            studentAnswer: studentAnswer,
+            correctAnswer: q.correctAnswer || null,
+            points: 0,
+            maxPoints: Number(q.points) || 0.4,
+            status: studentAnswer ? 'pending' : 'unanswered',
+            feedback: 'Correction locale : ce détail est généré en mode hors-ligne.',
+            betterMethod: null,
+            toReview: null
+          };
+        });
         perExercise.push({
           number: exercise.number || i + 1,
-          score,
-          maxScore: 5,
-          correctAnswers: Math.min(answered || 1, 10),
-          errors: answered === 0 ? ['Aucune réponse fournie sur cette partie.'] : [],
-          explanation: `La démarche attendue sur l’exercice ${exercise.number || i + 1} consiste à présenter les étapes importantes, à vérifier les calculs et à conclure proprement.`,
-          advice: 'Revois la méthode et fais un schéma ou un calcul intermédiaire pour sécuriser la réponse.'
+          title: exercise.title || `Exercice ${i + 1}`,
+          score: 0,
+          maxScore: questions.reduce((sum, q) => sum + q.maxPoints, 0),
+          correctAnswers: 0,
+          totalQuestions: questions.length,
+          questions,
+          explanation: 'Correction locale activée : les détails par question seront disponibles dès que la connexion au serveur sera rétablie.',
+          advice: 'Reconnecte-toi pour une correction IA détaillée.'
         });
       }
-      const total = perExercise.reduce((sum, item) => sum + Number(item.score || 0), 0);
-      return { success: true, result: { score: total, totalScore: total, exercises: perExercise, revisionTopics: ['Méthode de résolution', 'Vérification des calculs', 'Conclusion claire'] } };
+      return {
+        score: 0,
+        totalScore: 20,
+        percentage: 0,
+        grade: 'Indéterminé',
+        exercises: perExercise,
+        revisionTopics: [],
+        globalFeedback: {
+          strengths: [],
+          weaknesses: ['Correction locale'],
+          encouragement: 'Reconnecte-toi à internet pour une correction IA complète.'
+        }
+      };
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // GÉNÉRATION AVEC ÉTAPES
+    // GÉNÉRATION
     // ═══════════════════════════════════════════════════════════════
     async function generateExam(event) {
       event.preventDefault();
-
-      if (!navigator.onLine) {
-        return setStatus('configStatus', 'Votre connexion semble interrompue.', 'error');
-      }
+      if (!navigator.onLine) return setStatus('configStatus', 'Votre connexion semble interrompue.', 'error');
 
       const config = readConfig();
-      if (!Number.isInteger(config.exerciseCount) || config.exerciseCount < 1 || config.exerciseCount > 10) {
-        return setStatus('configStatus', 'Le nombre d\'exercices doit être compris entre 1 et 10.', 'error');
-      }
-
       const button = $('generateButton');
       button.disabled = true;
       button.classList.add('loading');
@@ -1248,49 +836,30 @@
         const user = await authReady;
         if (!user) throw new Error('AUTH_REQUIRED');
 
-        // ══ ÉTAPE 1 ══
         activateStep('genStep1', statusEl, 'Analyse de la configuration...');
         await sleep(600);
 
-        const headers = {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${await getIdToken(user)}`
-        };
+        const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${await getIdToken(user)}` };
 
-        // ══ ÉTAPE 2 ══
         activateStep('genStep2', statusEl, 'Génération des deux sujets...');
-
-        const responsePromise = fetch('/api/exam', {
-          method: 'POST',
-          headers,
-          body: JSON.stringify(config)
-        });
-
+        const responsePromise = fetch('/api/exam', { method: 'POST', headers, body: JSON.stringify(config) });
         await sleep(1500);
 
-        // ══ ÉTAPE 3 ══
         activateStep('genStep3', statusEl, 'Rédaction des exercices...');
-
         const response = await responsePromise;
         const payload = await response.json().catch(() => null);
 
         if (response.status === 401) throw new Error('AUTH_REQUIRED');
-
         if (response.status === 429 && payload?.code === 'FREE_EXAM_LIMIT') {
-          showView('configView');
-          showPremiumPopup();
-          return;
+          showView('configView'); showPremiumPopup(); return;
         }
-
         if (response.status === 429) throw new Error('RATE_LIMIT');
-
         if (!response.ok) {
           const error = new Error(payload?.error || 'SERVICE');
           error.code = response.status === 503 ? 'CONFIGURATION' : '';
           throw error;
         }
 
-        // ══ ÉTAPE 4 ══
         activateStep('genStep4', statusEl, 'Vérification des questions...');
         await sleep(800);
 
@@ -1299,39 +868,32 @@
         state.exerciseIndex = 0;
         clearDraft();
 
-        // ══ ÉTAPE 5 ══
         activateStep('genStep5', statusEl, 'Finalisation...');
         await sleep(600);
 
         finishAllSteps(GENERATION_STEPS, statusEl, '✅ Tes deux sujets sont prêts !');
         await sleep(400);
-
         displaySubjects();
         showView('subjectsView');
 
       } catch (error) {
         if (error?.code === 'CONFIGURATION' || error instanceof TypeError) {
           activateStep('genStep2', statusEl, 'Génération locale de secours...');
-
           const fallback = buildLocalExam(readConfig());
           state.exam = normalizeExam(fallback);
           state.answers = {};
           state.exerciseIndex = 0;
           clearDraft();
-
           activateStep('genStep3', statusEl, 'Finalisation locale...');
           await sleep(500);
           activateStep('genStep4', statusEl, 'Vérification...');
           await sleep(500);
-
           finishAllSteps(GENERATION_STEPS, statusEl, '✅ Sujets générés localement.');
           await sleep(400);
-
           displaySubjects();
           showView('subjectsView');
           return;
         }
-
         handleError(error, 'configStatus');
         showView('configView');
       } finally {
@@ -1356,7 +918,6 @@
       startTimer();
     }
 
-    function flattenQuestions(exercise) { return Array.isArray(exercise.questions) ? exercise.questions : []; }
     function answerKey(exerciseIndex, questionIndex) { return `${state.selectedSubject.id}:${exerciseIndex}:${questionIndex}`; }
     function saveAnswer(key, value) { state.answers[key] = value; saveDraft(); }
 
@@ -1370,7 +931,7 @@
       const list = $('questionsList');
       list.replaceChildren();
 
-      flattenQuestions(exercise).slice(0, 10).forEach((question, questionIndex) => {
+      exercise.questions.slice(0, 10).forEach((question, questionIndex) => {
         const key = answerKey(state.exerciseIndex, questionIndex);
         const wrapper = document.createElement('div');
         wrapper.className = 'question';
@@ -1401,10 +962,7 @@
           const input = document.createElement(question.type === 'number' ? 'input' : 'textarea');
           input.className = 'answer';
           input.placeholder = question.type === 'number' ? 'Ta réponse numérique' : 'Rédige ta réponse ici...';
-          if (question.type === 'number') {
-            input.type = 'number';
-            input.step = 'any';
-          }
+          if (question.type === 'number') { input.type = 'number'; input.step = 'any'; }
           input.value = state.answers[key] || '';
           input.addEventListener('input', () => saveAnswer(key, input.value));
           wrapper.appendChild(input);
@@ -1418,36 +976,19 @@
       renderMath($('examView'));
     }
 
-    function nextQuestion() {
-      if (state.exerciseIndex < state.selectedSubject.exercises.length - 1) {
-        state.exerciseIndex += 1;
-        saveDraft();
-        renderExercise();
-      }
-    }
-    function previousQuestion() {
-      if (state.exerciseIndex > 0) {
-        state.exerciseIndex -= 1;
-        saveDraft();
-        renderExercise();
-      }
-    }
+    function nextQuestion() { if (state.exerciseIndex < state.selectedSubject.exercises.length - 1) { state.exerciseIndex += 1; saveDraft(); renderExercise(); } }
+    function previousQuestion() { if (state.exerciseIndex > 0) { state.exerciseIndex -= 1; saveDraft(); renderExercise(); } }
 
     function startTimer() {
       clearInterval(state.timerId);
       state.timerId = setInterval(() => {
         state.remainingSeconds -= 1;
         updateTimer();
-        if (state.remainingSeconds <= 0) {
-          clearInterval(state.timerId);
-          submitExam(true);
-        } else if (state.remainingSeconds % 5 === 0) {
-          saveDraft();
-        }
+        if (state.remainingSeconds <= 0) { clearInterval(state.timerId); submitExam(true); }
+        else if (state.remainingSeconds % 5 === 0) saveDraft();
       }, 1000);
       updateTimer();
     }
-
     function updateTimer() {
       const seconds = Math.max(0, state.remainingSeconds);
       const hours = String(Math.floor(seconds / 3600)).padStart(2,'0');
@@ -1456,18 +997,13 @@
       $('timer').textContent = `${hours}:${minutes}:${secs}`;
       $('timer').classList.toggle('urgent', seconds <= 300);
     }
-
-    function askFinish() {
-      $('confirmModal').classList.add('show');
-      $('confirmFinishButton').focus();
-    }
+    function askFinish() { $('confirmModal').classList.add('show'); $('confirmFinishButton').focus(); }
 
     // ═══════════════════════════════════════════════════════════════
-    // CORRECTION AVEC ÉTAPES
+    // CORRECTION
     // ═══════════════════════════════════════════════════════════════
     async function submitExam(auto = false) {
       if (state.submitting || !state.selectedSubject) return;
-
       $('confirmModal').classList.remove('show');
       state.submitting = true;
       clearInterval(state.timerId);
@@ -1482,27 +1018,17 @@
         await sleep(600);
 
         const headers = { 'Content-Type': 'application/json' };
-        if (state.user) {
-          headers.Authorization = `Bearer ${await getIdToken(state.user)}`;
-        }
+        if (state.user) headers.Authorization = `Bearer ${await getIdToken(state.user)}`;
 
         activateStep('corrStep2', statusEl, 'Analyse des exercices...');
-
         const responsePromise = fetch('/api/exam', {
           method: 'POST',
           headers,
-          body: JSON.stringify({
-            action: 'correct',
-            exam: state.exam,
-            subjectId: state.selectedSubject.id,
-            answers: state.answers
-          })
+          body: JSON.stringify({ action: 'correct', exam: state.exam, subjectId: state.selectedSubject.id, answers: state.answers })
         });
-
         await sleep(1500);
 
         activateStep('corrStep3', statusEl, 'Évaluation pédagogique...');
-
         const response = await responsePromise;
         const payload = await response.json().catch(() => null);
 
@@ -1540,7 +1066,7 @@
         finishAllSteps(CORRECTION_STEPS, statusEl, '✅ Correction locale appliquée.');
         await sleep(400);
 
-        showResults(fallbackResult);
+        showResults({ result: fallbackResult });
         clearDraft();
       } finally {
         state.submitting = false;
@@ -1548,84 +1074,253 @@
       }
     }
 
+    // ═══════════════════════════════════════════════════════════════
+    // RÉSULTATS
+    // ═══════════════════════════════════════════════════════════════
     function showResults(payload) {
-      const result = payload?.result || payload?.results || payload;
-      const score = Math.max(0, Math.min(20, Number(result?.score ?? result?.totalScore ?? 0)));
-      $('resultScore').textContent = `${Number(score).toFixed(2)} / 20`;
-      $('resultPercent').textContent = `${Math.round((score / 20) * 100)} %`;
+      const result = payload?.result || payload;
+      state.lastResult = result;
+
+      const score = Math.max(0, Math.min(20, Number(result?.score ?? 0)));
+      const percentage = Number(result?.percentage ?? Math.round((score / 20) * 100));
+      const grade = result?.grade || getGrade(percentage);
+
+      $('resultScore').textContent = `${score.toFixed(2)} / 20`;
+      $('resultPercent').textContent = `${percentage} %`;
+
       const details = $('resultsDetails');
       details.replaceChildren();
-      const exercises = Array.isArray(result?.exercises) ? result.exercises : [];
 
-      if (!exercises.length) {
-        const message = document.createElement('p');
-        message.className = 'lead';
-        message.textContent = 'Correction reçue. Consulte le détail lorsque le backend le fournit.';
-        details.appendChild(message);
-      }
+      // Mention
+      const gradeBanner = document.createElement('div');
+      gradeBanner.className = `grade-banner grade-${getGradeClass(percentage)}`;
+      gradeBanner.innerHTML = `
+        <div class="grade-emoji">${getGradeEmoji(percentage)}</div>
+        <div class="grade-info">
+          <div class="grade-title">${escapeHtml(grade)}</div>
+          <div class="grade-sub">${escapeHtml(result?.globalFeedback?.encouragement || 'Continue tes efforts !')}</div>
+        </div>
+      `;
+      details.appendChild(gradeBanner);
+
+      // Récapitulatif des exercices
+      const exercises = Array.isArray(result?.exercises) ? result.exercises : [];
+      const recapSection = document.createElement('div');
+      recapSection.className = 'recap-section';
+      recapSection.innerHTML = `<h3 class="recap-title">📚 Récapitulatif des exercices</h3>`;
 
       exercises.forEach((exercise, index) => {
-        const article = document.createElement('article');
-        article.className = 'result-exercise';
-        const title = document.createElement('h3');
-        title.textContent = `Exercice ${exercise.number || index + 1} — ${exercise.score ?? 0} point(s)`;
-        article.appendChild(title);
-        if (exercise.explanation) {
-          const explanation = document.createElement('p');
-          explanation.textContent = exercise.explanation;
-          article.appendChild(explanation);
-        }
-        if (exercise.advice) {
-          const advice = document.createElement('p');
-          advice.className = 'lead';
-          advice.textContent = `Conseil : ${exercise.advice}`;
-          article.appendChild(advice);
-        }
-        details.appendChild(article);
+        const exercisePercent = (exercise.maxScore > 0) ? (exercise.score / exercise.maxScore) * 100 : 0;
+        const statusIcon = exercisePercent >= 75 ? '✅' : exercisePercent >= 50 ? '⚠️' : '❌';
+
+        const card = document.createElement('button');
+        card.className = 'exercise-card';
+        card.type = 'button';
+        card.innerHTML = `
+          <div class="exercise-card-icon">${statusIcon}</div>
+          <div class="exercise-card-body">
+            <div class="exercise-card-title">Exercice ${exercise.number || index + 1}${exercise.title ? ` — ${escapeHtml(exercise.title)}` : ''}</div>
+            <div class="exercise-card-meta">${Number(exercise.score || 0).toFixed(2)} / ${Number(exercise.maxScore || 4).toFixed(2)} pts · ${exercise.correctAnswers || 0}/${exercise.totalQuestions || 10} correctes</div>
+            <div class="exercise-card-progress"><div class="exercise-card-fill" style="width:${exercisePercent}%;background:${getProgressColor(exercisePercent)}"></div></div>
+          </div>
+          <div class="exercise-card-arrow">→</div>
+        `;
+        card.addEventListener('click', () => showExerciseDetail(exercise, index));
+        recapSection.appendChild(card);
       });
+
+      details.appendChild(recapSection);
+
+      // Points à revoir
+      if (Array.isArray(result?.revisionTopics) && result.revisionTopics.length > 0) {
+        const topicsSection = document.createElement('div');
+        topicsSection.className = 'topics-section';
+        topicsSection.innerHTML = `
+          <h3 class="topics-title">📖 Points à revoir en priorité</h3>
+          <ul class="topics-list">
+            ${result.revisionTopics.map(t => `<li>${escapeHtml(t)}</li>`).join('')}
+          </ul>
+        `;
+        details.appendChild(topicsSection);
+      }
 
       showView('resultsView');
       renderMath($('resultsView'));
     }
 
+    function showExerciseDetail(exercise, exerciseIndex) {
+      const details = $('resultsDetails');
+      details.replaceChildren();
+
+      const exercisePercent = (exercise.maxScore > 0) ? (exercise.score / exercise.maxScore) * 100 : 0;
+      const statusIcon = exercisePercent >= 75 ? '✅' : exercisePercent >= 50 ? '⚠️' : '❌';
+
+      // Header
+      const header = document.createElement('div');
+      header.className = 'exercise-detail-header';
+      header.innerHTML = `
+        <button class="back-btn-detail" id="backToRecapBtn"><i class="fas fa-arrow-left"></i> Retour</button>
+        <div class="exercise-detail-title">
+          <div class="exercise-detail-icon">${statusIcon}</div>
+          <div>
+            <h3>Exercice ${exercise.number || exerciseIndex + 1}${exercise.title ? ` — ${escapeHtml(exercise.title)}` : ''}</h3>
+            <div class="exercise-detail-meta">${Number(exercise.score || 0).toFixed(2)} / ${Number(exercise.maxScore || 4).toFixed(2)} pts · ${exercise.correctAnswers || 0}/${exercise.totalQuestions || 10} correctes</div>
+          </div>
+        </div>
+      `;
+      details.appendChild(header);
+
+      // Questions
+      const questions = Array.isArray(exercise.questions) ? exercise.questions : [];
+
+      if (questions.length === 0) {
+        const empty = document.createElement('p');
+        empty.className = 'lead';
+        empty.textContent = 'Aucun détail disponible pour cet exercice. Le backend n\'a pas fourni les corrections par question.';
+        details.appendChild(empty);
+      } else {
+        questions.forEach((q, qIdx) => {
+          const questionEl = document.createElement('div');
+          questionEl.className = `question-detail q-${q.status || 'pending'}`;
+
+          const qIcon = q.status === 'correct' ? '✅' : q.status === 'wrong' ? '❌' : '⏭️';
+
+          // Header question
+          const qHeader = document.createElement('div');
+          qHeader.className = 'question-header';
+          qHeader.innerHTML = `
+            <div class="question-number"><span class="q-icon">${qIcon}</span> Question ${escapeHtml(q.number || qIdx + 1)}</div>
+            <div class="question-points">${Number(q.points || 0).toFixed(2)} / ${Number(q.maxPoints || 0.4).toFixed(2)} pt</div>
+          `;
+          questionEl.appendChild(qHeader);
+
+          // Énoncé
+          if (q.questionText) {
+            const qText = document.createElement('div');
+            qText.className = 'question-text';
+            qText.innerHTML = `<strong>❓ Énoncé :</strong> ${escapeHtml(q.questionText)}`;
+            questionEl.appendChild(qText);
+          }
+
+          // Réponses
+          const answersRow = document.createElement('div');
+          answersRow.className = 'answers-row';
+
+          const studentBlock = document.createElement('div');
+          studentBlock.className = 'answer-block student-answer';
+          if (q.status === 'unanswered' || !q.studentAnswer) {
+            studentBlock.innerHTML = `<div class="answer-label">✍️ Ta réponse :</div><div class="answer-value unanswered">Aucune réponse</div>`;
+          } else {
+            studentBlock.innerHTML = `<div class="answer-label">✍️ Ta réponse :</div><div class="answer-value">${escapeHtml(String(q.studentAnswer))}</div>`;
+          }
+          answersRow.appendChild(studentBlock);
+
+          if (q.correctAnswer && q.status !== 'correct') {
+            const correctBlock = document.createElement('div');
+            correctBlock.className = 'answer-block correct-answer';
+            correctBlock.innerHTML = `<div class="answer-label">✅ Bonne réponse :</div><div class="answer-value">${escapeHtml(String(q.correctAnswer))}</div>`;
+            answersRow.appendChild(correctBlock);
+          }
+
+          questionEl.appendChild(answersRow);
+
+          // Feedback
+          if (q.feedback) {
+            const feedbackBlock = document.createElement('div');
+            feedbackBlock.className = 'feedback-block';
+            feedbackBlock.innerHTML = `<div class="feedback-text">${escapeHtml(q.feedback)}</div>`;
+            questionEl.appendChild(feedbackBlock);
+          }
+
+          // Meilleure méthode
+          if (q.betterMethod) {
+            const methodBlock = document.createElement('div');
+            methodBlock.className = 'method-block';
+            methodBlock.innerHTML = `<div class="method-label">💡 ${q.status === 'correct' ? 'Astuce bonus' : 'Meilleure méthode'}</div><div class="method-text">${escapeHtml(q.betterMethod)}</div>`;
+            questionEl.appendChild(methodBlock);
+          }
+
+          // À revoir
+          if (q.toReview) {
+            const reviewBlock = document.createElement('div');
+            reviewBlock.className = 'review-block';
+            reviewBlock.innerHTML = `<div class="review-label">📖 À revoir</div><div class="review-text">${escapeHtml(q.toReview)}</div>`;
+            questionEl.appendChild(reviewBlock);
+          }
+
+          details.appendChild(questionEl);
+        });
+      }
+
+      // Explication globale de l'exercice
+      if (exercise.explanation) {
+        const explanationEl = document.createElement('div');
+        explanationEl.className = 'exercise-explanation';
+        explanationEl.innerHTML = `<div class="explanation-label">📝 Bilan de l'exercice</div><div class="explanation-text">${escapeHtml(exercise.explanation)}</div>`;
+        details.appendChild(explanationEl);
+      }
+
+      renderMath(details);
+
+      document.getElementById('backToRecapBtn').addEventListener('click', () => {
+        showResults({ result: state.lastResult });
+      });
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // HELPERS RÉSULTATS
+    // ═══════════════════════════════════════════════════════════════
+    function getGrade(percentage) {
+      if (percentage >= 90) return 'Excellent';
+      if (percentage >= 80) return 'Très bien';
+      if (percentage >= 70) return 'Bien';
+      if (percentage >= 60) return 'Assez bien';
+      if (percentage >= 50) return 'Passable';
+      return 'Insuffisant';
+    }
+    function getGradeEmoji(percentage) {
+      if (percentage >= 90) return '🏆';
+      if (percentage >= 70) return '🎉';
+      if (percentage >= 50) return '📚';
+      return '💪';
+    }
+    function getGradeClass(percentage) {
+      if (percentage >= 70) return 'success';
+      if (percentage >= 50) return 'warning';
+      return 'danger';
+    }
+    function getProgressColor(percent) {
+      if (percent >= 75) return 'linear-gradient(90deg, #45b47d, #6fd99a)';
+      if (percent >= 50) return 'linear-gradient(90deg, #E0B84A, #F0CC65)';
+      return 'linear-gradient(90deg, #d7654a, #e88a72)';
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // ERREURS / PREMIUM
+    // ═══════════════════════════════════════════════════════════════
     function handleError(error, statusId) {
       const message = error?.message === 'AUTH_REQUIRED' ? 'Connecte-toi pour générer un examen.'
-        : error?.message === 'LIMIT' ? 'Vous avez atteint votre limite de génération pour aujourd\'hui.'
         : error?.message === 'RATE_LIMIT' ? 'Trop de tentatives. Attends une minute puis réessaie.'
         : error?.code === 'CONFIGURATION' ? 'Le service IA ou Firebase n\'est pas configuré sur le serveur.'
         : error?.message && error.message !== 'SERVICE' ? error.message
         : 'Impossible de générer l\'examen. Réessaie.';
       setStatus(statusId, message, 'error');
     }
-
-    function showPremiumPopup() {
-      $('premiumPopup').classList.add('show');
-      $('popupCloseBtn').focus();
-    }
-    function hidePremiumPopup() {
-      $('premiumPopup').classList.remove('show');
-    }
+    function showPremiumPopup() { $('premiumPopup').classList.add('show'); $('popupCloseBtn').focus(); }
+    function hidePremiumPopup() { $('premiumPopup').classList.remove('show'); }
 
     // ═══════════════════════════════════════════════════════════════
     // INITIALISATION
     // ═══════════════════════════════════════════════════════════════
     function initExam() {
-      // Initialiser les dropdowns
       initCustomSelects();
-
-      // Définir les valeurs par défaut
       customSelects.subject.select('Mathématiques', true);
       customSelects.level.select('Terminale D', true);
       customSelects.difficulty.select('medium', true);
       customSelects.duration.select('60', true);
-
-      // Générer les chapitres
       updateChapters();
-
-      // Écouter les changements de matière
       customSelects.subject.element.addEventListener('change', updateChapters);
 
-      // Autres listeners
       $('configForm').addEventListener('submit', generateExam);
       $('backConfigButton').addEventListener('click', () => showView('configView'));
       $('previousButton').addEventListener('click', previousQuestion);
@@ -1635,30 +1330,20 @@
       $('confirmFinishButton').addEventListener('click', () => submitExam(false));
       $('popupCloseBtn').addEventListener('click', hidePremiumPopup);
       $('popupLaterBtn').addEventListener('click', hidePremiumPopup);
-      $('premiumPopup').addEventListener('click', (event) => {
-        if (event.target === $('premiumPopup')) hidePremiumPopup();
-      });
+      $('premiumPopup').addEventListener('click', (event) => { if (event.target === $('premiumPopup')) hidePremiumPopup(); });
       $('newExamButton').addEventListener('click', () => {
         clearDraft();
         state.exam = null;
         state.selectedSubject = null;
         state.submitting = false;
+        state.lastResult = null;
         showView('configView');
       });
 
-      window.addEventListener('online', () => {
-        $('connectionState').textContent = 'Connexion disponible';
-        $('connectionState').classList.add('online');
-      });
-      window.addEventListener('offline', () => {
-        $('connectionState').textContent = 'Hors ligne';
-        $('connectionState').classList.remove('online');
-      });
+      window.addEventListener('online', () => { $('connectionState').textContent = 'Connexion disponible'; $('connectionState').classList.add('online'); });
+      window.addEventListener('offline', () => { $('connectionState').textContent = 'Hors ligne'; $('connectionState').classList.remove('online'); });
 
-      if (loadDraft()) {
-        displaySubjects();
-        showView('subjectsView');
-      }
+      if (loadDraft()) { displaySubjects(); showView('subjectsView'); }
     }
 
     onAuthStateChanged(auth, (user) => {

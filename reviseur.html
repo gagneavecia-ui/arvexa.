@@ -14,10 +14,11 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <script src="katex-utils.js" defer></script>
   <script src="register-sw.js" defer></script>
   <style>
     /* ═══════════════════════════════════════════════════════════
-       DESIGN SYSTEM — Identique à exam.html
+       DESIGN SYSTEM — Identique à exam.html et planificateur.html
        ═══════════════════════════════════════════════════════════ */
     :root {
       --black: #0A0A0A;
@@ -100,6 +101,7 @@
       font-weight: 700;
       letter-spacing: .05em;
       white-space: nowrap;
+      transition: all .25s ease;
     }
     .quota-badge i { font-size: 11px; }
     .quota-badge.warning {
@@ -204,6 +206,7 @@
       color: var(--white);
       padding: 12px 13px;
       outline: none;
+      transition: border-color .16s;
     }
     input:focus, select:focus {
       border-color: var(--gold-light);
@@ -211,7 +214,7 @@
     }
 
     /* ═══════════════════════════════════════════════════════════
-       BOUTONS (avec fix loader)
+       BOUTONS (loader fixé)
        ═══════════════════════════════════════════════════════════ */
     .actions {
       display: flex;
@@ -249,7 +252,7 @@
     }
     .btn.full { width: 100%; }
 
-    /* ⚡ FIX DU LOADER — Caché par défaut */
+    /* ⚡ LOADER — Caché par défaut (bug fixé) */
     .loader {
       display: none;
       width: 18px;
@@ -282,7 +285,7 @@
     .status.success { color: #7ce0aa; }
 
     /* ═══════════════════════════════════════════════════════════
-       CHIPS (sélecteur matière) — Style simple
+       CHIPS (sélecteur matière)
        ═══════════════════════════════════════════════════════════ */
     .chips {
       display: flex;
@@ -313,7 +316,7 @@
     .chip i { font-size: 12px; }
 
     /* ═══════════════════════════════════════════════════════════
-       MODES (Fiche / Flashcards) — Style simple
+       MODES (Fiche / Flashcards)
        ═══════════════════════════════════════════════════════════ */
     .modes {
       display: grid;
@@ -355,7 +358,7 @@
     }
 
     /* ═══════════════════════════════════════════════════════════
-       LOADING STATE (pleine page)
+       LOADING STATE
        ═══════════════════════════════════════════════════════════ */
     .loading-page {
       display: flex;
@@ -390,6 +393,7 @@
       color: var(--muted);
       transition: all .25s ease;
       border-left: 3px solid transparent;
+      text-align: left;
     }
     .step.active {
       background: rgba(224, 184, 74, .06);
@@ -449,7 +453,7 @@
     }
 
     /* ═══════════════════════════════════════════════════════════
-       CARTE SIMPLE (remplace fiche-section)
+       CARTES SIMPLES
        ═══════════════════════════════════════════════════════════ */
     .card {
       background: #101410;
@@ -464,7 +468,7 @@
       font-size: 14px;
       font-weight: 800;
       color: var(--gold-light);
-      margin-bottom: 10px;
+      margin-bottom: 12px;
       display: flex;
       align-items: center;
       gap: 8px;
@@ -488,7 +492,7 @@
     }
 
     /* ═══════════════════════════════════════════════════════════
-       FLASHCARDS — Plus simples
+       FLASHCARDS
        ═══════════════════════════════════════════════════════════ */
     .flashcard {
       perspective: 1200px;
@@ -518,6 +522,7 @@
       text-align: center;
       border: 1px solid var(--line);
       background: #101410;
+      overflow-y: auto;
     }
     .flashcard-back {
       transform: rotateY(180deg);
@@ -537,6 +542,7 @@
       line-height: 1.6;
       color: var(--white);
       font-weight: 500;
+      width: 100%;
     }
     .flashcard-hint {
       font-size: 12px;
@@ -716,9 +722,7 @@
       margin-bottom: 8px;
       transition: all .16s ease;
     }
-    .history-item:hover {
-      border-color: rgba(224, 184, 74, .3);
-    }
+    .history-item:hover { border-color: rgba(224, 184, 74, .3); }
     .history-icon {
       width: 42px;
       height: 42px;
@@ -738,10 +742,7 @@
       color: var(--white);
       margin-bottom: 2px;
     }
-    .history-sub {
-      font-size: 12px;
-      color: var(--muted);
-    }
+    .history-sub { font-size: 12px; color: var(--muted); }
     .history-score {
       font-size: 20px;
       font-weight: 800;
@@ -868,15 +869,86 @@
     .empty-state p { font-size: 13px; }
 
     /* ═══════════════════════════════════════════════════════════
-       KATEX
+       KATEX — Rendu renforcé
        ═══════════════════════════════════════════════════════════ */
-    .katex { color: var(--white); font-size: 1.05em; }
+    .katex {
+      font-size: 1.08em;
+      color: inherit;
+      line-height: 1.4;
+      text-rendering: optimizeLegibility;
+    }
+    .katex-inline { padding: 0 2px; font-weight: 500; }
+
     .katex-display {
-      max-width: 100%;
+      display: block;
+      margin: 1.2em 0;
+      text-align: center;
       overflow-x: auto;
       overflow-y: hidden;
-      padding: 6px 0;
+      padding: 8px 4px;
+      -webkit-overflow-scrolling: touch;
     }
+    .katex-display > .katex { font-size: 1.25em; white-space: nowrap; }
+
+    .katex-display::-webkit-scrollbar { height: 3px; }
+    .katex-display::-webkit-scrollbar-track { background: transparent; }
+    .katex-display::-webkit-scrollbar-thumb {
+      background: rgba(224, 184, 74, .2);
+      border-radius: 10px;
+    }
+
+    .katex .mbin,
+    .katex .mrel,
+    .katex .mop { color: #E0B84A; }
+    .katex .frac-line { border-bottom-color: currentColor; }
+    .katex .sqrt > .root { color: #E0B84A; }
+    .katex .accent-body { color: #E0B84A; }
+
+    .katex-error {
+      color: #ff9a84 !important;
+      background: rgba(215, 101, 74, .1);
+      padding: 1px 4px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: .9em;
+    }
+
+    /* Formule hero (mise en avant) */
+    .formula-hero {
+      display: block;
+      margin: 24px auto;
+      padding: 24px 20px;
+      background: linear-gradient(135deg, rgba(224, 184, 74, .08), rgba(26, 58, 42, .06));
+      border: 1px solid rgba(224, 184, 74, .15);
+      border-radius: 14px;
+      text-align: center;
+      position: relative;
+      overflow-x: auto;
+    }
+    .formula-hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 1px;
+      background: rgba(224, 184, 74, .4);
+    }
+    .formula-hero .katex-display > .katex { font-size: 1.5em; }
+
+    /* Formula block (encadré) */
+    .formula-block {
+      display: block;
+      margin: 1.2em auto;
+      padding: 16px 20px;
+      background: rgba(224, 184, 74, .04);
+      border-left: 3px solid #E0B84A;
+      border-radius: 0 10px 10px 0;
+      overflow-x: auto;
+      text-align: center;
+    }
+    .formula-block .katex-display { margin: 0; }
 
     /* ═══════════════════════════════════════════════════════════
        RESPONSIVE
@@ -894,6 +966,10 @@
       .flashcard, .flashcard-inner { height: 200px; min-height: 200px; }
       .flashcard-text { font-size: 15px; }
       .session-head { flex-direction: column; align-items: flex-start; }
+      .katex { font-size: 1em; }
+      .katex-display > .katex { font-size: 1.1em; }
+      .formula-hero { padding: 18px 14px; margin: 16px auto; }
+      .formula-hero .katex-display > .katex { font-size: 1.25em; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -907,7 +983,9 @@
 <body>
   <main class="shell">
 
-    <!-- HEADER -->
+    <!-- ═══════════════════════════════════════════════════════════
+         HEADER
+         ═══════════════════════════════════════════════════════════ -->
     <header>
       <a class="brand" href="index.html">ARVEX<span>A School</span></a>
       <div class="header-right">
@@ -1000,7 +1078,7 @@
     </section>
 
     <!-- ═══════════════════════════════════════════════════════════
-         VUE 3 : FICHE (cartes simples)
+         VUE 3 : FICHE
          ═══════════════════════════════════════════════════════════ -->
     <section class="view" id="ficheView">
       <div class="panel">
@@ -1278,6 +1356,60 @@
   }
 
   // ─────────────────────────────────────────────────────────────
+  // RENDER KATEX (avec KaTeXUtils si disponible)
+  // ─────────────────────────────────────────────────────────────
+  function renderKaTeX(root) {
+    if (!root) return;
+
+    if (window.KaTeXUtils) {
+      window.KaTeXUtils.renderMath(root);
+      return;
+    }
+
+    // Fallback
+    if (typeof renderMathInElement !== 'function') {
+      setTimeout(() => renderKaTeX(root), 200);
+      return;
+    }
+    try {
+      renderMathInElement(root, {
+        delimiters: [
+          { left: '$$', right: '$$', display: true },
+          { left: '\\[', right: '\\]', display: true },
+          { left: '$', right: '$', display: false },
+          { left: '\\(', right: '\\)', display: false }
+        ],
+        throwOnError: false,
+        errorColor: '#ff9a84',
+        strict: false,
+        macros: {
+          "\\R": "\\mathbb{R}",
+          "\\N": "\\mathbb{N}",
+          "\\Z": "\\mathbb{Z}",
+          "\\Q": "\\mathbb{Q}",
+          "\\C": "\\mathbb{C}",
+          "\\Re": "\\operatorname{Re}",
+          "\\Im": "\\operatorname{Im}",
+          "\\arg": "\\operatorname{arg}"
+        }
+      });
+    } catch (e) {
+      console.warn('KaTeX render error:', e);
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // NORMALISATION LATEX (via KaTeXUtils ou fallback)
+  // ─────────────────────────────────────────────────────────────
+  function normalizeMath(text) {
+    if (!text) return '';
+    if (window.KaTeXUtils) {
+      return window.KaTeXUtils.cleanAIResponse(text);
+    }
+    return String(text);
+  }
+
+  // ─────────────────────────────────────────────────────────────
   // CHAPITRES
   // ─────────────────────────────────────────────────────────────
   function renderChapters() {
@@ -1429,7 +1561,7 @@
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
   // ─────────────────────────────────────────────────────────────
-  // RENDU FICHE — Cartes simples
+  // RENDU FICHE (cartes simples + KaTeX)
   // ─────────────────────────────────────────────────────────────
   function renderFiche() {
     const session = state.currentSession;
@@ -1453,19 +1585,20 @@
       const div = document.createElement('div');
       div.className = 'card';
 
-      let body = '';
-      if (section.content) {
-        body = section.content
-          .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-          .replace(/`(.+?)`/g, '<code>$1</code>')
-          .replace(/\n/g, '<br>');
-      }
+      // ⚡ Normalisation LaTeX du contenu
+      let content = normalizeMath(section.content || '');
+
+      // Convertir le markdown basique
+      content = content
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/`(.+?)`/g, '<code>$1</code>')
+        .replace(/\n/g, '<br>');
 
       div.innerHTML = `
         <div class="card-title">
           <i class="fas fa-bookmark"></i> ${escapeHtml(section.title || 'Section')}
         </div>
-        <div class="card-body">${body}</div>
+        <div class="card-body">${content}</div>
       `;
       container.appendChild(div);
     });
@@ -1494,12 +1627,17 @@
     const card = state.flashcards[state.currentFlashIndex];
     if (!card) return;
 
-    $('flashFront').innerHTML = escapeHtml(card.question || '');
-    $('flashBack').innerHTML = escapeHtml(card.answer || '');
+    // ⚡ Normalisation LaTeX
+    const question = normalizeMath(card.question || '');
+    const answer = normalizeMath(card.answer || '');
+
+    $('flashFront').innerHTML = escapeHtml(question);
+    $('flashBack').innerHTML = escapeHtml(answer);
     $('flashCounter').textContent = `${state.currentFlashIndex + 1} / ${state.flashcards.length}`;
 
     $('flashcardEl').classList.remove('flipped');
 
+    // Rendu KaTeX sur chaque face
     renderKaTeX($('flashFront'));
     renderKaTeX($('flashBack'));
 
@@ -1594,16 +1732,22 @@
       div.className = 'quiz-question';
       div.dataset.index = index;
 
-      const optionsHtml = (q.options || []).map((opt) => `
-        <div class="quiz-option" data-option="${opt.id}" data-qindex="${index}">
-          <span class="quiz-option-letter">${opt.id}</span>
-          <span>${escapeHtml(opt.text)}</span>
-        </div>
-      `).join('');
+      // ⚡ Normalisation LaTeX
+      const cleanQuestion = normalizeMath(q.question || '');
+
+      const optionsHtml = (q.options || []).map((opt) => {
+        const cleanText = normalizeMath(opt.text || '');
+        return `
+          <div class="quiz-option" data-option="${opt.id}" data-qindex="${index}">
+            <span class="quiz-option-letter">${opt.id}</span>
+            <span>${escapeHtml(cleanText)}</span>
+          </div>
+        `;
+      }).join('');
 
       div.innerHTML = `
         <div class="quiz-q-number">Question ${index + 1}</div>
-        <div class="quiz-q-text">${escapeHtml(q.question)}</div>
+        <div class="quiz-q-text">${escapeHtml(cleanQuestion)}</div>
         <div class="quiz-options">${optionsHtml}</div>
         <div class="quiz-explanation" id="explanation-${index}"></div>
       `;
@@ -1629,8 +1773,10 @@
 
         const exp = $(`explanation-${qIndex}`);
         if (q.explanation) {
-          exp.innerHTML = `<strong>💡 Explication :</strong> ${escapeHtml(q.explanation)}`;
+          const cleanExp = normalizeMath(q.explanation);
+          exp.innerHTML = `<strong>💡 Explication :</strong> ${escapeHtml(cleanExp)}`;
           exp.classList.add('show');
+          renderKaTeX(exp);
         }
 
         if (Object.keys(state.quizAnswers).length === state.quiz.length) {
@@ -1677,9 +1823,12 @@
     if (wrongQuestions.length === 0) {
       $('resultsAdvice').innerHTML = '<p style="color:var(--success);">✅ Tu as tout juste ! Passe au chapitre suivant.</p>';
     } else {
-      $('resultsAdvice').innerHTML = wrongQuestions.slice(0, 3).map((q) =>
-        `<p style="margin-bottom:10px;"><strong style="color:#ff9a84;">❌ ${escapeHtml(q.question)}</strong><br><span style="color:var(--muted);font-size:13px;">${escapeHtml(q.explanation || 'Revois cette notion dans la fiche.')}</span></p>`
-      ).join('');
+      $('resultsAdvice').innerHTML = wrongQuestions.slice(0, 3).map((q) => {
+        const cleanQ = normalizeMath(q.question || '');
+        const cleanExp = normalizeMath(q.explanation || 'Revois cette notion dans la fiche.');
+        return `<p style="margin-bottom:10px;"><strong style="color:#ff9a84;">❌ ${escapeHtml(cleanQ)}</strong><br><span style="color:var(--muted);font-size:13px;">${escapeHtml(cleanExp)}</span></p>`;
+      }).join('');
+      renderKaTeX($('resultsAdvice'));
     }
 
     saveQuizResult(correct, total);
@@ -1821,7 +1970,6 @@
   async function loadQuota() {
     if (!state.user) return;
 
-    // Si Premium → badge premium
     if (state.isPremium) {
       showPremiumBadge();
       return;
@@ -1849,25 +1997,6 @@
     const div = document.createElement('div');
     div.textContent = String(text || '');
     return div.innerHTML;
-  }
-
-  function renderKaTeX(root) {
-    if (typeof renderMathInElement !== 'function') {
-      setTimeout(() => renderKaTeX(root), 200);
-      return;
-    }
-    try {
-      renderMathInElement(root, {
-        delimiters: [
-          { left: '$$', right: '$$', display: true },
-          { left: '\\[', right: '\\]', display: true },
-          { left: '$', right: '$', display: false },
-          { left: '\\(', right: '\\)', display: false }
-        ],
-        throwOnError: false,
-        strict: false
-      });
-    } catch (e) {}
   }
 
   // ─────────────────────────────────────────────────────────────
@@ -1902,7 +2031,6 @@
         conn.textContent = state.isPremium ? 'Premium actif' : 'Compte gratuit';
         conn.classList.toggle('online', state.isPremium);
 
-        // Charger le quota
         await loadQuota();
       }
     } catch (e) {
@@ -1912,7 +2040,7 @@
 
   // INIT
   renderChapters();
-  console.log('🎓 ARVEXA — Réviseur (style exam, cartes simples, quota 2/jour)');
+  console.log('🎓 ARVEXA — Réviseur (design exam, KaTeX renforcé, quota 2/jour)');
   </script>
 </body>
 </html>

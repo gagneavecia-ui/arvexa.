@@ -79,6 +79,28 @@ service cloud.firestore {
       }
     }
 
+match /users/{userId} {
+  // ... règles existantes ...
+
+  // ⚡ Session d'examen active (lecture/écriture par l'utilisateur)
+  match /activeExam/{docId} {
+    allow read: if request.auth != null && request.auth.uid == userId;
+    allow write: if request.auth != null && request.auth.uid == userId;
+  }
+
+  // Cache des examens (écriture serveur uniquement)
+  match /examCache/{docId} {
+    allow read: if false;
+    allow write: if false;
+  }
+
+  // Résultats (lecture par l'utilisateur, écriture serveur)
+  match /examResults/{docId} {
+    allow read: if request.auth != null && request.auth.uid == userId;
+    allow write: if false;
+  }
+}
+
     match /subjects/{subjectId} {
       allow read: if signedIn();
       allow write: if isAdmin();

@@ -17,7 +17,7 @@
   <script src="register-sw.js" defer></script>
   <style>
     /* ═══════════════════════════════════════════════════════════
-       DESIGN SYSTEM — Identique à exam.html et planificateur.html
+       DESIGN SYSTEM — Identique à exam.html
        ═══════════════════════════════════════════════════════════ */
     :root {
       --black: #0A0A0A;
@@ -69,6 +69,7 @@
       justify-content: space-between;
       gap: 14px;
       margin-bottom: 24px;
+      flex-wrap: wrap;
     }
 
     .brand {
@@ -78,6 +79,39 @@
       letter-spacing: .05em;
     }
     .brand span { color: var(--gold-light); font-style: italic; }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .quota-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      background: rgba(224, 184, 74, .08);
+      border: 1px solid rgba(224, 184, 74, .2);
+      color: var(--gold-light);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .05em;
+      white-space: nowrap;
+    }
+    .quota-badge i { font-size: 11px; }
+    .quota-badge.warning {
+      background: rgba(215, 101, 74, .1);
+      border-color: rgba(215, 101, 74, .3);
+      color: #ff9a84;
+    }
+    .quota-badge.premium {
+      background: rgba(69, 180, 125, .1);
+      border-color: rgba(69, 180, 125, .3);
+      color: #7ce0aa;
+    }
 
     .connection {
       color: var(--muted);
@@ -96,7 +130,7 @@
     .connection.online::before { background: var(--success); }
 
     /* ═══════════════════════════════════════════════════════════
-       PANEL (carte principale)
+       PANEL
        ═══════════════════════════════════════════════════════════ */
     .panel {
       background: rgba(21, 23, 21, .88);
@@ -126,7 +160,6 @@
     }
     h1 { font-size: clamp(28px, 6vw, 46px); max-width: 680px; }
     h2 { font-size: clamp(23px, 4vw, 32px); }
-    h3 { font-size: 19px; }
 
     .eyebrow {
       color: var(--gold-light);
@@ -163,7 +196,7 @@
       font-size: 13px;
       font-weight: 700;
     }
-    input, select, textarea {
+    input, select {
       width: 100%;
       border: 1px solid var(--line);
       border-radius: 10px;
@@ -172,13 +205,13 @@
       padding: 12px 13px;
       outline: none;
     }
-    input:focus, select:focus, textarea:focus {
+    input:focus, select:focus {
       border-color: var(--gold-light);
       box-shadow: 0 0 0 3px rgba(224, 184, 74, .12);
     }
 
     /* ═══════════════════════════════════════════════════════════
-       BOUTONS
+       BOUTONS (avec fix loader)
        ═══════════════════════════════════════════════════════════ */
     .actions {
       display: flex;
@@ -200,6 +233,7 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
+      font-family: inherit;
     }
     .btn:hover:not(:disabled) {
       transform: translateY(-1px);
@@ -213,38 +247,42 @@
       background: transparent;
       border-color: var(--line);
     }
-    .btn.danger {
-      background: rgba(215, 101, 74, .16);
-      border-color: rgba(215, 101, 74, .4);
-    }
     .btn.full { width: 100%; }
 
+    /* ⚡ FIX DU LOADER — Caché par défaut */
+    .loader {
+      display: none;
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(10, 10, 10, .25);
+      border-top-color: currentColor;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    .btn.secondary .loader {
+      border-color: rgba(255, 255, 255, .2);
+      border-top-color: var(--white);
+    }
+    .btn.loading .loader { display: inline-block; }
+    .btn.loading .btn-text { display: none; }
+    .btn.loading .btn-icon { display: none; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
     /* ═══════════════════════════════════════════════════════════
-       STATUS / LOADER
+       STATUS
        ═══════════════════════════════════════════════════════════ */
     .status {
       min-height: 22px;
       margin-top: 14px;
       color: var(--muted);
+      font-size: 13px;
     }
     .status.error { color: #ff9a84; }
     .status.success { color: #7ce0aa; }
 
-    .loader {
-      width: 20px;
-      height: 20px;
-      border: 2px solid rgba(10, 10, 10, .25);
-      border-top-color: currentColor;
-      border-radius: 50%;
-      animation: spin .7s linear infinite;
-      display: inline-block;
-      vertical-align: middle;
-      margin-right: 8px;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
     /* ═══════════════════════════════════════════════════════════
-       CHIPS (sélecteur matière)
+       CHIPS (sélecteur matière) — Style simple
        ═══════════════════════════════════════════════════════════ */
     .chips {
       display: flex;
@@ -252,10 +290,10 @@
       gap: 8px;
     }
     .chip {
-      padding: 9px 16px;
-      border-radius: 20px;
+      padding: 10px 16px;
+      border-radius: 10px;
       border: 1px solid var(--line);
-      background: transparent;
+      background: #0e100e;
       color: var(--muted);
       font-size: 13px;
       font-weight: 700;
@@ -268,24 +306,23 @@
     }
     .chip:hover { color: var(--white); border-color: rgba(224, 184, 74, .3); }
     .chip.active {
-      background: rgba(224, 184, 74, .12);
-      color: var(--gold-light);
-      border-color: var(--gold-light);
+      background: linear-gradient(135deg, var(--gold-light), var(--gold));
+      color: var(--black);
+      border-color: transparent;
     }
     .chip i { font-size: 12px; }
 
     /* ═══════════════════════════════════════════════════════════
-       MODES (Fiche / Flashcards)
+       MODES (Fiche / Flashcards) — Style simple
        ═══════════════════════════════════════════════════════════ */
     .modes {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-top: 8px;
+      gap: 10px;
     }
     .mode-card {
-      padding: 18px 16px;
-      border-radius: 12px;
+      padding: 16px 14px;
+      border-radius: 10px;
       border: 1px solid var(--line);
       background: #0e100e;
       cursor: pointer;
@@ -295,12 +332,13 @@
     .mode-card:hover { border-color: rgba(224, 184, 74, .3); }
     .mode-card.active {
       border-color: var(--gold-light);
-      background: rgba(224, 184, 74, .06);
+      background: rgba(224, 184, 74, .08);
     }
     .mode-card .mode-emoji {
-      font-size: 24px;
+      font-size: 22px;
       display: block;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
+      line-height: 1;
     }
     .mode-card .mode-name {
       font-size: 14px;
@@ -313,32 +351,34 @@
       font-size: 12px;
       color: var(--muted);
       display: block;
+      line-height: 1.4;
     }
 
     /* ═══════════════════════════════════════════════════════════
-       LOADING STATE (steps)
+       LOADING STATE (pleine page)
        ═══════════════════════════════════════════════════════════ */
-    .loading-state {
+    .loading-page {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 18px;
-      padding: 40px 0;
+      gap: 20px;
+      padding: 50px 20px;
+      text-align: center;
     }
-    .loading-state .big-spinner {
-      width: 44px;
-      height: 44px;
+    .loading-page .big-spinner {
+      width: 48px;
+      height: 48px;
       border: 3px solid rgba(224, 184, 74, .15);
       border-top-color: var(--gold-light);
       border-radius: 50%;
-      animation: spin .9s linear infinite;
+      animation: spin 0.9s linear infinite;
     }
     .steps {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
       width: 100%;
-      max-width: 340px;
+      max-width: 360px;
     }
     .step {
       display: flex;
@@ -349,35 +389,35 @@
       font-size: 14px;
       color: var(--muted);
       transition: all .25s ease;
+      border-left: 3px solid transparent;
     }
     .step.active {
-      background: rgba(224, 184, 74, .08);
+      background: rgba(224, 184, 74, .06);
       color: var(--gold-light);
-      border-left: 3px solid var(--gold-light);
+      border-left-color: var(--gold-light);
     }
     .step.done { color: var(--success); }
-    .step.done::after { content: '✓'; margin-left: auto; }
+    .step.done::after { content: '✓'; margin-left: auto; font-weight: 800; }
 
     /* ═══════════════════════════════════════════════════════════
-       SESSION HEADER (Fiche / Flashcards / Quiz)
+       SESSION HEAD
        ═══════════════════════════════════════════════════════════ */
     .session-head {
       display: flex;
       justify-content: space-between;
       align-items: end;
       gap: 12px;
-      margin-bottom: 14px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
     }
-    .session-head h2 { font-size: 26px; }
-    .count { color: var(--muted); font-size: 13px; }
-
+    .session-head h2 { font-size: clamp(22px, 4vw, 28px); }
     .session-meta {
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
       font-size: 12px;
       color: var(--muted);
-      margin-top: 6px;
+      margin-top: 8px;
     }
     .session-meta span {
       display: inline-flex;
@@ -404,48 +444,41 @@
       display: block;
       height: 100%;
       background: linear-gradient(90deg, var(--gold), var(--gold-light));
-      transition: width .2s;
+      transition: width .3s ease;
       width: 0%;
     }
 
     /* ═══════════════════════════════════════════════════════════
-       FICHE DE RÉVISION
+       CARTE SIMPLE (remplace fiche-section)
        ═══════════════════════════════════════════════════════════ */
-    .fiche-section {
+    .card {
       background: #101410;
       border: 1px solid var(--line);
-      border-left: 3px solid var(--gold-light);
       border-radius: 12px;
       padding: 18px 20px;
-      margin-bottom: 12px;
-      transition: all .16s ease;
+      margin-bottom: 10px;
+      transition: border-color .16s ease;
     }
-    .fiche-section:hover {
-      border-color: rgba(224, 184, 74, .3);
-      border-left-color: var(--gold-light);
-      transform: translateX(3px);
-    }
-    .fiche-section-title {
-      font-size: 11px;
+    .card:hover { border-color: rgba(224, 184, 74, .2); }
+    .card-title {
+      font-size: 14px;
       font-weight: 800;
-      letter-spacing: .14em;
-      text-transform: uppercase;
       color: var(--gold-light);
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       display: flex;
       align-items: center;
       gap: 8px;
     }
-    .fiche-section-title i { font-size: 12px; }
-    .fiche-section-body {
+    .card-title i { font-size: 13px; }
+    .card-body {
       font-size: 15px;
       line-height: 1.75;
       color: #e2e3dc;
     }
-    .fiche-section-body strong { color: var(--gold-light); font-weight: 700; }
-    .fiche-section-body ul { padding-left: 20px; margin: 8px 0; }
-    .fiche-section-body li { margin-bottom: 6px; }
-    .fiche-section-body code {
+    .card-body strong { color: var(--gold-light); font-weight: 700; }
+    .card-body ul { padding-left: 20px; margin: 8px 0; }
+    .card-body li { margin-bottom: 6px; }
+    .card-body code {
       background: rgba(224, 184, 74, .1);
       color: var(--gold-light);
       padding: 2px 7px;
@@ -455,18 +488,18 @@
     }
 
     /* ═══════════════════════════════════════════════════════════
-       FLASHCARDS
+       FLASHCARDS — Plus simples
        ═══════════════════════════════════════════════════════════ */
     .flashcard {
       perspective: 1200px;
-      margin-bottom: 20px;
-      min-height: 240px;
+      margin-bottom: 18px;
+      min-height: 220px;
     }
     .flashcard-inner {
       position: relative;
       width: 100%;
-      height: 240px;
-      transition: transform .7s cubic-bezier(.25, 1, .5, 1);
+      height: 220px;
+      transition: transform .6s cubic-bezier(.25, 1, .5, 1);
       transform-style: preserve-3d;
       cursor: pointer;
     }
@@ -477,21 +510,19 @@
       inset: 0;
       backface-visibility: hidden;
       border-radius: 14px;
-      padding: 30px 24px;
+      padding: 24px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
       border: 1px solid var(--line);
-    }
-    .flashcard-front {
-      background: linear-gradient(145deg, rgba(26, 58, 42, .5), rgba(10, 10, 10, .6));
+      background: #101410;
     }
     .flashcard-back {
-      background: linear-gradient(145deg, rgba(184, 134, 11, .15), rgba(10, 10, 10, .6));
       transform: rotateY(180deg);
       border-color: rgba(224, 184, 74, .3);
+      background: rgba(224, 184, 74, .04);
     }
     .flashcard-label {
       font-size: 10px;
@@ -499,7 +530,7 @@
       letter-spacing: .14em;
       text-transform: uppercase;
       color: var(--gold-light);
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
     .flashcard-text {
       font-size: 17px;
@@ -510,7 +541,7 @@
     .flashcard-hint {
       font-size: 12px;
       color: var(--muted);
-      margin-top: 18px;
+      margin-top: 16px;
       font-style: italic;
     }
 
@@ -524,6 +555,7 @@
       color: var(--muted);
       font-size: 13px;
       font-weight: 700;
+      white-space: nowrap;
     }
 
     /* ═══════════════════════════════════════════════════════════
@@ -532,33 +564,31 @@
     .quiz-question {
       background: #101410;
       border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 20px 22px;
-      margin-bottom: 14px;
-      transition: border-color .16s ease;
+      border-radius: 12px;
+      padding: 18px 20px;
+      margin-bottom: 12px;
     }
-    .quiz-question:hover { border-color: rgba(224, 184, 74, .2); }
     .quiz-q-number {
       font-size: 11px;
       font-weight: 800;
       letter-spacing: .14em;
       text-transform: uppercase;
       color: var(--gold-light);
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
     .quiz-q-text {
-      font-size: 16px;
-      line-height: 1.65;
+      font-size: 15px;
+      line-height: 1.6;
       color: var(--white);
       font-weight: 500;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
     .quiz-options { display: flex; flex-direction: column; gap: 8px; }
     .quiz-option {
       display: flex;
       align-items: flex-start;
       gap: 12px;
-      padding: 12px 14px;
+      padding: 11px 13px;
       border-radius: 10px;
       border: 1px solid var(--line);
       background: #0e100e;
@@ -588,9 +618,9 @@
     }
     .quiz-option.disabled { cursor: not-allowed; }
     .quiz-option-letter {
-      width: 28px;
-      height: 28px;
-      border-radius: 8px;
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
       background: rgba(255, 255, 255, .04);
       display: flex;
       align-items: center;
@@ -618,7 +648,7 @@
       padding: 12px 14px;
       background: rgba(74, 175, 224, .08);
       border-left: 3px solid #4AAFE0;
-      border-radius: 0 10px 10px 0;
+      border-radius: 0 8px 8px 0;
       font-size: 13px;
       line-height: 1.6;
       color: #cfd0cc;
@@ -630,16 +660,28 @@
     /* ═══════════════════════════════════════════════════════════
        RÉSULTATS
        ═══════════════════════════════════════════════════════════ */
+    .result-hero {
+      text-align: center;
+      padding: 30px 20px;
+      background: rgba(21, 23, 21, .88);
+      border: 1px solid rgba(224, 184, 74, .15);
+      border-radius: 14px;
+      margin-bottom: 16px;
+    }
+    .result-hero .emoji { font-size: 56px; display: block; margin-bottom: 12px; line-height: 1; }
+    .result-hero h2 { font-size: 26px; margin-bottom: 8px; }
+    .result-hero p { color: var(--muted); margin: 0; font-size: 14px; }
+
     .result-summary {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 12px;
-      margin: 20px 0;
+      margin-bottom: 20px;
     }
     .metric {
       border: 1px solid var(--line);
       border-radius: 12px;
-      padding: 16px;
+      padding: 18px 14px;
       background: #101310;
       text-align: center;
     }
@@ -660,19 +702,6 @@
       font-weight: 700;
     }
 
-    .result-hero {
-      text-align: center;
-      padding: 26px 20px;
-      background: linear-gradient(145deg, rgba(26, 58, 42, .4), rgba(184, 134, 11, .06));
-      border: 1px solid rgba(224, 184, 74, .2);
-      border-radius: 14px;
-      margin-bottom: 16px;
-    }
-    .result-hero .emoji { font-size: 56px; display: block; margin-bottom: 10px; }
-    .result-hero h2 { font-size: 26px; margin-bottom: 8px; }
-    .result-hero h2 em { color: var(--gold-light); font-style: italic; }
-    .result-hero p { color: var(--muted); margin: 0; font-size: 14px; }
-
     /* ═══════════════════════════════════════════════════════════
        HISTORIQUE
        ═══════════════════════════════════════════════════════════ */
@@ -689,7 +718,6 @@
     }
     .history-item:hover {
       border-color: rgba(224, 184, 74, .3);
-      transform: translateX(3px);
     }
     .history-icon {
       width: 42px;
@@ -722,7 +750,7 @@
     }
 
     /* ═══════════════════════════════════════════════════════════
-       MODAL PREMIUM (identique à exam.html)
+       MODAL PREMIUM
        ═══════════════════════════════════════════════════════════ */
     .premium-popup-overlay {
       position: fixed;
@@ -784,6 +812,7 @@
       text-align: center;
       font-size: 44px;
       margin-bottom: 6px;
+      line-height: 1;
     }
     .premium-popup h2 {
       text-align: center;
@@ -799,11 +828,7 @@
       margin: 0 0 18px;
     }
     .popup-subtitle strong { color: var(--gold-light); }
-    .popup-buttons {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
+    .popup-buttons { display: flex; flex-direction: column; gap: 8px; }
     .btn-subscribe {
       display: flex;
       align-items: center;
@@ -832,6 +857,7 @@
       margin-bottom: 12px;
       display: block;
       opacity: .5;
+      line-height: 1;
     }
     .empty-state h3 {
       font-family: 'Playfair Display', serif;
@@ -862,13 +888,12 @@
       .field.full { grid-column: auto; }
       .actions .btn { flex: 1 1 100%; }
       .modes { grid-template-columns: 1fr; }
-      .result-summary { grid-template-columns: 1fr 1fr; }
-      .session-head {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-      .flashcard, .flashcard-inner { height: 220px; min-height: 220px; }
+      .flashcard-nav { flex-wrap: wrap; }
+      .flashcard-nav .btn { flex: 1 1 auto; }
+      .flashcard-counter { width: 100%; text-align: center; order: 3; }
+      .flashcard, .flashcard-inner { height: 200px; min-height: 200px; }
       .flashcard-text { font-size: 15px; }
+      .session-head { flex-direction: column; align-items: flex-start; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -882,12 +907,16 @@
 <body>
   <main class="shell">
 
-    <!-- ═══════════════════════════════════════════════════════════
-         HEADER
-         ═══════════════════════════════════════════════════════════ -->
+    <!-- HEADER -->
     <header>
       <a class="brand" href="index.html">ARVEX<span>A School</span></a>
-      <div class="connection" id="connectionState">Vérification...</div>
+      <div class="header-right">
+        <div class="quota-badge" id="quotaBadge" style="display:none;">
+          <i class="fas fa-gift"></i>
+          <span id="quotaText">2 essais gratuits</span>
+        </div>
+        <div class="connection" id="connectionState">Vérification...</div>
+      </div>
     </header>
 
     <!-- ═══════════════════════════════════════════════════════════
@@ -895,11 +924,12 @@
          ═══════════════════════════════════════════════════════════ -->
     <section class="view active" id="configView">
       <div class="panel">
-        <div class="eyebrow">Réviseur intelligent · Premium</div>
-        <h1>Génère des <em>fiches</em>, <em>flashcards</em> et <em>quiz</em> sur mesure.</h1>
+        <div class="eyebrow">Réviseur intelligent</div>
+        <h1>Génère des fiches, flashcards et quiz sur mesure.</h1>
         <p class="lead">
           Choisis une matière, un chapitre et un mode. L'IA construit un contenu de révision
-          adapté à ton programme pour t'aider à maîtriser les notions essentielles.
+          adapté à ton programme. <strong style="color: var(--gold-light);">2 essais gratuits par jour</strong>,
+          illimité en Premium.
         </p>
 
         <!-- Matière -->
@@ -927,13 +957,13 @@
           <div class="modes">
             <div class="mode-card active" data-mode="fiche">
               <span class="mode-emoji">📝</span>
-              <span class="mode-name">Fiche de révision</span>
-              <span class="mode-desc">Résumé structuré en sections</span>
+              <span class="mode-name">Fiche</span>
+              <span class="mode-desc">Résumé structuré</span>
             </div>
             <div class="mode-card" data-mode="flashcard">
               <span class="mode-emoji">⚡</span>
               <span class="mode-name">Flashcards</span>
-              <span class="mode-desc">Questions / Réponses pour mémoriser</span>
+              <span class="mode-desc">Question / Réponse</span>
             </div>
           </div>
         </div>
@@ -941,7 +971,7 @@
         <!-- Action -->
         <div class="actions">
           <button class="btn primary full" id="generateBtn">
-            <i class="fas fa-wand-sparkles"></i>
+            <span class="btn-icon"><i class="fas fa-wand-sparkles"></i></span>
             <span class="btn-text">Générer ma révision</span>
             <span class="loader"></span>
           </button>
@@ -957,7 +987,7 @@
       <div class="panel">
         <div class="eyebrow">Génération en cours</div>
         <h2>Préparation de ta révision...</h2>
-        <div class="loading-state">
+        <div class="loading-page">
           <div class="big-spinner"></div>
           <div class="steps">
             <div class="step" id="step1"><span>🔍</span> Analyse du chapitre</div>
@@ -970,7 +1000,7 @@
     </section>
 
     <!-- ═══════════════════════════════════════════════════════════
-         VUE 3 : FICHE
+         VUE 3 : FICHE (cartes simples)
          ═══════════════════════════════════════════════════════════ -->
     <section class="view" id="ficheView">
       <div class="panel">
@@ -987,7 +1017,7 @@
         <div id="ficheContent"></div>
         <div class="actions">
           <button class="btn primary full" id="startQuizBtn">
-            <i class="fas fa-question-circle"></i>
+            <span class="btn-icon"><i class="fas fa-question-circle"></i></span>
             <span class="btn-text">Tester mes connaissances (Quiz)</span>
             <span class="loader"></span>
           </button>
@@ -1003,7 +1033,7 @@
         <div class="session-head">
           <div>
             <div class="eyebrow">Flashcards</div>
-            <h2>⚡ Cartes de <em>mémorisation</em></h2>
+            <h2>⚡ Cartes de mémorisation</h2>
             <div class="session-meta" id="flashMeta"></div>
           </div>
           <button class="btn secondary" id="newFlashBtn">
@@ -1051,7 +1081,7 @@
         <div class="session-head">
           <div>
             <div class="eyebrow">Quiz de vérification</div>
-            <h2>❓ Teste tes <em>connaissances</em></h2>
+            <h2>❓ Teste tes connaissances</h2>
             <div class="session-meta" id="quizMeta"></div>
           </div>
         </div>
@@ -1082,7 +1112,7 @@
 
         <div class="result-summary">
           <div class="metric">
-            <strong id="metricCorrect">0</strong>
+            <strong id="metricCorrect">0/5</strong>
             <small>Bonnes réponses</small>
           </div>
           <div class="metric">
@@ -1113,7 +1143,7 @@
         <div class="session-head">
           <div>
             <div class="eyebrow">Historique</div>
-            <h2>📜 Mes <em>révisions</em></h2>
+            <h2>📜 Mes révisions</h2>
           </div>
           <button class="btn secondary" id="backToConfigBtn">
             <i class="fas fa-arrow-left"></i> Retour
@@ -1125,9 +1155,7 @@
 
   </main>
 
-  <!-- ═══════════════════════════════════════════════════════════
-       MODAL PREMIUM
-       ═══════════════════════════════════════════════════════════ -->
+  <!-- MODAL PREMIUM -->
   <div class="premium-popup-overlay" id="premiumOverlay" role="dialog" aria-modal="true">
     <div class="premium-popup">
       <button class="popup-close" id="premiumClose" aria-label="Fermer">
@@ -1135,9 +1163,8 @@
       </button>
       <span class="popup-icon">👑</span>
       <h2>Réviseur <span>Premium</span></h2>
-      <p class="popup-subtitle">
-        Le Réviseur intelligent est réservé aux comptes <strong>Premium</strong>.
-        Débloque les fiches IA, les flashcards et les quiz personnalisés.
+      <p class="popup-subtitle" id="premiumSubtitle">
+        Débloque les fiches IA, les flashcards et les quiz <strong>sans limite</strong>.
       </p>
       <div class="popup-buttons">
         <a href="abonnement.html" class="btn-subscribe">
@@ -1147,9 +1174,7 @@
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════════════════════════════
-       SCRIPTS
-       ═══════════════════════════════════════════════════════════ -->
+  <!-- SCRIPTS -->
   <script type="importmap">
   {
     "imports": {
@@ -1182,6 +1207,8 @@
   // ─────────────────────────────────────────────────────────────
   // CONFIG
   // ─────────────────────────────────────────────────────────────
+  const FREE_LIMIT = 2;
+
   const CHAPTERS = {
     mathematiques: [
       'Nombres complexes', 'Probabilités - Variable aléatoire',
@@ -1233,7 +1260,7 @@
   };
 
   // ─────────────────────────────────────────────────────────────
-  // DOM
+  // DOM HELPERS
   // ─────────────────────────────────────────────────────────────
   const $ = (id) => document.getElementById(id);
   const views = ['configView', 'loadingView', 'ficheView', 'flashcardView', 'quizView', 'resultsView', 'historyView'];
@@ -1295,11 +1322,6 @@
 
   async function generateRevision() {
     if (state.isGenerating) return;
-
-    if (!state.isPremium) {
-      $('premiumOverlay').classList.add('show');
-      return;
-    }
     if (!state.user) {
       setStatus('configStatus', 'Connecte-toi pour utiliser le Réviseur.', 'error');
       return;
@@ -1336,11 +1358,13 @@
 
       const payload = await response.json().catch(() => null);
 
-      if (response.status === 403 && payload?.code === 'PREMIUM_REQUIRED') {
+      // ⚡ Quota atteint
+      if (response.status === 429 && payload?.code === 'FREE_REVISEUR_LIMIT') {
         showView('configView');
-        $('premiumOverlay').classList.add('show');
-        throw new Error('Premium requis');
+        showPremiumPopup(payload.used, payload.limit);
+        return;
       }
+
       if (!response.ok || !payload?.success) {
         throw new Error(payload?.error || 'Service temporairement indisponible.');
       }
@@ -1350,6 +1374,11 @@
 
       state.currentSession = payload.session;
       await saveSession(payload.session);
+
+      // Mettre à jour le badge quota
+      if (payload.quota && payload.quota.type === 'free') {
+        updateQuotaBadge(FREE_LIMIT - payload.quota.used);
+      }
 
       if (state.mode === 'flashcard' && Array.isArray(payload.session.flashcards)) {
         state.flashcards = payload.session.flashcards;
@@ -1400,7 +1429,7 @@
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
   // ─────────────────────────────────────────────────────────────
-  // RENDU FICHE
+  // RENDU FICHE — Cartes simples
   // ─────────────────────────────────────────────────────────────
   function renderFiche() {
     const session = state.currentSession;
@@ -1422,7 +1451,7 @@
 
     session.sections.forEach((section) => {
       const div = document.createElement('div');
-      div.className = 'fiche-section';
+      div.className = 'card';
 
       let body = '';
       if (section.content) {
@@ -1433,10 +1462,10 @@
       }
 
       div.innerHTML = `
-        <div class="fiche-section-title">
+        <div class="card-title">
           <i class="fas fa-bookmark"></i> ${escapeHtml(section.title || 'Section')}
         </div>
-        <div class="fiche-section-body">${body}</div>
+        <div class="card-body">${body}</div>
       `;
       container.appendChild(div);
     });
@@ -1448,7 +1477,6 @@
   // RENDU FLASHCARDS
   // ─────────────────────────────────────────────────────────────
   function renderFlashcard() {
-    const session = state.currentSession;
     if (!state.flashcards || state.flashcards.length === 0) {
       showView('configView');
       return;
@@ -1647,10 +1675,10 @@
 
     const wrongQuestions = state.quiz.filter((q, i) => state.quizAnswers[i] !== q.correctAnswer);
     if (wrongQuestions.length === 0) {
-      $('resultsAdvice').innerHTML = '<p style="color:var(--success);">✅ Tu as tout juste ! Passe au chapitre suivant pour continuer ta progression.</p>';
+      $('resultsAdvice').innerHTML = '<p style="color:var(--success);">✅ Tu as tout juste ! Passe au chapitre suivant.</p>';
     } else {
       $('resultsAdvice').innerHTML = wrongQuestions.slice(0, 3).map((q) =>
-        `<p style="margin-bottom:8px;"><strong style="color:#ff9a84;">❌ ${escapeHtml(q.question)}</strong><br><span style="color:var(--muted);font-size:13px;">${escapeHtml(q.explanation || 'Revois cette notion dans la fiche.')}</span></p>`
+        `<p style="margin-bottom:10px;"><strong style="color:#ff9a84;">❌ ${escapeHtml(q.question)}</strong><br><span style="color:var(--muted);font-size:13px;">${escapeHtml(q.explanation || 'Revois cette notion dans la fiche.')}</span></p>`
       ).join('');
     }
 
@@ -1741,6 +1769,17 @@
   // ─────────────────────────────────────────────────────────────
   // MODAL PREMIUM
   // ─────────────────────────────────────────────────────────────
+  function showPremiumPopup(used = 0, limit = FREE_LIMIT) {
+    const subtitle = $('premiumSubtitle');
+    if (used && limit) {
+      subtitle.innerHTML = `
+        Tu as utilisé tes <strong>${limit} essais gratuits</strong> du jour.
+        Passe à <strong>Premium</strong> pour générer des fiches, flashcards et quiz sans limite.
+      `;
+    }
+    $('premiumOverlay').classList.add('show');
+  }
+
   $('premiumClose').addEventListener('click', () => $('premiumOverlay').classList.remove('show'));
   $('premiumOverlay').addEventListener('click', (e) => {
     if (e.target === $('premiumOverlay')) $('premiumOverlay').classList.remove('show');
@@ -1748,6 +1787,60 @@
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') $('premiumOverlay').classList.remove('show');
   });
+
+  // ─────────────────────────────────────────────────────────────
+  // BADGE QUOTA
+  // ─────────────────────────────────────────────────────────────
+  function updateQuotaBadge(remaining) {
+    const badge = $('quotaBadge');
+    const text = $('quotaText');
+    if (!badge || !text) return;
+
+    badge.style.display = 'inline-flex';
+    badge.classList.remove('warning', 'premium');
+
+    if (remaining <= 0) {
+      badge.classList.add('warning');
+      text.textContent = '0 essai gratuit';
+    } else {
+      text.textContent = `${remaining} essai${remaining > 1 ? 's' : ''} gratuit${remaining > 1 ? 's' : ''}`;
+    }
+  }
+
+  function showPremiumBadge() {
+    const badge = $('quotaBadge');
+    const text = $('quotaText');
+    if (!badge || !text) return;
+
+    badge.style.display = 'inline-flex';
+    badge.classList.remove('warning');
+    badge.classList.add('premium');
+    text.textContent = 'Premium illimité';
+  }
+
+  async function loadQuota() {
+    if (!state.user) return;
+
+    // Si Premium → badge premium
+    if (state.isPremium) {
+      showPremiumBadge();
+      return;
+    }
+
+    try {
+      const today = new Date().toISOString().slice(0, 10);
+      const usageDoc = await getDoc(
+        doc(db, 'users', state.user.uid, 'reviseurUsage', today)
+      );
+
+      const used = usageDoc.exists() ? (usageDoc.data().count || 0) : 0;
+      const remaining = Math.max(0, FREE_LIMIT - used);
+
+      updateQuotaBadge(remaining);
+    } catch (e) {
+      console.warn('Load quota error:', e);
+    }
+  }
 
   // ─────────────────────────────────────────────────────────────
   // HELPERS
@@ -1808,6 +1901,9 @@
         state.isPremium = isUserPremium(data);
         conn.textContent = state.isPremium ? 'Premium actif' : 'Compte gratuit';
         conn.classList.toggle('online', state.isPremium);
+
+        // Charger le quota
+        await loadQuota();
       }
     } catch (e) {
       console.warn('Load user error:', e);
@@ -1816,7 +1912,7 @@
 
   // INIT
   renderChapters();
-  console.log('🎓 ARVEXA — Réviseur (design aligné exam/planificateur)');
+  console.log('🎓 ARVEXA — Réviseur (style exam, cartes simples, quota 2/jour)');
   </script>
 </body>
 </html>

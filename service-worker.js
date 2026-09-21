@@ -1,16 +1,17 @@
 // ================================================================
 // SERVICE WORKER — ARVEXA School
-// Version : 2.0.0 — Anti-cache agressif
+// Version : 2.0.0 — Anti-cache des versions
 // ================================================================
 
 const CACHE_VERSION = 'arvexa-v2.0.0';
 const CACHE_STATIC = `${CACHE_VERSION}-static`;
 
-// ⚡ SEULEMENT les fichiers vraiment statiques (icônes, manifest)
-// ⚠️ PAS les HTML, PAS les JS, PAS les CSS
+// ⚡ SEULEMENT les fichiers statiques qui changent rarement
+// ⚠️ On NE cache PAS les HTML/JS/CSS pour toujours avoir la dernière version
 const STATIC_ASSETS = [
   './icon.png',
-  './manifest.json'
+  './manifest.json',
+  './offline.html'
 ];
 
 // ================================================================
@@ -32,21 +33,6 @@ self.addEventListener('install', (event) => {
   );
 });
 
-self.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
-  }
-  if (event.data && event.data.type === 'CLEAR_CACHE') {
-    caches.keys().then((names) => {
-      names.forEach((name) => caches.delete(name));
-    }).then(() => {
-      self.clients.matchAll().then((clients) => {
-        clients.forEach((client) => client.postMessage({ type: 'CACHE_CLEARED' }));
-      });
-    });
-  }
-});
-
 // ================================================================
 // ACTIVATION — Supprime TOUS les anciens caches
 // ================================================================
@@ -57,7 +43,7 @@ self.addEventListener('activate', (event) => {
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
-          // ⚡ Supprime TOUS les caches qui ne sont pas de la version actuelle
+          // ⚡ Supprime tous les caches qui ne sont pas de la version actuelle
           if (cacheName !== CACHE_STATIC) {
             console.log('[SW] Suppression ancien cache:', cacheName);
             return caches.delete(cacheName);
@@ -85,7 +71,7 @@ self.addEventListener('fetch', (event) => {
   if (url.hostname.includes('firebase') || url.hostname.includes('gstatic')) return;
 
   // ═══════════════════════════════════════════════════════════════
-  // ⚡ RÈGLE CRITIQUE : HTML, JS, CSS, JSON → TOUJOURS NETWORK
+  // HTML, JS, CSS, JSON → TOUJOURS NETWORK (jamais de cache)
   // ═══════════════════════════════════════════════════════════════
 
   if (url.pathname.endsWith('.html') ||
@@ -97,18 +83,20 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // ⚡ IMAGES/ICÔNES → Cache-first (elles changent rarement)
+  // ⚡ IMAGES/ICÔNES → Cache-first (changent rarement)
   if (request.destination === 'image' ||
       url.pathname.endsWith('.png') ||
       url.pathname.endsWith('.jpg') ||
+      url.pathname.endsWith('.jpeg') ||
       url.pathname.endsWith('.svg') ||
       url.pathname.endsWith('.webp') ||
-      url.pathname.endsWith('.ico')) {
+      url.pathname.endsWith('.ico') ||
+      url.pathname.endsWith('.gif')) {
     event.respondWith(handleCacheFirst(request));
     return;
   }
 
-  // Autres → Network-first
+  // Autres (fonts, etc.) → Network-first
   event.respondWith(handleNetworkFirst(request));
 });
 
@@ -116,11 +104,14 @@ self.addEventListener('fetch', (event) => {
 // HANDLERS
 // ================================================================
 
-// ⚡ Network-first : essaie le réseau, fallback au cache si hors ligne
+/**
+ * Network-first : essaie le réseau en premier.
+ * Si le réseau échoue (hors ligne), utilise le cache.
+ */
 async function handleNetworkFirst(request) {
   try {
     const response = await fetch(request, {
-      cache: 'no-store'  // ⚡ Force la lecture fraîche depuis le serveur
+      cache: 'no-store'
     });
     return response;
   } catch (error) {
@@ -128,12 +119,14 @@ async function handleNetworkFirst(request) {
     const cached = await caches.match(request);
     if (cached) return cached;
 
-    // Page HTML non cachée → offline.html
-    if (request.destination === 'document' || request.url.endsWith('.html')) {
+    // Si c'est une page HTML → servir offline.html
+    if (request.destination === 'document' ||
+        request.url.endsWith('.html')) {
       const offline = await caches.match('./offline.html');
       if (offline) return offline;
     }
 
+    // Fallback ultime
     return new Response('Hors ligne', {
       status: 503,
       headers: { 'Content-Type': 'text/plain; charset=utf-8' }
@@ -141,7 +134,10 @@ async function handleNetworkFirst(request) {
   }
 }
 
-// Cache-first pour les images (mises à jour rarement)
+/**
+ * Cache-first : utilise le cache en priorité.
+ * Si absent, va chercher sur le réseau et met en cache.
+ */
 async function handleCacheFirst(request) {
   const cached = await caches.match(request);
   if (cached) return cached;
@@ -165,12 +161,15 @@ self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
   }
+
   if (event.data && event.data.type === 'CLEAR_CACHE') {
     caches.keys().then((names) => {
-      names.forEach((name) => caches.delete(name));
+      return Promise.all(names.map((name) => caches.delete(name)));
     }).then(() => {
       self.clients.matchAll().then((clients) => {
-        clients.forEach((client) => client.postMessage({ type: 'CACHE_CLEARED' }));
+        clients.forEach((client) => {
+          client.postMessage({ type: 'CACHE_CLEARED' });
+        });
       });
     });
   }

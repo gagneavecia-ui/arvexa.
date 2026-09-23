@@ -5,18 +5,33 @@ service cloud.firestore {
 
     // ═══════════════════════════════════════════════════════════════
     // RÈGLES ARVEXA SCHOOL
+    // Version : 2026-09-23
     // ═══════════════════════════════════════════════════════════════
 
-    // ─── Profil utilisateur + sous-collections ───────────────────
+    // ─── Fonction helper : est-ce un admin ? ─────────────────────
+    function isAdmin() {
+      return request.auth != null
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // ─── Fonction helper : est-ce le propriétaire ? ──────────────
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // USERS + SOUS-COLLECTIONS
+    // ═══════════════════════════════════════════════════════════════
     match /users/{userId} {
 
-      // Lecture / création du profil : propriétaire uniquement
-      allow read: if request.auth != null && request.auth.uid == userId;
-      allow create: if request.auth != null && request.auth.uid == userId;
+      // ─── Lecture : propriétaire OU admin ────────────────────────
+      allow read: if isOwner(userId) || isAdmin();
 
-      // Update : propriétaire, SAUF champs sensibles
-      allow update: if request.auth != null
-        && request.auth.uid == userId
+      // ─── Création : propriétaire uniquement ─────────────────────
+      allow create: if isOwner(userId);
+
+      // ─── Update : propriétaire SAUF champs sensibles ────────────
+      allow update: if isOwner(userId)
         && !(request.resource.data.diff(resource.data).affectedKeys()
               .hasAny([
                 'premium',
@@ -26,61 +41,72 @@ service cloud.firestore {
                 'accountStatus'
               ]));
 
-      // Suppression interdite côté client
-      allow delete: if false;
+      // ─── Suppression : admin uniquement ─────────────────────────
+      allow delete: if isAdmin();
 
-      // ─── examResults : examens blancs ─────────────────────────
+      // ─── examResults ────────────────────────────────────────────
       match /examResults/{docId} {
-        allow read: if request.auth != null && request.auth.uid == userId;
-        allow create: if request.auth != null && request.auth.uid == userId;
+        allow read: if isOwner(userId) || isAdmin();
+        allow create: if isOwner(userId);
         allow update, delete: if false;
       }
 
-      // ─── revisionSessions : Réviseur ──────────────────────────
+      // ─── revisionSessions ───────────────────────────────────────
       match /revisionSessions/{docId} {
-        allow read: if request.auth != null && request.auth.uid == userId;
-        allow create: if request.auth != null && request.auth.uid == userId;
+        allow read: if isOwner(userId) || isAdmin();
+        allow create: if isOwner(userId);
         allow update, delete: if false;
       }
 
-      // ─── grades : notes manuelles ─────────────────────────────
+      // ─── grades ─────────────────────────────────────────────────
       match /grades/{docId} {
-        allow read, write: if request.auth != null && request.auth.uid == userId;
+        allow read: if isOwner(userId) || isAdmin();
+        allow create, update, delete: if isOwner(userId);
       }
 
-      // ─── notifications : lecture + marquer comme lu ───────────
+      // ─── notifications ──────────────────────────────────────────
       match /notifications/{docId} {
-        allow read: if request.auth != null && request.auth.uid == userId;
-        allow update: if request.auth != null && request.auth.uid == userId;
-        allow create, delete: if false;
+        allow read: if isOwner(userId) || isAdmin();
+        allow update: if isOwner(userId);
+        allow create, delete: if isAdmin();
       }
 
-      // ─── examCache, examUsage, reviseurUsage (serveur only) ───
+      // ─── examCache (écriture serveur uniquement) ────────────────
       match /examCache/{docId} {
         allow read, write: if false;
       }
+
+      // ─── examUsage ──────────────────────────────────────────────
       match /examUsage/{docId} {
-        allow read: if request.auth != null && request.auth.uid == userId;
+        allow read: if isOwner(userId);
         allow write: if false;
       }
+
+      // ─── reviseurUsage ──────────────────────────────────────────
       match /reviseurUsage/{docId} {
-        allow read: if request.auth != null && request.auth.uid == userId;
+        allow read: if isOwner(userId);
         allow write: if false;
       }
 
-      // ─── Session d'examen / révision active ───────────────────
+      // ─── activeExam ─────────────────────────────────────────────
       match /activeExam/{docId} {
-        allow read, write: if request.auth != null && request.auth.uid == userId;
-      }
-      match /activeRevision/{docId} {
-        allow read, write: if request.auth != null && request.auth.uid == userId;
+        allow read, write: if isOwner(userId);
       }
 
-      // ─── Favoris ──────────────────────────────────────────────
+      // ─── activeRevision ─────────────────────────────────────────
+      match /activeRevision/{docId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // ─── favorites ──────────────────────────────────────────────
       match /favorites/{docId} {
-        allow read, write: if request.auth != null && request.auth.uid == userId;
+        allow read, write: if isOwner(userId);
       }
     }
+
+    // ═══════════════════════════════════════════════════════════════
+    // COLLECTIONS GLOBALES
+    // ═══════════════════════════════════════════════════════════════
 
     // ─── Sujets (cours) : lecture pour tous les connectés ────────
     match /subjects/{document=**} {
@@ -92,17 +118,36 @@ service cloud.firestore {
     match /avis/{docId} {
       allow read: if request.auth != null;
       allow create: if request.auth != null;
-      allow update, delete: if false;
+      allow update, delete: if isAdmin();
     }
 
     // ─── Groupes (chat) ───────────────────────────────────────────
     match /groups/{groupId}/{document=**} {
-      allow read, write: if request.auth != null;
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
     }
 
-    // ─── Notifications admin (écrites par admin-89) ───────────────
+    // ─── Notifications admin (lecture pour tous) ──────────────────
     match /admin_notifications/{docId} {
       allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    // ─── Codes promo : lecture pour connectés ────────────────────
+    match /promoCodes/{code} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    // ─── Config : lecture pour admins ─────────────────────────────
+    match /config/{docId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // ─── Logs admin : lecture pour admins ─────────────────────────
+    match /adminLogs/{docId} {
+      allow read: if isAdmin();
       allow write: if false;
     }
   }

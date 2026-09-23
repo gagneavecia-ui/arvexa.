@@ -2,51 +2,62 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    
+
     // ═══════════════════════════════════════════════════════════════
-    // RÈGLES ARVEXA SCHOOL — Version complète
+    // RÈGLES ARVEXA SCHOOL
     // ═══════════════════════════════════════════════════════════════
 
-    // ─── Profil utilisateur + toutes les sous-collections ─────────
+    // ─── Profil utilisateur + sous-collections ───────────────────
     match /users/{userId} {
-      
-      // Lecture/écriture du profil : propriétaire uniquement
+
+      // Lecture / création du profil : propriétaire uniquement
       allow read: if request.auth != null && request.auth.uid == userId;
       allow create: if request.auth != null && request.auth.uid == userId;
-      allow update: if request.auth != null && request.auth.uid == userId
-        && !(request.resource.data.diff(resource.data).affectedKeys().hasAny(['premium', 'role', 'accountStatus']));
+
+      // Update : propriétaire, SAUF champs sensibles
+      allow update: if request.auth != null
+        && request.auth.uid == userId
+        && !(request.resource.data.diff(resource.data).affectedKeys()
+              .hasAny([
+                'premium',
+                'isUnlocked',
+                'hasDeposited',
+                'role',
+                'accountStatus'
+              ]));
+
+      // Suppression interdite côté client
       allow delete: if false;
-      
-      // ─── examResults : examens blancs ───────────────────────────
+
+      // ─── examResults : examens blancs ─────────────────────────
       match /examResults/{docId} {
         allow read: if request.auth != null && request.auth.uid == userId;
         allow create: if request.auth != null && request.auth.uid == userId;
         allow update, delete: if false;
       }
-      
-      // ─── revisionSessions : sessions du Réviseur ────────────────
+
+      // ─── revisionSessions : Réviseur ──────────────────────────
       match /revisionSessions/{docId} {
         allow read: if request.auth != null && request.auth.uid == userId;
         allow create: if request.auth != null && request.auth.uid == userId;
         allow update, delete: if false;
       }
-      
-      // ─── grades : notes manuelles ───────────────────────────────
+
+      // ─── grades : notes manuelles ─────────────────────────────
       match /grades/{docId} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
-      
-      // ─── notifications ──────────────────────────────────────────
+
+      // ─── notifications : lecture + marquer comme lu ───────────
       match /notifications/{docId} {
         allow read: if request.auth != null && request.auth.uid == userId;
         allow update: if request.auth != null && request.auth.uid == userId;
         allow create, delete: if false;
       }
-      
-      // ─── examCache, examUsage, reviseurUsage (écriture serveur) ─
+
+      // ─── examCache, examUsage, reviseurUsage (serveur only) ───
       match /examCache/{docId} {
-        allow read: if false;
-        allow write: if false;
+        allow read, write: if false;
       }
       match /examUsage/{docId} {
         allow read: if request.auth != null && request.auth.uid == userId;
@@ -56,40 +67,40 @@ service cloud.firestore {
         allow read: if request.auth != null && request.auth.uid == userId;
         allow write: if false;
       }
-      
-      // ─── Session d'examen / révision active ─────────────────────
+
+      // ─── Session d'examen / révision active ───────────────────
       match /activeExam/{docId} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
       match /activeRevision/{docId} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
-      
-      // ─── Favoris ────────────────────────────────────────────────
+
+      // ─── Favoris ──────────────────────────────────────────────
       match /favorites/{docId} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
     }
-    
-    // ─── Sujets (cours) : lecture pour tous les connectés ─────────
+
+    // ─── Sujets (cours) : lecture pour tous les connectés ────────
     match /subjects/{document=**} {
       allow read: if request.auth != null;
       allow write: if false;
     }
-    
-    // ─── Avis utilisateurs ─────────────────────────────────────────
+
+    // ─── Avis utilisateurs ────────────────────────────────────────
     match /avis/{docId} {
       allow read: if request.auth != null;
       allow create: if request.auth != null;
       allow update, delete: if false;
     }
-    
-    // ─── Groupes (chat) ────────────────────────────────────────────
+
+    // ─── Groupes (chat) ───────────────────────────────────────────
     match /groups/{groupId}/{document=**} {
       allow read, write: if request.auth != null;
     }
-    
-    // ─── Admin notifications ───────────────────────────────────────
+
+    // ─── Notifications admin (écrites par admin-89) ───────────────
     match /admin_notifications/{docId} {
       allow read: if request.auth != null;
       allow write: if false;

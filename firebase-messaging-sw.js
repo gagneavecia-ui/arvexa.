@@ -40,16 +40,26 @@ function getSafeNotificationUrl(value) {
 messaging.onBackgroundMessage((payload) => {
   console.log('[FCM-SW] Message reçu en arrière-plan:', payload);
 
-  const notificationTitle = payload.notification?.title || payload.data?.title || 'ARVEXA School';
-  const notificationBody = payload.notification?.body || payload.data?.body || '';
-  const notificationIcon = payload.notification?.icon || 'icon.png';
+  // ⚡ Lire depuis data en priorité (nouveau format)
+  const notificationTitle =
+    payload.data?.title ||
+    payload.notification?.title ||
+    'ARVEXA School';
+
+  const notificationBody =
+    payload.data?.body ||
+    payload.notification?.body ||
+    '';
+
   const clickAction = getSafeNotificationUrl(
-    payload.data?.click_action || payload.fcmOptions?.link
+    payload.data?.click_action ||
+    payload.notification?.click_action ||
+    payload.fcmOptions?.link
   );
 
   const notificationOptions = {
     body: notificationBody,
-    icon: notificationIcon,
+    icon: 'icon.png',
     badge: 'icon.png',
     vibrate: [200, 100, 200],
     tag: 'arvexa-notification-' + Date.now(),

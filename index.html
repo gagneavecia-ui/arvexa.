@@ -1921,18 +1921,42 @@
     }
   }
 
-  async function saveFcmToken(token) {
-    const user = auth.currentUser;
-    if (!user) return;
-    try {
-      await updateDoc(doc(db, 'users', user.uid), {
-        fcmToken: token,
-        fcmTokenUpdatedAt: serverTimestamp()
-      });
-    } catch (e) {
-      console.error('[FCM] Erreur sauvegarde:', e);
+ async function saveFcmToken(token) {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  try {
+    const userRef = doc(db, 'users', user.uid);
+    const userSnap = await getDoc(userRef);
+    const data = userSnap.exists() ? userSnap.data() : {};
+
+    // Récupérer le tableau existant (ou fallback sur l'ancien champ)
+    let tokens = Array.isArray(data.fcmTokens) ? [...data.fcmTokens] : [];
+
+    // Migration : si un ancien fcmToken existe, l'inclure
+    if (data.fcmToken && !tokens.includes(data.fcmToken)) {
+      tokens.push(data.fcmToken);
     }
+
+    // Ajouter le nouveau token s'il n'y est pas déjà
+    if (!tokens.includes(token)) {
+      tokens.push(token);
+    }
+
+    // Garder max 5 tokens (au cas où)
+    if (tokens.length > 5) tokens = tokens.slice(-5);
+
+    // Sauvegarder
+    await updateDoc(userRef, {
+      fcmTokens: tokens,
+      fcmTokenUpdatedAt: serverTimestamp(),
+      // ⚡ On garde aussi fcmToken pour compatibilité backend ancien
+      fcmToken: token
+    });
+  } catch (e) {
+    console.error('[FCM] Erreur sauvegarde:', e.message);
   }
+}
 
   function setupFcmForeground() {
     if (!messaging) return;

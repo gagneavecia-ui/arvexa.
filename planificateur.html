@@ -2,86 +2,920 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0a0d0b">
   <title>ARVEXA | Planificateur Premium</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   <style>
-    :root { --bg:#0a0d0b; --panel:#141914; --line:rgba(255,255,255,.09); --text:#f5f5f1; --muted:#a9ad9d; --gold:#d4af37; --gold-light:#f3d778; --green:#43b57d; --danger:#e76f51; }
-    * { box-sizing:border-box; }
-    body { margin:0; min-height:100vh; color:var(--text); font:15px/1.6 Inter,system-ui,sans-serif; background:radial-gradient(circle at 85% 0,rgba(28,70,52,.38),transparent 30rem),linear-gradient(180deg,#0a0d0b,#101511); }
-    a { color:inherit; text-decoration:none; }
-    .shell { width:min(100% - 28px,980px); margin:auto; padding:22px 0 50px; }
-    header { display:flex; justify-content:space-between; align-items:center; gap:14px; margin-bottom:24px; }
-    .brand { font:700 24px 'Playfair Display',serif; letter-spacing:.04em; }
-    .brand span { color:var(--gold-light); }
-    .back { display:inline-flex; gap:8px; align-items:center; padding:10px 15px; border:1px solid var(--line); border-radius:10px; font-weight:700; }
-    .panel { padding:24px; border:1px solid var(--line); border-radius:18px; background:rgba(20,25,20,.9); box-shadow:0 18px 50px rgba(0,0,0,.22); }
-    .eyebrow { color:var(--gold-light); font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; }
-    h1,h2 { margin:0; font-family:'Playfair Display',serif; line-height:1.2; }
-    h1 { margin-top:8px; font-size:clamp(30px,6vw,48px); }
-    .lead { color:var(--muted); max-width:680px; margin:12px 0 0; }
-    .premium-note { display:flex; gap:10px; align-items:flex-start; margin-top:22px; padding:14px; border:1px solid rgba(212,175,55,.28); border-radius:12px; background:rgba(212,175,55,.08); color:#f7e7a7; }
-    .premium-note i { margin-top:4px; color:var(--gold-light); }
-    .actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:22px; }
-    button,.btn { min-height:44px; padding:10px 17px; border:1px solid transparent; border-radius:10px; font:800 14px Inter,sans-serif; cursor:pointer; }
-    .btn-primary { background:linear-gradient(135deg,var(--gold-light),var(--gold)); color:#0a0d0b; }
-    .btn-secondary { border-color:var(--line); background:transparent; color:var(--text); }
-    .status { min-height:24px; margin-top:14px; color:var(--muted); }
-    .status.error { color:#ff9a84; }
-    .status.success { color:#7ce0aa; }
-    .plan { display:none; margin-top:22px; }
-    .plan.show { display:block; }
-    .plan-head { display:flex; justify-content:space-between; gap:12px; align-items:end; margin-bottom:14px; }
-    .plan-head h2 { font-size:26px; }
-    .count { color:var(--muted); font-size:13px; }
-    .priorities { display:grid; gap:12px; }
-    .priority { display:grid; grid-template-columns:auto 1fr auto; gap:13px; align-items:center; padding:15px; border:1px solid var(--line); border-radius:12px; background:#101410; }
-    .priority-index { width:34px; height:34px; display:grid; place-items:center; border-radius:10px; background:rgba(212,175,55,.14); color:var(--gold-light); font-weight:800; }
-    .priority h3 { margin:0; font-size:16px; }
-    .priority p { margin:3px 0 0; color:var(--muted); font-size:13px; }
-    .score { color:var(--gold-light); font-weight:800; white-space:nowrap; }
-    .sessions { margin-top:22px; }
-    .sessions h2 { font-size:24px; margin-bottom:12px; }
-    .session { display:flex; justify-content:space-between; gap:12px; padding:11px 0; border-bottom:1px solid var(--line); color:var(--muted); }
-    .session strong { color:var(--text); }
-    .loader { display:inline-block; width:16px; height:16px; margin-right:7px; border:2px solid rgba(0,0,0,.25); border-top-color:currentColor; border-radius:50%; animation:spin .7s linear infinite; vertical-align:middle; }
-    @keyframes spin { to { transform:rotate(360deg); } }
-    .modal-backdrop { position:fixed; inset:0; z-index:5; display:none; place-items:center; padding:16px; background:rgba(0,0,0,.85); backdrop-filter:blur(14px); }
-    .modal-backdrop.show { display:grid; }
-    .modal { position:relative; width:min(100%,400px); padding:25px 21px 20px; border:1px solid var(--gold); border-radius:18px; background:linear-gradient(145deg,#141414,#0a0a0a); }
-    .modal h2 { text-align:center; font-size:24px; }.modal h2 span { color:var(--gold); font-style:italic; }.modal p { color:var(--muted); text-align:center; }.modal-close { position:absolute; top:8px; right:8px; width:28px; min-height:28px; padding:0; background:transparent; color:var(--muted); }
-    @media (max-width:620px) { .shell { width:min(100% - 20px,980px); padding-top:13px; }.panel { padding:18px; }.priority { grid-template-columns:auto 1fr; }.score { grid-column:2; }.session { flex-direction:column; gap:2px; } }
+    :root {
+      --bg: #0a0d0b;
+      --bg-2: #101511;
+      --panel: rgba(20, 25, 20, 0.85);
+      --panel-2: rgba(26, 32, 26, 0.9);
+      --line: rgba(255,255,255,0.08);
+      --line-strong: rgba(255,255,255,0.12);
+      --text: #f5f5f1;
+      --muted: #a9ad9d;
+      --muted-2: #6b6f61;
+      --gold: #d4af37;
+      --gold-light: #f3d778;
+      --green: #43b57d;
+      --red: #e76f51;
+      --amber: #f59e0b;
+      --blue: #60a5fa;
+      --radius: 18px;
+      --radius-sm: 12px;
+      --shadow: 0 20px 60px rgba(0,0,0,.35);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html { scroll-behavior: smooth; }
+    body {
+      min-height: 100vh;
+      color: var(--text);
+      font: 15px/1.6 'Inter', system-ui, sans-serif;
+      background:
+        radial-gradient(circle at 85% 0%, rgba(28, 70, 52, .38), transparent 30rem),
+        radial-gradient(circle at 15% 100%, rgba(212, 175, 55, .08), transparent 30rem),
+        linear-gradient(180deg, #0a0d0b, #101511);
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+
+    /* ═══ SHELL ═══ */
+    .shell { width: min(100% - 28px, 1080px); margin: auto; padding: 22px 0 60px; }
+
+    /* ═══ HEADER ═══ */
+    .top-header {
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 14px; margin-bottom: 28px; flex-wrap: wrap;
+    }
+    .brand {
+      font: 700 26px 'Playfair Display', serif; letter-spacing: .04em;
+    }
+    .brand span {
+      background: linear-gradient(90deg, var(--gold), var(--gold-light));
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent; font-style: italic;
+    }
+    .top-actions { display: flex; gap: 10px; align-items: center; }
+    .top-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 11px 18px; border-radius: 12px;
+      border: 1px solid var(--line); background: rgba(255,255,255,.03);
+      color: var(--text); font-weight: 700; font-size: 13px;
+      transition: all .2s ease;
+    }
+    .top-btn:hover { border-color: rgba(212,175,55,.4); background: rgba(212,175,55,.06); }
+
+    /* ═══ PREMIUM BADGE ═══ */
+    .premium-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 14px; border-radius: 20px;
+      background: linear-gradient(135deg, rgba(212,175,55,.15), rgba(212,175,55,.05));
+      border: 1px solid rgba(212,175,55,.3);
+      color: var(--gold-light); font-size: 11px; font-weight: 800;
+      letter-spacing: .05em; text-transform: uppercase;
+    }
+
+    /* ═══ HERO ═══ */
+    .hero {
+      margin-bottom: 28px;
+    }
+    .hero h1 {
+      font: 800 clamp(28px, 4.5vw, 44px)/1.1 'Playfair Display', serif;
+      letter-spacing: -.02em; margin-bottom: 12px;
+    }
+    .hero h1 em {
+      background: linear-gradient(90deg, var(--gold), var(--gold-light));
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent; font-style: italic;
+    }
+    .hero p {
+      color: var(--muted); max-width: 640px; line-height: 1.7;
+    }
+
+    /* ═══ LAUNCH PANEL ═══ */
+    .launch-panel {
+      padding: 26px 28px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, rgba(20,25,20,.95), rgba(26,32,26,.9));
+      box-shadow: var(--shadow);
+      position: relative; overflow: hidden;
+      margin-bottom: 24px;
+    }
+    .launch-panel::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--gold), var(--gold-light), var(--gold));
+    }
+    .launch-note {
+      display: flex; gap: 12px; align-items: flex-start;
+      padding: 14px 16px; margin-bottom: 20px;
+      border: 1px solid rgba(212,175,55,.28);
+      border-radius: var(--radius-sm);
+      background: rgba(212,175,55,.06);
+      color: #f7e7a7; font-size: 13.5px; line-height: 1.6;
+    }
+    .launch-note i { color: var(--gold-light); margin-top: 3px; flex-shrink: 0; }
+    .launch-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 15px 26px; border-radius: 14px;
+      background: linear-gradient(135deg, var(--gold-light), var(--gold));
+      color: #0a0d0b; font-weight: 800; font-size: 14.5px;
+      transition: all .2s ease; box-shadow: 0 8px 24px rgba(212,175,55,.25);
+    }
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px); box-shadow: 0 12px 32px rgba(212,175,55,.4);
+    }
+    .btn-primary:disabled { opacity: .6; cursor: not-allowed; }
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 15px 22px; border-radius: 14px;
+      background: rgba(255,255,255,.04); color: var(--text);
+      border: 1px solid var(--line); font-weight: 700; font-size: 14px;
+      transition: all .2s ease;
+    }
+    .btn-secondary:hover:not(:disabled) {
+      background: rgba(255,255,255,.08); border-color: var(--line-strong);
+    }
+    .btn-secondary:disabled { opacity: .5; cursor: not-allowed; }
+    .loader {
+      display: inline-block; width: 16px; height: 16px;
+      border: 2px solid rgba(10,10,10,.25); border-top-color: currentColor;
+      border-radius: 50%; animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .status {
+      min-height: 22px; margin-top: 16px; color: var(--muted); font-size: 13.5px;
+    }
+    .status.error { color: #ff9a84; }
+    .status.success { color: #7ce0aa; }
+
+    /* ═══ PLAN VIEW ═══ */
+    .plan-view { display: none; }
+    .plan-view.show { display: block; animation: fadeInUp .5s cubic-bezier(.25,1,.5,1); }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
+
+    /* ═══ SECTION ═══ */
+    .section { margin-bottom: 28px; }
+    .section-head {
+      display: flex; justify-content: space-between; align-items: baseline;
+      margin-bottom: 16px; flex-wrap: wrap; gap: 10px;
+    }
+    .section-title {
+      font: 700 20px 'Playfair Display', serif; letter-spacing: -.01em;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .section-title i { color: var(--gold-light); font-size: 18px; }
+    .section-sub { color: var(--muted); font-size: 13px; }
+
+    /* ═══ META BAR ═══ */
+    .meta-bar {
+      display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 24px;
+    }
+    .meta-chip {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 9px 15px; border-radius: 24px;
+      background: rgba(255,255,255,.03); border: 1px solid var(--line);
+      font-size: 12.5px; font-weight: 600; color: var(--muted);
+    }
+    .meta-chip i { color: var(--gold-light); font-size: 12px; }
+    .meta-chip strong { color: var(--text); font-weight: 700; }
+    .meta-chip.ai-badge {
+      background: rgba(67,181,125,.1); border-color: rgba(67,181,125,.3);
+      color: #7ce0aa;
+    }
+    .meta-chip.ai-badge i { color: #7ce0aa; }
+    .meta-chip.cache-badge {
+      background: rgba(96,165,250,.08); border-color: rgba(96,165,250,.25);
+      color: #93c5fd;
+    }
+    .meta-chip.cache-badge i { color: #93c5fd; }
+
+    /* ═══ READINESS CARD (Carte principale) ═══ */
+    .readiness-card {
+      display: grid; grid-template-columns: auto 1fr;
+      gap: 28px; align-items: center;
+      padding: 28px; border-radius: var(--radius);
+      background: linear-gradient(135deg, rgba(20,25,20,.95), rgba(26,32,26,.9));
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+      position: relative; overflow: hidden;
+    }
+    @media (max-width: 640px) { .readiness-card { grid-template-columns: 1fr; gap: 20px; text-align: center; } }
+
+    .readiness-circle {
+      position: relative; width: 140px; height: 140px; flex-shrink: 0;
+    }
+    .readiness-circle svg { transform: rotate(-90deg); width: 100%; height: 100%; }
+    .readiness-circle .circle-bg { fill: none; stroke: rgba(255,255,255,.06); stroke-width: 10; }
+    .readiness-circle .circle-progress {
+      fill: none; stroke-width: 10; stroke-linecap: round;
+      transition: stroke-dashoffset 1.6s cubic-bezier(.25,1,.5,1);
+    }
+    .circle-progress.solide { stroke: var(--green); }
+    .circle-progress.progressing { stroke: var(--gold-light); }
+    .circle-progress.reinforce { stroke: var(--red); }
+    .circle-progress.insuffisant { stroke: var(--muted-2); }
+    .readiness-value {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+      font: 800 36px 'Playfair Display', serif; color: var(--text); line-height: 1;
+    }
+    .readiness-value small { font-size: 14px; color: var(--muted); font-weight: 500; }
+
+    .readiness-info h2 {
+      font: 700 24px 'Playfair Display', serif; margin-bottom: 8px;
+      letter-spacing: -.01em;
+    }
+    .readiness-info p { color: var(--muted); line-height: 1.7; margin-bottom: 14px; }
+    .readiness-info .target-info {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 8px 14px; border-radius: 12px;
+      background: rgba(212,175,55,.08); border: 1px solid rgba(212,175,55,.2);
+      color: var(--gold-light); font-size: 13px; font-weight: 600;
+    }
+
+    /* ═══ SUMMARY CARD ═══ */
+    .summary-card {
+      padding: 22px 24px; border-radius: var(--radius);
+      background: linear-gradient(135deg, rgba(212,175,55,.06), rgba(67,181,125,.03));
+      border: 1px solid rgba(212,175,55,.15);
+      margin-bottom: 24px;
+      position: relative;
+    }
+    .summary-card::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+      width: 3px; background: linear-gradient(180deg, var(--gold-light), var(--gold));
+      border-radius: 3px;
+    }
+    .summary-card .summary-label {
+      font-size: 11px; font-weight: 800; color: var(--gold-light);
+      letter-spacing: .12em; text-transform: uppercase;
+      margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
+    }
+    .summary-card .summary-text { font-size: 15.5px; line-height: 1.75; color: var(--text); }
+    .summary-card .week-goal {
+      margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.06);
+      font-size: 15px; line-height: 1.7;
+    }
+    .summary-card .week-goal strong { color: var(--gold-light); }
+
+    /* ═══ ALERTS ═══ */
+    .alerts-list { display: grid; gap: 10px; margin-bottom: 24px; }
+    .alert-item {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 15px 18px; border-radius: 14px;
+      background: rgba(255,255,255,.02); border: 1px solid var(--line);
+    }
+    .alert-item.danger { border-color: rgba(231,111,81,.3); background: rgba(231,111,81,.05); }
+    .alert-item.warning { border-color: rgba(245,158,11,.3); background: rgba(245,158,11,.05); }
+    .alert-item.info { border-color: rgba(96,165,250,.3); background: rgba(96,165,250,.05); }
+    .alert-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; font-size: 15px;
+    }
+    .alert-item.danger .alert-icon { background: rgba(231,111,81,.15); color: #ff9a84; }
+    .alert-item.warning .alert-icon { background: rgba(245,158,11,.15); color: #fbbf24; }
+    .alert-item.info .alert-icon { background: rgba(96,165,250,.15); color: #93c5fd; }
+    .alert-content { flex: 1; min-width: 0; }
+    .alert-title { font-weight: 700; font-size: 14px; margin-bottom: 2px; }
+    .alert-message { font-size: 13px; color: var(--muted); line-height: 1.55; }
+
+    /* ═══ SWOT GRID ═══ */
+    .swot-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    @media (max-width: 640px) { .swot-grid { grid-template-columns: 1fr; } }
+    .swot-card {
+      padding: 18px 20px; border-radius: 14px;
+      background: rgba(255,255,255,.02); border: 1px solid var(--line);
+    }
+    .swot-title {
+      font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase;
+      margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+    }
+    .swot-card.strengths { border-color: rgba(67,181,125,.25); background: rgba(67,181,125,.04); }
+    .swot-card.strengths .swot-title { color: var(--green); }
+    .swot-card.weaknesses { border-color: rgba(231,111,81,.25); background: rgba(231,111,81,.04); }
+    .swot-card.weaknesses .swot-title { color: var(--red); }
+    .swot-card.opportunities { border-color: rgba(96,165,250,.25); background: rgba(96,165,250,.04); }
+    .swot-card.opportunities .swot-title { color: var(--blue); }
+    .swot-card.threats { border-color: rgba(245,158,11,.25); background: rgba(245,158,11,.04); }
+    .swot-card.threats .swot-title { color: var(--amber); }
+    .swot-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .swot-list li {
+      font-size: 13.5px; color: var(--text); line-height: 1.55;
+      padding-left: 18px; position: relative;
+    }
+    .swot-list li::before {
+      content: '→'; position: absolute; left: 0; color: currentColor; opacity: .5;
+    }
+
+    /* ═══ PRIORITIES ═══ */
+    .priorities-list { display: grid; gap: 12px; }
+    .priority-card {
+      display: grid; grid-template-columns: auto 1fr auto;
+      gap: 16px; align-items: center;
+      padding: 18px 20px; border-radius: 14px;
+      background: rgba(20,25,20,.85); border: 1px solid var(--line);
+      transition: all .2s ease;
+    }
+    @media (max-width: 640px) {
+      .priority-card { grid-template-columns: auto 1fr; }
+      .priority-score { grid-column: 2; }
+    }
+    .priority-card:hover { border-color: rgba(212,175,55,.3); transform: translateX(4px); }
+    .priority-rank {
+      width: 40px; height: 40px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font: 800 16px 'Playfair Display', serif;
+      background: rgba(212,175,55,.12); color: var(--gold-light);
+    }
+    .priority-card.urgent .priority-rank { background: rgba(231,111,81,.15); color: #ff9a84; }
+    .priority-card.important .priority-rank { background: rgba(245,158,11,.15); color: #fbbf24; }
+    .priority-body { min-width: 0; }
+    .priority-subject {
+      font: 700 16px 'Playfair Display', serif; margin-bottom: 4px;
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    }
+    .priority-subject i { color: var(--gold-light); font-size: 14px; }
+    .priority-badge {
+      font-size: 10px; font-weight: 800; padding: 3px 10px;
+      border-radius: 10px; letter-spacing: .05em; text-transform: uppercase;
+    }
+    .priority-badge.urgent { background: rgba(231,111,81,.15); color: #ff9a84; }
+    .priority-badge.important { background: rgba(245,158,11,.15); color: #fbbf24; }
+    .priority-badge.entretien { background: rgba(67,181,125,.15); color: #7ce0aa; }
+    .priority-reason {
+      font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 8px;
+    }
+    .priority-chapters {
+      display: flex; flex-wrap: wrap; gap: 6px;
+    }
+    .chapter-chip {
+      font-size: 11px; padding: 3px 10px; border-radius: 10px;
+      background: rgba(231,111,81,.08); border: 1px solid rgba(231,111,81,.2);
+      color: #ff9a84; font-weight: 600;
+    }
+    .priority-score {
+      display: flex; flex-direction: column; align-items: flex-end; gap: 4px;
+      text-align: right;
+    }
+    .priority-score .score-value {
+      font: 800 24px 'Playfair Display', serif; color: var(--gold-light);
+      line-height: 1;
+    }
+    .priority-score .score-label {
+      font-size: 10px; color: var(--muted); text-transform: uppercase;
+      letter-spacing: .05em; font-weight: 700;
+    }
+    .priority-score .score-time {
+      font-size: 11px; color: var(--muted); margin-top: 2px;
+    }
+
+    /* ═══ WEEKLY PLAN ═══ */
+    .week-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 10px;
+    }
+    @media (max-width: 900px) { .week-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 480px) { .week-grid { grid-template-columns: 1fr; } }
+
+    .day-card {
+      padding: 16px 14px; border-radius: 14px;
+      background: rgba(20,25,20,.85); border: 1px solid var(--line);
+      display: flex; flex-direction: column; gap: 10px;
+      min-height: 220px; transition: all .2s ease;
+      position: relative; overflow: hidden;
+    }
+    .day-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--gold), transparent);
+      opacity: .6;
+    }
+    .day-card:hover { border-color: rgba(212,175,55,.3); transform: translateY(-3px); }
+    .day-num {
+      font: 800 12px 'Playfair Display', serif;
+      color: var(--gold-light); text-transform: uppercase;
+      letter-spacing: .1em;
+    }
+    .day-subject {
+      font: 700 14px 'Playfair Display', serif;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .day-subject i { color: var(--gold-light); font-size: 13px; }
+    .day-task { font-size: 12.5px; color: var(--text); line-height: 1.55; flex: 1; }
+    .day-meta {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 11px; color: var(--muted);
+      padding-top: 8px; border-top: 1px solid rgba(255,255,255,.05);
+    }
+    .day-meta .duration { color: var(--gold-light); font-weight: 700; }
+    .day-objective {
+      font-size: 11px; color: var(--muted); font-style: italic;
+      line-height: 1.5;
+    }
+    .day-method {
+      font-size: 11px; color: var(--muted);
+      padding: 8px 10px; border-radius: 8px;
+      background: rgba(255,255,255,.02);
+      line-height: 1.5;
+      border-left: 2px solid rgba(212,175,55,.3);
+    }
+
+    /* ═══ ENCOURAGEMENT ═══ */
+    .encouragement-card {
+      padding: 24px 26px; border-radius: var(--radius);
+      background: linear-gradient(135deg, rgba(212,175,55,.08), rgba(67,181,125,.04));
+      border: 1px solid rgba(212,175,55,.2);
+      position: relative; overflow: hidden;
+    }
+    .encouragement-card::before {
+      content: '"'; position: absolute; top: -20px; right: 20px;
+      font-family: 'Playfair Display', serif; font-size: 100px;
+      color: var(--gold-light); opacity: .1; line-height: 1;
+    }
+    .encouragement-text {
+      font: 500 16px/1.7 'Playfair Display', serif;
+      color: var(--text); font-style: italic; position: relative;
+    }
+
+    /* ═══ MODAL PREMIUM ═══ */
+    .modal-backdrop {
+      position: fixed; inset: 0; z-index: 100;
+      display: none; place-items: center; padding: 16px;
+      background: rgba(0,0,0,.85); backdrop-filter: blur(14px);
+    }
+    .modal-backdrop.show { display: grid; animation: fadeIn .25s ease; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .modal {
+      position: relative; width: min(100%, 420px);
+      padding: 28px 24px 22px;
+      border: 1px solid var(--gold); border-radius: 20px;
+      background: linear-gradient(145deg, #141414, #0a0a0a);
+      box-shadow: 0 30px 80px rgba(0,0,0,.6);
+      animation: modalPop .3s cubic-bezier(.34,1.56,.64,1);
+    }
+    @keyframes modalPop { from { transform: scale(.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .modal h2 {
+      text-align: center; font: 700 24px 'Playfair Display', serif;
+      margin-bottom: 10px;
+    }
+    .modal h2 span { color: var(--gold-light); font-style: italic; }
+    .modal p { color: var(--muted); text-align: center; line-height: 1.7; margin-bottom: 20px; }
+    .modal-close {
+      position: absolute; top: 12px; right: 12px;
+      width: 32px; height: 32px; border-radius: 10px;
+      background: rgba(255,255,255,.04); border: 1px solid var(--line);
+      color: var(--muted); font-size: 14px;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .2s ease;
+    }
+    .modal-close:hover { color: var(--text); border-color: rgba(212,175,55,.3); }
+    .modal-icon {
+      display: block; text-align: center; font-size: 48px; margin-bottom: 6px;
+    }
+    .modal-actions { display: flex; flex-direction: column; gap: 10px; }
+    .modal-actions .btn-primary { justify-content: center; width: 100%; }
+
+    /* ═══ RESPONSIVE ═══ */
+    @media (max-width: 620px) {
+      .shell { width: min(100% - 20px, 1080px); padding-top: 14px; }
+      .launch-panel { padding: 20px; }
+      .launch-actions { flex-direction: column; }
+      .launch-actions .btn-primary,
+      .launch-actions .btn-secondary { justify-content: center; width: 100%; }
+      .readiness-card { padding: 22px 20px; }
+      .readiness-circle { width: 120px; height: 120px; margin: 0 auto; }
+      .readiness-value { font-size: 30px; }
+      .readiness-info h2 { font-size: 20px; }
+      .section-title { font-size: 18px; }
+      .summary-card { padding: 18px 20px; }
+      .swot-card { padding: 16px; }
+      .priority-card { padding: 16px; gap: 12px; }
+      .priority-score .score-value { font-size: 20px; }
+    }
   </style>
 </head>
 <body>
-  <main class="shell">
-    <header><a class="brand" href="index.html">ARVEX<span>A School</span></a><a class="back" href="outils.html"><i class="fa-solid fa-arrow-left"></i> Outils</a></header>
-    <section class="panel">
-      <div class="eyebrow">Premium · Planification personnalisée</div>
-      <h1>Ton plan de révision, construit à partir de tes examens.</h1>
-      <p class="lead">Le planificateur analyse tes résultats et tes difficultés enregistrées pour organiser tes prochaines séances de travail.</p>
-      <div class="premium-note"><i class="fa-solid fa-lock"></i><span>Ce service est réservé aux comptes Premium. Tes données restent liées à ton compte Firebase.</span></div>
-      <div class="actions"><button class="btn btn-primary" id="loadPlanButton" type="button"><i class="fa-solid fa-calendar-days"></i> Générer mon planning</button><a class="btn btn-secondary" href="abonnement.html">Voir Premium</a></div>
-      <div class="status" id="plannerStatus" role="status" aria-live="polite"></div>
-      <section class="plan" id="planView"><div class="plan-head"><h2>Priorités de la semaine</h2><span class="count" id="resultCount"></span></div><div class="priorities" id="prioritiesList"></div><div class="sessions"><h2>Sessions recommandées</h2><div id="sessionsList"></div></div></section>
-    </section>
-  </main>
-  <div class="modal-backdrop" id="premiumModal" role="dialog" aria-modal="true" aria-labelledby="premiumTitle"><div class="modal"><button class="modal-close" id="modalClose" type="button" aria-label="Fermer"><i class="fa-solid fa-xmark"></i></button><div style="text-align:center;font-size:42px">👑</div><h2 id="premiumTitle">Accès <span>Premium</span></h2><p>Le planificateur analyse tes résultats d’examen et construit un programme personnalisé. Passe à Premium pour l’utiliser.</p><div class="actions"><a class="btn btn-primary" href="abonnement.html" style="width:100%;text-align:center">S’abonner maintenant</a></div></div></div>
-  <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js';
-    import { getAuth, onAuthStateChanged, getIdToken } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js';
-    const app = initializeApp({ apiKey:'AIzaSyDHscOXw3rLuhV6z1Cny-bdYCumqpnG7QE', authDomain:'arvexa-fbf10.firebaseapp.com', projectId:'arvexa-fbf10', storageBucket:'arvexa-fbf10.firebasestorage.app', messagingSenderId:'920108330053', appId:'1:920108330053:web:f532d71cbc2c824bc7472c' });
-    const auth = getAuth(app); let currentUser = null;
-    const $ = (id) => document.getElementById(id);
-    function setStatus(message, type = '') { $('plannerStatus').textContent = message; $('plannerStatus').className = `status ${type}`; }
-    function showPremium() { $('premiumModal').classList.add('show'); }
-    function renderPlan(data) { const plan = data.plan || {}; $('resultCount').textContent = `${data.resultCount || 0} examen(s) analysé(s)`; $('prioritiesList').innerHTML = (plan.priorities || []).map((item, index) => `<article class="priority"><div class="priority-index">${index + 1}</div><div><h3>${item.subject}</h3><p>${item.priority} · ${item.recommendedMinutes} min · ${item.attempts} tentative(s)</p></div><div class="score">${Number(item.averageScore || 0).toFixed(2)}/20</div></article>`).join('') || '<p class="lead">Passe un examen pour créer tes premières priorités.</p>'; $('sessionsList').innerHTML = (plan.sessions || []).map((session) => `<div class="session"><strong>Jour ${session.day} · ${session.subject}</strong><span>${session.durationMinutes} min · ${session.task}</span></div>`).join('') || '<p class="lead">Aucune session recommandée pour le moment.</p>'; $('planView').classList.add('show'); }
-    async function loadPlan() { if (!currentUser) { setStatus('Connecte-toi pour utiliser le planificateur.', 'error'); return; } const button = $('loadPlanButton'); button.disabled = true; button.innerHTML = '<span class="loader"></span>Analyse en cours...'; setStatus('Analyse de tes résultats...'); try { const response = await fetch('/api/planner', { headers: { Authorization: `Bearer ${await getIdToken(currentUser)}` } }); const payload = await response.json().catch(() => null); if (response.status === 403 && payload?.code === 'PREMIUM_REQUIRED') { showPremium(); return; } if (!response.ok) throw new Error(payload?.error || 'Service indisponible.'); renderPlan(payload); setStatus('Planning mis à jour à partir de tes examens.', 'success'); } catch (error) { setStatus(error.message || 'Impossible de charger le planning.', 'error'); } finally { button.disabled = false; button.innerHTML = '<i class="fa-solid fa-calendar-days"></i> Générer mon planning'; } }
-    $('loadPlanButton').addEventListener('click', loadPlan); $('modalClose').addEventListener('click', () => $('premiumModal').classList.remove('show')); $('premiumModal').addEventListener('click', (event) => { if (event.target === $('premiumModal')) $('premiumModal').classList.remove('show'); }); onAuthStateChanged(auth, (user) => { currentUser = user; if (!user) setStatus('Connecte-toi pour utiliser le planificateur.', 'error'); });
-  </script>
+
+<main class="shell">
+
+  <!-- HEADER -->
+  <header class="top-header">
+    <a class="brand" href="index.html">ARVEX<span>A School</span></a>
+    <div class="top-actions">
+      <div class="premium-badge"><i class="fa-solid fa-crown"></i> Premium</div>
+      <a class="top-btn" href="outils.html"><i class="fa-solid fa-arrow-left"></i> Outils</a>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <h1>Ton plan de révision <em>personnalisé</em></h1>
+    <p>Analyse intelligente de tes examens par IA. Priorités, sessions détaillées, objectifs concrets. Un vrai copilote pour ton BAC.</p>
+  </section>
+
+  <!-- LAUNCH PANEL -->
+  <section class="launch-panel">
+    <div class="launch-note">
+      <i class="fa-solid fa-lock"></i>
+      <div>Ce service analyse tes examens et construit un plan IA. Réservé aux comptes Premium.</div>
+    </div>
+    <div class="launch-actions">
+      <button class="btn-primary" id="loadPlanButton" type="button">
+        <i class="fa-solid fa-wand-magic-sparkles"></i>
+        <span class="btn-text">Générer mon plan</span>
+        <span class="loader" style="display:none"></span>
+      </button>
+      <button class="btn-secondary" id="refreshPlanButton" type="button" disabled title="Rafraîchir depuis l'IA (ignorer le cache)">
+        <i class="fa-solid fa-rotate"></i> Rafraîchir
+      </button>
+      <a class="btn-secondary" href="abonnement.html">
+        <i class="fa-solid fa-crown"></i> Gérer Premium
+      </a>
+    </div>
+    <div class="status" id="plannerStatus" role="status" aria-live="polite"></div>
+  </section>
+
+  <!-- PLAN VIEW -->
+  <section class="plan-view" id="planView"></section>
+
+</main>
+
+<!-- MODAL PREMIUM -->
+<div class="modal-backdrop" id="premiumModal" role="dialog" aria-modal="true">
+  <div class="modal">
+    <button class="modal-close" id="modalClose" type="button" aria-label="Fermer">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+    <div class="modal-icon">👑</div>
+    <h2>Accès <span>Premium</span></h2>
+    <p>Le planificateur analyse tes résultats d'examen et construit un programme sur mesure grâce à l'IA.</p>
+    <div class="modal-actions">
+      <a class="btn-primary" href="abonnement.html" style="justify-content: center;">
+        <i class="fa-solid fa-crown"></i> S'abonner maintenant
+      </a>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js';
+import { getAuth, onAuthStateChanged, getIdToken } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js';
+
+const app = initializeApp({
+  apiKey: 'AIzaSyDHscOXw3rLuhV6z1Cny-bdYCumqpnG7QE',
+  authDomain: 'arvexa-fbf10.firebaseapp.com',
+  projectId: 'arvexa-fbf10',
+  storageBucket: 'arvexa-fbf10.firebasestorage.app',
+  messagingSenderId: '920108330053',
+  appId: '1:920108330053:web:f532d71cbc2c824bc7472c'
+});
+const auth = getAuth(app);
+
+const $ = (id) => document.getElementById(id);
+let currentUser = null;
+let lastPlan = null;
+
+// ═══════════════════════════════════════════════════════════════
+// UTILITAIRES
+// ═══════════════════════════════════════════════════════════════
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = String(text || '');
+  return div.innerHTML;
+}
+
+function setStatus(message, type = '') {
+  $('plannerStatus').textContent = message;
+  $('plannerStatus').className = `status ${type}`;
+}
+
+function showPremium() { $('premiumModal').classList.add('show'); }
+function hidePremium() { $('premiumModal').classList.remove('show'); }
+
+function formatRelativeTime(isoDate) {
+  if (!isoDate) return '';
+  const diff = Date.now() - new Date(isoDate).getTime();
+  const min = Math.floor(diff / 60000);
+  if (min < 1) return "à l'instant";
+  if (min < 60) return `il y a ${min} min`;
+  const h = Math.floor(min / 60);
+  if (h < 24) return `il y a ${h}h`;
+  const d = Math.floor(h / 24);
+  return `il y a ${d} j`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDU DU PLAN
+// ═══════════════════════════════════════════════════════════════
+function renderPlan(data) {
+  const plan = data.plan || {};
+  const meta = plan._meta || {};
+  const container = $('planView');
+
+  const readinessScore = meta.readinessScore || 0;
+  const readinessLevel = meta.readinessLevel || 'insuffisant';
+  const readinessLabel = meta.readinessLabel || 'Données insuffisantes';
+  const circumference = 2 * Math.PI * 60;
+  const offset = circumference - (readinessScore / 100) * circumference;
+
+  let html = '';
+
+  // ═══ META BAR ═══
+  html += `
+    <div class="meta-bar">
+      <span class="meta-chip"><i class="fa-solid fa-book"></i> <strong>${meta.resultCount || 0}</strong> examen${(meta.resultCount || 0) > 1 ? 's' : ''} analysé${(meta.resultCount || 0) > 1 ? 's' : ''}</span>
+      <span class="meta-chip"><i class="fa-solid fa-signal"></i> ${escapeHtml(meta.dataQualityLabel || 'N/A')}</span>
+      ${meta.aiGenerated ? `<span class="meta-chip ai-badge"><i class="fa-solid fa-brain"></i> Généré par IA</span>` : `<span class="meta-chip"><i class="fa-solid fa-robot"></i> Mode local</span>`}
+      ${data.cached ? `<span class="meta-chip cache-badge"><i class="fa-solid fa-bolt"></i> Depuis le cache</span>` : ''}
+      <span class="meta-chip"><i class="fa-solid fa-clock"></i> ${formatRelativeTime(meta.generatedAt)}</span>
+    </div>
+  `;
+
+  // ═══ READINESS CARD ═══
+  html += `
+    <div class="readiness-card">
+      <div class="readiness-circle">
+        <svg viewBox="0 0 140 140">
+          <circle class="circle-bg" cx="70" cy="70" r="60"></circle>
+          <circle class="circle-progress ${readinessLevel}" cx="70" cy="70" r="60"
+            stroke-dasharray="${circumference}"
+            stroke-dashoffset="${offset}"></circle>
+        </svg>
+        <div class="readiness-value">${readinessScore}<small>/100</small></div>
+      </div>
+      <div class="readiness-info">
+        <h2>${escapeHtml(readinessLabel)}</h2>
+        <p>${escapeHtml(plan.summary || 'Analyse en cours...')}</p>
+        ${meta.targetScore ? `<div class="target-info"><i class="fa-solid fa-bullseye"></i> Objectif : ${meta.targetScore}/20 en ${escapeHtml(meta.targetHorizon || '3 semaines')}</div>` : ''}
+      </div>
+    </div>
+  `;
+
+  // ═══ OBJECTIF SEMAINE ═══
+  if (plan.weekGoal) {
+    html += `
+      <div class="summary-card">
+        <div class="summary-label"><i class="fa-solid fa-flag-checkered"></i> Objectif de la semaine</div>
+        <div class="week-goal"><strong>${escapeHtml(plan.weekGoal)}</strong></div>
+        ${plan.estimatedGain ? `<div style="margin-top:12px;color:var(--gold-light);font-weight:600;font-size:14px;">📈 ${escapeHtml(plan.estimatedGain)}</div>` : ''}
+      </div>
+    `;
+  }
+
+  // ═══ ALERTES ═══
+  if (Array.isArray(meta.alerts) && meta.alerts.length > 0) {
+    html += `<div class="section">
+      <div class="section-head">
+        <div class="section-title"><i class="fa-solid fa-triangle-exclamation"></i> Points d'attention</div>
+      </div>
+      <div class="alerts-list">`;
+    meta.alerts.forEach((alert) => {
+      html += `
+        <div class="alert-item ${alert.type}">
+          <div class="alert-icon"><i class="fa-solid ${alert.icon}"></i></div>
+          <div class="alert-content">
+            <div class="alert-title">${escapeHtml(alert.title)}</div>
+            <div class="alert-message">${escapeHtml(alert.message)}</div>
+          </div>
+        </div>
+      `;
+    });
+    html += `</div></div>`;
+  }
+
+  // ═══ SWOT ═══
+  if (plan.swot) {
+    const s = plan.swot;
+    html += `
+      <div class="section">
+        <div class="section-head">
+          <div class="section-title"><i class="fa-solid fa-chart-simple"></i> Analyse SWOT</div>
+        </div>
+        <div class="swot-grid">
+          ${s.strengths && s.strengths.length ? `
+            <div class="swot-card strengths">
+              <div class="swot-title"><i class="fa-solid fa-arrow-up"></i> Forces</div>
+              <ul class="swot-list">${s.strengths.map((x) => `<li>${escapeHtml(x)}</li>`).join('')}</ul>
+            </div>` : ''}
+          ${s.weaknesses && s.weaknesses.length ? `
+            <div class="swot-card weaknesses">
+              <div class="swot-title"><i class="fa-solid fa-arrow-down"></i> Faiblesses</div>
+              <ul class="swot-list">${s.weaknesses.map((x) => `<li>${escapeHtml(x)}</li>`).join('')}</ul>
+            </div>` : ''}
+          ${s.opportunities && s.opportunities.length ? `
+            <div class="swot-card opportunities">
+              <div class="swot-title"><i class="fa-solid fa-lightbulb"></i> Opportunités</div>
+              <ul class="swot-list">${s.opportunities.map((x) => `<li>${escapeHtml(x)}</li>`).join('')}</ul>
+            </div>` : ''}
+          ${s.threats && s.threats.length ? `
+            <div class="swot-card threats">
+              <div class="swot-title"><i class="fa-solid fa-shield"></i> Menaces</div>
+              <ul class="swot-list">${s.threats.map((x) => `<li>${escapeHtml(x)}</li>`).join('')}</ul>
+            </div>` : ''}
+        </div>
+      </div>
+    `;
+  }
+
+  // ═══ PRIORITÉS ═══
+  if (Array.isArray(plan.priorities) && plan.priorities.length > 0) {
+    html += `
+      <div class="section">
+        <div class="section-head">
+          <div class="section-title"><i class="fa-solid fa-list-ol"></i> Priorités</div>
+          <span class="section-sub">${plan.priorities.length} matière${plan.priorities.length > 1 ? 's' : ''}</span>
+        </div>
+        <div class="priorities-list">`;
+    plan.priorities.forEach((p, i) => {
+      const urgent = p.priority === 'Urgente';
+      const important = p.priority === 'Importante';
+      const priorityClass = urgent ? 'urgent' : important ? 'important' : '';
+      const badgeClass = urgent ? 'urgent' : important ? 'important' : 'entretien';
+      html += `
+        <div class="priority-card ${priorityClass}">
+          <div class="priority-rank">${i + 1}</div>
+          <div class="priority-body">
+            <div class="priority-subject">
+              ${escapeHtml(p.subject)}
+              <span class="priority-badge ${badgeClass}">${escapeHtml(p.priority)}</span>
+            </div>
+            <div class="priority-reason">${escapeHtml(p.reason)}</div>
+            ${Array.isArray(p.weakChapters) && p.weakChapters.length > 0 ? `
+              <div class="priority-chapters">
+                ${p.weakChapters.map((c) => `<span class="chapter-chip">⚠ ${escapeHtml(c)}</span>`).join('')}
+              </div>` : ''}
+          </div>
+          <div class="priority-score">
+            <div class="score-value">${p.averageScore !== null && p.averageScore !== undefined ? p.averageScore : '—'}</div>
+            <div class="score-label">Moyenne</div>
+            <div class="score-time">${p.recommendedMinutes || 30} min/sem</div>
+          </div>
+        </div>
+      `;
+    });
+    html += `</div></div>`;
+  }
+
+  // ═══ PLAN SEMAINE ═══
+  if (Array.isArray(plan.sessions) && plan.sessions.length > 0) {
+    html += `
+      <div class="section">
+        <div class="section-head">
+          <div class="section-title"><i class="fa-solid fa-calendar-week"></i> Plan de la semaine</div>
+          <span class="section-sub">${plan.weeklyOverview?.totalHours ? plan.weeklyOverview.totalHours + 'h au total' : '7 jours'}</span>
+        </div>
+        <div class="week-grid">`;
+    plan.sessions.forEach((s) => {
+      html += `
+        <div class="day-card">
+          <div class="day-num">Jour ${s.day}</div>
+          <div class="day-subject"><i class="fa-solid fa-book"></i> ${escapeHtml(s.subject)}</div>
+          <div class="day-task">${escapeHtml(s.task)}</div>
+          ${s.objective ? `<div class="day-objective">🎯 ${escapeHtml(s.objective)}</div>` : ''}
+          ${s.method ? `<div class="day-method">${escapeHtml(s.method)}</div>` : ''}
+          <div class="day-meta">
+            <span class="duration"><i class="fa-solid fa-clock"></i> ${s.durationMinutes || 30} min</span>
+          </div>
+        </div>
+      `;
+    });
+    html += `</div></div>`;
+  }
+
+  // ═══ ENCOURAGEMENT ═══
+  if (plan.encouragement) {
+    html += `
+      <div class="section">
+        <div class="encouragement-card">
+          <div class="summary-label" style="color:var(--gold-light);font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+            <i class="fa-solid fa-quote-left"></i> Message du coach
+          </div>
+          <div class="encouragement-text">${escapeHtml(plan.encouragement)}</div>
+        </div>
+      </div>
+    `;
+  }
+
+  container.innerHTML = html;
+  container.classList.add('show');
+
+  // Animer le cercle
+  setTimeout(() => {
+    const circle = container.querySelector('.circle-progress');
+    if (circle) {
+      circle.style.strokeDashoffset = offset;
+    }
+  }, 100);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CHARGEMENT DU PLAN
+// ═══════════════════════════════════════════════════════════════
+async function loadPlan(forceRefresh = false) {
+  if (!currentUser) {
+    setStatus('Connecte-toi pour utiliser le planificateur.', 'error');
+    return;
+  }
+
+  const btn = $('loadPlanButton');
+  const refreshBtn = $('refreshPlanButton');
+  const btnText = btn.querySelector('.btn-text');
+  const btnLoader = btn.querySelector('.loader');
+
+  btn.disabled = true;
+  refreshBtn.disabled = true;
+  if (btnText) btnText.textContent = 'Analyse en cours...';
+  if (btnLoader) btnLoader.style.display = 'inline-block';
+  setStatus(forceRefresh ? 'Nouvelle analyse IA en cours (peut prendre 15-30 sec)...' : 'Chargement du plan...');
+
+  try {
+    const token = await getIdToken(currentUser);
+    const url = forceRefresh ? '/api/planner?refresh=true' : '/api/planner';
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ refresh: forceRefresh })
+    });
+
+    const payload = await response.json().catch(() => null);
+
+    if (response.status === 403 && payload?.code === 'PREMIUM_REQUIRED') {
+      showPremium();
+      setStatus('Premium requis.', 'error');
+      return;
+    }
+    if (!response.ok) {
+      throw new Error(payload?.error || 'Service indisponible.');
+    }
+
+    lastPlan = payload.plan;
+    renderPlan(payload);
+
+    if (payload.aiGenerated) {
+      setStatus('✨ Plan IA généré avec succès.', 'success');
+    } else {
+      setStatus('Plan généré localement (IA temporairement indisponible).', 'success');
+    }
+
+  } catch (error) {
+    console.error('Planner error:', error);
+    setStatus(error.message || 'Impossible de charger le plan.', 'error');
+  } finally {
+    btn.disabled = false;
+    refreshBtn.disabled = false;
+    if (btnText) btnText.textContent = 'Générer mon plan';
+    if (btnLoader) btnLoader.style.display = 'none';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ÉVÉNEMENTS
+// ═══════════════════════════════════════════════════════════════
+$('loadPlanButton').addEventListener('click', () => loadPlan(false));
+$('refreshPlanButton').addEventListener('click', () => {
+  if (confirm('Rafraîchir le plan ? Cela appellera l\'IA et écrasera le cache actuel.')) {
+    loadPlan(true);
+  }
+});
+$('modalClose').addEventListener('click', hidePremium);
+$('premiumModal').addEventListener('click', (e) => {
+  if (e.target === $('premiumModal')) hidePremium();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') hidePremium();
+});
+
+// ═══════════════════════════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════════════════════════
+onAuthStateChanged(auth, (user) => {
+  currentUser = user;
+  if (!user) {
+    setStatus('Connecte-toi pour utiliser le planificateur.', 'error');
+    $('loadPlanButton').disabled = true;
+    $('refreshPlanButton').disabled = true;
+  } else {
+    setStatus('Prêt à générer ton plan personnalisé.');
+  }
+});
+</script>
+
 </body>
 </html>

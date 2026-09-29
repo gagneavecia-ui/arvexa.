@@ -153,6 +153,9 @@ function round2(n) {
 // AGRÉGATION INTELLIGENTE DES DONNÉES
 // ================================================================
 function aggregateStudentData(results) {
+  // ⚡ Déclaré en premier pour être dispo partout
+  const totalAttempts = results.length;
+
   const grouped = new Map();
   let oldestDate = null;
   let newestDate = null;
@@ -352,8 +355,6 @@ function aggregateStudentData(results) {
   }
 
   // ═══ QUALITÉ DES DONNÉES ═══
-  const totalAttempts = results.length;
-  let dataQuality = 'insuffisante';
   let dataQualityLabel = 'Données insuffisantes';
   if (totalAttempts >= MIN_ATTEMPTS_FOR_SOLID) {
     dataQuality = 'solide';

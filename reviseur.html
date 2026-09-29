@@ -1399,20 +1399,22 @@
   // ═══════════════════════════════════════════════════════════════
   // ÉTAT
   // ═══════════════════════════════════════════════════════════════
-  const state = {
-    subject: 'mathematiques',
-    chapter: 'all',
-    mode: 'fiche',
-    user: null,
-    isPremium: false,
-    currentSession: null,
-    flashcards: [],
-    currentFlashIndex: 0,
-    quiz: [],
-    quizAnswers: {},
-    isGenerating: false
-  };
-
+const state = {
+  subject: 'mathematiques',
+  chapter: 'all',
+  mode: 'fiche',
+  user: null,
+  isPremium: false,
+  currentSession: null,
+  flashcards: [],
+  currentFlashIndex: 0,
+  quiz: [],
+  quizAnswers: {},
+  isGenerating: false,
+  sessionStartedAt: null,
+  quizProgressSaved: false                              // ⚡ AJOUT
+};
+    
   // ═══════════════════════════════════════════════════════════════
   // DOM HELPERS
   // ═══════════════════════════════════════════════════════════════
@@ -1690,9 +1692,10 @@
     btn.classList.add('loading');
     setStatus('configStatus', '');
 
-    state.subject = customSelects.subject.getValue();
-    state.chapter = customSelects.chapter.getValue();
-
+  state.subject = customSelects.subject.getValue();
+  state.chapter = customSelects.chapter.getValue();
+  state.sessionStartedAt = Date.now();                // ⚡ AJOUT : démarre le chrono
+   
     showView('loadingView');
     resetSteps(GENERATION_STEPS);
     const statusEl = $('genLoadingStatus');
@@ -1938,7 +1941,33 @@
     }
   });
 
-  $('finishFlashBtn').addEventListener('click', startQuiz);
+ $('finishFlashBtn').addEventListener('click', async () => {
+  // ⚡ Enregistrer la fin de la session flashcards
+  if (state.user && state.flashcards && state.flashcards.length > 0) {
+    try {
+      const durationSeconds = state.sessionStartedAt
+        ? Math.round((Date.now() - state.sessionStartedAt) / 1000)
+        : 0;
+
+      await addDoc(collection(db, 'users', state.user.uid, 'revisionSessions'), {
+        subject: state.subject,
+        subjectKey: normalizeSubjectKey(state.subject),
+        chapter: state.chapter,
+        type: 'flashcard_completed',
+        cardsViewed: state.currentFlashIndex + 1,
+        totalCards: state.flashcards.length,
+        duration: durationSeconds,
+        createdAt: serverTimestamp()
+      });
+      console.log('✅ Session flashcards enregistrée');
+    } catch (e) {
+      console.warn('Save flashcard completion error:', e);
+    }
+  }
+
+  // Puis on lance le quiz
+  startQuiz();
+});
 
   // ═══════════════════════════════════════════════════════════════
   // QUIZ
@@ -1948,6 +1977,7 @@
 
     if (Array.isArray(state.currentSession.quiz) && state.currentSession.quiz.length > 0) {
       state.quiz = state.currentSession.quiz;
+      state.quizProgressSaved = false;                     
       state.quizAnswers = {};
       renderQuiz();
       showView('quizView');
@@ -2038,7 +2068,20 @@
         const q = state.quiz[qIndex];
         const selected = opt.dataset.option;
         state.quizAnswers[qIndex] = selected;
-
+    // ⚡ Enregistrer la tentative dès la 2e réponse (une seule fois)
+    if (!state.quizProgressSaved && Object.keys(state.quizAnswers).length >= 2 && state.user) {
+      state.quizProgressSaved = true;
+      addDoc(collection(db, 'users', state.user.uid, 'revisionSessions'), {
+        subject: state.subject,
+        subjectKey: normalizeSubjectKey(state.subject),
+        chapter: state.chapter,
+        type: 'quiz_attempted',
+        answeredCount: Object.keys(state.quizAnswers).length,
+        totalQuestions: state.quiz.length,
+        createdAt: serverTimestamp()
+      }).catch((e) => console.warn('Quiz partial save error:', e));
+    }
+        
         const question = container.querySelector(`[data-index="${qIndex}"]`);
         question.querySelectorAll('.quiz-option').forEach((o) => {
           o.classList.add('disabled');
@@ -2119,34 +2162,48 @@
   // ═══════════════════════════════════════════════════════════════
   // SAUVEGARDE FIRESTORE
   // ═══════════════════════════════════════════════════════════════
-  async function saveSession(session) {
-    if (!state.user) return;
-    try {
-      await addDoc(collection(db, 'users', state.user.uid, 'revisionSessions'), {
-        subject: state.subject,
-        chapter: state.chapter,
-        chapterTitle: session.chapterTitle || state.chapter,
-        mode: state.mode,
-        session,
-        createdAt: serverTimestamp()
-      });
-    } catch (e) { console.warn('Save session error:', e); }
-  }
+async function saveSession(session) {
+  if (!state.user) return;
+  try {
+    // ⚡ Durée écoulée depuis le début de la session (si dispo)
+    const durationSeconds = state.sessionStartedAt
+      ? Math.round((Date.now() - state.sessionStartedAt) / 1000)
+      : 0;
 
-  async function saveQuizResult(correct, total) {
-    if (!state.user) return;
-    try {
-      await addDoc(collection(db, 'users', state.user.uid, 'revisionSessions'), {
-        subject: state.subject,
-        chapter: state.chapter,
-        type: 'quiz_result',
-        score: Math.round((correct / total) * 20),
-        correct,
-        total,
-        createdAt: serverTimestamp()
-      });
-    } catch (e) { console.warn('Save quiz error:', e); }
-  }
+    await addDoc(collection(db, 'users', state.user.uid, 'revisionSessions'), {
+      subject: state.subject,
+      subjectKey: normalizeSubjectKey(state.subject),   // ⚡ AJOUT
+      chapter: state.chapter,
+      chapterTitle: session.chapterTitle || state.chapter,
+      mode: state.mode,
+      session,
+      duration: durationSeconds,                        // ⚡ AJOUT
+      createdAt: serverTimestamp()
+    });
+  } catch (e) { console.warn('Save session error:', e); }
+}
+    
+ async function saveQuizResult(correct, total) {
+  if (!state.user) return;
+  try {
+    // ⚡ Durée totale de la session (fiche + quiz, ou flashcards + quiz)
+    const durationSeconds = state.sessionStartedAt
+      ? Math.round((Date.now() - state.sessionStartedAt) / 1000)
+      : 0;
+
+    await addDoc(collection(db, 'users', state.user.uid, 'revisionSessions'), {
+      subject: state.subject,
+      subjectKey: normalizeSubjectKey(state.subject),   // ⚡ AJOUT
+      chapter: state.chapter,
+      type: 'quiz_result',
+      score: Math.round((correct / total) * 20),
+      correct,
+      total,
+      duration: durationSeconds,                        // ⚡ AJOUT
+      createdAt: serverTimestamp()
+    });
+  } catch (e) { console.warn('Save quiz error:', e); }
+}
 
   // ═══════════════════════════════════════════════════════════════
   // HISTORIQUE
@@ -2273,6 +2330,30 @@
     } catch (e) { console.warn('Load quota error:', e); }
   }
 
+    // ⚡ Normalise le nom de matière pour ARV-PILOT (ex: "Mathématiques" → "mathematiques")
+function normalizeSubjectKey(raw) {
+  if (!raw) return null;
+  const s = String(raw)
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, '_')
+    .replace(/[^a-z_]/g, '');
+
+  const map = {
+    mathematiques: 'mathematiques', maths: 'mathematiques', math: 'mathematiques',
+    physique: 'physique', physiques: 'physique',
+    chimie: 'chimie',
+    svt: 'svt',
+    francais: 'francais',
+    anglais: 'anglais',
+    philosophie: 'philosophie', philo: 'philosophie',
+    histoire_geo: 'histoire_geo', histoiregeo: 'histoire_geo',
+    eps: 'eps'
+  };
+  return map[s] || s;
+}
+    
   // ═══════════════════════════════════════════════════════════════
   // HELPERS
   // ═══════════════════════════════════════════════════════════════

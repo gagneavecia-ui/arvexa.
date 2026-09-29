@@ -14,6 +14,7 @@ const ALLOWED_ACTIONS = new Set(['generate', 'quiz']);
 
 // ⚡ QUOTA GRATUIT
 const FREE_REVISEUR_LIMIT = 2;
+module.exports.config = { maxDuration: 60 };
 
 let adminServices;
 
@@ -341,9 +342,26 @@ Schéma exact :
 // ────────────────────────────────────────────────────────────────
 async function callProvider(provider, prompt, maxTokens = 4000) {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 60000);
+  // ⚡ Timeout réduit à 25s : si le provider traîne, on bascule au suivant
+  const timeout = setTimeout(() => controller.abort(), 25000);
 
   try {
+    const body = {
+      model: provider.model,
+      temperature: 0.3,
+      max_tokens: maxTokens,
+      messages: [
+        { role: 'system', content: 'Tu produis exclusivement du JSON valide.' },
+        { role: 'user', content: prompt }
+      ]
+    };
+
+    // ⚡ Mistral ne supporte PAS response_format:json_object de la même façon
+    // → on l'active uniquement pour Groq et OpenRouter
+    if (provider.name === 'Groq' || provider.name === 'OpenRouter') {
+      body.response_format = { type: 'json_object' };
+    }
+
     const result = await fetch(provider.endpoint, {
       method: 'POST',
       headers: {
@@ -351,24 +369,19 @@ async function callProvider(provider, prompt, maxTokens = 4000) {
         'Authorization': `Bearer ${provider.key}`,
         ...provider.headers
       },
-      body: JSON.stringify({
-        model: provider.model,
-        temperature: 0.3,
-        max_tokens: maxTokens,
-        response_format: { type: 'json_object' },
-        messages: [
-          { role: 'system', content: 'Tu produis exclusivement du JSON valide.' },
-          { role: 'user', content: prompt }
-        ]
-      }),
+      body: JSON.stringify(body),
       signal: controller.signal
     });
 
     const data = await result.json().catch(() => null);
-    if (!result.ok) throw new Error(`${provider.name} HTTP ${result.status}`);
+
+    if (!result.ok) {
+      const msg = data?.error?.message || data?.message || `HTTP ${result.status}`;
+      throw new Error(`${provider.name}: ${msg}`);
+    }
 
     const content = data?.choices?.[0]?.message?.content;
-    if (!content) throw new Error(`${provider.name} réponse vide`);
+    if (!content) throw new Error(`${provider.name}: réponse vide`);
 
     const cleaned = content
       .replace(/^```(?:json)?\s*/i, '')
@@ -381,18 +394,33 @@ async function callProvider(provider, prompt, maxTokens = 4000) {
   }
 }
 
-async function generateWithFallback(prompt, maxTokens = 4000) {
+async function generateWithFallback(prompt, validator, maxTokens = 4000) {
   const providers = getProviders();
   if (!providers.length) throw new Error('provider_missing');
 
+  const errors = [];
+
   for (const provider of providers) {
     try {
-      return await callProvider(provider, prompt, maxTokens);
+      console.log(`[AI] Tentative ${provider.name}...`);
+      const data = await callProvider(provider, prompt, maxTokens);
+
+      // ⚡ Validation DANS la boucle : on ne retourne que si la structure est OK
+      if (validator(data)) {
+        console.log(`[AI] ✅ ${provider.name} a répondu avec une structure valide`);
+        return data;
+      }
+
+      errors.push(`${provider.name}: structure invalide`);
+      console.warn(`[AI] ⚠️ ${provider.name} : structure invalide, on essaie le suivant`);
+
     } catch (error) {
-      console.warn(`${provider.name} indisponible:`, error.message);
+      errors.push(`${provider.name}: ${error.message}`);
+      console.warn(`[AI] ❌ ${provider.name} échec: ${error.message}`);
     }
   }
-  throw new Error('all_providers_failed');
+
+  throw new Error('all_providers_failed: ' + errors.join(' | '));
 }
 
 // ────────────────────────────────────────────────────────────────
@@ -559,84 +587,65 @@ module.exports = async function handler(request, response) {
     // ═══════════════════════════════════════════════════════
     // ACTION : GÉNÉRATION (fiche ou flashcards)
     // ═══════════════════════════════════════════════════════
-    if (action === 'generate') {
-      if (!ALLOWED_MODES.has(body.mode)) {
-        // Libérer le crédit si mode invalide
-        if (reservation?.reserved) {
-          try {
-            await releaseFreeGeneration(user.uid, reservation.usageDate);
-          } catch (_) {}
-        }
-        return jsonError(response, 400, 'Mode invalide.');
-      }
-
-      const prompt =
-        body.mode === 'flashcard'
-          ? flashcardPrompt(body.subject, body.chapter)
-          : fichePrompt(body.subject, body.chapter);
-
-      const data = await generateWithFallback(prompt);
-
-      // Validation
-      if (body.mode === 'flashcard' && !validateFlashcards(data)) {
-        throw new Error('invalid_flashcard_structure');
-      }
-      if (body.mode === 'fiche' && !validateFiche(data)) {
-        throw new Error('invalid_fiche_structure');
-      }
-
-      return response.status(200).json({
-        success: true,
-        session: {
-          ...data,
-          subject: body.subject,
-          chapter: body.chapter,
-          mode: body.mode,
-          generatedAt: new Date().toISOString()
-        },
-        quota: reservation?.premium
-          ? { type: 'premium', unlimited: true }
-          : {
-              type: 'free',
-              used: reservation?.used,
-              limit: FREE_REVISEUR_LIMIT
-            }
-      });
+if (action === 'generate') {
+  if (!ALLOWED_MODES.has(body.mode)) {
+    // Libérer le crédit si mode invalide
+    if (reservation?.reserved) {
+      try {
+        await releaseFreeGeneration(user.uid, reservation.usageDate);
+      } catch (_) {}
     }
+    return jsonError(response, 400, 'Mode invalide.');
+  }
+
+  // ⚡ On prépare le prompt ET le validateur adapté au mode
+  const isFlashcard = body.mode === 'flashcard';
+  const prompt = isFlashcard
+    ? flashcardPrompt(body.subject, body.chapter)
+    : fichePrompt(body.subject, body.chapter);
+  const validator = isFlashcard ? validateFlashcards : validateFiche;
+
+  // ⚡ generateWithFallback valide chaque réponse DANS la boucle
+  const data = await generateWithFallback(prompt, validator);
+
+  return response.status(200).json({
+    success: true,
+    session: {
+      ...data,
+      subject: body.subject,
+      chapter: body.chapter,
+      mode: body.mode,
+      generatedAt: new Date().toISOString()
+    },
+    quota: reservation?.premium
+      ? { type: 'premium', unlimited: true }
+      : {
+          type: 'free',
+          used: reservation?.used,
+          limit: FREE_REVISEUR_LIMIT
+        }
+  });
+}
 
     // ═══════════════════════════════════════════════════════
     // ACTION : QUIZ (gratuit — pas de quota)
     // ═══════════════════════════════════════════════════════
-    if (action === 'quiz') {
-      if (!body.session) {
-        return jsonError(response, 400, 'Session manquante.');
-      }
+  if (action === 'quiz') {
+  if (!body.session) {
+    return jsonError(response, 400, 'Session manquante.');
+  }
 
-      const prompt = quizPrompt(body.subject, body.chapter, body.session);
-      const data = await generateWithFallback(prompt, 3000);
+  const prompt = quizPrompt(body.subject, body.chapter, body.session);
 
-      if (!validateQuiz(data)) {
-        throw new Error('invalid_quiz_structure');
-      }
+  // ⚡ Validation DANS la boucle via generateWithFallback
+  const data = await generateWithFallback(prompt, validateQuiz, 3000);
 
-      return response.status(200).json({
-        success: true,
-        quiz: data.quiz
-      });
-    }
-  } catch (error) {
-    console.error('Réviseur failed:', error.message);
-
-    // ⚡ Libérer le crédit si on l'avait réservé et que la génération échoue
-    if (reservation?.reserved && action === 'generate') {
-      try {
-        await releaseFreeGeneration(user.uid, reservation.usageDate);
-        console.log('Crédit libéré suite à une erreur');
-      } catch (releaseError) {
-        console.error('Erreur libération crédit:', releaseError.message);
-      }
-    }
-
+  return response.status(200).json({
+    success: true,
+    quiz: data.quiz
+  });
+}
+    
     // ── Fallback local pour la génération ──────────────────
     if (action === 'generate') {
       const fallback =

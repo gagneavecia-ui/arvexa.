@@ -583,100 +583,113 @@ module.exports = async function handler(request, response) {
     }
   }
 
-  try {
-    // ═══════════════════════════════════════════════════════
-    // ACTION : GÉNÉRATION (fiche ou flashcards)
-    // ═══════════════════════════════════════════════════════
-if (action === 'generate') {
-  if (!ALLOWED_MODES.has(body.mode)) {
-    // Libérer le crédit si mode invalide
-    if (reservation?.reserved) {
-      try {
-        await releaseFreeGeneration(user.uid, reservation.usageDate);
-      } catch (_) {}
+ try {
+  // ═══════════════════════════════════════════════════════
+  // ACTION : GÉNÉRATION (fiche ou flashcards)
+  // ═══════════════════════════════════════════════════════
+  if (action === 'generate') {
+    if (!ALLOWED_MODES.has(body.mode)) {
+      // Libérer le crédit si mode invalide
+      if (reservation?.reserved) {
+        try {
+          await releaseFreeGeneration(user.uid, reservation.usageDate);
+        } catch (_) {}
+      }
+      return jsonError(response, 400, 'Mode invalide.');
     }
-    return jsonError(response, 400, 'Mode invalide.');
+
+    // ⚡ On prépare le prompt ET le validateur adapté au mode
+    const isFlashcard = body.mode === 'flashcard';
+    const prompt = isFlashcard
+      ? flashcardPrompt(body.subject, body.chapter)
+      : fichePrompt(body.subject, body.chapter);
+    const validator = isFlashcard ? validateFlashcards : validateFiche;
+
+    // ⚡ generateWithFallback valide chaque réponse DANS la boucle
+    const data = await generateWithFallback(prompt, validator);
+
+    return response.status(200).json({
+      success: true,
+      session: {
+        ...data,
+        subject: body.subject,
+        chapter: body.chapter,
+        mode: body.mode,
+        generatedAt: new Date().toISOString()
+      },
+      quota: reservation?.premium
+        ? { type: 'premium', unlimited: true }
+        : {
+            type: 'free',
+            used: reservation?.used,
+            limit: FREE_REVISEUR_LIMIT
+          }
+    });
   }
 
-  // ⚡ On prépare le prompt ET le validateur adapté au mode
-  const isFlashcard = body.mode === 'flashcard';
-  const prompt = isFlashcard
-    ? flashcardPrompt(body.subject, body.chapter)
-    : fichePrompt(body.subject, body.chapter);
-  const validator = isFlashcard ? validateFlashcards : validateFiche;
-
-  // ⚡ generateWithFallback valide chaque réponse DANS la boucle
-  const data = await generateWithFallback(prompt, validator);
-
-  return response.status(200).json({
-    success: true,
-    session: {
-      ...data,
-      subject: body.subject,
-      chapter: body.chapter,
-      mode: body.mode,
-      generatedAt: new Date().toISOString()
-    },
-    quota: reservation?.premium
-      ? { type: 'premium', unlimited: true }
-      : {
-          type: 'free',
-          used: reservation?.used,
-          limit: FREE_REVISEUR_LIMIT
-        }
-  });
-}
-
-    // ═══════════════════════════════════════════════════════
-    // ACTION : QUIZ (gratuit — pas de quota)
-    // ═══════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════
+  // ACTION : QUIZ (gratuit — pas de quota)
+  // ═══════════════════════════════════════════════════════
   if (action === 'quiz') {
-  if (!body.session) {
-    return jsonError(response, 400, 'Session manquante.');
-  }
-
-  const prompt = quizPrompt(body.subject, body.chapter, body.session);
-
-  // ⚡ Validation DANS la boucle via generateWithFallback
-  const data = await generateWithFallback(prompt, validateQuiz, 3000);
-
-  return response.status(200).json({
-    success: true,
-    quiz: data.quiz
-  });
-}
-    
-    // ── Fallback local pour la génération ──────────────────
-    if (action === 'generate') {
-      const fallback =
-        body.mode === 'flashcard'
-          ? buildLocalFlashcards(body)
-          : buildLocalFiche(body);
-
-      return response.status(200).json({
-        success: true,
-        session: {
-          ...fallback,
-          subject: body.subject,
-          chapter: body.chapter,
-          mode: body.mode
-        },
-        quota: reservation?.premium
-          ? { type: 'premium', unlimited: true }
-          : {
-              type: 'free',
-              used: reservation?.used,
-              limit: FREE_REVISEUR_LIMIT
-            },
-        fallback: true
-      });
+    if (!body.session) {
+      return jsonError(response, 400, 'Session manquante.');
     }
 
-    // ── Quiz en échec total ────────────────────────────────
-    return jsonError(
-      response,
-      503,
-      'Le Réviseur est temporairement indisponible. Réessaie.'
-    );
+    const prompt = quizPrompt(body.subject, body.chapter, body.session);
+
+    // ⚡ Validation DANS la boucle via generateWithFallback
+    const data = await generateWithFallback(prompt, validateQuiz, 3000);
+
+    return response.status(200).json({
+      success: true,
+      quiz: data.quiz
+    });
   }
+
+} catch (error) {
+  console.error('Réviseur failed:', error.message);
+
+  // ⚡ Libérer le crédit si on l'avait réservé et que la génération échoue
+  if (reservation?.reserved && action === 'generate') {
+    try {
+      await releaseFreeGeneration(user.uid, reservation.usageDate);
+      console.log('Crédit libéré suite à une erreur');
+    } catch (releaseError) {
+      console.error('Erreur libération crédit:', releaseError.message);
+    }
+  }
+
+  // ── Fallback local pour la génération ──────────────────
+  if (action === 'generate') {
+    const fallback =
+      body.mode === 'flashcard'
+        ? buildLocalFlashcards(body)
+        : buildLocalFiche(body);
+
+    return response.status(200).json({
+      success: true,
+      session: {
+        ...fallback,
+        subject: body.subject,
+        chapter: body.chapter,
+        mode: body.mode
+      },
+      quota: reservation?.premium
+        ? { type: 'premium', unlimited: true }
+        : {
+            type: 'free',
+            used: reservation?.used,
+            limit: FREE_REVISEUR_LIMIT
+          },
+      fallback: true
+    });
+  }
+
+  // ── Quiz en échec total ────────────────────────────────
+  return jsonError(
+    response,
+    503,
+    'Le Réviseur est temporairement indisponible. Réessaie.'
+  );
+}
 };

@@ -1664,7 +1664,7 @@
 
 <script type="module">
 // ================================================================
-// ABONNEMENT — Version robuste anti-flash
+// ABONNEMENT — Version robuste anti-flash + notifications admin
 // ================================================================
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
@@ -1682,7 +1682,11 @@ import {
   doc,
   updateDoc,
   onSnapshot,
-  serverTimestamp
+  serverTimestamp,
+  collection,
+  addDoc,
+  getDocs,
+  increment
 } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
 // ================================================================
@@ -1718,11 +1722,29 @@ const PRICES = {
   annual: 18000
 };
 
-const PROMO_CODES = {
-  'PROMO25': 25
-};
+// ⚡ Codes promo chargés dynamiquement depuis Firestore
+let PROMO_CODES_CACHE = {};
+
+async function loadPromoCodes() {
+  try {
+    const snap = await getDocs(collection(db, 'promoCodes'));
+    PROMO_CODES_CACHE = {};
+    snap.forEach((docSnap) => {
+      const data = docSnap.data();
+      const code = (data.code || docSnap.id).toUpperCase();
+      if (data.discount && data.discount > 0) {
+        PROMO_CODES_CACHE[code] = Number(data.discount);
+      }
+    });
+    console.log('🎟️ Codes promo chargés :', Object.keys(PROMO_CODES_CACHE));
+  } catch (e) {
+    console.warn('Impossible de charger les codes promo :', e.message);
+    PROMO_CODES_CACHE = {};
+  }
+}
 
 const SUPPORT_WHATSAPP = '22798064667';
+const ADMIN_API_URL = 'https://admin-89.vercel.app/api/admin';
 
 // ================================================================
 // MODES DE PAIEMENT
@@ -1856,6 +1878,7 @@ function toDate(value) {
   if (!value) return null;
   if (typeof value.toDate === 'function') return value.toDate();
   if (value.seconds !== undefined) return new Date(value.seconds * 1000);
+  if (value._seconds !== undefined) return new Date(value._seconds * 1000);
   const date = value instanceof Date ? value : new Date(value);
   return Number.isNaN(date.getTime()) ? null : date;
 }
@@ -2149,8 +2172,6 @@ function renderQR(methodKey) {
 }
 
 function updateConfirmButtonState() {
-  const hasName = fullNameInput.value.trim().length > 0;
-  const hasWhatsapp = whatsappInput.value.trim().length >= 8;
   const hasMethod = selectedPaymentMethod !== null;
 
   if (!hasMethod) {
@@ -2186,7 +2207,12 @@ async function applyPromoCode(code) {
     return false;
   }
 
-  const discount = PROMO_CODES[upperCode];
+  // ⚡ Si le cache est vide, recharger depuis Firestore
+  if (Object.keys(PROMO_CODES_CACHE).length === 0) {
+    await loadPromoCodes();
+  }
+
+  const discount = PROMO_CODES_CACHE[upperCode];
   if (!discount) {
     promoMessage.className = 'promo-message error';
     promoMessage.textContent = '❌ Code promo invalide.';
@@ -2261,7 +2287,7 @@ function generateRequestId() {
 }
 
 // ================================================================
-// ENVOI WHATSAPP + FIRESTORE
+// ENVOI WHATSAPP + FIRESTORE + NOTIFICATION ADMIN
 // ================================================================
 async function sendToWhatsApp() {
   if (isSubscribing) return;
@@ -2294,37 +2320,12 @@ async function sendToWhatsApp() {
 
   const methodInfo = PAYMENT_METHODS[selectedPaymentMethod];
 
-  let message = '📱 *NOUVELLE DEMANDE D\'ABONNEMENT ARVEXA*\n\n';
-  message += `🔖 *Réf. :* ${requestId}\n`;
-  message += '👤 *Nom :* ' + fullName + '\n';
-  message += '📱 *WhatsApp :* +227 ' + whatsapp + '\n';
-  message += '📅 *Forfait :* ' + planName + '\n';
-  message += '💰 *Prix normal :* ' + display.original.toLocaleString('fr-FR') + ' FCFA\n';
+  // ⚡ MESSAGE ULTRA COURT — juste pour démarrer la discussion
+  let message = '👋 Bonjour ARVEXA School, je veux m\'abonner au Premium (' + planName + ') — ' + display.final.toLocaleString('fr-FR') + ' FCFA.\n';
+  message += '🔖 Réf : ' + requestId + '\n';
+  message += '👤 Nom : ' + fullName;
 
-  if (appliedPromo && currentPlan === 'annual') {
-    message += '🎟️ *Code promo :* ' + appliedPromo.code + ' (-' + appliedPromo.discount + '%)\n';
-    const discountAmount = display.original - display.final;
-    message += '   *Réduction :* -' + discountAmount.toLocaleString('fr-FR') + ' FCFA\n';
-  }
-
-  message += '━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━\n';
-  message += '💵 *Total à payer :* ' + display.final.toLocaleString('fr-FR') + ' FCFA\n';
-
-  if (savings.totalSaving > 0) {
-    message += '💡 *Économie :* ' + savings.totalSaving.toLocaleString('fr-FR') + ' FCFA\n';
-  }
-
-  message += '💳 *Mode de paiement :* ' + methodInfo.name + '\n';
-  message += '\n🔹 *Statut :* En attente de paiement\n';
-  message += '🔹 *Date :* ' + new Date().toLocaleDateString('fr-FR') + '\n\n';
-
-  message += '📌 *Instructions :*\n';
-  message += '1️⃣ Envoyer le montant sur *+227 98 06 46 67* via ' + methodInfo.name + '\n';
-  message += '2️⃣ Prendre une *capture d\'écran*\n';
-  message += '3️⃣ Envoyer la capture dans cette conversation\n';
-  message += '4️⃣ Activation dans les minutes qui suivent\n\n';
-  message += '🙏 *Merci pour votre confiance !*';
-
+  // 1) Sauvegarder en Firestore
   const saved = await saveSubscriptionRequest(fullName, whatsapp, display, requestId, selectedPaymentMethod);
   if (!saved) {
     isSubscribing = false;
@@ -2333,10 +2334,17 @@ async function sendToWhatsApp() {
     return;
   }
 
+  // 2) Notifier l'admin par push FCM
+  notifyAdminPush(fullName, display, requestId, planName).catch((e) => {
+    console.warn('Push admin failed:', e.message);
+  });
+
+  // 3) Ouvrir WhatsApp (élève → admin)
   const encodedMessage = encodeURIComponent(message);
   const waUrl = 'https://wa.me/' + SUPPORT_WHATSAPP + '?text=' + encodedMessage;
   window.open(waUrl, '_blank', 'noopener,noreferrer');
 
+  // 4) Mettre à jour l'affichage vers l'écran "pending"
   setTimeout(() => {
     closeModal();
     isSubscribing = false;
@@ -2355,9 +2363,13 @@ async function sendToWhatsApp() {
   }, 600);
 }
 
+// ================================================================
+// SAUVEGARDE FIRESTORE
+// ================================================================
 async function saveSubscriptionRequest(fullName, whatsapp, display, requestId, paymentMethod) {
   if (!currentUser) return false;
   try {
+    // 1) Mise à jour du profil élève
     await updateDoc(doc(db, 'users', currentUser.uid), {
       subscriptionStatus: 'pending',
       subscriptionPlan: currentPlan,
@@ -2370,9 +2382,80 @@ async function saveSubscriptionRequest(fullName, whatsapp, display, requestId, p
       subscriptionWhatsapp: whatsapp,
       subscriptionPaymentMethod: paymentMethod
     });
+
+    // 2) Incrémenter le compteur d'utilisations du code promo
+    if (appliedPromo && appliedPromo.code) {
+      try {
+        await updateDoc(doc(db, 'promoCodes', appliedPromo.code), {
+          uses: increment(1)
+        });
+      } catch (e) {
+        console.warn('Impossible d\'incrémenter uses :', e.message);
+      }
+    }
+
+    // 3) Créer une notification pour l'admin (temps réel dans la console)
+    try {
+      await addDoc(collection(db, 'admin_notifications'), {
+        kind: 'subscription_request',
+        title: '💳 Nouvelle demande Premium',
+        message: `${fullName} — ${currentPlan === 'annual' ? 'Annuel' : 'Mensuel'} · ${display.final.toLocaleString('fr-FR')} FCFA`,
+        userUid: currentUser.uid,
+        userEmail: currentUser.email || '',
+        userName: fullName,
+        userWhatsapp: whatsapp,
+        plan: currentPlan,
+        planLabel: currentPlan === 'annual' ? 'Annuel' : 'Mensuel',
+        price: display.final,
+        originalPrice: display.original,
+        promoCode: appliedPromo ? appliedPromo.code : null,
+        paymentMethod,
+        requestId,
+        type: 'warning',
+        read: false,
+        createdAt: serverTimestamp()
+      });
+    } catch (e) {
+      console.warn('Impossible de créer la notification admin :', e.message);
+    }
+
     return true;
   } catch (error) {
+    console.error('Erreur saveSubscriptionRequest:', error);
     return false;
+  }
+}
+
+// ================================================================
+// PUSH FCM VERS L'ADMIN
+// ================================================================
+async function notifyAdminPush(fullName, display, requestId, planName) {
+  if (!currentUser) return;
+  try {
+    const token = await currentUser.getIdToken();
+    const res = await fetch(ADMIN_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
+      body: JSON.stringify({
+        action: 'notifyNewSubscriptionRequest',
+        userUid: currentUser.uid,
+        userName: fullName,
+        plan: currentPlan,
+        planLabel: planName,
+        price: display.final,
+        requestId
+      })
+    });
+    if (!res.ok) {
+      const data = await res.json().catch(() => null);
+      throw new Error(data?.error || 'API error ' + res.status);
+    }
+    console.log('✅ Push admin envoyé');
+  } catch (e) {
+    console.warn('Push admin échoué:', e.message);
   }
 }
 
@@ -2605,6 +2688,9 @@ initAuthGuard(async (user) => {
     showScreen('free');
   }
 
+  // ⚡ Charger les codes promo depuis Firestore
+  await loadPromoCodes();
+
   // Firestore en arrière-plan
   loadUserData(user);
 });
@@ -2614,7 +2700,7 @@ initAuthGuard(async (user) => {
 // ================================================================
 updateDisplay();
 
-console.log('🚀 ARVEXA — Abonnement (avec session robuste)');
+console.log('🚀 ARVEXA — Abonnement (avec notifications admin)');
 </script>
 </body>
 </html>

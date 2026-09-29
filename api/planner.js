@@ -1,16 +1,15 @@
 // ================================================================
-// API PLANNER — ARVEXA School
-// Planificateur Premium alimenté par IA (Groq → OpenRouter → Mistral)
-// Analyse les examens de l'élève et génère un plan de révision personnalisé
+// API PLANNER v2.0 — ARVEXA School
+// Planificateur Premium alimenté par IA
+// Cascade : Groq → OpenRouter → Mistral → Fallback local enrichi
+// Cache intelligent + invalidation auto si nouvel examen
 // ================================================================
 
 const MAX_REQUESTS_PER_WINDOW = 12;
 const requestLog = new Map();
 
-// ⚡ Cache des plans pour éviter les appels IA redondants
 const CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6 heures
 
-// ⚡ Seuil pour considérer les données comme "solides"
 const MIN_ATTEMPTS_FOR_SOLID = 5;
 const MIN_ATTEMPTS_FOR_LIMITED = 2;
 
@@ -78,7 +77,6 @@ function isPremiumUser(data) {
   return !end || end.getTime() > Date.now();
 }
 
-// ⚡ Normalise le nom de matière (ex: "Mathématiques" → "mathematiques")
 function normalizeSubjectKey(raw) {
   if (!raw) return null;
   const s = String(raw)
@@ -114,6 +112,18 @@ const SUBJECT_LABELS = {
   eps: 'EPS'
 };
 
+const SUBJECT_ICONS = {
+  mathematiques: 'fa-square-root-variable',
+  physique: 'fa-bolt',
+  chimie: 'fa-flask',
+  svt: 'fa-dna',
+  francais: 'fa-book-open',
+  anglais: 'fa-globe',
+  philosophie: 'fa-brain',
+  histoire_geo: 'fa-landmark',
+  eps: 'fa-person-running'
+};
+
 const COEFFICIENTS = {
   mathematiques: 5,
   physique: 3,
@@ -140,28 +150,29 @@ function round2(n) {
 }
 
 // ================================================================
-// AGRÉGATION DES DONNÉES DE L'ÉLÈVE
+// AGRÉGATION INTELLIGENTE DES DONNÉES
 // ================================================================
-// Construit un résumé analytique complet : moyennes par matière,
-// points faibles par chapitre, évolution 30j, qualité des données
 function aggregateStudentData(results) {
   const grouped = new Map();
+  let oldestDate = null;
+  let newestDate = null;
 
-  // ⚡ Groupement par matière
   results.forEach((entry) => {
     const key = normalizeSubjectKey(entry.subjectKey || entry.subject) || 'autre';
     if (!grouped.has(key)) {
       grouped.set(key, {
         subjectKey: key,
         label: SUBJECT_LABELS[key] || entry.subject || key,
+        icon: SUBJECT_ICONS[key] || 'fa-book',
+        coefficient: COEFFICIENTS[key] || 1,
         attempts: 0,
         totalScore: 0,
         scores: [],
         weakChapters: [],
         strongChapters: [],
         advices: [],
-        lastDate: null,
-        dates: []
+        dates: [],
+        exams: []
       });
     }
 
@@ -171,9 +182,13 @@ function aggregateStudentData(results) {
       item.attempts += 1;
       item.totalScore += score;
       item.scores.push(score);
+      item.exams.push({
+        score,
+        date: toDate(entry.date || entry.createdAt),
+        title: entry.chapterTitle || entry.examTitle || 'Examen'
+      });
     }
 
-    // ⚡ Extraction des chapitres faibles / forts depuis difficulties
     if (Array.isArray(entry.difficulties)) {
       entry.difficulties.forEach((diff) => {
         const s = Number(diff.score || 0);
@@ -182,56 +197,39 @@ function aggregateStudentData(results) {
 
         const chapterInfo = {
           number: diff.number,
-          score: s,
-          maxScore: max,
+          score: round2(s),
+          maxScore: round2(max),
+          ratio: round2(ratio),
           advice: String(diff.advice || '').slice(0, 200)
         };
 
-        if (ratio < 0.5) {
-          item.weakChapters.push(chapterInfo);
-        } else if (ratio >= 0.85) {
-          item.strongChapters.push(chapterInfo);
-        }
-      });
-    }
-
-    // ⚡ Récupérer les advice texte
-    if (Array.isArray(entry.difficulties)) {
-      entry.difficulties.forEach((d) => {
-        if (d.advice) item.advices.push(String(d.advice).slice(0, 200));
+        if (ratio < 0.5) item.weakChapters.push(chapterInfo);
+        else if (ratio >= 0.85) item.strongChapters.push(chapterInfo);
       });
     }
 
     const date = toDate(entry.date || entry.createdAt);
     if (date) {
       item.dates.push(date.getTime());
-      item.lastDate = date;
+      if (!oldestDate || date < oldestDate) oldestDate = date;
+      if (!newestDate || date > newestDate) newestDate = date;
     }
   });
 
-  // ⚡ Calcul des moyennes, évolutions, priorités
+  // ═══ ANALYSE PAR MATIÈRE ═══
   const subjects = [];
   grouped.forEach((item, key) => {
     const average = item.scores.length > 0
       ? round2(item.scores.reduce((a, b) => a + b, 0) / item.scores.length)
       : null;
 
-    // ⚡ Évolution sur 30 jours
+    // Évolution 30j
     let evolution = null;
-    if (item.dates.length >= 2) {
+    if (item.exams.length >= 2) {
       const now = Date.now();
       const cutoff = now - 30 * 24 * 60 * 60 * 1000;
-      const recent = [];
-      const previous = [];
-      results.forEach((r) => {
-        const rKey = normalizeSubjectKey(r.subjectKey || r.subject);
-        if (rKey !== key) return;
-        const d = toDate(r.date || r.createdAt);
-        const s = Number(r.score ?? r.totalScore ?? 0);
-        if (!d || isNaN(s)) return;
-        if (d.getTime() >= cutoff) recent.push(s);
-        else previous.push(s);
-      });
+      const recent = item.exams.filter((e) => e.date && e.date.getTime() >= cutoff).map((e) => e.score);
+      const previous = item.exams.filter((e) => e.date && e.date.getTime() < cutoff).map((e) => e.score);
       if (recent.length > 0 && previous.length > 0) {
         const avgR = recent.reduce((a, b) => a + b, 0) / recent.length;
         const avgP = previous.reduce((a, b) => a + b, 0) / previous.length;
@@ -239,38 +237,31 @@ function aggregateStudentData(results) {
       }
     }
 
-    // ⚡ Dédup des chapitres faibles (par numéro)
-    const seenWeak = new Set();
-    item.weakChapters = item.weakChapters
-      .filter((c) => {
-        if (seenWeak.has(c.number)) return false;
-        seenWeak.add(c.number);
+    // Dédup chapitres
+    const dedup = (arr) => {
+      const seen = new Set();
+      return arr.filter((c) => {
+        if (seen.has(c.number)) return false;
+        seen.add(c.number);
         return true;
-      })
-      .slice(0, 5);
+      });
+    };
+    item.weakChapters = dedup(item.weakChapters).sort((a, b) => a.ratio - b.ratio).slice(0, 6);
+    item.strongChapters = dedup(item.strongChapters).slice(0, 4);
 
-    const seenStrong = new Set();
-    item.strongChapters = item.strongChapters
-      .filter((c) => {
-        if (seenStrong.has(c.number)) return false;
-        seenStrong.add(c.number);
-        return true;
-      })
-      .slice(0, 3);
+    // Tendance
+    let trend = 'stable';
+    if (evolution !== null && evolution > 0.5) trend = 'hausse';
+    else if (evolution !== null && evolution < -0.5) trend = 'baisse';
 
-    // ⚡ Calcul du score de priorité
+    // Score de priorité
     let priorityScore = 0;
-    if (average !== null && average < 12) {
-      priorityScore += Math.min(40, (12 - average) * 5);
-    }
-    if (evolution !== null && evolution < -0.5) {
-      priorityScore += 15;
-    }
-    if (item.weakChapters.length >= 2) {
-      priorityScore += 15;
-    } else if (item.weakChapters.length === 1) {
-      priorityScore += 8;
-    }
+    if (average !== null && average < 12) priorityScore += Math.min(40, (12 - average) * 5);
+    if (evolution !== null && evolution < -0.5) priorityScore += 15;
+    if (item.weakChapters.length >= 2) priorityScore += 15;
+    else if (item.weakChapters.length === 1) priorityScore += 8;
+    if (item.attempts >= 3) priorityScore += 3; // bonus pour historique fiable
+    priorityScore = Math.min(100, Math.round(priorityScore));
 
     let priorityLevel = 'none';
     if (average === null) priorityLevel = 'none';
@@ -278,50 +269,89 @@ function aggregateStudentData(results) {
     else if (priorityScore >= 25) priorityLevel = 'medium';
     else priorityLevel = 'low';
 
-    // ⚡ Type de priorité lisible
-    let priorityLabel = 'Aucune donnée';
-    if (priorityLevel === 'high') priorityLabel = 'Urgente';
-    else if (priorityLevel === 'medium') priorityLabel = 'Importante';
-    else if (priorityLevel === 'low') priorityLabel = 'Entretien';
+    const priorityLabel = {
+      high: 'Urgente',
+      medium: 'Importante',
+      low: 'Entretien',
+      none: 'Aucune donnée'
+    }[priorityLevel];
 
-    // ⚡ Minutes recommandées basées sur priorité
-    let recommendedMinutes = 30;
-    if (priorityLevel === 'high') recommendedMinutes = 120;
-    else if (priorityLevel === 'medium') recommendedMinutes = 60;
-    else if (priorityLevel === 'low') recommendedMinutes = 30;
+    // Minutes recommandées (proportionnelles au coef et à la priorité)
+    const coef = COEFFICIENTS[key] || 1;
+    let baseMinutes = 30;
+    if (priorityLevel === 'high') baseMinutes = 120;
+    else if (priorityLevel === 'medium') baseMinutes = 60;
+    const recommendedMinutes = Math.min(180, baseMinutes * Math.ceil(coef / 3));
 
     subjects.push({
       subjectKey: key,
       subject: item.label,
+      icon: item.icon,
+      coefficient: coef,
       attempts: item.attempts,
       averageScore: average,
       evolution,
+      trend,
       priority: priorityLabel,
       priorityLevel,
-      priorityScore: Math.round(priorityScore),
+      priorityScore,
       recommendedMinutes,
       weakChapters: item.weakChapters,
       strongChapters: item.strongChapters,
       advice: [...new Set(item.advices)].slice(0, 3),
-      lastDate: item.lastDate ? item.lastDate.toISOString() : null
+      lastDate: item.dates.length > 0 ? new Date(Math.max(...item.dates)).toISOString() : null
     });
   });
 
-  // ⚡ Tri par priorité (plus haute en premier)
   subjects.sort((a, b) => b.priorityScore - a.priorityScore);
 
-  // ⚡ Moyenne générale pondérée
+  // ═══ MOYENNE GÉNÉRALE PONDÉRÉE ═══
   let totalWeighted = 0;
   let totalCoef = 0;
   subjects.forEach((s) => {
     if (s.averageScore === null) return;
-    const coef = COEFFICIENTS[s.subjectKey] || 1;
-    totalWeighted += s.averageScore * coef;
-    totalCoef += coef;
+    totalWeighted += s.averageScore * s.coefficient;
+    totalCoef += s.coefficient;
   });
   const generalAverage = totalCoef > 0 ? round2(totalWeighted / totalCoef) : null;
 
-  // ⚡ Qualité des données
+  // ═══ SCORE DE PRÉPARATION (0-100) ═══
+  // Combine : moyenne, régularité, évolution, couverture matières
+  let readinessScore = 0;
+  if (generalAverage !== null) {
+    readinessScore = (generalAverage / 20) * 60; // 60 pts max sur la moyenne
+  }
+  const subjectsWithData = subjects.filter((s) => s.averageScore !== null).length;
+  readinessScore += Math.min(20, subjectsWithData * 4); // 20 pts sur la couverture
+  const evolutions = subjects.filter((s) => s.evolution !== null);
+  if (evolutions.length > 0) {
+    const avgEvo = evolutions.reduce((a, b) => a + b.evolution, 0) / evolutions.length;
+    readinessScore += Math.min(20, Math.max(-10, avgEvo * 10)); // 20 pts sur l'évolution
+  }
+  readinessScore = Math.max(0, Math.min(100, Math.round(readinessScore)));
+
+  let readinessLevel = 'insuffisant';
+  let readinessLabel = 'Données insuffisantes';
+  if (totalAttempts >= 3 && generalAverage !== null) {
+    if (readinessScore >= 75) { readinessLevel = 'solide'; readinessLabel = 'Préparation solide'; }
+    else if (readinessScore >= 55) { readinessLevel = 'progressing'; readinessLabel = 'En progression'; }
+    else { readinessLevel = 'reinforce'; readinessLabel = 'À renforcer'; }
+  }
+
+  // ═══ OBJECTIF INTELLIGENT ═══
+  // Si l'élève a une moyenne de 8, viser 12 d'un coup est irréaliste.
+  // On propose un objectif progressif.
+  let targetScore = 12;
+  let targetHorizon = '4 semaines';
+  if (generalAverage !== null) {
+    if (generalAverage < 8) { targetScore = round2(generalAverage + 2); targetHorizon = '6 semaines'; }
+    else if (generalAverage < 11) { targetScore = round2(generalAverage + 1.5); targetHorizon = '4 semaines'; }
+    else if (generalAverage < 13) { targetScore = round2(Math.min(14, generalAverage + 1)); targetHorizon = '3 semaines'; }
+    else if (generalAverage < 15) { targetScore = round2(Math.min(16, generalAverage + 0.5)); targetHorizon = '3 semaines'; }
+    else { targetScore = round2(Math.min(18, generalAverage + 0.5)); targetHorizon = '4 semaines'; }
+  }
+
+  // ═══ QUALITÉ DES DONNÉES ═══
   const totalAttempts = results.length;
   let dataQuality = 'insuffisante';
   let dataQualityLabel = 'Données insuffisantes';
@@ -333,42 +363,92 @@ function aggregateStudentData(results) {
     dataQualityLabel = 'Analyse limitée';
   }
 
+  // ═══ ALERTES ═══
+  const alerts = [];
+  subjects.forEach((s) => {
+    if (s.evolution !== null && s.evolution < -1) {
+      alerts.push({
+        type: 'danger',
+        icon: 'fa-arrow-trend-down',
+        title: `${s.subject} en baisse`,
+        message: `-${Math.abs(s.evolution)} pt sur les 30 derniers jours`
+      });
+    }
+    if (s.attempts >= 3 && s.averageScore !== null && s.averageScore < 8) {
+      alerts.push({
+        type: 'warning',
+        icon: 'fa-exclamation-triangle',
+        title: `${s.subject} critique`,
+        message: `Moyenne ${s.averageScore}/20 sur ${s.attempts} examens`
+      });
+    }
+  });
+  if (totalAttempts > 0) {
+    const lastDate = newestDate;
+    if (lastDate) {
+      const daysSince = Math.floor((Date.now() - lastDate.getTime()) / (24 * 60 * 60 * 1000));
+      if (daysSince > 10) {
+        alerts.push({
+          type: 'info',
+          icon: 'fa-clock',
+          title: 'Reprise recommandée',
+          message: `Ton dernier examen date de ${daysSince} jours`
+        });
+      }
+    }
+  }
+
   return {
     subjects,
     generalAverage,
     totalAttempts,
     dataQuality,
     dataQualityLabel,
-    coefficients: COEFFICIENTS
+    readinessScore,
+    readinessLevel,
+    readinessLabel,
+    targetScore,
+    targetHorizon,
+    alerts,
+    coefficients: COEFFICIENTS,
+    oldestDate: oldestDate ? oldestDate.toISOString() : null,
+    newestDate: newestDate ? newestDate.toISOString() : null
   };
 }
 
 // ================================================================
-// PROMPT IA POUR LE PLANIFICATEUR
+// PROMPT IA v2 (ultra-structuré)
 // ================================================================
 function plannerPrompt(aggregated) {
-  const { subjects, generalAverage, totalAttempts, dataQuality } = aggregated;
+  const {
+    subjects, generalAverage, totalAttempts, dataQuality,
+    readinessScore, readinessLabel, targetScore, targetHorizon
+  } = aggregated;
 
   const subjectsSummary = subjects.map((s) => ({
     matiere: s.subject,
+    subjectKey: s.subjectKey,
+    coefficient: s.coefficient,
     moyenne: s.averageScore !== null ? `${s.averageScore}/20` : 'inconnue',
     tentatives: s.attempts,
+    tendance: s.trend,
     evolution_30j: s.evolution !== null ? `${s.evolution > 0 ? '+' : ''}${s.evolution} pt` : 'inconnue',
     priorite_actuelle: s.priority,
     chapitres_faibles: s.weakChapters.map((c) => `Ex${c.number} (${c.score}/${c.maxScore})`),
-    chapitres_forts: s.strongChapters.map((c) => `Ex${c.number}`),
-    conseils_detectes: s.advice.slice(0, 2)
+    chapitres_forts: s.strongChapters.map((c) => `Ex${c.number}`)
   }));
 
   return `Tu es un coach pédagogique expert du BAC au Niger (Terminale D).
-Ta mission : générer un PLAN DE RÉVISION HEBDOMADAIRE personnalisé pour un élève, à partir de ses résultats d'examens.
+Ta mission : générer un PLAN DE RÉVISION HEBDOMADAIRE COMPLET pour un élève.
 
 ═══════════════════════════════════════════════════════════════
-DONNÉES DE L'ÉLÈVE
+CONTEXTE DE L'ÉLÈVE
 ═══════════════════════════════════════════════════════════════
-Nombre total d'examens analysés : ${totalAttempts}
+Examens analysés : ${totalAttempts}
 Qualité des données : ${dataQuality}
 Moyenne générale pondérée : ${generalAverage !== null ? generalAverage + '/20' : 'non calculable'}
+Score de préparation : ${readinessScore}/100 (${readinessLabel})
+Objectif calculé par le système : ${targetScore}/20 en ${targetHorizon}
 
 Détail par matière :
 ${JSON.stringify(subjectsSummary, null, 2)}
@@ -376,25 +456,35 @@ ${JSON.stringify(subjectsSummary, null, 2)}
 ═══════════════════════════════════════════════════════════════
 MISSION
 ═══════════════════════════════════════════════════════════════
-Produis un plan de révision hebdomadaire (7 jours) sur mesure.
+Produis un plan de révision hebdomadaire sur 7 jours.
 
-RÈGLES :
-1. Priorise les matières avec priorité "Urgente" ou "Importante"
-2. Cible les chapitres faibles identifiés (via chapitres_faibles)
-3. Alterne les matières pour éviter la fatigue
-4. Sois SPÉCIFIQUE : "Refaire Ex3 dérivées composées" ≠ "Réviser maths"
-5. Tiens compte de l'évolution : si une matière baisse, c'est urgent
-6. Si les données sont insuffisantes (< 3 examens), dis-le et propose des actions génériques mais utiles
-7. Ton encourageant et personnalisé, jamais moralisateur
+RÈGLES CRITIQUES :
+1. Priorise les matières "Urgente" et "Importante"
+2. Cible SPÉCIFIQUEMENT les chapitres faibles (utilise les numéros d'exercices fournis)
+3. Alterne les matières pour éviter la fatigue cognitive
+4. Chaque session doit être CONCRÈTE : "Refaire Ex3 (dérivées composées), faire 5 exercices du même type" ≠ "Réviser maths"
+5. Si évolution négative → mentionne-la dans le summary
+6. Sois encourageant mais honnête : pas de fausses promesses
+7. Si données insuffisantes (< 3 examens), propose des actions génériques utiles ET recommande de passer plus d'examens
+8. Utilise un ton PROFESSIONNEL et BIENVEILLANT, jamais moralisateur
 
 ═══════════════════════════════════════════════════════════════
-FORMAT DE RÉPONSE (JSON UNIQUEMENT, sans markdown)
+FORMAT DE RÉPONSE (JSON UNIQUEMENT)
 ═══════════════════════════════════════════════════════════════
 {
   "dataQuality": "${dataQuality}",
-  "summary": "Résumé en 2-3 phrases de la situation de l'élève. Inclure les points forts et faibles principaux.",
-  "weekGoal": "Objectif principal de la semaine, formulé clairement en 1-2 phrases.",
-  "estimatedGain": "Gain estimé si l'élève suit le plan (ex: '+1.5 pt en maths')",
+  "readinessLevel": "${readinessLabel}",
+  "summary": "Résumé analytique en 3-4 phrases. Inclut : niveau global, points forts, points faibles, tendance.",
+  "weekGoal": "Objectif principal de la semaine, formulé clairement et de façon actionnable.",
+  "estimatedGain": "Gain estimé si le plan est suivi (ex: '+1.5 pt en maths')",
+  "targetScore": ${targetScore},
+  "targetHorizon": "${targetHorizon}",
+  "swot": {
+    "strengths": ["Force 1", "Force 2"],
+    "weaknesses": ["Faiblesse 1", "Faiblesse 2"],
+    "opportunities": ["Opportunité 1"],
+    "threats": ["Menace 1"]
+  },
   "priorities": [
     {
       "subject": "Mathématiques",
@@ -403,7 +493,7 @@ FORMAT DE RÉPONSE (JSON UNIQUEMENT, sans markdown)
       "attempts": 3,
       "priority": "Urgente",
       "recommendedMinutes": 120,
-      "weakChapters": ["Dérivées composées", "Intégrales"],
+      "weakChapters": ["Ex3 - Dérivées composées", "Ex5 - Intégrales"],
       "reason": "Moyenne faible ET en baisse. 2 exercices critiques identifiés."
     }
   ],
@@ -414,18 +504,26 @@ FORMAT DE RÉPONSE (JSON UNIQUEMENT, sans markdown)
       "subjectKey": "mathematiques",
       "durationMinutes": 30,
       "task": "Revoir les dérivées composées (cours + 5 exercices ciblés)",
-      "objective": "Maîtriser la règle de dérivation en chaîne"
+      "objective": "Maîtriser la règle de dérivation en chaîne",
+      "method": "1) Relire le cours 10 min 2) Faire 3 exercices guidés 3) Faire 2 exercices seuls 4) Vérifier les corrections"
     }
   ],
-  "encouragement": "Message personnel court et motivant (1-2 phrases)."
+  "weeklyOverview": {
+    "totalHours": 4.5,
+    "focusSubject": "Mathématiques",
+    "secondarySubject": "Physique"
+  },
+  "encouragement": "Message personnel de 2-3 phrases basé sur l'historique réel de l'élève.",
+  "nextReviewDate": "Date suggérée pour refaire un point (format ISO)"
 }
 
 CONTRAINTES :
-- priorities : 2 à 5 matières max (les plus importantes)
+- priorities : 2 à 5 matières (les plus importantes)
 - sessions : exactement 7 sessions (une par jour)
-- Chaque session = 20 à 45 minutes (réaliste pour un élève)
-- Français clair, ton direct et bienveillant
-- Aucune donnée inventée : si une info est manquante, ne l'invente pas
+- Chaque session entre 20 et 60 minutes
+- swot : 2-4 items par catégorie
+- Ton professionnel, précis, jamais vague
+- Aucune donnée inventée
 - Réponds UNIQUEMENT avec l'objet JSON`;
 }
 
@@ -462,9 +560,9 @@ function getProviders() {
 }
 
 // ================================================================
-// APPEL IA (avec timeout + Mistral sans response_format)
+// APPEL IA
 // ================================================================
-async function callProvider(provider, prompt, maxTokens = 3000) {
+async function callProvider(provider, prompt, maxTokens = 4000) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 25000);
 
@@ -479,7 +577,6 @@ async function callProvider(provider, prompt, maxTokens = 3000) {
       ]
     };
 
-    // ⚡ Mistral ne supporte PAS response_format:json_object
     if (provider.name === 'Groq' || provider.name === 'OpenRouter') {
       body.response_format = { type: 'json_object' };
     }
@@ -517,22 +614,20 @@ async function callProvider(provider, prompt, maxTokens = 3000) {
 }
 
 // ================================================================
-// VALIDATION DE LA STRUCTURE DU PLAN
+// VALIDATION
 // ================================================================
 function validatePlan(plan) {
   if (!plan || typeof plan !== 'object') return false;
-  if (typeof plan.summary !== 'string' || plan.summary.length < 10) return false;
+  if (typeof plan.summary !== 'string' || plan.summary.length < 20) return false;
   if (typeof plan.weekGoal !== 'string' || plan.weekGoal.length < 10) return false;
   if (!Array.isArray(plan.priorities) || plan.priorities.length < 1) return false;
   if (!Array.isArray(plan.sessions) || plan.sessions.length < 5) return false;
 
-  // ⚡ Vérifier que chaque priorité a les champs requis
   const validPriority = plan.priorities.every(
     (p) => p && typeof p.subject === 'string' && typeof p.priority === 'string'
   );
   if (!validPriority) return false;
 
-  // ⚡ Vérifier que chaque session a les champs requis
   const validSession = plan.sessions.every(
     (s) => s && typeof s.day === 'number' &&
            typeof s.subject === 'string' &&
@@ -544,7 +639,7 @@ function validatePlan(plan) {
 }
 
 // ================================================================
-// GÉNÉRATION AVEC CASCADE IA + VALIDATION DANS LA BOUCLE
+// CASCADE IA
 // ================================================================
 async function generateWithFallback(prompt) {
   const providers = getProviders();
@@ -563,8 +658,7 @@ async function generateWithFallback(prompt) {
       }
 
       errors.push(`${provider.name}: structure invalide`);
-      console.warn(`[AI-PLANNER] ⚠️ ${provider.name} : structure invalide, on essaie le suivant`);
-
+      console.warn(`[AI-PLANNER] ⚠️ ${provider.name} : structure invalide`);
     } catch (error) {
       errors.push(`${provider.name}: ${error.message}`);
       console.warn(`[AI-PLANNER] ❌ ${provider.name} échec: ${error.message}`);
@@ -575,23 +669,26 @@ async function generateWithFallback(prompt) {
 }
 
 // ================================================================
-// FALLBACK LOCAL ENRICHI (basé sur les vraies données, pas figé)
+// FALLBACK LOCAL ENRICHI
 // ================================================================
 function buildLocalPlan(aggregated) {
-  const { subjects, generalAverage, totalAttempts, dataQuality, dataQualityLabel } = aggregated;
+  const {
+    subjects, generalAverage, totalAttempts, dataQuality, dataQualityLabel,
+    readinessScore, readinessLevel, readinessLabel, targetScore, targetHorizon, alerts
+  } = aggregated;
 
-  // ⚡ Priorités basées sur les vraies données
   const priorities = subjects
     .filter((s) => s.averageScore !== null && s.priorityLevel !== 'none')
-    .slice(0, 4)
+    .slice(0, 5)
     .map((s) => ({
       subject: s.subject,
       subjectKey: s.subjectKey,
+      icon: s.icon,
       averageScore: s.averageScore,
       attempts: s.attempts,
       priority: s.priority,
       recommendedMinutes: s.recommendedMinutes,
-      weakChapters: s.weakChapters.map((c) => `Exercice ${c.number}`),
+      weakChapters: s.weakChapters.map((c) => `Ex${c.number} (${c.score}/${c.maxScore})`),
       reason: s.evolution !== null && s.evolution < -0.5
         ? `Moyenne en baisse (${s.evolution} pt sur 30j)`
         : s.weakChapters.length > 0
@@ -599,20 +696,33 @@ function buildLocalPlan(aggregated) {
           : `Moyenne ${s.averageScore}/20`
     }));
 
-  // ⚡ Sessions : on construit une semaine équilibrée
+  // Construction des sessions
   const sessions = [];
   const prioritySubjects = priorities.length > 0
     ? priorities
     : subjects.filter((s) => s.averageScore !== null).slice(0, 3);
 
-  const tasksByPriority = {
-    'Urgente': (s) => s.weakChapters.length > 0
-      ? `Refaire ${s.weakChapters[0].number ? 'Ex' + s.weakChapters[0].number : 'les exercices faibles'} de ${s.subject}`
-      : `Revoir les bases de ${s.subject}`,
-    'Importante': (s) => s.weakChapters.length > 0
-      ? `S'entraîner sur les points faibles de ${s.subject}`
-      : `Consolider ${s.subject}`,
-    'Entretien': (s) => `Maintenir le niveau en ${s.subject} (exercices variés)`
+  const getTask = (subject) => {
+    if (subject.weakChapters.length > 0) {
+      const wc = subject.weakChapters[0];
+      return {
+        task: `Refaire ${wc} de ${subject.subject} + 3 exercices du même type`,
+        objective: `Maîtriser ce chapitre (${wc})`,
+        method: '1) Relire le cours 2) Refaire l\'exercice 3) Faire 3 exercices similaires 4) Vérifier'
+      };
+    }
+    if (subject.priority === 'Urgente') {
+      return {
+        task: `Revoir les bases de ${subject.subject} + 5 exercices progressifs`,
+        objective: `Renforcer les fondamentaux`,
+        method: '1) Fiche de synthèse 2) Exercices faciles 3) Exercices moyens 4) Auto-évaluation'
+      };
+    }
+    return {
+      task: `Consolider ${subject.subject} avec des exercices variés`,
+      objective: `Maintenir et progresser`,
+      method: '1) Exercices mixtes 2) Chronométrer 3) Corriger'
+    };
   };
 
   for (let day = 1; day <= 7; day++) {
@@ -623,77 +733,89 @@ function buildLocalPlan(aggregated) {
         subjectKey: 'general',
         durationMinutes: 30,
         task: 'Effectuer un premier examen pour créer tes priorités',
-        objective: 'Obtenir une première analyse de ton niveau'
+        objective: 'Obtenir une première analyse',
+        method: 'Va dans Mode Examen, choisis une matière, fais un sujet'
       });
       continue;
     }
-
-    // ⚡ Alterner les matières (round-robin)
     const subject = prioritySubjects[(day - 1) % prioritySubjects.length];
-    const taskFn = tasksByPriority[subject.priority] || tasksByPriority['Entretien'];
-
+    const taskInfo = getTask(subject);
     sessions.push({
       day,
       subject: subject.subject,
       subjectKey: subject.subjectKey,
-      durationMinutes: Math.min(subject.recommendedMinutes, 45),
-      task: taskFn(subject),
-      objective: `Progresser de 0.5 à 1 pt d'ici 2 semaines`
+      durationMinutes: Math.min(subject.recommendedMinutes || 30, 45),
+      ...taskInfo
     });
   }
 
-  // ⚡ Résumé basé sur les vraies données
+  // SWOT basique
+  const strengths = subjects
+    .filter((s) => s.averageScore !== null && s.averageScore >= 14)
+    .map((s) => `${s.subject} (${s.averageScore}/20)`);
+
+  const weaknesses = subjects
+    .filter((s) => s.averageScore !== null && s.averageScore < 10)
+    .map((s) => `${s.subject} (${s.averageScore}/20)`);
+
+  const opportunities = [
+    'Des chapitres précis identifiés pour progresser',
+    'Un plan structuré = gain de temps'
+  ];
+
+  const threats = [];
+  subjects.forEach((s) => {
+    if (s.evolution !== null && s.evolution < -0.5) {
+      threats.push(`${s.subject} en baisse`);
+    }
+  });
+  if (totalAttempts < 3) threats.push('Manque d\'examens pour analyse fiable');
+
+  // Summary
   let summary;
   if (totalAttempts === 0) {
-    summary = "Tu n'as encore passé aucun examen. Fais-en un pour qu'on puisse analyser ton niveau et te donner un plan personnalisé.";
+    summary = "Aucun examen enregistré. Commence par un examen pour qu'on puisse analyser ton niveau et te proposer un plan adapté.";
   } else if (totalAttempts < 3) {
-    const list = priorities.slice(0, 2).map((p) => p.subject).join(' et ');
-    summary = `Analyse basée sur ${totalAttempts} examen${totalAttempts > 1 ? 's' : ''}. ${priorities.length > 0 ? `Concentre-toi en priorité sur ${list}.` : 'Continue à passer des examens pour affiner ton plan.'} Fais 2-3 examens supplémentaires pour un plan plus précis.`;
+    const names = priorities.slice(0, 2).map((p) => p.subject).join(' et ');
+    summary = `Analyse basée sur ${totalAttempts} examen${totalAttempts > 1 ? 's' : ''}. ${priorities.length > 0 ? `Tes priorités identifiées : ${names}.` : ''} Passe 2-3 examens supplémentaires pour affiner ton plan.`;
   } else {
-    const list = priorities.slice(0, 2).map((p) => p.subject).join(' et ');
-    summary = `Analyse basée sur ${totalAttempts} examens. ${list ? `Priorités actuelles : ${list}.` : 'Toutes les matières sont à niveau équilibré.'} ${generalAverage !== null ? `Moyenne générale : ${generalAverage}/20.` : ''}`;
-  }
-
-  // ⚡ Objectif de la semaine
-  const weekGoal = priorities.length > 0
-    ? `Renforcer ${priorities[0].subject}${priorities[1] ? ' et ' + priorities[1].subject : ''} en travaillant les chapitres faibles identifiés.`
-    : "Passer 2 examens supplémentaires pour affiner ton analyse.";
-
-  // ⚡ Gain estimé
-  const estimatedGain = priorities.length > 0 && priorities[0].averageScore !== null
-    ? `+${Math.min(2, Math.max(0.5, round2((12 - priorities[0].averageScore) * 0.3)))} pt en ${priorities[0].subject} avec 6h de travail ciblé`
-    : "Gain non calculable sans plus de données";
-
-  // ⚡ Encouragement
-  let encouragement;
-  if (totalAttempts === 0) {
-    encouragement = "Commence par un examen, tu verras, c'est rapide et ça t'aide vraiment à progresser.";
-  } else if (priorities.length > 0 && priorities[0].priority === 'Urgente') {
-    encouragement = `Tu as identifié des faiblesses, c'est déjà un grand pas. En suivant ce plan, tu peux remonter rapidement.`;
-  } else if (generalAverage !== null && generalAverage >= 14) {
-    encouragement = `Bravo pour ton niveau actuel (${generalAverage}/20). Continue sur cette lancée pour sécuriser ta réussite.`;
-  } else {
-    encouragement = `Chaque session compte. Tiens ce rythme et tu verras des résultats d'ici 2 semaines.`;
+    const names = priorities.slice(0, 2).map((p) => p.subject).join(' et ');
+    summary = `Analyse basée sur ${totalAttempts} examens. ${generalAverage !== null ? `Moyenne générale : ${generalAverage}/20.` : ''} ${names ? `Priorités actuelles : ${names}.` : 'Toutes les matières sont à niveau équilibré.'}`;
   }
 
   return {
     dataQuality,
-    dataQualityLabel,
+    readinessLevel,
     summary,
-    weekGoal,
-    estimatedGain,
+    weekGoal: priorities.length > 0
+      ? `Renforcer ${priorities[0].subject}${priorities[1] ? ' et ' + priorities[1].subject : ''} en travaillant les chapitres faibles.`
+      : "Passer 2 examens supplémentaires pour affiner l'analyse.",
+    estimatedGain: priorities.length > 0 && priorities[0].averageScore !== null
+      ? `+${Math.min(2, Math.max(0.5, round2((12 - priorities[0].averageScore) * 0.3)))} pt en ${priorities[0].subject}`
+      : "Non calculable",
+    targetScore,
+    targetHorizon,
+    swot: { strengths, weaknesses, opportunities, threats },
     priorities,
     sessions,
-    encouragement,
+    weeklyOverview: {
+      totalHours: round2(sessions.reduce((sum, s) => sum + (s.durationMinutes || 0), 0) / 60),
+      focusSubject: priorities[0]?.subject || 'Général',
+      secondarySubject: priorities[1]?.subject || null
+    },
+    encouragement: generalAverage !== null && generalAverage >= 14
+      ? `Bravo pour ton niveau (${generalAverage}/20). Continue pour sécuriser ta réussite.`
+      : `Chaque session compte. Tiens ce rythme et tu verras des résultats d'ici 2 semaines.`,
+    nextReviewDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
     generatedLocally: true,
     generatedAt: new Date().toISOString()
   };
 }
 
 // ================================================================
-// CACHE FIRESTORE (6h)
+// CACHE INTELLIGENT (avec invalidation auto si nouvel examen)
 // ================================================================
-async function getCachedPlan(uid) {
+async function getCachedPlan(uid, resultCount) {
   try {
     const { db } = getAdminServices();
     const cacheRef = db.collection('users').doc(uid).collection('plannerCache').doc('current');
@@ -703,6 +825,12 @@ async function getCachedPlan(uid) {
     const data = snapshot.data();
     const cachedAt = toDate(data.cachedAt);
     if (!cachedAt) return null;
+
+    // ⚡ Invalidation si nouvel examen détecté
+    if (resultCount && data.resultCount !== undefined && data.resultCount !== resultCount) {
+      console.log(`[AI-PLANNER] Cache invalidé : ${data.resultCount} → ${resultCount} examens`);
+      return null;
+    }
 
     const age = Date.now() - cachedAt.getTime();
     if (age > CACHE_TTL_MS) return null;
@@ -755,41 +883,42 @@ module.exports = async function handler(request, response) {
     const { db } = getAdminServices();
     const uid = user.uid;
 
-    // ⚡ 1. Vérifier que c'est un compte Premium
+    // Premium check
     const userSnapshot = await db.collection('users').doc(uid).get();
     if (!isPremiumUser(userSnapshot.data())) {
       return jsonError(response, 403, 'Le planificateur est réservé aux comptes Premium.', 'PREMIUM_REQUIRED');
     }
 
-    // ⚡ 2. Vérifier le cache (6h)
-    const forceRefresh = request.query?.refresh === 'true' || request.body?.refresh === true;
-    if (!forceRefresh) {
-      const cached = await getCachedPlan(uid);
-      if (cached) {
-        console.log('[AI-PLANNER] ✅ Plan servi depuis le cache');
-        return response.status(200).json({
-          success: true,
-          plan: cached,
-          resultCount: cached._resultCount || 0,
-          cached: true
-        });
-      }
-    }
-
-    // ⚡ 3. Récupérer les examens
+    // Récupérer les examens
     const snapshot = await db.collection('users').doc(uid)
       .collection('examResults')
       .orderBy('createdAt', 'desc')
       .limit(50)
       .get();
 
-    const results = snapshot.docs.map((document) => document.data());
+    const results = snapshot.docs.map((d) => d.data());
+    const resultCount = results.length;
 
-    // ⚡ 4. Agréger les données
+    // Check cache
+    const forceRefresh = request.query?.refresh === 'true' || request.body?.refresh === true;
+    if (!forceRefresh) {
+      const cached = await getCachedPlan(uid, resultCount);
+      if (cached) {
+        console.log('[AI-PLANNER] ✅ Plan servi depuis le cache');
+        return response.status(200).json({
+          success: true,
+          plan: cached,
+          resultCount,
+          cached: true
+        });
+      }
+    }
+
+    // Agréger
     const aggregated = aggregateStudentData(results);
-    console.log(`[AI-PLANNER] ${results.length} examens analysés, qualité: ${aggregated.dataQuality}`);
+    console.log(`[AI-PLANNER] ${resultCount} examens, qualité: ${aggregated.dataQuality}, readiness: ${aggregated.readinessScore}`);
 
-    // ⚡ 5. Tentative IA
+    // Tentative IA
     let plan;
     let aiSucceeded = false;
 
@@ -799,29 +928,35 @@ module.exports = async function handler(request, response) {
       aiSucceeded = true;
       console.log('[AI-PLANNER] ✅ Plan IA généré');
     } catch (aiError) {
-      console.warn('[AI-PLANNER] ⚠️ Échec IA, fallback local:', aiError.message);
+      console.warn('[AI-PLANNER] ⚠️ Fallback local:', aiError.message);
       plan = buildLocalPlan(aggregated);
     }
 
-    // ⚡ 6. Enrichir avec des métadonnées
+    // Enrichir avec métadonnées calculées côté serveur
     const enrichedPlan = {
       ...plan,
-      _resultCount: results.length,
-      _dataQuality: aggregated.dataQuality,
-      _dataQualityLabel: aggregated.dataQualityLabel,
-      _generalAverage: aggregated.generalAverage,
-      _aiGenerated: aiSucceeded,
-      _generatedAt: new Date().toISOString()
+      _meta: {
+        resultCount,
+        dataQuality: aggregated.dataQuality,
+        dataQualityLabel: aggregated.dataQualityLabel,
+        generalAverage: aggregated.generalAverage,
+        readinessScore: aggregated.readinessScore,
+        readinessLevel: aggregated.readinessLevel,
+        readinessLabel: aggregated.readinessLabel,
+        targetScore: aggregated.targetScore,
+        targetHorizon: aggregated.targetHorizon,
+        alerts: aggregated.alerts,
+        aiGenerated: aiSucceeded,
+        generatedAt: new Date().toISOString()
+      }
     };
 
-    // ⚡ 7. Sauvegarder en cache
-    await savePlanToCache(uid, enrichedPlan, results.length);
+    await savePlanToCache(uid, enrichedPlan, resultCount);
 
-    // ⚡ 8. Renvoyer
     return response.status(200).json({
       success: true,
       plan: enrichedPlan,
-      resultCount: results.length,
+      resultCount,
       aiGenerated: aiSucceeded,
       cached: false
     });
@@ -832,5 +967,4 @@ module.exports = async function handler(request, response) {
   }
 };
 
-// ⚡ Limite Vercel (60 s)
 module.exports.config = { maxDuration: 60 };

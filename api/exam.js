@@ -13,6 +13,7 @@ const ALLOWED_DURATIONS = new Set([30, 60, 90, 120, 180]);
 const REQUIRED_EXERCISES = 5;
 const QUESTIONS_PER_EXERCISE = 10;
 const FREE_EXAM_LIMIT = 2;
+module.exports.config = { maxDuration: 60 };
 
 let adminServices;
 
@@ -144,6 +145,30 @@ async function findCachedExam(uid, config) {
   return match?.data()?.exam || null;
 }
 
+// ⚡ Normalise le nom de matière pour ARV-PILOT (ex: "Mathématiques" → "mathematiques")
+function normalizeSubjectKey(raw) {
+  if (!raw) return null;
+  const s = String(raw)
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, '_')
+    .replace(/[^a-z_]/g, '');
+
+  const map = {
+    mathematiques: 'mathematiques', maths: 'mathematiques', math: 'mathematiques',
+    physique: 'physique', physiques: 'physique',
+    chimie: 'chimie',
+    svt: 'svt',
+    francais: 'francais',
+    anglais: 'anglais',
+    philosophie: 'philosophie', philo: 'philosophie',
+    histoire_geo: 'histoire_geo', histoiregeo: 'histoire_geo',
+    eps: 'eps'
+  };
+  return map[s] || s;
+}
+
 // ────────────────────────────────────────────────────────────────
 // SAUVEGARDE RÉSULTAT
 // ────────────────────────────────────────────────────────────────
@@ -156,16 +181,23 @@ async function saveExamResult(uid, body, result) {
     maxScore: Number(exercise.maxScore || 5),
     advice: String(exercise.advice || '').slice(0, 500)
   })) : [];
+
   await db.collection('users').doc(uid).collection('examResults').add({
     subject: body.exam.subject,
+    subjectKey: normalizeSubjectKey(body.exam.subject),    // ⚡ AJOUT
     subjectId: body.subjectId,
     chapter: body.exam.chapter || 'all',
+    chapterTitle: selected?.title || 'Examen',             // ⚡ AJOUT (cohérence ARV-PILOT)
     score: Number(result?.score ?? result?.totalScore ?? 0),
+    totalScore: 20,                                        // ⚡ AJOUT
+    percentage: Number(result?.percentage ?? Math.round((Number(result?.score ?? 0) / 20) * 100)), // ⚡ AJOUT
+    grade: result?.grade || null,                          // ⚡ AJOUT
     result: { ...result, exercises: difficulties },
     difficulties,
     answerCount: Object.values(body.answers || {}).filter(Boolean).length,
     examTitle: selected?.title || 'Examen',
-    createdAt: FieldValue.serverTimestamp()
+    createdAt: FieldValue.serverTimestamp(),
+    date: FieldValue.serverTimestamp()                     // ⚡ AJOUT (cohérence avec le front)
   });
 }
 
@@ -412,28 +444,52 @@ function getProviders() {
 // ────────────────────────────────────────────────────────────────
 async function callProvider(provider, prompt, maxTokens = 14000) {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 90000);
+  // ⚡ Timeout réduit à 25s : si le provider traîne, on bascule au suivant
+  const timeout = setTimeout(() => controller.abort(), 25000);
+
   try {
+    const body = {
+      model: provider.model,
+      temperature: 0.2,
+      max_tokens: maxTokens,
+      messages: [
+        { role: 'system', content: 'Tu produis exclusivement du JSON valide.' },
+        { role: 'user', content: prompt }
+      ]
+    };
+
+    // ⚡ Mistral ne supporte PAS response_format:json_object de la même façon
+    // → on l'active uniquement pour Groq et OpenRouter
+    if (provider.name === 'Groq' || provider.name === 'OpenRouter') {
+      body.response_format = { type: 'json_object' };
+    }
+
     const result = await fetch(provider.endpoint, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${provider.key}`, ...provider.headers },
-      body: JSON.stringify({
-        model: provider.model,
-        temperature: 0.2,
-        max_tokens: maxTokens,
-        response_format: { type: 'json_object' },
-        messages: [
-          { role: 'system', content: 'Tu produis exclusivement du JSON valide.' },
-          { role: 'user', content: prompt }
-        ]
-      }),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${provider.key}`,
+        ...provider.headers
+      },
+      body: JSON.stringify(body),
       signal: controller.signal
     });
+
     const data = await result.json().catch(() => null);
-    if (!result.ok) throw new Error('provider_error');
+
+    if (!result.ok) {
+      const msg = data?.error?.message || data?.message || `HTTP ${result.status}`;
+      throw new Error(`${provider.name}: ${msg}`);
+    }
+
     const content = data?.choices?.[0]?.message?.content;
-    if (!content) throw new Error('provider_empty');
-    const normalizedContent = content.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+    if (!content) throw new Error(`${provider.name}: réponse vide`);
+
+    const normalizedContent = content
+      .replace(/^```(?:json)?\s*/i, '')
+      .replace(/\s*```$/i, '')
+      .trim();
+
     return JSON.parse(normalizedContent);
   } finally {
     clearTimeout(timeout);
@@ -466,29 +522,58 @@ function validateGeneratedExam(exam, subjectName) {
 async function generateWithFallback(prompt, subjectName) {
   const providers = getProviders();
   if (!providers.length) throw new Error('provider_missing');
+
+  const errors = [];
+
   for (const provider of providers) {
     try {
+      console.log(`[AI] Tentative ${provider.name}...`);
       const exam = await callProvider(provider, prompt);
-      if (validateGeneratedExam(exam, subjectName)) return exam;
-      console.warn(`${provider.name} a renvoyé une structure invalide.`);
+
+      if (validateGeneratedExam(exam, subjectName)) {
+        console.log(`[AI] ✅ ${provider.name} a répondu avec une structure valide`);
+        return exam;
+      }
+
+      errors.push(`${provider.name}: structure invalide`);
+      console.warn(`[AI] ⚠️ ${provider.name} : structure invalide, on essaie le suivant`);
+
     } catch (error) {
-      console.warn(`${provider.name} indisponible:`, error.message);
+      errors.push(`${provider.name}: ${error.message}`);
+      console.warn(`[AI] ❌ ${provider.name} échec: ${error.message}`);
     }
   }
-  throw new Error('all_providers_failed');
+
+  throw new Error('all_providers_failed: ' + errors.join(' | '));
 }
 
 async function correctWithFallback(prompt) {
   const providers = getProviders();
   if (!providers.length) throw new Error('provider_missing');
+
+  const errors = [];
+
   for (const provider of providers) {
     try {
-      return await callProvider(provider, prompt, 16000);
+      console.log(`[AI] Correction avec ${provider.name}...`);
+      const result = await callProvider(provider, prompt, 16000);
+
+      // ⚡ Validation minimale : on doit avoir un tableau d'exercices
+      if (result && typeof result === 'object' && Array.isArray(result.exercises)) {
+        console.log(`[AI] ✅ ${provider.name} a fourni une correction valide`);
+        return result;
+      }
+
+      errors.push(`${provider.name}: structure invalide`);
+      console.warn(`[AI] ⚠️ ${provider.name} : correction invalide, on essaie le suivant`);
+
     } catch (error) {
-      console.warn(`${provider.name} correction indisponible:`, error.message);
+      errors.push(`${provider.name}: ${error.message}`);
+      console.warn(`[AI] ❌ ${provider.name} échec: ${error.message}`);
     }
   }
-  throw new Error('all_providers_failed');
+
+  throw new Error('all_providers_failed: ' + errors.join(' | '));
 }
 
 // ────────────────────────────────────────────────────────────────

@@ -1,6 +1,6 @@
 // ================================================================
 // REGISTER SERVICE WORKER — ARVEXA School
-// Version : 5.0.0 — Charge aussi offline.js + analytics.js
+// Version : 6.0.0 — Charge offline.js + modals.js + analytics.js
 // ================================================================
 
 (function () {
@@ -20,7 +20,7 @@
           console.log('[SW] Enregistré. Scope:', registration.scope);
         })
         .catch((error) => {
-          console.error('[SW] Erreur:', error);
+          console.warn('[SW] Erreur:', error.message);
         });
     });
   }
@@ -30,6 +30,7 @@
   // ============================================================
   function injectOffline() {
     if (document.getElementById('arvexaOfflineScript')) return;
+
     const script = document.createElement('script');
     script.id = 'arvexaOfflineScript';
     script.src = 'offline.js';
@@ -39,37 +40,60 @@
   }
 
   // ============================================================
-  // 3. ⚡ INJECTION AUTOMATIQUE DE analytics.js
+  // 3. INJECTION AUTOMATIQUE DE modals.js (drag-to-close)
+  // ============================================================
+  function injectModals() {
+    if (document.getElementById('arvexaModalsScript')) return;
+
+    const script = document.createElement('script');
+    script.id = 'arvexaModalsScript';
+    script.src = 'modals.js';
+    script.defer = true;
+    script.onerror = () => console.warn('[Modals] Impossible de charger modals.js');
+    document.head.appendChild(script);
+  }
+
+  // ============================================================
+  // 4. INJECTION AUTOMATIQUE DE analytics.js (ultra-robuste)
   // ============================================================
   function injectAnalytics() {
     if (document.getElementById('arvexaAnalyticsScript')) return;
 
-    // Ne pas injecter sur les pages admin (l'admin a ses propres analytics)
+    // ⚡ Ne pas injecter sur les pages admin
     const path = window.location.pathname;
     if (path.includes('admin')) return;
 
     const script = document.createElement('script');
     script.id = 'arvexaAnalyticsScript';
     script.src = 'analytics.js';
-    script.defer = true;
-    script.type = 'module'; // ⚡ module pour pouvoir utiliser les imports Firebase
-    script.onerror = () => console.warn('[Analytics] Impossible de charger analytics.js');
+    script.async = true;     // ⚡ async → jamais bloquant
+    script.type = 'module';  // ⚡ module ES (pour les imports Firebase)
+    script.onerror = () => {
+      // Silencieux : si ça échoue, la page continue normalement
+      console.warn('[Analytics] Script non chargé (non bloquant)');
+    };
     document.head.appendChild(script);
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      injectOffline();
-      injectAnalytics();
-    });
-  } else {
+  // ============================================================
+  // 5. LANCEMENT
+  // ============================================================
+  function boot() {
     injectOffline();
+    injectModals();
     injectAnalytics();
   }
 
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
+
   // ============================================================
-  // 4. LOGS RÉSEAU
+  // 6. LOGS RÉSEAU
   // ============================================================
   window.addEventListener('online', () => console.log('[SW] En ligne'));
   window.addEventListener('offline', () => console.log('[SW] Hors ligne'));
+
 })();

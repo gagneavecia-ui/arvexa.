@@ -67,7 +67,6 @@
   // ============================================================
   function boot() {
     injectOffline();
-    injectModals();
     injectAnalytics();
   }
 

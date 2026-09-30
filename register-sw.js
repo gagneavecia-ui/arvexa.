@@ -39,19 +39,6 @@
     document.head.appendChild(script);
   }
 
-  // ============================================================
-  // 3. INJECTION AUTOMATIQUE DE modals.js (drag-to-close)
-  // ============================================================
-  function injectModals() {
-    if (document.getElementById('arvexaModalsScript')) return;
-
-    const script = document.createElement('script');
-    script.id = 'arvexaModalsScript';
-    script.src = 'modals.js';
-    script.defer = true;
-    script.onerror = () => console.warn('[Modals] Impossible de charger modals.js');
-    document.head.appendChild(script);
-  }
 
   // ============================================================
   // 4. INJECTION AUTOMATIQUE DE analytics.js (ultra-robuste)

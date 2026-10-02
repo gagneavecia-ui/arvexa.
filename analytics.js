@@ -336,22 +336,49 @@
     // ─────────────────────────────────────────────────────────────
     // DÉMARRAGE
     // ─────────────────────────────────────────────────────────────
-    async function startTracking(uid) {
-      try {
-        currentUid = uid;
-        resetQueue();
-        initSession();
-        trackPageView();
-        trackAutoFeature();
-        trackContent();
-        startFlushTimer();
-        flush();
-        isStarted = true;
-        console.log('📊 [Analytics] Tracking actif pour', uid);
-      } catch (e) {
-        console.warn('[Analytics] startTracking error:', e.message);
-      }
+ // ⚡ Liste des emails admin à exclure du tracking
+const ADMIN_EMAILS = ['gagneavecia@gmail.com'];
+
+async function isAdminUser(uid) {
+  try {
+    // Lire le rôle dans Firestore
+    const fsMod = await import('https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js');
+    const userRef = fsMod.doc(db, 'users', uid);
+    const snap = await fsMod.getDoc(userRef);
+    if (!snap.exists()) return false;
+    const data = snap.data();
+    if (data.role === 'admin') return true;
+    if (data.email && ADMIN_EMAILS.includes(data.email)) return true;
+    return false;
+  } catch (e) {
+    console.warn('[Analytics] isAdminUser error:', e.message);
+    return false;
+  }
+}
+
+async function startTracking(uid) {
+  try {
+    // ⚡ Vérifier si c'est un admin → ne rien tracker
+    const isAdmin = await isAdminUser(uid);
+    if (isAdmin) {
+      console.log('📊 [Analytics] Admin détecté → tracking désactivé');
+      return;
     }
+
+    currentUid = uid;
+    resetQueue();
+    initSession();
+    trackPageView();
+    trackAutoFeature();
+    trackContent();
+    startFlushTimer();
+    flush();
+    isStarted = true;
+    console.log('📊 [Analytics] Tracking actif pour', uid);
+  } catch (e) {
+    console.warn('[Analytics] startTracking error:', e.message);
+  }
+}
 
     function stopTracking() {
       try {

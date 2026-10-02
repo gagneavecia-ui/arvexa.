@@ -1082,15 +1082,17 @@
     setPersistence,
     browserLocalPersistence
   } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
-  import {
-    initializeFirestore,
-    persistentLocalCache,
-    persistentSingleTabManager,
-    doc,
-    setDoc,
-    serverTimestamp
-  } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
-
+ import {
+  initializeFirestore,
+  persistentLocalCache,
+  persistentSingleTabManager,
+  doc,
+  setDoc,
+  addDoc,        // ⚡ AJOUTER si manquant
+  collection,    // ⚡ AJOUTER si manquant
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+    
   // ================================================================
   // CONFIG FIREBASE
   // ================================================================
@@ -1514,6 +1516,46 @@
         updatedAt: serverTimestamp()
       });
 
+    // ⚡ Notifier les admins (push FCM)
+try {
+  const token = await user.getIdToken();
+  await fetch('https://admin-89.vercel.app/api/admin', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + token
+    },
+    body: JSON.stringify({
+      action: 'notifyNewSignup',
+      uid: user.uid,
+      userName: `${firstNameValue} ${lastNameValue}`.trim(),
+      userEmail: emailValue,
+      establishment: establishmentValue || ''
+    })
+  });
+  console.log('✅ Notification admin envoyée');
+} catch (e) {
+  console.warn('Notification admin échouée:', e.message);
+}
+
+      // ⚡ Créer une notification pour l'admin (temps réel dans la console)
+try {
+  await addDoc(collection(db, 'admin_notifications'), {
+    kind: 'new_signup',
+    title: '🎉 Nouvelle inscription',
+    message: `${firstNameValue} ${lastNameValue}`.trim() + (establishmentValue ? ' · ' + establishmentValue : ''),
+    userUid: user.uid,
+    userEmail: emailValue,
+    userName: `${firstNameValue} ${lastNameValue}`.trim(),
+    establishment: establishmentValue || '',
+    type: 'success',
+    read: false,
+    createdAt: serverTimestamp()
+  });
+} catch (e) {
+  console.warn('Erreur création notif admin:', e.message);
+}
+      
       // 3. Sauvegarder la session AVANT redirection
       try {
         localStorage.setItem('arvexa_session', JSON.stringify({

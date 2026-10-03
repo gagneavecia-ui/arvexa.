@@ -10,7 +10,13 @@
   <link rel="apple-touch-icon" href="icon.png">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <script src="katex-utils.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.0/dist/tesseract.min.js" defer></script>
   <script src="register-sw.js" defer></script>
+
   <style>
     :root {
       --accent: #B8860B;
@@ -24,10 +30,12 @@
       --bg-dark: #0A0A0A;
       --bg-surface: #141414;
       --bg-card: rgba(20, 20, 20, 0.7);
+      --bg-elevated: rgba(255,255,255,0.02);
       --text-light: #F5F0E8;
       --text-dim: #8A8A7A;
       --text-muted: #5A5A4A;
       --card-border: rgba(184, 134, 11, 0.08);
+      --border-soft: rgba(255,255,255,0.05);
       --transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
       --transition-fast: all 0.15s ease;
       --radius: 16px;
@@ -39,7 +47,6 @@
 
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     html { scroll-behavior: smooth; width: 100%; overflow-x: hidden; -webkit-text-size-adjust: 100%; }
-
     body {
       font-family: 'Inter', -apple-system, 'Segoe UI', Arial, sans-serif;
       background: var(--bg-dark);
@@ -107,13 +114,13 @@
 
     /* ===== CONTAINER ===== */
     .container {
-      max-width: 720px; margin: 0 auto;
+      max-width: 760px; margin: 0 auto;
       padding: 16px 14px calc(80px + var(--safe-bottom));
       width: 100%; display: flex; flex-direction: column; gap: 14px;
       flex: 1;
     }
 
-    /* ===== HERO CARD (Score à jour) ===== */
+    /* ===== HERO CARD ===== */
     .hero-card {
       background: linear-gradient(135deg, rgba(184,134,11,0.08), rgba(26,58,42,0.06));
       border: 1px solid rgba(184,134,11,0.18);
@@ -126,7 +133,6 @@
       content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
       background: linear-gradient(90deg, transparent, var(--accent-bright), transparent);
     }
-
     .hero-top {
       display: flex; align-items: center; justify-content: space-between;
       gap: 12px; margin-bottom: 16px; flex-wrap: wrap;
@@ -137,39 +143,20 @@
       display: flex; align-items: center; gap: 8px;
     }
     .hero-title i { font-size: 14px; }
-
-    .hero-score {
-      display: flex; align-items: baseline; gap: 8px;
-      margin-bottom: 6px;
-    }
+    .hero-score { display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px; }
     .hero-score .value {
       font-family: 'Playfair Display', serif;
       font-size: clamp(40px, 10vw, 56px);
-      font-weight: 700;
-      color: var(--accent-bright);
-      line-height: 1;
-      letter-spacing: -0.03em;
+      font-weight: 700; color: var(--accent-bright);
+      line-height: 1; letter-spacing: -0.03em;
     }
-    .hero-score .unit {
-      font-size: clamp(16px, 4vw, 20px);
-      color: var(--text-dim);
-      font-weight: 400;
-    }
-    .hero-status {
-      font-size: 13px; color: var(--text-dim);
-      margin-bottom: 18px;
-    }
+    .hero-score .unit { font-size: clamp(16px, 4vw, 20px); color: var(--text-dim); font-weight: 400; }
+    .hero-status { font-size: 13px; color: var(--text-dim); margin-bottom: 18px; }
     .hero-status strong { color: var(--text-light); }
-
-    /* Barre de progression circulaire */
     .hero-progress-wrap {
-      position: relative;
-      width: 100%;
-      height: 8px;
-      background: rgba(255,255,255,0.05);
-      border-radius: 8px;
-      overflow: hidden;
-      margin-bottom: 18px;
+      position: relative; width: 100%; height: 8px;
+      background: rgba(255,255,255,0.05); border-radius: 8px;
+      overflow: hidden; margin-bottom: 18px;
     }
     .hero-progress-fill {
       height: 100%;
@@ -178,10 +165,8 @@
       transition: width 1.2s cubic-bezier(0.25, 1, 0.5, 1);
       width: 0%;
     }
-
     .hero-stats-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      display: grid; grid-template-columns: repeat(3, 1fr);
       gap: 8px;
     }
     .hero-stat {
@@ -193,22 +178,18 @@
     }
     .hero-stat .num {
       font-family: 'Playfair Display', serif;
-      font-size: 20px;
-      font-weight: 700;
-      line-height: 1.1;
-      margin-bottom: 2px;
+      font-size: 20px; font-weight: 700;
+      line-height: 1.1; margin-bottom: 2px;
     }
     .hero-stat .lbl {
-      font-size: 10px;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      font-size: 10px; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.5px;
     }
     .hero-stat.mastered .num { color: var(--success-light); }
     .hero-stat.reinforce .num { color: var(--warning); }
     .hero-stat.critical .num { color: var(--danger-light); }
 
-    /* ===== SECTION ===== */
+    /* ===== SECTIONS ===== */
     .section-title {
       display: flex; align-items: center; justify-content: space-between;
       gap: 10px; margin: 8px 0 4px;
@@ -218,19 +199,15 @@
       font-size: 17px; font-weight: 700; color: var(--text-light);
       display: flex; align-items: center; gap: 8px;
     }
-    .section-title h2 i {
-      font-size: 15px; color: var(--accent-bright);
-    }
+    .section-title h2 i { font-size: 15px; color: var(--accent-bright); }
     .section-title .count {
       font-size: 11px; color: var(--text-muted);
       padding: 3px 10px; border-radius: 100px;
       background: rgba(255,255,255,0.04);
     }
 
-    /* ===== CARTE À FAIRE ===== */
-    .today-list {
-      display: flex; flex-direction: column; gap: 8px;
-    }
+    /* ===== À FAIRE ===== */
+    .today-list { display: flex; flex-direction: column; gap: 8px; }
     .today-item {
       display: flex; align-items: center; gap: 14px;
       padding: 14px 16px;
@@ -242,41 +219,31 @@
       position: relative;
       overflow: hidden;
     }
-    .today-item:hover {
-      border-color: rgba(184,134,11,0.2);
-      transform: translateX(2px);
-    }
+    .today-item:hover { border-color: rgba(184,134,11,0.2); transform: translateX(2px); }
     .today-item.surprise {
       background: linear-gradient(135deg, rgba(184,134,11,0.1), rgba(184,134,11,0.03));
       border-color: rgba(184,134,11,0.25);
     }
     .today-item.surprise::before {
       content: ''; position: absolute; left: 0; top: 0; bottom: 0;
-      width: 3px;
-      background: linear-gradient(180deg, var(--accent), var(--accent-bright));
+      width: 3px; background: linear-gradient(180deg, var(--accent), var(--accent-bright));
     }
-
     .today-item-icon {
-      width: 44px; height: 44px;
-      border-radius: 12px;
+      width: 44px; height: 44px; border-radius: 12px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 18px;
-      flex-shrink: 0;
-      background: rgba(184,134,11,0.1);
-      color: var(--accent-bright);
+      font-size: 18px; flex-shrink: 0;
+      background: rgba(184,134,11,0.1); color: var(--accent-bright);
       border: 1px solid rgba(184,134,11,0.12);
     }
-    .today-item-icon.maths { background: rgba(224,184,74,0.1); color: #E0B84A; border-color: rgba(224,184,74,0.15); }
-    .today-item-icon.physique { background: rgba(74,175,224,0.1); color: #4AAFE0; border-color: rgba(74,175,224,0.15); }
-    .today-item-icon.chimie { background: rgba(224,122,74,0.1); color: #E07A4A; border-color: rgba(224,122,74,0.15); }
-    .today-item-icon.svt { background: rgba(122,224,74,0.1); color: #7AE04A; border-color: rgba(122,224,74,0.15); }
-    .today-item-icon.surprise { background: rgba(184,134,11,0.15); color: var(--accent-bright); border-color: rgba(184,134,11,0.25); }
-
+    .today-item-icon.maths { background: rgba(224,184,74,0.1); color: #E0B84A; }
+    .today-item-icon.physique { background: rgba(74,175,224,0.1); color: #4AAFE0; }
+    .today-item-icon.chimie { background: rgba(224,122,74,0.1); color: #E07A4A; }
+    .today-item-icon.svt { background: rgba(122,224,74,0.1); color: #7AE04A; }
+    .today-item-icon.surprise { background: rgba(184,134,11,0.15); color: var(--accent-bright); }
     .today-item-content { flex: 1; min-width: 0; }
     .today-item-title {
       font-size: 14px; font-weight: 600; color: var(--text-light);
       margin-bottom: 2px;
-      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
     }
     .today-item-sub {
       font-size: 12px; color: var(--text-dim);
@@ -286,7 +253,6 @@
       display: inline-flex; align-items: center; gap: 4px;
       color: var(--accent-bright); font-weight: 600;
     }
-
     .today-item-arrow {
       width: 28px; height: 28px; border-radius: 8px;
       display: flex; align-items: center; justify-content: center;
@@ -294,15 +260,12 @@
       transition: var(--transition);
     }
     .today-item:hover .today-item-arrow {
-      color: var(--accent-bright);
-      background: rgba(184,134,11,0.08);
+      color: var(--accent-bright); background: rgba(184,134,11,0.08);
       transform: translateX(2px);
     }
 
     /* ===== PROGRESSION PAR MATIÈRE ===== */
-    .subject-progress-list {
-      display: flex; flex-direction: column; gap: 10px;
-    }
+    .subject-progress-list { display: flex; flex-direction: column; gap: 10px; }
     .subject-progress {
       display: flex; flex-direction: column; gap: 6px;
       padding: 14px 16px;
@@ -321,26 +284,20 @@
     .subject-progress-name i { color: var(--accent-bright); font-size: 13px; width: 16px; }
     .subject-progress-value {
       font-family: 'Playfair Display', serif;
-      font-size: 16px; font-weight: 700;
-      color: var(--accent-bright);
+      font-size: 16px; font-weight: 700; color: var(--accent-bright);
     }
     .subject-progress-bar {
-      height: 5px;
-      background: rgba(255,255,255,0.05);
-      border-radius: 5px;
-      overflow: hidden;
+      height: 5px; background: rgba(255,255,255,0.05);
+      border-radius: 5px; overflow: hidden;
     }
     .subject-progress-fill {
-      height: 100%;
-      border-radius: 5px;
+      height: 100%; border-radius: 5px;
       transition: width 1s cubic-bezier(0.25, 1, 0.5, 1);
       width: 0%;
     }
 
     /* ===== COURS RÉCENTS ===== */
-    .courses-list {
-      display: flex; flex-direction: column; gap: 8px;
-    }
+    .courses-list { display: flex; flex-direction: column; gap: 8px; }
     .course-item {
       display: flex; align-items: center; gap: 12px;
       padding: 12px 14px;
@@ -350,17 +307,12 @@
       cursor: pointer;
       transition: var(--transition);
     }
-    .course-item:hover {
-      border-color: rgba(184,134,11,0.2);
-      transform: translateX(2px);
-    }
+    .course-item:hover { border-color: rgba(184,134,11,0.2); transform: translateX(2px); }
     .course-item-icon {
       width: 38px; height: 38px; border-radius: 10px;
-      background: rgba(184,134,11,0.08);
-      color: var(--accent-bright);
+      background: rgba(184,134,11,0.08); color: var(--accent-bright);
       display: flex; align-items: center; justify-content: center;
-      font-size: 15px;
-      flex-shrink: 0;
+      font-size: 15px; flex-shrink: 0;
     }
     .course-item-content { flex: 1; min-width: 0; }
     .course-item-title {
@@ -373,7 +325,7 @@
       margin-top: 2px;
     }
 
-    /* ===== ÉTAT VIDE ===== */
+    /* ===== EMPTY STATE ===== */
     .empty-state {
       text-align: center;
       padding: 36px 20px;
@@ -386,8 +338,7 @@
       width: 64px; height: 64px; border-radius: 18px;
       background: rgba(184,134,11,0.08);
       display: flex; align-items: center; justify-content: center;
-      font-size: 26px;
-      color: var(--accent-bright);
+      font-size: 26px; color: var(--accent-bright);
       border: 1px solid rgba(184,134,11,0.15);
     }
     .empty-state h3 {
@@ -399,7 +350,7 @@
       max-width: 320px; line-height: 1.6;
     }
 
-    /* ===== BOUTON FLOTTANT ===== */
+    /* ===== FAB ===== */
     .fab {
       position: fixed;
       bottom: calc(20px + var(--safe-bottom));
@@ -409,9 +360,7 @@
       background: linear-gradient(135deg, var(--accent-bright), var(--accent));
       color: #0A0A0A;
       font-size: 14px; font-weight: 700;
-      font-family: inherit;
-      border: none;
-      cursor: pointer;
+      font-family: inherit; border: none; cursor: pointer;
       display: flex; align-items: center; gap: 10px;
       box-shadow: 0 10px 32px rgba(184,134,11,0.35), 0 4px 12px rgba(0,0,0,0.3);
       transition: var(--transition);
@@ -419,12 +368,11 @@
     }
     .fab:hover {
       transform: translateY(-3px) scale(1.02);
-      box-shadow: 0 14px 42px rgba(184,134,11,0.5), 0 4px 12px rgba(0,0,0,0.3);
+      box-shadow: 0 14px 42px rgba(184,134,11,0.5);
     }
-    .fab:active { transform: translateY(-1px) scale(0.99); }
     .fab i { font-size: 15px; }
 
-    /* ===== MODAL CAPTURE ===== */
+    /* ===== MODAL BACKDROP ===== */
     .modal-back {
       position: fixed; inset: 0; z-index: 999;
       background: rgba(0,0,0,0.75);
@@ -467,7 +415,7 @@
     }
     .modal-header p { font-size: 13px; color: var(--text-dim); }
 
-    /* Capture modes */
+    /* ===== CAPTURE MODES ===== */
     .capture-modes {
       display: grid; grid-template-columns: repeat(3, 1fr);
       gap: 10px; margin-bottom: 16px;
@@ -492,21 +440,15 @@
       background: rgba(184,134,11,0.08);
     }
     .capture-mode .icon {
-      width: 44px; height: 44px;
-      border-radius: 12px;
-      background: rgba(184,134,11,0.1);
-      color: var(--accent-bright);
+      width: 44px; height: 44px; border-radius: 12px;
+      background: rgba(184,134,11,0.1); color: var(--accent-bright);
       display: flex; align-items: center; justify-content: center;
       font-size: 18px;
     }
-    .capture-mode .label {
-      font-size: 12.5px; font-weight: 600; color: var(--text-light);
-    }
-    .capture-mode .sub {
-      font-size: 10.5px; color: var(--text-muted); line-height: 1.3;
-    }
+    .capture-mode .label { font-size: 12.5px; font-weight: 600; color: var(--text-light); }
+    .capture-mode .sub { font-size: 10.5px; color: var(--text-muted); line-height: 1.3; }
 
-    /* Form fields */
+    /* ===== FORM ===== */
     .form-field { margin-bottom: 14px; }
     .form-label {
       display: block;
@@ -516,7 +458,7 @@
       margin-bottom: 6px;
     }
     .form-label i { color: var(--accent-bright); margin-right: 5px; }
-    .form-input, .form-textarea {
+    .form-input, .form-textarea, .form-select {
       width: 100%;
       padding: 12px 14px;
       border-radius: 12px;
@@ -529,17 +471,182 @@
       transition: var(--transition);
       resize: vertical;
     }
-    .form-input:focus, .form-textarea:focus {
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
       border-color: rgba(184,134,11,0.3);
       background: rgba(184,134,11,0.02);
     }
-    .form-textarea {
-      min-height: 140px;
-      line-height: 1.6;
-    }
+    .form-textarea { min-height: 140px; line-height: 1.6; }
+    .form-select { appearance: none; -webkit-appearance: none; cursor: pointer; padding-right: 36px; }
     .form-input::placeholder, .form-textarea::placeholder { color: var(--text-muted); }
 
-    /* Actions */
+    /* ===== CAPTURE ZONES ===== */
+    .capture-zone { display: none; }
+    .capture-zone.active { display: block; }
+
+    /* Voice recording */
+    .voice-recorder {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 16px; padding: 24px 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      text-align: center;
+    }
+    .voice-btn {
+      width: 80px; height: 80px; border-radius: 50%;
+      border: none;
+      background: linear-gradient(135deg, var(--accent-bright), var(--accent));
+      color: #0A0A0A;
+      font-size: 30px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: var(--transition);
+      box-shadow: 0 8px 32px rgba(184,134,11,0.3);
+    }
+    .voice-btn:hover { transform: scale(1.05); }
+    .voice-btn.recording {
+      background: linear-gradient(135deg, #E74C3C, #B85C3A);
+      animation: pulseRec 1.5s ease-in-out infinite;
+    }
+    @keyframes pulseRec {
+      0%, 100% { box-shadow: 0 8px 32px rgba(231,76,60,0.4), 0 0 0 0 rgba(231,76,60,0.4); }
+      50% { box-shadow: 0 8px 32px rgba(231,76,60,0.4), 0 0 0 20px rgba(231,76,60,0); }
+    }
+    .voice-status {
+      font-size: 13px; color: var(--text-dim);
+      min-height: 20px; font-weight: 500;
+    }
+    .voice-status.recording { color: var(--danger-light); font-weight: 700; }
+    .voice-transcript {
+      width: 100%;
+      padding: 12px 14px;
+      background: rgba(0,0,0,0.2);
+      border: 1px solid var(--border-soft);
+      border-radius: 10px;
+      font-size: 13px;
+      color: var(--text-light);
+      min-height: 60px;
+      max-height: 200px;
+      overflow-y: auto;
+      text-align: left;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .voice-transcript:empty::before {
+      content: 'Ta dictée apparaîtra ici...';
+      color: var(--text-muted);
+    }
+
+    /* Photo */
+    .photo-zone { display: flex; flex-direction: column; gap: 14px; }
+    .photo-upload {
+      position: relative;
+      border: 2px dashed rgba(184,134,11,0.25);
+      border-radius: var(--radius);
+      padding: 32px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition);
+      background: var(--bg-card);
+    }
+    .photo-upload:hover { border-color: rgba(184,134,11,0.5); background: rgba(184,134,11,0.04); }
+    .photo-upload input { display: none; }
+    .photo-upload .upload-icon { font-size: 36px; color: var(--accent-bright); margin-bottom: 10px; }
+    .photo-upload .upload-title { font-size: 14px; font-weight: 600; color: var(--text-light); margin-bottom: 4px; }
+    .photo-upload .upload-sub { font-size: 12px; color: var(--text-muted); }
+
+    .photo-preview {
+      display: none;
+      position: relative;
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--border-soft);
+    }
+    .photo-preview.show { display: block; }
+    .photo-preview img { width: 100%; display: block; max-height: 300px; object-fit: contain; background: #000; }
+    .photo-preview-remove {
+      position: absolute; top: 10px; right: 10px;
+      width: 32px; height: 32px;
+      border-radius: 50%; border: none;
+      background: rgba(184,92,58,0.9); color: #fff;
+      font-size: 14px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .ocr-progress {
+      display: none;
+      padding: 14px 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+    }
+    .ocr-progress.show { display: block; }
+    .ocr-progress-head {
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 12.5px; color: var(--text-dim);
+      margin-bottom: 8px;
+    }
+    .ocr-progress-head strong { color: var(--accent-bright); }
+    .ocr-progress-bar {
+      height: 5px; background: rgba(255,255,255,0.06);
+      border-radius: 5px; overflow: hidden;
+    }
+    .ocr-progress-fill {
+      height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-bright));
+      border-radius: 5px; transition: width 0.3s ease;
+      width: 0%;
+    }
+
+    .ocr-result {
+      display: none;
+      padding: 14px 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+    }
+    .ocr-result.show { display: block; }
+    .ocr-result-head {
+      font-size: 12px; font-weight: 600;
+      color: var(--accent-bright);
+      text-transform: uppercase; letter-spacing: 0.5px;
+      margin-bottom: 8px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .ocr-result-text {
+      font-size: 13px; color: var(--text-light);
+      max-height: 200px; overflow-y: auto;
+      line-height: 1.55;
+      white-space: pre-wrap;
+      word-break: break-word;
+      padding: 10px 12px;
+      background: rgba(0,0,0,0.2);
+      border-radius: 8px;
+      border: 1px solid var(--border-soft);
+    }
+
+    /* ===== INFO NOTE ===== */
+    .info-note {
+      padding: 10px 14px;
+      background: rgba(184,134,11,0.06);
+      border-left: 3px solid var(--accent-bright);
+      border-radius: 8px;
+      font-size: 12.5px;
+      color: var(--text-dim);
+      line-height: 1.55;
+      margin-bottom: 14px;
+    }
+    .info-note strong { color: var(--text-light); }
+    .info-note.warning {
+      background: rgba(212,160,23,0.08);
+      border-left-color: var(--warning);
+    }
+    .info-note.danger {
+      background: rgba(184,92,58,0.08);
+      border-left-color: var(--danger);
+    }
+
+    /* ===== MODAL ACTIONS ===== */
     .modal-actions {
       display: flex; gap: 10px; margin-top: 18px;
     }
@@ -565,21 +672,13 @@
       transform: translateY(-1px);
       box-shadow: 0 8px 24px rgba(184,134,11,0.35);
     }
-    .btn-primary:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      box-shadow: none;
-      transform: none;
-    }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; transform: none; }
     .btn-secondary {
       background: rgba(255,255,255,0.04);
       color: var(--text-dim);
       border: 1px solid rgba(255,255,255,0.06);
     }
-    .btn-secondary:hover {
-      background: rgba(255,255,255,0.08);
-      color: var(--text-light);
-    }
+    .btn-secondary:hover { background: rgba(255,255,255,0.08); color: var(--text-light); }
     .btn .spinner {
       display: none;
       width: 16px; height: 16px;
@@ -593,20 +692,7 @@
     .btn.loading .btn-icon { display: none; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* Info inline */
-    .info-note {
-      padding: 10px 14px;
-      background: rgba(184,134,11,0.06);
-      border-left: 3px solid var(--accent-bright);
-      border-radius: 8px;
-      font-size: 12.5px;
-      color: var(--text-dim);
-      line-height: 1.55;
-      margin-bottom: 14px;
-    }
-    .info-note strong { color: var(--text-light); }
-
-    /* ===== QUIZ MODAL ===== */
+    /* ===== QUIZ / FLASHCARDS ===== */
     .quiz-header {
       display: flex; align-items: center; justify-content: space-between;
       margin-bottom: 16px;
@@ -617,16 +703,14 @@
       font-weight: 600;
     }
     .quiz-progress-bar {
-      height: 4px;
-      background: rgba(255,255,255,0.06);
+      height: 4px; background: rgba(255,255,255,0.06);
       border-radius: 4px; overflow: hidden;
       margin-bottom: 20px;
     }
     .quiz-progress-fill {
       height: 100%;
       background: linear-gradient(90deg, var(--accent), var(--accent-bright));
-      border-radius: 4px;
-      transition: width 0.4s ease;
+      border-radius: 4px; transition: width 0.4s ease;
       width: 0%;
     }
     .quiz-question {
@@ -634,6 +718,7 @@
       color: var(--text-light);
       line-height: 1.55; margin-bottom: 18px;
     }
+    .quiz-question .katex { font-size: 1.05em; }
     .quiz-options {
       display: flex; flex-direction: column; gap: 8px;
       margin-bottom: 16px;
@@ -652,22 +737,10 @@
       font-family: inherit;
       width: 100%;
     }
-    .quiz-option:hover {
-      border-color: rgba(184,134,11,0.25);
-      background: rgba(184,134,11,0.04);
-    }
-    .quiz-option.selected {
-      border-color: var(--accent-bright);
-      background: rgba(184,134,11,0.1);
-    }
-    .quiz-option.correct {
-      border-color: var(--success);
-      background: rgba(45,125,90,0.1);
-    }
-    .quiz-option.wrong {
-      border-color: var(--danger);
-      background: rgba(184,92,58,0.1);
-    }
+    .quiz-option:hover { border-color: rgba(184,134,11,0.25); background: rgba(184,134,11,0.04); }
+    .quiz-option.selected { border-color: var(--accent-bright); background: rgba(184,134,11,0.1); }
+    .quiz-option.correct { border-color: var(--success); background: rgba(45,125,90,0.1); }
+    .quiz-option.wrong { border-color: var(--danger); background: rgba(184,92,58,0.1); }
     .quiz-option-letter {
       width: 24px; height: 24px; border-radius: 6px;
       background: rgba(255,255,255,0.05);
@@ -675,15 +748,182 @@
       font-size: 12px; font-weight: 700;
       flex-shrink: 0;
     }
-    .quiz-option.selected .quiz-option-letter {
-      background: var(--accent-bright);
-      color: #0A0A0A;
+    .quiz-option.selected .quiz-option-letter { background: var(--accent-bright); color: #0A0A0A; }
+    .quiz-option.correct .quiz-option-letter { background: var(--success); color: #fff; }
+    .quiz-option.wrong .quiz-option-letter { background: var(--danger); color: #fff; }
+    .quiz-option > div:last-child { flex: 1; min-width: 0; }
+
+    /* ===== FLASHCARD ===== */
+    .flashcard-wrap {
+      perspective: 1200px;
+      margin-bottom: 20px;
+      min-height: 240px;
     }
-    .quiz-option.correct .quiz-option-letter {
-      background: var(--success); color: #fff;
+    .flashcard-inner {
+      position: relative;
+      width: 100%;
+      height: 240px;
+      transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+      transform-style: preserve-3d;
+      cursor: pointer;
     }
-    .quiz-option.wrong .quiz-option-letter {
-      background: var(--danger); color: #fff;
+    .flashcard-wrap.flipped .flashcard-inner { transform: rotateY(180deg); }
+
+    .flashcard-face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      border-radius: 14px;
+      padding: 24px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+      border: 1px solid var(--border-soft);
+      background: var(--bg-surface);
+      overflow-y: auto;
+      word-break: break-word;
+    }
+    .flashcard-back {
+      transform: rotateY(180deg);
+      border-color: rgba(184,134,11,0.3);
+      background: rgba(184,134,11,0.04);
+    }
+    .flashcard-label {
+      font-size: 10px; font-weight: 800;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--accent-bright);
+      margin-bottom: 14px;
+    }
+    .flashcard-text {
+      font-size: 16px; line-height: 1.6;
+      color: var(--text-light);
+      font-weight: 500;
+      width: 100%;
+    }
+    .flashcard-text .katex { font-size: 1.05em; }
+    .flashcard-hint {
+      font-size: 12px; color: var(--text-muted);
+      margin-top: 16px; font-style: italic;
+    }
+
+    .flashcard-actions {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .flashcard-action {
+      padding: 12px 8px;
+      border-radius: 12px;
+      border: none;
+      font-size: 12px; font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: var(--transition);
+      display: flex; flex-direction: column; align-items: center;
+      gap: 4px;
+    }
+    .flashcard-action.hard {
+      background: rgba(184,92,58,0.12); color: var(--danger-light);
+      border: 1px solid rgba(184,92,58,0.2);
+    }
+    .flashcard-action.medium {
+      background: rgba(212,160,23,0.12); color: var(--warning);
+      border: 1px solid rgba(212,160,23,0.2);
+    }
+    .flashcard-action.easy {
+      background: rgba(45,125,90,0.12); color: var(--success-light);
+      border: 1px solid rgba(45,125,90,0.2);
+    }
+    .flashcard-action:hover { transform: translateY(-1px); }
+    .flashcard-action i { font-size: 16px; }
+
+    /* ===== RESUME VIEW ===== */
+    .resume-container {
+      display: flex; flex-direction: column;
+      gap: 14px;
+    }
+    .resume-section {
+      padding: 16px 18px;
+      background: var(--bg-card);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+    }
+    .resume-section-title {
+      font-size: 12px; font-weight: 700;
+      color: var(--accent-bright);
+      text-transform: uppercase; letter-spacing: 1px;
+      margin-bottom: 10px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .resume-section-title i { font-size: 13px; }
+    .resume-one-liner {
+      font-size: 15px; font-weight: 600;
+      color: var(--text-light);
+      line-height: 1.6;
+      padding: 14px 16px;
+      background: linear-gradient(135deg, rgba(184,134,11,0.08), rgba(26,58,42,0.06));
+      border: 1px solid rgba(184,134,11,0.15);
+      border-radius: 12px;
+      text-align: center;
+    }
+    .resume-keypoints {
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .resume-keypoint {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 14px; color: var(--text-light);
+      line-height: 1.55;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border-soft);
+    }
+    .resume-keypoint:last-child { border-bottom: none; }
+    .resume-keypoint::before {
+      content: '✓';
+      color: var(--success-light);
+      font-weight: 700;
+      flex-shrink: 0;
+      font-size: 14px;
+      margin-top: 2px;
+    }
+    .resume-formula {
+      font-family: 'KaTeX_Main', serif;
+      font-size: 15px;
+      color: var(--accent-bright);
+      padding: 10px 14px;
+      background: rgba(0,0,0,0.2);
+      border-left: 3px solid var(--accent-bright);
+      border-radius: 6px;
+      margin: 6px 0;
+      overflow-x: auto;
+      word-break: break-word;
+    }
+
+    /* ===== SECTION MEMORISABLE ===== */
+    .memorizable-section {
+      padding: 14px 16px;
+      background: linear-gradient(135deg, rgba(45,125,90,0.06), rgba(184,134,11,0.03));
+      border: 1px solid rgba(45,125,90,0.15);
+      border-radius: var(--radius);
+    }
+    .memorizable-section .title {
+      font-size: 12px; font-weight: 700;
+      color: var(--success-light);
+      text-transform: uppercase; letter-spacing: 1px;
+      margin-bottom: 10px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .memorizable-section .formulas-list {
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .memorizable-section .formula-item {
+      font-size: 15px;
+      color: var(--text-light);
+      padding: 10px 14px;
+      background: rgba(0,0,0,0.2);
+      border-radius: 8px;
+      border-left: 3px solid var(--success-light);
+      overflow-x: auto;
     }
 
     /* ===== TOAST ===== */
@@ -716,10 +956,7 @@
     .toast.error i { color: var(--danger-light); }
     .toast.info i { color: var(--accent-bright); }
     .toast i { font-size: 14px; flex-shrink: 0; }
-    @keyframes toastIn {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    @keyframes toastIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
 
     /* ===== LOADING ===== */
     .loading-state {
@@ -751,6 +988,9 @@
       .capture-mode { padding: 16px 6px; }
       .capture-mode .icon { width: 38px; height: 38px; font-size: 16px; }
       .modal { padding: 18px 16px; padding-bottom: calc(18px + var(--safe-bottom)); }
+      .flashcard-wrap, .flashcard-inner { height: 220px; min-height: 220px; }
+      .flashcard-text { font-size: 15px; }
+      .voice-btn { width: 70px; height: 70px; font-size: 26px; }
     }
 
     @media (min-width: 768px) {
@@ -760,6 +1000,14 @@
 
     @media (prefers-reduced-motion: reduce) {
       * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+
+    /* ===== KATEX ===== */
+    .katex { color: inherit; font-size: 1.02em; }
+    .katex-display {
+      margin: 8px 0;
+      overflow-x: auto; overflow-y: hidden;
+      padding: 4px 0;
     }
   </style>
 </head>
@@ -791,10 +1039,10 @@
       <p>Chargement de ton parcours...</p>
     </div>
 
-    <!-- Contenu (masqué tant que pas chargé) -->
+    <!-- Contenu -->
     <div id="contentWrapper" style="display:none;">
 
-      <!-- HERO SCORE -->
+      <!-- HERO -->
       <div class="hero-card">
         <div class="hero-top">
           <div class="hero-title">
@@ -802,17 +1050,14 @@
             <span>État global</span>
           </div>
         </div>
-
         <div class="hero-score">
           <span class="value" id="heroPercent">0</span>
           <span class="unit">% à jour</span>
         </div>
         <div class="hero-status" id="heroStatus">Analyse de tes données...</div>
-
         <div class="hero-progress-wrap">
           <div class="hero-progress-fill" id="heroProgressFill"></div>
         </div>
-
         <div class="hero-stats-grid">
           <div class="hero-stat mastered">
             <div class="num" id="statMastered">0</div>
@@ -829,42 +1074,36 @@
         </div>
       </div>
 
-      <!-- SECTION : À FAIRE AUJOURD'HUI -->
+      <!-- AUJOURD'HUI -->
       <div class="section-title">
         <h2><i class="fas fa-list-check"></i> À faire aujourd'hui</h2>
         <span class="count" id="todayCount">0</span>
       </div>
-      <div class="today-list" id="todayList">
-        <!-- injecté par JS -->
-      </div>
+      <div class="today-list" id="todayList"></div>
 
-      <!-- SECTION : PROGRESSION PAR MATIÈRE -->
+      <!-- PROGRESSION MATIÈRE -->
       <div class="section-title" id="progressSectionTitle" style="display:none;">
         <h2><i class="fas fa-chart-simple"></i> Progression par matière</h2>
       </div>
-      <div class="subject-progress-list" id="subjectProgressList">
-        <!-- injecté par JS -->
-      </div>
+      <div class="subject-progress-list" id="subjectProgressList"></div>
 
-      <!-- SECTION : COURS RÉCENTS -->
+      <!-- COURS RÉCENTS -->
       <div class="section-title" id="coursesSectionTitle" style="display:none;">
         <h2><i class="fas fa-book"></i> Cours récents</h2>
       </div>
-      <div class="courses-list" id="coursesList">
-        <!-- injecté par JS -->
-      </div>
+      <div class="courses-list" id="coursesList"></div>
 
     </div>
 
   </main>
 
-  <!-- ===== FAB : AJOUTER UN COURS ===== -->
+  <!-- ===== FAB ===== -->
   <button class="fab" id="fabAddCourse">
     <i class="fas fa-plus"></i>
     <span>Ajouter mon cours</span>
   </button>
 
-  <!-- ===== MODAL : CAPTURE ===== -->
+  <!-- ===== MODAL CAPTURE ===== -->
   <div class="modal-back" id="captureModal">
     <div class="modal">
       <div class="modal-handle"></div>
@@ -874,7 +1113,7 @@
         <p>Choisis comment ajouter ton contenu</p>
       </div>
 
-      <!-- Mode selector -->
+      <!-- Modes -->
       <div class="capture-modes">
         <div class="capture-mode" data-mode="text">
           <div class="icon"><i class="fas fa-keyboard"></i></div>
@@ -884,41 +1123,96 @@
         <div class="capture-mode" data-mode="photo">
           <div class="icon"><i class="fas fa-camera"></i></div>
           <div class="label">Photo</div>
-          <div class="sub">Bientôt</div>
+          <div class="sub">OCR automatique</div>
         </div>
         <div class="capture-mode" data-mode="voice">
           <div class="icon"><i class="fas fa-microphone"></i></div>
           <div class="label">Dicter</div>
-          <div class="sub">Bientôt</div>
+          <div class="sub">Voix → texte</div>
         </div>
       </div>
 
-      <!-- Zone de contenu (mode texte) -->
-      <div id="captureContent">
-        <div class="info-note">
-          <strong>Colle ou écris ton cours.</strong> ARVEXA va analyser le contenu, extraire les notions essentielles et créer un parcours de révision automatique.
-        </div>
+      <!-- Métadonnées communes -->
+      <div class="form-field">
+        <label class="form-label"><i class="fas fa-bookmark"></i> Matière</label>
+        <select class="form-select" id="captureSubject">
+          <option value="mathematiques">📐 Mathématiques</option>
+          <option value="physique">⚡ Physique</option>
+          <option value="chimie">🧪 Chimie</option>
+          <option value="svt">🧬 SVT</option>
+        </select>
+      </div>
 
-        <div class="form-field">
-          <label class="form-label"><i class="fas fa-bookmark"></i> Matière</label>
-          <select class="form-input" id="captureSubject">
-            <option value="mathematiques">📐 Mathématiques</option>
-            <option value="physique">⚡ Physique</option>
-            <option value="chimie">🧪 Chimie</option>
-            <option value="svt">🧬 SVT</option>
-          </select>
-        </div>
+      <div class="form-field">
+        <label class="form-label"><i class="fas fa-heading"></i> Titre du cours (optionnel)</label>
+        <input type="text" class="form-input" id="captureTitle" placeholder="Ex : Dérivation, Dynamique..." maxlength="100">
+      </div>
 
-        <div class="form-field">
-          <label class="form-label"><i class="fas fa-heading"></i> Titre du cours (optionnel)</label>
-          <input type="text" class="form-input" id="captureTitle" placeholder="Ex : Dérivation, Dynamique..." maxlength="100">
-        </div>
-
+      <!-- ZONE TEXTE -->
+      <div class="capture-zone active" id="zoneText">
         <div class="form-field">
           <label class="form-label"><i class="fas fa-align-left"></i> Contenu du cours</label>
           <textarea class="form-textarea" id="captureBody" placeholder="Colle ici ton cours, tes notes, tes définitions, tes formules..." maxlength="15000"></textarea>
         </div>
       </div>
+
+      <!-- ZONE PHOTO -->
+      <div class="capture-zone" id="zonePhoto">
+        <div class="photo-zone">
+          <div class="photo-upload" id="photoUpload">
+            <input type="file" accept="image/*" id="photoInput" capture="environment">
+            <div class="upload-icon"><i class="fas fa-camera"></i></div>
+            <div class="upload-title">Prendre ou choisir une photo</div>
+            <div class="upload-sub">Le texte sera lu automatiquement (OCR)</div>
+          </div>
+
+          <div class="photo-preview" id="photoPreview">
+            <img id="photoPreviewImg" alt="Aperçu">
+            <button class="photo-preview-remove" id="photoRemove">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+
+          <div class="ocr-progress" id="ocrProgress">
+            <div class="ocr-progress-head">
+              <span>Lecture du texte...</span>
+              <strong id="ocrPercent">0%</strong>
+            </div>
+            <div class="ocr-progress-bar">
+              <div class="ocr-progress-fill" id="ocrProgressFill"></div>
+            </div>
+          </div>
+
+          <div class="ocr-result" id="ocrResult">
+            <div class="ocr-result-head">
+              <i class="fas fa-check-circle"></i>
+              Texte détecté
+            </div>
+            <div class="ocr-result-text" id="ocrResultText"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ZONE VOIX -->
+      <div class="capture-zone" id="zoneVoice">
+        <div class="voice-recorder">
+          <div class="voice-status" id="voiceStatus">Appuie pour commencer à dicter</div>
+
+          <button class="voice-btn" id="voiceBtn">
+            <i class="fas fa-microphone"></i>
+          </button>
+
+          <div class="voice-transcript" id="voiceTranscript"></div>
+
+          <div style="font-size:11.5px;color:var(--text-muted);text-align:center;line-height:1.5">
+            Parle naturellement. Tu peux dire : <em>« x carré plus deux x »</em><br>
+            qui sera converti en formule.
+          </div>
+        </div>
+      </div>
+
+      <!-- Info quota -->
+      <div class="info-note" id="quotaNote" style="display:none;"></div>
 
       <!-- Actions -->
       <div class="modal-actions">
@@ -929,11 +1223,10 @@
           <span class="spinner"></span>
         </button>
       </div>
-
     </div>
   </div>
 
-  <!-- ===== MODAL : QUIZ ===== -->
+  <!-- ===== MODAL QUIZ ===== -->
   <div class="modal-back" id="quizModal">
     <div class="modal">
       <div class="modal-handle"></div>
@@ -941,11 +1234,25 @@
     </div>
   </div>
 
+  <!-- ===== MODAL FLASHCARDS ===== -->
+  <div class="modal-back" id="flashModal">
+    <div class="modal">
+      <div class="modal-handle"></div>
+      <div id="flashContainer"></div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL RÉSUMÉ ===== -->
+  <div class="modal-back" id="resumeModal">
+    <div class="modal">
+      <div class="modal-handle"></div>
+      <div id="resumeContainer"></div>
+    </div>
+  </div>
+
   <!-- ===== TOASTS ===== -->
   <div class="toast-container" id="toastContainer"></div>
 
-  <!-- ============================================================ -->
-  <!-- IMPORTS & SCRIPT                                             -->
   <!-- ============================================================ -->
   <script type="importmap">
   {
@@ -959,8 +1266,7 @@
 
   <script type="module">
   // ================================================================
-  // ARV-PROGRESS — Moteur de progression ARVEXA
-  // Version 1.0 — MVP Phase 1
+  // ARV-PROGRESS v2.0 — Interface complète
   // ================================================================
 
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
@@ -970,13 +1276,9 @@
   } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
   import {
     initializeFirestore, persistentLocalCache, persistentSingleTabManager,
-    doc, getDoc, collection, getDocs, orderBy, limit,
-    query, serverTimestamp
+    doc, getDoc
   } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
-  // ================================================================
-  // CONFIG
-  // ================================================================
   const firebaseConfig = {
     apiKey: "AIzaSyDHscOXw3rLuhV6z1Cny-bdYCumqpnG7QE",
     authDomain: "arvexa-fbf10.firebaseapp.com",
@@ -993,7 +1295,7 @@
   });
   try { await setPersistence(auth, browserLocalPersistence); } catch (e) {}
 
-  const BACKEND_URL = ''; // ⚡ même domaine
+  const BACKEND_URL = '';
   const MAX_CONTENT_LENGTH = 15000;
   const MIN_CONTENT_LENGTH = 100;
 
@@ -1008,13 +1310,19 @@
     subjectProgress: [],
     recentCourses: [],
     captureMode: 'text',
-    isLoading: false
+    photoFile: null,
+    photoBase64: null,
+    photoText: '',
+    voiceRecognition: null,
+    voiceTranscriptText: '',
+    isRecording: false,
+    currentQuiz: null,
+    currentFlashcards: null,
+    flashIndex: 0
   };
 
-  // ================================================================
-  // DOM HELPERS
-  // ================================================================
   const $ = (id) => document.getElementById(id);
+  const $$ = (s) => document.querySelectorAll(s);
 
   function escapeHtml(text) {
     const div = document.createElement('div');
@@ -1037,7 +1345,37 @@
   }
 
   // ================================================================
-  // API CALLS
+  // LATEX / KATEX
+  // ================================================================
+  function renderKaTeX(root) {
+    if (!root) return;
+    if (window.KaTeXUtils) {
+      window.KaTeXUtils.renderMath(root);
+      return;
+    }
+    if (typeof renderMathInElement !== 'function') {
+      setTimeout(() => renderKaTeX(root), 200);
+      return;
+    }
+    try {
+      renderMathInElement(root, {
+        delimiters: [
+          { left: '$$', right: '$$', display: true },
+          { left: '\\[', right: '\\]', display: true },
+          { left: '$', right: '$', display: false },
+          { left: '\\(', right: '\\)', display: false }
+        ],
+        throwOnError: false,
+        errorColor: '#E07A5F',
+        strict: false
+      });
+    } catch (e) {
+      console.warn('KaTeX error:', e);
+    }
+  }
+
+  // ================================================================
+  // API
   // ================================================================
   async function callApi(action, params = {}) {
     if (!state.user) throw new Error('Non authentifié.');
@@ -1063,22 +1401,20 @@
   function renderHero(summary) {
     const s = summary || {};
     const percent = Math.max(0, Math.min(100, Number(s.percentUpToDate) || 0));
-
     $('heroPercent').textContent = percent;
     $('heroProgressFill').style.width = percent + '%';
 
-    // Message contextuel
     const total = s.totalNotions || 0;
     if (total === 0) {
-      $('heroStatus').innerHTML = `Commence par <strong>ajouter ton premier cours</strong> pour initialiser ton parcours.`;
+      $('heroStatus').innerHTML = `Commence par <strong>ajouter ton premier cours</strong>.`;
     } else if (percent >= 90) {
-      $('heroStatus').innerHTML = `Tu es <strong>à jour</strong> sur l'ensemble de tes notions. Continue !`;
+      $('heroStatus').innerHTML = `Tu es <strong>à jour</strong>. Continue !`;
     } else if (percent >= 70) {
-      $('heroStatus').innerHTML = `Bon rythme. Encore <strong>quelques révisions</strong> et tu seras à jour.`;
+      $('heroStatus').innerHTML = `Bon rythme. Encore <strong>quelques révisions</strong>.`;
     } else if (percent >= 40) {
-      $('heroStatus').innerHTML = `Il reste <strong>du travail</strong> mais tu progresses régulièrement.`;
+      $('heroStatus').innerHTML = `Il reste <strong>du travail</strong> mais tu progresses.`;
     } else {
-      $('heroStatus').innerHTML = `Prends <strong>quelques minutes</strong> aujourd'hui pour rattraper.`;
+      $('heroStatus').innerHTML = `Prends <strong>quelques minutes</strong> pour rattraper.`;
     }
 
     $('statMastered').textContent = s.mastered || 0;
@@ -1087,19 +1423,18 @@
   }
 
   // ================================================================
-  // RENDER — À FAIRE AUJOURD'HUI
+  // RENDER — TODAY
   // ================================================================
   function renderTodayPlan(items) {
     const list = $('todayList');
-    const count = items ? items.length : 0;
-    $('todayCount').textContent = count;
+    $('todayCount').textContent = items ? items.length : 0;
 
     if (!items || items.length === 0) {
       list.innerHTML = `
         <div class="empty-state">
           <div class="icon"><i class="fas fa-check-circle"></i></div>
           <h3>Rien à faire aujourd'hui</h3>
-          <p>Ajoute un cours pour qu'ARV-PROGRESS génère automatiquement ton planning de révision.</p>
+          <p>Ajoute un cours pour qu'ARV-PROGRESS génère automatiquement ton planning.</p>
         </div>
       `;
       return;
@@ -1116,7 +1451,7 @@
       const task = escapeHtml(item.task || 'Réviser');
 
       return `
-        <div class="today-item ${isSurprise ? 'surprise' : ''}" data-item-id="${escapeHtml(item.id || '')}" data-kind="${escapeHtml(item.kind || 'revision')}">
+        <div class="today-item ${isSurprise ? 'surprise' : ''}" data-item-id="${escapeHtml(item.id || '')}" data-kind="${escapeHtml(item.kind || 'revision')}" data-notion="${escapeHtml(item.notionId || '')}">
           <div class="today-item-icon ${iconClass}">
             <i class="fas ${iconFa}"></i>
           </div>
@@ -1128,29 +1463,26 @@
               <span>→ ${task}</span>
             </div>
           </div>
-          <div class="today-item-arrow">
-            <i class="fas fa-chevron-right"></i>
-          </div>
+          <div class="today-item-arrow"><i class="fas fa-chevron-right"></i></div>
         </div>
       `;
     }).join('');
 
-    // Click handlers
     list.querySelectorAll('.today-item').forEach((el) => {
       el.addEventListener('click', () => {
         const kind = el.dataset.kind;
-        const itemId = el.dataset.itemId;
+        const notionId = el.dataset.notion;
         if (kind === 'surprise_test') {
           startSurpriseTest();
-        } else {
-          startRevision(itemId);
+        } else if (notionId) {
+          startRevision(notionId);
         }
       });
     });
   }
 
   // ================================================================
-  // RENDER — PROGRESSION PAR MATIÈRE
+  // RENDER — SUBJECT PROGRESS
   // ================================================================
   function renderSubjectProgress(subjects) {
     const container = $('subjectProgressList');
@@ -1190,45 +1522,36 @@
   // ================================================================
   function renderRecentCourses(courses) {
     const container = $('coursesList');
-
     if (!courses || courses.length === 0) {
       container.innerHTML = '';
       $('coursesSectionTitle').style.display = 'none';
       return;
     }
-
     $('coursesSectionTitle').style.display = 'flex';
-    container.innerHTML = courses.map((c) => {
-      const notionCount = c.notionsCount || 0;
-      const mastery = Math.max(0, Math.min(100, Number(c.masteryPercent) || 0));
-      const dateLabel = c.addedLabel || '';
 
-      return `
-        <div class="course-item" data-course-id="${escapeHtml(c.id)}">
-          <div class="course-item-icon">
-            <i class="fas ${escapeHtml(c.icon || 'fa-book')}"></i>
-          </div>
-          <div class="course-item-content">
-            <div class="course-item-title">${escapeHtml(c.title || 'Cours')}</div>
-            <div class="course-item-meta">
-              <span>${escapeHtml(c.subjectLabel || '')}</span>
-              <span>·</span>
-              <span>${notionCount} notion${notionCount > 1 ? 's' : ''}</span>
-              <span>·</span>
-              <span>${mastery}%</span>
-              ${dateLabel ? `<span>·</span><span>${escapeHtml(dateLabel)}</span>` : ''}
-            </div>
-          </div>
-          <div class="today-item-arrow">
-            <i class="fas fa-chevron-right"></i>
+    container.innerHTML = courses.map((c) => `
+      <div class="course-item" data-course-id="${escapeHtml(c.id)}">
+        <div class="course-item-icon">
+          <i class="fas ${escapeHtml(c.icon || 'fa-book')}"></i>
+        </div>
+        <div class="course-item-content">
+          <div class="course-item-title">${escapeHtml(c.title || 'Cours')}</div>
+          <div class="course-item-meta">
+            <span>${escapeHtml(c.subjectLabel || '')}</span>
+            <span>·</span>
+            <span>${c.notionsCount || 0} notion${(c.notionsCount || 0) > 1 ? 's' : ''}</span>
+            <span>·</span>
+            <span>${c.masteryPercent || 0}%</span>
+            ${c.addedLabel ? `<span>·</span><span>${escapeHtml(c.addedLabel)}</span>` : ''}
           </div>
         </div>
-      `;
-    }).join('');
+        <div class="today-item-arrow"><i class="fas fa-chevron-right"></i></div>
+      </div>
+    `).join('');
   }
 
   // ================================================================
-  // CHARGEMENT DES DONNÉES
+  // CHARGEMENT
   // ================================================================
   async function loadAll() {
     try {
@@ -1249,7 +1572,7 @@
       console.error('loadAll error:', e);
       $('initialLoading').innerHTML = `
         <div class="empty-state" style="border-color:rgba(231,76,60,0.3)">
-          <div class="icon" style="background:rgba(231,76,60,0.1);color:var(--danger-light);border-color:rgba(231,76,60,0.2)">
+          <div class="icon" style="background:rgba(231,76,60,0.1);color:var(--danger-light)">
             <i class="fas fa-exclamation-triangle"></i>
           </div>
           <h3>Impossible de charger</h3>
@@ -1263,82 +1586,381 @@
   }
 
   // ================================================================
-  // MODAL — CAPTURE
+  // MODAL CAPTURE
   // ================================================================
   function openCaptureModal() {
     $('captureModal').classList.add('show');
     document.body.style.overflow = 'hidden';
     state.captureMode = 'text';
-    document.querySelectorAll('.capture-mode').forEach((m) => {
-      m.classList.toggle('active', m.dataset.mode === 'text');
-    });
-    $('captureContent').style.display = 'block';
-    $('captureTitle').value = '';
-    $('captureBody').value = '';
+    state.photoFile = null;
+    state.photoBase64 = null;
+    state.photoText = '';
+    state.voiceTranscriptText = '';
+    switchCaptureMode('text');
+    resetCaptureForm();
     updateSubmitState();
-    setTimeout(() => $('captureBody').focus(), 200);
   }
 
   function closeCaptureModal() {
     $('captureModal').classList.remove('show');
     document.body.style.overflow = '';
+    stopVoiceRecognition();
+  }
+
+  function resetCaptureForm() {
+    $('captureTitle').value = '';
+    $('captureBody').value = '';
+    $('photoInput').value = '';
+    $('photoPreview').classList.remove('show');
+    $('ocrProgress').classList.remove('show');
+    $('ocrResult').classList.remove('show');
+    $('voiceTranscript').textContent = '';
+    $('voiceStatus').textContent = 'Appuie pour commencer à dicter';
+    $('voiceStatus').className = 'voice-status';
+    $('voiceBtn').classList.remove('recording');
+  }
+
+  function switchCaptureMode(mode) {
+    state.captureMode = mode;
+    $$('.capture-mode').forEach((m) => m.classList.toggle('active', m.dataset.mode === mode));
+    $$('.capture-zone').forEach((z) => z.classList.remove('active'));
+    if (mode === 'text') $('zoneText').classList.add('active');
+    if (mode === 'photo') $('zonePhoto').classList.add('active');
+    if (mode === 'voice') $('zoneVoice').classList.add('active');
+    updateSubmitState();
   }
 
   function updateSubmitState() {
-    const body = ($('captureBody').value || '').trim();
-    $('captureSubmit').disabled = body.length < MIN_CONTENT_LENGTH;
+    let ready = false;
+    if (state.captureMode === 'text') {
+      const body = ($('captureBody').value || '').trim();
+      ready = body.length >= MIN_CONTENT_LENGTH;
+    } else if (state.captureMode === 'photo') {
+      ready = (state.photoText || '').length >= MIN_CONTENT_LENGTH;
+    } else if (state.captureMode === 'voice') {
+      ready = (state.voiceTranscriptText || '').length >= MIN_CONTENT_LENGTH;
+    }
+    $('captureSubmit').disabled = !ready;
   }
 
+  // ================================================================
+  // PHOTO — OCR avec Tesseract.js
+  // ================================================================
+  async function handlePhotoUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      showToast('Fichier non valide (image requise)', 'error');
+      return;
+    }
+    if (file.size > 8 * 1024 * 1024) {
+      showToast('Image trop lourde (max 8 Mo)', 'error');
+      return;
+    }
+
+    state.photoFile = file;
+    state.photoText = '';
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      state.photoBase64 = event.target.result;
+      $('photoPreviewImg').src = state.photoBase64;
+      $('photoPreview').classList.add('show');
+    };
+    reader.readAsDataURL(file);
+
+    // Lancer OCR
+    runOCR(file);
+  }
+
+  async function runOCR(file) {
+    if (typeof Tesseract === 'undefined') {
+      showToast('OCR non disponible. Réessaie dans un instant.', 'error');
+      return;
+    }
+
+    $('ocrProgress').classList.add('show');
+    $('ocrResult').classList.remove('show');
+    $('ocrProgressFill').style.width = '0%';
+    $('ocrPercent').textContent = '0%';
+
+    try {
+      const { data } = await Tesseract.recognize(file, 'fra+eng', {
+        logger: (m) => {
+          if (m.status === 'recognizing text') {
+            const percent = Math.round(m.progress * 100);
+            $('ocrProgressFill').style.width = percent + '%';
+            $('ocrPercent').textContent = percent + '%';
+          }
+        }
+      });
+
+      const text = (data.text || '').trim();
+      state.photoText = text;
+
+      if (text.length < 20) {
+        showToast('Texte non détecté. Essaie avec une photo plus nette ou utilise la dictée.', 'error');
+        $('ocrResult').classList.remove('show');
+      } else {
+        $('ocrResultText').textContent = text.slice(0, 2000) + (text.length > 2000 ? '\n...(tronqué)' : '');
+        $('ocrResult').classList.add('show');
+      }
+
+      $('ocrProgress').classList.remove('show');
+      updateSubmitState();
+    } catch (err) {
+      console.error('OCR error:', err);
+      showToast('Erreur lors de la lecture. Réessaie.', 'error');
+      $('ocrProgress').classList.remove('show');
+    }
+  }
+
+  // ================================================================
+  // VOIX — Web Speech API
+  // ================================================================
+  function initVoiceRecognition() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      showToast('La dictée n\'est pas supportée sur ce navigateur. Utilise Chrome.', 'error');
+      return null;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'fr-FR';
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.maxAlternatives = 1;
+
+    return recognition;
+  }
+
+  function startVoiceRecognition() {
+    if (state.isRecording) {
+      stopVoiceRecognition();
+      return;
+    }
+
+    if (!state.voiceRecognition) {
+      state.voiceRecognition = initVoiceRecognition();
+      if (!state.voiceRecognition) return;
+    }
+
+    const recognition = state.voiceRecognition;
+
+    recognition.onstart = () => {
+      state.isRecording = true;
+      $('voiceBtn').classList.add('recording');
+      $('voiceStatus').textContent = '🔴 Enregistrement... Parle maintenant';
+      $('voiceStatus').className = 'voice-status recording';
+    };
+
+    recognition.onresult = (event) => {
+      let finalText = '';
+      let interimText = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) finalText += transcript + ' ';
+        else interimText += transcript;
+      }
+      if (finalText) {
+        state.voiceTranscriptText += finalText;
+      }
+      $('voiceTranscript').textContent = state.voiceTranscriptText + interimText;
+      updateSubmitState();
+    };
+
+    recognition.onerror = (e) => {
+      console.warn('Speech error:', e.error);
+      if (e.error === 'not-allowed') {
+        showToast('Micro non autorisé. Autorise dans les paramètres du navigateur.', 'error', 5000);
+      }
+      stopVoiceRecognition();
+    };
+
+    recognition.onend = () => {
+      state.isRecording = false;
+      $('voiceBtn').classList.remove('recording');
+      $('voiceStatus').textContent = 'Appuie pour reprendre ou termine';
+      $('voiceStatus').className = 'voice-status';
+    };
+
+    try {
+      recognition.start();
+    } catch (e) {
+      console.warn('Start error:', e);
+      showToast('Impossible de démarrer. Réessaie.', 'error');
+    }
+  }
+
+  function stopVoiceRecognition() {
+    if (state.voiceRecognition && state.isRecording) {
+      try { state.voiceRecognition.stop(); } catch (e) {}
+    }
+    state.isRecording = false;
+    $('voiceBtn')?.classList.remove('recording');
+  }
+
+  // ================================================================
+  // SUBMIT CAPTURE
+  // ================================================================
   async function submitCapture() {
     const subject = $('captureSubject').value;
     const title = $('captureTitle').value.trim();
-    const body = $('captureBody').value.trim();
 
-    if (body.length < MIN_CONTENT_LENGTH) {
+    let content = '';
+    let mode = state.captureMode;
+
+    if (mode === 'text') {
+      content = ($('captureBody').value || '').trim();
+    } else if (mode === 'photo') {
+      content = (state.photoText || '').trim();
+    } else if (mode === 'voice') {
+      content = (state.voiceTranscriptText || '').trim();
+    }
+
+    if (content.length < MIN_CONTENT_LENGTH) {
       showToast(`Contenu trop court (min ${MIN_CONTENT_LENGTH} caractères)`, 'error');
       return;
     }
-    if (body.length > MAX_CONTENT_LENGTH) {
-      showToast(`Contenu trop long (max ${MAX_CONTENT_LENGTH} caractères)`, 'error');
-      return;
+    if (content.length > MAX_CONTENT_LENGTH) {
+      content = content.slice(0, MAX_CONTENT_LENGTH);
     }
+
+    stopVoiceRecognition();
 
     const btn = $('captureSubmit');
     btn.disabled = true;
     btn.classList.add('loading');
 
     try {
-      const result = await callApi('analyzeCourse', { subject, title, content: body });
+      const result = await callApi('analyzeCourse', { subject, title, content, mode });
 
-      showToast(`✅ Cours analysé · ${result.notionsCount || 0} notions extraites`, 'success');
-
+      showToast(`✅ Cours analysé · ${result.notionsCount || 0} notions extraites`, 'success', 4000);
       closeCaptureModal();
 
-      // Si l'API renvoie un quiz initial
-      if (result.initialQuiz && Array.isArray(result.initialQuiz) && result.initialQuiz.length > 0) {
+      // Recharger le dashboard en arrière-plan
+      setTimeout(() => loadAll(), 400);
+
+      // Afficher le résumé
+      if (result.courseId && result.summary) {
         setTimeout(() => {
-          startQuiz(result.courseId, result.initialQuiz);
-        }, 400);
-      } else {
-        // Recharger le dashboard
-        setTimeout(() => loadAll(), 400);
+          showResumeModal(result);
+        }, 700);
+      }
+
+      // Lancer le quiz initial
+      if (result.initialQuiz && result.initialQuiz.length > 0) {
+        setTimeout(() => {
+          startQuiz(result.courseId, null, result.initialQuiz);
+        }, 2000);
       }
     } catch (e) {
       console.error('submitCapture error:', e);
-      showToast('Erreur : ' + e.message, 'error');
+      showToast('Erreur : ' + e.message, 'error', 5000);
       btn.disabled = false;
       btn.classList.remove('loading');
     }
   }
 
   // ================================================================
+  // MODAL RÉSUMÉ
+  // ================================================================
+  function showResumeModal(data) {
+    const summary = data.summary || {};
+    const keyPoints = summary.keyPoints || [];
+    const mustRemember = summary.mustRemember || [];
+    const mnemonics = summary.mnemonics || [];
+    const illisible = data.illisibleZones || [];
+
+    let html = `
+      <div class="modal-header">
+        <h2>📝 Résumé du cours</h2>
+        <p>${escapeHtml(data.courseTitle || 'Ton cours')}</p>
+      </div>
+      <div class="resume-container">
+    `;
+
+    // One-liner
+    if (summary.oneLiner) {
+      html += `<div class="resume-one-liner">${escapeHtml(summary.oneLiner)}</div>`;
+    }
+
+    // Zones illisibles
+    if (illisible.length > 0) {
+      html += `
+        <div class="info-note warning">
+          <strong>⚠️ Zones à vérifier :</strong><br>
+          ${illisible.map((z) => '• ' + escapeHtml(z)).join('<br>')}
+        </div>
+      `;
+    }
+
+    // Formules à mémoriser
+    if (mustRemember.length > 0) {
+      html += `
+        <div class="memorizable-section">
+          <div class="title"><i class="fas fa-brain"></i> À retenir par cœur</div>
+          <div class="formulas-list">
+            ${mustRemember.map((f) => `<div class="formula-item">${escapeHtml(f)}</div>`).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    // Points clés
+    if (keyPoints.length > 0) {
+      html += `
+        <div class="resume-section">
+          <div class="resume-section-title"><i class="fas fa-list-check"></i> Points clés</div>
+          <div class="resume-keypoints">
+            ${keyPoints.map((p) => `<div class="resume-keypoint">${escapeHtml(p)}</div>`).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    // Mnémotechniques
+    if (mnemonics.length > 0) {
+      html += `
+        <div class="resume-section">
+          <div class="resume-section-title"><i class="fas fa-lightbulb"></i> Astuces mémorisation</div>
+          <div class="resume-keypoints">
+            ${mnemonics.map((m) => `<div class="resume-keypoint" style="border-left:3px solid var(--accent-bright);padding-left:12px;border-bottom:none">${escapeHtml(m)}</div>`).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    html += `
+      </div>
+      <div class="modal-actions" style="margin-top:20px">
+        <button class="btn btn-primary" id="resumeCloseBtn" style="width:100%">
+          <i class="fas fa-check"></i>
+          Compris !
+        </button>
+      </div>
+    `;
+
+    $('resumeContainer').innerHTML = html;
+    $('resumeModal').classList.add('show');
+    document.body.style.overflow = 'hidden';
+
+    setTimeout(() => renderKaTeX($('resumeContainer')), 100);
+
+    $('resumeCloseBtn').addEventListener('click', () => {
+      $('resumeModal').classList.remove('show');
+      document.body.style.overflow = '';
+    });
+  }
+
+  // ================================================================
   // QUIZ
   // ================================================================
-  let currentQuiz = null;
-
-  function startQuiz(courseId, questions) {
-    currentQuiz = {
+  function startQuiz(courseId, notionId, questions) {
+    state.currentQuiz = {
       courseId,
+      notionId,
       questions,
       currentIndex: 0,
       answers: [],
@@ -1350,7 +1972,7 @@
   }
 
   function renderQuiz() {
-    const q = currentQuiz;
+    const q = state.currentQuiz;
     if (!q || !q.questions || q.questions.length === 0) return;
 
     const question = q.questions[q.currentIndex];
@@ -1365,9 +1987,7 @@
       <div class="quiz-progress-bar">
         <div class="quiz-progress-fill" style="width:${percent}%"></div>
       </div>
-
       <div class="quiz-question">${escapeHtml(question.text)}</div>
-
       <div class="quiz-options" id="quizOptions">
         ${(question.options || []).map((opt, i) => `
           <button class="quiz-option" data-option-id="${escapeHtml(opt.id)}">
@@ -1376,41 +1996,34 @@
           </button>
         `).join('')}
       </div>
-
       <button class="btn btn-primary" id="quizNextBtn" disabled style="width:100%;margin-top:8px">
         <span class="btn-text">${current === total ? 'Terminer' : 'Suivant'}</span>
       </button>
     `;
 
-    // Bind options
-    $('quizOptions').querySelectorAll('.quiz-option').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        if (btn.disabled) return;
-        selectQuizOption(btn.dataset.optionId);
-      });
+    setTimeout(() => renderKaTeX($('quizContainer')), 100);
+
+    $$('#quizOptions .quiz-option').forEach((btn) => {
+      btn.addEventListener('click', () => selectQuizOption(btn.dataset.optionId));
     });
 
-    // Bind next
     $('quizNextBtn').addEventListener('click', nextQuizQuestion);
   }
 
   function selectQuizOption(optionId) {
-    const q = currentQuiz;
+    const q = state.currentQuiz;
     const question = q.questions[q.currentIndex];
 
-    // Retirer les états précédents
-    $('quizOptions').querySelectorAll('.quiz-option').forEach((btn) => {
+    $$('#quizOptions .quiz-option').forEach((btn) => {
       btn.classList.remove('selected', 'correct', 'wrong');
       btn.disabled = true;
     });
 
-    // Marquer la sélection
-    const selected = $('quizOptions').querySelector(`[data-option-id="${optionId}"]`);
+    const selected = $(`#quizOptions [data-option-id="${optionId}"]`);
     if (selected) selected.classList.add('selected');
 
-    // Feedback correct/wrong
     if (question.correctAnswer) {
-      const correct = $('quizOptions').querySelector(`[data-option-id="${question.correctAnswer}"]`);
+      const correct = $(`#quizOptions [data-option-id="${question.correctAnswer}"]`);
       if (correct) correct.classList.add('correct');
       if (optionId !== question.correctAnswer && selected) {
         selected.classList.remove('selected');
@@ -1418,17 +2031,13 @@
       }
     }
 
-    // Enregistrer la réponse
     q.answers[q.currentIndex] = optionId;
-
-    // Activer Suivant
     $('quizNextBtn').disabled = false;
   }
 
   async function nextQuizQuestion() {
-    const q = currentQuiz;
+    const q = state.currentQuiz;
     q.currentIndex++;
-
     if (q.currentIndex >= q.questions.length) {
       await finishQuiz();
       return;
@@ -1437,7 +2046,7 @@
   }
 
   async function finishQuiz() {
-    const q = currentQuiz;
+    const q = state.currentQuiz;
     const btn = $('quizNextBtn');
     if (btn) {
       btn.disabled = true;
@@ -1456,19 +2065,21 @@
 
       const result = await callApi('submitQuiz', {
         courseId: q.courseId,
+        notionId: q.notionId,
         answers
       });
 
       const score = result.score || 0;
       const total = q.questions.length;
+      const percent = result.scorePercent || 0;
 
       $('quizContainer').innerHTML = `
         <div class="modal-header">
-          <h2>${score === total ? '🎉 Parfait !' : score >= total * 0.6 ? '👍 Bien joué' : '💪 Continue'}</h2>
-          <p>${score} / ${total} bonnes réponses</p>
+          <h2>${percent === 100 ? '🎉 Parfait !' : percent >= 60 ? '👍 Bien joué' : '💪 Continue'}</h2>
+          <p>${score} / ${total} bonnes réponses (${percent}%)</p>
         </div>
         <div class="info-note" style="text-align:center;">
-          <strong>${result.message || 'Ta maîtrise a été mise à jour.'}</strong>
+          <strong>${escapeHtml(result.message || 'Ta maîtrise a été mise à jour.')}</strong>
         </div>
         <button class="btn btn-primary" id="quizCloseBtn" style="width:100%">
           <i class="fas fa-check"></i>
@@ -1477,32 +2088,196 @@
       `;
 
       $('quizCloseBtn').addEventListener('click', () => {
-        closeQuiz();
+        $('quizModal').classList.remove('show');
+        document.body.style.overflow = '';
+        state.currentQuiz = null;
         loadAll();
       });
     } catch (e) {
       console.error('finishQuiz error:', e);
       showToast('Erreur : ' + e.message, 'error');
-      closeQuiz();
+      $('quizModal').classList.remove('show');
+      document.body.style.overflow = '';
       loadAll();
     }
   }
 
-  function closeQuiz() {
-    $('quizModal').classList.remove('show');
-    document.body.style.overflow = '';
-    currentQuiz = null;
+  // ================================================================
+  // RÉVISION — choix du mode (Quiz / Flashcards)
+  // ================================================================
+  async function startRevision(notionId) {
+    // Affiche un mini-choix
+    $('quizContainer').innerHTML = `
+      <div class="modal-header">
+        <h2>Réviser cette notion</h2>
+        <p>Choisis ton mode de révision</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:16px">
+        <button class="btn btn-primary" id="modeQuiz" style="width:100%">
+          <i class="fas fa-question-circle"></i>
+          Faire un quiz
+        </button>
+        <button class="btn btn-secondary" id="modeFlash" style="width:100%">
+          <i class="fas fa-clone"></i>
+          Réviser avec flashcards
+        </button>
+      </div>
+    `;
+    $('quizModal').classList.add('show');
+    document.body.style.overflow = 'hidden';
+
+    $('modeQuiz').addEventListener('click', async () => {
+      $('quizModal').classList.remove('show');
+      await launchQuiz(notionId);
+    });
+
+    $('modeFlash').addEventListener('click', async () => {
+      $('quizModal').classList.remove('show');
+      await launchFlashcards(notionId);
+    });
+  }
+
+  async function launchQuiz(notionId) {
+    try {
+      showToast('Génération du quiz...', 'info', 2000);
+      const result = await callApi('generateQuiz', { notionId, difficulty: 2 });
+      startQuiz(null, notionId, result.questions);
+    } catch (e) {
+      showToast('Erreur : ' + e.message, 'error');
+    }
+  }
+
+  async function launchFlashcards(notionId) {
+    try {
+      $('flashContainer').innerHTML = `<div class="loading-state"><div class="loading-spinner"></div><p>Génération des flashcards...</p></div>`;
+      $('flashModal').classList.add('show');
+      document.body.style.overflow = 'hidden';
+
+      const result = await callApi('generateFlashcards', { notionId });
+      state.currentFlashcards = { notionId, cards: result.flashcards };
+      state.flashIndex = 0;
+      renderFlashcard();
+    } catch (e) {
+      showToast('Erreur : ' + e.message, 'error');
+      $('flashModal').classList.remove('show');
+      document.body.style.overflow = '';
+    }
+  }
+
+  function renderFlashcard() {
+    const f = state.currentFlashcards;
+    if (!f || !f.cards || f.cards.length === 0) return;
+
+    const card = f.cards[state.flashIndex];
+    const total = f.cards.length;
+    const current = state.flashIndex + 1;
+
+    $('flashContainer').innerHTML = `
+      <div class="quiz-header">
+        <div class="quiz-step">Carte ${current} / ${total}</div>
+      </div>
+
+      <div class="flashcard-wrap" id="flashWrap">
+        <div class="flashcard-inner">
+          <div class="flashcard-face">
+            <div class="flashcard-label">Question</div>
+            <div class="flashcard-text">${escapeHtml(card.front)}</div>
+            ${card.hint ? `<div class="flashcard-hint">💡 ${escapeHtml(card.hint)}</div>` : ''}
+          </div>
+          <div class="flashcard-face flashcard-back">
+            <div class="flashcard-label">Réponse</div>
+            <div class="flashcard-text">${escapeHtml(card.back)}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flashcard-actions" id="flashActions" style="display:none">
+        <button class="flashcard-action hard" data-rating="hard">
+          <i class="fas fa-times-circle"></i>
+          <span>Difficile</span>
+        </button>
+        <button class="flashcard-action medium" data-rating="medium">
+          <i class="fas fa-circle-half-stroke"></i>
+          <span>Moyen</span>
+        </button>
+        <button class="flashcard-action easy" data-rating="easy">
+          <i class="fas fa-check-circle"></i>
+          <span>Facile</span>
+        </button>
+      </div>
+
+      <p style="text-align:center;font-size:12px;color:var(--text-muted);margin-top:8px">
+        Clique sur la carte pour voir la réponse
+      </p>
+    `;
+
+    setTimeout(() => renderKaTeX($('flashContainer')), 100);
+
+    const wrap = $('flashWrap');
+    wrap.addEventListener('click', () => {
+      wrap.classList.toggle('flipped');
+      $('flashActions').style.display = wrap.classList.contains('flipped') ? 'grid' : 'none';
+    });
+
+    $$('#flashActions .flashcard-action').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        reviewFlashcard(btn.dataset.rating);
+      });
+    });
+  }
+
+  async function reviewFlashcard(rating) {
+    const f = state.currentFlashcards;
+    try {
+      await callApi('reviewFlashcard', {
+        notionId: f.notionId,
+        flashcardIndex: state.flashIndex,
+        rating
+      });
+
+      state.flashIndex++;
+      if (state.flashIndex >= f.cards.length) {
+        // Fin
+        $('flashContainer').innerHTML = `
+          <div class="modal-header">
+            <h2>🎉 Session terminée !</h2>
+            <p>Tu as révisé ${f.cards.length} cartes</p>
+          </div>
+          <button class="btn btn-primary" id="flashCloseBtn" style="width:100%">
+            <i class="fas fa-check"></i>
+            Terminer
+          </button>
+        `;
+        $('flashCloseBtn').addEventListener('click', () => {
+          $('flashModal').classList.remove('show');
+          document.body.style.overflow = '';
+          state.currentFlashcards = null;
+          loadAll();
+        });
+      } else {
+        renderFlashcard();
+      }
+    } catch (e) {
+      showToast('Erreur : ' + e.message, 'error');
+    }
   }
 
   // ================================================================
-  // PLACEHOLDERS — À développer en Phase 2+
+  // TEST SURPRISE
   // ================================================================
-  function startRevision(itemId) {
-    showToast('Fonctionnalité en cours de développement', 'info');
-  }
-
-  function startSurpriseTest() {
-    showToast('Test surprise bientôt disponible', 'info');
+  async function startSurpriseTest() {
+    try {
+      showToast('Préparation du test surprise...', 'info', 2000);
+      const result = await callApi('getSurpriseTest', { count: 5 });
+      startQuiz(null, null, result.test);
+    } catch (e) {
+      if (e.message.includes('limite')) {
+        showToast('Limite de tests surprise atteinte. Passe à Premium.', 'info', 4000);
+      } else {
+        showToast('Erreur : ' + e.message, 'error');
+      }
+    }
   }
 
   // ================================================================
@@ -1520,7 +2295,6 @@
       if (snap.exists()) state.userData = snap.data();
     } catch (e) {}
 
-    // Charger les données
     loadAll();
   });
 
@@ -1532,42 +2306,57 @@
   $('captureSubmit').addEventListener('click', submitCapture);
   $('captureBody').addEventListener('input', updateSubmitState);
 
-  document.querySelectorAll('.capture-mode').forEach((el) => {
-    el.addEventListener('click', () => {
-      const mode = el.dataset.mode;
-      if (mode !== 'text') {
-        showToast('Bientôt disponible', 'info');
-        return;
-      }
-      state.captureMode = mode;
-      document.querySelectorAll('.capture-mode').forEach((m) => {
-        m.classList.toggle('active', m === el);
-      });
-    });
+  $$('.capture-mode').forEach((el) => {
+    el.addEventListener('click', () => switchCaptureMode(el.dataset.mode));
   });
 
+  // Photo
+  $('photoUpload').addEventListener('click', () => $('photoInput').click());
+  $('photoInput').addEventListener('change', handlePhotoUpload);
+  $('photoRemove').addEventListener('click', () => {
+    state.photoFile = null;
+    state.photoBase64 = null;
+    state.photoText = '';
+    $('photoPreview').classList.remove('show');
+    $('ocrResult').classList.remove('show');
+    $('photoInput').value = '';
+    updateSubmitState();
+  });
+
+  // Voix
+  $('voiceBtn').addEventListener('click', startVoiceRecognition);
+
+  // Refresh
   $('refreshBtn').addEventListener('click', () => {
     $('refreshBtn').querySelector('i').style.transform = 'rotate(360deg)';
     setTimeout(() => $('refreshBtn').querySelector('i').style.transform = '', 600);
     loadAll();
   });
 
-  // Close modals on backdrop click
-  $('captureModal').addEventListener('click', (e) => {
-    if (e.target === $('captureModal')) closeCaptureModal();
-  });
-  $('quizModal').addEventListener('click', (e) => {
-    if (e.target === $('quizModal')) closeQuiz();
+  // Modal backdrop clicks
+  ['captureModal', 'quizModal', 'flashModal', 'resumeModal'].forEach((id) => {
+    $(id).addEventListener('click', (e) => {
+      if (e.target === $(id)) {
+        $(id).classList.remove('show');
+        document.body.style.overflow = '';
+        if (id === 'captureModal') stopVoiceRecognition();
+        if (id === 'quizModal') state.currentQuiz = null;
+        if (id === 'flashModal') state.currentFlashcards = null;
+      }
+    });
   });
 
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
-      closeCaptureModal();
-      closeQuiz();
+      $$('.modal-back.show').forEach((m) => {
+        m.classList.remove('show');
+      });
+      document.body.style.overflow = '';
+      stopVoiceRecognition();
     }
   });
 
-  console.log('🚀 ARV-PROGRESS v1.0 — prêt');
+  console.log('🚀 ARV-PROGRESS v2.0 — prêt');
   </script>
 </body>
 </html>

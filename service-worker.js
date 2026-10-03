@@ -41,6 +41,8 @@ const PRECACHE_SHELL = [
   './404.html',
   './manifest.json',
   './icon.png'
+  './arv-progress.html',
+  './katex-utils.js',
 ];
 
 // ================================================================
@@ -121,14 +123,23 @@ self.addEventListener('fetch', (event) => {
   }
 
   // ─────────────────────────────────────────────────────────────
-  // 3️⃣ PAGES HTML principales → network-first avec fallback
-  // ─────────────────────────────────────────────────────────────
-  if (request.mode === 'navigate' ||
-      request.destination === 'document' ||
-      url.pathname.endsWith('.html')) {
-    event.respondWith(handlePageRequest(request));
-    return;
-  }
+// 3️⃣ PAGES HTML principales → network-first avec fallback
+// ─────────────────────────────────────────────────────────────
+if (request.mode === 'navigate' ||
+    request.destination === 'document' ||
+    url.pathname.endsWith('.html')) {
+  event.respondWith(handlePageRequest(request));
+  return;
+}
+
+// ─────────────────────────────────────────────────────────────
+// 6️⃣ ASSETS CDN KaTeX + Tesseract → cache-first permanent
+// ─────────────────────────────────────────────────────────────
+if (url.hostname === 'cdn.jsdelivr.net' &&
+    (url.pathname.includes('/katex') || url.pathname.includes('/tesseract'))) {
+  event.respondWith(handleAssetRequest(request, CACHE_IMAGES));
+  return;
+}
 
   // ─────────────────────────────────────────────────────────────
   // 4️⃣ IMAGES / FONTS / ICÔNES → cache-first

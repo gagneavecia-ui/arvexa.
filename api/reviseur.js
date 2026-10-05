@@ -185,10 +185,10 @@ function getProviders() {
 }
 
 // ────────────────────────────────────────────────────────────────
-// PROMPTS
+// PROMPTS ENRICHIS
 // ────────────────────────────────────────────────────────────────
 function fichePrompt(subject, chapter) {
-  return `Tu es un professeur expert du BAC au Niger. Tu prépares une FICHE DE RÉVISION pour un élève de Terminale D.
+  return `Tu es un professeur expert du BAC au Niger. Tu prépares une FICHE DE RÉVISION PREMIUM pour un élève de Terminale D.
 
 Matière : ${subject}
 Chapitre : ${chapter}
@@ -203,6 +203,24 @@ Schéma exact :
       "title": "Titre de la section",
       "content": "Contenu avec **mots-clés** en gras et formules LaTeX."
     }
+  ],
+  "keyPoints": [
+    "Point clé 1 à retenir absolument",
+    "Point clé 2",
+    "Point clé 3",
+    "Point clé 4",
+    "Point clé 5"
+  ],
+  "examTraps": [
+    {
+      "trap": "Piège classique au BAC",
+      "solution": "Comment l'éviter"
+    }
+  ],
+  "commonMistakes": [
+    "Erreur fréquente 1",
+    "Erreur fréquente 2",
+    "Erreur fréquente 3"
   ]
 }
 
@@ -244,22 +262,28 @@ Schéma exact :
 5. Ne mets JAMAIS de formule entre simples quotes ou guillemets.
 6. Chaque formule doit être TESTÉE mentalement — vérifie les accolades.
 
-═══ CONTENU ═══
+═══ CONTENU DES SECTIONS ═══
 - Exactement 5 à 7 sections
 - Chaque section traite un point clé (définitions, propriétés, formules, méthodes)
 - Utilise **gras** pour les termes importants
 - Contenu concis mais complet
+
+═══ RÈGLES POUR LES CHAMPS ENRICHIS ═══
+- keyPoints : 5 à 8 points essentiels à mémoriser absolument pour le BAC
+- examTraps : 2 à 4 pièges classiques d'examen (ce sur quoi les élèves perdent des points)
+- commonMistakes : 3 à 5 erreurs fréquentes que font les élèves sur ce chapitre
+
 - Pas de données personnelles
 - Pas de commentaires hors JSON`;
 }
 
-function flashcardPrompt(subject, chapter) {
+function flashcardPrompt(subject, chapter, count = 10) {
   return `Tu es un professeur expert du BAC au Niger. Tu prépares des FLASHCARDS pour un élève de Terminale D.
 
 Matière : ${subject}
 Chapitre : ${chapter}
 
-Génère 10 flashcards sous forme de JSON valide. Réponds UNIQUEMENT avec un objet JSON, sans markdown, sans texte avant ou après.
+Génère exactement ${count} flashcards sous forme de JSON valide. Réponds UNIQUEMENT avec un objet JSON, sans markdown, sans texte avant ou après.
 
 Schéma exact :
 {
@@ -267,7 +291,8 @@ Schéma exact :
   "flashcards": [
     {
       "question": "Question courte et claire",
-      "answer": "Réponse concise avec formules LaTeX."
+      "answer": "Réponse concise avec formules LaTeX.",
+      "hint": "Indice court ou null"
     }
   ]
 }
@@ -280,22 +305,29 @@ Schéma exact :
 - Fonctions : \\sin, \\cos, \\tan, \\ln, \\log, \\lim, \\int, \\sum
 
 ═══ CONTENU ═══
-- Exactement 10 flashcards
+- Exactement ${count} flashcards
 - Questions directes (définitions, formules, propriétés)
 - Réponses concises (1-3 lignes max)
+- La DERNIÈRE flashcard doit être une question piège ou un cas limite
+- "hint" : un indice utile pour aider à se rappeler (ou null si évident)
+
 - Pas de données personnelles
 - Pas de commentaires hors JSON`;
 }
 
-function quizPrompt(subject, chapter, session) {
+function quizPrompt(subject, chapter, session, difficulty = 2, count = 5) {
   const ficheContent = JSON.stringify(session).slice(0, 3000);
+  const difficultyLabels = { 1: 'Facile', 2: 'Moyen', 3: 'Difficile', 4: 'Niveau BAC' };
+  const difficultyLabel = difficultyLabels[difficulty] || 'Moyen';
+
   return `Tu es un professeur expert du BAC au Niger. Tu crées un QUIZ pour vérifier les connaissances d'un élève de Terminale D.
 
 Matière : ${subject}
 Chapitre : ${chapter}
+Difficulté : ${difficultyLabel} (${difficulty}/4)
 Contenu de la révision : ${ficheContent}
 
-Génère 5 questions à choix multiples en JSON valide. Réponds UNIQUEMENT avec un objet JSON, sans markdown, sans texte avant ou après.
+Génère exactement ${count} questions à choix multiples en JSON valide. Réponds UNIQUEMENT avec un objet JSON, sans markdown, sans texte avant ou après.
 
 Schéma exact :
 {
@@ -309,7 +341,8 @@ Schéma exact :
         { "id": "D", "text": "Proposition avec LaTeX si nécessaire" }
       ],
       "correctAnswer": "A",
-      "explanation": "Explication avec LaTeX si nécessaire"
+      "explanation": "Explication avec LaTeX si nécessaire",
+      "difficulty": ${difficulty}
     }
   ]
 }
@@ -328,11 +361,12 @@ Schéma exact :
 - Unités : utiliser \\, pour l'espace → "$9,81\\,m/s^2$"
 
 ═══ CONTENU ═══
-- Exactement 5 questions
+- Exactement ${count} questions
 - 4 options par question (A, B, C, D)
 - Une seule bonne réponse
-- Niveau Terminale D
-- Explications claires
+- Niveau : ${difficultyLabel}
+- Commence par les questions les plus simples et termine par les plus difficiles
+- Explications claires et pédagogiques
 - Pas de données personnelles
 - Pas de commentaires hors JSON`;
 }

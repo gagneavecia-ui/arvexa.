@@ -9,15 +9,16 @@ const MAX_REQUESTS_PER_WINDOW = 12;
 const requestLog = new Map();
 
 const CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6 heures
+const PLAN_VERSION = '2.0';
 
 const MIN_ATTEMPTS_FOR_SOLID = 5;
 const MIN_ATTEMPTS_FOR_LIMITED = 2;
 
 let adminServices;
 
-// ================================================================
+// ════════════════════════════════════════════════════════════════
 // FIREBASE ADMIN
-// ================================================================
+// ════════════════════════════════════════════════════════════════
 function getAdminServices() {
   if (adminServices) return adminServices;
   const credentials = process.env.FIREBASE_ADMIN_CREDENTIALS;
@@ -35,17 +36,16 @@ function getAdminServices() {
   return adminServices;
 }
 
-// ================================================================
+// ════════════════════════════════════════════════════════════════
 // UTILITAIRES
-// ================================================================
+// ════════════════════════════════════════════════════════════════
 function jsonError(response, status, error, code) {
   return response.status(status).json({ success: false, error, ...(code ? { code } : {}) });
 }
 
 function clientIp(request) {
   return String(request.headers['x-forwarded-for'] || request.socket?.remoteAddress || 'unknown')
-    .split(',')[0]
-    .trim();
+    .split(',')[0].trim();
 }
 
 function rateLimited(ip) {
@@ -71,70 +71,10 @@ function isPremiumUser(data) {
   if (!data) return false;
   const active = data.premium === true || data.isUnlocked === true || data.hasDeposited === true;
   if (!active) return false;
-  const end =
-    data.subscriptionEndDate?.toDate?.() ||
+  const end = data.subscriptionEndDate?.toDate?.() ||
     (data.subscriptionEndDate?.seconds ? new Date(data.subscriptionEndDate.seconds * 1000) : null);
   return !end || end.getTime() > Date.now();
 }
-
-function normalizeSubjectKey(raw) {
-  if (!raw) return null;
-  const s = String(raw)
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/\s+/g, '_')
-    .replace(/[^a-z_]/g, '');
-
-  const map = {
-    mathematiques: 'mathematiques', maths: 'mathematiques', math: 'mathematiques',
-    physique: 'physique', physiques: 'physique',
-    chimie: 'chimie',
-    svt: 'svt',
-    francais: 'francais',
-    anglais: 'anglais',
-    philosophie: 'philosophie', philo: 'philosophie',
-    histoire_geo: 'histoire_geo', histoiregeo: 'histoire_geo',
-    eps: 'eps'
-  };
-  return map[s] || s;
-}
-
-const SUBJECT_LABELS = {
-  mathematiques: 'Mathématiques',
-  physique: 'Physique',
-  chimie: 'Chimie',
-  svt: 'SVT',
-  francais: 'Français',
-  anglais: 'Anglais',
-  philosophie: 'Philosophie',
-  histoire_geo: 'Histoire-Géo',
-  eps: 'EPS'
-};
-
-const SUBJECT_ICONS = {
-  mathematiques: 'fa-square-root-variable',
-  physique: 'fa-bolt',
-  chimie: 'fa-flask',
-  svt: 'fa-dna',
-  francais: 'fa-book-open',
-  anglais: 'fa-globe',
-  philosophie: 'fa-brain',
-  histoire_geo: 'fa-landmark',
-  eps: 'fa-person-running'
-};
-
-const COEFFICIENTS = {
-  mathematiques: 5,
-  physique: 3,
-  chimie: 2,
-  svt: 5,
-  francais: 3,
-  anglais: 2,
-  philosophie: 2,
-  histoire_geo: 2,
-  eps: 1
-};
 
 function toDate(value) {
   if (!value) return null;
@@ -149,13 +89,42 @@ function round2(n) {
   return Math.round(n * 100) / 100;
 }
 
-// ================================================================
-// AGRÉGATION INTELLIGENTE DES DONNÉES
-// ================================================================
-function aggregateStudentData(results) {
-  // ⚡ Déclaré en premier pour être dispo partout
-  const totalAttempts = results.length;
+function normalizeSubjectKey(raw) {
+  if (!raw) return null;
+  const s = String(raw).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, '_').replace(/[^a-z_]/g, '');
+  const map = {
+    mathematiques: 'mathematiques', maths: 'mathematiques', math: 'mathematiques',
+    physique: 'physique', physiques: 'physique',
+    chimie: 'chimie', svt: 'svt', francais: 'francais', anglais: 'anglais',
+    philosophie: 'philosophie', philo: 'philosophie',
+    histoire_geo: 'histoire_geo', histoiregeo: 'histoire_geo', eps: 'eps'
+  };
+  return map[s] || s;
+}
 
+const SUBJECT_LABELS = {
+  mathematiques: 'Mathématiques', physique: 'Physique', chimie: 'Chimie',
+  svt: 'SVT', francais: 'Français', anglais: 'Anglais',
+  philosophie: 'Philosophie', histoire_geo: 'Histoire-Géo', eps: 'EPS'
+};
+
+const SUBJECT_ICONS = {
+  mathematiques: 'fa-square-root-variable', physique: 'fa-bolt', chimie: 'fa-flask',
+  svt: 'fa-dna', francais: 'fa-book-open', anglais: 'fa-globe',
+  philosophie: 'fa-brain', histoire_geo: 'fa-landmark', eps: 'fa-person-running'
+};
+
+const COEFFICIENTS = {
+  mathematiques: 5, physique: 3, chimie: 2, svt: 5, francais: 3,
+  anglais: 2, philosophie: 2, histoire_geo: 2, eps: 1
+};
+
+// ════════════════════════════════════════════════════════════════
+// AGRÉGATION
+// ════════════════════════════════════════════════════════════════
+function aggregateStudentData(results) {
+  const totalAttempts = results.length;
   const grouped = new Map();
   let oldestDate = null;
   let newestDate = null;
@@ -173,7 +142,6 @@ function aggregateStudentData(results) {
         scores: [],
         weakChapters: [],
         strongChapters: [],
-        advices: [],
         dates: [],
         exams: []
       });
@@ -197,7 +165,6 @@ function aggregateStudentData(results) {
         const s = Number(diff.score || 0);
         const max = Number(diff.maxScore || 5);
         const ratio = max > 0 ? s / max : 0;
-
         const chapterInfo = {
           number: diff.number,
           score: round2(s),
@@ -205,7 +172,6 @@ function aggregateStudentData(results) {
           ratio: round2(ratio),
           advice: String(diff.advice || '').slice(0, 200)
         };
-
         if (ratio < 0.5) item.weakChapters.push(chapterInfo);
         else if (ratio >= 0.85) item.strongChapters.push(chapterInfo);
       });
@@ -219,14 +185,13 @@ function aggregateStudentData(results) {
     }
   });
 
-  // ═══ ANALYSE PAR MATIÈRE ═══
   const subjects = [];
   grouped.forEach((item, key) => {
     const average = item.scores.length > 0
       ? round2(item.scores.reduce((a, b) => a + b, 0) / item.scores.length)
       : null;
 
-    // Évolution 30j
+    // Évolution 30 jours
     let evolution = null;
     if (item.exams.length >= 2) {
       const now = Date.now();
@@ -240,7 +205,6 @@ function aggregateStudentData(results) {
       }
     }
 
-    // Dédup chapitres
     const dedup = (arr) => {
       const seen = new Set();
       return arr.filter((c) => {
@@ -252,18 +216,16 @@ function aggregateStudentData(results) {
     item.weakChapters = dedup(item.weakChapters).sort((a, b) => a.ratio - b.ratio).slice(0, 6);
     item.strongChapters = dedup(item.strongChapters).slice(0, 4);
 
-    // Tendance
     let trend = 'stable';
     if (evolution !== null && evolution > 0.5) trend = 'hausse';
     else if (evolution !== null && evolution < -0.5) trend = 'baisse';
 
-    // Score de priorité
     let priorityScore = 0;
     if (average !== null && average < 12) priorityScore += Math.min(40, (12 - average) * 5);
     if (evolution !== null && evolution < -0.5) priorityScore += 15;
     if (item.weakChapters.length >= 2) priorityScore += 15;
     else if (item.weakChapters.length === 1) priorityScore += 8;
-    if (item.attempts >= 3) priorityScore += 3; // bonus pour historique fiable
+    if (item.attempts >= 3) priorityScore += 3;
     priorityScore = Math.min(100, Math.round(priorityScore));
 
     let priorityLevel = 'none';
@@ -273,13 +235,9 @@ function aggregateStudentData(results) {
     else priorityLevel = 'low';
 
     const priorityLabel = {
-      high: 'Urgente',
-      medium: 'Importante',
-      low: 'Entretien',
-      none: 'Aucune donnée'
+      high: 'Urgente', medium: 'Importante', low: 'Entretien', none: 'Aucune donnée'
     }[priorityLevel];
 
-    // Minutes recommandées (proportionnelles au coef et à la priorité)
     const coef = COEFFICIENTS[key] || 1;
     let baseMinutes = 30;
     if (priorityLevel === 'high') baseMinutes = 120;
@@ -301,14 +259,12 @@ function aggregateStudentData(results) {
       recommendedMinutes,
       weakChapters: item.weakChapters,
       strongChapters: item.strongChapters,
-      advice: [...new Set(item.advices)].slice(0, 3),
       lastDate: item.dates.length > 0 ? new Date(Math.max(...item.dates)).toISOString() : null
     });
   });
 
   subjects.sort((a, b) => b.priorityScore - a.priorityScore);
 
-  // ═══ MOYENNE GÉNÉRALE PONDÉRÉE ═══
   let totalWeighted = 0;
   let totalCoef = 0;
   subjects.forEach((s) => {
@@ -318,18 +274,14 @@ function aggregateStudentData(results) {
   });
   const generalAverage = totalCoef > 0 ? round2(totalWeighted / totalCoef) : null;
 
-  // ═══ SCORE DE PRÉPARATION (0-100) ═══
-  // Combine : moyenne, régularité, évolution, couverture matières
   let readinessScore = 0;
-  if (generalAverage !== null) {
-    readinessScore = (generalAverage / 20) * 60; // 60 pts max sur la moyenne
-  }
+  if (generalAverage !== null) readinessScore = (generalAverage / 20) * 60;
   const subjectsWithData = subjects.filter((s) => s.averageScore !== null).length;
-  readinessScore += Math.min(20, subjectsWithData * 4); // 20 pts sur la couverture
+  readinessScore += Math.min(20, subjectsWithData * 4);
   const evolutions = subjects.filter((s) => s.evolution !== null);
   if (evolutions.length > 0) {
     const avgEvo = evolutions.reduce((a, b) => a + b.evolution, 0) / evolutions.length;
-    readinessScore += Math.min(20, Math.max(-10, avgEvo * 10)); // 20 pts sur l'évolution
+    readinessScore += Math.min(20, Math.max(-10, avgEvo * 10));
   }
   readinessScore = Math.max(0, Math.min(100, Math.round(readinessScore)));
 
@@ -341,9 +293,6 @@ function aggregateStudentData(results) {
     else { readinessLevel = 'reinforce'; readinessLabel = 'À renforcer'; }
   }
 
-  // ═══ OBJECTIF INTELLIGENT ═══
-  // Si l'élève a une moyenne de 8, viser 12 d'un coup est irréaliste.
-  // On propose un objectif progressif.
   let targetScore = 12;
   let targetHorizon = '4 semaines';
   if (generalAverage !== null) {
@@ -354,7 +303,7 @@ function aggregateStudentData(results) {
     else { targetScore = round2(Math.min(18, generalAverage + 0.5)); targetHorizon = '4 semaines'; }
   }
 
-  // ═══ QUALITÉ DES DONNÉES ═══
+  let dataQuality = 'insuffisante';
   let dataQualityLabel = 'Données insuffisantes';
   if (totalAttempts >= MIN_ATTEMPTS_FOR_SOLID) {
     dataQuality = 'solide';
@@ -364,21 +313,18 @@ function aggregateStudentData(results) {
     dataQualityLabel = 'Analyse limitée';
   }
 
-  // ═══ ALERTES ═══
   const alerts = [];
   subjects.forEach((s) => {
     if (s.evolution !== null && s.evolution < -1) {
       alerts.push({
-        type: 'danger',
-        icon: 'fa-arrow-trend-down',
+        type: 'danger', icon: 'fa-arrow-trend-down',
         title: `${s.subject} en baisse`,
         message: `-${Math.abs(s.evolution)} pt sur les 30 derniers jours`
       });
     }
     if (s.attempts >= 3 && s.averageScore !== null && s.averageScore < 8) {
       alerts.push({
-        type: 'warning',
-        icon: 'fa-exclamation-triangle',
+        type: 'warning', icon: 'fa-exclamation-triangle',
         title: `${s.subject} critique`,
         message: `Moyenne ${s.averageScore}/20 sur ${s.attempts} examens`
       });
@@ -390,8 +336,7 @@ function aggregateStudentData(results) {
       const daysSince = Math.floor((Date.now() - lastDate.getTime()) / (24 * 60 * 60 * 1000));
       if (daysSince > 10) {
         alerts.push({
-          type: 'info',
-          icon: 'fa-clock',
+          type: 'info', icon: 'fa-clock',
           title: 'Reprise recommandée',
           message: `Ton dernier examen date de ${daysSince} jours`
         });
@@ -400,16 +345,10 @@ function aggregateStudentData(results) {
   }
 
   return {
-    subjects,
-    generalAverage,
-    totalAttempts,
-    dataQuality,
-    dataQualityLabel,
-    readinessScore,
-    readinessLevel,
-    readinessLabel,
-    targetScore,
-    targetHorizon,
+    subjects, generalAverage, totalAttempts,
+    dataQuality, dataQualityLabel,
+    readinessScore, readinessLevel, readinessLabel,
+    targetScore, targetHorizon,
     alerts,
     coefficients: COEFFICIENTS,
     oldestDate: oldestDate ? oldestDate.toISOString() : null,
@@ -417,14 +356,25 @@ function aggregateStudentData(results) {
   };
 }
 
-// ================================================================
-// PROMPT IA v2 (ultra-structuré)
-// ================================================================
+// ════════════════════════════════════════════════════════════════
+// HELPER : date ISO du jour + décalage
+// ════════════════════════════════════════════════════════════════
+function isoDatePlusDays(days) {
+  const d = new Date();
+  d.setDate(d.getDate() + days);
+  return d.toISOString().slice(0, 10);
+}
+
+// ════════════════════════════════════════════════════════════════
+// PROMPT IA v2 (enrichi)
+// ════════════════════════════════════════════════════════════════
 function plannerPrompt(aggregated) {
   const {
     subjects, generalAverage, totalAttempts, dataQuality,
     readinessScore, readinessLabel, targetScore, targetHorizon
   } = aggregated;
+
+  const today = new Date().toISOString().slice(0, 10);
 
   const subjectsSummary = subjects.map((s) => ({
     matiere: s.subject,
@@ -440,44 +390,60 @@ function plannerPrompt(aggregated) {
   }));
 
   return `Tu es un coach pédagogique expert du BAC au Niger (Terminale D).
-Ta mission : générer un PLAN DE RÉVISION HEBDOMADAIRE COMPLET pour un élève.
+Ta mission : générer un PLAN DE RÉVISION HEBDOMADAIRE COMPLET ET ACTIONNABLE pour un élève.
 
 ═══════════════════════════════════════════════════════════════
 CONTEXTE DE L'ÉLÈVE
 ═══════════════════════════════════════════════════════════════
+Date du jour : ${today}
 Examens analysés : ${totalAttempts}
 Qualité des données : ${dataQuality}
 Moyenne générale pondérée : ${generalAverage !== null ? generalAverage + '/20' : 'non calculable'}
 Score de préparation : ${readinessScore}/100 (${readinessLabel})
-Objectif calculé par le système : ${targetScore}/20 en ${targetHorizon}
+Objectif système : ${targetScore}/20 en ${targetHorizon}
 
 Détail par matière :
 ${JSON.stringify(subjectsSummary, null, 2)}
 
 ═══════════════════════════════════════════════════════════════
-MISSION
+RÈGLES CRITIQUES
 ═══════════════════════════════════════════════════════════════
-Produis un plan de révision hebdomadaire sur 7 jours.
-
-RÈGLES CRITIQUES :
 1. Priorise les matières "Urgente" et "Importante"
-2. Cible SPÉCIFIQUEMENT les chapitres faibles (utilise les numéros d'exercices fournis)
+2. Cible SPÉCIFIQUEMENT les chapitres faibles (utilise les numéros fournis)
 3. Alterne les matières pour éviter la fatigue cognitive
-4. Chaque session doit être CONCRÈTE : "Refaire Ex3 (dérivées composées), faire 5 exercices du même type" ≠ "Réviser maths"
-5. Si évolution négative → mentionne-la dans le summary
-6. Sois encourageant mais honnête : pas de fausses promesses
-7. Si données insuffisantes (< 3 examens), propose des actions génériques utiles ET recommande de passer plus d'examens
-8. Utilise un ton PROFESSIONNEL et BIENVEILLANT, jamais moralisateur
+4. Chaque session doit être CONCRÈTE et MESURABLE :
+   ❌ "Réviser maths"
+   ✅ "Refaire Ex3 dérivées composées + 3 exercices similaires"
+5. Chaque session doit avoir des ÉTAPES numérotées explicites
+6. Chaque session doit avoir un CRITÈRE DE RÉUSSITE vérifiable
+7. Alterne les thèmes : Découverte → Approfondissement → Consolidation → Repos → Bilan
+8. Prévois AU MOINS 1 jour de repos (le dimanche idéalement)
+9. Utilise un ton PROFESSIONNEL et BIENVEILLANT
+10. Si données insuffisantes (< 3 examens), propose des actions génériques utiles + recommande de passer plus d'examens
+11. Fournis les LIENS vers les ressources (reviseur, examen, fiche)
+
+═══════════════════════════════════════════════════════════════
+THÈMES DES JOURS (à assigner intelligemment)
+═══════════════════════════════════════════════════════════════
+- "Découverte" : première approche d'une notion
+- "Approfondissement" : travail en profondeur
+- "Consolidation" : révision active
+- "Pratique" : exercices intensifs
+- "Repos" : pause bien méritée (15 min max)
+- "Bilan" : récap de la semaine
 
 ═══════════════════════════════════════════════════════════════
 FORMAT DE RÉPONSE (JSON UNIQUEMENT)
 ═══════════════════════════════════════════════════════════════
 {
-  "dataQuality": "${dataQuality}",
-  "readinessLevel": "${readinessLabel}",
-  "summary": "Résumé analytique en 3-4 phrases. Inclut : niveau global, points forts, points faibles, tendance.",
-  "weekGoal": "Objectif principal de la semaine, formulé clairement et de façon actionnable.",
-  "estimatedGain": "Gain estimé si le plan est suivi (ex: '+1.5 pt en maths')",
+  "weekGoal": {
+    "title": "Titre court de l'objectif principal de la semaine",
+    "description": "1 phrase claire",
+    "measurable": "Comment savoir si l'objectif est atteint (ex: 'Réussir 80% des exercices types')",
+    "deadline": "Dimanche soir"
+  },
+  "summary": "Résumé analytique 3-4 phrases (niveau global + points forts + points faibles + tendance)",
+  "estimatedGain": "Gain estimé si plan suivi (ex: '+1.5 pt en maths')",
   "targetScore": ${targetScore},
   "targetHorizon": "${targetHorizon}",
   "swot": {
@@ -490,80 +456,103 @@ FORMAT DE RÉPONSE (JSON UNIQUEMENT)
     {
       "subject": "Mathématiques",
       "subjectKey": "mathematiques",
-      "averageScore": 11.5,
-      "attempts": 3,
       "priority": "Urgente",
       "recommendedMinutes": 120,
+      "averageScore": 11.5,
+      "attempts": 3,
       "weakChapters": ["Ex3 - Dérivées composées", "Ex5 - Intégrales"],
-      "reason": "Moyenne faible ET en baisse. 2 exercices critiques identifiés."
+      "reason": "Moyenne faible ET en baisse. 2 exercices critiques identifiés.",
+      "concreteGoal": "Réussir 5 dérivées composées d'affilée sans erreur",
+      "linkedResources": [
+        { "type": "reviseur", "label": "Fiche dérivées", "url": "reviseur.html" },
+        { "type": "exam", "label": "Mini-examen dérivées", "url": "exam.html" }
+      ]
     }
   ],
   "sessions": [
     {
       "day": 1,
+      "date": "${isoDatePlusDays(0)}",
+      "theme": "Découverte",
       "subject": "Mathématiques",
       "subjectKey": "mathematiques",
       "durationMinutes": 30,
-      "task": "Revoir les dérivées composées (cours + 5 exercices ciblés)",
+      "task": "Refaire Ex3 sur les dérivées composées",
+      "steps": [
+        "Relire la fiche pendant 8 min",
+        "Refaire l'exercice sans regarder la correction",
+        "Comparer avec la correction",
+        "Noter l'erreur principale"
+      ],
       "objective": "Maîtriser la règle de dérivation en chaîne",
-      "method": "1) Relire le cours 10 min 2) Faire 3 exercices guidés 3) Faire 2 exercices seuls 4) Vérifier les corrections"
+      "successCriteria": "Tu réussis 3 exercices sur 4 sans erreur",
+      "linkedResources": []
+    },
+    {
+      "day": 7,
+      "date": "${isoDatePlusDays(6)}",
+      "theme": "Bilan",
+      "subject": "Bilan hebdomadaire",
+      "subjectKey": "general",
+      "durationMinutes": 15,
+      "task": "Faire le point sur la semaine",
+      "steps": [
+        "Relire les notes prises",
+        "Refaire 1 exercice de chaque matière",
+        "Noter les progrès et les difficultés restantes"
+      ],
+      "objective": "Consolider les acquis de la semaine",
+      "successCriteria": "Tu identifies 3 progrès concrets",
+      "linkedResources": []
     }
   ],
-  "weeklyOverview": {
+  "weekOverview": {
     "totalHours": 4.5,
     "focusSubject": "Mathématiques",
-    "secondarySubject": "Physique"
+    "secondarySubject": "Physique",
+    "difficultyCurve": "progressif",
+    "restDays": [7]
   },
-  "encouragement": "Message personnel de 2-3 phrases basé sur l'historique réel de l'élève.",
-  "nextReviewDate": "Date suggérée pour refaire un point (format ISO)"
+  "successMetrics": [
+    { "label": "Sessions complétées", "target": "6/7" },
+    { "label": "Exercices réussis", "target": "≥ 80%" },
+    { "label": "Notions maîtrisées", "target": "3 nouvelles" }
+  ],
+  "encouragement": "Message personnel 2-3 phrases basé sur l'historique réel",
+  "nextReviewDate": "${isoDatePlusDays(7)}"
 }
 
 CONTRAINTES :
-- priorities : 2 à 5 matières (les plus importantes)
-- sessions : exactement 7 sessions (une par jour)
-- Chaque session entre 20 et 60 minutes
+- priorities : 2 à 5 matières
+- sessions : EXACTEMENT 7 sessions (une par jour, day de 1 à 7)
+- Chaque session entre 15 et 60 minutes
 - swot : 2-4 items par catégorie
+- successMetrics : 3 à 5 métriques mesurables
+- restDays : au moins 1 jour dans la semaine
 - Ton professionnel, précis, jamais vague
 - Aucune donnée inventée
 - Réponds UNIQUEMENT avec l'objet JSON`;
 }
 
-// ================================================================
-// PROVIDERS IA
-// ================================================================
+// ════════════════════════════════════════════════════════════════
+// PROVIDERS
+// ════════════════════════════════════════════════════════════════
 function getProviders() {
   return [
-    {
-      name: 'Groq',
-      key: process.env.GROQ_API_KEY,
+    { name: 'Groq', key: process.env.GROQ_API_KEY,
       endpoint: 'https://api.groq.com/openai/v1/chat/completions',
-      model: process.env.GROQ_MODEL || 'openai/gpt-oss-120b',
-      headers: {}
-    },
-    {
-      name: 'OpenRouter',
-      key: process.env.OPENROUTER_API_KEY,
+      model: process.env.GROQ_MODEL || 'openai/gpt-oss-120b', headers: {} },
+    { name: 'OpenRouter', key: process.env.OPENROUTER_API_KEY,
       endpoint: 'https://openrouter.ai/api/v1/chat/completions',
       model: process.env.OPENROUTER_MODEL || 'openai/gpt-oss-120b',
-      headers: {
-        'HTTP-Referer': process.env.APP_ORIGIN || '',
-        'X-Title': 'ARVEXA School'
-      }
-    },
-    {
-      name: 'Mistral',
-      key: process.env.MISTRAL_API_KEY,
+      headers: { 'HTTP-Referer': process.env.APP_ORIGIN || '', 'X-Title': 'ARVEXA School' } },
+    { name: 'Mistral', key: process.env.MISTRAL_API_KEY,
       endpoint: 'https://api.mistral.ai/v1/chat/completions',
-      model: process.env.MISTRAL_MODEL || 'mistral-large-latest',
-      headers: {}
-    }
+      model: process.env.MISTRAL_MODEL || 'mistral-large-latest', headers: {} }
   ].filter((p) => Boolean(p.key));
 }
 
-// ================================================================
-// APPEL IA
-// ================================================================
-async function callProvider(provider, prompt, maxTokens = 4000) {
+async function callProvider(provider, prompt, maxTokens = 6000) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 25000);
 
@@ -594,7 +583,6 @@ async function callProvider(provider, prompt, maxTokens = 4000) {
     });
 
     const data = await result.json().catch(() => null);
-
     if (!result.ok) {
       const msg = data?.error?.message || data?.message || `HTTP ${result.status}`;
       throw new Error(`${provider.name}: ${msg}`);
@@ -603,24 +591,27 @@ async function callProvider(provider, prompt, maxTokens = 4000) {
     const content = data?.choices?.[0]?.message?.content;
     if (!content) throw new Error(`${provider.name}: réponse vide`);
 
-    const cleaned = content
-      .replace(/^```(?:json)?\s*/i, '')
-      .replace(/\s*```$/i, '')
-      .trim();
-
+    const cleaned = content.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
     return JSON.parse(cleaned);
   } finally {
     clearTimeout(timeout);
   }
 }
 
-// ================================================================
-// VALIDATION
-// ================================================================
+// ════════════════════════════════════════════════════════════════
+// VALIDATION v2 (tolérante)
+// ════════════════════════════════════════════════════════════════
 function validatePlan(plan) {
   if (!plan || typeof plan !== 'object') return false;
   if (typeof plan.summary !== 'string' || plan.summary.length < 20) return false;
-  if (typeof plan.weekGoal !== 'string' || plan.weekGoal.length < 10) return false;
+
+  // weekGoal peut être string (v1) OU object (v2)
+  const hasGoal = plan.weekGoal && (
+    typeof plan.weekGoal === 'string' ||
+    (typeof plan.weekGoal === 'object' && plan.weekGoal.title)
+  );
+  if (!hasGoal) return false;
+
   if (!Array.isArray(plan.priorities) || plan.priorities.length < 1) return false;
   if (!Array.isArray(plan.sessions) || plan.sessions.length < 5) return false;
 
@@ -631,23 +622,18 @@ function validatePlan(plan) {
 
   const validSession = plan.sessions.every(
     (s) => s && typeof s.day === 'number' &&
-           typeof s.subject === 'string' &&
-           typeof s.task === 'string'
+      typeof s.subject === 'string' && typeof s.task === 'string'
   );
   if (!validSession) return false;
 
   return true;
 }
 
-// ================================================================
-// CASCADE IA
-// ================================================================
 async function generateWithFallback(prompt) {
   const providers = getProviders();
   if (!providers.length) throw new Error('provider_missing');
 
   const errors = [];
-
   for (const provider of providers) {
     try {
       console.log(`[AI-PLANNER] Tentative ${provider.name}...`);
@@ -655,7 +641,7 @@ async function generateWithFallback(prompt) {
 
       if (validatePlan(plan)) {
         console.log(`[AI-PLANNER] ✅ ${provider.name} a généré un plan valide`);
-        return plan;
+        return { plan, aiUsed: true };
       }
 
       errors.push(`${provider.name}: structure invalide`);
@@ -669,9 +655,9 @@ async function generateWithFallback(prompt) {
   throw new Error('all_providers_failed: ' + errors.join(' | '));
 }
 
-// ================================================================
-// FALLBACK LOCAL ENRICHI
-// ================================================================
+// ════════════════════════════════════════════════════════════════
+// FALLBACK LOCAL ENRICHI v2
+// ════════════════════════════════════════════════════════════════
 function buildLocalPlan(aggregated) {
   const {
     subjects, generalAverage, totalAttempts, dataQuality, dataQualityLabel,
@@ -681,76 +667,127 @@ function buildLocalPlan(aggregated) {
   const priorities = subjects
     .filter((s) => s.averageScore !== null && s.priorityLevel !== 'none')
     .slice(0, 5)
-    .map((s) => ({
-      subject: s.subject,
-      subjectKey: s.subjectKey,
-      icon: s.icon,
-      averageScore: s.averageScore,
-      attempts: s.attempts,
-      priority: s.priority,
-      recommendedMinutes: s.recommendedMinutes,
-      weakChapters: s.weakChapters.map((c) => `Ex${c.number} (${c.score}/${c.maxScore})`),
-      reason: s.evolution !== null && s.evolution < -0.5
-        ? `Moyenne en baisse (${s.evolution} pt sur 30j)`
-        : s.weakChapters.length > 0
-          ? `${s.weakChapters.length} chapitre(s) faible(s) identifié(s)`
-          : `Moyenne ${s.averageScore}/20`
-    }));
+    .map((s) => {
+      const weakChapterLabel = s.weakChapters.length > 0
+        ? `Ex${s.weakChapters[0].number}`
+        : null;
 
-  // Construction des sessions
-  const sessions = [];
+      return {
+        subject: s.subject,
+        subjectKey: s.subjectKey,
+        icon: s.icon,
+        averageScore: s.averageScore,
+        attempts: s.attempts,
+        priority: s.priority,
+        recommendedMinutes: s.recommendedMinutes,
+        weakChapters: s.weakChapters.map((c) => `Ex${c.number} (${c.score}/${c.maxScore})`),
+        reason: s.evolution !== null && s.evolution < -0.5
+          ? `Moyenne en baisse (${s.evolution} pt sur 30j)`
+          : s.weakChapters.length > 0
+            ? `${s.weakChapters.length} chapitre(s) faible(s) identifié(s)`
+            : `Moyenne ${s.averageScore}/20`,
+        concreteGoal: weakChapterLabel
+          ? `Réussir 5 exercices du type ${weakChapterLabel}`
+          : `Améliorer la moyenne de ${s.subject} à ${Math.min(20, Math.round(s.averageScore + 1))}/20`,
+        linkedResources: [
+          { type: 'reviseur', label: `Fiche ${s.subject}`, url: 'reviseur.html' },
+          { type: 'exam', label: `Mini-examen ${s.subject}`, url: 'exam.html' }
+        ]
+      };
+    });
+
   const prioritySubjects = priorities.length > 0
     ? priorities
     : subjects.filter((s) => s.averageScore !== null).slice(0, 3);
 
-  const getTask = (subject) => {
-    if (subject.weakChapters.length > 0) {
-      const wc = subject.weakChapters[0];
-      return {
-        task: `Refaire ${wc} de ${subject.subject} + 3 exercices du même type`,
-        objective: `Maîtriser ce chapitre (${wc})`,
-        method: '1) Relire le cours 2) Refaire l\'exercice 3) Faire 3 exercices similaires 4) Vérifier'
-      };
-    }
-    if (subject.priority === 'Urgente') {
-      return {
-        task: `Revoir les bases de ${subject.subject} + 5 exercices progressifs`,
-        objective: `Renforcer les fondamentaux`,
-        method: '1) Fiche de synthèse 2) Exercices faciles 3) Exercices moyens 4) Auto-évaluation'
-      };
-    }
-    return {
-      task: `Consolider ${subject.subject} avec des exercices variés`,
-      objective: `Maintenir et progresser`,
-      method: '1) Exercices mixtes 2) Chronométrer 3) Corriger'
-    };
-  };
+  // Thèmes des 7 jours
+  const dayThemes = ['Découverte', 'Approfondissement', 'Pratique', 'Consolidation', 'Pratique', 'Consolidation', 'Bilan'];
 
+  const sessions = [];
   for (let day = 1; day <= 7; day++) {
+    const isRestDay = day === 7;
+    const theme = dayThemes[day - 1];
+
     if (prioritySubjects.length === 0) {
       sessions.push({
         day,
+        date: isoDatePlusDays(day - 1),
+        theme,
         subject: 'Organisation',
         subjectKey: 'general',
         durationMinutes: 30,
         task: 'Effectuer un premier examen pour créer tes priorités',
+        steps: ['Aller dans Mode Examen', 'Choisir une matière', 'Faire un sujet complet'],
         objective: 'Obtenir une première analyse',
-        method: 'Va dans Mode Examen, choisis une matière, fais un sujet'
+        successCriteria: 'Tu as terminé 1 examen',
+        linkedResources: [{ type: 'exam', label: 'Mode Examen', url: 'exam.html' }]
       });
       continue;
     }
+
+    if (isRestDay) {
+      sessions.push({
+        day,
+        date: isoDatePlusDays(day - 1),
+        theme: 'Repos / Bilan',
+        subject: 'Bilan hebdomadaire',
+        subjectKey: 'general',
+        durationMinutes: 15,
+        task: 'Faire le point sur la semaine',
+        steps: [
+          'Relire les notes prises',
+          'Refaire 1 exercice de chaque matière travaillée',
+          'Noter 3 progrès et 1 difficulté restante'
+        ],
+        objective: 'Consolider les acquis de la semaine',
+        successCriteria: 'Tu identifies 3 progrès concrets',
+        linkedResources: []
+      });
+      continue;
+    }
+
     const subject = prioritySubjects[(day - 1) % prioritySubjects.length];
-    const taskInfo = getTask(subject);
+    const weakChapter = subject.weakChapters && subject.weakChapters[0];
+
+    let task, steps, objective, successCriteria;
+    if (weakChapter) {
+      const wc = typeof weakChapter === 'string' ? weakChapter : `Ex${weakChapter.number}`;
+      task = `Travailler ${wc} de ${subject.subject}`;
+      steps = [
+        `Relire la fiche ${subject.subject} (8 min)`,
+        `Refaire ${wc} sans regarder la correction`,
+        'Faire 2 exercices similaires',
+        'Comparer avec la correction et noter les erreurs'
+      ];
+      objective = `Maîtriser ${wc}`;
+      successCriteria = 'Tu réussis 3 exercices sur 4 sans erreur';
+    } else {
+      task = `Renforcer ${subject.subject} avec des exercices progressifs`;
+      steps = [
+        'Relire les notions clés (10 min)',
+        'Faire 3 exercices faciles',
+        'Faire 2 exercices moyens',
+        'Vérifier les corrections'
+      ];
+      objective = 'Renforcer les bases';
+      successCriteria = 'Tu réussis 4 exercices sur 5';
+    }
+
     sessions.push({
       day,
+      date: isoDatePlusDays(day - 1),
+      theme,
       subject: subject.subject,
       subjectKey: subject.subjectKey,
       durationMinutes: Math.min(subject.recommendedMinutes || 30, 45),
-      ...taskInfo
+      task,
+      steps,
+      objective,
+      successCriteria,
+      linkedResources: subject.linkedResources || []
     });
   }
 
-  // SWOT basique
   const strengths = subjects
     .filter((s) => s.averageScore !== null && s.averageScore >= 14)
     .map((s) => `${s.subject} (${s.averageScore}/20)`);
@@ -766,9 +803,7 @@ function buildLocalPlan(aggregated) {
 
   const threats = [];
   subjects.forEach((s) => {
-    if (s.evolution !== null && s.evolution < -0.5) {
-      threats.push(`${s.subject} en baisse`);
-    }
+    if (s.evolution !== null && s.evolution < -0.5) threats.push(`${s.subject} en baisse`);
   });
   if (totalAttempts < 3) threats.push('Manque d\'examens pour analyse fiable');
 
@@ -784,38 +819,54 @@ function buildLocalPlan(aggregated) {
     summary = `Analyse basée sur ${totalAttempts} examens. ${generalAverage !== null ? `Moyenne générale : ${generalAverage}/20.` : ''} ${names ? `Priorités actuelles : ${names}.` : 'Toutes les matières sont à niveau équilibré.'}`;
   }
 
+  const focusSubject = priorities[0]?.subject || 'Général';
+  const secondarySubject = priorities[1]?.subject || null;
+
   return {
-    dataQuality,
-    readinessLevel,
+    weekGoal: {
+      title: priorities.length > 0
+        ? `Renforcer ${priorities[0].subject}${priorities[1] ? ' et ' + priorities[1].subject : ''}`
+        : 'Créer une base de données d\'examens',
+      description: priorities.length > 0
+        ? `Travailler en priorité les chapitres faibles de ${priorities[0].subject}.`
+        : 'Passer 2-3 examens pour obtenir une analyse fiable.',
+      measurable: priorities.length > 0 && priorities[0].averageScore !== null
+        ? `Atteindre ${Math.min(20, Math.round(priorities[0].averageScore + 1))}/20 en ${priorities[0].subject}`
+        : 'Terminer 3 examens',
+      deadline: 'Dimanche soir'
+    },
     summary,
-    weekGoal: priorities.length > 0
-      ? `Renforcer ${priorities[0].subject}${priorities[1] ? ' et ' + priorities[1].subject : ''} en travaillant les chapitres faibles.`
-      : "Passer 2 examens supplémentaires pour affiner l'analyse.",
     estimatedGain: priorities.length > 0 && priorities[0].averageScore !== null
       ? `+${Math.min(2, Math.max(0.5, round2((12 - priorities[0].averageScore) * 0.3)))} pt en ${priorities[0].subject}`
-      : "Non calculable",
+      : 'Non calculable',
     targetScore,
     targetHorizon,
     swot: { strengths, weaknesses, opportunities, threats },
     priorities,
     sessions,
-    weeklyOverview: {
+    weekOverview: {
       totalHours: round2(sessions.reduce((sum, s) => sum + (s.durationMinutes || 0), 0) / 60),
-      focusSubject: priorities[0]?.subject || 'Général',
-      secondarySubject: priorities[1]?.subject || null
+      focusSubject,
+      secondarySubject,
+      difficultyCurve: 'progressif',
+      restDays: [7]
     },
+    successMetrics: [
+      { label: 'Sessions complétées', target: '6/7' },
+      { label: 'Exercices réussis', target: '≥ 75%' },
+      { label: 'Notions maîtrisées', target: '3 nouvelles' }
+    ],
     encouragement: generalAverage !== null && generalAverage >= 14
       ? `Bravo pour ton niveau (${generalAverage}/20). Continue pour sécuriser ta réussite.`
       : `Chaque session compte. Tiens ce rythme et tu verras des résultats d'ici 2 semaines.`,
-    nextReviewDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-    generatedLocally: true,
-    generatedAt: new Date().toISOString()
+    nextReviewDate: isoDatePlusDays(7),
+    generatedLocally: true
   };
 }
 
-// ================================================================
-// CACHE INTELLIGENT (avec invalidation auto si nouvel examen)
-// ================================================================
+// ════════════════════════════════════════════════════════════════
+// CACHE
+// ════════════════════════════════════════════════════════════════
 async function getCachedPlan(uid, resultCount) {
   try {
     const { db } = getAdminServices();
@@ -827,7 +878,13 @@ async function getCachedPlan(uid, resultCount) {
     const cachedAt = toDate(data.cachedAt);
     if (!cachedAt) return null;
 
-    // ⚡ Invalidation si nouvel examen détecté
+    // Invalidation si version différente
+    if (data.plan?._meta?.version !== PLAN_VERSION) {
+      console.log('[AI-PLANNER] Cache invalidé : version obsolète');
+      return null;
+    }
+
+    // Invalidation si nouvel examen détecté
     if (resultCount && data.resultCount !== undefined && data.resultCount !== resultCount) {
       console.log(`[AI-PLANNER] Cache invalidé : ${data.resultCount} → ${resultCount} examens`);
       return null;
@@ -837,9 +894,7 @@ async function getCachedPlan(uid, resultCount) {
     if (age > CACHE_TTL_MS) return null;
 
     return data.plan || null;
-  } catch (_) {
-    return null;
-  }
+  } catch (_) { return null; }
 }
 
 async function savePlanToCache(uid, plan, resultCount) {
@@ -856,9 +911,9 @@ async function savePlanToCache(uid, plan, resultCount) {
   }
 }
 
-// ================================================================
+// ════════════════════════════════════════════════════════════════
 // HANDLER
-// ================================================================
+// ════════════════════════════════════════════════════════════════
 module.exports = async function handler(request, response) {
   if (request.method !== 'GET' && request.method !== 'POST') {
     response.setHeader('Allow', 'GET, POST');
@@ -900,7 +955,7 @@ module.exports = async function handler(request, response) {
     const results = snapshot.docs.map((d) => d.data());
     const resultCount = results.length;
 
-    // Check cache
+    // Cache
     const forceRefresh = request.query?.refresh === 'true' || request.body?.refresh === true;
     if (!forceRefresh) {
       const cached = await getCachedPlan(uid, resultCount);
@@ -919,13 +974,14 @@ module.exports = async function handler(request, response) {
     const aggregated = aggregateStudentData(results);
     console.log(`[AI-PLANNER] ${resultCount} examens, qualité: ${aggregated.dataQuality}, readiness: ${aggregated.readinessScore}`);
 
-    // Tentative IA
+    // IA
     let plan;
     let aiSucceeded = false;
 
     try {
       const prompt = plannerPrompt(aggregated);
-      plan = await generateWithFallback(prompt);
+      const result = await generateWithFallback(prompt);
+      plan = result.plan;
       aiSucceeded = true;
       console.log('[AI-PLANNER] ✅ Plan IA généré');
     } catch (aiError) {
@@ -933,10 +989,11 @@ module.exports = async function handler(request, response) {
       plan = buildLocalPlan(aggregated);
     }
 
-    // Enrichir avec métadonnées calculées côté serveur
+    // Enrichir avec métadonnées
     const enrichedPlan = {
       ...plan,
       _meta: {
+        version: PLAN_VERSION,
         resultCount,
         dataQuality: aggregated.dataQuality,
         dataQualityLabel: aggregated.dataQualityLabel,

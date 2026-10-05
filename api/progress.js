@@ -964,7 +964,7 @@ async function buildTodayPlan(uid, allMastery) {
 // ═══════════════════════════════════════════════════════════════
 // ACTION 2 — analyzeCourse (texte/voix)
 // ═══════════════════════════════════════════════════════════════
-async function analyzeCourse(uid, body) {
+  async function analyzeCourse(uid, body) {
   const { subject, title, content, mode = 'text' } = body;
 
   if (!ALLOWED_SUBJECTS.has(subject)) {
@@ -996,26 +996,29 @@ async function analyzeCourse(uid, body) {
   // Normaliser LaTeX (dictée vocale)
   const normalizedContent = normalizeLatexInput(content);
 
-  // ── CACHE : cherche une analyse existante similaire ──
+  // ── CACHE ──
   const hash = contentHash(normalizedContent + subject + (title || ''));
   const { db, FieldValue } = getAdminServices();
 
   const cacheRef = db.collection('users').doc(uid).collection('analysisCache').doc(hash);
   const cacheSnap = await cacheRef.get();
 
-  if (cacheSnap.exists()) {
+  if (cacheSnap.exists) {                                          // ← CORRIGÉ
     const cached = cacheSnap.data();
-    const ageDays = (Date.now() - (toISO(cached.cachedAt) ? new Date(toISO(cached.cachedAt)).getTime() : 0)) / (24 * 60 * 60 * 1000);
+    const cachedAt = toISO(cached.cachedAt);
+    const ageDays = cachedAt
+      ? (Date.now() - new Date(cachedAt).getTime()) / (24 * 60 * 60 * 1000)
+      : 999;
+
     if (ageDays < 30) {
       console.log('[PROGRESS] Cache hit pour analyse cours');
-      // Incrémenter le quota quand même (c'est un nouveau cours pour l'élève)
       if (!quota.premium) await incrementCaptureQuota(uid);
       return {
         success: true,
         cached: true,
         courseId: null,
         analysis: cached.analysis,
-        notionsCount: (cached.analysis.notions || []).length,
+        notionsCount: (cached.analysis?.notions || []).length,
         message: 'Analyse récupérée depuis le cache.'
       };
     }
@@ -1041,7 +1044,6 @@ async function analyzeCourse(uid, body) {
     analysis = buildLocalCourseAnalysis({ subject, title, content: normalizedContent, mode });
   }
 
-  // Limiter le nombre de notions
   const notions = Array.isArray(analysis.notions)
     ? analysis.notions.slice(0, MAX_NOTIONS_PER_COURSE)
     : [];
@@ -1073,7 +1075,6 @@ async function analyzeCourse(uid, body) {
     updatedAt: FieldValue.serverTimestamp()
   });
 
-  // Notions + maîtrise initiale
   const batch = db.batch();
 
   notions.forEach((n) => {
@@ -1121,7 +1122,6 @@ async function analyzeCourse(uid, body) {
     cachedAt: FieldValue.serverTimestamp()
   }, { merge: true });
 
-  // Incrémenter le quota (si non-Premium)
   if (!quota.premium) await incrementCaptureQuota(uid);
 
   return {
@@ -1132,7 +1132,7 @@ async function analyzeCourse(uid, body) {
     analysis,
     message: `${notions.length} notion(s) extraite(s). Fiche + flashcards + quiz prêts !`
   };
-}
+    }
 
 // ═══════════════════════════════════════════════════════════════
 // ACTION 3 — getCourseDetail

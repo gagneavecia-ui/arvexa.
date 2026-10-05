@@ -2213,28 +2213,46 @@
   // ────────────────────────────────────────────────────────────────
   // KATEX
   // ────────────────────────────────────────────────────────────────
-  function renderKaTeX(root) {
-    if (!root) return;
-    if (window.KaTeXUtils) { window.KaTeXUtils.renderMath(root); return; }
-    if (typeof renderMathInElement !== 'function') {
-      setTimeout(() => renderKaTeX(root), 200);
-      return;
-    }
-    try {
-      renderMathInElement(root, {
-        delimiters: [
-          { left: '$$', right: '$$', display: true },
-          { left: '\\[', right: '\\]', display: true },
-          { left: '$', right: '$', display: false },
-          { left: '\\(', right: '\\)', display: false }
-        ],
-        throwOnError: false,
-        errorColor: '#ff9a84',
-        strict: false
-      });
-    } catch (e) { /* silent */ }
+ function renderKaTeX(root) {
+  if (!root) return;
+
+  if (window.KaTeXUtils?.renderMath) {
+    window.KaTeXUtils.renderMath(root);
+    return;
   }
 
+  if (typeof renderMathInElement !== 'function') {
+    setTimeout(() => renderKaTeX(root), 200);
+    return;
+  }
+
+  try {
+    renderMathInElement(root, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '\\[', right: '\\]', display: true },
+        { left: '$', right: '$', display: false },
+        { left: '\\(', right: '\\)', display: false }
+      ],
+      throwOnError: false,
+      errorColor: '#ff9a84',
+      strict: false,
+      trust: true,
+      macros: {
+        "\\R": "\\mathbb{R}",
+        "\\C": "\\mathbb{C}",
+        "\\N": "\\mathbb{N}",
+        "\\Z": "\\mathbb{Z}",
+        "\\Re": "\\operatorname{Re}",
+        "\\Im": "\\operatorname{Im}",
+        "\\arg": "\\operatorname{arg}"
+      }
+    });
+  } catch (e) {
+    console.warn('KaTeX render error:', e);
+  }
+}
+    
   function normalizeMath(text) {
     if (!text) return '';
     if (window.KaTeXUtils) return window.KaTeXUtils.cleanAIResponse(text);
@@ -2628,87 +2646,91 @@
   // ────────────────────────────────────────────────────────────────
   // RENDU FICHE ENRICHIE
   // ────────────────────────────────────────────────────────────────
-  function renderFiche() {
-    const session = state.currentSession;
-    if (!session) return;
+ function renderFiche() {
+  const session = state.currentSession;
+  if (!session) return;
 
-    $('ficheMeta').innerHTML = `
-      <span><i class="fas fa-book"></i> ${SUBJECT_LABELS[state.subject]}</span>
-      <span><i class="fas fa-list"></i> ${session.chapterTitle || state.chapter}</span>
-      <span><i class="fas fa-clock"></i> ${session.sections?.length || 0} sections</span>
-    `;
+  $('ficheMeta').innerHTML = `
+    <span><i class="fas fa-book"></i> ${SUBJECT_LABELS[state.subject]}</span>
+    <span><i class="fas fa-list"></i> ${session.chapterTitle || state.chapter}</span>
+    <span><i class="fas fa-clock"></i> ${session.sections?.length || 0} sections</span>
+  `;
 
-    const container = $('ficheContent');
-    container.innerHTML = '';
+  const container = $('ficheContent');
+  container.innerHTML = '';
 
-    // Sections
-    if (Array.isArray(session.sections) && session.sections.length > 0) {
-      session.sections.forEach((section) => {
-        const div = document.createElement('div');
-        div.className = 'card';
+  // Sécurisation : préserver les $ et le LaTeX, échapper seulement < >
+  const safeText = (t) => String(t || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-        let content = normalizeMath(section.content || '');
-        content = content
-          .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-          .replace(/`(.+?)`/g, '<code>$1</code>')
-          .replace(/\n/g, '<br>');
+  // Sections
+  if (Array.isArray(session.sections) && session.sections.length > 0) {
+    session.sections.forEach((section) => {
+      const div = document.createElement('div');
+      div.className = 'card';
 
-        div.innerHTML = `
-          <div class="card-title"><i class="fas fa-bookmark"></i> ${escapeHtml(section.title || 'Section')}</div>
-          <div class="card-body">${content}</div>
-        `;
-        container.appendChild(div);
-      });
-    }
+      let content = normalizeMath(section.content || '');
+      content = content
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/`(.+?)`/g, '<code>$1</code>')
+        .replace(/\n/g, '<br>');
 
-    // Mots-clés à retenir
-    if (Array.isArray(session.keyPoints) && session.keyPoints.length > 0) {
-      const block = document.createElement('div');
-      block.className = 'enriched-block key-points';
-      block.innerHTML = `
-        <div class="enriched-title"><i class="fas fa-star"></i> Points clés à retenir</div>
-        <ul class="key-points-list">
-          ${session.keyPoints.map((p) => `<li>${escapeHtml(normalizeMath(p))}</li>`).join('')}
-        </ul>
+      div.innerHTML = `
+        <div class="card-title"><i class="fas fa-bookmark"></i> ${safeText(section.title || 'Section')}</div>
+        <div class="card-body">${content}</div>
       `;
-      container.appendChild(block);
-    }
-
-    // Pièges d'examen
-    if (Array.isArray(session.examTraps) && session.examTraps.length > 0) {
-      const block = document.createElement('div');
-      block.className = 'enriched-block exam-traps';
-      block.innerHTML = `
-        <div class="enriched-title"><i class="fas fa-triangle-exclamation"></i> Pièges classiques au BAC</div>
-        <div class="exam-traps-list">
-          ${session.examTraps.map((t) => `
-            <div class="exam-trap-item">
-              <div class="trap-label">⚠️ Piège</div>
-              <div class="trap-text">${escapeHtml(normalizeMath(t.trap || ''))}</div>
-              <div class="trap-solution">${escapeHtml(normalizeMath(t.solution || ''))}</div>
-            </div>
-          `).join('')}
-        </div>
-      `;
-      container.appendChild(block);
-    }
-
-    // Erreurs fréquentes
-    if (Array.isArray(session.commonMistakes) && session.commonMistakes.length > 0) {
-      const block = document.createElement('div');
-      block.className = 'enriched-block common-mistakes';
-      block.innerHTML = `
-        <div class="enriched-title"><i class="fas fa-circle-exclamation"></i> Erreurs fréquentes</div>
-        <ul class="common-mistakes-list">
-          ${session.commonMistakes.map((m) => `<li>${escapeHtml(normalizeMath(m))}</li>`).join('')}
-        </ul>
-      `;
-      container.appendChild(block);
-    }
-
-    renderKaTeX(container);
+      container.appendChild(div);
+    });
   }
 
+  // Points clés
+  if (Array.isArray(session.keyPoints) && session.keyPoints.length > 0) {
+    const block = document.createElement('div');
+    block.className = 'enriched-block key-points';
+    block.innerHTML = `
+      <div class="enriched-title"><i class="fas fa-star"></i> Points clés à retenir</div>
+      <ul class="key-points-list">
+        ${session.keyPoints.map((p) => `<li>${safeText(normalizeMath(p))}</li>`).join('')}
+      </ul>
+    `;
+    container.appendChild(block);
+  }
+
+  // Pièges d'examen
+  if (Array.isArray(session.examTraps) && session.examTraps.length > 0) {
+    const block = document.createElement('div');
+    block.className = 'enriched-block exam-traps';
+    block.innerHTML = `
+      <div class="enriched-title"><i class="fas fa-triangle-exclamation"></i> Pièges classiques au BAC</div>
+      <div class="exam-traps-list">
+        ${session.examTraps.map((t) => `
+          <div class="exam-trap-item">
+            <div class="trap-label">⚠️ Piège</div>
+            <div class="trap-text">${safeText(normalizeMath(t.trap || ''))}</div>
+            <div class="trap-solution">${safeText(normalizeMath(t.solution || ''))}</div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+    container.appendChild(block);
+  }
+
+  // Erreurs fréquentes
+  if (Array.isArray(session.commonMistakes) && session.commonMistakes.length > 0) {
+    const block = document.createElement('div');
+    block.className = 'enriched-block common-mistakes';
+    block.innerHTML = `
+      <div class="enriched-title"><i class="fas fa-circle-exclamation"></i> Erreurs fréquentes</div>
+      <ul class="common-mistakes-list">
+        ${session.commonMistakes.map((m) => `<li>${safeText(normalizeMath(m))}</li>`).join('')}
+      </ul>
+    `;
+    container.appendChild(block);
+  }
+
+  // Un seul appel après tout le DOM
+  renderKaTeX(container);
+}
+     
   // ────────────────────────────────────────────────────────────────
   // RENDU FLASHCARDS ACTIVES
   // ────────────────────────────────────────────────────────────────

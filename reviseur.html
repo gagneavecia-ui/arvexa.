@@ -35,6 +35,7 @@
       --warning: #D4A017;
       --warning-light: #E8C158;
       --info: #4AAFE0;
+      --purple: #9B59B6;
 
       --bg-dark: #0A0A0A;
       --bg-surface: #141414;
@@ -175,7 +176,7 @@
     .connection.online::before { background: var(--success-light); }
 
     /* ═══════════════════════════════════════════════════════════
-       STEP BAR (progression de session)
+       STEP BAR
        ═══════════════════════════════════════════════════════════ */
     .step-bar {
       display: none;
@@ -245,9 +246,7 @@
       background: var(--success-light);
       color: #0A0A0A;
     }
-    .step-item.done .num::before {
-      content: '✓';
-    }
+    .step-item.done .num::before { content: '✓'; }
     .step-item.done .num span { display: none; }
 
     .step-sep {
@@ -343,7 +342,7 @@
     }
 
     /* ═══════════════════════════════════════════════════════════
-       PERSONNALISATION (chips)
+       CHIPS
        ═══════════════════════════════════════════════════════════ */
     .chips-row {
       display: flex;
@@ -421,15 +420,6 @@
     .btn.secondary:hover:not(:disabled) {
       border-color: var(--border-gold);
       color: var(--text-light);
-    }
-    .btn.danger {
-      background: rgba(184, 92, 58, 0.1);
-      border-color: rgba(184, 92, 58, 0.3);
-      color: var(--danger-light);
-    }
-    .btn.danger:hover:not(:disabled) {
-      background: rgba(184, 92, 58, 0.2);
-      border-color: rgba(184, 92, 58, 0.5);
     }
     .btn.full { width: 100%; }
 
@@ -708,7 +698,7 @@
     }
 
     /* ═══════════════════════════════════════════════════════════
-       FICHE
+       SESSION HEAD
        ═══════════════════════════════════════════════════════════ */
     .session-head {
       display: flex;
@@ -739,6 +729,9 @@
     }
     .session-meta i { color: var(--accent-bright); font-size: 11px; }
 
+    /* ═══════════════════════════════════════════════════════════
+       FICHE — CARDS (SECTIONS)
+       ═══════════════════════════════════════════════════════════ */
     .card {
       background: rgba(20, 20, 20, 0.5);
       border: 1px solid var(--border-soft);
@@ -766,6 +759,8 @@
       font-size: 15px;
       line-height: 1.75;
       color: var(--text-body);
+      overflow-wrap: break-word;
+      word-wrap: break-word;
     }
     .card-body strong { color: var(--accent-bright); font-weight: 700; }
     .card-body ul { padding-left: 20px; margin: 8px 0; }
@@ -780,13 +775,14 @@
     }
 
     /* ═══════════════════════════════════════════════════════════
-       BLOCS ENRICHIS (keyPoints / examTraps / commonMistakes)
+       FICHE — BLOCS ENRICHIS
        ═══════════════════════════════════════════════════════════ */
     .enriched-block {
       padding: 18px 20px;
       border-radius: 12px;
       margin-bottom: 12px;
       border: 1px solid var(--border-soft);
+      overflow-wrap: break-word;
     }
 
     .enriched-block.key-points {
@@ -807,51 +803,99 @@
     }
     .enriched-block.common-mistakes .enriched-title { color: #fbbf24; }
 
+    .enriched-block.mnemonics {
+      background: linear-gradient(135deg, rgba(155, 89, 182, 0.06), rgba(155, 89, 182, 0.02));
+      border-color: rgba(155, 89, 182, 0.2);
+    }
+    .enriched-block.mnemonics .enriched-title { color: #b07cd0; }
+
+    .enriched-block.methods {
+      background: linear-gradient(135deg, rgba(74, 175, 224, 0.06), rgba(74, 175, 224, 0.02));
+      border-color: rgba(74, 175, 224, 0.2);
+    }
+    .enriched-block.methods .enriched-title { color: #4AAFE0; }
+
     .enriched-title {
       font-size: 12px;
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
       display: flex;
       align-items: center;
       gap: 8px;
     }
     .enriched-title i { font-size: 13px; }
 
-    .key-points-list {
+    /* ═══════════════════════════════════════════════════════════
+       LISTES ENRICHIES — FIX FLEXBOX
+       ═══════════════════════════════════════════════════════════ */
+    .key-points-list,
+    .common-mistakes-list {
       list-style: none;
       padding: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .key-points-list li {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      font-size: 14px;
-      color: var(--text-body);
-      line-height: 1.6;
-    }
-    .key-points-list li::before {
-      content: '★';
-      color: #7ce0aa;
-      flex-shrink: 0;
-      font-size: 12px;
-      margin-top: 2px;
+      display: block;
     }
 
+    .key-points-list li {
+      display: block;
+      position: relative;
+      padding-left: 22px;
+      font-size: 14px;
+      color: var(--text-body);
+      line-height: 1.75;
+      margin-bottom: 10px;
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+    }
+    .key-points-list li:last-child { margin-bottom: 0; }
+    .key-points-list li::before {
+      content: '★';
+      position: absolute;
+      left: 0;
+      top: 1px;
+      color: #7ce0aa;
+      font-size: 12px;
+      line-height: 1.75;
+    }
+
+    .common-mistakes-list li {
+      display: block;
+      position: relative;
+      padding-left: 22px;
+      font-size: 14px;
+      color: var(--text-body);
+      line-height: 1.75;
+      margin-bottom: 10px;
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+    }
+    .common-mistakes-list li:last-child { margin-bottom: 0; }
+    .common-mistakes-list li::before {
+      content: '✗';
+      position: absolute;
+      left: 0;
+      top: 0;
+      color: #fbbf24;
+      font-weight: 800;
+      font-size: 13px;
+      line-height: 1.75;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       PIÈGES D'EXAMEN
+       ═══════════════════════════════════════════════════════════ */
     .exam-traps-list {
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
     .exam-trap-item {
-      padding: 12px 14px;
+      padding: 14px 16px;
       border-radius: 10px;
       background: rgba(0, 0, 0, 0.2);
       border-left: 3px solid #ff9a84;
+      overflow-wrap: break-word;
     }
     .exam-trap-item .trap-label {
       font-size: 11px;
@@ -859,51 +903,147 @@
       text-transform: uppercase;
       letter-spacing: 0.06em;
       color: #ff9a84;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
     }
     .exam-trap-item .trap-text {
       font-size: 14px;
       color: var(--text-light);
-      line-height: 1.6;
-      margin-bottom: 6px;
+      line-height: 1.65;
+      margin-bottom: 8px;
       font-weight: 500;
+      overflow-wrap: break-word;
     }
     .exam-trap-item .trap-solution {
+      position: relative;
+      padding-left: 18px;
       font-size: 13px;
       color: #7ce0aa;
-      line-height: 1.6;
-      display: flex;
-      align-items: flex-start;
-      gap: 6px;
+      line-height: 1.65;
+      display: block;
+      overflow-wrap: break-word;
+      word-wrap: break-word;
     }
     .exam-trap-item .trap-solution::before {
       content: '→';
+      position: absolute;
+      left: 0;
+      top: 0;
       font-weight: 800;
-      flex-shrink: 0;
     }
 
-    .common-mistakes-list {
+    /* ═══════════════════════════════════════════════════════════
+       MNÉMOTECHNIQUES
+       ═══════════════════════════════════════════════════════════ */
+    .mnemonics-list {
       list-style: none;
       padding: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
+      display: block;
     }
-    .common-mistakes-list li {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
+    .mnemonics-list li {
+      display: block;
+      position: relative;
+      padding-left: 22px;
       font-size: 14px;
       color: var(--text-body);
-      line-height: 1.6;
+      line-height: 1.75;
+      margin-bottom: 10px;
+      font-style: italic;
+      overflow-wrap: break-word;
     }
-    .common-mistakes-list li::before {
-      content: '✗';
-      color: #fbbf24;
-      font-weight: 800;
-      flex-shrink: 0;
+    .mnemonics-list li:last-child { margin-bottom: 0; }
+    .mnemonics-list li::before {
+      content: '🧠';
+      position: absolute;
+      left: 0;
+      top: 1px;
       font-size: 13px;
+      line-height: 1.75;
     }
+
+    /* ═══════════════════════════════════════════════════════════
+       MÉTHODES PAS-À-PAS
+       ═══════════════════════════════════════════════════════════ */
+    .methods-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .method-item {
+      padding: 14px 16px;
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.2);
+      border-left: 3px solid #4AAFE0;
+      overflow-wrap: break-word;
+    }
+    .method-item .method-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: #4AAFE0;
+      margin-bottom: 10px;
+      overflow-wrap: break-word;
+    }
+    .method-steps {
+      list-style: none;
+      padding: 0;
+      counter-reset: step;
+      display: block;
+    }
+    .method-steps li {
+      display: block;
+      position: relative;
+      padding-left: 30px;
+      counter-increment: step;
+      font-size: 13.5px;
+      color: var(--text-body);
+      line-height: 1.7;
+      margin-bottom: 8px;
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+    }
+    .method-steps li:last-child { margin-bottom: 0; }
+    .method-steps li::before {
+      content: counter(step);
+      position: absolute;
+      left: 0;
+      top: 2px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: rgba(74, 175, 224, 0.15);
+      color: #4AAFE0;
+      font-size: 11px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       KATEX — Fix inline dans le flux
+       ═══════════════════════════════════════════════════════════ */
+    .key-points-list li .katex,
+    .common-mistakes-list li .katex,
+    .mnemonics-list li .katex,
+    .exam-trap-item .katex,
+    .method-steps li .katex,
+    .card-body .katex {
+      display: inline;
+      white-space: normal;
+    }
+    .key-points-list li .katex-display,
+    .common-mistakes-list li .katex-display,
+    .mnemonics-list li .katex-display,
+    .exam-trap-item .katex-display,
+    .method-steps li .katex-display,
+    .card-body .katex-display {
+      display: block;
+      margin: 10px 0;
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+    .katex { font-size: 1.05em; color: inherit; }
+    .katex-display { max-width: 100%; padding: 4px 0; }
 
     /* ═══════════════════════════════════════════════════════════
        FLASHCARDS
@@ -1011,14 +1151,16 @@
       font-style: italic;
     }
 
-    /* Feedback buttons (après flip) */
     .flashcard-feedback {
       display: none;
       gap: 8px;
       margin-bottom: 16px;
+    }
+    .flashcard-feedback.show {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
       animation: fadeUp 0.3s ease;
     }
-    .flashcard-feedback.show { display: grid; grid-template-columns: repeat(3, 1fr); }
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: translateY(0); }
@@ -1112,6 +1254,7 @@
       color: var(--text-light);
       font-weight: 500;
       margin-bottom: 14px;
+      overflow-wrap: break-word;
     }
     .quiz-options { display: flex; flex-direction: column; gap: 8px; }
 
@@ -1183,9 +1326,10 @@
       border-left: 3px solid #4AAFE0;
       border-radius: 0 8px 8px 0;
       font-size: 13px;
-      line-height: 1.6;
+      line-height: 1.65;
       color: var(--text-body);
       display: none;
+      overflow-wrap: break-word;
     }
     .quiz-explanation.show { display: block; }
     .quiz-explanation strong { color: #4AAFE0; }
@@ -1264,6 +1408,9 @@
       font-weight: 700;
     }
 
+    /* ═══════════════════════════════════════════════════════════
+       MASTERY BLOCK
+       ═══════════════════════════════════════════════════════════ */
     .mastery-block {
       padding: 18px 20px;
       border-radius: 12px;
@@ -1310,6 +1457,9 @@
       line-height: 1.55;
     }
 
+    /* ═══════════════════════════════════════════════════════════
+       RECOMMANDATIONS
+       ═══════════════════════════════════════════════════════════ */
     .recommendations {
       padding: 18px 20px;
       border-radius: 12px;
@@ -1331,23 +1481,26 @@
     .recommendations .rec-list {
       list-style: none;
       padding: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
+      display: block;
     }
     .recommendations .rec-list li {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
+      display: block;
+      position: relative;
+      padding-left: 20px;
       font-size: 13.5px;
       color: var(--text-body);
-      line-height: 1.6;
+      line-height: 1.65;
+      margin-bottom: 8px;
+      overflow-wrap: break-word;
     }
+    .recommendations .rec-list li:last-child { margin-bottom: 0; }
     .recommendations .rec-list li::before {
       content: '→';
+      position: absolute;
+      left: 0;
+      top: 0;
       color: #4AAFE0;
       font-weight: 800;
-      flex-shrink: 0;
     }
 
     /* ═══════════════════════════════════════════════════════════
@@ -1396,7 +1549,7 @@
     }
 
     /* ═══════════════════════════════════════════════════════════
-       EMPTY STATE
+       EMPTY
        ═══════════════════════════════════════════════════════════ */
     .empty-state {
       text-align: center;
@@ -1430,7 +1583,6 @@
       padding: 18px;
       background: rgba(0, 0, 0, 0.78);
       backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
     }
     .modal-backdrop.show { display: grid; animation: fadeIn 0.25s ease; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -1512,7 +1664,6 @@
       padding: 16px;
       background: rgba(0, 0, 0, 0.85);
       backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
       opacity: 0;
       visibility: hidden;
       transition: opacity 0.25s ease, visibility 0.25s ease;
@@ -1619,17 +1770,6 @@
     .btn-later:hover { color: var(--text-light); }
 
     /* ═══════════════════════════════════════════════════════════
-       KATEX
-       ═══════════════════════════════════════════════════════════ */
-    .katex { color: inherit; font-size: 1.05em; }
-    .katex-display {
-      max-width: 100%;
-      overflow-x: auto;
-      overflow-y: hidden;
-      padding: 6px 0;
-    }
-
-    /* ═══════════════════════════════════════════════════════════
        RESPONSIVE
        ═══════════════════════════════════════════════════════════ */
     @media (max-width: 620px) {
@@ -1681,9 +1821,6 @@
 <body>
   <main class="shell">
 
-    <!-- ═══════════════════════════════════════════════════════
-         HEADER
-         ═══════════════════════════════════════════════════════ -->
     <header>
       <a class="brand" href="index.html">ARVEX<span>A School</span></a>
       <div class="header-right">
@@ -1695,9 +1832,6 @@
       </div>
     </header>
 
-    <!-- ═══════════════════════════════════════════════════════
-         STEP BAR (parcours continu)
-         ═══════════════════════════════════════════════════════ -->
     <div class="step-bar" id="stepBar">
       <div class="step-item active" data-step="fiche">
         <div class="num"><span>1</span></div>
@@ -1720,17 +1854,14 @@
       </div>
     </div>
 
-    <!-- ═══════════════════════════════════════════════════════
-         VUE 1 : CONFIGURATION
-         ═══════════════════════════════════════════════════════ -->
+    <!-- CONFIG -->
     <section class="view active" id="configView">
       <div class="panel">
         <div class="eyebrow">Réviseur intelligent</div>
         <h1>Génère ta révision <em style="color:var(--accent-bright);font-style:italic;">sur mesure</em>.</h1>
         <p class="lead">
-          Choisis une matière, un chapitre, puis personnalise ta session.
-          L'IA construit une fiche enrichie, des flashcards actives et un quiz adapté.
-          <strong style="color:var(--accent-bright);">2 essais gratuits par jour</strong>, illimité en Premium.
+          Une fiche enrichie, des flashcards actives et un quiz adaptatif — l'IA construit ta session complète.
+          <strong style="color:var(--accent-bright);">2 essais gratuits/jour</strong>, illimité en Premium.
         </p>
 
         <form id="configForm" class="form-grid">
@@ -1779,7 +1910,7 @@
           </div>
 
           <div class="field">
-            <label>Difficulté du quiz</label>
+            <label>Difficulté quiz</label>
             <div class="chips-row" id="difficultyChips">
               <button type="button" class="chip" data-diff="1">🟢 Facile</button>
               <button type="button" class="chip active" data-diff="2">🟡 Moyen</button>
@@ -1789,7 +1920,7 @@
           </div>
 
           <div class="field">
-            <label>Nombre de questions quiz</label>
+            <label>Nombre de questions</label>
             <div class="chips-row" id="quizCountChips">
               <button type="button" class="chip" data-qcount="3">3</button>
               <button type="button" class="chip active" data-qcount="5">5</button>
@@ -1809,21 +1940,19 @@
       </div>
     </section>
 
-    <!-- ═══════════════════════════════════════════════════════
-         VUE 2 : CHARGEMENT
-         ═══════════════════════════════════════════════════════ -->
+    <!-- LOADING -->
     <section class="view" id="loadingView">
       <div class="panel">
         <div class="eyebrow">Génération en cours</div>
         <h2>Préparation de ta révision...</h2>
-        <p class="lead">Cela prend généralement 20 à 40 secondes. Chaque étape indique la progression exacte.</p>
+        <p class="lead">Cela prend généralement 20 à 40 secondes.</p>
 
         <div class="loading-steps">
           <div class="loader-spinner"></div>
           <div class="steps-list">
             <div class="loading-step" id="genStep1"><span class="step-icon">🔍</span><div class="step-content"><span class="step-label">Analyse du chapitre</span><span class="step-desc">Matière, chapitre et mode sélectionnés</span></div></div>
             <div class="loading-step" id="genStep2"><span class="step-icon">🧠</span><div class="step-content"><span class="step-label">Extraction des notions clés</span><span class="step-desc">L'IA identifie les points essentiels</span></div></div>
-            <div class="loading-step" id="genStep3"><span class="step-icon">✍️</span><div class="step-content"><span class="step-label">Rédaction du contenu enrichi</span><span class="step-desc">Sections, formules, pièges d'examen</span></div></div>
+            <div class="loading-step" id="genStep3"><span class="step-icon">✍️</span><div class="step-content"><span class="step-label">Rédaction enrichie</span><span class="step-desc">Sections, pièges, méthodes, mnémos</span></div></div>
             <div class="loading-step" id="genStep4"><span class="step-icon">🧮</span><div class="step-content"><span class="step-label">Vérification</span><span class="step-desc">Contrôle de la cohérence et du LaTeX</span></div></div>
             <div class="loading-step" id="genStep5"><span class="step-icon">✨</span><div class="step-content"><span class="step-label">Finalisation</span><span class="step-desc">Préparation de l'affichage</span></div></div>
           </div>
@@ -1832,9 +1961,7 @@
       </div>
     </section>
 
-    <!-- ═══════════════════════════════════════════════════════
-         VUE 3 : FICHE ENRICHIE
-         ═══════════════════════════════════════════════════════ -->
+    <!-- FICHE -->
     <section class="view" id="ficheView">
       <div class="panel">
         <div class="session-head">
@@ -1863,9 +1990,7 @@
       </div>
     </section>
 
-    <!-- ═══════════════════════════════════════════════════════
-         VUE 4 : FLASHCARDS ACTIVES
-         ═══════════════════════════════════════════════════════ -->
+    <!-- FLASHCARDS -->
     <section class="view" id="flashcardView">
       <div class="panel">
         <div class="session-head">
@@ -1931,9 +2056,7 @@
       </div>
     </section>
 
-    <!-- ═══════════════════════════════════════════════════════
-         VUE 5 : QUIZ
-         ═══════════════════════════════════════════════════════ -->
+    <!-- QUIZ -->
     <section class="view" id="quizView">
       <div class="panel">
         <div class="session-head">
@@ -1956,9 +2079,7 @@
       </div>
     </section>
 
-    <!-- ═══════════════════════════════════════════════════════
-         VUE 6 : RÉSULTATS
-         ═══════════════════════════════════════════════════════ -->
+    <!-- RÉSULTATS -->
     <section class="view" id="resultsView">
       <div class="panel">
         <div class="result-hero">
@@ -2012,9 +2133,7 @@
       </div>
     </section>
 
-    <!-- ═══════════════════════════════════════════════════════
-         VUE 7 : HISTORIQUE
-         ═══════════════════════════════════════════════════════ -->
+    <!-- HISTORIQUE -->
     <section class="view" id="historyView">
       <div class="panel">
         <div class="session-head">
@@ -2032,9 +2151,6 @@
 
   </main>
 
-  <!-- ═══════════════════════════════════════════════════════════
-       MODALE REPRISE
-       ═══════════════════════════════════════════════════════════ -->
   <div class="modal-backdrop" id="resumeModal">
     <div class="modal">
       <div class="resume-modal-content">
@@ -2049,9 +2165,6 @@
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════════════════════════════
-       POPUP PREMIUM
-       ═══════════════════════════════════════════════════════════ -->
   <div class="premium-popup-overlay" id="premiumOverlay">
     <div class="premium-popup">
       <button class="popup-close" id="premiumClose"><i class="fas fa-times"></i></button>
@@ -2079,7 +2192,7 @@
 
   <script type="module">
   // ═══════════════════════════════════════════════════════════════
-  // RÉVISEUR v2 — Parcours continu Fiche → Flashcards → Quiz → Résultats
+  // RÉVISEUR v3 — Ultra-éducatif
   // ═══════════════════════════════════════════════════════════════
 
   import { initializeApp } from "firebase/app";
@@ -2089,9 +2202,6 @@
     collection, addDoc, query, orderBy, limit, getDocs, serverTimestamp
   } from "firebase/firestore";
 
-  // ────────────────────────────────────────────────────────────────
-  // CONFIG
-  // ────────────────────────────────────────────────────────────────
   const app = initializeApp({
     apiKey: "AIzaSyDHscOXw3rLuhV6z1Cny-bdYCumqpnG7QE",
     authDomain: "arvexa-fbf10.firebaseapp.com",
@@ -2140,9 +2250,6 @@
 
   const DIFFICULTY_LABELS = { 1: 'Facile', 2: 'Moyen', 3: 'Difficile', 4: 'Niveau BAC' };
 
-  // ────────────────────────────────────────────────────────────────
-  // ÉTAT
-  // ────────────────────────────────────────────────────────────────
   const state = {
     subject: 'mathematiques',
     chapter: 'all',
@@ -2163,9 +2270,6 @@
     quizProgressSaved: false
   };
 
-  // ────────────────────────────────────────────────────────────────
-  // DOM HELPERS
-  // ────────────────────────────────────────────────────────────────
   const $ = (id) => document.getElementById(id);
   const views = ['configView', 'loadingView', 'ficheView', 'flashcardView', 'quizView', 'resultsView', 'historyView'];
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -2175,7 +2279,6 @@
   function showView(id) {
     views.forEach((v) => $(v).classList.toggle('active', v === id));
 
-    // Sync step bar
     const stepMap = {
       ficheView: 'fiche',
       flashcardView: 'flashcard',
@@ -2210,49 +2313,53 @@
     return div.innerHTML;
   }
 
-  // ────────────────────────────────────────────────────────────────
-  // KATEX
-  // ────────────────────────────────────────────────────────────────
- function renderKaTeX(root) {
-  if (!root) return;
-
-  if (window.KaTeXUtils?.renderMath) {
-    window.KaTeXUtils.renderMath(root);
-    return;
+  /**
+   * Sécurise le texte pour injection HTML :
+   * échappe < et > uniquement, préserve $ et le LaTeX pour KaTeX.
+   */
+  function safeText(text) {
+    return String(text || '')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
   }
 
-  if (typeof renderMathInElement !== 'function') {
-    setTimeout(() => renderKaTeX(root), 200);
-    return;
+  function renderKaTeX(root) {
+    if (!root) return;
+    if (window.KaTeXUtils?.renderMath) {
+      window.KaTeXUtils.renderMath(root);
+      return;
+    }
+    if (typeof renderMathInElement !== 'function') {
+      setTimeout(() => renderKaTeX(root), 200);
+      return;
+    }
+    try {
+      renderMathInElement(root, {
+        delimiters: [
+          { left: '$$', right: '$$', display: true },
+          { left: '\\[', right: '\\]', display: true },
+          { left: '$', right: '$', display: false },
+          { left: '\\(', right: '\\)', display: false }
+        ],
+        throwOnError: false,
+        errorColor: '#ff9a84',
+        strict: false,
+        trust: true,
+        macros: {
+          "\\R": "\\mathbb{R}",
+          "\\C": "\\mathbb{C}",
+          "\\N": "\\mathbb{N}",
+          "\\Z": "\\mathbb{Z}",
+          "\\Re": "\\operatorname{Re}",
+          "\\Im": "\\operatorname{Im}",
+          "\\arg": "\\operatorname{arg}"
+        }
+      });
+    } catch (e) {
+      console.warn('KaTeX render error:', e);
+    }
   }
 
-  try {
-    renderMathInElement(root, {
-      delimiters: [
-        { left: '$$', right: '$$', display: true },
-        { left: '\\[', right: '\\]', display: true },
-        { left: '$', right: '$', display: false },
-        { left: '\\(', right: '\\)', display: false }
-      ],
-      throwOnError: false,
-      errorColor: '#ff9a84',
-      strict: false,
-      trust: true,
-      macros: {
-        "\\R": "\\mathbb{R}",
-        "\\C": "\\mathbb{C}",
-        "\\N": "\\mathbb{N}",
-        "\\Z": "\\mathbb{Z}",
-        "\\Re": "\\operatorname{Re}",
-        "\\Im": "\\operatorname{Im}",
-        "\\arg": "\\operatorname{arg}"
-      }
-    });
-  } catch (e) {
-    console.warn('KaTeX render error:', e);
-  }
-}
-    
   function normalizeMath(text) {
     if (!text) return '';
     if (window.KaTeXUtils) return window.KaTeXUtils.cleanAIResponse(text);
@@ -2260,7 +2367,7 @@
   }
 
   // ────────────────────────────────────────────────────────────────
-  // ÉTAPES DE CHARGEMENT
+  // ÉTAPES
   // ────────────────────────────────────────────────────────────────
   function resetSteps(steps) {
     steps.forEach((id) => { const el = $(id); if (el) el.classList.remove('active', 'done'); });
@@ -2370,11 +2477,7 @@
     ]);
   }
 
-  // ────────────────────────────────────────────────────────────────
-  // CHIPS (personnalisation)
-  // ────────────────────────────────────────────────────────────────
   function initChips() {
-    // Mode
     document.querySelectorAll('#modeChips .chip').forEach((chip) => {
       chip.addEventListener('click', () => {
         document.querySelectorAll('#modeChips .chip').forEach((c) => c.classList.remove('active'));
@@ -2382,8 +2485,6 @@
         state.mode = chip.dataset.mode;
       });
     });
-
-    // Nombre de flashcards
     document.querySelectorAll('#flashCountChips .chip').forEach((chip) => {
       chip.addEventListener('click', () => {
         document.querySelectorAll('#flashCountChips .chip').forEach((c) => c.classList.remove('active'));
@@ -2391,8 +2492,6 @@
         state.flashCount = Number(chip.dataset.count);
       });
     });
-
-    // Difficulté
     document.querySelectorAll('#difficultyChips .chip').forEach((chip) => {
       chip.addEventListener('click', () => {
         document.querySelectorAll('#difficultyChips .chip').forEach((c) => c.classList.remove('active'));
@@ -2400,8 +2499,6 @@
         state.difficulty = Number(chip.dataset.diff);
       });
     });
-
-    // Nombre de questions quiz
     document.querySelectorAll('#quizCountChips .chip').forEach((chip) => {
       chip.addEventListener('click', () => {
         document.querySelectorAll('#quizCountChips .chip').forEach((c) => c.classList.remove('active'));
@@ -2412,7 +2509,7 @@
   }
 
   // ────────────────────────────────────────────────────────────────
-  // FIRESTORE SESSION ACTIVE
+  // SESSION FIRESTORE
   // ────────────────────────────────────────────────────────────────
   async function saveActiveSession() {
     if (!state.user || !state.currentSession) return;
@@ -2435,9 +2532,8 @@
 
   async function clearActiveSession() {
     if (!state.user) return;
-    try {
-      await deleteDoc(doc(db, 'users', state.user.uid, 'activeRevision', 'current'));
-    } catch (e) { /* silent */ }
+    try { await deleteDoc(doc(db, 'users', state.user.uid, 'activeRevision', 'current')); }
+    catch (e) { /* silent */ }
   }
 
   async function loadActiveSession() {
@@ -2446,7 +2542,6 @@
       const snap = await getDoc(doc(db, 'users', state.user.uid, 'activeRevision', 'current'));
       if (!snap.exists()) return null;
       const data = snap.data();
-
       const updated = data.updatedAt?.toDate?.() || new Date(data.updatedAt);
       const ageHours = (Date.now() - updated.getTime()) / (1000 * 60 * 60);
       if (ageHours > 24) { await clearActiveSession(); return null; }
@@ -2511,7 +2606,7 @@
 
       await sleep(1500);
 
-      activateStep('genStep3', statusEl, 'Rédaction du contenu enrichi...');
+      activateStep('genStep3', statusEl, 'Rédaction enrichie...');
 
       const response = await responsePromise;
       const payload = await response.json().catch(() => null);
@@ -2605,7 +2700,7 @@
   }
 
   // ────────────────────────────────────────────────────────────────
-  // FALLBACKS LOCAUX
+  // FALLBACKS
   // ────────────────────────────────────────────────────────────────
   function buildLocalFiche() {
     const subjectLabel = SUBJECT_LABELS[state.subject] || 'Matière';
@@ -2613,21 +2708,19 @@
       chapterTitle: state.chapter === 'all' ? 'Révision générale' : state.chapter,
       sections: [
         { title: 'Introduction', content: `Cette fiche couvre les notions essentielles du chapitre **${state.chapter === 'all' ? 'complet' : state.chapter}** en **${subjectLabel}**.` },
-        { title: 'Définitions clés', content: '- **Définition 1** : à compléter avec ton cours.\n- **Définition 2** : à compléter avec ton cours.\n- **Définition 3** : à compléter avec ton cours.' },
-        { title: 'Formules importantes', content: 'Les formules principales à retenir :\n\n$F = ma$\n\n$E = mc^2$\n\nComplète avec les formules de ton cours.' },
-        { title: 'Méthodes de résolution', content: '1. Lire attentivement l\'énoncé\n2. Identifier les données\n3. Choisir la bonne formule\n4. Calculer\n5. Vérifier le résultat' }
+        { title: 'Définitions clés', content: '- **Définition 1** : à compléter.\n- **Définition 2** : à compléter.\n- **Définition 3** : à compléter.' }
       ],
       keyPoints: [
         'Lire et comprendre l\'énoncé avant de commencer',
-        'Vérifier les unités dans chaque calcul',
-        'Justifier chaque étape de raisonnement'
+        'Vérifier les unités dans chaque calcul'
       ],
       examTraps: [
-        { trap: 'Oublier les unités', solution: 'Toujours vérifier les unités dans la réponse finale' }
+        { trap: 'Oublier les unités', solution: 'Toujours vérifier les unités dans la réponse' }
       ],
-      commonMistakes: [
-        'Aller trop vite sans lire l\'énoncé',
-        'Ne pas vérifier le résultat'
+      commonMistakes: ['Aller trop vite', 'Ne pas vérifier le résultat'],
+      mnemonics: ['Astuce : relis-toi toujours une fois'],
+      methods: [
+        { name: 'Méthode générale', steps: ['Lire', 'Analyser', 'Résoudre', 'Vérifier'] }
       ]
     };
   }
@@ -2636,103 +2729,133 @@
     return {
       chapterTitle: state.chapter === 'all' ? 'Révision générale' : state.chapter,
       flashcards: Array.from({ length: state.flashCount }, (_, i) => ({
-        question: `Question ${i + 1} sur ${state.chapter === 'all' ? 'le programme' : state.chapter}`,
-        answer: 'Réponse à compléter avec ton cours. Cette carte est un placeholder généré en mode hors-ligne.',
+        question: `Question ${i + 1}`,
+        answer: 'Réponse à compléter.',
         hint: null
       }))
     };
   }
 
   // ────────────────────────────────────────────────────────────────
-  // RENDU FICHE ENRICHIE
+  // RENDU FICHE — ULTRA-ENRICHIE
   // ────────────────────────────────────────────────────────────────
- function renderFiche() {
-  const session = state.currentSession;
-  if (!session) return;
+  function renderFiche() {
+    const session = state.currentSession;
+    if (!session) return;
 
-  $('ficheMeta').innerHTML = `
-    <span><i class="fas fa-book"></i> ${SUBJECT_LABELS[state.subject]}</span>
-    <span><i class="fas fa-list"></i> ${session.chapterTitle || state.chapter}</span>
-    <span><i class="fas fa-clock"></i> ${session.sections?.length || 0} sections</span>
-  `;
+    $('ficheMeta').innerHTML = `
+      <span><i class="fas fa-book"></i> ${escapeHtml(SUBJECT_LABELS[state.subject])}</span>
+      <span><i class="fas fa-list"></i> ${escapeHtml(session.chapterTitle || state.chapter)}</span>
+      <span><i class="fas fa-clock"></i> ${session.sections?.length || 0} sections</span>
+    `;
 
-  const container = $('ficheContent');
-  container.innerHTML = '';
+    const container = $('ficheContent');
+    container.innerHTML = '';
 
-  // Sécurisation : préserver les $ et le LaTeX, échapper seulement < >
-  const safeText = (t) => String(t || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    // 1. Sections principales
+    if (Array.isArray(session.sections) && session.sections.length > 0) {
+      session.sections.forEach((section) => {
+        const div = document.createElement('div');
+        div.className = 'card';
 
-  // Sections
-  if (Array.isArray(session.sections) && session.sections.length > 0) {
-    session.sections.forEach((section) => {
-      const div = document.createElement('div');
-      div.className = 'card';
+        let content = safeText(normalizeMath(section.content || ''));
+        content = content
+          .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+          .replace(/`(.+?)`/g, '<code>$1</code>')
+          .replace(/\n/g, '<br>');
 
-      let content = normalizeMath(section.content || '');
-      content = content
-        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-        .replace(/`(.+?)`/g, '<code>$1</code>')
-        .replace(/\n/g, '<br>');
+        div.innerHTML = `
+          <div class="card-title"><i class="fas fa-bookmark"></i> ${safeText(section.title || 'Section')}</div>
+          <div class="card-body">${content}</div>
+        `;
+        container.appendChild(div);
+      });
+    }
 
-      div.innerHTML = `
-        <div class="card-title"><i class="fas fa-bookmark"></i> ${safeText(section.title || 'Section')}</div>
-        <div class="card-body">${content}</div>
+    // 2. Points clés à retenir
+    if (Array.isArray(session.keyPoints) && session.keyPoints.length > 0) {
+      const block = document.createElement('div');
+      block.className = 'enriched-block key-points';
+      block.innerHTML = `
+        <div class="enriched-title"><i class="fas fa-star"></i> Points clés à retenir</div>
+        <ul class="key-points-list">
+          ${session.keyPoints.map((p) => `<li>${safeText(normalizeMath(p))}</li>`).join('')}
+        </ul>
       `;
-      container.appendChild(div);
-    });
+      container.appendChild(block);
+    }
+
+    // 3. Méthodes pas-à-pas
+    if (Array.isArray(session.methods) && session.methods.length > 0) {
+      const block = document.createElement('div');
+      block.className = 'enriched-block methods';
+      block.innerHTML = `
+        <div class="enriched-title"><i class="fas fa-list-ol"></i> Méthodes pas-à-pas</div>
+        <div class="methods-list">
+          ${session.methods.map((m) => `
+            <div class="method-item">
+              <div class="method-name">${safeText(normalizeMath(m.name || 'Méthode'))}</div>
+              <ol class="method-steps">
+                ${(Array.isArray(m.steps) ? m.steps : []).map((s) => `<li>${safeText(normalizeMath(s))}</li>`).join('')}
+              </ol>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      container.appendChild(block);
+    }
+
+    // 4. Pièges d'examen
+    if (Array.isArray(session.examTraps) && session.examTraps.length > 0) {
+      const block = document.createElement('div');
+      block.className = 'enriched-block exam-traps';
+      block.innerHTML = `
+        <div class="enriched-title"><i class="fas fa-triangle-exclamation"></i> Pièges classiques au BAC</div>
+        <div class="exam-traps-list">
+          ${session.examTraps.map((t) => `
+            <div class="exam-trap-item">
+              <div class="trap-label">⚠️ Piège</div>
+              <div class="trap-text">${safeText(normalizeMath(t.trap || ''))}</div>
+              <div class="trap-solution">${safeText(normalizeMath(t.solution || ''))}</div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      container.appendChild(block);
+    }
+
+    // 5. Erreurs fréquentes
+    if (Array.isArray(session.commonMistakes) && session.commonMistakes.length > 0) {
+      const block = document.createElement('div');
+      block.className = 'enriched-block common-mistakes';
+      block.innerHTML = `
+        <div class="enriched-title"><i class="fas fa-circle-exclamation"></i> Erreurs fréquentes</div>
+        <ul class="common-mistakes-list">
+          ${session.commonMistakes.map((m) => `<li>${safeText(normalizeMath(m))}</li>`).join('')}
+        </ul>
+      `;
+      container.appendChild(block);
+    }
+
+    // 6. Mnémotechniques
+    if (Array.isArray(session.mnemonics) && session.mnemonics.length > 0) {
+      const block = document.createElement('div');
+      block.className = 'enriched-block mnemonics';
+      block.innerHTML = `
+        <div class="enriched-title"><i class="fas fa-brain"></i> Astuces mémorisation</div>
+        <ul class="mnemonics-list">
+          ${session.mnemonics.map((m) => `<li>${safeText(normalizeMath(m))}</li>`).join('')}
+        </ul>
+      `;
+      container.appendChild(block);
+    }
+
+    // KaTeX APRÈS injection complète
+    renderKaTeX(container);
   }
 
-  // Points clés
-  if (Array.isArray(session.keyPoints) && session.keyPoints.length > 0) {
-    const block = document.createElement('div');
-    block.className = 'enriched-block key-points';
-    block.innerHTML = `
-      <div class="enriched-title"><i class="fas fa-star"></i> Points clés à retenir</div>
-      <ul class="key-points-list">
-        ${session.keyPoints.map((p) => `<li>${safeText(normalizeMath(p))}</li>`).join('')}
-      </ul>
-    `;
-    container.appendChild(block);
-  }
-
-  // Pièges d'examen
-  if (Array.isArray(session.examTraps) && session.examTraps.length > 0) {
-    const block = document.createElement('div');
-    block.className = 'enriched-block exam-traps';
-    block.innerHTML = `
-      <div class="enriched-title"><i class="fas fa-triangle-exclamation"></i> Pièges classiques au BAC</div>
-      <div class="exam-traps-list">
-        ${session.examTraps.map((t) => `
-          <div class="exam-trap-item">
-            <div class="trap-label">⚠️ Piège</div>
-            <div class="trap-text">${safeText(normalizeMath(t.trap || ''))}</div>
-            <div class="trap-solution">${safeText(normalizeMath(t.solution || ''))}</div>
-          </div>
-        `).join('')}
-      </div>
-    `;
-    container.appendChild(block);
-  }
-
-  // Erreurs fréquentes
-  if (Array.isArray(session.commonMistakes) && session.commonMistakes.length > 0) {
-    const block = document.createElement('div');
-    block.className = 'enriched-block common-mistakes';
-    block.innerHTML = `
-      <div class="enriched-title"><i class="fas fa-circle-exclamation"></i> Erreurs fréquentes</div>
-      <ul class="common-mistakes-list">
-        ${session.commonMistakes.map((m) => `<li>${safeText(normalizeMath(m))}</li>`).join('')}
-      </ul>
-    `;
-    container.appendChild(block);
-  }
-
-  // Un seul appel après tout le DOM
-  renderKaTeX(container);
-}
-     
   // ────────────────────────────────────────────────────────────────
-  // RENDU FLASHCARDS ACTIVES
+  // RENDU FLASHCARDS
   // ────────────────────────────────────────────────────────────────
   function renderFlashcard() {
     if (!state.flashcards || state.flashcards.length === 0) {
@@ -2741,7 +2864,7 @@
     }
 
     $('flashMeta').innerHTML = `
-      <span><i class="fas fa-book"></i> ${SUBJECT_LABELS[state.subject]}</span>
+      <span><i class="fas fa-book"></i> ${escapeHtml(SUBJECT_LABELS[state.subject])}</span>
       <span><i class="fas fa-layer-group"></i> ${state.flashcards.length} cartes</span>
     `;
 
@@ -2756,8 +2879,8 @@
     const answer = normalizeMath(card.answer || '');
     const hint = card.hint ? normalizeMath(card.hint) : '';
 
-    $('flashFront').innerHTML = escapeHtml(question);
-    $('flashBack').innerHTML = escapeHtml(answer);
+    $('flashFront').innerHTML = safeText(question);
+    $('flashBack').innerHTML = safeText(answer);
 
     if (hint) {
       $('flashHint').style.display = 'flex';
@@ -2787,14 +2910,12 @@
     }
   });
 
-  // Feedback actif
   document.querySelectorAll('.feedback-btn').forEach((btn) => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       const rating = btn.dataset.rating;
       state.flashRatings[state.currentFlashIndex] = rating;
 
-      // Animation de transition
       const card = $('flashcardEl');
       card.style.transition = 'opacity 0.2s ease';
       card.style.opacity = '0';
@@ -2806,7 +2927,6 @@
           card.style.opacity = '1';
           debouncedSaveRevision();
         } else {
-          // Fin des flashcards
           card.style.opacity = '1';
           $('flashFeedback').classList.remove('show');
           $('flashCounter').textContent = `${state.flashcards.length} / ${state.flashcards.length}`;
@@ -2892,7 +3012,6 @@
   }
 
   $('startFlashcardsBtn').addEventListener('click', async () => {
-    // Si pas encore de flashcards, on les génère
     if (!state.flashcards || state.flashcards.length === 0) {
       const btn = $('startFlashcardsBtn');
       btn.disabled = true;
@@ -2942,7 +3061,7 @@
 
     $('quizMeta').innerHTML = `
       <span><i class="fas fa-question-circle"></i> ${state.quiz.length} questions</span>
-      <span><i class="fas fa-signal"></i> ${DIFFICULTY_LABELS[state.difficulty]}</span>
+      <span><i class="fas fa-signal"></i> ${escapeHtml(DIFFICULTY_LABELS[state.difficulty])}</span>
     `;
 
     state.quiz.forEach((q, index) => {
@@ -2955,16 +3074,16 @@
       const optionsHtml = (q.options || []).map((opt) => {
         const cleanText = normalizeMath(opt.text || '');
         return `
-          <div class="quiz-option" data-option="${opt.id}" data-qindex="${index}">
-            <span class="quiz-option-letter">${opt.id}</span>
-            <span>${escapeHtml(cleanText)}</span>
+          <div class="quiz-option" data-option="${escapeHtml(opt.id)}" data-qindex="${index}">
+            <span class="quiz-option-letter">${escapeHtml(opt.id)}</span>
+            <span>${safeText(cleanText)}</span>
           </div>
         `;
       }).join('');
 
       div.innerHTML = `
         <div class="quiz-q-number">Question ${index + 1}</div>
-        <div class="quiz-q-text">${escapeHtml(cleanQuestion)}</div>
+        <div class="quiz-q-text">${safeText(cleanQuestion)}</div>
         <div class="quiz-options">${optionsHtml}</div>
         <div class="quiz-explanation" id="explanation-${index}"></div>
       `;
@@ -3004,7 +3123,7 @@
         const exp = $(`explanation-${qIndex}`);
         if (q.explanation) {
           const cleanExp = normalizeMath(q.explanation);
-          exp.innerHTML = `<strong>💡 Explication :</strong> ${escapeHtml(cleanExp)}`;
+          exp.innerHTML = `<strong>💡 Explication :</strong> ${safeText(cleanExp)}`;
           exp.classList.add('show');
           renderKaTeX(exp);
         }
@@ -3026,7 +3145,7 @@
   $('validateQuizBtn').addEventListener('click', showQuizResults);
 
   // ────────────────────────────────────────────────────────────────
-  // RÉSULTATS + MAÎTRISE + RECOMMANDATIONS
+  // RÉSULTATS
   // ────────────────────────────────────────────────────────────────
   async function showQuizResults() {
     let correct = 0;
@@ -3045,7 +3164,6 @@
     $('metricScore').textContent = `${score}/20`;
     $('metricPercent').textContent = `${percent}%`;
 
-    // Hero
     let emoji, title, sub;
     if (percent >= 90) { emoji = '🏆'; title = 'Excellent !'; sub = 'Tu maîtrises ce chapitre !'; }
     else if (percent >= 70) { emoji = '🎉'; title = 'Bravo !'; sub = 'Tu es sur la bonne voie.'; }
@@ -3056,7 +3174,6 @@
     $('resultsTitle').textContent = title;
     $('resultsSub').textContent = sub;
 
-    // Score de maîtrise (combine % quiz + qualité feedback flashcards)
     const masteryScore = computeMasteryScore(percent);
     const masteryEl = $('masteryValue');
     const masteryFill = $('masteryFill');
@@ -3084,7 +3201,6 @@
     setTimeout(() => { masteryFill.style.width = `${masteryScore}%`; }, 100);
     masteryText.textContent = masteryLabel;
 
-    // Recommandations
     const recList = $('recommendationsList');
     recList.innerHTML = '';
 
@@ -3100,14 +3216,17 @@
     if (wrongQuestions.length > 0) {
       const topics = wrongQuestions.slice(0, 3).map((q) => {
         const t = normalizeMath(q.question || '');
-        return t.length > 60 ? t.slice(0, 60) + '...' : t;
+        return t.length > 70 ? t.slice(0, 70) + '...' : t;
       });
       topics.forEach((t) => recs.push(`À revoir : ${t}`));
     }
 
-    if (state.flashRatings && Object.keys(state.flashRatings).length > 0) {
-      const hard = Object.values(state.flashRatings).filter((r) => r === 'hard').length;
+    const ratings = Object.values(state.flashRatings);
+    if (ratings.length > 0) {
+      const hard = ratings.filter((r) => r === 'hard').length;
+      const medium = ratings.filter((r) => r === 'medium').length;
       if (hard > 0) recs.push(`${hard} flashcard${hard > 1 ? 's' : ''} difficile${hard > 1 ? 's' : ''} à retravailler.`);
+      if (medium > 0) recs.push(`${medium} notion${medium > 1 ? 's' : ''} à consolider.`);
     }
 
     recs.forEach((r) => {
@@ -3123,7 +3242,6 @@
   }
 
   function computeMasteryScore(quizPercent) {
-    // Combinaison : 70% quiz + 30% qualité flashcards
     let flashBonus = 0;
     const ratings = Object.values(state.flashRatings);
     if (ratings.length > 0) {
@@ -3135,12 +3253,11 @@
     } else {
       flashBonus = quizPercent * 0.3;
     }
-
     return Math.round(quizPercent * 0.7 + flashBonus);
   }
 
   // ────────────────────────────────────────────────────────────────
-  // SAUVEGARDE FIRESTORE
+  // SAUVEGARDE
   // ────────────────────────────────────────────────────────────────
   async function saveSession(session) {
     if (!state.user) return;
@@ -3224,9 +3341,6 @@
     }
   }
 
-  // ────────────────────────────────────────────────────────────────
-  // BOUTONS
-  // ────────────────────────────────────────────────────────────────
   $('newFicheBtn').addEventListener('click', async () => { await clearActiveSession(); showView('configView'); });
   $('newFlashBtn').addEventListener('click', async () => { await clearActiveSession(); showView('configView'); });
   $('restartBtn').addEventListener('click', async () => { await clearActiveSession(); showView('configView'); });
@@ -3249,7 +3363,7 @@
   });
 
   // ────────────────────────────────────────────────────────────────
-  // QUOTA BADGE
+  // QUOTA
   // ────────────────────────────────────────────────────────────────
   function updateQuotaBadge(remaining) {
     const badge = $('quotaBadge');
@@ -3284,9 +3398,6 @@
     } catch (e) { /* silent */ }
   }
 
-  // ────────────────────────────────────────────────────────────────
-  // NORMALISATION MATIÈRE
-  // ────────────────────────────────────────────────────────────────
   function normalizeSubjectKey(raw) {
     if (!raw) return null;
     const s = String(raw).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
@@ -3299,7 +3410,7 @@
   }
 
   // ────────────────────────────────────────────────────────────────
-  // REPRISE DE SESSION
+  // REPRISE
   // ────────────────────────────────────────────────────────────────
   async function checkActiveSession() {
     const session = await loadActiveSession();
@@ -3391,13 +3502,10 @@
     await checkActiveSession();
   });
 
-  // ────────────────────────────────────────────────────────────────
-  // INIT
-  // ────────────────────────────────────────────────────────────────
   function init() {
     initCustomSelects();
     initChips();
-    console.log('🎓 ARVEXA — Réviseur v2 (parcours continu)');
+    console.log('🎓 ARVEXA — Réviseur v3 (ultra-éducatif)');
   }
 
   init();

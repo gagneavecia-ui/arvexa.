@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0A0A0A">
-  <meta name="description" content="ARVEXA School — Réviseur intelligent">
+  <meta name="description" content="ARVEXA School — Réviseur intelligent v4.0">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icon.png" type="image/png">
   <link rel="apple-touch-icon" href="icon.png">
@@ -36,7 +36,6 @@
       --warning-light: #E8C158;
       --info: #4AAFE0;
       --purple: #9B59B6;
-      --purple-light: #b07cd0;
 
       --bg-dark: #0A0A0A;
       --bg-surface: #141414;
@@ -98,64 +97,33 @@
     button:disabled { cursor: not-allowed; opacity: 0.55; }
 
     /* ═══════════════════════════════════════════════════════════
-       SHELL
-       ═══════════════════════════════════════════════════════════ */
-    .shell {
-      width: min(100% - 28px, 980px);
-      margin: auto;
-      padding: 18px 0 46px;
-    }
-
-    /* ═══════════════════════════════════════════════════════════
        HEADER
        ═══════════════════════════════════════════════════════════ */
     header {
+      position: sticky; top: 0; z-index: 50;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 14px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
+      padding: calc(12px + var(--safe-top)) 16px 12px;
+      background: rgba(10, 10, 10, 0.92);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border-soft);
+      gap: 12px;
     }
 
     .brand {
       color: var(--text-light);
       text-decoration: none;
-      font: 700 22px var(--font-serif);
-      letter-spacing: 0.05em;
+      font: 700 20px var(--font-serif);
+      letter-spacing: 0.04em;
     }
     .brand span { color: var(--accent-bright); font-style: italic; }
 
     .header-right {
       display: flex;
       align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .quota-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 12px;
-      border-radius: 20px;
-      background: rgba(224, 184, 74, 0.08);
-      border: 1px solid rgba(224, 184, 74, 0.2);
-      color: var(--accent-bright);
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      white-space: nowrap;
-    }
-    .quota-badge.warning {
-      background: rgba(215, 101, 74, 0.1);
-      border-color: rgba(215, 101, 74, 0.3);
-      color: #ff9a84;
-    }
-    .quota-badge.premium {
-      background: rgba(69, 180, 125, 0.1);
-      border-color: rgba(69, 180, 125, 0.3);
-      color: #7ce0aa;
+      gap: 12px;
     }
 
     .connection {
@@ -177,6 +145,12 @@
     /* ═══════════════════════════════════════════════════════════
        STEP BAR
        ═══════════════════════════════════════════════════════════ */
+    .shell {
+      width: min(100% - 28px, 980px);
+      margin: auto;
+      padding: 18px 0 46px;
+    }
+
     .step-bar {
       display: none;
       align-items: center;
@@ -193,7 +167,10 @@
     }
     .step-bar.show { display: flex; }
     .step-bar::-webkit-scrollbar { height: 3px; }
-    .step-bar::-webkit-scrollbar-thumb { background: rgba(224, 184, 74, 0.2); border-radius: 10px; }
+    .step-bar::-webkit-scrollbar-thumb {
+      background: rgba(224, 184, 74, 0.2);
+      border-radius: 10px;
+    }
 
     .step-item {
       display: flex;
@@ -211,10 +188,14 @@
       flex-shrink: 0;
     }
     .step-item .num {
-      width: 20px; height: 20px;
+      width: 20px;
+      height: 20px;
       border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 10px; font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 800;
       background: rgba(255, 255, 255, 0.05);
       color: var(--text-muted);
       flex-shrink: 0;
@@ -224,13 +205,28 @@
       border-color: rgba(224, 184, 74, 0.25);
       color: var(--accent-bright);
     }
-    .step-item.active .num { background: var(--accent-bright); color: #0A0A0A; }
-    .step-item.done { color: var(--success-light); background: rgba(69, 180, 125, 0.06); border-color: rgba(69, 180, 125, 0.15); }
-    .step-item.done .num { background: var(--success-light); color: #0A0A0A; }
+    .step-item.active .num {
+      background: var(--accent-bright);
+      color: #0A0A0A;
+    }
+    .step-item.done {
+      color: var(--success-light);
+      background: rgba(69, 180, 125, 0.06);
+      border-color: rgba(69, 180, 125, 0.15);
+    }
+    .step-item.done .num {
+      background: var(--success-light);
+      color: #0A0A0A;
+    }
     .step-item.done .num::before { content: '✓'; }
     .step-item.done .num span { display: none; }
 
-    .step-sep { color: var(--text-muted); font-size: 10px; flex-shrink: 0; opacity: 0.5; }
+    .step-sep {
+      color: var(--text-muted);
+      font-size: 10px;
+      flex-shrink: 0;
+      opacity: 0.5;
+    }
 
     /* ═══════════════════════════════════════════════════════════
        PANELS
@@ -268,7 +264,12 @@
     /* ═══════════════════════════════════════════════════════════
        TYPOGRAPHIE
        ═══════════════════════════════════════════════════════════ */
-    h1, h2, h3 { margin: 0; line-height: 1.2; font-family: var(--font-serif); color: var(--text-light); }
+    h1, h2, h3 {
+      margin: 0;
+      line-height: 1.2;
+      font-family: var(--font-serif);
+      color: var(--text-light);
+    }
     h1 { font-size: clamp(26px, 5vw, 40px); max-width: 680px; letter-spacing: -0.01em; }
     h2 { font-size: clamp(21px, 4vw, 28px); letter-spacing: -0.01em; }
 
@@ -297,7 +298,12 @@
       gap: 16px;
       margin-top: 24px;
     }
-    .field { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      min-width: 0;
+    }
     .field.full { grid-column: 1 / -1; }
 
     label {
@@ -310,7 +316,11 @@
     /* ═══════════════════════════════════════════════════════════
        CHIPS
        ═══════════════════════════════════════════════════════════ */
-    .chips-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chips-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
     .chip {
       padding: 8px 16px;
       border-radius: 20px;
@@ -323,7 +333,10 @@
       transition: var(--transition-fast);
       font-family: inherit;
     }
-    .chip:hover { border-color: rgba(224, 184, 74, 0.3); color: var(--text-light); }
+    .chip:hover {
+      border-color: rgba(224, 184, 74, 0.3);
+      color: var(--text-light);
+    }
     .chip.active {
       background: rgba(224, 184, 74, 0.12);
       border-color: rgba(224, 184, 74, 0.3);
@@ -333,7 +346,12 @@
     /* ═══════════════════════════════════════════════════════════
        BOUTONS
        ═══════════════════════════════════════════════════════════ */
-    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 24px;
+    }
     .btn {
       min-height: 44px;
       border: 1px solid transparent;
@@ -366,8 +384,15 @@
       box-shadow: 0 8px 28px rgba(184, 134, 11, 0.35);
       border-color: transparent;
     }
-    .btn.secondary { background: transparent; border-color: var(--border-strong); color: var(--text-dim); }
-    .btn.secondary:hover:not(:disabled) { border-color: var(--border-gold); color: var(--text-light); }
+    .btn.secondary {
+      background: transparent;
+      border-color: var(--border-strong);
+      color: var(--text-dim);
+    }
+    .btn.secondary:hover:not(:disabled) {
+      border-color: var(--border-gold);
+      color: var(--text-light);
+    }
     .btn.full { width: 100%; }
 
     /* ═══════════════════════════════════════════════════════════
@@ -375,28 +400,48 @@
        ═══════════════════════════════════════════════════════════ */
     .loader {
       display: none;
-      width: 18px; height: 18px;
+      width: 18px;
+      height: 18px;
       border: 2px solid rgba(10, 10, 10, 0.25);
       border-top-color: currentColor;
       border-radius: 50%;
       animation: spin 0.7s linear infinite;
     }
-    .btn.secondary .loader { border-color: rgba(255, 255, 255, 0.2); border-top-color: var(--text-light); }
+    .btn.secondary .loader {
+      border-color: rgba(255, 255, 255, 0.2);
+      border-top-color: var(--text-light);
+    }
     .btn.loading .loader { display: inline-block; }
-    .btn.loading .btn-text,
+    .btn.loading .btn-text { display: none; }
     .btn.loading .btn-icon { display: none; }
+
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    .status { min-height: 22px; margin-top: 14px; color: var(--text-dim); font-size: 13px; }
+    /* ═══════════════════════════════════════════════════════════
+       STATUS
+       ═══════════════════════════════════════════════════════════ */
+    .status {
+      min-height: 22px;
+      margin-top: 14px;
+      color: var(--text-dim);
+      font-size: 13px;
+    }
     .status.error { color: #ff9a84; }
     .status.success { color: #7ce0aa; }
 
     /* ═══════════════════════════════════════════════════════════
        CUSTOM SELECT
        ═══════════════════════════════════════════════════════════ */
-    .custom-select { position: relative; width: 100%; user-select: none; }
+    .custom-select {
+      position: relative;
+      width: 100%;
+      user-select: none;
+    }
     .custom-select-trigger {
-      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
       width: 100%;
       min-height: 46px;
       padding: 12px 14px;
@@ -404,7 +449,8 @@
       border: 1px solid var(--border-soft);
       border-radius: var(--radius-sm);
       color: var(--text-light);
-      font-size: 14px; font-weight: 500;
+      font-size: 14px;
+      font-weight: 500;
       cursor: pointer;
       transition: var(--transition-fast);
       text-align: left;
@@ -420,34 +466,48 @@
       background: rgba(184, 134, 11, 0.02);
     }
     .custom-select-value {
-      flex: 1; min-width: 0;
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-      display: flex; align-items: center; gap: 8px;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-    .custom-select-value .icon-prefix { color: var(--accent-bright); font-size: 13px; flex-shrink: 0; }
+    .custom-select-value .icon-prefix {
+      color: var(--accent-bright);
+      font-size: 13px;
+      flex-shrink: 0;
+    }
     .custom-select-arrow {
       color: var(--text-muted);
       font-size: 12px;
       flex-shrink: 0;
       transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1);
     }
-    .custom-select.open .custom-select-arrow { transform: rotate(180deg); color: var(--accent-bright); }
+    .custom-select.open .custom-select-arrow {
+      transform: rotate(180deg);
+      color: var(--accent-bright);
+    }
     .custom-select-options {
       position: absolute;
       top: calc(100% + 6px);
-      left: 0; right: 0;
+      left: 0;
+      right: 0;
       z-index: 50;
       max-height: 280px;
       overflow-y: auto;
       background: linear-gradient(145deg, #171717, #101010);
       border: 1px solid var(--border-strong);
       border-radius: var(--radius-sm);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(224, 184, 74, 0.05);
       padding: 6px;
       opacity: 0;
       visibility: hidden;
       transform: translateY(-8px) scale(0.98);
       transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+      transform-origin: top center;
     }
     .custom-select.open .custom-select-options {
       opacity: 1;
@@ -455,19 +515,28 @@
       transform: translateY(0) scale(1);
     }
     .custom-select-options::-webkit-scrollbar { width: 4px; }
-    .custom-select-options::-webkit-scrollbar-thumb { background: rgba(224, 184, 74, 0.2); border-radius: 10px; }
+    .custom-select-options::-webkit-scrollbar-thumb {
+      background: rgba(224, 184, 74, 0.2);
+      border-radius: 10px;
+    }
     .custom-select-option {
-      display: flex; align-items: center; gap: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
       padding: 11px 14px;
       border-radius: 8px;
       color: var(--text-body);
-      font-size: 14px; font-weight: 500;
+      font-size: 14px;
+      font-weight: 500;
       cursor: pointer;
       transition: var(--transition-fast);
       position: relative;
     }
     .custom-select-option:hover,
-    .custom-select-option.focused { background: rgba(224, 184, 74, 0.08); color: var(--text-light); }
+    .custom-select-option.focused {
+      background: rgba(224, 184, 74, 0.08);
+      color: var(--text-light);
+    }
     .custom-select-option.selected {
       background: rgba(224, 184, 74, 0.12);
       color: var(--accent-bright);
@@ -500,7 +569,8 @@
       gap: 24px;
     }
     .loader-spinner {
-      width: 56px; height: 56px;
+      width: 56px;
+      height: 56px;
       border: 3px solid rgba(224, 184, 74, 0.15);
       border-top-color: var(--accent-bright);
       border-radius: 50%;
@@ -532,6 +602,7 @@
       border-left-color: var(--accent-bright);
       border-color: rgba(224, 184, 74, 0.2);
       transform: translateX(4px);
+      box-shadow: 0 4px 20px rgba(224, 184, 74, 0.08);
     }
     .loading-step.done {
       opacity: 0.85;
@@ -556,58 +627,47 @@
       filter: grayscale(0.6);
       transition: filter 0.3s ease;
     }
-    .loading-step.active .step-icon { filter: none; animation: pulseStep 1.5s ease-in-out infinite; }
+    .loading-step.active .step-icon {
+      filter: none;
+      animation: pulseStep 1.5s ease-in-out infinite;
+    }
     @keyframes pulseStep {
       0%, 100% { transform: scale(1); }
       50% { transform: scale(1.15); }
     }
-    .step-content { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
-    .step-label { font-size: 14px; font-weight: 700; color: var(--text-light); line-height: 1.3; }
+    .step-content {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+      flex: 1;
+    }
+    .step-label {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-light);
+      line-height: 1.3;
+    }
     .loading-step.active .step-label { color: var(--accent-bright); }
     .loading-step.done .step-label { color: var(--success); }
-    .step-desc { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+    .step-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
     .loading-status {
       font-size: 13px;
       color: var(--text-muted);
       text-align: center;
       font-style: italic;
       min-height: 20px;
+      transition: color 0.3s ease;
     }
-    .loading-status.active { color: var(--accent-bright); font-style: normal; font-weight: 600; }
-
-    /* ═══════════════════════════════════════════════════════════
-       META BAR
-       ═══════════════════════════════════════════════════════════ */
-    .meta-bar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
-    .meta-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      padding: 7px 13px;
-      border-radius: 20px;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--border-soft);
-      font-size: 12px;
+    .loading-status.active {
+      color: var(--accent-bright);
+      font-style: normal;
       font-weight: 600;
-      color: var(--text-dim);
     }
-    .meta-chip i { color: var(--accent-bright); font-size: 11px; }
-    .meta-chip strong { color: var(--text-light); font-weight: 700; }
-    .meta-chip.ai-badge {
-      background: rgba(67, 181, 125, 0.1);
-      border-color: rgba(67, 181, 125, 0.3);
-      color: #7ce0aa;
-    }
-    .meta-chip.ai-badge i { color: #7ce0aa; }
-    .meta-chip.cache-badge {
-      background: rgba(96, 165, 250, 0.08);
-      border-color: rgba(96, 165, 250, 0.25);
-      color: #93c5fd;
-    }
-    .meta-chip.cache-badge i { color: #93c5fd; }
-    .meta-chip.level-bases { background: rgba(212, 160, 23, 0.1); border-color: rgba(212, 160, 23, 0.3); color: #fbbf24; }
-    .meta-chip.level-standard { background: rgba(96, 165, 250, 0.1); border-color: rgba(96, 165, 250, 0.3); color: #93c5fd; }
-    .meta-chip.level-avance { background: rgba(155, 89, 182, 0.1); border-color: rgba(155, 89, 182, 0.3); color: var(--purple-light); }
 
     /* ═══════════════════════════════════════════════════════════
        SESSION HEAD
@@ -622,119 +682,219 @@
     }
     .session-head h2 { font-size: clamp(20px, 3.5vw, 26px); }
 
-    /* ═══════════════════════════════════════════════════════════
-       KEY POINTS
-       ═══════════════════════════════════════════════════════════ */
-    .key-points-block {
-      padding: 18px 20px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, rgba(69, 180, 125, 0.06), rgba(69, 180, 125, 0.02));
-      border: 1px solid rgba(69, 180, 125, 0.2);
-      margin-bottom: 18px;
+    .session-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 8px;
     }
-    .key-points-title {
+    .session-meta span {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-soft);
+    }
+    .session-meta i { color: var(--accent-bright); font-size: 11px; }
+
+    /* ═══════════════════════════════════════════════════════════
+       KEY POINTS GLOBAUX
+       ═══════════════════════════════════════════════════════════ */
+    .global-block {
+      padding: 18px 20px;
+      border-radius: 14px;
+      margin-bottom: 16px;
+      border: 1px solid var(--border-soft);
+      overflow-wrap: break-word;
+    }
+    .global-block.key-points {
+      background: linear-gradient(135deg, rgba(69, 180, 125, 0.06), rgba(69, 180, 125, 0.02));
+      border-color: rgba(69, 180, 125, 0.2);
+    }
+    .global-block.key-points .global-title { color: #7ce0aa; }
+    .global-block.exam-traps {
+      background: linear-gradient(135deg, rgba(215, 101, 74, 0.06), rgba(215, 101, 74, 0.02));
+      border-color: rgba(215, 101, 74, 0.2);
+    }
+    .global-block.exam-traps .global-title { color: #ff9a84; }
+    .global-block.common-mistakes {
+      background: linear-gradient(135deg, rgba(212, 160, 23, 0.06), rgba(212, 160, 23, 0.02));
+      border-color: rgba(212, 160, 23, 0.2);
+    }
+    .global-block.common-mistakes .global-title { color: #fbbf24; }
+    .global-block.recap {
+      background: linear-gradient(135deg, rgba(224, 184, 74, 0.06), rgba(224, 184, 74, 0.02));
+      border-color: rgba(224, 184, 74, 0.2);
+    }
+    .global-block.recap .global-title { color: var(--accent-bright); }
+
+    .global-title {
       font-size: 12px;
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      color: #7ce0aa;
       margin-bottom: 12px;
       display: flex;
       align-items: center;
       gap: 8px;
     }
-    .key-points-list {
+    .global-title i { font-size: 13px; }
+
+    .global-list {
       list-style: none;
       padding: 0;
       display: block;
     }
-    .key-points-list li {
+    .global-list li {
+      display: block;
       position: relative;
-      padding-left: 22px;
+      padding-left: 20px;
       font-size: 14px;
       color: var(--text-body);
-      line-height: 1.65;
+      line-height: 1.7;
       margin-bottom: 8px;
       overflow-wrap: break-word;
     }
-    .key-points-list li:last-child { margin-bottom: 0; }
-    .key-points-list li::before {
-      content: '★';
+    .global-list li:last-child { margin-bottom: 0; }
+    .global-list li::before {
+      content: '→';
       position: absolute;
       left: 0;
-      top: 1px;
-      color: #7ce0aa;
-      font-size: 12px;
+      top: 0;
+      color: currentColor;
+      opacity: 0.5;
+      font-weight: 700;
     }
 
     /* ═══════════════════════════════════════════════════════════
-       ACCORDÉON — NOTIONS
+       ACCORDÉON DE NOTIONS
        ═══════════════════════════════════════════════════════════ */
+    .sections-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font: 700 17px var(--font-serif);
+      color: var(--text-light);
+      margin: 22px 0 14px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-soft);
+      position: relative;
+    }
+    .sections-label::after {
+      content: '';
+      position: absolute;
+      bottom: -1px; left: 0;
+      width: 40px;
+      height: 2px;
+      background: var(--accent-bright);
+    }
+    .sections-label i { color: var(--accent-bright); font-size: 15px; }
+    .sections-label .count {
+      margin-left: auto;
+      font-family: var(--font-body);
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
     .notion-accordion {
       display: flex;
       flex-direction: column;
       gap: 10px;
-      margin-bottom: 22px;
+      margin-bottom: 24px;
     }
 
-    .notion-card {
+    .notion-item {
       background: rgba(20, 20, 20, 0.6);
       border: 1px solid var(--border-soft);
       border-radius: 14px;
       overflow: hidden;
       transition: var(--transition);
     }
-    .notion-card.open {
-      border-color: rgba(224, 184, 74, 0.25);
-      background: rgba(20, 20, 20, 0.85);
+    .notion-item:hover { border-color: rgba(224, 184, 74, 0.2); }
+    .notion-item.open {
+      border-color: rgba(224, 184, 74, 0.3);
+      background: rgba(224, 184, 74, 0.02);
     }
 
     .notion-header {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
       padding: 16px 18px;
       cursor: pointer;
-      transition: var(--transition-fast);
       user-select: none;
+      transition: var(--transition-fast);
     }
-    .notion-header:hover { background: rgba(224, 184, 74, 0.04); }
-    .notion-card.open .notion-header { background: rgba(224, 184, 74, 0.06); }
+    .notion-header:hover {
+      background: rgba(224, 184, 74, 0.03);
+    }
 
     .notion-num {
-      width: 32px; height: 32px;
+      width: 36px;
+      height: 36px;
       border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font: 800 14px var(--font-serif);
       background: rgba(224, 184, 74, 0.1);
       color: var(--accent-bright);
-      font-size: 13px;
-      font-weight: 800;
+      border: 1px solid rgba(224, 184, 74, 0.15);
       flex-shrink: 0;
-      font-family: var(--font-serif);
+      transition: var(--transition);
     }
-    .notion-card.open .notion-num {
-      background: var(--accent-bright);
-      color: #0A0A0A;
+    .notion-item.open .notion-num {
+      background: rgba(224, 184, 74, 0.18);
+      border-color: rgba(224, 184, 74, 0.35);
     }
 
-    .notion-title {
+    .notion-title-wrap {
       flex: 1;
       min-width: 0;
-      font-size: 15px;
-      font-weight: 700;
+    }
+    .notion-title {
+      font: 700 15px var(--font-serif);
       color: var(--text-light);
       line-height: 1.3;
       overflow-wrap: break-word;
     }
-
-    .notion-chevron {
+    .notion-subtitle {
+      font-size: 12px;
       color: var(--text-muted);
-      font-size: 14px;
-      flex-shrink: 0;
-      transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+      margin-top: 2px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
     }
-    .notion-card.open .notion-chevron {
+    .notion-subtitle i {
+      color: var(--accent);
+      font-size: 10px;
+    }
+
+    .notion-toggle {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text-muted);
+      font-size: 12px;
+      flex-shrink: 0;
+      transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), background 0.2s ease;
+    }
+    .notion-item.open .notion-toggle {
       transform: rotate(180deg);
+      background: rgba(224, 184, 74, 0.12);
       color: var(--accent-bright);
     }
 
@@ -743,27 +903,27 @@
       overflow: hidden;
       transition: max-height 0.4s cubic-bezier(0.25, 1, 0.5, 1);
     }
-    .notion-card.open .notion-body { max-height: 5000px; }
+    .notion-item.open .notion-body {
+      max-height: 30000px;
+    }
 
     .notion-content {
-      padding: 0 18px 18px;
+      padding: 4px 18px 20px;
       display: flex;
       flex-direction: column;
       gap: 14px;
     }
 
-    /* ═══════════════════════════════════════════════════════════
-       BLOCS DE CONTENU (comprendre, formules, méthode, etc.)
-       ═══════════════════════════════════════════════════════════ */
-    .content-block {
+    /* ── Bloc interne (comprendre, formules, méthode, exemple, piège, astuce) ── */
+    .block {
       padding: 14px 16px;
       border-radius: 12px;
       border: 1px solid var(--border-soft);
+      background: rgba(0, 0, 0, 0.2);
       overflow-wrap: break-word;
     }
-
-    .content-block-label {
-      font-size: 11px;
+    .block-label {
+      font-size: 10.5px;
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.08em;
@@ -772,92 +932,71 @@
       align-items: center;
       gap: 8px;
     }
+    .block-label i { font-size: 12px; }
 
-    /* Variantes de couleur */
-    .content-block.comprendre {
-      background: rgba(224, 184, 74, 0.04);
-      border-color: rgba(224, 184, 74, 0.2);
+    /* Comprendre */
+    .block.comprendre {
+      background: linear-gradient(135deg, rgba(224, 184, 74, 0.05), rgba(224, 184, 74, 0.02));
+      border-color: rgba(224, 184, 74, 0.15);
     }
-    .content-block.comprendre .content-block-label { color: var(--accent-bright); }
-
-    .content-block.formules {
-      background: rgba(74, 175, 224, 0.04);
-      border-color: rgba(74, 175, 224, 0.2);
-    }
-    .content-block.formules .content-block-label { color: var(--info); }
-
-    .content-block.methode {
-      background: rgba(69, 180, 125, 0.04);
-      border-color: rgba(69, 180, 125, 0.2);
-    }
-    .content-block.methode .content-block-label { color: #7ce0aa; }
-
-    .content-block.exemple {
-      background: rgba(155, 89, 182, 0.04);
-      border-color: rgba(155, 89, 182, 0.2);
-    }
-    .content-block.exemple .content-block-label { color: var(--purple-light); }
-
-    .content-block.piege {
-      background: rgba(215, 101, 74, 0.04);
-      border-color: rgba(215, 101, 74, 0.25);
-    }
-    .content-block.piege .content-block-label { color: #ff9a84; }
-
-    .content-block.astuce {
-      background: rgba(212, 160, 23, 0.04);
-      border-color: rgba(212, 160, 23, 0.2);
-    }
-    .content-block.astuce .content-block-label { color: var(--warning-light); }
-
-    /* Texte dans les blocs */
-    .content-text {
-      font-size: 14.5px;
-      line-height: 1.7;
+    .block.comprendre .block-label { color: var(--accent-bright); }
+    .block.comprendre .block-text {
+      font-size: 14px;
       color: var(--text-body);
-      overflow-wrap: break-word;
+      line-height: 1.75;
     }
-    .content-text strong { color: var(--accent-bright); }
 
-    /* Liste de formules */
+    /* Formules */
+    .block.formules {
+      background: linear-gradient(135deg, rgba(74, 175, 224, 0.05), rgba(74, 175, 224, 0.02));
+      border-color: rgba(74, 175, 224, 0.18);
+    }
+    .block.formules .block-label { color: var(--info); }
     .formula-list {
       display: flex;
       flex-direction: column;
       gap: 10px;
     }
     .formula-item {
-      padding: 10px 14px;
-      background: rgba(0, 0, 0, 0.25);
+      padding: 12px 14px;
       border-radius: 10px;
+      background: rgba(0, 0, 0, 0.3);
       border-left: 3px solid var(--info);
     }
     .formula-latex {
       font-size: 15px;
       color: var(--text-light);
+      text-align: center;
+      padding: 6px 0;
       overflow-x: auto;
-      overflow-y: hidden;
-      padding: 4px 0;
       -webkit-overflow-scrolling: touch;
     }
-    .formula-condition {
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-top: 4px;
-      font-style: italic;
-    }
-    .formula-usage {
+    .formula-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
       font-size: 11.5px;
+    }
+    .formula-meta .tag {
+      padding: 2px 8px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-soft);
       color: var(--text-dim);
-      margin-top: 2px;
+    }
+    .formula-meta .tag.condition {
+      background: rgba(212, 160, 23, 0.08);
+      border-color: rgba(212, 160, 23, 0.2);
+      color: var(--warning);
     }
 
-    /* Étapes de méthode */
-    .method-title {
-      font-size: 13.5px;
-      font-weight: 700;
-      color: var(--text-light);
-      margin-bottom: 10px;
+    /* Méthode */
+    .block.methode {
+      background: linear-gradient(135deg, rgba(69, 180, 125, 0.05), rgba(69, 180, 125, 0.02));
+      border-color: rgba(69, 180, 125, 0.18);
     }
+    .block.methode .block-label { color: #7ce0aa; }
     .method-steps {
       list-style: none;
       padding: 0;
@@ -865,13 +1004,14 @@
       display: block;
     }
     .method-steps li {
+      display: block;
       position: relative;
-      padding-left: 32px;
+      padding-left: 34px;
       counter-increment: step;
-      font-size: 14px;
+      font-size: 13.5px;
       color: var(--text-body);
-      line-height: 1.65;
-      margin-bottom: 8px;
+      line-height: 1.7;
+      margin-bottom: 10px;
       overflow-wrap: break-word;
     }
     .method-steps li:last-child { margin-bottom: 0; }
@@ -879,7 +1019,7 @@
       content: counter(step);
       position: absolute;
       left: 0;
-      top: 1px;
+      top: 2px;
       width: 22px;
       height: 22px;
       border-radius: 50%;
@@ -894,165 +1034,126 @@
     }
 
     /* Exemple résolu */
+    .block.exemple {
+      background: linear-gradient(135deg, rgba(155, 89, 182, 0.06), rgba(155, 89, 182, 0.02));
+      border-color: rgba(155, 89, 182, 0.2);
+    }
+    .block.exemple .block-label { color: #b07cd0; }
     .example-enonce {
-      font-size: 14px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: rgba(155, 89, 182, 0.08);
+      border-left: 3px solid #b07cd0;
+      font-size: 13.5px;
       color: var(--text-light);
-      font-weight: 600;
-      line-height: 1.6;
+      line-height: 1.65;
+      font-weight: 500;
       margin-bottom: 12px;
-      padding: 10px 12px;
-      background: rgba(0, 0, 0, 0.25);
-      border-radius: 8px;
-      border-left: 3px solid var(--purple);
+    }
+    .example-enonce::before {
+      content: 'Énoncé';
+      display: block;
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #b07cd0;
+      margin-bottom: 6px;
     }
     .example-steps {
       list-style: none;
       padding: 0;
-      display: block;
+      counter-reset: estep;
+      margin-bottom: 12px;
     }
     .example-steps li {
+      display: block;
       position: relative;
-      padding-left: 20px;
+      padding-left: 30px;
+      counter-increment: estep;
       font-size: 13.5px;
       color: var(--text-body);
-      line-height: 1.65;
+      line-height: 1.7;
       margin-bottom: 8px;
       overflow-wrap: break-word;
     }
     .example-steps li:last-child { margin-bottom: 0; }
     .example-steps li::before {
-      content: '→';
+      content: counter(estep);
       position: absolute;
       left: 0;
-      top: 0;
-      color: var(--purple-light);
-      font-weight: 700;
+      top: 2px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: rgba(155, 89, 182, 0.15);
+      color: #b07cd0;
+      font-size: 10px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .example-conclusion {
-      margin-top: 12px;
-      padding: 10px 12px;
-      background: rgba(69, 180, 125, 0.1);
+      padding: 10px 14px;
       border-radius: 8px;
-      border-left: 3px solid var(--success);
-      font-size: 14px;
+      background: rgba(69, 180, 125, 0.1);
+      border: 1px solid rgba(69, 180, 125, 0.2);
+      font-size: 13.5px;
       color: #7ce0aa;
       font-weight: 600;
-      overflow-wrap: break-word;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .example-conclusion::before {
+      content: '✓';
+      font-weight: 800;
+      flex-shrink: 0;
     }
 
-    /* Piège */
+    /* Piège BAC */
+    .block.piege {
+      background: linear-gradient(135deg, rgba(215, 101, 74, 0.06), rgba(215, 101, 74, 0.02));
+      border-color: rgba(215, 101, 74, 0.2);
+    }
+    .block.piege .block-label { color: #ff9a84; }
     .piege-trap {
-      font-size: 14px;
-      color: #ff9a84;
-      font-weight: 600;
-      margin-bottom: 8px;
-      line-height: 1.6;
+      font-size: 13.5px;
+      color: var(--text-light);
+      line-height: 1.65;
+      margin-bottom: 10px;
+      font-weight: 500;
       overflow-wrap: break-word;
     }
     .piege-solution {
       position: relative;
-      padding-left: 20px;
-      font-size: 13.5px;
+      padding-left: 22px;
+      font-size: 13px;
       color: #7ce0aa;
       line-height: 1.65;
+      display: block;
       overflow-wrap: break-word;
     }
     .piege-solution::before {
-      content: '✓';
-      position: absolute;
-      left: 0;
-      top: 0;
-      font-weight: 800;
-    }
-
-    /* ═══════════════════════════════════════════════════════════
-       BLOCS DE FIN (exam traps, common mistakes, recap)
-       ═══════════════════════════════════════════════════════════ */
-    .info-block {
-      padding: 18px 20px;
-      border-radius: 12px;
-      margin-bottom: 14px;
-      overflow-wrap: break-word;
-    }
-    .info-block.exam-traps {
-      background: linear-gradient(135deg, rgba(215, 101, 74, 0.06), rgba(215, 101, 74, 0.02));
-      border: 1px solid rgba(215, 101, 74, 0.2);
-    }
-    .info-block.common-mistakes {
-      background: linear-gradient(135deg, rgba(212, 160, 23, 0.06), rgba(212, 160, 23, 0.02));
-      border: 1px solid rgba(212, 160, 23, 0.2);
-    }
-    .info-block.recap {
-      background: linear-gradient(135deg, rgba(155, 89, 182, 0.06), rgba(155, 89, 182, 0.02));
-      border: 1px solid rgba(155, 89, 182, 0.2);
-    }
-    .info-block-title {
-      font-size: 12px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .info-block.exam-traps .info-block-title { color: #ff9a84; }
-    .info-block.common-mistakes .info-block-title { color: var(--warning-light); }
-    .info-block.recap .info-block-title { color: var(--purple-light); }
-
-    .info-list {
-      list-style: none;
-      padding: 0;
-      display: block;
-    }
-    .info-list li {
-      position: relative;
-      padding-left: 20px;
-      font-size: 13.5px;
-      color: var(--text-body);
-      line-height: 1.65;
-      margin-bottom: 8px;
-      overflow-wrap: break-word;
-    }
-    .info-list li:last-child { margin-bottom: 0; }
-    .info-list li::before {
-      content: '•';
-      position: absolute;
-      left: 0;
-      top: 0;
-      font-weight: 800;
-      color: currentColor;
-    }
-
-    .exam-trap-item {
-      padding: 12px 14px;
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 10px;
-      border-left: 3px solid #ff9a84;
-      margin-bottom: 10px;
-    }
-    .exam-trap-item:last-child { margin-bottom: 0; }
-    .exam-trap-trap {
-      font-size: 13.5px;
-      color: #ff9a84;
-      font-weight: 600;
-      margin-bottom: 6px;
-      overflow-wrap: break-word;
-    }
-    .exam-trap-solution {
-      position: relative;
-      padding-left: 18px;
-      font-size: 13px;
-      color: #7ce0aa;
-      line-height: 1.6;
-      overflow-wrap: break-word;
-    }
-    .exam-trap-solution::before {
       content: '→';
       position: absolute;
       left: 0;
       top: 0;
       font-weight: 800;
+    }
+
+    /* Astuce */
+    .block.astuce {
+      background: linear-gradient(135deg, rgba(212, 160, 23, 0.06), rgba(212, 160, 23, 0.02));
+      border-color: rgba(212, 160, 23, 0.2);
+    }
+    .block.astuce .block-label { color: #fbbf24; }
+    .block.astuce .block-text {
+      font-size: 13.5px;
+      color: var(--text-body);
+      line-height: 1.7;
+      font-style: italic;
     }
 
     /* ═══════════════════════════════════════════════════════════
@@ -1068,7 +1169,10 @@
       color: var(--text-muted);
       flex-wrap: wrap;
     }
-    .flashcard-progress .counter { font-weight: 700; color: var(--accent-bright); }
+    .flashcard-progress .counter {
+      font-weight: 700;
+      color: var(--accent-bright);
+    }
     .flashcard-track {
       flex: 1;
       min-width: 100px;
@@ -1084,32 +1188,15 @@
       transition: width 0.4s ease;
     }
 
-    .flashcard-type-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 3px 10px;
-      border-radius: 12px;
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      margin-bottom: 10px;
-    }
-    .flashcard-type-badge.definition { background: rgba(224, 184, 74, 0.12); color: var(--accent-bright); }
-    .flashcard-type-badge.formule { background: rgba(74, 175, 224, 0.12); color: var(--info); }
-    .flashcard-type-badge.methode { background: rgba(69, 180, 125, 0.12); color: #7ce0aa; }
-    .flashcard-type-badge.piege { background: rgba(215, 101, 74, 0.12); color: #ff9a84; }
-
     .flashcard {
       perspective: 1400px;
       margin-bottom: 18px;
-      min-height: 260px;
+      min-height: 280px;
     }
     .flashcard-inner {
       position: relative;
       width: 100%;
-      height: 260px;
+      height: 280px;
       transition: transform 0.65s cubic-bezier(0.25, 1, 0.5, 1);
       transform-style: preserve-3d;
       cursor: pointer;
@@ -1131,6 +1218,7 @@
       border: 1px solid var(--border-soft);
       background: var(--bg-card);
       backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       overflow-y: auto;
       box-shadow: var(--shadow);
     }
@@ -1146,6 +1234,38 @@
       text-transform: uppercase;
       color: var(--accent-bright);
       margin-bottom: 14px;
+    }
+    .flashcard-type-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 12px;
+    }
+    .flashcard-type-badge.definition {
+      background: rgba(224, 184, 74, 0.12);
+      color: var(--accent-bright);
+      border: 1px solid rgba(224, 184, 74, 0.2);
+    }
+    .flashcard-type-badge.formule {
+      background: rgba(74, 175, 224, 0.12);
+      color: var(--info);
+      border: 1px solid rgba(74, 175, 224, 0.2);
+    }
+    .flashcard-type-badge.methode {
+      background: rgba(69, 180, 125, 0.12);
+      color: #7ce0aa;
+      border: 1px solid rgba(69, 180, 125, 0.2);
+    }
+    .flashcard-type-badge.piege {
+      background: rgba(215, 101, 74, 0.12);
+      color: #ff9a84;
+      border: 1px solid rgba(215, 101, 74, 0.2);
     }
     .flashcard-text {
       font-size: 17px;
@@ -1206,12 +1326,21 @@
     }
     .feedback-btn i { font-size: 18px; }
     .feedback-btn:hover { transform: translateY(-2px); }
-    .feedback-btn.hard { background: rgba(215, 101, 74, 0.1); border-color: rgba(215, 101, 74, 0.3); color: #ff9a84; }
-    .feedback-btn.hard:hover { background: rgba(215, 101, 74, 0.18); border-color: rgba(215, 101, 74, 0.5); }
-    .feedback-btn.medium { background: rgba(212, 160, 23, 0.1); border-color: rgba(212, 160, 23, 0.3); color: #fbbf24; }
-    .feedback-btn.medium:hover { background: rgba(212, 160, 23, 0.18); border-color: rgba(212, 160, 23, 0.5); }
-    .feedback-btn.easy { background: rgba(69, 180, 125, 0.1); border-color: rgba(69, 180, 125, 0.3); color: #7ce0aa; }
-    .feedback-btn.easy:hover { background: rgba(69, 180, 125, 0.18); border-color: rgba(69, 180, 125, 0.5); }
+    .feedback-btn.hard {
+      background: rgba(215, 101, 74, 0.1);
+      border-color: rgba(215, 101, 74, 0.3);
+      color: #ff9a84;
+    }
+    .feedback-btn.medium {
+      background: rgba(212, 160, 23, 0.1);
+      border-color: rgba(212, 160, 23, 0.3);
+      color: #fbbf24;
+    }
+    .feedback-btn.easy {
+      background: rgba(69, 180, 125, 0.1);
+      border-color: rgba(69, 180, 125, 0.3);
+      color: #7ce0aa;
+    }
 
     /* ═══════════════════════════════════════════════════════════
        QUIZ
@@ -1237,32 +1366,35 @@
       border-radius: 12px;
       padding: 18px 20px;
       margin-bottom: 12px;
-      transition: var(--transition);
     }
-    .quiz-question:hover { border-color: rgba(224, 184, 74, 0.15); }
-
+    .quiz-q-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
     .quiz-q-number {
       font-size: 11px;
       font-weight: 800;
       letter-spacing: 0.12em;
       text-transform: uppercase;
       color: var(--accent-bright);
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
     }
-    .quiz-level-badge {
-      padding: 2px 8px;
-      border-radius: 10px;
-      font-size: 9px;
+    .quiz-q-level {
+      font-size: 10px;
       font-weight: 800;
+      padding: 3px 10px;
+      border-radius: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
-    .quiz-level-badge.level-1 { background: rgba(69, 180, 125, 0.15); color: #7ce0aa; }
-    .quiz-level-badge.level-2 { background: rgba(96, 165, 250, 0.15); color: #93c5fd; }
-    .quiz-level-badge.level-3 { background: rgba(224, 184, 74, 0.15); color: var(--accent-bright); }
-    .quiz-level-badge.level-4 { background: rgba(212, 160, 23, 0.15); color: #fbbf24; }
-    .quiz-level-badge.level-5 { background: rgba(215, 101, 74, 0.15); color: #ff9a84; }
+    .quiz-q-level.l1 { background: rgba(69, 180, 125, 0.15); color: #7ce0aa; }
+    .quiz-q-level.l2 { background: rgba(74, 175, 224, 0.15); color: var(--info); }
+    .quiz-q-level.l3 { background: rgba(224, 184, 74, 0.15); color: var(--accent-bright); }
+    .quiz-q-level.l4 { background: rgba(212, 160, 23, 0.15); color: #fbbf24; }
+    .quiz-q-level.l5 { background: rgba(215, 101, 74, 0.15); color: #ff9a84; }
 
     .quiz-q-text {
       font-size: 15px;
@@ -1310,24 +1442,36 @@
     .quiz-option.disabled { cursor: not-allowed; }
 
     .quiz-option-letter {
-      width: 26px; height: 26px;
+      width: 26px;
+      height: 26px;
       border-radius: 6px;
       background: rgba(255, 255, 255, 0.04);
-      display: flex; align-items: center; justify-content: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       font-size: 12px;
       font-weight: 800;
       flex-shrink: 0;
       color: var(--text-muted);
     }
-    .quiz-option.selected .quiz-option-letter { background: var(--accent-bright); color: #0A0A0A; }
-    .quiz-option.correct .quiz-option-letter { background: var(--success); color: #fff; }
-    .quiz-option.wrong .quiz-option-letter { background: var(--danger); color: #fff; }
+    .quiz-option.selected .quiz-option-letter {
+      background: var(--accent-bright);
+      color: #0A0A0A;
+    }
+    .quiz-option.correct .quiz-option-letter {
+      background: var(--success);
+      color: #fff;
+    }
+    .quiz-option.wrong .quiz-option-letter {
+      background: var(--danger);
+      color: #fff;
+    }
 
     .quiz-explanation {
       margin-top: 12px;
       padding: 12px 14px;
       background: rgba(74, 175, 224, 0.08);
-      border-left: 3px solid var(--info);
+      border-left: 3px solid #4AAFE0;
       border-radius: 0 8px 8px 0;
       font-size: 13px;
       line-height: 1.65;
@@ -1336,7 +1480,7 @@
       overflow-wrap: break-word;
     }
     .quiz-explanation.show { display: block; }
-    .quiz-explanation strong { color: var(--info); }
+    .quiz-explanation strong { color: #4AAFE0; }
 
     /* ═══════════════════════════════════════════════════════════
        RÉSULTATS
@@ -1369,8 +1513,15 @@
       from { transform: scale(0); opacity: 0; }
       to { transform: scale(1); opacity: 1; }
     }
-    .result-hero h2 { font-size: clamp(22px, 4vw, 28px); margin-bottom: 8px; }
-    .result-hero p { color: var(--text-dim); margin: 0; font-size: 14.5px; }
+    .result-hero h2 {
+      font-size: clamp(22px, 4vw, 28px);
+      margin-bottom: 8px;
+    }
+    .result-hero p {
+      color: var(--text-dim);
+      margin: 0;
+      font-size: 14.5px;
+    }
 
     .result-summary {
       display: grid;
@@ -1383,7 +1534,9 @@
       border-radius: 12px;
       padding: 16px 12px;
       background: var(--bg-card);
+      backdrop-filter: blur(10px);
       text-align: center;
+      transition: var(--transition);
     }
     .metric strong {
       display: block;
@@ -1460,14 +1613,19 @@
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      color: var(--info);
+      color: #4AAFE0;
       margin-bottom: 12px;
       display: flex;
       align-items: center;
       gap: 8px;
     }
-    .recommendations .rec-list { list-style: none; padding: 0; display: block; }
+    .recommendations .rec-list {
+      list-style: none;
+      padding: 0;
+      display: block;
+    }
     .recommendations .rec-list li {
+      display: block;
       position: relative;
       padding-left: 20px;
       font-size: 13.5px;
@@ -1482,12 +1640,12 @@
       position: absolute;
       left: 0;
       top: 0;
-      color: var(--info);
+      color: #4AAFE0;
       font-weight: 800;
     }
 
     /* ═══════════════════════════════════════════════════════════
-       EMPTY STATE
+       EMPTY
        ═══════════════════════════════════════════════════════════ */
     .empty-state {
       text-align: center;
@@ -1510,7 +1668,38 @@
     .empty-state p { font-size: 13px; }
 
     /* ═══════════════════════════════════════════════════════════
-       MODAL PREMIUM
+       MODALES
+       ═══════════════════════════════════════════════════════════ */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: none;
+      place-items: center;
+      padding: 18px;
+      background: rgba(0, 0, 0, 0.78);
+      backdrop-filter: blur(10px);
+    }
+    .modal-backdrop.show { display: grid; animation: fadeIn 0.25s ease; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .modal {
+      max-width: 440px;
+      width: 100%;
+      background: linear-gradient(145deg, #161616, #0f0f0f);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius);
+      padding: 24px 22px;
+      position: relative;
+      animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    @keyframes modalPop {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       POPUP PREMIUM
        ═══════════════════════════════════════════════════════════ */
     .premium-popup-overlay {
       position: fixed;
@@ -1540,7 +1729,9 @@
       transform: scale(0.94) translateY(16px);
       transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
     }
-    .premium-popup-overlay.show .premium-popup { transform: scale(1) translateY(0); }
+    .premium-popup-overlay.show .premium-popup {
+      transform: scale(1) translateY(0);
+    }
     .premium-popup::before {
       content: '';
       position: absolute;
@@ -1550,19 +1741,32 @@
     }
     .popup-close {
       position: absolute;
-      top: 10px; right: 10px;
-      width: 30px; height: 30px;
+      top: 10px;
+      right: 10px;
+      width: 30px;
+      height: 30px;
       border: 1px solid rgba(184, 134, 11, 0.2);
       border-radius: 8px;
       background: rgba(255, 255, 255, 0.03);
       color: var(--text-muted);
-      display: flex; align-items: center; justify-content: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       font-size: 14px;
       cursor: pointer;
       transition: var(--transition);
     }
-    .popup-close:hover { color: var(--text-light); border-color: rgba(184, 134, 11, 0.3); }
-    .popup-icon { display: block; text-align: center; font-size: 44px; margin-bottom: 6px; line-height: 1; }
+    .popup-close:hover {
+      color: var(--text-light);
+      border-color: rgba(184, 134, 11, 0.3);
+    }
+    .popup-icon {
+      display: block;
+      text-align: center;
+      font-size: 44px;
+      margin-bottom: 6px;
+      line-height: 1;
+    }
     .premium-popup h2 {
       text-align: center;
       font-size: 22px;
@@ -1612,6 +1816,42 @@
     .btn-later:hover { color: var(--text-light); }
 
     /* ═══════════════════════════════════════════════════════════
+       TOAST
+       ═══════════════════════════════════════════════════════════ */
+    .toast {
+      position: fixed;
+      top: calc(var(--safe-top) + 20px);
+      left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      padding: 12px 20px;
+      border-radius: 12px;
+      background: rgba(20, 22, 20, 0.96);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(224, 184, 74, 0.3);
+      color: var(--text-light);
+      font-size: 13px;
+      font-weight: 500;
+      z-index: 300;
+      opacity: 0;
+      transition: var(--transition);
+      max-width: 90%;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      pointer-events: none;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    .toast.success { border-color: rgba(58, 182, 126, 0.5); }
+    .toast.error { border-color: rgba(248, 113, 113, 0.5); }
+    .toast i { font-size: 14px; flex-shrink: 0; }
+    .toast.success i { color: var(--success-light); }
+    .toast.error i { color: #f87171; }
+
+    /* ═══════════════════════════════════════════════════════════
        KATEX
        ═══════════════════════════════════════════════════════════ */
     .katex { font-size: 1.05em; color: inherit; }
@@ -1631,10 +1871,17 @@
       .form-grid { grid-template-columns: 1fr; }
       .field.full { grid-column: auto; }
       .actions .btn { flex: 1 1 100%; }
+
       .step-bar { padding: 10px 12px; gap: 6px; }
       .step-item { padding: 5px 10px; font-size: 11px; }
       .step-item .num { width: 18px; height: 18px; font-size: 9px; }
-      .flashcard, .flashcard-inner { height: 240px; min-height: 240px; }
+
+      .notion-header { padding: 14px 15px; gap: 12px; }
+      .notion-num { width: 32px; height: 32px; font-size: 13px; }
+      .notion-title { font-size: 14px; }
+      .notion-content { padding: 4px 15px 18px; gap: 12px; }
+      .block { padding: 12px 14px; }
+      .flashcard, .flashcard-inner { height: 260px; min-height: 260px; }
       .flashcard-text { font-size: 15.5px; }
       .flashcard-face { padding: 20px; }
       .flashcard-feedback.show { grid-template-columns: repeat(3, 1fr); gap: 6px; }
@@ -1646,18 +1893,13 @@
       .metric small { font-size: 9.5px; }
       .session-head { flex-direction: column; align-items: flex-start; }
       .custom-select-trigger { padding: 11px 12px; min-height: 44px; font-size: 13.5px; }
-      .notion-header { padding: 14px 16px; }
-      .notion-content { padding: 0 16px 16px; }
     }
 
     @media (max-width: 380px) {
       .panel { padding: 14px; }
       .btn { font-size: 13px; padding: 10px 14px; }
-      .flashcard, .flashcard-inner { height: 220px; min-height: 220px; }
-      .flashcard-text { font-size: 15px; }
-      .feedback-btn { font-size: 10.5px; padding: 10px 4px; }
-      .step-item .label { display: none; }
-      .step-item { padding: 5px 8px; }
+      .notion-num { width: 28px; height: 28px; font-size: 12px; }
+      .notion-title { font-size: 13px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -1674,10 +1916,6 @@
     <header>
       <a class="brand" href="index.html">ARVEX<span>A School</span></a>
       <div class="header-right">
-        <div class="quota-badge" id="quotaBadge" style="display:none;">
-          <i class="fas fa-gift"></i>
-          <span id="quotaText">2 essais gratuits</span>
-        </div>
         <div class="connection" id="connectionState">Vérification...</div>
       </div>
     </header>
@@ -1707,11 +1945,11 @@
     <!-- CONFIG -->
     <section class="view active" id="configView">
       <div class="panel">
-        <div class="eyebrow">Réviseur intelligent</div>
+        <div class="eyebrow">Réviseur intelligent v4</div>
         <h1>Génère ta révision <em style="color:var(--accent-bright);font-style:italic;">sur mesure</em>.</h1>
         <p class="lead">
-          Une fiche enrichie, des flashcards actives et un quiz adaptatif — l'IA construit ta session complète.
-          <strong style="color:var(--accent-bright);">2 essais gratuits/jour</strong>, illimité en Premium.
+          Une fiche ultra-détaillée, des flashcards typées et un quiz à 5 niveaux.
+          L'IA exploite <strong style="color:var(--accent-bright);">toute la base de connaissances</strong> du BAC.
         </p>
 
         <form id="configForm" class="form-grid">
@@ -1801,9 +2039,9 @@
           <div class="loader-spinner"></div>
           <div class="steps-list">
             <div class="loading-step" id="genStep1"><span class="step-icon">🔍</span><div class="step-content"><span class="step-label">Analyse du chapitre</span><span class="step-desc">Matière, chapitre et mode sélectionnés</span></div></div>
-            <div class="loading-step" id="genStep2"><span class="step-icon">🧠</span><div class="step-content"><span class="step-label">Extraction des notions clés</span><span class="step-desc">L'IA identifie les points essentiels</span></div></div>
-            <div class="loading-step" id="genStep3"><span class="step-icon">✍️</span><div class="step-content"><span class="step-label">Rédaction enrichie</span><span class="step-desc">Sections, pièges, méthodes, mnémos</span></div></div>
-            <div class="loading-step" id="genStep4"><span class="step-icon">🧮</span><div class="step-content"><span class="step-label">Vérification</span><span class="step-desc">Contrôle de la cohérence et du LaTeX</span></div></div>
+            <div class="loading-step" id="genStep2"><span class="step-icon">🧠</span><div class="step-content"><span class="step-label">Extraction des notions clés</span><span class="step-desc">Exploitation de la base de connaissances</span></div></div>
+            <div class="loading-step" id="genStep3"><span class="step-icon">✍️</span><div class="step-content"><span class="step-label">Rédaction enrichie</span><span class="step-desc">Sections, formules, méthodes, exemples, pièges</span></div></div>
+            <div class="loading-step" id="genStep4"><span class="step-icon">🧮</span><div class="step-content"><span class="step-label">Vérification</span><span class="step-desc">Contrôle de la complétude</span></div></div>
             <div class="loading-step" id="genStep5"><span class="step-icon">✨</span><div class="step-content"><span class="step-label">Finalisation</span><span class="step-desc">Préparation de l'affichage</span></div></div>
           </div>
           <div class="loading-status" id="genLoadingStatus">Préparation...</div>
@@ -1817,14 +2055,14 @@
         <div class="session-head">
           <div>
             <div class="eyebrow">Fiche de révision</div>
-            <h2 id="ficheTitle">📝 Fiche enrichie</h2>
+            <h2 id="ficheTitle">📝 Fiche ultra-riche</h2>
+            <div class="session-meta" id="ficheMeta"></div>
           </div>
           <button class="btn secondary" id="newFicheBtn">
             <i class="fas fa-plus"></i> Nouvelle
           </button>
         </div>
 
-        <div class="meta-bar" id="ficheMeta"></div>
         <div id="ficheContent"></div>
 
         <div class="actions">
@@ -1847,13 +2085,12 @@
           <div>
             <div class="eyebrow">Flashcards actives</div>
             <h2>⚡ Cartes de mémorisation</h2>
+            <div class="session-meta" id="flashMeta"></div>
           </div>
           <button class="btn secondary" id="newFlashBtn">
             <i class="fas fa-plus"></i> Nouvelle
           </button>
         </div>
-
-        <div class="meta-bar" id="flashMeta"></div>
 
         <div class="flashcard-progress">
           <span>Progression</span>
@@ -1866,7 +2103,7 @@
         <div class="flashcard" id="flashcardEl">
           <div class="flashcard-inner">
             <div class="flashcard-face flashcard-front">
-              <div id="flashTypeBadge"></div>
+              <div class="flashcard-type-badge" id="flashTypeBadge" style="display:none;"></div>
               <div class="flashcard-label">Question</div>
               <div class="flashcard-text" id="flashFront"></div>
               <div class="flashcard-hint" id="flashHint" style="display:none;">
@@ -1915,10 +2152,10 @@
           <div>
             <div class="eyebrow">Quiz de vérification</div>
             <h2>❓ Teste tes connaissances</h2>
+            <div class="session-meta" id="quizMeta"></div>
           </div>
         </div>
 
-        <div class="meta-bar" id="quizMeta"></div>
         <div class="progress"><span id="quizProgress"></span></div>
         <div id="quizContent"></div>
 
@@ -2001,6 +2238,11 @@
     </div>
   </div>
 
+  <div class="toast" id="toast">
+    <i class="fas fa-info-circle"></i>
+    <span id="toastText"></span>
+  </div>
+
   <script type="importmap">
   {
     "imports": {
@@ -2013,15 +2255,12 @@
 
   <script type="module">
   // ═══════════════════════════════════════════════════════════════
-  // RÉVISEUR v4.0 — Front adapté au backend enrichi
+  // RÉVISEUR v4 — Adapté au backend v4.0
   // ═══════════════════════════════════════════════════════════════
 
   import { initializeApp } from "firebase/app";
   import { getAuth, onAuthStateChanged, getIdToken } from "firebase/auth";
-  import {
-    getFirestore, doc, getDoc, setDoc, deleteDoc,
-    collection, addDoc, query, orderBy, limit, getDocs, serverTimestamp
-  } from "firebase/firestore";
+  import { getFirestore, doc, getDoc } from "firebase/firestore";
 
   const app = initializeApp({
     apiKey: "AIzaSyDHscOXw3rLuhV6z1Cny-bdYCumqpnG7QE",
@@ -2038,39 +2277,25 @@
 
   const CHAPTERS = {
     mathematiques: [
-      'Nombres complexes', 'Similitudes planes directes',
-      'Probabilités', 'Variables aléatoires',
-      'Fonctions numériques', 'Limites et continuité', 'Dérivation',
-      'Étude de fonctions', 'Fonction logarithme', 'Fonction exponentielle',
-      'Primitives et intégrales', 'Équations différentielles',
-      'Géométrie dans l\'espace', 'Produit scalaire / produit vectoriel',
-      'Droites et plans dans l\'espace'
+      'Nombres complexes', 'Similitudes planes directes', 'Calcul de probabilités',
+      'Variable aléatoire', 'Fonctions numériques', 'Fonction logarithme',
+      'Fonction exponentielle', 'Calcul intégral', 'Équations différentielles',
+      'Suites numériques', 'Statistiques'
     ],
     physique: [
-      'Cinématique', 'Dynamique', 'Travail et puissance d\'une force',
-      'Énergie cinétique', 'Énergie potentielle', 'Énergie mécanique',
-      'Courant alternatif', 'Condensateurs', 'Bobines / auto-induction',
-      'Circuits RLC', 'Oscillations électriques', 'Électricité et énergie',
-      'Propagation rectiligne de la lumière', 'Lentilles minces',
-      'Dispersion de la lumière', 'Diffraction de la lumière',
-      'Effet photoélectrique', 'Noyau atomique', 'Réactions nucléaires'
+      'Cinématique', 'Mouvement du centre d\'inertie', 'Champ de pesanteur',
+      'Particules chargées', 'Oscillateurs mécaniques', 'Vibrations',
+      'Propagation des ondes', 'Superposition', 'Interférences lumineuses',
+      'Champ magnétique', 'Force de Lorentz', 'Force de Laplace',
+      'Induction électromagnétique', 'Auto-Induction', 'Circuit LC',
+      'Régime sinusoïdal', 'Radioactivité'
     ],
     chimie: [
-      'Solutions aqueuses', 'Solutions d\'acide chlorhydrique et d\'hydroxyde de sodium',
-      'Réactions acido-basiques', 'pH', 'Dosage acido-basique',
-      'Oxydoréduction', 'Couples oxydant/réducteur',
-      'Piles et potentiels d\'oxydoréduction', 'Dosage d\'oxydoréduction',
-      'Alcools', 'Aldéhydes et cétones', 'Acides carboxyliques',
-      'Esters', 'Réactions des composés organiques', 'Polymères / macromolécules'
+      'Solutions aqueuses', 'Acide chlorhydrique / Soude', 'Couples acide/base',
+      'Réaction acide-base', 'Solution tampon', 'Alcools', 'Acides carboxyliques',
+      'Amines', 'Acides α-aminés'
     ],
-    svt: [
-      'Génétique', 'Hérédité et transmission des caractères',
-      'Génétique humaine', 'ADN et expression de l\'information génétique',
-      'Mutations', 'Évolution', 'Immunologie', 'Défenses de l\'organisme',
-      'Reproduction humaine', 'Régulation hormonale', 'Système nerveux',
-      'Géologie', 'Tectonique des plaques', 'Dynamique interne de la Terre',
-      'Roches et phénomènes géologiques'
-    ]
+    svt: ['Génétique', 'Immunologie', 'Écologie', 'Évolution']
   };
 
   const SUBJECT_LABELS = {
@@ -2081,9 +2306,13 @@
   };
 
   const DIFFICULTY_LABELS = { 1: 'Facile', 2: 'Moyen', 3: 'Difficile', 4: 'Niveau BAC' };
-  const LEVEL_LABELS = { bases: 'Bases', standard: 'Standard', avance: 'Avancé' };
 
-  const GENERATION_STEPS = ['genStep1', 'genStep2', 'genStep3', 'genStep4', 'genStep5'];
+  const TYPE_LABELS = {
+    definition: { label: 'Définition', icon: '📖' },
+    formule: { label: 'Formule', icon: '📐' },
+    methode: { label: 'Méthode', icon: '🧮' },
+    piege: { label: 'Piège', icon: '⚠️' }
+  };
 
   const state = {
     subject: 'mathematiques',
@@ -2100,18 +2329,18 @@
     flashRatings: {},
     quiz: [],
     quizAnswers: {},
-    isGenerating: false,
-    sessionStartedAt: null,
-    sessionSource: null,
-    sessionLevel: null
+    isGenerating: false
   };
 
   const $ = (id) => document.getElementById(id);
   const views = ['configView', 'loadingView', 'ficheView', 'flashcardView', 'quizView', 'resultsView'];
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+  const GENERATION_STEPS = ['genStep1', 'genStep2', 'genStep3', 'genStep4', 'genStep5'];
+
   function showView(id) {
     views.forEach((v) => $(v).classList.toggle('active', v === id));
+
     const stepMap = {
       ficheView: 'fiche',
       flashcardView: 'flashcard',
@@ -2145,8 +2374,14 @@
     return div.innerHTML;
   }
 
+  /**
+   * Sécurise le texte pour injection HTML :
+   * échappe < et > uniquement, préserve $ pour KaTeX.
+   */
   function safeText(text) {
-    return String(text || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return String(text || '')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
   }
 
   function renderKaTeX(root) {
@@ -2170,33 +2405,34 @@
         throwOnError: false,
         errorColor: '#ff9a84',
         strict: false,
-        trust: true,
-        macros: {
-          "\\R": "\\mathbb{R}",
-          "\\C": "\\mathbb{C}",
-          "\\N": "\\mathbb{N}",
-          "\\Z": "\\mathbb{Z}",
-          "\\Re": "\\operatorname{Re}",
-          "\\Im": "\\operatorname{Im}",
-          "\\arg": "\\operatorname{arg}"
-        }
+        trust: true
       });
-    } catch (e) {}
+    } catch (e) {
+      console.warn('KaTeX render error:', e);
+    }
   }
 
-  function normalizeMath(text) {
-    if (!text) return '';
-    if (window.KaTeXUtils) return window.KaTeXUtils.cleanAIResponse(text);
-    return String(text);
+  function showToast(message, type = 'info') {
+    const toast = $('toast');
+    const text = $('toastText');
+    text.textContent = message;
+    toast.className = `toast show ${type}`;
+    const icon = toast.querySelector('i');
+    if (icon) {
+      icon.className = type === 'success' ? 'fas fa-check-circle'
+        : type === 'error' ? 'fas fa-exclamation-circle'
+        : 'fas fa-info-circle';
+    }
+    clearTimeout(window.__toastTimer);
+    window.__toastTimer = setTimeout(() => toast.classList.remove('show'), 3200);
   }
 
-  // ═══════════════════════════════════════════════════════════════
-  // ÉTAPES DE CHARGEMENT
-  // ═══════════════════════════════════════════════════════════════
+  // ────────────────────────────────────────────────────────────────
+  // ÉTAPES
+  // ────────────────────────────────────────────────────────────────
   function resetSteps(steps) {
     steps.forEach((id) => { const el = $(id); if (el) el.classList.remove('active', 'done'); });
   }
-
   function activateStep(stepId, statusEl, label) {
     document.querySelectorAll('.loading-step').forEach((s) => {
       if (s.id === stepId) { s.classList.add('active'); s.classList.remove('done'); }
@@ -2204,7 +2440,6 @@
     });
     if (statusEl) { statusEl.textContent = label; statusEl.classList.add('active'); }
   }
-
   function finishAllSteps(steps, statusEl, finalLabel = 'Terminé !') {
     steps.forEach((id) => {
       const el = $(id);
@@ -2213,9 +2448,9 @@
     if (statusEl) { statusEl.textContent = finalLabel; statusEl.classList.remove('active'); }
   }
 
-  // ═══════════════════════════════════════════════════════════════
+  // ────────────────────────────────────────────────────────────────
   // CUSTOM SELECT
-  // ═══════════════════════════════════════════════════════════════
+  // ────────────────────────────────────────────────────────────────
   class CustomSelect {
     constructor(element) {
       this.element = element;
@@ -2286,7 +2521,6 @@
   }
 
   const customSelects = { subject: null, chapter: null };
-
   function initCustomSelects() {
     customSelects.subject = new CustomSelect($('subjectSelect'));
     customSelects.chapter = new CustomSelect($('chapterSelect'));
@@ -2336,58 +2570,13 @@
   }
 
   // ═══════════════════════════════════════════════════════════════
-  // SESSION FIRESTORE (reprise)
-  // ═══════════════════════════════════════════════════════════════
-  async function saveActiveSession() {
-    if (!state.user || !state.currentSession) return;
-    try {
-      const ref = doc(db, 'users', state.user.uid, 'activeRevision', 'current');
-      await setDoc(ref, {
-        subject: state.subject,
-        chapter: state.chapter,
-        mode: state.mode,
-        currentSession: state.currentSession,
-        flashcards: state.flashcards,
-        currentFlashIndex: state.currentFlashIndex,
-        flashRatings: state.flashRatings,
-        quiz: state.quiz,
-        quizAnswers: state.quizAnswers,
-        updatedAt: serverTimestamp()
-      }, { merge: true });
-    } catch (e) {}
-  }
-
-  async function clearActiveSession() {
-    if (!state.user) return;
-    try { await deleteDoc(doc(db, 'users', state.user.uid, 'activeRevision', 'current')); } catch (e) {}
-  }
-
-  async function loadActiveSession() {
-    if (!state.user) return null;
-    try {
-      const snap = await getDoc(doc(db, 'users', state.user.uid, 'activeRevision', 'current'));
-      if (!snap.exists()) return null;
-      const data = snap.data();
-      const updated = data.updatedAt?.toDate?.() || new Date(data.updatedAt);
-      const ageHours = (Date.now() - updated.getTime()) / (1000 * 60 * 60);
-      if (ageHours > 24) { await clearActiveSession(); return null; }
-      return data;
-    } catch (_) { return null; }
-  }
-
-  let saveRevisionTimer = null;
-  function debouncedSaveRevision() {
-    if (saveRevisionTimer) clearTimeout(saveRevisionTimer);
-    saveRevisionTimer = setTimeout(saveActiveSession, 1500);
-  }
-
-  // ═══════════════════════════════════════════════════════════════
   // GÉNÉRATION
   // ═══════════════════════════════════════════════════════════════
   $('configForm').addEventListener('submit', generateRevision);
 
   async function generateRevision(event) {
     event.preventDefault();
+
     if (state.isGenerating) return;
     if (!state.user) {
       setStatus('configStatus', 'Connecte-toi pour utiliser le Réviseur.', 'error');
@@ -2402,7 +2591,6 @@
 
     state.subject = customSelects.subject.getValue();
     state.chapter = customSelects.chapter.getValue();
-    state.sessionStartedAt = Date.now();
 
     showView('loadingView');
     resetSteps(GENERATION_STEPS);
@@ -2410,9 +2598,9 @@
 
     try {
       activateStep('genStep1', statusEl, 'Analyse du chapitre...');
-      await sleep(600);
+      await sleep(500);
 
-      activateStep('genStep2', statusEl, 'Extraction des notions clés...');
+      activateStep('genStep2', statusEl, 'Extraction des notions...');
 
       const token = await getIdToken(state.user);
       const responsePromise = fetch('/api/reviseur', {
@@ -2426,12 +2614,12 @@
           subject: state.subject,
           chapter: state.chapter,
           mode: state.mode,
-          count: state.flashCount,
           level: 'auto'
         })
       });
 
       await sleep(1500);
+
       activateStep('genStep3', statusEl, 'Rédaction enrichie...');
 
       const response = await responsePromise;
@@ -2451,22 +2639,19 @@
       await sleep(800);
 
       state.currentSession = payload.session;
-      state.sessionSource = payload.source || 'ai';
-      state.sessionLevel = payload.session?.level || 'standard';
       state.flashcards = [];
       state.currentFlashIndex = 0;
       state.flashRatings = {};
       state.quiz = [];
       state.quizAnswers = {};
 
-      await saveSession(payload.session);
-
       if (payload.quota && payload.quota.type === 'free') {
-        updateQuotaBadge(FREE_LIMIT - payload.quota.used);
+        const remaining = Math.max(0, (payload.quota.limit || FREE_LIMIT) - (payload.quota.used || 0));
+        console.log(`Essais restants : ${remaining}`);
       }
 
       activateStep('genStep5', statusEl, 'Finalisation...');
-      await sleep(600);
+      await sleep(500);
 
       finishAllSteps(GENERATION_STEPS, statusEl, '✅ Ta révision est prête !');
       await sleep(400);
@@ -2474,11 +2659,9 @@
       if (state.mode === 'flashcard' && Array.isArray(payload.session.flashcards)) {
         state.flashcards = payload.session.flashcards;
         state.currentFlashIndex = 0;
-        await saveActiveSession();
         renderFlashcard();
         showView('flashcardView');
       } else {
-        await saveActiveSession();
         renderFiche();
         showView('ficheView');
       }
@@ -2495,188 +2678,70 @@
   }
 
   // ═══════════════════════════════════════════════════════════════
-  // RENDU FICHE — Version v4.0 (accordéon riche)
+  // RENDU FICHE v4 — Accordéon + 6 blocs par notion
   // ═══════════════════════════════════════════════════════════════
   function renderFiche() {
     const session = state.currentSession;
     if (!session) return;
 
-    // Meta
-    const meta = $('ficheMeta');
-    meta.innerHTML = `
-      <span class="meta-chip"><i class="fas fa-book"></i> ${escapeHtml(SUBJECT_LABELS[state.subject])}</span>
-      <span class="meta-chip"><i class="fas fa-list"></i> ${escapeHtml(session.chapterTitle || state.chapter)}</span>
-      <span class="meta-chip"><i class="fas fa-layer-group"></i> <strong>${session.sections?.length || 0}</strong> sections</span>
-      ${session.level ? `<span class="meta-chip level-${session.level}"><i class="fas fa-signal"></i> ${LEVEL_LABELS[session.level] || session.level}</span>` : ''}
-      ${state.sessionSource === 'cache' ? `<span class="meta-chip cache-badge"><i class="fas fa-bolt"></i> Cache</span>` : ''}
-      ${state.sessionSource === 'ai' ? `<span class="meta-chip ai-badge"><i class="fas fa-brain"></i> IA</span>` : ''}
-    `;
+    const sections = session.sections || [];
+    const level = session.level || 'standard';
 
-    // Titre
-    $('ficheTitle').textContent = '📝 ' + (session.chapterTitle || 'Fiche de révision');
+    $('ficheTitle').textContent = `📝 ${session.chapterTitle || 'Fiche'}`;
+
+    $('ficheMeta').innerHTML = `
+      <span><i class="fas fa-book"></i> ${escapeHtml(SUBJECT_LABELS[state.subject])}</span>
+      <span><i class="fas fa-list"></i> ${sections.length} section${sections.length > 1 ? 's' : ''}</span>
+      <span><i class="fas fa-signal"></i> Niveau ${escapeHtml(level)}</span>
+    `;
 
     const container = $('ficheContent');
     container.innerHTML = '';
 
-    // Key Points
+    // ═══ Points clés globaux ═══
     if (Array.isArray(session.keyPoints) && session.keyPoints.length > 0) {
       const block = document.createElement('div');
-      block.className = 'key-points-block';
+      block.className = 'global-block key-points';
       block.innerHTML = `
-        <div class="key-points-title"><i class="fas fa-star"></i> Points clés à retenir</div>
-        <ul class="key-points-list">
-          ${session.keyPoints.map((p) => `<li>${safeText(normalizeMath(p))}</li>`).join('')}
+        <div class="global-title"><i class="fas fa-star"></i> Points clés du chapitre</div>
+        <ul class="global-list">
+          ${session.keyPoints.map((p) => `<li>${safeText(p)}</li>`).join('')}
         </ul>
       `;
       container.appendChild(block);
     }
 
-    // Accordéon des notions
-    if (Array.isArray(session.sections) && session.sections.length > 0) {
-      const accordion = document.createElement('div');
-      accordion.className = 'notion-accordion';
+    // ═══ Label des sections ═══
+    const sectionsLabel = document.createElement('div');
+    sectionsLabel.className = 'sections-label';
+    sectionsLabel.innerHTML = `
+      <i class="fas fa-layer-group"></i>
+      Détail par notion
+      <span class="count">${sections.length} notion${sections.length > 1 ? 's' : ''}</span>
+    `;
+    container.appendChild(sectionsLabel);
 
-      session.sections.forEach((section, index) => {
-        const card = document.createElement('div');
-        card.className = 'notion-card';
-        card.dataset.index = index;
+    // ═══ Accordéon ═══
+    const accordion = document.createElement('div');
+    accordion.className = 'notion-accordion';
 
-        const notionTitle = section.notionTitle || section.title || `Section ${index + 1}`;
+    sections.forEach((section, i) => {
+      accordion.appendChild(buildNotionItem(section, i));
+    });
 
-        let bodyContent = '';
+    container.appendChild(accordion);
 
-        // 🎯 Comprendre
-        const comprendre = section.comprendre || section.content || '';
-        if (comprendre) {
-          bodyContent += `
-            <div class="content-block comprendre">
-              <div class="content-block-label"><i class="fas fa-bullseye"></i> Comprendre</div>
-              <div class="content-text">${safeText(normalizeMath(comprendre)).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')}</div>
-            </div>
-          `;
-        }
-
-        // 📐 Formules
-        if (Array.isArray(section.formules) && section.formules.length > 0) {
-          bodyContent += `
-            <div class="content-block formules">
-              <div class="content-block-label"><i class="fas fa-square-root-variable"></i> Formules clés</div>
-              <div class="formula-list">
-                ${section.formules.map((f) => {
-                  const latex = typeof f === 'string' ? f : (f.latex || '');
-                  const condition = typeof f === 'object' ? (f.condition || '') : '';
-                  const usage = typeof f === 'object' ? (f.usage || '') : '';
-                  return `
-                    <div class="formula-item">
-                      <div class="formula-latex">${safeText(normalizeMath(latex))}</div>
-                      ${condition ? `<div class="formula-condition">${safeText(condition)}</div>` : ''}
-                      ${usage ? `<div class="formula-usage">${safeText(usage)}</div>` : ''}
-                    </div>
-                  `;
-                }).join('')}
-              </div>
-            </div>
-          `;
-        }
-
-        // 🧮 Méthode
-        if (section.methode && (section.methode.title || Array.isArray(section.methode.steps))) {
-          const methodTitle = section.methode.title || 'Méthode';
-          const steps = Array.isArray(section.methode.steps) ? section.methode.steps : [];
-          bodyContent += `
-            <div class="content-block methode">
-              <div class="content-block-label"><i class="fas fa-list-ol"></i> Méthode pas-à-pas</div>
-              ${methodTitle ? `<div class="method-title">${safeText(methodTitle)}</div>` : ''}
-              ${steps.length > 0 ? `
-                <ol class="method-steps">
-                  ${steps.map((s) => `<li>${safeText(normalizeMath(s))}</li>`).join('')}
-                </ol>
-              ` : ''}
-            </div>
-          `;
-        }
-
-        // ✅ Exemple résolu
-        if (section.exempleResolu) {
-          const ex = section.exempleResolu;
-          bodyContent += `
-            <div class="content-block exemple">
-              <div class="content-block-label"><i class="fas fa-check-circle"></i> Exemple résolu</div>
-              ${ex.enonce ? `<div class="example-enonce">${safeText(normalizeMath(ex.enonce))}</div>` : ''}
-              ${Array.isArray(ex.etapes) && ex.etapes.length > 0 ? `
-                <ul class="example-steps">
-                  ${ex.etapes.map((s) => `<li>${safeText(normalizeMath(s))}</li>`).join('')}
-                </ul>
-              ` : ''}
-              ${ex.conclusion ? `<div class="example-conclusion">${safeText(normalizeMath(ex.conclusion))}</div>` : ''}
-            </div>
-          `;
-        }
-
-        // ⚠️ Piège BAC
-        if (section.piegeBAC) {
-          const piege = section.piegeBAC;
-          bodyContent += `
-            <div class="content-block piege">
-              <div class="content-block-label"><i class="fas fa-exclamation-triangle"></i> Piège du BAC</div>
-              ${piege.trap ? `<div class="piege-trap">⚠️ ${safeText(normalizeMath(piege.trap))}</div>` : ''}
-              ${piege.solution ? `<div class="piege-solution">${safeText(normalizeMath(piege.solution))}</div>` : ''}
-            </div>
-          `;
-        }
-
-        // 💡 Astuce
-        if (section.astuce) {
-          bodyContent += `
-            <div class="content-block astuce">
-              <div class="content-block-label"><i class="fas fa-lightbulb"></i> Astuce</div>
-              <div class="content-text">${safeText(normalizeMath(section.astuce))}</div>
-            </div>
-          `;
-        }
-
-        card.innerHTML = `
-          <div class="notion-header" data-toggle="${index}">
-            <div class="notion-num">${index + 1}</div>
-            <div class="notion-title">${safeText(notionTitle)}</div>
-            <i class="fas fa-chevron-down notion-chevron"></i>
-          </div>
-          <div class="notion-body">
-            <div class="notion-content">${bodyContent}</div>
-          </div>
-        `;
-
-        accordion.appendChild(card);
-      });
-
-      container.appendChild(accordion);
-
-      // Toggle accordéon
-      accordion.querySelectorAll('.notion-header').forEach((header) => {
-        header.addEventListener('click', () => {
-          const card = header.closest('.notion-card');
-          card.classList.toggle('open');
-        });
-      });
-
-      // Ouvrir la 1ère par défaut
-      const firstCard = accordion.querySelector('.notion-card');
-      if (firstCard) firstCard.classList.add('open');
-    } else {
-      container.innerHTML = '<div class="empty-state"><i class="fas fa-inbox empty-icon"></i><h3>Aucune section</h3><p>Réessaye avec un autre chapitre.</p></div>';
-    }
-
-    // Exam Traps
+    // ═══ Pièges d'examen globaux ═══
     if (Array.isArray(session.examTraps) && session.examTraps.length > 0) {
       const block = document.createElement('div');
-      block.className = 'info-block exam-traps';
+      block.className = 'global-block exam-traps';
       block.innerHTML = `
-        <div class="info-block-title"><i class="fas fa-exclamation-triangle"></i> Pièges généraux du chapitre</div>
-        <div>
+        <div class="global-title"><i class="fas fa-triangle-exclamation"></i> Pièges transversaux du BAC</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
           ${session.examTraps.map((t) => `
-            <div class="exam-trap-item">
-              <div class="exam-trap-trap">⚠️ ${safeText(normalizeMath(t.trap || t))}</div>
-              ${t.solution ? `<div class="exam-trap-solution">${safeText(normalizeMath(t.solution))}</div>` : ''}
+            <div style="padding:10px 12px;border-radius:8px;background:rgba(0,0,0,0.2);border-left:3px solid #ff9a84">
+              <div style="font-size:13.5px;color:var(--text-light);margin-bottom:6px;font-weight:500">${safeText(t.trap || '')}</div>
+              <div style="font-size:12.5px;color:#7ce0aa;padding-left:16px;position:relative"><span style="position:absolute;left:0">→</span>${safeText(t.solution || '')}</div>
             </div>
           `).join('')}
         </div>
@@ -2684,33 +2749,223 @@
       container.appendChild(block);
     }
 
-    // Common Mistakes
+    // ═══ Erreurs fréquentes globales ═══
     if (Array.isArray(session.commonMistakes) && session.commonMistakes.length > 0) {
       const block = document.createElement('div');
-      block.className = 'info-block common-mistakes';
+      block.className = 'global-block common-mistakes';
       block.innerHTML = `
-        <div class="info-block-title"><i class="fas fa-circle-exclamation"></i> Erreurs fréquentes</div>
-        <ul class="info-list">
-          ${session.commonMistakes.map((m) => `<li>${safeText(normalizeMath(m))}</li>`).join('')}
+        <div class="global-title"><i class="fas fa-circle-exclamation"></i> Erreurs fréquentes</div>
+        <ul class="global-list">
+          ${session.commonMistakes.map((m) => `<li>${safeText(m)}</li>`).join('')}
         </ul>
       `;
       container.appendChild(block);
     }
 
-    // Recap
+    // ═══ Récap final ═══
     if (Array.isArray(session.recap) && session.recap.length > 0) {
       const block = document.createElement('div');
-      block.className = 'info-block recap';
+      block.className = 'global-block recap';
       block.innerHTML = `
-        <div class="info-block-title"><i class="fas fa-quote-left"></i> En résumé</div>
-        <ul class="info-list">
-          ${session.recap.map((r) => `<li>${safeText(normalizeMath(r))}</li>`).join('')}
+        <div class="global-title"><i class="fas fa-flag-checkered"></i> Récap final</div>
+        <ul class="global-list">
+          ${session.recap.map((r) => `<li>${safeText(r)}</li>`).join('')}
         </ul>
       `;
       container.appendChild(block);
     }
 
+    // ═══ KaTeX ═══
     renderKaTeX(container);
+
+    // ═══ Auto-ouvrir la 1ère section ═══
+    const firstItem = accordion.querySelector('.notion-item');
+    if (firstItem) {
+      setTimeout(() => toggleNotion(firstItem), 200);
+    }
+  }
+
+  // ────────────────────────────────────────────────────────────────
+  // CONSTRUCTION D'UN ITEM ACCORDÉON
+  // ────────────────────────────────────────────────────────────────
+  function buildNotionItem(section, index) {
+    const item = document.createElement('div');
+    item.className = 'notion-item';
+
+    const notionTitle = section.notionTitle || section.title || `Section ${index + 1}`;
+    const notionId = section.notionId || '';
+
+    // Bloc COMPRENDRE
+    const comprendreHTML = section.comprendre
+      ? `<div class="block comprendre">
+           <div class="block-label"><i class="fas fa-lightbulb"></i> Comprendre</div>
+           <div class="block-text">${safeText(section.comprendre)}</div>
+         </div>`
+      : '';
+
+    // Bloc FORMULES
+    let formulesHTML = '';
+    if (Array.isArray(section.formules) && section.formules.length > 0) {
+      formulesHTML = `
+        <div class="block formules">
+          <div class="block-label"><i class="fas fa-square-root-variable"></i> Formules clés</div>
+          <div class="formula-list">
+            ${section.formules.map((f) => {
+              const latex = typeof f === 'string' ? f : (f.latex || '');
+              const condition = typeof f === 'object' ? (f.condition || '') : '';
+              const usage = typeof f === 'object' ? (f.usage || '') : '';
+              return `
+                <div class="formula-item">
+                  <div class="formula-latex">$$${safeText(latex)}$$</div>
+                  ${(condition || usage) ? `
+                    <div class="formula-meta">
+                      ${condition ? `<span class="tag condition">${safeText(condition)}</span>` : ''}
+                      ${usage ? `<span class="tag">${safeText(usage)}</span>` : ''}
+                    </div>
+                  ` : ''}
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    // Bloc MÉTHODE
+    let methodeHTML = '';
+    if (section.methode && typeof section.methode === 'object') {
+      const steps = Array.isArray(section.methode.steps) ? section.methode.steps : [];
+      if (steps.length > 0) {
+        methodeHTML = `
+          <div class="block methode">
+            <div class="block-label"><i class="fas fa-list-ol"></i> ${safeText(section.methode.title || 'Méthode pas-à-pas')}</div>
+            <ol class="method-steps">
+              ${steps.map((s) => `<li>${safeText(s)}</li>`).join('')}
+            </ol>
+          </div>
+        `;
+      }
+    } else if (Array.isArray(section.methode) && section.methode.length > 0) {
+      methodeHTML = `
+        <div class="block methode">
+          <div class="block-label"><i class="fas fa-list-ol"></i> Méthode pas-à-pas</div>
+          <ol class="method-steps">
+            ${section.methode.map((s) => `<li>${safeText(s)}</li>`).join('')}
+          </ol>
+        </div>
+      `;
+    }
+
+    // Bloc EXEMPLE RÉSOLU
+    let exempleHTML = '';
+    if (section.exempleResolu && typeof section.exempleResolu === 'object') {
+      const ex = section.exempleResolu;
+      const etapes = Array.isArray(ex.etapes) ? ex.etapes : [];
+      exempleHTML = `
+        <div class="block exemple">
+          <div class="block-label"><i class="fas fa-check-circle"></i> Exemple résolu</div>
+          ${ex.enonce ? `<div class="example-enonce">${safeText(ex.enonce)}</div>` : ''}
+          ${etapes.length > 0 ? `
+            <ol class="example-steps">
+              ${etapes.map((e) => `<li>${safeText(e)}</li>`).join('')}
+            </ol>
+          ` : ''}
+          ${ex.conclusion ? `<div class="example-conclusion">${safeText(ex.conclusion)}</div>` : ''}
+        </div>
+      `;
+    }
+
+    // Bloc PIÈGE BAC
+    let piegeHTML = '';
+    if (section.piegeBAC && typeof section.piegeBAC === 'object') {
+      const p = section.piegeBAC;
+      piegeHTML = `
+        <div class="block piege">
+          <div class="block-label"><i class="fas fa-triangle-exclamation"></i> Piège du BAC</div>
+          ${p.trap ? `<div class="piege-trap">${safeText(p.trap)}</div>` : ''}
+          ${p.solution ? `<div class="piege-solution">${safeText(p.solution)}</div>` : ''}
+        </div>
+      `;
+    }
+
+    // Bloc ASTUCE
+    let astuceHTML = '';
+    if (section.astuce) {
+      astuceHTML = `
+        <div class="block astuce">
+          <div class="block-label"><i class="fas fa-star"></i> Astuce</div>
+          <div class="block-text">${safeText(section.astuce)}</div>
+        </div>
+      `;
+    }
+
+    // Contenu fallback (ancien format)
+    if (!comprendreHTML && section.content) {
+      const fallback = `
+        <div class="block comprendre">
+          <div class="block-label"><i class="fas fa-bookmark"></i> Contenu</div>
+          <div class="block-text">${safeText(section.content)}</div>
+        </div>
+      `;
+      item.innerHTML = `
+        <div class="notion-header">
+          <div class="notion-num">${index + 1}</div>
+          <div class="notion-title-wrap">
+            <div class="notion-title">${safeText(notionTitle)}</div>
+            <div class="notion-subtitle">
+              <i class="fas fa-file-lines"></i> Section
+            </div>
+          </div>
+          <div class="notion-toggle"><i class="fas fa-chevron-down"></i></div>
+        </div>
+        <div class="notion-body">
+          <div class="notion-content">${fallback}</div>
+        </div>
+      `;
+    } else {
+      item.innerHTML = `
+        <div class="notion-header">
+          <div class="notion-num">${index + 1}</div>
+          <div class="notion-title-wrap">
+            <div class="notion-title">${safeText(notionTitle)}</div>
+            <div class="notion-subtitle">
+              ${notionId ? `<i class="fas fa-tag"></i> ${escapeHtml(notionId)}` : '<i class="fas fa-file-lines"></i> Notion'}
+            </div>
+          </div>
+          <div class="notion-toggle"><i class="fas fa-chevron-down"></i></div>
+        </div>
+        <div class="notion-body">
+          <div class="notion-content">
+            ${comprendreHTML}
+            ${formulesHTML}
+            ${methodeHTML}
+            ${exempleHTML}
+            ${piegeHTML}
+            ${astuceHTML}
+          </div>
+        </div>
+      `;
+    }
+
+    // Click sur le header → ouvrir/fermer
+    const header = item.querySelector('.notion-header');
+    header.addEventListener('click', () => toggleNotion(item));
+
+    return item;
+  }
+
+  function toggleNotion(item) {
+    const isOpen = item.classList.contains('open');
+    // Ferme les autres
+    document.querySelectorAll('.notion-item.open').forEach((other) => {
+      if (other !== item) other.classList.remove('open');
+    });
+    item.classList.toggle('open', !isOpen);
+    // Re-render KaTeX dans le body ouvert
+    if (!isOpen) {
+      const body = item.querySelector('.notion-content');
+      if (body) setTimeout(() => renderKaTeX(body), 150);
+    }
   }
 
   // ═══════════════════════════════════════════════════════════════
@@ -2723,39 +2978,33 @@
     }
 
     $('flashMeta').innerHTML = `
-      <span class="meta-chip"><i class="fas fa-book"></i> ${escapeHtml(SUBJECT_LABELS[state.subject])}</span>
-      <span class="meta-chip"><i class="fas fa-layer-group"></i> <strong>${state.flashcards.length}</strong> cartes</span>
+      <span><i class="fas fa-book"></i> ${escapeHtml(SUBJECT_LABELS[state.subject])}</span>
+      <span><i class="fas fa-layer-group"></i> ${state.flashcards.length} cartes</span>
     `;
 
     updateFlashcardContent();
-  }
-
-  function getFlashTypeLabel(type) {
-    const labels = {
-      definition: '📖 Définition',
-      formule: '📐 Formule',
-      methode: '🧮 Méthode',
-      piege: '⚠️ Piège'
-    };
-    return labels[type] || '📌 Carte';
   }
 
   function updateFlashcardContent() {
     const card = state.flashcards[state.currentFlashIndex];
     if (!card) return;
 
-    const question = normalizeMath(card.question || '');
-    const answer = normalizeMath(card.answer || '');
-    const hint = card.hint ? normalizeMath(card.hint) : '';
-    const type = card.type || 'definition';
+    const question = card.question || '';
+    const answer = card.answer || '';
+    const hint = card.hint || '';
+    const type = card.type || null;
 
     $('flashFront').innerHTML = safeText(question);
     $('flashBack').innerHTML = safeText(answer);
 
-    // Badge de type
-    const typeBadge = $('flashTypeBadge');
-    if (typeBadge) {
-      typeBadge.innerHTML = `<div class="flashcard-type-badge ${type}">${getFlashTypeLabel(type)}</div>`;
+    // Badge type
+    const badgeEl = $('flashTypeBadge');
+    if (type && TYPE_LABELS[type]) {
+      badgeEl.className = `flashcard-type-badge ${type}`;
+      badgeEl.innerHTML = `${TYPE_LABELS[type].icon} ${TYPE_LABELS[type].label}`;
+      badgeEl.style.display = 'inline-flex';
+    } else {
+      badgeEl.style.display = 'none';
     }
 
     if (hint) {
@@ -2801,7 +3050,6 @@
           state.currentFlashIndex++;
           updateFlashcardContent();
           card.style.opacity = '1';
-          debouncedSaveRevision();
         } else {
           card.style.opacity = '1';
           $('flashFeedback').classList.remove('show');
@@ -2812,26 +3060,7 @@
     });
   });
 
-  $('finishFlashBtn').addEventListener('click', async () => {
-    if (state.user && state.flashcards && state.flashcards.length > 0) {
-      try {
-        const durationSeconds = state.sessionStartedAt
-          ? Math.round((Date.now() - state.sessionStartedAt) / 1000) : 0;
-        await addDoc(collection(db, 'users', state.user.uid, 'revisionSessions'), {
-          subject: state.subject,
-          subjectKey: state.subject,
-          chapter: state.chapter,
-          type: 'flashcard_completed',
-          cardsViewed: Object.keys(state.flashRatings).length,
-          totalCards: state.flashcards.length,
-          ratings: state.flashRatings,
-          duration: durationSeconds,
-          createdAt: serverTimestamp()
-        });
-      } catch (e) {}
-    }
-    startQuiz();
-  });
+  $('finishFlashBtn').addEventListener('click', () => startQuiz());
 
   // ═══════════════════════════════════════════════════════════════
   // QUIZ
@@ -2839,17 +3068,15 @@
   async function startQuiz() {
     if (!state.currentSession) return;
 
-    if (Array.isArray(state.currentSession.quiz) && state.currentSession.quiz.length > 0) {
-      state.quiz = state.currentSession.quiz;
+    if (Array.isArray(state.currentSession.initialQuiz) && state.currentSession.initialQuiz.length > 0) {
+      state.quiz = state.currentSession.initialQuiz;
       state.quizAnswers = {};
       renderQuiz();
       showView('quizView');
       return;
     }
 
-    const btn = $('startFlashcardsBtn');
-    if (btn) { btn.disabled = true; btn.classList.add('loading'); }
-
+    // Sinon : appeler l'API pour générer
     try {
       const token = await getIdToken(state.user);
       const response = await fetch('/api/reviseur', {
@@ -2863,34 +3090,29 @@
           subject: state.subject,
           chapter: state.chapter,
           difficulty: state.difficulty,
-          count: state.quizCount,
-          level: 'auto'
+          count: state.quizCount
         })
       });
 
       const payload = await response.json().catch(() => null);
-      if (!response.ok || !payload?.success) {
-        throw new Error(payload?.error || 'Impossible de générer le quiz.');
-      }
+      if (!response.ok || !payload?.success) throw new Error(payload?.error || 'Erreur quiz');
 
       state.quiz = payload.quiz || [];
       state.quizAnswers = {};
-      await saveActiveSession();
       renderQuiz();
       showView('quizView');
-    } catch (error) {
-      alert(error.message || 'Erreur');
-    } finally {
-      if (btn) { btn.disabled = false; btn.classList.remove('loading'); }
+    } catch (e) {
+      alert('Impossible de générer le quiz : ' + e.message);
     }
   }
 
   $('startFlashcardsBtn').addEventListener('click', async () => {
     if (!state.flashcards || state.flashcards.length === 0) {
-      const btn = $('startFlashcardsBtn');
-      btn.disabled = true;
-      btn.classList.add('loading');
+      // Générer les flashcards
       try {
+        const btn = $('startFlashcardsBtn');
+        btn.disabled = true;
+        btn.classList.add('loading');
         const token = await getIdToken(state.user);
         const response = await fetch('/api/reviseur', {
           method: 'POST',
@@ -2903,22 +3125,20 @@
             subject: state.subject,
             chapter: state.chapter,
             mode: 'flashcard',
-            count: state.flashCount,
             level: 'auto'
           })
         });
         const payload = await response.json().catch(() => null);
         if (!response.ok || !payload?.success) throw new Error(payload?.error || 'Erreur');
-
-        state.flashcards = payload.session.flashcards || [];
+        state.flashcards = payload.session?.flashcards || [];
         state.currentFlashIndex = 0;
         state.flashRatings = {};
-        await saveActiveSession();
         renderFlashcard();
         showView('flashcardView');
       } catch (e) {
         alert(e.message);
       } finally {
+        const btn = $('startFlashcardsBtn');
         btn.disabled = false;
         btn.classList.remove('loading');
       }
@@ -2935,9 +3155,14 @@
     const container = $('quizContent');
     container.innerHTML = '';
 
+    if (!state.quiz || state.quiz.length === 0) {
+      container.innerHTML = '<div class="empty-state"><p>Aucune question disponible.</p></div>';
+      return;
+    }
+
     $('quizMeta').innerHTML = `
-      <span class="meta-chip"><i class="fas fa-question-circle"></i> <strong>${state.quiz.length}</strong> questions</span>
-      <span class="meta-chip"><i class="fas fa-signal"></i> ${escapeHtml(DIFFICULTY_LABELS[state.difficulty])}</span>
+      <span><i class="fas fa-question-circle"></i> ${state.quiz.length} questions</span>
+      <span><i class="fas fa-signal"></i> ${escapeHtml(DIFFICULTY_LABELS[state.difficulty] || '')}</span>
     `;
 
     state.quiz.forEach((q, index) => {
@@ -2945,25 +3170,26 @@
       div.className = 'quiz-question';
       div.dataset.index = index;
 
-      const cleanQuestion = normalizeMath(q.question || q.text || '');
-      const level = Number(q.level) || 0;
+      const questionText = q.question || q.text || '';
+      const level = q.level || 1;
 
       const optionsHtml = (q.options || []).map((opt) => {
-        const cleanText = normalizeMath(opt.text || '');
+        const text = typeof opt === 'string' ? opt : (opt.text || '');
+        const id = typeof opt === 'string' ? String.fromCharCode(65 + q.options.indexOf(opt)) : (opt.id || '');
         return `
-          <div class="quiz-option" data-option="${escapeHtml(opt.id)}" data-qindex="${index}">
-            <span class="quiz-option-letter">${escapeHtml(opt.id)}</span>
-            <span>${safeText(cleanText)}</span>
+          <div class="quiz-option" data-option="${escapeHtml(id)}" data-qindex="${index}">
+            <span class="quiz-option-letter">${escapeHtml(id)}</span>
+            <span>${safeText(text)}</span>
           </div>
         `;
       }).join('');
 
       div.innerHTML = `
-        <div class="quiz-q-number">
-          Question ${index + 1}
-          ${level > 0 ? `<span class="quiz-level-badge level-${level}">Niveau ${level}</span>` : ''}
+        <div class="quiz-q-header">
+          <div class="quiz-q-number">Question ${index + 1}</div>
+          <div class="quiz-q-level l${level}">Niveau ${level}</div>
         </div>
-        <div class="quiz-q-text">${safeText(cleanQuestion)}</div>
+        <div class="quiz-q-text">${safeText(questionText)}</div>
         <div class="quiz-options">${optionsHtml}</div>
         <div class="quiz-explanation" id="explanation-${index}"></div>
       `;
@@ -2989,8 +3215,7 @@
 
         const exp = $(`explanation-${qIndex}`);
         if (q.explanation) {
-          const cleanExp = normalizeMath(q.explanation);
-          exp.innerHTML = `<strong>💡 Explication :</strong> ${safeText(cleanExp)}`;
+          exp.innerHTML = `<strong>💡 Explication :</strong> ${safeText(q.explanation)}`;
           exp.classList.add('show');
           renderKaTeX(exp);
         }
@@ -3001,8 +3226,6 @@
 
         const percent = (Object.keys(state.quizAnswers).length / state.quiz.length) * 100;
         $('quizProgress').style.width = percent + '%';
-
-        debouncedSaveRevision();
       });
     });
 
@@ -3016,11 +3239,8 @@
   // ═══════════════════════════════════════════════════════════════
   async function showQuizResults() {
     let correct = 0;
-    const wrongQuestions = [];
-
     state.quiz.forEach((q, i) => {
       if (state.quizAnswers[i] === q.correctAnswer) correct++;
-      else wrongQuestions.push(q);
     });
 
     const total = state.quiz.length;
@@ -3042,50 +3262,46 @@
     $('resultsSub').textContent = sub;
 
     const masteryScore = computeMasteryScore(percent);
-    const masteryEl = $('masteryValue');
-    const masteryFill = $('masteryFill');
-    const masteryText = $('masteryText');
-
-    masteryEl.textContent = `${masteryScore}%`;
+    $('masteryValue').textContent = `${masteryScore}%`;
 
     let masteryColor, masteryLabel;
     if (masteryScore >= 80) {
       masteryColor = 'linear-gradient(90deg, #45b47d, #6fd99a)';
-      masteryLabel = 'Chapitre solide — tu peux passer au suivant.';
+      masteryLabel = 'Chapitre solide — tu peux passer au suivant ou approfondir.';
     } else if (masteryScore >= 60) {
       masteryColor = 'linear-gradient(90deg, #E0B84A, #F0CC65)';
       masteryLabel = 'Bonne maîtrise — quelques points à consolider.';
     } else if (masteryScore >= 40) {
       masteryColor = 'linear-gradient(90deg, #D4A017, #E8C158)';
-      masteryLabel = 'Maîtrise partielle — refais une session.';
+      masteryLabel = 'Maîtrise partielle — une nouvelle session te fera du bien.';
     } else {
       masteryColor = 'linear-gradient(90deg, #d7654a, #e88a72)';
       masteryLabel = 'Chapitre à retravailler en profondeur.';
     }
 
-    masteryFill.style.background = masteryColor;
-    masteryFill.style.width = '0%';
-    setTimeout(() => { masteryFill.style.width = `${masteryScore}%`; }, 100);
-    masteryText.textContent = masteryLabel;
+    const fill = $('masteryFill');
+    fill.style.background = masteryColor;
+    fill.style.width = '0%';
+    setTimeout(() => { fill.style.width = `${masteryScore}%`; }, 100);
+    $('masteryText').textContent = masteryLabel;
 
+    // Recommandations
     const recList = $('recommendationsList');
     recList.innerHTML = '';
 
     const recs = [];
     if (percent === 100) {
-      recs.push('Continue sur ce rythme, teste-toi sur un autre chapitre.');
+      recs.push('Continue sur ce rythme, teste-toi sur un autre chapitre pour élargir ta maîtrise.');
     } else if (percent >= 70) {
-      recs.push('Revois rapidement les questions manquées, puis passe à un autre chapitre.');
+      recs.push('Revois rapidement les questions manquées, puis passe à un chapitre proche.');
     } else {
-      recs.push('Refais une session sur ce même chapitre dans 2-3 jours.');
+      recs.push('Refais une session sur ce même chapitre dans 2-3 jours pour ancrer les notions.');
     }
 
-    if (wrongQuestions.length > 0) {
-      const topics = wrongQuestions.slice(0, 3).map((q) => {
-        const t = normalizeMath(q.question || q.text || '');
-        return t.length > 70 ? t.slice(0, 70) + '...' : t;
-      });
-      topics.forEach((t) => recs.push(`À revoir : ${t}`));
+    const ratings = Object.values(state.flashRatings);
+    if (ratings.length > 0) {
+      const hard = ratings.filter((r) => r === 'hard').length;
+      if (hard > 0) recs.push(`${hard} flashcard${hard > 1 ? 's' : ''} difficile${hard > 1 ? 's' : ''} à retravailler.`);
     }
 
     recs.forEach((r) => {
@@ -3093,9 +3309,6 @@
       li.textContent = r;
       recList.appendChild(li);
     });
-
-    await saveQuizResult(correct, total);
-    await clearActiveSession();
 
     showView('resultsView');
   }
@@ -3116,54 +3329,11 @@
   }
 
   // ═══════════════════════════════════════════════════════════════
-  // SAUVEGARDE
+  // BOUTONS
   // ═══════════════════════════════════════════════════════════════
-  async function saveSession(session) {
-    if (!state.user) return;
-    try {
-      const durationSeconds = state.sessionStartedAt
-        ? Math.round((Date.now() - state.sessionStartedAt) / 1000) : 0;
-      await addDoc(collection(db, 'users', state.user.uid, 'revisionSessions'), {
-        subject: state.subject,
-        subjectKey: state.subject,
-        chapter: state.chapter,
-        chapterTitle: session.chapterTitle || state.chapter,
-        mode: state.mode,
-        source: state.sessionSource,
-        level: session.level,
-        session,
-        duration: durationSeconds,
-        createdAt: serverTimestamp()
-      });
-    } catch (e) {}
-  }
-
-  async function saveQuizResult(correct, total) {
-    if (!state.user) return;
-    try {
-      const durationSeconds = state.sessionStartedAt
-        ? Math.round((Date.now() - state.sessionStartedAt) / 1000) : 0;
-      await addDoc(collection(db, 'users', state.user.uid, 'revisionSessions'), {
-        subject: state.subject,
-        subjectKey: state.subject,
-        chapter: state.chapter,
-        type: 'quiz_result',
-        score: Math.round((correct / total) * 20),
-        correct,
-        total,
-        difficulty: state.difficulty,
-        duration: durationSeconds,
-        createdAt: serverTimestamp()
-      });
-    } catch (e) {}
-  }
-
-  // ═══════════════════════════════════════════════════════════════
-  // NAVIGATION
-  // ═══════════════════════════════════════════════════════════════
-  $('newFicheBtn').addEventListener('click', async () => { await clearActiveSession(); showView('configView'); });
-  $('newFlashBtn').addEventListener('click', async () => { await clearActiveSession(); showView('configView'); });
-  $('restartBtn').addEventListener('click', async () => { await clearActiveSession(); showView('configView'); });
+  $('newFicheBtn').addEventListener('click', () => showView('configView'));
+  $('newFlashBtn').addEventListener('click', () => showView('configView'));
+  $('restartBtn').addEventListener('click', () => showView('configView'));
 
   // ═══════════════════════════════════════════════════════════════
   // PREMIUM
@@ -3175,83 +3345,11 @@
     }
     $('premiumOverlay').classList.add('show');
   }
-
   $('premiumClose').addEventListener('click', () => $('premiumOverlay').classList.remove('show'));
   $('popupLaterBtn').addEventListener('click', () => $('premiumOverlay').classList.remove('show'));
   $('premiumOverlay').addEventListener('click', (e) => {
     if (e.target === $('premiumOverlay')) $('premiumOverlay').classList.remove('show');
   });
-
-  // ═══════════════════════════════════════════════════════════════
-  // QUOTA
-  // ═══════════════════════════════════════════════════════════════
-  function updateQuotaBadge(remaining) {
-    const badge = $('quotaBadge');
-    const text = $('quotaText');
-    if (!badge || !text) return;
-    badge.style.display = 'inline-flex';
-    badge.classList.remove('warning', 'premium');
-    if (remaining <= 0) {
-      badge.classList.add('warning');
-      text.textContent = '0 essai gratuit';
-    } else {
-      text.textContent = `${remaining} essai${remaining > 1 ? 's' : ''} gratuit${remaining > 1 ? 's' : ''}`;
-    }
-  }
-
-  function showPremiumBadge() {
-    const badge = $('quotaBadge');
-    const text = $('quotaText');
-    if (!badge || !text) return;
-    badge.style.display = 'inline-flex';
-    badge.classList.remove('warning');
-    badge.classList.add('premium');
-    text.textContent = 'Premium illimité';
-  }
-
-  async function loadQuota() {
-    if (!state.user) return;
-    if (state.isPremium) { showPremiumBadge(); return; }
-    try {
-      const today = new Date().toISOString().slice(0, 10);
-      const usageDoc = await getDoc(doc(db, 'users', state.user.uid, 'reviseurUsage', today));
-      const used = usageDoc.exists() ? (usageDoc.data().count || 0) : 0;
-      updateQuotaBadge(Math.max(0, FREE_LIMIT - used));
-    } catch (e) {}
-  }
-
-  // ═══════════════════════════════════════════════════════════════
-  // REPRISE
-  // ═══════════════════════════════════════════════════════════════
-  async function checkActiveSession() {
-    const session = await loadActiveSession();
-    if (!session || !session.currentSession) return;
-
-    state.subject = session.subject;
-    state.chapter = session.chapter;
-    state.mode = session.mode;
-    state.currentSession = session.currentSession;
-    state.flashcards = session.flashcards || [];
-    state.currentFlashIndex = session.currentFlashIndex || 0;
-    state.flashRatings = session.flashRatings || {};
-    state.quiz = session.quiz || [];
-    state.quizAnswers = session.quizAnswers || {};
-
-    customSelects.subject.select(session.subject, true);
-    updateChapters();
-    customSelects.chapter.select(session.chapter, true);
-
-    if (state.mode === 'flashcard' && state.flashcards.length > 0) {
-      renderFlashcard();
-      showView('flashcardView');
-    } else if (state.quiz.length > 0 && Object.keys(state.quizAnswers).length > 0) {
-      renderQuiz();
-      showView('quizView');
-    } else {
-      renderFiche();
-      showView('ficheView');
-    }
-  }
 
   // ═══════════════════════════════════════════════════════════════
   // AUTH
@@ -3267,10 +3365,12 @@
 
   onAuthStateChanged(auth, async (user) => {
     const conn = $('connectionState');
+
     if (!user) {
-      window.location.replace('auth-choice.html');
+      window.location.replace('login.html');
       return;
     }
+
     state.user = user;
     conn.textContent = 'Connecté';
     conn.classList.add('online');
@@ -3282,17 +3382,17 @@
         state.isPremium = isUserPremium(data);
         conn.textContent = state.isPremium ? 'Premium actif' : 'Compte gratuit';
         conn.classList.toggle('online', state.isPremium);
-        await loadQuota();
       }
     } catch (e) {}
-
-    await checkActiveSession();
   });
 
+  // ═══════════════════════════════════════════════════════════════
+  // INIT
+  // ═══════════════════════════════════════════════════════════════
   function init() {
     initCustomSelects();
     initChips();
-    console.log('🎓 ARVEXA — Réviseur v4.0 (front adapté)');
+    console.log('🎓 ARVEXA — Réviseur v4 (accordéon 6 blocs)');
   }
 
   init();

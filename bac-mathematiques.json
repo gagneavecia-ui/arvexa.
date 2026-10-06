@@ -4,1207 +4,717 @@
   "niveau": "terminale_d",
   "pays": "niger",
   "exam": "bac",
-  "version": "1.0.0",
-  "derniereMaj": "2026-01-15",
+  "version": "2.0.0",
+  "derniereMaj": "2026-10-06",
   "totalChapitres": 11,
   "totalNotions": 94,
+  "structureVersion": "enrichie-v2",
   "chapitres": [
     {
       "id": "nombres_complexes",
       "numero": 1,
       "titre": "Nombres complexes",
       "description": "Étude des nombres de la forme a + bi, propriétés algébriques et géométriques.",
+      "duree_estimee_min": 480,
+      "difficulte": 3,
+      "obligatoire": true,
+      "prerequis": ["nombres_reels", "racines_carrees", "trigonometrie_base"],
       "notions": [
         {
           "id": "forme_algebrique",
           "titre": "Forme algébrique",
           "obligatoire": true,
-          "description": "Un nombre complexe s'écrit z = a + bi avec a, b réels et i² = -1.",
-          "formules": ["$z = a + bi$", "$i^2 = -1$"],
-          "proprietes": ["a = Re(z)", "b = Im(z)", "b = 0 → z réel", "a = 0 → z imaginaire pur"],
-          "methodes": ["Identifier partie réelle et imaginaire", "Écrire z sous la forme a + bi"],
-          "erreurs_frequentes": ["Confondre partie réelle et imaginaire", "Oublier i² = -1"],
-          "pieges_examen": ["Un complexe nul a ses deux parties nulles"]
+          "difficulte": 1,
+          "duree_etude_min": 20,
+          "description_courte": "Un nombre complexe s'écrit z = a + bi avec a, b réels et i² = -1.",
+          "description_longue": "Un nombre complexe est un nombre de la forme z = a + bi où a et b sont des nombres réels et i est l'unité imaginaire vérifiant i² = -1. Le réel a est appelé partie réelle de z, noté Re(z), et le réel b est appelé partie imaginaire de z, noté Im(z). Cette notation, dite algébrique, est la plus utilisée pour effectuer des calculs simples (additions, soustractions, multiplications).",
+          "formules": [
+            { "latex": "$z = a + bi$", "condition": "$a, b \\in \\mathbb{R}$", "usage": "Écriture canonique" },
+            { "latex": "$i^2 = -1$", "condition": "Définition de $i$", "usage": "Règle fondamentale" },
+            { "latex": "$\\text{Re}(z) = a$", "condition": "", "usage": "Partie réelle" },
+            { "latex": "$\\text{Im}(z) = b$", "condition": "", "usage": "Partie imaginaire" }
+          ],
+          "proprietes": [
+            "$z$ est réel $\\iff$ $\\text{Im}(z) = 0$",
+            "$z$ est imaginaire pur $\\iff$ $\\text{Re}(z) = 0$ (et $z \\neq 0$)",
+            "$z = 0 \\iff \\text{Re}(z) = 0$ ET $\\text{Im}(z) = 0$"
+          ],
+          "methodes": [
+            "Identifier la partie réelle $a$ et la partie imaginaire $b$",
+            "Écrire $z$ sous la forme $a + bi$ si ce n'est pas déjà fait",
+            "Simplifier les $i^2$ en $-1$ lors des calculs"
+          ],
+          "exemple_resolu": {
+            "enonce": "Écrire $z = 3 + 2i - i^2 + 4i$ sous forme algébrique.",
+            "etapes": [
+              "Remplacer $i^2$ par $-1$ : $z = 3 + 2i - (-1) + 4i$",
+              "Simplifier : $z = 3 + 2i + 1 + 4i$",
+              "Regrouper : $z = 4 + 6i$"
+            ],
+            "conclusion": "$z = 4 + 6i$, donc $\\text{Re}(z) = 4$ et $\\text{Im}(z) = 6$"
+          },
+          "erreurs_frequentes": [
+            "Confondre partie réelle et partie imaginaire",
+            "Oublier que $i^2 = -1$ (et non $+1$)",
+            "Écrire $\\text{Im}(z) = bi$ au lieu de $\\text{Im}(z) = b$"
+          ],
+          "pieges_examen": [
+            "$\\text{Im}(z)$ est le RÉEL $b$, pas $bi$",
+            "Un complexe nul a ses DEUX parties nulles",
+            "Attention au signe : $3 - 4i$ a pour partie imaginaire $-4$, pas $4$"
+          ],
+          "mnemo": "« **R**éel pour **R**e, **I**maginaire pour **I**m » — R avant I dans l'alphabet",
+          "liens": {
+            "avant": [],
+            "apres": ["egalite_complexes", "conjugue", "module"]
+          }
         },
         {
           "id": "egalite_complexes",
-          "titre": "Égalité de deux complexes",
+          "titre": "Égalité de deux nombres complexes",
           "obligatoire": true,
-          "description": "Deux complexes sont égaux si et seulement si parties réelle et imaginaire sont égales.",
-          "formules": ["$a + bi = a' + b'i \\iff a = a' \\text{ et } b = b'$"],
-          "proprietes": ["Sépare en deux équations réelles"],
-          "methodes": ["Identifier parties réelles et imaginaires", "Écrire le système"],
-          "erreurs_frequentes": ["Oublier une des deux égalités"],
-          "pieges_examen": ["Identification de coefficients"]
+          "difficulte": 1,
+          "duree_etude_min": 15,
+          "description_courte": "Deux complexes sont égaux si et seulement si leurs parties réelles et imaginaires sont égales.",
+          "description_longue": "L'égalité entre nombres complexes est plus stricte que celle entre réels : il faut que les DEUX parties (réelle et imaginaire) correspondent. Cela permet de transformer une équation complexe en un système de deux équations réelles.",
+          "formules": [
+            { "latex": "$a + bi = a' + b'i \\iff a = a' \\text{ et } b = b'$", "condition": "", "usage": "Égalité" }
+          ],
+          "proprietes": [
+            "Une équation complexe = un système de 2 équations réelles",
+            "C'est la base pour identifier les coefficients"
+          ],
+          "methodes": [
+            "Écrire les deux complexes sous forme algébrique",
+            "Identifier partie réelle gauche = partie réelle droite",
+            "Identifier partie imaginaire gauche = partie imaginaire droite"
+          ],
+          "exemple_resolu": {
+            "enonce": "Trouver $x$ et $y$ réels tels que $(x + 2) + (y - 1)i = 5 + 3i$",
+            "etapes": [
+              "Identifier parties réelles : $x + 2 = 5$",
+              "Identifier parties imaginaires : $y - 1 = 3$",
+              "Résoudre : $x = 3$ et $y = 4$"
+            ],
+            "conclusion": "$x = 3$ et $y = 4$"
+          },
+          "erreurs_frequentes": [
+            "Oublier UNE des deux égalités",
+            "Chercher $x$ et $y$ complexes alors qu'ils sont réels"
+          ],
+          "pieges_examen": [
+            "Toujours vérifier que les inconnues sont RÉELLES dans l'énoncé"
+          ],
+          "mnemo": "« **DEUX** équations pour **DEUX** inconnues »",
+          "liens": {
+            "avant": ["forme_algebrique"],
+            "apres": ["equation_second_degre"]
+          }
         },
         {
           "id": "conjugue",
-          "titre": "Conjugué d'un complexe",
+          "titre": "Conjugué d'un nombre complexe",
           "obligatoire": true,
-          "description": "Le conjugué de z = a + bi est z̄ = a - bi.",
-          "formules": ["$\\bar{z} = a - bi$", "$z \\cdot \\bar{z} = a^2 + b^2 = |z|^2$"],
-          "proprietes": ["z + z̄ = 2a (réel)", "z - z̄ = 2bi", "z réel ⟺ z = z̄"],
-          "methodes": ["Changer le signe de la partie imaginaire", "Utiliser z·z̄ = |z|²"],
-          "erreurs_frequentes": ["Oublier de changer le signe du i"],
-          "pieges_examen": ["z·z̄ = |z|² est la base du module"]
+          "difficulte": 2,
+          "duree_etude_min": 25,
+          "description_courte": "Le conjugué de z = a + bi est z̄ = a - bi.",
+          "description_longue": "Le conjugué d'un nombre complexe s'obtient en changeant le signe de sa partie imaginaire. Il est essentiel pour : calculer un module, simplifier un quotient, vérifier si un complexe est réel, résoudre des équations. Le produit z·z̄ est TOUJOURS un réel positif (le carré du module).",
+          "formules": [
+            { "latex": "$\\bar{z} = a - bi$", "condition": "$z = a + bi$", "usage": "Définition" },
+            { "latex": "$z \\cdot \\bar{z} = a^2 + b^2 = |z|^2$", "condition": "", "usage": "Formule clé" },
+            { "latex": "$z + \\bar{z} = 2\\text{Re}(z)$", "condition": "", "usage": "Somme" },
+            { "latex": "$z - \\bar{z} = 2i\\text{Im}(z)$", "condition": "", "usage": "Différence" }
+          ],
+          "proprietes": [
+            "$z$ réel $\\iff$ $z = \\bar{z}$",
+            "$z$ imaginaire pur $\\iff$ $z = -\\bar{z}$",
+            "$\\overline{\\bar{z}} = z$",
+            "$\\overline{z_1 + z_2} = \\bar{z_1} + \\bar{z_2}$",
+            "$\\overline{z_1 \\cdot z_2} = \\bar{z_1} \\cdot \\bar{z_2}$",
+            "$\\overline{z_1 / z_2} = \\bar{z_1} / \\bar{z_2}$"
+          ],
+          "methodes": [
+            "Changer le signe de la partie imaginaire",
+            "Pour simplifier un quotient : multiplier numérateur et dénominateur par le conjugué du dénominateur",
+            "Utiliser $z \\bar{z} = |z|^2$ pour calculer un module au carré"
+          ],
+          "exemple_resolu": {
+            "enonce": "Écrire $\\frac{1}{3 + 4i}$ sous forme algébrique.",
+            "etapes": [
+              "Multiplier par le conjugué : $\\frac{1}{3+4i} \\cdot \\frac{3-4i}{3-4i}$",
+              "Numérateur : $3 - 4i$",
+              "Dénominateur : $3^2 + 4^2 = 9 + 16 = 25$",
+              "Résultat : $\\frac{3 - 4i}{25} = \\frac{3}{25} - \\frac{4}{25}i$"
+            ],
+            "conclusion": "$\\frac{1}{3+4i} = \\frac{3}{25} - \\frac{4}{25}i$"
+          },
+          "erreurs_frequentes": [
+            "Oublier de changer le signe du $i$",
+            "Confondre conjugué et opposé",
+            "Mal appliquer la formule $z\\bar{z} = a^2 + b^2$ (oublier le carré)"
+          ],
+          "pieges_examen": [
+            "$z \\cdot \\bar{z} = |z|^2$, c'est la base du module — à retenir absolument",
+            "Le conjugué de $i$ est $-i$",
+            "Le conjugué d'un réel est lui-même"
+          ],
+          "mnemo": "« Le **barre** change le **sIgne** du $i$ »",
+          "liens": {
+            "avant": ["forme_algebrique"],
+            "apres": ["module", "argument"]
+          }
         },
         {
           "id": "module",
-          "titre": "Module d'un complexe",
+          "titre": "Module d'un nombre complexe",
           "obligatoire": true,
-          "description": "Le module de z = a + bi est |z| = √(a² + b²).",
-          "formules": ["$|z| = \\sqrt{a^2 + b^2}$", "$|z|^2 = z \\cdot \\bar{z}$", "$|z_1 z_2| = |z_1| \\cdot |z_2|$"],
-          "proprietes": ["|z| ≥ 0", "|z| = 0 ⟺ z = 0", "|z̄| = |z|"],
-          "methodes": ["Calculer a² + b² puis racine", "Utiliser z·z̄ = |z|²"],
-          "erreurs_frequentes": ["Confondre |z| et |z|²"],
-          "pieges_examen": ["|z| est un réel positif"]
+          "difficulte": 2,
+          "duree_etude_min": 30,
+          "description_courte": "Le module de z = a + bi est |z| = √(a² + b²).",
+          "description_longue": "Le module d'un nombre complexe est un réel positif qui mesure la distance entre l'origine du plan complexe et le point d'affixe z. C'est l'équivalent de la valeur absolue pour les réels. Le module intervient dans la formule de la forme trigonométrique et dans de nombreux calculs.",
+          "formules": [
+            { "latex": "$|z| = \\sqrt{a^2 + b^2}$", "condition": "$z = a + bi$", "usage": "Définition" },
+            { "latex": "$|z|^2 = z \\cdot \\bar{z}$", "condition": "", "usage": "Astuce calcul" },
+            { "latex": "$|z_1 z_2| = |z_1| \\cdot |z_2|$", "condition": "", "usage": "Multiplication" },
+            { "latex": "$\\left|\\frac{z_1}{z_2}\\right| = \\frac{|z_1|}{|z_2|}$", "condition": "$z_2 \\neq 0$", "usage": "Division" },
+            { "latex": "$|z^n| = |z|^n$", "condition": "", "usage": "Puissance" }
+          ],
+          "proprietes": [
+            "$|z| \\geq 0$ et $|z| = 0 \\iff z = 0$",
+            "$|\\bar{z}| = |z|$",
+            "$|-z| = |z|$",
+            "$|z_1 + z_2| \\leq |z_1| + |z_2|$ (inégalité triangulaire)"
+          ],
+          "methodes": [
+            "Identifier $a = \\text{Re}(z)$ et $b = \\text{Im}(z)$",
+            "Calculer $a^2 + b^2$",
+            "Prendre la racine carrée"
+          ],
+          "exemple_resolu": {
+            "enonce": "Calculer $|3 + 4i|$",
+            "etapes": [
+              "Identifier $a = 3$ et $b = 4$",
+              "Calculer $a^2 + b^2 = 9 + 16 = 25$",
+              "Prendre la racine : $|z| = \\sqrt{25} = 5$"
+            ],
+            "conclusion": "$|3 + 4i| = 5$"
+          },
+          "erreurs_frequentes": [
+            "Confondre $|z|$ et $|z|^2$",
+            "Oublier les carrés (calculer $\\sqrt{a + b}$ au lieu de $\\sqrt{a^2 + b^2}$)",
+            "Écrire un résultat négatif (le module est TOUJOURS positif)"
+          ],
+          "pieges_examen": [
+            "Mémoriser les triplets : $(3, 4, 5)$, $(5, 12, 13)$, $(8, 15, 17)$",
+            "$|z_1 + z_2| \\neq |z_1| + |z_2|$ en général",
+            "$|z|^2 = z \\bar{z}$ est TON MEILLEUR AMI — apprends-le par cœur"
+          ],
+          "mnemo": "« **M**odule = **M**esure au carré puis racine » — pythagore sur $(a, b)$",
+          "liens": {
+            "avant": ["forme_algebrique", "conjugue"],
+            "apres": ["argument", "forme_trigonometrique"]
+          }
         },
         {
           "id": "argument",
-          "titre": "Argument d'un complexe",
+          "titre": "Argument d'un nombre complexe",
           "obligatoire": true,
-          "description": "L'argument de z ≠ 0 est l'angle θ tel que cos θ = a/|z| et sin θ = b/|z|.",
-          "formules": ["$\\cos\\theta = \\frac{a}{|z|}$", "$\\sin\\theta = \\frac{b}{|z|}$", "$\\arg(z_1 z_2) = \\arg(z_1) + \\arg(z_2)$"],
-          "proprietes": ["Défini modulo 2π", "arg(z̄) = -arg(z)", "arg(-z) = arg(z) + π"],
-          "methodes": ["Calculer cos θ et sin θ", "Utiliser valeurs remarquables"],
-          "erreurs_frequentes": ["Oublier le modulo 2π", "Utiliser tan sans vérifier quadrant"],
-          "pieges_examen": ["arg(z) = arctan(b/a) seulement si a > 0"]
+          "difficulte": 3,
+          "duree_etude_min": 35,
+          "description_courte": "L'argument de z ≠ 0 est l'angle θ tel que cos θ = a/|z| et sin θ = b/|z|.",
+          "description_longue": "L'argument d'un nombre complexe non nul est l'angle orienté que fait le vecteur associé avec l'axe des réels positifs. Il est défini modulo 2π. L'argument donne l'information « direction » alors que le module donne l'information « distance ». Ensemble, ils forment les coordonnées polaires.",
+          "formules": [
+            { "latex": "$\\cos\\theta = \\frac{a}{|z|}$", "condition": "$z \\neq 0$", "usage": "Cosinus" },
+            { "latex": "$\\sin\\theta = \\frac{b}{|z|}$", "condition": "$z \\neq 0$", "usage": "Sinus" },
+            { "latex": "$\\arg(z_1 z_2) = \\arg(z_1) + \\arg(z_2) \\ [2\\pi]$", "condition": "", "usage": "Multiplication" },
+            { "latex": "$\\arg(z_1 / z_2) = \\arg(z_1) - \\arg(z_2) \\ [2\\pi]$", "condition": "$z_2 \\neq 0$", "usage": "Division" },
+            { "latex": "$\\arg(z^n) = n \\arg(z) \\ [2\\pi]$", "condition": "", "usage": "Puissance" }
+          ],
+          "proprietes": [
+            "$\\arg(\\bar{z}) = -\\arg(z) \\ [2\\pi]$",
+            "$\\arg(-z) = \\arg(z) + \\pi \\ [2\\pi]$",
+            "$\\arg(z) = 0 \\ [\\pi]$ $\\iff$ $z$ réel",
+            "$\\arg(z) = \\pi/2 \\ [\\pi]$ $\\iff$ $z$ imaginaire pur"
+          ],
+          "methodes": [
+            "Calculer $|z|$ d'abord",
+            "Calculer $\\cos\\theta$ et $\\sin\\theta$",
+            "Reconnaître une valeur remarquable ou utiliser $\\arctan(b/a)$ avec précaution",
+            "Donner le résultat modulo $2\\pi$"
+          ],
+          "exemple_resolu": {
+            "enonce": "Calculer l'argument de $z = 1 + i$",
+            "etapes": [
+              "Calculer $|z| = \\sqrt{1 + 1} = \\sqrt{2}$",
+              "$\\cos\\theta = \\frac{1}{\\sqrt{2}} = \\frac{\\sqrt{2}}{2}$",
+              "$\\sin\\theta = \\frac{1}{\\sqrt{2}} = \\frac{\\sqrt{2}}{2}$",
+              "Reconnaître : $\\theta = \\frac{\\pi}{4}$"
+            ],
+            "conclusion": "$\\arg(1 + i) = \\frac{\\pi}{4} \\ [2\\pi]$"
+          },
+          "erreurs_frequentes": [
+            "Oublier le modulo $2\\pi$",
+            "Utiliser $\\tan\\theta = b/a$ sans vérifier le quadrant",
+            "Confondre $\\pi/6$ et $\\pi/3$ dans les valeurs remarquables"
+          ],
+          "pieges_examen": [
+            "$\\arg(z) = \\arctan(b/a)$ SEULEMENT si $a > 0$",
+            "Si $a < 0$, ajouter $\\pi$",
+            "L'argument de $0$ n'est PAS défini",
+            "Les arguments s'écrivent TOUJOURS modulo $2\\pi$"
+          ],
+          "mnemo": "Tableau des valeurs remarquables : **$0, \\pi/6, \\pi/4, \\pi/3, \\pi/2$** — apprendre cos/sin par cœur",
+          "liens": {
+            "avant": ["module", "conjugue"],
+            "apres": ["forme_trigonometrique", "forme_exponentielle"]
+          }
         },
         {
           "id": "forme_trigonometrique",
           "titre": "Forme trigonométrique",
           "obligatoire": true,
-          "description": "z = r(cos θ + i sin θ) avec r = |z| et θ = arg(z).",
-          "formules": ["$z = r(\\cos\\theta + i\\sin\\theta)$"],
-          "proprietes": ["r = |z| ≥ 0", "θ = arg(z) modulo 2π"],
-          "methodes": ["Calculer module et argument", "Écrire la forme"],
-          "erreurs_frequentes": ["Oublier le module r"],
-          "pieges_examen": ["Facilite les puissances"]
+          "difficulte": 2,
+          "duree_etude_min": 25,
+          "description_courte": "z = r(cos θ + i sin θ) avec r = |z| et θ = arg(z).",
+          "description_longue": "La forme trigonométrique est une réécriture d'un nombre complexe utilisant son module et son argument. Elle est particulièrement utile pour les multiplications, divisions et puissances.",
+          "formules": [
+            { "latex": "$z = r(\\cos\\theta + i\\sin\\theta)$", "condition": "$r = |z|, \\theta = \\arg(z)$", "usage": "Définition" },
+            { "latex": "$r_1(\\cos\\theta_1 + i\\sin\\theta_1) \\cdot r_2(\\cos\\theta_2 + i\\sin\\theta_2) = r_1 r_2 [\\cos(\\theta_1 + \\theta_2) + i\\sin(\\theta_1 + \\theta_2)]$", "condition": "", "usage": "Produit" }
+          ],
+          "proprietes": [
+            "Multiplication : les modules se multiplient, les arguments s'ajoutent",
+            "Division : les modules se divisent, les arguments se soustraient"
+          ],
+          "methodes": [
+            "Calculer $r = |z|$",
+            "Calculer $\\theta = \\arg(z)$",
+            "Écrire $z = r(\\cos\\theta + i\\sin\\theta)$"
+          ],
+          "exemple_resolu": {
+            "enonce": "Écrire $z = 1 + i$ sous forme trigonométrique",
+            "etapes": [
+              "$r = |z| = \\sqrt{2}$",
+              "$\\theta = \\arg(z) = \\frac{\\pi}{4}$",
+              "$z = \\sqrt{2}(\\cos\\frac{\\pi}{4} + i\\sin\\frac{\\pi}{4})$"
+            ],
+            "conclusion": "$z = \\sqrt{2}(\\cos\\frac{\\pi}{4} + i\\sin\\frac{\\pi}{4})$"
+          },
+          "erreurs_frequentes": [
+            "Oublier le module $r$",
+            "Écrire $\\cos\\theta$ et $\\sin\\theta$ sans le module"
+          ],
+          "pieges_examen": [
+            "Bien garder $\\cos\\theta + i\\sin\\theta$ (avec le $i$ devant $\\sin$)",
+            "Le module est TOUJOURS positif"
+          ],
+          "mnemo": "« **r** pour **r**ayon, **θ** pour **θ**eta »",
+          "liens": {
+            "avant": ["module", "argument"],
+            "apres": ["forme_exponentielle", "formule_moivre"]
+          }
         },
         {
           "id": "forme_exponentielle",
           "titre": "Forme exponentielle",
           "obligatoire": true,
-          "description": "z = r·e^(iθ) avec r = |z| et θ = arg(z).",
-          "formules": ["$z = r e^{i\\theta}$", "$e^{i\\theta} = \\cos\\theta + i\\sin\\theta$", "$e^{i\\pi} = -1$"],
-          "proprietes": ["Multiplication : modules ×, exposants +", "Puissance : r^n · e^(inθ)"],
-          "methodes": ["Utiliser pour puissances", "Simplifier produits/quotients"],
-          "erreurs_frequentes": ["Oublier le module"],
-          "pieges_examen": ["Forme la plus pratique pour calculs"]
+          "difficulte": 2,
+          "duree_etude_min": 25,
+          "description_courte": "z = r·e^(iθ) avec r = |z| et θ = arg(z).",
+          "description_longue": "La forme exponentielle est la forme la plus compacte d'un nombre complexe. Elle découle de la formule d'Euler $e^{i\\theta} = \\cos\\theta + i\\sin\\theta$. Elle simplifie énormément les calculs de puissances et de produits.",
+          "formules": [
+            { "latex": "$z = r e^{i\\theta}$", "condition": "$r = |z|, \\theta = \\arg(z)$", "usage": "Définition" },
+            { "latex": "$e^{i\\theta} = \\cos\\theta + i\\sin\\theta$", "condition": "", "usage": "Formule d'Euler" },
+            { "latex": "$e^{i\\pi} = -1$", "condition": "", "usage": "Identité d'Euler" }
+          ],
+          "proprietes": [
+            "$e^{i\\theta_1} \\cdot e^{i\\theta_2} = e^{i(\\theta_1 + \\theta_2)}$",
+            "$(e^{i\\theta})^n = e^{in\\theta}$",
+            "$e^{i\\theta} / e^{i\\phi} = e^{i(\\theta - \\phi)}$"
+          ],
+          "methodes": [
+            "Calculer $r = |z|$",
+            "Calculer $\\theta = \\arg(z)$",
+            "Écrire $z = r e^{i\\theta}$"
+          ],
+          "exemple_resolu": {
+            "enonce": "Calculer $(1 + i)^{10}$",
+            "etapes": [
+              "Écrire $1 + i = \\sqrt{2} e^{i\\pi/4}$",
+              "$(1+i)^{10} = (\\sqrt{2})^{10} e^{i \\cdot 10\\pi/4}$",
+              "$= 2^5 e^{i 5\\pi/2} = 32 e^{i\\pi/2}$",
+              "$= 32i$"
+            ],
+            "conclusion": "$(1+i)^{10} = 32i$"
+          },
+          "erreurs_frequentes": [
+            "Oublier $r$ dans la forme exponentielle",
+            "Écrire $e^{i\\theta}$ sans le module"
+          ],
+          "pieges_examen": [
+            "La forme exponentielle est LA meilleure pour les puissances",
+            "Bien simplifier l'angle modulo $2\\pi$",
+            "$e^{i\\pi} = -1$ (identité d'Euler, très utile)"
+          ],
+          "mnemo": "« **r e^(iθ)** — la forme la plus **compacte** »",
+          "liens": {
+            "avant": ["forme_trigonometrique"],
+            "apres": ["formule_moivre", "formules_euler", "racines_niemes"]
+          }
         },
         {
           "id": "operations_formes",
           "titre": "Opérations sur les formes",
           "obligatoire": true,
-          "description": "Addition, multiplication, division selon la forme.",
-          "formules": ["$(a+bi)(c+di) = (ac-bd) + (ad+bc)i$", "$\\frac{a+bi}{c+di} = \\frac{(a+bi)(c-di)}{c^2+d^2}$"],
-          "proprietes": ["Addition : algébrique", "Multiplication : exponentielle"],
-          "methodes": ["Choisir la forme adaptée", "Multiplier par le conjugué pour diviser"],
-          "erreurs_frequentes": ["Erreur de signe dans produits"],
-          "pieges_examen": ["Diviser = multiplier par conjugué"]
+          "difficulte": 2,
+          "duree_etude_min": 30,
+          "description_courte": "Addition, multiplication, division selon la forme utilisée.",
+          "description_longue": "Chaque opération est plus simple dans une forme particulière : l'addition en algébrique, la multiplication et la puissance en exponentielle. Savoir choisir la bonne forme fait gagner un temps précieux au BAC.",
+          "formules": [
+            { "latex": "$(a + bi)(c + di) = (ac - bd) + (ad + bc)i$", "condition": "", "usage": "Produit algébrique" },
+            { "latex": "$\\frac{a + bi}{c + di} = \\frac{(a + bi)(c - di)}{c^2 + d^2}$", "condition": "$c^2 + d^2 \\neq 0$", "usage": "Quotient algébrique" }
+          ],
+          "proprietes": [
+            "Addition : forme algébrique",
+            "Multiplication : forme exponentielle plus rapide",
+            "Division : forme exponentielle ou multiplier par le conjugué",
+            "Puissance : forme exponentielle OBLIGATOIRE"
+          ],
+          "methodes": [
+            "Pour l'addition : regrouper parties réelles et imaginaires",
+            "Pour la multiplication algébrique : distribuer puis utiliser $i^2 = -1$",
+            "Pour la division : multiplier par le conjugué du dénominateur",
+            "Pour la puissance : passer en forme exponentielle"
+          ],
+          "exemple_resolu": {
+            "enonce": "Calculer $(2 + 3i)(4 - i)$",
+            "etapes": [
+              "Distribuer : $2 \\cdot 4 + 2 \\cdot (-i) + 3i \\cdot 4 + 3i \\cdot (-i)$",
+              "$= 8 - 2i + 12i - 3i^2$",
+              "Utiliser $i^2 = -1$ : $= 8 - 2i + 12i + 3$",
+              "Regrouper : $= 11 + 10i$"
+            ],
+            "conclusion": "$(2 + 3i)(4 - i) = 11 + 10i$"
+          },
+          "erreurs_frequentes": [
+            "Erreur de signe dans les produits",
+            "Oublier $i^2 = -1$",
+            "Mal appliquer la formule du quotient"
+          ],
+          "pieges_examen": [
+            "Pour diviser par un complexe : TOUJOURS multiplier par le conjugué",
+            "Vérifier le résultat en forme algébrique",
+            "Pour $(a + bi)^n$, passer en exponentielle"
+          ],
+          "mnemo": "« **+** en algébrique, **× ÷ ^** en exponentielle »",
+          "liens": {
+            "avant": ["forme_algebrique", "forme_exponentielle"],
+            "apres": ["equation_second_degre", "racines_niemes"]
+          }
         },
         {
           "id": "formule_moivre",
           "titre": "Formule de Moivre",
           "obligatoire": true,
-          "description": "(cos θ + i sin θ)^n = cos(nθ) + i sin(nθ).",
-          "formules": ["$(\\cos\\theta + i\\sin\\theta)^n = \\cos(n\\theta) + i\\sin(n\\theta)$"],
-          "proprietes": ["Permet les puissances", "Base de la linéarisation"],
-          "methodes": ["Forme trigonométrique", "Appliquer la formule"],
-          "erreurs_frequentes": ["Oublier r^n"],
-          "pieges_examen": ["Utile pour cos(nθ) et sin(nθ)"]
+          "difficulte": 3,
+          "duree_etude_min": 25,
+          "description_courte": "(cos θ + i sin θ)^n = cos(nθ) + i sin(nθ).",
+          "description_longue": "La formule de Moivre relie les puissances des nombres complexes trigonométriques aux multiples d'angles. C'est le pont entre les nombres complexes et la trigonométrie. Utile pour linéariser ou pour trouver des formules de duplication.",
+          "formules": [
+            { "latex": "$(\\cos\\theta + i\\sin\\theta)^n = \\cos(n\\theta) + i\\sin(n\\theta)$", "condition": "$n \\in \\mathbb{Z}$", "usage": "Formule principale" },
+            { "latex": "$(e^{i\\theta})^n = e^{in\\theta}$", "condition": "", "usage": "Version exponentielle" }
+          ],
+          "proprietes": [
+            "Permet de calculer facilement des puissances de complexes",
+            "Sert à exprimer $\\cos(n\\theta)$ et $\\sin(n\\theta)$ en fonction de $\\cos\\theta$ et $\\sin\\theta$"
+          ],
+          "methodes": [
+            "Mettre $z$ sous forme trigonométrique $r(\\cos\\theta + i\\sin\\theta)$",
+            "Appliquer : $z^n = r^n (\\cos(n\\theta) + i\\sin(n\\theta))$",
+            "Simplifier l'angle obtenu"
+          ],
+          "exemple_resolu": {
+            "enonce": "Calculer $(\\cos\\frac{\\pi}{6} + i\\sin\\frac{\\pi}{6})^6$",
+            "etapes": [
+              "Appliquer Moivre : $(\\cos\\frac{\\pi}{6} + i\\sin\\frac{\\pi}{6})^6 = \\cos(6 \\cdot \\frac{\\pi}{6}) + i\\sin(6 \\cdot \\frac{\\pi}{6})$",
+              "$= \\cos(\\pi) + i\\sin(\\pi)$",
+              "$= -1 + 0i = -1$"
+            ],
+            "conclusion": "Le résultat est $-1$"
+          },
+          "erreurs_frequentes": [
+            "Oublier $r^n$ quand $z = r(\\cos\\theta + i\\sin\\theta)$",
+            "Confondre avec la formule d'Euler"
+          ],
+          "pieges_examen": [
+            "Si $z = r(\\cos\\theta + i\\sin\\theta)$, alors $z^n = r^n(\\cos(n\\theta) + i\\sin(n\\theta))$",
+            "Ne pas oublier le $r^n$",
+            "Bien réduire $n\\theta$ modulo $2\\pi$"
+          ],
+          "mnemo": "« **Moivre** = **M**ultiplication **o**rganisée des **a**ngles »",
+          "liens": {
+            "avant": ["forme_trigonometrique", "forme_exponentielle"],
+            "apres": ["formules_euler", "racines_niemes"]
+          }
         },
         {
           "id": "formules_euler",
           "titre": "Formules d'Euler",
           "obligatoire": true,
-          "description": "cos θ = (e^(iθ) + e^(-iθ))/2 et sin θ = (e^(iθ) - e^(-iθ))/(2i).",
-          "formules": ["$\\cos\\theta = \\frac{e^{i\\theta} + e^{-i\\theta}}{2}$", "$\\sin\\theta = \\frac{e^{i\\theta} - e^{-i\\theta}}{2i}$"],
-          "proprietes": ["Linéarisation", "Produits → sommes"],
-          "methodes": ["Écrire cos/sin sous forme exp", "Développer"],
-          "erreurs_frequentes": ["Oublier le 2i pour sin"],
-          "pieges_examen": ["Linéariser cos², sin³, etc."]
+          "difficulte": 3,
+          "duree_etude_min": 25,
+          "description_courte": "cos θ = (e^(iθ) + e^(-iθ))/2 et sin θ = (e^(iθ) - e^(-iθ))/(2i).",
+          "description_longue": "Les formules d'Euler expriment les fonctions trigonométriques en fonction de l'exponentielle complexe. Elles sont fondamentales pour la linéarisation (transformer des produits de cos/sin en sommes, plus faciles à intégrer).",
+          "formules": [
+            { "latex": "$\\cos\\theta = \\frac{e^{i\\theta} + e^{-i\\theta}}{2}$", "condition": "", "usage": "Cosinus" },
+            { "latex": "$\\sin\\theta = \\frac{e^{i\\theta} - e^{-i\\theta}}{2i}$", "condition": "", "usage": "Sinus" },
+            { "latex": "$e^{i\\theta} = \\cos\\theta + i\\sin\\theta$", "condition": "", "usage": "Formule d'Euler directe" }
+          ],
+          "proprietes": [
+            "Permet de linéariser les expressions trigonométriques",
+            "Base des formules de duplication et de transformation produit-somme"
+          ],
+          "methodes": [
+            "Écrire $\\cos\\theta$ et $\\sin\\theta$ sous forme exponentielle",
+            "Développer les puissances avec le binôme de Newton",
+            "Regrouper les termes $e^{ik\\theta} + e^{-ik\\theta}$ en $2\\cos(k\\theta)$"
+          ],
+          "exemple_resolu": {
+            "enonce": "Linéariser $\\cos^2\\theta$",
+            "etapes": [
+              "$\\cos^2\\theta = \\left(\\frac{e^{i\\theta} + e^{-i\\theta}}{2}\\right)^2$",
+              "$= \\frac{e^{2i\\theta} + 2 + e^{-2i\\theta}}{4}$",
+              "$= \\frac{1}{2} + \\frac{e^{2i\\theta} + e^{-2i\\theta}}{4}$",
+              "$= \\frac{1}{2} + \\frac{\\cos(2\\theta)}{2}$"
+            ],
+            "conclusion": "$\\cos^2\\theta = \\frac{1 + \\cos(2\\theta)}{2}$"
+          },
+          "erreurs_frequentes": [
+            "Oublier le $2i$ pour le sinus",
+            "Se tromper dans le développement du binôme"
+          ],
+          "pieges_examen": [
+            "$\\cos\\theta = \\frac{e^{i\\theta} + e^{-i\\theta}}{2}$ (division par 2)",
+            "$\\sin\\theta = \\frac{e^{i\\theta} - e^{-i\\theta}}{2i}$ (division par $2i$, pas $2$)",
+            "Pour linéariser $\\cos^3$, utiliser le binôme de Newton"
+          ],
+          "mnemo": "« **Euler** : le **pont** entre **trigo** et **exp** »",
+          "liens": {
+            "avant": ["forme_exponentielle"],
+            "apres": ["equation_second_degre"]
+          }
         },
         {
           "id": "equation_second_degre",
           "titre": "Équations du second degré dans ℂ",
           "obligatoire": true,
-          "description": "Résolution de az² + bz + c = 0 avec Δ possiblement négatif.",
-          "formules": ["$\\Delta = b^2 - 4ac$", "$z = \\frac{-b \\pm \\sqrt{\\Delta}}{2a}$", "$\\Delta < 0 \\implies \\sqrt{\\Delta} = i\\sqrt{-\\Delta}$"],
-          "proprietes": ["Toujours 2 solutions (ou 1 double)", "Conjuguées si coeff réels"],
-          "methodes": ["Calculer Δ", "Écrire √Δ en complexe", "Appliquer formule"],
-          "erreurs_frequentes": ["Oublier le i pour Δ < 0"],
-          "pieges_examen": ["Δ < 0 : solutions conjuguées"]
+          "difficulte": 3,
+          "duree_etude_min": 35,
+          "description_courte": "Résolution de az² + bz + c = 0 avec Δ possiblement négatif.",
+          "description_longue": "Dans l'ensemble des complexes, toute équation du second degré admet TOUJOURS deux solutions (éventuellement confondues). Le discriminant Δ peut être négatif, auquel cas on utilise $i$ pour exprimer sa racine carrée. Si les coefficients sont réels et Δ < 0, les deux solutions sont conjuguées.",
+          "formules": [
+            { "latex": "$\\Delta = b^2 - 4ac$", "condition": "", "usage": "Discriminant" },
+            { "latex": "$z = \\frac{-b \\pm \\sqrt{\\Delta}}{2a}$", "condition": "$a \\neq 0$", "usage": "Formule générale" },
+            { "latex": "$\\Delta < 0 \\implies \\sqrt{\\Delta} = i\\sqrt{-\\Delta}$", "condition": "Coefficients réels", "usage": "Cas Δ négatif" }
+          ],
+          "proprietes": [
+            "Toujours 2 solutions dans $\\mathbb{C}$ (ou 1 double si $\\Delta = 0$)",
+            "Si coefficients réels et $\\Delta < 0$ : solutions conjuguées",
+            "Somme des racines : $-b/a$ ; produit : $c/a$"
+          ],
+          "methodes": [
+            "Identifier $a$, $b$, $c$",
+            "Calculer $\\Delta = b^2 - 4ac$",
+            "Si $\\Delta > 0$ : deux racines réelles",
+            "Si $\\Delta = 0$ : une racine double",
+            "Si $\\Delta < 0$ : écrire $\\sqrt{\\Delta} = i\\sqrt{-\\Delta}$",
+            "Appliquer la formule"
+          ],
+          "exemple_resolu": {
+            "enonce": "Résoudre $z^2 - 2z + 5 = 0$ dans $\\mathbb{C}$",
+            "etapes": [
+              "$a = 1$, $b = -2$, $c = 5$",
+              "$\\Delta = (-2)^2 - 4 \\cdot 1 \\cdot 5 = 4 - 20 = -16$",
+              "$\\Delta < 0$, donc $\\sqrt{\\Delta} = i\\sqrt{16} = 4i$",
+              "$z = \\frac{2 \\pm 4i}{2} = 1 \\pm 2i$"
+            ],
+            "conclusion": "$z_1 = 1 + 2i$ et $z_2 = 1 - 2i$"
+          },
+          "erreurs_frequentes": [
+            "Oublier le $i$ pour $\\Delta < 0$",
+            "Se tromper dans le calcul du discriminant",
+            "Diviser par $2a$ au lieu de $2a$ (oublier le $a$)"
+          ],
+          "pieges_examen": [
+            "$\\Delta < 0$ : les solutions sont CONJUGUÉES (si coeff réels)",
+            "Ne pas oublier de simplifier la fraction finale",
+            "Vérifier le résultat en remplaçant dans l'équation"
+          ],
+          "mnemo": "« **Delta** < 0 → **i** apparaît »",
+          "liens": {
+            "avant": ["forme_algebrique", "operations_formes"],
+            "apres": ["racines_niemes"]
+          }
         },
         {
           "id": "racines_niemes",
           "titre": "Racines n-ièmes",
           "obligatoire": true,
-          "description": "Les n racines n-ièmes de z = re^(iθ) sont r^(1/n) · e^(i(θ+2kπ)/n), k = 0,...,n-1.",
-          "formules": ["$z_k = r^{1/n} e^{i(\\theta + 2k\\pi)/n}$", "$k = 0, 1, \\ldots, n-1$"],
-          "proprietes": ["n racines distinctes", "Forment un polygone régulier"],
-          "methodes": ["Forme exponentielle", "Appliquer pour chaque k"],
-          "erreurs_frequentes": ["Oublier +2kπ", "Prendre seulement k = 0"],
-          "pieges_examen": ["Racines cubiques = triangle équilatéral"]
+          "difficulte": 4,
+          "duree_etude_min": 40,
+          "description_courte": "Les n racines n-ièmes de z = r e^(iθ) sont r^(1/n) · e^(i(θ+2kπ)/n), k = 0,...,n-1.",
+          "description_longue": "Toute équation $z^n = Z$ (avec $Z \\neq 0$) admet exactement $n$ solutions distinctes dans $\\mathbb{C}$. Ces solutions sont les racines $n$-ièmes de $Z$. Elles forment dans le plan complexe un polygone régulier à $n$ côtés inscrit dans un cercle de rayon $|Z|^{1/n}$.",
+          "formules": [
+            { "latex": "$z_k = r^{1/n} e^{i(\\theta + 2k\\pi)/n}$", "condition": "$k = 0, 1, \\ldots, n-1$", "usage": "Formule" },
+            { "latex": "$|z_k| = r^{1/n}$", "condition": "", "usage": "Module commun" },
+            { "latex": "$\\arg(z_k) = \\frac{\\theta + 2k\\pi}{n}$", "condition": "", "usage": "Arguments" }
+          ],
+          "proprietes": [
+            "Il y a TOUJOURS exactement $n$ racines $n$-ièmes distinctes",
+            "Les racines forment un polygone régulier de centre $O$",
+            "Les arguments sont en progression arithmétique de raison $2\\pi/n$"
+          ],
+          "methodes": [
+            "Écrire $Z = r e^{i\\theta}$ (forme exponentielle)",
+            "Appliquer : $z_k = r^{1/n} e^{i(\\theta + 2k\\pi)/n}$",
+            "Calculer pour $k = 0, 1, \\ldots, n-1$"
+          ],
+          "exemple_resolu": {
+            "enonce": "Résoudre $z^3 = 8$ dans $\\mathbb{C}$",
+            "etapes": [
+              "Écrire $8 = 8 e^{i \\cdot 0}$",
+              "$r^{1/3} = 2$, $\\theta = 0$, $n = 3$",
+              "$z_k = 2 e^{i(0 + 2k\\pi)/3} = 2 e^{i 2k\\pi/3}$",
+              "$k = 0$ : $z_0 = 2 e^{0} = 2$",
+              "$k = 1$ : $z_1 = 2 e^{i 2\\pi/3} = 2(-\\frac{1}{2} + i\\frac{\\sqrt{3}}{2}) = -1 + i\\sqrt{3}$",
+              "$k = 2$ : $z_2 = 2 e^{i 4\\pi/3} = -1 - i\\sqrt{3}$"
+            ],
+            "conclusion": "Les trois racines sont $2$, $-1 + i\\sqrt{3}$, $-1 - i\\sqrt{3}$"
+          },
+          "erreurs_frequentes": [
+            "Oublier le $+2k\\pi$",
+            "Prendre seulement $k = 0$ (une seule racine sur les $n$)",
+            "Se tromper dans le calcul de $r^{1/n}$"
+          ],
+          "pieges_examen": [
+            "TOUJOURS donner les $n$ racines demandées",
+            "Utiliser la forme exponentielle pour plus de facilité",
+            "Racines cubiques = triangle équilatéral dans le plan complexe"
+          ],
+          "mnemo": "« $n$ racines = $n$ sommets d'un polygone régulier »",
+          "liens": {
+            "avant": ["forme_exponentielle", "formule_moivre"],
+            "apres": ["interpretation_geometrique"]
+          }
         },
         {
           "id": "interpretation_geometrique",
           "titre": "Interprétation géométrique",
           "obligatoire": true,
-          "description": "z = a + bi correspond au point M(a, b).",
-          "formules": ["$|z_B - z_A| = AB$", "$|z - z_0| = r$ : cercle"],
-          "proprietes": ["Affixe d'un point", "Distance et angle"],
-          "methodes": ["Placer les points", "Reconnaître les lieux"],
-          "erreurs_frequentes": ["Confondre affixe et coordonnées"],
-          "pieges_examen": ["|z - a| = r est un cercle"]
+          "difficulte": 3,
+          "duree_etude_min": 30,
+          "description_courte": "z = a + bi correspond au point M(a, b).",
+          "description_longue": "À tout nombre complexe $z = a + bi$, on associe le point $M(a, b)$ du plan muni d'un repère orthonormé. Cette correspondance permet de traduire des problèmes de géométrie en calculs algébriques sur les complexes, et réciproquement.",
+          "formules": [
+            { "latex": "$|z_B - z_A| = AB$", "condition": "", "usage": "Distance" },
+            { "latex": "$|z - z_0| = r$", "condition": "", "usage": "Cercle de centre $z_0$ et rayon $r$" },
+            { "latex": "$|z - z_0| = |z - z_1|$", "condition": "", "usage": "Médiatrice de $[z_0, z_1]$" },
+            { "latex": "$\\arg\\left(\\frac{z_B - z_A}{z_C - z_A}\\right) = (\\overrightarrow{AC}, \\overrightarrow{AB})$", "condition": "", "usage": "Angle" }
+          ],
+          "proprietes": [
+            "$z$ réel $\\iff$ $M$ sur l'axe des réels",
+            "$z$ imaginaire pur $\\iff$ $M$ sur l'axe des imaginaires",
+            "$|z| = OM$ (distance à l'origine)",
+            "$\\arg(z) = $ angle de $(\\vec{u}, \\overrightarrow{OM})$"
+          ],
+          "methodes": [
+            "Placer les points avec leurs affixes",
+            "Traduire les conditions géométriques en équations",
+            "Reconnaître les lieux géométriques classiques"
+          ],
+          "exemple_resolu": {
+            "enonce": "Déterminer l'ensemble des points $M$ d'affixe $z$ tels que $|z - 2| = 3$",
+            "etapes": [
+              "$|z - 2|$ est la distance entre $M$ et le point $A(2, 0)$",
+              "L'ensemble des points à distance 3 de $A$ est un cercle",
+              "Centre $A(2, 0)$, rayon 3"
+            ],
+            "conclusion": "Cercle de centre $(2, 0)$ et rayon 3"
+          },
+          "erreurs_frequentes": [
+            "Confondre affixe et coordonnées",
+            "Oublier que $|z - a|$ représente une DISTANCE",
+            "Se tromper dans l'interprétation des arguments"
+          ],
+          "pieges_examen": [
+            "$|z - a| = r$ : **cercle** de centre $a$, rayon $r$",
+            "$|z - a| = |z - b|$ : **médiatrice** du segment $[a, b]$",
+            "$\\arg(z - a) = \\theta$ : **demi-droite** d'origine $a$, angle $\\theta$"
+          ],
+          "mnemo": "« **D**istance = **D**ifférence des **z** en module »",
+          "liens": {
+            "avant": ["module", "argument"],
+            "apres": ["applications_geometriques"]
+          }
         },
         {
           "id": "applications_geometriques",
           "titre": "Applications géométriques",
           "obligatoire": true,
-          "description": "Résolution de problèmes géométriques avec complexes.",
-          "formules": ["$\\frac{z_C - z_A}{z_B - z_A}$ : rapport distances/angles"],
-          "proprietes": ["Alignement : arg = 0 ou π", "Orthogonalité : arg = ±π/2"],
-          "methodes": ["Calculer les rapports", "Étudier module et argument"],
-          "erreurs_frequentes": ["Oublier de vérifier le module"],
-          "pieges_examen": ["Triangle équilatéral : rapport = e^(±iπ/3)"]
+          "difficulte": 4,
+          "duree_etude_min": 40,
+          "description_courte": "Résolution de problèmes géométriques avec les complexes.",
+          "description_longue": "Les nombres complexes sont un outil puissant pour résoudre des problèmes de géométrie : alignement, orthogonalité, nature d'un triangle, parallélisme, longueurs, angles. C'est une compétence fréquemment testée au BAC.",
+          "formules": [
+            { "latex": "$\\frac{z_C - z_A}{z_B - z_A}$ : rapport de distances et d'angles", "condition": "", "usage": "Outil universel" }
+          ],
+          "proprietes": [
+            "Alignement : $\\frac{z_C - z_A}{z_B - z_A} \\in \\mathbb{R}$",
+            "Orthogonalité : $\\frac{z_C - z_A}{z_B - z_A}$ imaginaire pur",
+            "Triangle équilatéral : rapport $= e^{\\pm i\\pi/3}$",
+            "Triangle rectangle isocèle : rapport $= \\pm i$"
+          ],
+          "methodes": [
+            "Placer les points avec leurs affixes",
+            "Calculer le rapport $\\frac{z_C - z_A}{z_B - z_A}$",
+            "Étudier module et argument du rapport",
+            "Conclure selon la nature (réel → aligné, imaginaire pur → orthogonal, etc.)"
+          ],
+          "exemple_resolu": {
+            "enonce": "Les points $A(1)$ et $B(i)$ sont-ils tels que le triangle $OAB$ soit rectangle isocèle en $O$ ?",
+            "etapes": [
+              "Calculer $\\frac{z_B - z_O}{z_A - z_O} = \\frac{i - 0}{1 - 0} = i$",
+              "$|i| = 1 \\implies OA = OB$ (isocèle)",
+              "$\\arg(i) = \\pi/2 \\implies$ angle droit",
+              "Conclusion : oui, triangle rectangle isocèle en $O$"
+            ],
+            "conclusion": "Triangle $OAB$ rectangle isocèle en $O$"
+          },
+          "erreurs_frequentes": [
+            "Oublier de vérifier le module ET l'argument",
+            "Confondre alignement et orthogonalité",
+            "Se tromper dans l'ordre des points"
+          ],
+          "pieges_examen": [
+            "Toujours calculer le rapport dans le bon ordre",
+            "Triangle équilatéral : rapport $= e^{\\pm i\\pi/3}$",
+            "Carré : deux rapports égaux à $\\pm i$"
+          ],
+          "mnemo": "« **Rapport** = **R**éel aligné, **I**maginaire orthogonal »",
+          "liens": {
+            "avant": ["interpretation_geometrique"],
+            "apres": []
+          }
         }
       ],
-      "exercicesTypes": [
-        "Calculer la forme algébrique",
-        "Calculer module et argument",
-        "Passer d'une forme à une autre",
-        "Résoudre une équation du second degré",
+      "exercices_types": [
+        "Calculer la forme algébrique d'une expression",
+        "Calculer le module et l'argument",
+        "Passer d'une forme à une autre (algébrique, trigo, expo)",
+        "Résoudre une équation du second degré dans ℂ",
         "Calculer les racines n-ièmes",
         "Déterminer un lieu géométrique",
-        "Démontrer un alignement ou orthogonalité"
+        "Démontrer alignement ou orthogonalité"
       ]
-    },
-    {
-      "id": "similitudes_planes",
-      "numero": 2,
-      "titre": "Similitudes planes directes",
-      "description": "Transformations du plan conservant les angles et multipliant les distances par un rapport constant.",
-      "notions": [
-        {
-          "id": "definition_similitude",
-          "titre": "Définition d'une similitude directe",
-          "obligatoire": true,
-          "description": "Transformation du plan qui multiplie les distances par k > 0 et conserve les angles.",
-          "formules": ["$M'N' = k \\cdot MN$"],
-          "proprietes": ["Conserve les angles orientés", "k = rapport"],
-          "methodes": ["Vérifier conservation angles", "Vérifier multiplication distances"],
-          "erreurs_frequentes": ["Confondre avec isométrie"],
-          "pieges_examen": ["Toute similitude directe a une écriture complexe"]
-        },
-        {
-          "id": "ecriture_complexe",
-          "titre": "Écriture complexe",
-          "obligatoire": true,
-          "description": "Toute similitude directe s'écrit z' = az + b avec a ≠ 0.",
-          "formules": ["$z' = az + b$", "$a \\neq 0$"],
-          "proprietes": ["a détermine rapport et angle", "b détermine position"],
-          "methodes": ["Identifier a et b", "Utiliser pour calculs"],
-          "erreurs_frequentes": ["Oublier a ≠ 0"],
-          "pieges_examen": ["Chercher a et b à partir de 2 points"]
-        },
-        {
-          "id": "rapport_angle",
-          "titre": "Rapport et angle",
-          "obligatoire": true,
-          "description": "Le rapport k = |a| et l'angle θ = arg(a).",
-          "formules": ["$k = |a|$", "$\\theta = \\arg(a)$"],
-          "proprietes": ["k > 0", "θ modulo 2π"],
-          "methodes": ["Calculer |a| et arg(a)", "Interpréter"],
-          "erreurs_frequentes": ["Oublier la valeur absolue pour k"],
-          "pieges_examen": ["k ≠ 1 même si θ = 0"]
-        },
-        {
-          "id": "centre_similitude",
-          "titre": "Centre d'une similitude",
-          "obligatoire": true,
-          "description": "Le centre ω est solution de ω = aω + b.",
-          "formules": ["$\\omega = \\frac{b}{1-a}$", "Si a = 1 : translation"],
-          "proprietes": ["Unique si a ≠ 1", "Point fixe"],
-          "methodes": ["Résoudre z = az + b"],
-          "erreurs_frequentes": ["Oublier le cas a = 1"],
-          "pieges_examen": ["a = 1 ⟺ translation"]
-        },
-        {
-          "id": "cas_particuliers",
-          "titre": "Cas particuliers",
-          "obligatoire": true,
-          "description": "Translations, rotations, homothéties comme cas particuliers.",
-          "formules": ["Translation : z' = z + b", "Rotation : |a| = 1", "Homothétie : a réel"],
-          "proprietes": ["Combinaisons de transformations"],
-          "methodes": ["Identifier le type à partir de a"],
-          "erreurs_frequentes": ["Confondre rotation et homothétie"],
-          "pieges_examen": ["Similitude = rotation × homothétie"]
-        },
-        {
-          "id": "composition_similitudes",
-          "titre": "Composition de similitudes",
-          "obligatoire": true,
-          "description": "La composée de deux similitudes directes est une similitude directe.",
-          "formules": ["$z_2'(z_1(z)) = a_2 a_1 z + (a_2 b_1 + b_2)$"],
-          "proprietes": ["Rapport = k₁ × k₂", "Angle = θ₁ + θ₂", "Non commutative"],
-          "methodes": ["Composer les écritures", "Identifier la nouvelle similitude"],
-          "erreurs_frequentes": ["Croire que c'est commutatif"],
-          "pieges_examen": ["Attention à l'ordre"]
-        },
-        {
-          "id": "applications_geo",
-          "titre": "Applications géométriques",
-          "obligatoire": true,
-          "description": "Utilisation des similitudes pour résoudre des problèmes.",
-          "formules": ["Image d'un cercle = cercle", "Image d'une droite = droite"],
-          "proprietes": ["Conserve les configurations"],
-          "methodes": ["Identifier la similitude", "Calculer images"],
-          "erreurs_frequentes": ["Oublier le rapport k"],
-          "pieges_examen": ["Triangle → triangle semblable"]
-        }
-      ],
-      "exercicesTypes": [
-        "Déterminer l'écriture complexe",
-        "Calculer rapport, angle, centre",
-        "Composer deux similitudes",
-        "Résoudre un problème géométrique"
-      ]
-    },
-    {
-      "id": "calcul_probabilites",
-      "numero": 3,
-      "titre": "Calcul de probabilités",
-      "description": "Événements aléatoires, probabilités conditionnelles, indépendance.",
-      "notions": [
-        {
-          "id": "vocabulaire",
-          "titre": "Vocabulaire",
-          "obligatoire": true,
-          "description": "Univers, événement, événement élémentaire, certain, impossible.",
-          "formules": ["$\\Omega$ : univers", "$A \\subset \\Omega$ : événement"],
-          "proprietes": ["Événement = sous-ensemble de Ω"],
-          "methodes": ["Identifier Ω", "Définir les événements"],
-          "erreurs_frequentes": ["Confondre événement et probabilité"],
-          "pieges_examen": ["Bien distinguer ∩ et ∪"]
-        },
-        {
-          "id": "probabilite_univers_fini",
-          "titre": "Probabilité sur un univers fini",
-          "obligatoire": true,
-          "description": "Probabilité P définie sur les événements, P(Ω) = 1.",
-          "formules": ["$0 \\leq P(A) \\leq 1$", "$P(\\Omega) = 1$", "$P(\\emptyset) = 0$"],
-          "proprietes": ["Additivité sur événements disjoints", "Équiprobabilité : cas favorables / cas possibles"],
-          "methodes": ["Calculer probabilités élémentaires"],
-          "erreurs_frequentes": ["Oublier somme = 1"],
-          "pieges_examen": ["Loi uniforme"]
-        },
-        {
-          "id": "evenement_contraire",
-          "titre": "Événement contraire",
-          "obligatoire": true,
-          "description": "P(Ā) = 1 - P(A).",
-          "formules": ["$P(\\bar{A}) = 1 - P(A)$"],
-          "proprietes": ["Utile quand calcul direct difficile"],
-          "methodes": ["Calculer P(Ā) puis P(A)"],
-          "erreurs_frequentes": ["Confondre contraire et incompatible"],
-          "pieges_examen": ["« Au moins un » par le contraire"]
-        },
-        {
-          "id": "reunion_intersection",
-          "titre": "Réunion et intersection",
-          "obligatoire": true,
-          "description": "Formule de la réunion.",
-          "formules": ["$P(A \\cup B) = P(A) + P(B) - P(A \\cap B)$"],
-          "proprietes": ["Incompatibles : A ∩ B = ∅"],
-          "methodes": ["Identifier si incompatibles"],
-          "erreurs_frequentes": ["Oublier de soustraire P(A ∩ B)"],
-          "pieges_examen": ["« Ou » = ∪, « et » = ∩"]
-        },
-        {
-          "id": "probabilite_conditionnelle",
-          "titre": "Probabilité conditionnelle",
-          "obligatoire": true,
-          "description": "P(B|A) = P(A ∩ B) / P(A).",
-          "formules": ["$P_A(B) = \\frac{P(A \\cap B)}{P(A)}$", "$P(A \\cap B) = P(A) \\cdot P_A(B)$"],
-          "proprietes": ["P_A est une probabilité"],
-          "methodes": ["Arbre pondéré", "Multiplier le long d'un chemin"],
-          "erreurs_frequentes": ["Confondre P_A(B) et P_B(A)"],
-          "pieges_examen": ["« Sachant que » = conditionnelle"]
-        },
-        {
-          "id": "probabilites_totales",
-          "titre": "Formule des probabilités totales",
-          "obligatoire": true,
-          "description": "Si (A_i) partition de Ω, P(B) = Σ P(A_i) × P_{A_i}(B).",
-          "formules": ["$P(B) = \\sum_i P(A_i) \\cdot P_{A_i}(B)$"],
-          "proprietes": ["Partition de Ω"],
-          "methodes": ["Décomposer selon cas", "Sommer les chemins"],
-          "erreurs_frequentes": ["Oublier un cas"],
-          "pieges_examen": ["Deux urnes, deux ateliers"]
-        },
-        {
-          "id": "formule_bayes",
-          "titre": "Formule de Bayes",
-          "obligatoire": true,
-          "description": "Inversion de la probabilité conditionnelle.",
-          "formules": ["$P_B(A) = \\frac{P(A) \\cdot P_A(B)}{P(B)}$"],
-          "proprietes": ["Découle des probabilités totales"],
-          "methodes": ["Calculer P(B) par totales", "Appliquer"],
-          "erreurs_frequentes": ["Confondre numérateur et dénominateur"],
-          "pieges_examen": ["Test médical, contrôle qualité"]
-        },
-        {
-          "id": "independance",
-          "titre": "Indépendance",
-          "obligatoire": true,
-          "description": "A et B indépendants ⟺ P(A ∩ B) = P(A) × P(B).",
-          "formules": ["$P(A \\cap B) = P(A) \\cdot P(B)$"],
-          "proprietes": ["A et B indép ⟹ Ā et B indép"],
-          "methodes": ["Vérifier P(A ∩ B) = P(A) × P(B)"],
-          "erreurs_frequentes": ["Confondre indép et incompatibilité"],
-          "pieges_examen": ["Indépendance se calcule"]
-        }
-      ],
-      "exercicesTypes": [
-        "Calculer une probabilité simple",
-        "Utiliser un arbre pondéré",
-        "Calculer une probabilité conditionnelle",
-        "Appliquer Bayes",
-        "Vérifier l'indépendance"]
-    }
-  ],
-    {
-      "id": "variable_aleatoire",
-      "numero": 4,
-      "titre": "Variable aléatoire",
-      "description": "Étude des variables aléatoires, espérance, variance, lois usuelles.",
-      "notions": [
-        {
-          "id": "definition_variable",
-          "titre": "Définition d'une variable aléatoire",
-          "obligatoire": true,
-          "description": "Application X : Ω → ℝ qui associe une valeur numérique à chaque issue.",
-          "formules": ["$X : \\Omega \\to \\mathbb{R}$", "$(X = x_i)$ : événement"],
-          "proprietes": ["Nombre fini de valeurs", "Permet de calculer des probabilités"],
-          "methodes": ["Identifier les valeurs possibles", "Définir les événements"],
-          "erreurs_frequentes": ["Oublier certaines valeurs"],
-          "pieges_examen": ["« Gain algébrique » = gain - mise"]
-        },
-        {
-          "id": "loi_probabilite",
-          "titre": "Loi de probabilité",
-          "obligatoire": true,
-          "description": "Tableau donnant P(X = x_i) pour chaque valeur x_i.",
-          "formules": ["$\\sum_i P(X = x_i) = 1$"],
-          "proprietes": ["Somme des probabilités = 1", "P(X = x_i) ≥ 0"],
-          "methodes": ["Construire le tableau", "Vérifier la somme = 1"],
-          "erreurs_frequentes": ["Somme ≠ 1"],
-          "pieges_examen": ["Toujours vérifier la somme"]
-        },
-        {
-          "id": "esperance",
-          "titre": "Espérance mathématique",
-          "obligatoire": true,
-          "description": "Valeur moyenne attendue E(X) = Σ x_i · P(X = x_i).",
-          "formules": ["$E(X) = \\sum_i x_i \\cdot P(X = x_i)$", "$E(aX + b) = aE(X) + b$"],
-          "proprietes": ["Linéarité", "Moyenne théorique"],
-          "methodes": ["Multiplier valeur × probabilité", "Additionner"],
-          "erreurs_frequentes": ["Oublier la probabilité", "Erreur de signe pour gain"],
-          "pieges_examen": ["Espérance ≠ valeur la plus probable"]
-        },
-        {
-          "id": "variance_ecart_type",
-          "titre": "Variance et écart-type",
-          "obligatoire": true,
-          "description": "V(X) = E(X²) - [E(X)]², σ(X) = √V(X).",
-          "formules": ["$V(X) = E(X^2) - [E(X)]^2$", "$\\sigma(X) = \\sqrt{V(X)}$", "$V(aX + b) = a^2 V(X)$"],
-          "proprietes": ["V(X) ≥ 0", "σ mesure la dispersion"],
-          "methodes": ["Calculer E(X) puis E(X²)", "Appliquer la formule"],
-          "erreurs_frequentes": ["Confondre V(X) et σ(X)"],
-          "pieges_examen": ["σ(X) ≥ 0 toujours"]
-        },
-        {
-          "id": "loi_binomiale",
-          "titre": "Loi binomiale",
-          "obligatoire": true,
-          "description": "X compte le nombre de succès dans n épreuves de Bernoulli indépendantes de paramètre p.",
-          "formules": ["$P(X = k) = \\binom{n}{k} p^k (1-p)^{n-k}$", "$E(X) = np$", "$V(X) = np(1-p)$"],
-          "proprietes": ["n épreuves identiques et indépendantes", "2 issues par épreuve"],
-          "methodes": ["Vérifier les conditions", "Identifier n et p", "Appliquer"],
-          "erreurs_frequentes": ["Oublier le coefficient binomial"],
-          "pieges_examen": ["P(X ≥ 1) = 1 - P(X = 0)"]
-        },
-        {
-          "id": "loi_normale",
-          "titre": "Loi normale",
-          "obligatoire": true,
-          "description": "Loi continue en cloche N(μ, σ²) pour les grands échantillons.",
-          "formules": ["$Z = \\frac{X - \\mu}{\\sigma} \\sim \\mathcal{N}(0, 1)$", "$P(\\mu - \\sigma \\leq X \\leq \\mu + \\sigma) \\approx 0{,}68$"],
-          "proprietes": ["Symétrique autour de μ", "Aire sous la courbe = 1"],
-          "methodes": ["Centrer et réduire", "Utiliser table"],
-          "erreurs_frequentes": ["Oublier de centrer-réduire"],
-          "pieges_examen": ["P(X ≤ a) = P(Z ≤ (a-μ)/σ)"]
-        },
-        {
-          "id": "applications_va",
-          "titre": "Applications",
-          "obligatoire": true,
-          "description": "Résolution de problèmes concrets avec variables aléatoires.",
-          "formules": ["Utilisation combinée de E(X), V(X), lois usuelles"],
-          "proprietes": ["Modélisation de situations réelles"],
-          "methodes": ["Modéliser le problème", "Choisir la loi", "Calculer"],
-          "erreurs_frequentes": ["Mauvaise modélisation"],
-          "pieges_examen": ["Jeux, contrôles qualité, sondages"]
-        }
-      ],
-      "exercicesTypes": [
-        "Construire une loi de probabilité",
-        "Calculer espérance et variance",
-        "Utiliser la loi binomiale",
-        "Utiliser la loi normale"
-      ]
-    },
-    {
-      "id": "fonctions_numeriques",
-      "numero": 5,
-      "titre": "Fonctions numériques",
-      "description": "Limites, continuité, dérivabilité, étude des fonctions.",
-      "notions": [
-        {
-          "id": "limites",
-          "titre": "Limites d'une fonction",
-          "obligatoire": true,
-          "description": "Comportement en un point ou à l'infini.",
-          "formules": ["$\\lim_{x \\to a} f(x) = L$", "$\\lim_{x \\to +\\infty} f(x) = L$"],
-          "proprietes": ["Unicité", "Opérations sur les limites"],
-          "methodes": ["Factoriser", "Multiplier par conjugué", "Limites usuelles"],
-          "erreurs_frequentes": ["Conclure sur forme indéterminée"],
-          "pieges_examen": ["Toujours lever l'indétermination"]
-        },
-        {
-          "id": "croissances_comparees",
-          "titre": "Croissances comparées",
-          "obligatoire": true,
-          "description": "Comparaison des croissances en +∞.",
-          "formules": ["$\\lim_{x \\to +\\infty} \\frac{e^x}{x^n} = +\\infty$", "$\\lim_{x \\to +\\infty} \\frac{\\ln x}{x^n} = 0$", "$\\lim_{x \\to 0} \\frac{\\ln(1+x)}{x} = 1$", "$\\lim_{x \\to 0} \\frac{e^x - 1}{x} = 1$"],
-          "proprietes": ["Exp > puissance > log"],
-          "methodes": ["Reconnaître la forme", "Appliquer"],
-          "erreurs_frequentes": ["Confondre les croissances"],
-          "pieges_examen": ["À connaître par cœur"]
-        },
-        {
-          "id": "continuite",
-          "titre": "Continuité",
-          "obligatoire": true,
-          "description": "f continue en a si lim f(x) = f(a).",
-          "formules": ["$\\lim_{x \\to a} f(x) = f(a)$"],
-          "proprietes": ["Somme, produit, quotient, composée"],
-          "methodes": ["Vérifier limite à gauche et à droite"],
-          "erreurs_frequentes": ["Oublier de vérifier f(a)"],
-          "pieges_examen": ["Fonction par morceaux"]
-        },
-        {
-          "id": "theoreme_valeurs_intermediaires",
-          "titre": "Théorème des valeurs intermédiaires",
-          "obligatoire": true,
-          "description": "Si f continue sur [a,b] et k entre f(a) et f(b), ∃c : f(c) = k.",
-          "formules": ["$f(a) \\leq k \\leq f(b) \\implies \\exists c : f(c) = k$"],
-          "proprietes": ["Existence de solution"],
-          "methodes": ["Vérifier continuité", "Vérifier valeurs bornes"],
-          "erreurs_frequentes": ["Oublier la continuité"],
-          "pieges_examen": ["TVI + monotonie = unicité"]
-        },
-        {
-          "id": "theoreme_bijection",
-          "titre": "Théorème de la bijection",
-          "obligatoire": true,
-          "description": "f continue strictement monotone sur I réalise une bijection.",
-          "formules": ["$\\exists ! c : f(c) = k$"],
-          "proprietes": ["Existence ET unicité"],
-          "methodes": ["Vérifier continuité et monotonie"],
-          "erreurs_frequentes": ["Oublier la stricte monotonie"],
-          "pieges_examen": ["Bijection = existence + unicité"]
-        },
-        {
-          "id": "derivabilite",
-          "titre": "Dérivabilité",
-          "obligatoire": true,
-          "description": "f dérivable en a si le taux d'accroissement admet une limite finie.",
-          "formules": ["$f'(a) = \\lim_{h \\to 0} \\frac{f(a+h) - f(a)}{h}$"],
-          "proprietes": ["Dérivable ⟹ continue", "Réciproque fausse"],
-          "methodes": ["Calculer la limite du taux"],
-          "erreurs_frequentes": ["Confondre dérivabilité et continuité"],
-          "pieges_examen": ["Dérivabilité en point problématique"]
-        },
-        {
-          "id": "derivees_usuelles",
-          "titre": "Dérivées usuelles",
-          "obligatoire": true,
-          "description": "Formules de dérivation des fonctions de référence.",
-          "formules": ["$(x^n)' = nx^{n-1}$", "$(e^x)' = e^x$", "$(\\ln x)' = \\frac{1}{x}$", "$(\\cos x)' = -\\sin x$", "$(\\sin x)' = \\cos x$"],
-          "proprietes": ["À connaître par cœur"],
-          "methodes": ["Identifier la fonction", "Appliquer"],
-          "erreurs_frequentes": ["Oublier le signe moins pour cos"],
-          "pieges_examen": ["Puissances négatives"]
-        },
-        {
-          "id": "operations_derivees",
-          "titre": "Opérations sur les dérivées",
-          "obligatoire": true,
-          "description": "Dérivée d'une somme, produit, quotient.",
-          "formules": ["$(u+v)' = u' + v'$", "$(uv)' = u'v + uv'$", "$\\left(\\frac{u}{v}\\right)' = \\frac{u'v - uv'}{v^2}$"],
-          "proprietes": ["Linéarité pour somme"],
-          "methodes": ["Identifier la structure", "Appliquer"],
-          "erreurs_frequentes": ["(uv)' ≠ u'v'", "Erreur de signe quotient"],
-          "pieges_examen": ["Ne pas oublier -uv'"]
-        },
-        {
-          "id": "derivee_composee",
-          "titre": "Dérivée composée",
-          "obligatoire": true,
-          "description": "Dérivée de f(g(x)).",
-          "formules": ["$(f \\circ g)'(x) = g'(x) \\cdot f'(g(x))$", "$(u^n)' = n u^{n-1} u'$", "$(\\ln u)' = \\frac{u'}{u}$", "$(e^u)' = u' e^u$"],
-          "proprietes": ["Composition = produit en cascade"],
-          "methodes": ["Identifier u", "Appliquer"],
-          "erreurs_frequentes": ["Oublier u'"],
-          "pieges_examen": ["Toujours multiplier par u'"]
-        },
-        {
-          "id": "sens_variation",
-          "titre": "Sens de variation",
-          "obligatoire": true,
-          "description": "Le signe de f' donne le sens de variation de f.",
-          "formules": ["$f' > 0 \\implies f$ croissante", "$f' < 0 \\implies f$ décroissante"],
-          "proprietes": ["Tableau de variation"],
-          "methodes": ["Calculer f'", "Étudier le signe", "Tableau"],
-          "erreurs_frequentes": ["Confondre signe de f et f'"],
-          "pieges_examen": ["f' = 0 ne suffit pas"]
-        },
-        {
-          "id": "extremums",
-          "titre": "Extremums locaux",
-          "obligatoire": true,
-          "description": "Points où f' s'annule ET change de signe.",
-          "formules": ["$f'(a) = 0$ et changement de signe en a"],
-          "proprietes": ["f' = 0 nécessaire mais pas suffisant"],
-          "methodes": ["Résoudre f'(x) = 0", "Étudier le signe autour"],
-          "erreurs_frequentes": ["Conclure extremum dès f' = 0"],
-          "pieges_examen": ["x³ : f'(0) = 0 mais pas d'extremum"]
-        },
-        {
-          "id": "etude_complete",
-          "titre": "Étude complète d'une fonction",
-          "obligatoire": true,
-          "description": "Méthode : domaine → limites → f' → signe → tableau → courbe.",
-          "formules": ["Étapes systématiques"],
-          "proprietes": ["Méthode structurée"],
-          "methodes": ["1) Domaine", "2) Limites", "3) f'", "4) Signe", "5) Tableau", "6) Extremums", "7) Asymptotes", "8) Tracé"],
-          "erreurs_frequentes": ["Oublier le domaine", "Erreur de signe"],
-          "pieges_examen": ["Toujours vérifier le domaine AVANT"]
-        }
-      ],
-      "exercicesTypes": [
-        "Calculer une limite",
-        "Étudier la continuité",
-        "Appliquer le TVI",
-        "Calculer une dérivée",
-        "Dresser un tableau de variation",
-        "Étude complète"
-      ]
-    },
-    {
-      "id": "fonction_logarithme",
-      "numero": 6,
-      "titre": "Fonction logarithme népérien",
-      "description": "Étude de la fonction ln, propriétés algébriques et analytiques.",
-      "notions": [
-        {
-          "id": "definition_ln",
-          "titre": "Définition de ln",
-          "obligatoire": true,
-          "description": "ln est la primitive de 1/x sur ]0, +∞[ qui s'annule en 1.",
-          "formules": ["$\\ln(1) = 0$", "$\\ln'(x) = \\frac{1}{x}$"],
-          "proprietes": ["Domaine : ]0, +∞[", "Strictement croissante"],
-          "methodes": ["Utiliser la définition"],
-          "erreurs_frequentes": ["Oublier le domaine"],
-          "pieges_examen": ["ln défini que pour x > 0"]
-        },
-        {
-          "id": "proprietes_algebriques_ln",
-          "titre": "Propriétés algébriques de ln",
-          "obligatoire": true,
-          "description": "Règles de calcul avec ln.",
-          "formules": ["$\\ln(ab) = \\ln a + \\ln b$", "$\\ln(a/b) = \\ln a - \\ln b$", "$\\ln(a^n) = n \\ln a$"],
-          "proprietes": ["Produits → sommes", "Puissances → produits"],
-          "methodes": ["Décomposer les expressions"],
-          "erreurs_frequentes": ["ln(a + b) ≠ ln a + ln b"],
-          "pieges_examen": ["Règles ≠ addition"]
-        },
-        {
-          "id": "derivee_ln",
-          "titre": "Dérivée de ln",
-          "obligatoire": true,
-          "description": "(ln x)' = 1/x pour x > 0.",
-          "formules": ["$(\\ln x)' = \\frac{1}{x}$", "$(\\ln u)' = \\frac{u'}{u}$"],
-          "proprietes": ["Dérivée positive ⟹ ln croissante"],
-          "methodes": ["Identifier si composée"],
-          "erreurs_frequentes": ["Oublier u' dans ln(u)"],
-          "pieges_examen": ["ln(u) : toujours × u'"]
-        },
-        {
-          "id": "limites_ln",
-          "titre": "Limites de ln",
-          "obligatoire": true,
-          "description": "Limites de ln aux bornes.",
-          "formules": ["$\\lim_{x \\to +\\infty} \\ln x = +\\infty$", "$\\lim_{x \\to 0^+} \\ln x = -\\infty$", "$\\lim_{x \\to +\\infty} \\frac{\\ln x}{x} = 0$"],
-          "proprietes": ["Croissance lente"],
-          "methodes": ["Croissances comparées"],
-          "erreurs_frequentes": ["Confondre avec autres limites"],
-          "pieges_examen": ["ln plus lent que x^n"]
-        },
-        {
-          "id": "etude_ln",
-          "titre": "Étude de ln",
-          "obligatoire": true,
-          "description": "Tableau et courbe de ln.",
-          "formules": ["ln strictement croissante", "ln(1) = 0"],
-          "proprietes": ["Passe par (1, 0)", "Asymptote verticale en 0"],
-          "methodes": ["Dresser le tableau", "Tracer"],
-          "erreurs_frequentes": ["Confondre ln(x) et x"],
-          "pieges_examen": ["Signe de ln selon x"]
-        },
-        {
-          "id": "derivee_ln_u",
-          "titre": "Dérivée de ln(u)",
-          "obligatoire": true,
-          "description": "Dérivée de la composée ln(u) où u > 0.",
-          "formules": ["$(\\ln u)' = \\frac{u'}{u}$"],
-          "proprietes": ["u > 0 obligatoire"],
-          "methodes": ["Identifier u", "Calculer u'", "Appliquer"],
-          "erreurs_frequentes": ["Oublier u'"],
-          "pieges_examen": ["Vérifier u > 0"]
-        },
-        {
-          "id": "equations_inequations_ln",
-          "titre": "Équations et inéquations avec ln",
-          "obligatoire": true,
-          "description": "Résolution d'équations et inéquations.",
-          "formules": ["$\\ln x = a \\iff x = e^a$", "$\\ln x = \\ln y \\iff x = y$"],
-          "proprietes": ["Utiliser bijection", "Attention domaine"],
-          "methodes": ["Domaine", "ln ou exp", "Vérifier"],
-          "erreurs_frequentes": ["Oublier le domaine"],
-          "pieges_examen": ["Vérifier les solutions"]
-        },
-        {
-          "id": "applications_ln",
-          "titre": "Applications",
-          "obligatoire": true,
-          "description": "Utilisation de ln dans problèmes concrets.",
-          "formules": ["pH = -log[H₃O⁺]"],
-          "proprietes": ["Modélisation"],
-          "methodes": ["Identifier la situation"],
-          "erreurs_frequentes": ["Confondre ln et log"],
-          "pieges_examen": ["ln = base e"]
-        }
-      ],
-      "exercicesTypes": [
-        "Calculer avec les propriétés de ln",
-        "Résoudre une équation avec ln",
-        "Étudier une fonction avec ln",
-        "Calculer des limites avec ln"
-      ]
-    },
-    {
-      "id": "fonction_exponentielle",
-      "numero": 7,
-      "titre": "Fonction exponentielle",
-      "description": "Étude de la fonction exp, propriétés algébriques et analytiques.",
-      "notions": [
-        {
-          "id": "definition_exp",
-          "titre": "Définition de exp",
-          "obligatoire": true,
-          "description": "exp est la bijection réciproque de ln sur ℝ.",
-          "formules": ["$\\exp(x) = e^x$", "$\\exp(0) = 1$"],
-          "proprietes": ["Domaine : ℝ", "Strictement croissante", "Toujours positive"],
-          "methodes": ["Utiliser la définition"],
-          "erreurs_frequentes": ["Oublier que exp > 0"],
-          "pieges_examen": ["exp(x) > 0 pour tout x"]
-        },
-        {
-          "id": "proprietes_algebriques_exp",
-          "titre": "Propriétés algébriques de exp",
-          "obligatoire": true,
-          "description": "Règles de calcul avec exp.",
-          "formules": ["$e^{a+b} = e^a \\cdot e^b$", "$e^{a-b} = \\frac{e^a}{e^b}$", "$(e^a)^n = e^{na}$"],
-          "proprietes": ["Sommes → produits"],
-          "methodes": ["Décomposer les expressions"],
-          "erreurs_frequentes": ["e^(a+b) ≠ e^a + e^b"],
-          "pieges_examen": ["Règles ≠ addition"]
-        },
-        {
-          "id": "derivee_exp",
-          "titre": "Dérivée de exp",
-          "obligatoire": true,
-          "description": "(e^x)' = e^x.",
-          "formules": ["$(e^x)' = e^x$", "$(e^u)' = u' e^u$"],
-          "proprietes": ["Dérivée = elle-même"],
-          "methodes": ["Identifier si composée"],
-          "erreurs_frequentes": ["Oublier u' dans e^u"],
-          "pieges_examen": ["e^u : toujours × u'"]
-        },
-        {
-          "id": "limites_exp",
-          "titre": "Limites de exp",
-          "obligatoire": true,
-          "description": "Limites de exp aux bornes.",
-          "formules": ["$\\lim_{x \\to +\\infty} e^x = +\\infty$", "$\\lim_{x \\to -\\infty} e^x = 0$", "$\\lim_{x \\to +\\infty} \\frac{e^x}{x^n} = +\\infty$"],
-          "proprietes": ["Croissance très rapide"],
-          "methodes": ["Croissances comparées"],
-          "erreurs_frequentes": ["Confondre les croissances"],
-          "pieges_examen": ["exp plus rapide que x^n"]
-        },
-        {
-          "id": "etude_exp",
-          "titre": "Étude de exp",
-          "obligatoire": true,
-          "description": "Tableau et courbe de exp.",
-          "formules": ["exp strictement croissante", "exp(0) = 1"],
-          "proprietes": ["Passe par (0, 1)", "Asymptote horizontale y = 0 en -∞"],
-          "methodes": ["Dresser le tableau", "Tracer"],
-          "erreurs_frequentes": ["Confondre exp(x) et x"],
-          "pieges_examen": ["exp(x) > 0 toujours"]
-        },
-        {
-          "id": "derivee_exp_u",
-          "titre": "Dérivée de exp(u)",
-          "obligatoire": true,
-          "description": "Dérivée de la composée exp(u).",
-          "formules": ["$(e^u)' = u' e^u$"],
-          "proprietes": ["u quelconque"],
-          "methodes": ["Identifier u", "Calculer u'", "Appliquer"],
-          "erreurs_frequentes": ["Oublier u'"],
-          "pieges_examen": ["Ne pas oublier u'"]
-        },
-        {
-          "id": "relation_ln_exp",
-          "titre": "Relation ln / exp",
-          "obligatoire": true,
-          "description": "ln et exp sont réciproques.",
-          "formules": ["$\\ln(e^x) = x$", "$e^{\\ln x} = x$ (x > 0)"],
-          "proprietes": ["Bijection réciproque"],
-          "methodes": ["Utiliser pour simplifier"],
-          "erreurs_frequentes": ["Oublier le domaine de ln"],
-          "pieges_examen": ["e^ln(x) = x seulement si x > 0"]
-        },
-        {
-          "id": "equations_inequations_exp",
-          "titre": "Équations et inéquations avec exp",
-          "obligatoire": true,
-          "description": "Résolution d'équations et inéquations.",
-          "formules": ["$e^x = a \\iff x = \\ln a$ (a > 0)", "$e^x = e^y \\iff x = y$"],
-          "proprietes": ["Utiliser la bijection"],
-          "methodes": ["Isoler exp", "Appliquer ln"],
-          "erreurs_frequentes": ["Oublier a > 0"],
-          "pieges_examen": ["e^x = -1 n'a pas de solution"]
-        },
-        {
-          "id": "applications_exp",
-          "titre": "Applications",
-          "obligatoire": true,
-          "description": "Utilisation de exp dans problèmes concrets.",
-          "formules": ["Croissance exponentielle", "Décroissance radioactive"],
-          "proprietes": ["Modélisation"],
-          "methodes": ["Identifier la situation"],
-          "erreurs_frequentes": ["Confondre avec ln"],
-          "pieges_examen": ["exp = base e"]
-        }
-      ],
-      "exercicesTypes": [
-        "Calculer avec les propriétés de exp",
-        "Résoudre une équation avec exp",
-        "Étudier une fonction avec exp",
-        "Calculer des limites avec exp"]
-    }
-  ],
-    {
-      "id": "calcul_integral",
-      "numero": 8,
-      "titre": "Calcul intégral",
-      "description": "Primitives, intégrales, techniques de calcul et applications.",
-      "notions": [
-        {
-          "id": "primitives_definition",
-          "titre": "Primitives — définition",
-          "obligatoire": true,
-          "description": "F est une primitive de f sur I si F' = f sur I.",
-          "formules": ["$F' = f$ sur I", "Les primitives diffèrent d'une constante"],
-          "proprietes": ["F + C est aussi primitive", "C = constante réelle"],
-          "methodes": ["Vérifier F' = f", "Ajouter + C"],
-          "erreurs_frequentes": ["Oublier la constante C"],
-          "pieges_examen": ["Deux primitives diffèrent d'une constante"]
-        },
-        {
-          "id": "primitives_usuelles",
-          "titre": "Primitives usuelles",
-          "obligatoire": true,
-          "description": "Tableau des primitives des fonctions de référence.",
-          "formules": ["$\\int x^n dx = \\frac{x^{n+1}}{n+1} + C$", "$\\int \\frac{1}{x} dx = \\ln|x| + C$", "$\\int e^x dx = e^x + C$", "$\\int \\cos x dx = \\sin x + C$", "$\\int \\sin x dx = -\\cos x + C$"],
-          "proprietes": ["À connaître par cœur"],
-          "methodes": ["Identifier la forme", "Appliquer"],
-          "erreurs_frequentes": ["Oublier la valeur absolue pour 1/x", "Oublier + C"],
-          "pieges_examen": ["Vérifier le signe pour sin"]
-        },
-        {
-          "id": "primitives_composees",
-          "titre": "Primitives composées",
-          "obligatoire": true,
-          "description": "Primitives des fonctions composées courantes.",
-          "formules": ["$\\int u' u^n dx = \\frac{u^{n+1}}{n+1} + C$", "$\\int \\frac{u'}{u} dx = \\ln|u| + C$", "$\\int u' e^u dx = e^u + C$"],
-          "proprietes": ["Reconnaître la forme u' × f(u)"],
-          "methodes": ["Identifier u", "Vérifier u'", "Appliquer"],
-          "erreurs_frequentes": ["Oublier le u'", "Confondre les formes"],
-          "pieges_examen": ["Toujours chercher u' dans l'expression"]
-        },
-        {
-          "id": "integrale_definition",
-          "titre": "Intégrale — définition",
-          "obligatoire": true,
-          "description": "L'intégrale de f sur [a,b] est F(b) - F(a) où F est une primitive de f.",
-          "formules": ["$\\int_a^b f(x) dx = F(b) - F(a)$"],
-          "proprietes": ["Ne dépend pas de la primitive choisie", "F en notation $[F(x)]_a^b$"],
-          "methodes": ["Trouver une primitive", "Évaluer en b et a", "Soustraire"],
-          "erreurs_frequentes": ["Oublier de soustraire F(a)", "Erreur de signe"],
-          "pieges_examen": ["Attention au signe : F(b) - F(a)"]
-        },
-        {
-          "id": "proprietes_integrale",
-          "titre": "Propriétés de l'intégrale",
-          "obligatoire": true,
-          "description": "Propriétés fondamentales de l'intégrale.",
-          "formules": ["$\\int_a^a f = 0$", "$\\int_b^a f = -\\int_a^b f$", "$\\int_a^b (f+g) = \\int_a^b f + \\int_a^b g$"],
-          "proprietes": ["Linéarité", "Inversion des bornes"],
-          "methodes": ["Utiliser les propriétés pour simplifier"],
-          "erreurs_frequentes": ["Oublier le signe - pour l'inversion"],
-          "pieges_examen": ["Inverser les bornes = changer le signe"]
-        },
-        {
-          "id": "linearite",
-          "titre": "Linéarité de l'intégrale",
-          "obligatoire": true,
-          "description": "L'intégrale est linéaire.",
-          "formules": ["$\\int_a^b (\\alpha f + \\beta g) = \\alpha \\int_a^b f + \\beta \\int_a^b g$"],
-          "proprietes": ["Somme et multiplication par constante"],
-          "methodes": ["Séparer les termes", "Sortir les constantes"],
-          "erreurs_frequentes": ["Sortir une fonction variable"],
-          "pieges_examen": ["Seules les constantes sortent"]
-        },
-        {
-          "id": "relation_chasles",
-          "titre": "Relation de Chasles",
-          "obligatoire": true,
-          "description": "Découpage d'une intégrale en plusieurs morceaux.",
-          "formules": ["$\\int_a^c f = \\int_a^b f + \\int_b^c f$"],
-          "proprietes": ["Découpage possible en tout point"],
-          "methodes": ["Choisir un point intermédiaire", "Additionner"],
-          "erreurs_frequentes": ["Mauvais découpage"],
-          "pieges_examen": ["Utile pour les fonctions en morceaux"]
-        },
-        {
-          "id": "integration_parties",
-          "titre": "Intégration par parties",
-          "obligatoire": true,
-          "description": "Formule pour intégrer un produit de fonctions.",
-          "formules": ["$\\int_a^b u'v \\, dx = [uv]_a^b - \\int_a^b uv' \\, dx$"],
-          "proprietes": ["Utile pour x·e^x, x·ln(x), etc."],
-          "methodes": ["Choisir u' et v", "Appliquer la formule", "Calculer"],
-          "erreurs_frequentes": ["Mauvais choix de u' et v", "Erreur de signe"],
-          "pieges_examen": ["Choisir u' facile à intégrer et v facile à dériver"]
-        },
-        {
-          "id": "calcul_aires",
-          "titre": "Calcul d'aires",
-          "obligatoire": true,
-          "description": "L'aire entre la courbe et l'axe des abscisses est l'intégrale de |f|.",
-          "formules": ["$A = \\int_a^b |f(x)| dx$", "Si f ≥ 0 : $A = \\int_a^b f(x) dx$"],
-          "proprietes": ["Aire toujours positive"],
-          "methodes": ["Étudier le signe de f", "Découper si nécessaire", "Calculer"],
-          "erreurs_frequentes": ["Oublier la valeur absolue"],
-          "pieges_examen": ["Si f change de signe : découper"]
-        },
-        {
-          "id": "valeur_moyenne",
-          "titre": "Valeur moyenne",
-          "obligatoire": true,
-          "description": "La valeur moyenne de f sur [a,b] est (1/(b-a)) × ∫f.",
-          "formules": ["$\\bar{f} = \\frac{1}{b-a} \\int_a^b f(x) dx$"],
-          "proprietes": ["Interprétation physique"],
-          "methodes": ["Calculer l'intégrale", "Diviser par (b-a)"],
-          "erreurs_frequentes": ["Oublier de diviser"],
-          "pieges_examen": ["Ne pas oublier le 1/(b-a)"]
-        }
-      ],
-      "exercicesTypes": [
-        "Calculer une primitive",
-        "Calculer une intégrale",
-        "Intégration par parties",
-        "Calculer une aire",
-        "Calculer une valeur moyenne"
-      ]
-    },
-    {
-      "id": "equations_differentielles",
-      "numero": 9,
-      "titre": "Équations différentielles",
-      "description": "Résolution d'équations différentielles linéaires du premier ordre.",
-      "notions": [
-        {
-          "id": "equation_y_prime_ay",
-          "titre": "Équation y' = ay",
-          "obligatoire": true,
-          "description": "Solutions de la forme y = C·e^(ax).",
-          "formules": ["$y' = ay$", "$y(x) = C e^{ax}$"],
-          "proprietes": ["C = constante déterminée par condition initiale"],
-          "methodes": ["Écrire la solution générale", "Utiliser la condition"],
-          "erreurs_frequentes": ["Oublier la constante C"],
-          "pieges_examen": ["Déterminer C avec y(0)"]
-        },
-        {
-          "id": "equation_y_prime_ay_b",
-          "titre": "Équation y' = ay + b",
-          "obligatoire": true,
-          "description": "Solutions avec solution particulière constante.",
-          "formules": ["$y' = ay + b$", "$y(x) = C e^{ax} - \\frac{b}{a}$"],
-          "proprietes": ["Solution particulière : y₀ = -b/a"],
-          "methodes": ["Chercher une solution constante", "Ajouter solution homogène"],
-          "erreurs_frequentes": ["Oublier la solution particulière"],
-          "pieges_examen": ["Solution = homogène + particulière"]
-        },
-        {
-          "id": "equation_y_prime_ay_fx",
-          "titre": "Équation y' = ay + f(x)",
-          "obligatoire": true,
-          "description": "Solution générale = solution homogène + solution particulière.",
-          "formules": ["$y = y_h + y_p$", "$y_h = C e^{ax}$"],
-          "proprietes": ["Principe de superposition"],
-          "methodes": ["Résoudre homogène", "Chercher solution particulière adaptée", "Ajouter"],
-          "erreurs_frequentes": ["Oublier la solution particulière"],
-          "pieges_examen": ["Chercher y_p de la même forme que f"]
-        },
-        {
-          "id": "conditions_initiales",
-          "titre": "Conditions initiales",
-          "obligatoire": true,
-          "description": "La condition y(x₀) = y₀ détermine la constante C.",
-          "formules": ["$y(x_0) = y_0$", "Détermine C"],
-          "proprietes": ["Une seule condition suffit"],
-          "methodes": ["Remplacer x₀ et y₀", "Résoudre pour C"],
-          "erreurs_frequentes": ["Erreur d'algèbre dans la détermination"],
-          "pieges_examen": ["Vérifier que la solution satisfait la condition"]
-        },
-        {
-          "id": "applications_equa_diff",
-          "titre": "Applications",
-          "obligatoire": true,
-          "description": "Modélisation de phénomènes physiques.",
-          "formules": ["Croissance exponentielle", "Refroidissement de Newton", "Charge/décharge condensateur"],
-          "proprietes": ["Modélisation réelle"],
-          "methodes": ["Identifier le modèle", "Résoudre", "Interpréter"],
-          "erreurs_frequentes": ["Mauvaise modélisation"],
-          "pieges_examen": ["Bien identifier les conditions initiales"]
-        }
-      ],
-      "exercicesTypes": [
-        "Résoudre y' = ay",
-        "Résoudre y' = ay + b",
-        "Résoudre avec second membre",
-        "Utiliser une condition initiale",
-        "Modéliser un problème concret"
-      ]
-    },
-    {
-      "id": "suites_numeriques",
-      "numero": 10,
-      "titre": "Suites numériques",
-      "description": "Suites arithmétiques, géométriques, convergence, récurrence.",
-      "notions": [
-        {
-          "id": "definition_suite",
-          "titre": "Définition d'une suite",
-          "obligatoire": true,
-          "description": "Une suite est une fonction de ℕ (ou d'une partie) vers ℝ.",
-          "formules": ["$u : n \\mapsto u_n$", "$u_n$ : terme général"],
-          "proprietes": ["Suite explicite ou récurrente", "Peut être définie par formule ou récurrence"],
-          "methodes": ["Identifier le type de définition", "Calculer les premiers termes"],
-          "erreurs_frequentes": ["Confondre explicite et récurrente"],
-          "pieges_examen": ["Toujours calculer u₀, u₁, u₂ pour comprendre"]
-        },
-        {
-          "id": "suite_arithmetique",
-          "titre": "Suite arithmétique",
-          "obligatoire": true,
-          "description": "Suite où chaque terme s'obtient en ajoutant une constante r (raison).",
-          "formules": ["$u_{n+1} = u_n + r$", "$u_n = u_0 + nr$", "$S_n = \\frac{(n+1)(u_0 + u_n)}{2}$"],
-          "proprietes": ["Croissance linéaire", "r = u_{n+1} - u_n"],
-          "methodes": ["Identifier la raison", "Appliquer les formules"],
-          "erreurs_frequentes": ["Confondre avec géométrique"],
-          "pieges_examen": ["Somme des termes = n+1 termes"]
-        },
-        {
-          "id": "suite_geometrique",
-          "titre": "Suite géométrique",
-          "obligatoire": true,
-          "description": "Suite où chaque terme s'obtient en multipliant par une constante q (raison).",
-          "formules": ["$u_{n+1} = u_n \\times q$", "$u_n = u_0 \\times q^n$", "$S_n = u_0 \\times \\frac{1 - q^{n+1}}{1 - q}$"],
-          "proprietes": ["Croissance exponentielle", "q = u_{n+1} / u_n"],
-          "methodes": ["Identifier la raison", "Appliquer les formules"],
-          "erreurs_frequentes": ["Formule de somme si q = 1"],
-          "pieges_examen": ["Si q = 1 : suite constante"]
-        },
-        {
-          "id": "sens_variation_suite",
-          "titre": "Sens de variation",
-          "obligatoire": true,
-          "description": "Étude de la monotonie d'une suite.",
-          "formules": ["u_{n+1} - u_n > 0 : croissante", "u_{n+1} - u_n < 0 : décroissante"],
-          "proprietes": ["Comparer u_{n+1} et u_n"],
-          "methodes": ["Calculer u_{n+1} - u_n", "Étudier le signe", "Ou comparer u_{n+1}/u_n à 1"],
-          "erreurs_frequentes": ["Confondre les méthodes"],
-          "pieges_examen": ["Pour suite à termes positifs : comparer u_{n+1}/u_n à 1"]
-        },
-        {
-          "id": "convergence_limite",
-          "titre": "Convergence et limite",
-          "obligatoire": true,
-          "description": "Comportement d'une suite quand n → +∞.",
-          "formules": ["$\\lim_{n \\to +\\infty} u_n = L$", "Si q < 1 : $q^n \\to 0$"],
-          "proprietes": ["Suites convergentes ou divergentes", "Toute suite croissante majorée converge"],
-          "methodes": ["Étudier la limite", "Utiliser théorèmes de convergence"],
-          "erreurs_frequentes": ["Confondre limite et valeur de u_n"],
-          "pieges_examen": ["Suite croissante majorée ⟹ converge"]
-        },
-        {
-          "id": "raisonnement_recurrence",
-          "titre": "Raisonnement par récurrence",
-          "obligatoire": true,
-          "description": "Méthode pour démontrer une propriété pour tout n.",
-          "formules": ["1) Initialisation : P(0)", "2) Hérédité : P(n) ⟹ P(n+1)", "3) Conclusion"],
-          "proprietes": ["Méthode fondamentale"],
-          "methodes": ["Initialisation", "Hérédité", "Conclusion"],
-          "erreurs_frequentes": ["Oublier l'initialisation"],
-          "pieges_examen": ["Les 3 étapes obligatoires"]
-        },
-        {
-          "id": "suites_majorees_minorees",
-          "titre": "Suites majorées / minorées / bornées",
-          "obligatoire": true,
-          "description": "Une suite est majorée si ∃M : u_n ≤ M pour tout n.",
-          "formules": ["$\\exists M : u_n \\leq M$ (majorée)", "$\\exists m : u_n \\geq m$ (minorée)"],
-          "proprietes": ["Bornée = majorée et minorée", "Théorème de convergence monotone"],
-          "methodes": ["Chercher un majorant/minorant", "Utiliser la récurrence"],
-          "erreurs_frequentes": ["Confondre majorant et maximum"],
-          "pieges_examen": ["Suite croissante majorée converge"]
-        },
-        {
-          "id": "applications_suites",
-          "titre": "Applications",
-          "obligatoire": true,
-          "description": "Résolution de problèmes concrets avec suites.",
-          "formules": ["Modélisation de croissances", "Intérêts composés", "Évolution de populations"],
-          "proprietes": ["Modélisation réelle"],
-          "methodes": ["Identifier le type", "Modéliser", "Calculer"],
-          "erreurs_frequentes": ["Mauvais choix de modèle"],
-          "pieges_examen": ["Bien identifier si arithmétique ou géométrique"]
-        }
-      ],
-      "exercicesTypes": [
-        "Calculer les termes d'une suite",
-        "Identifier arithmétique ou géométrique",
-        "Calculer la somme des termes",
-        "Étudier la convergence",
-        "Démontrer par récurrence"
-      ]
-    },
-    {
-      "id": "statistiques",
-      "numero": 11,
-      "titre": "Statistiques",
-      "description": "Séries statistiques, indicateurs, ajustement linéaire.",
-      "notions": [
-        {
-          "id": "serie_statistique",
-          "titre": "Série statistique",
-          "obligatoire": true,
-          "description": "Ensemble de données numériques avec effectifs.",
-          "formules": ["Série : (x_i, n_i)", "N = Σ n_i"],
-          "proprietes": ["Données brutes ou regroupées", "Effectif total N"],
-          "methodes": ["Organiser les données", "Calculer les effectifs"],
-          "erreurs_frequentes": ["Confondre effectif et valeur"],
-          "pieges_examen": ["Effectif total = N"]
-        },
-        {
-          "id": "moyenne_mediane_quartiles",
-          "titre": "Moyenne, médiane, quartiles",
-          "obligatoire": true,
-          "description": "Indicateurs de position d'une série statistique.",
-          "formules": ["$\\bar{x} = \\frac{1}{N} \\sum n_i x_i$", "Médiane : partage en 2", "Q1, Q3 : quartiles"],
-          "proprietes": ["Moyenne sensible aux valeurs extrêmes", "Médiane robuste"],
-          "methodes": ["Calculer Σ n_i x_i", "Diviser par N", "Ordonner pour médiane"],
-          "erreurs_frequentes": ["Oublier de pondérer par les effectifs"],
-          "pieges_examen": ["Médiane = valeur qui partage en 2 (50%)"]
-        },
-        {
-          "id": "ecart_type",
-          "titre": "Écart-type",
-          "obligatoire": true,
-          "description": "Mesure de dispersion autour de la moyenne.",
-          "formules": ["$\\sigma = \\sqrt{V}$", "$V = \\frac{1}{N} \\sum n_i (x_i - \\bar{x})^2$", "$V = \\bar{x^2} - \\bar{x}^2$"],
-          "proprietes": ["σ ≥ 0", "Homogène à la moyenne"],
-          "methodes": ["Calculer moyenne", "Calculer moyenne des carrés", "Soustraire"],
-          "erreurs_frequentes": ["Oublier la racine carrée", "Erreur de signe"],
-          "pieges_examen": ["Formule de König : V = E(X²) - [E(X)]²"]
-        },
-        {
-          "id": "ajustement_lineaire",
-          "titre": "Ajustement linéaire",
-          "obligatoire": true,
-          "description": "Droite d'ajustement par la méthode des moindres carrés.",
-          "formules": ["$y = ax + b$", "$a = \\frac{\\text{Cov}(x,y)}{V(x)}$", "$b = \\bar{y} - a\\bar{x}$"],
-          "proprietes": ["Droite passe par le point moyen", "Minimise les carrés des écarts"],
-          "methodes": ["Calculer moyennes", "Calculer covariance et variance", "Appliquer formules"],
-          "erreurs_frequentes": ["Confondre a et b"],
-          "pieges_examen": ["La droite passe toujours par (x̄, ȳ)"]
-        },
-        {
-          "id": "correlation",
-          "titre": "Corrélation",
-          "obligatoire": true,
-          "description": "Mesure de la dépendance linéaire entre deux variables.",
-          "formules": ["$r = \\frac{\\text{Cov}(x,y)}{\\sigma_x \\sigma_y}$", "$-1 \\leq r \\leq 1$"],
-          "proprietes": ["r = 1 : corrélation parfaite positive", "r = -1 : parfaite négative", "r = 0 : pas de corrélation linéaire"],
-          "methodes": ["Calculer Cov, σ_x, σ_y", "Appliquer la formule"],
-          "erreurs_frequentes": ["Confondre corrélation et causalité"],
-          "pieges_examen": ["r proche de ±1 ⟹ ajustement fiable"]
-        },
-        {
-          "id": "applications_stats",
-          "titre": "Applications",
-          "obligatoire": true,
-          "description": "Utilisation des statistiques dans problèmes concrets.",
-          "formules": ["Analyse de séries", "Prévision par ajustement"],
-          "proprietes": ["Modélisation de données"],
-          "methodes": ["Collecter", "Analyser", "Interpréter"],
-          "erreurs_frequentes": ["Mauvaise interprétation"],
-          "pieges_examen": ["Nuage de points + droite d'ajustement"]
-        }
-      ],
-      "exercicesTypes": [
-        "Calculer moyenne, médiane, quartiles",
-        "Calculer l'écart-type",
-        "Déterminer une droite d'ajustement",
-        "Calculer un coefficient de corrélation",
-        "Faire une prévision"]
     }
   ]
 }

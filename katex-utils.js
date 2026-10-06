@@ -1,14 +1,17 @@
 // ================================================================
-// KATEX UTILS — ARVEXA School
-// Normalisation, rendu et correction des formules LaTeX
-// À inclure dans toutes les pages qui affichent des maths
+// KATEX UTILS v2.0 — ARVEXA School
+// Rendu mathématique robuste, global, auto-injecté
+// Utilisé par TOUTES les pages d'ARVEXA
 // ================================================================
 
-(function() {
+(function () {
   'use strict';
 
+  if (window.__arvexaKatexInit) return;
+  window.__arvexaKatexInit = true;
+
   // ═══════════════════════════════════════════════════════════════
-  // MACROS PERSONNALISÉES
+  // MACROS UNIVERSELLES
   // ═══════════════════════════════════════════════════════════════
   const MACROS = {
     "\\R": "\\mathbb{R}",
@@ -33,253 +36,286 @@
   };
 
   // ═══════════════════════════════════════════════════════════════
+  // DÉLIMITEURS ÉTENDUS
+  // ═══════════════════════════════════════════════════════════════
+  const DELIMITERS = [
+    { left: '$$', right: '$$', display: true },
+    { left: '\\[', right: '\\]', display: true },
+    { left: '$', right: '$', display: false },
+    { left: '\\(', right: '\\)', display: false },
+    { left: '\\begin{equation}', right: '\\end{equation}', display: true },
+    { left: '\\begin{equation*}', right: '\\end{equation*}', display: true },
+    { left: '\\begin{align}', right: '\\end{align}', display: true },
+    { left: '\\begin{align*}', right: '\\end{align*}', display: true },
+    { left: '\\begin{cases}', right: '\\end{cases}', display: true },
+    { left: '\\begin{matrix}', right: '\\end{matrix}', display: true },
+    { left: '\\begin{pmatrix}', right: '\\end{pmatrix}', display: true },
+    { left: '\\begin{bmatrix}', right: '\\end{bmatrix}', display: true }
+  ];
+
+  // ═══════════════════════════════════════════════════════════════
   // NORMALISATION LATEX
   // ═══════════════════════════════════════════════════════════════
   function normalizeLatex(input) {
     if (!input || typeof input !== 'string') return '';
-
     let text = String(input);
 
-    // 1. Symboles Unicode → LaTeX
+    // Symboles Unicode → LaTeX
     const unicodeMap = {
-      '×': '\\times',
-      '÷': '\\div',
-      '−': '-',
-      '–': '-',
-      '—': '-',
-      '≠': '\\neq',
-      '≤': '\\leq',
-      '≥': '\\geq',
-      '≈': '\\approx',
-      '∞': '\\infty',
-      '√': '\\sqrt',
-      'π': '\\pi',
-      'θ': '\\theta',
-      'α': '\\alpha',
-      'β': '\\beta',
-      'γ': '\\gamma',
-      'δ': '\\delta',
-      'Δ': '\\Delta',
-      'λ': '\\lambda',
-      'μ': '\\mu',
-      'σ': '\\sigma',
-      'Σ': '\\Sigma',
-      'φ': '\\phi',
-      'ω': '\\omega',
-      'Ω': '\\Omega',
-      '∫': '\\int',
-      '∑': '\\sum',
-      '∂': '\\partial',
-      '∈': '\\in',
-      '∉': '\\notin',
-      '⊂': '\\subset',
-      '⊃': '\\supset',
-      '∪': '\\cup',
-      '∩': '\\cap',
-      '∀': '\\forall',
-      '∃': '\\exists',
-      '⇒': '\\Rightarrow',
-      '⇔': '\\Leftrightarrow',
-      '→': '\\to',
-      '↦': '\\mapsto',
-      '⟹': '\\Longrightarrow',
-      '⟺': '\\Longleftrightarrow',
-      '±': '\\pm',
-      '∓': '\\mp',
-      '⋅': '\\cdot',
-      '…': '\\ldots',
-      '⋯': '\\cdots',
-      '⋯': '\\cdots'
+      '×': '\\times', '÷': '\\div',
+      '−': '-', '–': '-', '—': '-',
+      '≠': '\\neq', '≤': '\\leq', '≥': '\\geq',
+      '≈': '\\approx', '∞': '\\infty',
+      '√': '\\sqrt', 'π': '\\pi',
+      'θ': '\\theta', 'α': '\\alpha', 'β': '\\beta', 'γ': '\\gamma',
+      'δ': '\\delta', 'Δ': '\\Delta',
+      'λ': '\\lambda', 'μ': '\\mu', 'σ': '\\sigma', 'Σ': '\\Sigma',
+      'φ': '\\phi', 'ω': '\\omega', 'Ω': '\\Omega',
+      '∫': '\\int', '∑': '\\sum', '∂': '\\partial',
+      '∈': '\\in', '∉': '\\notin', '⊂': '\\subset', '⊃': '\\supset',
+      '∪': '\\cup', '∩': '\\cap',
+      '∀': '\\forall', '∃': '\\exists',
+      '⇒': '\\Rightarrow', '⇔': '\\Leftrightarrow',
+      '→': '\\to', '↦': '\\mapsto',
+      '⟹': '\\Longrightarrow', '⟺': '\\Longleftrightarrow',
+      '±': '\\pm', '∓': '\\mp',
+      '⋅': '\\cdot', '…': '\\ldots', '⋯': '\\cdots'
     };
 
     Object.keys(unicodeMap).forEach((symbol) => {
       text = text.split(symbol).join(unicodeMap[symbol]);
     });
 
-    // 2. Fractions textuelles → LaTeX
-    // "1/2" → "\frac{1}{2}"
+    // Fractions textuelles
     text = text.replace(/\b(\d+)\s*\/\s*(\d+)\b/g, '\\frac{$1}{$2}');
 
-    // 3. Exposants textuels : "x^2" OK, "x²" → "x^{2}"
+    // Exposants textuels
     text = text.replace(/([a-zA-Z0-9])\^(\d+)/g, '$1^{$2}');
-
-    // 4. Indices textuels : "x_1" OK, "x₁" → "x_{1}"
     text = text.replace(/([a-zA-Z0-9])_(\d+)/g, '$1_{$2}');
 
-    // 5. Racines : "sqrt(x)" → "\sqrt{x}"
+    // Racines
     text = text.replace(/sqrt\(([^)]+)\)/g, '\\sqrt{$1}');
 
-    // 6. Fonctions trigonométriques
+    // Fonctions trigonométriques
     const funcs = ['sin', 'cos', 'tan', 'cot', 'sec', 'csc', 'arcsin', 'arccos', 'arctan', 'sinh', 'cosh', 'tanh'];
     funcs.forEach((fn) => {
       const regex = new RegExp(`(?<![\\\\a-zA-Z])${fn}\\s*\\(`, 'g');
       text = text.replace(regex, `\\${fn}(`);
     });
 
-    // 7. ln, log, exp
+    // ln, log, exp
     text = text.replace(/(?<![\\a-zA-Z])ln\s*\(/g, '\\ln(');
     text = text.replace(/(?<![\\a-zA-Z])log\s*\(/g, '\\log(');
     text = text.replace(/(?<![\\a-zA-Z])exp\s*\(/g, '\\exp(');
 
-    // 8. Limites : "lim x→0" → "\lim_{x \to 0}"
+    // Limites
     text = text.replace(/lim\s+([a-zA-Z])\s*(?:→|\\to|->)\s*([^\s,;)]+)/g, '\\lim_{$1 \\to $2}');
-
-    // 9. Sommes et intégrales
-    text = text.replace(/sum\s*\(([^,]+),\s*([^,]+),\s*([^)]+)\)/g, '\\sum_{$1=$2}^{$3}');
-    text = text.replace(/int\s*\(([^,]+),\s*([^,]+),\s*([^)]+)\)/g, '\\int_{$1}^{$2} $3 \\, d$1');
 
     return text;
   }
 
   // ═══════════════════════════════════════════════════════════════
-  // CORRECTION DES DÉLIMITEURS
+  // FIX DÉLIMITEURS
   // ═══════════════════════════════════════════════════════════════
   function fixDelimiters(text) {
     if (!text || typeof text !== 'string') return '';
-
     let result = text;
 
-    // Remplacer \( ... \) par $ ... $
+    // \( ... \) → $ ... $
     result = result.replace(/\\\((.+?)\\\)/gs, '$$$1$$');
-
-    // Remplacer \[ ... \] par $$ ... $$
+    // \[ ... \] → $$ ... $$
     result = result.replace(/\\\[(.+?)\\\]/gs, '$$$$$1$$$$');
-
-    // Corriger les doubles délimiteurs $$...$$...$$ (incohérents)
+    // Corriger doubles délimiteurs
     result = result.replace(/\$\$\$+/g, '$$');
-
-    // Détecter les formules orphelines (LaTeX sans délimiteurs)
-    // Si contient \frac, \sqrt, \lim, \int, \sum sans $ autour
-    const patterns = [
-      /\\frac\{[^}]+\}\{[^}]+\}/g,
-      /\\sqrt\{[^}]+\}/g,
-      /\\lim_\{[^}]+\}/g,
-      /\\int_\{[^}]+\}/g,
-      /\\sum_\{[^}]+\}/g,
-      /\\alpha|\\beta|\\gamma|\\theta|\\pi/g
-    ];
 
     return result;
   }
 
   // ═══════════════════════════════════════════════════════════════
-  // RENDU KATEX COMPLET
+  // CLEAN AI RESPONSE
+  // ═══════════════════════════════════════════════════════════════
+  function cleanAIResponse(text) {
+    if (!text || typeof text !== 'string') return '';
+    let cleaned = text;
+
+    // Retirer blocs code markdown
+    cleaned = cleaned.replace(/```(?:json|latex|math)?\s*/gi, '');
+    cleaned = cleaned.replace(/```/g, '');
+
+    // Retirer HTML dangereux
+    cleaned = cleaned.replace(/<script[\s\S]*?<\/script>/gi, '');
+    cleaned = cleaned.replace(/<style[\s\S]*?<\/style>/gi, '');
+
+    // Normaliser LaTeX
+    cleaned = normalizeLatex(cleaned);
+    cleaned = fixDelimiters(cleaned);
+
+    return cleaned;
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // FILTRE : nœud à ignorer ?
+  // ═══════════════════════════════════════════════════════════════
+  function shouldIgnoreNode(node) {
+    if (!node || node.nodeType !== 1) return true;
+
+    const tag = (node.tagName || '').toLowerCase();
+    if (['script', 'style', 'noscript', 'textarea', 'pre', 'code', 'kbd', 'samp'].includes(tag)) {
+      return true;
+    }
+
+    const cls = node.className || '';
+    if (typeof cls === 'string') {
+      if (cls.includes('katex') || cls.includes('no-katex') || cls.includes('katex-ignore')) {
+        return true;
+      }
+    }
+
+    // Vérifier parents
+    let parent = node.parentElement;
+    let depth = 0;
+    while (parent && depth < 5) {
+      if (parent.classList &&
+          (parent.classList.contains('katex') ||
+           parent.classList.contains('no-katex') ||
+           parent.classList.contains('katex-ignore'))) {
+        return true;
+      }
+      parent = parent.parentElement;
+      depth++;
+    }
+
+    return false;
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // RENDU KATEX (config robuste)
   // ═══════════════════════════════════════════════════════════════
   function renderKaTeX(root, options = {}) {
     if (typeof renderMathInElement !== 'function') {
-      setTimeout(() => renderKaTeX(root, options), 150);
+      setTimeout(() => renderKaTeX(root, options), 200);
       return;
     }
 
     const element = root || document.body;
-
-    // Pré-traitement : normaliser le contenu
-    // (utile si le contenu vient d'une API brute)
+    if (!element || !document.body.contains(element)) return;
 
     try {
       renderMathInElement(element, {
-        delimiters: [
-          { left: '$$', right: '$$', display: true },
-          { left: '\\[', right: '\\]', display: true },
-          { left: '$', right: '$', display: false },
-          { left: '\\(', right: '\\)', display: false },
-          // Délimiteurs supplémentaires pour robustesse
-          { left: '\\begin{equation}', right: '\\end{equation}', display: true },
-          { left: '\\begin{align}', right: '\\end{align}', display: true },
-          { left: '\\begin{cases}', right: '\\end{cases}', display: true },
-          { left: '\\begin{matrix}', right: '\\end{matrix}', display: true }
-        ],
+        delimiters: DELIMITERS,
         throwOnError: false,
         errorColor: '#ff9a84',
         strict: false,
-        trust: false,
-        macros: {
-          ...MACROS,
-          ...(options.macros || {})
-        },
-        // Ignorer les balises spécifiques
-        ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-        ignoredClasses: ['no-katex'],
+        trust: true,
+        maxSize: 50,
+        maxExpand: 1000,
+        macros: { ...MACROS, ...(options.macros || {}) },
+        ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code', 'kbd', 'samp', 'option'],
+        ignoredClasses: ['no-katex', 'katex-ignore', 'katex'],
         ...options
       });
     } catch (error) {
-      console.warn('[KaTeX] Erreur de rendu:', error);
+      console.warn('[KaTeX] render error:', error.message);
     }
   }
 
   // ═══════════════════════════════════════════════════════════════
-  // RENDU + NORMALISATION COMBINÉS
+  // RENDU SAFE (avec double-check)
   // ═══════════════════════════════════════════════════════════════
-  function renderMath(root) {
-    const element = root || document.body;
-
-    // Normaliser les nœuds texte contenant des maths
-    normalizeTextNodes(element);
-
-    // Rendre avec KaTeX
-    renderKaTeX(element);
-  }
-
-  function normalizeTextNodes(root) {
-    // Récupérer les nœuds texte contenant potentiellement du LaTeX
-    const walker = document.createTreeWalker(
-      root,
-      NodeFilter.SHOW_TEXT,
-      {
-        acceptNode: (node) => {
-          const text = node.textContent;
-          // Ignorer les nœuds déjà rendus par KaTeX
-          if (node.parentElement?.classList?.contains('katex')) {
-            return NodeFilter.FILTER_REJECT;
-          }
-          // Ignorer les nœuds vides
-          if (!text || !text.trim()) {
-            return NodeFilter.FILTER_REJECT;
-          }
-          // Ne garder que ceux avec des délimiteurs maths
-          if (/\$|\\\(|\\\[/.test(text)) {
-            return NodeFilter.FILTER_ACCEPT;
-          }
-          return NodeFilter.FILTER_REJECT;
-        }
-      }
-    );
-
-    const nodesToFix = [];
-    let node;
-    while ((node = walker.nextNode())) {
-      nodesToFix.push(node);
-    }
-
-    // Normaliser chaque nœud
-    nodesToFix.forEach((node) => {
-      const fixed = fixDelimiters(node.textContent);
-      if (fixed !== node.textContent) {
-        node.textContent = fixed;
-      }
+  function renderMathSafe(root) {
+    if (!root) return;
+    requestAnimationFrame(() => {
+      renderKaTeX(root);
+      // Double check pour injections tardives
+      setTimeout(() => renderKaTeX(root), 250);
     });
   }
 
   // ═══════════════════════════════════════════════════════════════
-  // NETTOYAGE DES PROMPTS IA (côté serveur — export pour usage backend)
+  // RENDU + NORMALISATION
   // ═══════════════════════════════════════════════════════════════
-  function cleanAIResponse(text) {
-    if (!text || typeof text !== 'string') return '';
+  function renderMath(root) {
+    const element = root || document.body;
 
-    let cleaned = text;
+    // Normaliser les nœuds texte
+    try {
+      const walker = document.createTreeWalker(
+        element,
+        NodeFilter.SHOW_TEXT,
+        {
+          acceptNode: (node) => {
+            if (shouldIgnoreNode(node.parentElement)) return NodeFilter.FILTER_REJECT;
+            const text = node.textContent;
+            if (!text || !text.trim()) return NodeFilter.FILTER_REJECT;
+            if (/\$|\\\(|\\\[/.test(text)) return NodeFilter.FILTER_ACCEPT;
+            return NodeFilter.FILTER_REJECT;
+          }
+        }
+      );
+      const nodes = [];
+      let node;
+      while ((node = walker.nextNode())) nodes.push(node);
+      nodes.forEach((n) => {
+        const fixed = fixDelimiters(n.textContent);
+        if (fixed !== n.textContent) n.textContent = fixed;
+      });
+    } catch (e) { /* silent */ }
 
-    // Retirer les blocs de code markdown
-    cleaned = cleaned.replace(/```(?:json|latex|math)?\s*/gi, '');
-    cleaned = cleaned.replace(/```/g, '');
+    renderKaTeX(element);
+  }
 
-    // Retirer les balises HTML éventuelles
-    cleaned = cleaned.replace(/<script[\s\S]*?<\/script>/gi, '');
-    cleaned = cleaned.replace(/<style[\s\S]*?<\/style>/gi, '');
+  // ═══════════════════════════════════════════════════════════════
+  // AUTO-RENDER — MutationObserver
+  // ═══════════════════════════════════════════════════════════════
+  let observerTimer = null;
 
-    // Normaliser le LaTeX
-    cleaned = normalizeLatex(cleaned);
+  function hasLatexContent(node) {
+    if (!node || node.nodeType !== 1) return false;
+    const text = node.textContent || '';
+    return text.includes('$') || text.includes('\\(') || text.includes('\\[');
+  }
 
-    return cleaned;
+  function initAutoRender() {
+    if (!window.MutationObserver) return;
+    if (window.__arvexaKatexObserver) return;
+    if (window.__arvexaKatexDisabled) {
+      console.log('📐 KaTeX auto-render désactivé');
+      return;
+    }
+
+    const observer = new MutationObserver((mutations) => {
+      const targets = new Set();
+
+      mutations.forEach((mutation) => {
+        mutation.addedNodes.forEach((node) => {
+          if (node.nodeType !== 1) return;
+          if (shouldIgnoreNode(node)) return;
+          if (hasLatexContent(node)) {
+            targets.add(node);
+          }
+        });
+      });
+
+      if (targets.size === 0) return;
+
+      // Debounce
+      if (observerTimer) clearTimeout(observerTimer);
+      observerTimer = setTimeout(() => {
+        targets.forEach((target) => {
+          if (document.body.contains(target)) {
+            renderKaTeX(target);
+          }
+        });
+      }, 100);
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+
+    window.__arvexaKatexObserver = observer;
+    console.log('📐 KaTeX auto-render activé');
   }
 
   // ═══════════════════════════════════════════════════════════════
@@ -288,18 +324,34 @@
   window.KaTeXUtils = {
     normalizeLatex,
     fixDelimiters,
-    renderKaTeX,
-    renderMath,
     cleanAIResponse,
-    MACROS
+    renderMath,
+    renderMathSafe,
+    renderKaTeX,
+    initAutoRender,
+    MACROS,
+    DELIMITERS,
+
+    // Raccourci pour désactiver l'auto-render
+    disableAutoRender: () => {
+      window.__arvexaKatexDisabled = true;
+      if (window.__arvexaKatexObserver) {
+        window.__arvexaKatexObserver.disconnect();
+        window.__arvexaKatexObserver = null;
+      }
+    }
   };
 
-  // Auto-render au chargement du DOM
+  // ═══════════════════════════════════════════════════════════════
+  // AUTO-INIT
+  // ═══════════════════════════════════════════════════════════════
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-      // Ne rien faire automatiquement, laisser les pages appeler
+      initAutoRender();
     });
+  } else {
+    initAutoRender();
   }
 
-  console.log('📐 KaTeXUtils chargé');
+  console.log('📐 KaTeXUtils v2.0 chargé');
 })();

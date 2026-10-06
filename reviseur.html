@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0A0A0A">
-  <meta name="description" content="ARVEXA School — Réviseur intelligent v4.1">
+  <meta name="description" content="ARVEXA School — Réviseur intelligent">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icon.png" type="image/png">
   <link rel="apple-touch-icon" href="icon.png">
@@ -21,44 +21,31 @@
 
   <style>
     /* ═══════════════════════════════════════════════════════════
-       ROOT — Design tokens ARVEXA
+       ROOT — Design unifié ARVEXA
        ═══════════════════════════════════════════════════════════ */
     :root {
       --accent: #B8860B;
       --accent-bright: #E0B84A;
-      --accent-dim: rgba(184, 134, 11, 0.08);
-
       --success: #2D7D5A;
       --success-light: #3AB67E;
       --danger: #B85C3A;
       --danger-light: #E07A5F;
       --warning: #D4A017;
-      --warning-light: #E8C158;
-      --info: #4AAFE0;
-      --purple: #9B59B6;
 
       --bg-dark: #0A0A0A;
       --bg-surface: #141414;
-      --bg-card: rgba(20, 20, 20, 0.7);
-      --bg-input: rgba(0, 0, 0, 0.3);
+      --card-bg: rgba(20, 20, 20, 0.6);
+      --card-border: rgba(255, 255, 255, 0.06);
+      --card-border-hover: rgba(224, 184, 74, 0.2);
+      --block-bg: rgba(0, 0, 0, 0.25);
+      --block-border: rgba(255, 255, 255, 0.04);
 
       --text-light: #F5F0E8;
       --text-dim: #8A8A7A;
       --text-muted: #5A5A4A;
       --text-body: #cfd0cc;
 
-      --border-soft: rgba(255, 255, 255, 0.05);
-      --border-strong: rgba(255, 255, 255, 0.08);
-      --border-gold: rgba(184, 134, 11, 0.15);
-
-      --transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-      --transition-fast: all 0.15s ease;
-
-      --radius-sm: 8px;
-      --radius: 12px;
-
-      --font-body: 'Inter', system-ui, sans-serif;
-      --font-serif: 'Playfair Display', Georgia, serif;
+      --transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
 
       --safe-top: env(safe-area-inset-top, 0px);
       --safe-bottom: env(safe-area-inset-bottom, 0px);
@@ -71,23 +58,21 @@
       color-scheme: dark;
       min-width: 320px;
       width: 100%;
-      height: 100%;
-      overflow: hidden;
     }
 
     body {
       margin: 0;
-      height: 100%;
-      overflow: hidden;
+      min-height: 100vh;
+      overflow-x: hidden;
       background:
         radial-gradient(ellipse 40% 30% at 30% 15%, rgba(26, 58, 42, 0.16) 0%, transparent 70%),
         radial-gradient(ellipse 35% 25% at 75% 85%, rgba(184, 134, 11, 0.05) 0%, transparent 60%),
         linear-gradient(180deg, #0A0A0A 0%, #060606 100%);
       color: var(--text-light);
-      font: 15px/1.6 var(--font-body);
+      font: 15px/1.6 'Inter', system-ui, sans-serif;
+      padding-top: var(--safe-top);
+      padding-bottom: calc(80px + var(--safe-bottom));
       -webkit-font-smoothing: antialiased;
-      display: flex;
-      flex-direction: column;
     }
 
     button, input, select, textarea { font: inherit; font-family: inherit; }
@@ -95,36 +80,30 @@
     button:disabled { cursor: not-allowed; opacity: 0.55; }
 
     /* ═══════════════════════════════════════════════════════════
-       HEADER (fixe)
+       HEADER (sticky)
        ═══════════════════════════════════════════════════════════ */
     header {
-      flex-shrink: 0;
-      position: relative;
+      position: sticky;
+      top: 0;
       z-index: 50;
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: calc(12px + var(--safe-top)) 16px 12px;
-      background: rgba(10, 10, 10, 0.92);
+      background: rgba(10, 10, 10, 0.94);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
-      border-bottom: 1px solid var(--border-soft);
+      border-bottom: 1px solid var(--card-border);
       gap: 12px;
     }
 
     .brand {
       color: var(--text-light);
       text-decoration: none;
-      font: 700 20px var(--font-serif);
+      font: 700 20px 'Playfair Display', serif;
       letter-spacing: 0.04em;
     }
     .brand span { color: var(--accent-bright); font-style: italic; }
-
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
 
     .connection {
       color: var(--text-muted);
@@ -143,26 +122,12 @@
     .connection.online::before { background: var(--success-light); }
 
     /* ═══════════════════════════════════════════════════════════
-       SHELL — Zone scrollable globale
+       SHELL
        ═══════════════════════════════════════════════════════════ */
     .shell {
-      flex: 1;
-      overflow-y: auto;
-      overflow-x: hidden;
-      -webkit-overflow-scrolling: touch;
-      padding-bottom: calc(60px + var(--safe-bottom));
-      width: 100%;
-    }
-    .shell::-webkit-scrollbar { width: 4px; }
-    .shell::-webkit-scrollbar-thumb {
-      background: rgba(224, 184, 74, 0.2);
-      border-radius: 10px;
-    }
-
-    .shell-inner {
-      width: min(100% - 28px, 980px);
-      margin: auto;
-      padding: 18px 0 20px;
+      width: min(100% - 28px, 900px);
+      margin: 0 auto;
+      padding: 20px 0 30px;
     }
 
     /* ═══════════════════════════════════════════════════════════
@@ -174,11 +139,10 @@
       gap: 8px;
       padding: 12px 16px;
       margin-bottom: 20px;
-      background: var(--bg-card);
+      background: var(--card-bg);
       backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border: 1px solid var(--border-soft);
-      border-radius: var(--radius);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
     }
@@ -237,7 +201,6 @@
     }
     .step-item.done .num::before { content: '✓'; }
     .step-item.done .num span { display: none; }
-
     .step-sep {
       color: var(--text-muted);
       font-size: 10px;
@@ -246,32 +209,19 @@
     }
 
     /* ═══════════════════════════════════════════════════════════
-       PANELS
+       PANELS / VUES
        ═══════════════════════════════════════════════════════════ */
     .panel {
-      background: var(--bg-card);
+      background: var(--card-bg);
       backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid var(--border-soft);
-      border-radius: var(--radius);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
       padding: 22px;
       position: relative;
     }
-    .panel::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 2px;
-      border-radius: var(--radius) var(--radius) 0 0;
-      background: linear-gradient(90deg, transparent, var(--accent), transparent);
-      opacity: 0.6;
-    }
 
-    /* ═══════════════════════════════════════════════════════════
-       VUES
-       ═══════════════════════════════════════════════════════════ */
-    .view { display: none; animation: appear 0.28s ease both; }
-    .view.active { display: block; }
+    .view { display: none; }
+    .view.active { display: block; animation: appear 0.3s ease; }
     @keyframes appear {
       from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: none; }
@@ -283,16 +233,16 @@
     h1, h2, h3 {
       margin: 0;
       line-height: 1.2;
-      font-family: var(--font-serif);
+      font-family: 'Playfair Display', serif;
       color: var(--text-light);
     }
-    h1 { font-size: clamp(26px, 5vw, 40px); max-width: 680px; letter-spacing: -0.01em; }
-    h2 { font-size: clamp(21px, 4vw, 28px); letter-spacing: -0.01em; }
+    h1 { font-size: clamp(24px, 4.5vw, 36px); letter-spacing: -0.01em; }
+    h2 { font-size: clamp(19px, 3.5vw, 24px); letter-spacing: -0.01em; }
 
     .eyebrow {
       color: var(--accent-bright);
       font-size: 11px;
-      font-weight: 800;
+      font-weight: 700;
       letter-spacing: 0.14em;
       text-transform: uppercase;
       margin-bottom: 10px;
@@ -300,19 +250,20 @@
 
     .lead {
       color: var(--text-dim);
-      max-width: 650px;
+      max-width: 620px;
       margin: 12px 0 0;
       line-height: 1.7;
+      font-size: 14.5px;
     }
 
     /* ═══════════════════════════════════════════════════════════
-       FORMULAIRE
+       FORMULAIRE CONFIG
        ═══════════════════════════════════════════════════════════ */
     .form-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 16px;
-      margin-top: 24px;
+      margin-top: 22px;
     }
     .field {
       display: flex;
@@ -321,12 +272,10 @@
       min-width: 0;
     }
     .field.full { grid-column: 1 / -1; }
-
     label {
       color: var(--text-light);
       font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 0.01em;
+      font-weight: 600;
     }
 
     /* ═══════════════════════════════════════════════════════════
@@ -340,19 +289,16 @@
     .chip {
       padding: 8px 16px;
       border-radius: 20px;
-      border: 1px solid var(--border-soft);
+      border: 1px solid var(--card-border);
       background: transparent;
       color: var(--text-dim);
       font-size: 12.5px;
       font-weight: 600;
       cursor: pointer;
-      transition: var(--transition-fast);
+      transition: var(--transition);
       font-family: inherit;
     }
-    .chip:hover {
-      border-color: rgba(224, 184, 74, 0.3);
-      color: var(--text-light);
-    }
+    .chip:hover { border-color: rgba(224, 184, 74, 0.3); color: var(--text-light); }
     .chip.active {
       background: rgba(224, 184, 74, 0.12);
       border-color: rgba(224, 184, 74, 0.3);
@@ -366,24 +312,23 @@
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-      margin-top: 24px;
+      margin-top: 22px;
     }
     .btn {
       min-height: 44px;
       border: 1px solid transparent;
-      border-radius: var(--radius-sm);
+      border-radius: 10px;
       padding: 10px 18px;
       color: var(--text-light);
       background: rgba(255, 255, 255, 0.04);
-      font-weight: 700;
+      font-weight: 600;
       font-size: 14px;
       transition: var(--transition);
-      font-family: var(--font-body);
+      font-family: inherit;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
-      letter-spacing: 0.01em;
     }
     .btn:hover:not(:disabled) {
       transform: translateY(-1px);
@@ -393,19 +338,18 @@
     .btn.primary {
       background: linear-gradient(135deg, var(--accent-bright), var(--accent));
       color: #0A0A0A;
-      border-color: transparent;
+      font-weight: 700;
     }
     .btn.primary:hover:not(:disabled) {
-      box-shadow: 0 8px 28px rgba(184, 134, 11, 0.35);
-      border-color: transparent;
+      box-shadow: 0 8px 24px rgba(184, 134, 11, 0.3);
     }
     .btn.secondary {
       background: transparent;
-      border-color: var(--border-strong);
+      border-color: rgba(255, 255, 255, 0.08);
       color: var(--text-dim);
     }
     .btn.secondary:hover:not(:disabled) {
-      border-color: var(--border-gold);
+      border-color: rgba(224, 184, 74, 0.3);
       color: var(--text-light);
     }
     .btn.full { width: 100%; }
@@ -429,15 +373,14 @@
     .btn.loading .loader { display: inline-block; }
     .btn.loading .btn-text { display: none; }
     .btn.loading .btn-icon { display: none; }
-
     @keyframes spin { to { transform: rotate(360deg); } }
 
     /* ═══════════════════════════════════════════════════════════
        STATUS
        ═══════════════════════════════════════════════════════════ */
     .status {
-      min-height: 22px;
-      margin-top: 14px;
+      min-height: 20px;
+      margin-top: 12px;
       color: var(--text-dim);
       font-size: 13px;
     }
@@ -460,24 +403,22 @@
       width: 100%;
       min-height: 46px;
       padding: 12px 14px;
-      background: var(--bg-input);
-      border: 1px solid var(--border-soft);
-      border-radius: var(--radius-sm);
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
       color: var(--text-light);
       font-size: 14px;
       font-weight: 500;
       cursor: pointer;
-      transition: var(--transition-fast);
+      transition: var(--transition);
       text-align: left;
-      font-family: var(--font-body);
+      font-family: inherit;
     }
-    .custom-select-trigger:hover:not(.disabled) {
+    .custom-select-trigger:hover {
       border-color: rgba(224, 184, 74, 0.3);
-      background: rgba(255, 255, 255, 0.04);
     }
     .custom-select.open .custom-select-trigger {
       border-color: var(--accent-bright);
-      box-shadow: 0 0 0 3px rgba(224, 184, 74, 0.1);
       background: rgba(184, 134, 11, 0.02);
     }
     .custom-select-value {
@@ -499,7 +440,7 @@
       color: var(--text-muted);
       font-size: 12px;
       flex-shrink: 0;
-      transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+      transition: transform 0.25s ease;
     }
     .custom-select.open .custom-select-arrow {
       transform: rotate(180deg);
@@ -513,26 +454,20 @@
       z-index: 50;
       max-height: 280px;
       overflow-y: auto;
-      background: linear-gradient(145deg, #171717, #101010);
-      border: 1px solid var(--border-strong);
-      border-radius: var(--radius-sm);
+      background: #171717;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
       padding: 6px;
       opacity: 0;
       visibility: hidden;
-      transform: translateY(-8px) scale(0.98);
-      transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
-      transform-origin: top center;
+      transform: translateY(-8px);
+      transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
     }
     .custom-select.open .custom-select-options {
       opacity: 1;
       visibility: visible;
-      transform: translateY(0) scale(1);
-    }
-    .custom-select-options::-webkit-scrollbar { width: 4px; }
-    .custom-select-options::-webkit-scrollbar-thumb {
-      background: rgba(224, 184, 74, 0.2);
-      border-radius: 10px;
+      transform: translateY(0);
     }
     .custom-select-option {
       display: flex;
@@ -544,26 +479,16 @@
       font-size: 14px;
       font-weight: 500;
       cursor: pointer;
-      transition: var(--transition-fast);
-      position: relative;
+      transition: background 0.15s ease;
     }
-    .custom-select-option:hover,
-    .custom-select-option.focused {
+    .custom-select-option:hover {
       background: rgba(224, 184, 74, 0.08);
       color: var(--text-light);
     }
     .custom-select-option.selected {
       background: rgba(224, 184, 74, 0.12);
       color: var(--accent-bright);
-      font-weight: 700;
-    }
-    .custom-select-option.selected::after {
-      content: '✓';
-      margin-left: auto;
-      color: var(--accent-bright);
-      font-size: 12px;
-      font-weight: 800;
-      flex-shrink: 0;
+      font-weight: 600;
     }
     .custom-select-option .option-prefix {
       color: var(--accent-bright);
@@ -574,18 +499,18 @@
     }
 
     /* ═══════════════════════════════════════════════════════════
-       ÉTAPES DE CHARGEMENT
+       ÉTAPES DE CHARGEMENT (unifiées)
        ═══════════════════════════════════════════════════════════ */
     .loading-steps {
-      margin-top: 28px;
+      margin-top: 26px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 24px;
+      gap: 22px;
     }
     .loader-spinner {
-      width: 56px;
-      height: 56px;
+      width: 52px;
+      height: 52px;
       border: 3px solid rgba(224, 184, 74, 0.15);
       border-top-color: var(--accent-bright);
       border-radius: 50%;
@@ -595,20 +520,20 @@
     .steps-list {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
       width: 100%;
-      max-width: 480px;
+      max-width: 460px;
     }
     .loading-step {
       display: flex;
       align-items: flex-start;
-      gap: 14px;
-      padding: 12px 16px;
-      border-radius: 12px;
-      background: rgba(20, 20, 20, 0.6);
-      border: 1px solid var(--border-soft);
-      border-left: 3px solid transparent;
-      transition: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: rgba(20, 20, 20, 0.5);
+      border: 1px solid var(--card-border);
+      border-left: 2px solid transparent;
+      transition: all 0.3s ease;
       opacity: 0.5;
     }
     .loading-step.active {
@@ -616,7 +541,6 @@
       background: rgba(224, 184, 74, 0.06);
       border-left-color: var(--accent-bright);
       border-color: rgba(224, 184, 74, 0.2);
-      transform: translateX(4px);
     }
     .loading-step.done {
       opacity: 0.85;
@@ -627,28 +551,20 @@
     .loading-step.done::after {
       content: '✓';
       margin-left: auto;
-      color: var(--success);
+      color: var(--success-light);
       font-weight: 800;
-      font-size: 16px;
+      font-size: 15px;
       flex-shrink: 0;
     }
     .step-icon {
-      font-size: 22px;
+      font-size: 20px;
       line-height: 1;
       flex-shrink: 0;
-      width: 28px;
+      width: 26px;
       text-align: center;
-      filter: grayscale(0.6);
-      transition: filter 0.3s ease;
+      opacity: 0.7;
     }
-    .loading-step.active .step-icon {
-      filter: none;
-      animation: pulseStep 1.5s ease-in-out infinite;
-    }
-    @keyframes pulseStep {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.15); }
-    }
+    .loading-step.active .step-icon { opacity: 1; }
     .step-content {
       display: flex;
       flex-direction: column;
@@ -657,15 +573,15 @@
       flex: 1;
     }
     .step-label {
-      font-size: 14px;
-      font-weight: 700;
+      font-size: 13.5px;
+      font-weight: 600;
       color: var(--text-light);
       line-height: 1.3;
     }
     .loading-step.active .step-label { color: var(--accent-bright); }
-    .loading-step.done .step-label { color: var(--success); }
+    .loading-step.done .step-label { color: var(--success-light); }
     .step-desc {
-      font-size: 12px;
+      font-size: 11.5px;
       color: var(--text-muted);
       line-height: 1.4;
     }
@@ -673,13 +589,10 @@
       font-size: 13px;
       color: var(--text-muted);
       text-align: center;
-      font-style: italic;
       min-height: 20px;
-      transition: color 0.3s ease;
     }
     .loading-status.active {
       color: var(--accent-bright);
-      font-style: normal;
       font-weight: 600;
     }
 
@@ -694,7 +607,7 @@
       margin-bottom: 18px;
       flex-wrap: wrap;
     }
-    .session-head h2 { font-size: clamp(20px, 3.5vw, 26px); }
+    .session-head h2 { font-size: clamp(18px, 3vw, 22px); }
 
     .session-meta {
       display: flex;
@@ -711,110 +624,23 @@
       padding: 4px 10px;
       border-radius: 20px;
       background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--border-soft);
+      border: 1px solid var(--card-border);
     }
     .session-meta i { color: var(--accent-bright); font-size: 11px; }
 
     /* ═══════════════════════════════════════════════════════════
-       BLOCS GLOBAUX
+       CARTE NOTION — STYLE UNIFIÉ
        ═══════════════════════════════════════════════════════════ */
-    .global-block {
-      padding: 14px 16px;
-      border-radius: 10px;
-      margin-bottom: 12px;
-      border: 1px solid var(--border-soft);
-      background: rgba(255, 255, 255, 0.015);
-      overflow-wrap: break-word;
-    }
-
-    .global-title {
-      font-size: 12px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
+    .notion-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
       margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--accent-bright);
-    }
-    .global-title i { font-size: 12px; }
-
-    .global-list {
-      list-style: none;
-      padding: 0;
-    }
-    .global-list li {
-      position: relative;
-      padding-left: 18px;
-      font-size: 14px;
-      color: var(--text-body);
-      line-height: 1.7;
-      margin-bottom: 6px;
-      overflow-wrap: break-word;
-    }
-    .global-list li:last-child { margin-bottom: 0; }
-    .global-list li::before {
-      content: '•';
-      position: absolute;
-      left: 4px;
-      top: 0;
-      color: var(--accent);
-      font-weight: 700;
-    }
-
-    /* ═══════════════════════════════════════════════════════════
-       ACCORDÉON DE NOTIONS — SIMPLE
-       ═══════════════════════════════════════════════════════════ */
-    .sections-label {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font: 700 16px var(--font-serif);
-      color: var(--text-light);
-      margin: 20px 0 12px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid var(--border-soft);
-      position: relative;
-    }
-    .sections-label::after {
-      content: '';
-      position: absolute;
-      bottom: -1px; left: 0;
-      width: 36px;
-      height: 2px;
-      background: var(--accent-bright);
-    }
-    .sections-label i { color: var(--accent-bright); font-size: 14px; }
-    .sections-label .count {
-      margin-left: auto;
-      font-family: var(--font-body);
-      font-size: 11px;
-      color: var(--text-muted);
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .notion-accordion {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-bottom: 20px;
-    }
-
-    .notion-item {
-      background: rgba(20, 20, 20, 0.5);
-      border: 1px solid var(--border-soft);
-      border-radius: 10px;
       overflow: hidden;
-      transition: border-color 0.2s ease;
+      transition: var(--transition);
     }
-    .notion-item:hover { border-color: rgba(255, 255, 255, 0.1); }
-    .notion-item.open {
-      border-color: rgba(224, 184, 74, 0.25);
-      background: rgba(20, 20, 20, 0.7);
-    }
+    .notion-card:hover { border-color: var(--card-border-hover); }
+    .notion-card.open { border-color: rgba(224, 184, 74, 0.25); }
 
     .notion-header {
       display: flex;
@@ -825,39 +651,34 @@
       user-select: none;
       transition: background 0.15s ease;
     }
-    .notion-header:hover {
-      background: rgba(255, 255, 255, 0.02);
-    }
+    .notion-header:hover { background: rgba(255, 255, 255, 0.02); }
 
     .notion-num {
       width: 30px;
       height: 30px;
-      border-radius: 6px;
+      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font: 700 13px var(--font-serif);
-      background: rgba(255, 255, 255, 0.04);
+      font: 700 13px 'Playfair Display', serif;
+      background: rgba(224, 184, 74, 0.1);
       color: var(--accent-bright);
-      border: 1px solid var(--border-soft);
+      border: 1px solid rgba(224, 184, 74, 0.15);
       flex-shrink: 0;
     }
-    .notion-item.open .notion-num {
-      background: rgba(224, 184, 74, 0.15);
-      border-color: rgba(224, 184, 74, 0.3);
+    .notion-card.open .notion-num {
+      background: rgba(224, 184, 74, 0.18);
+      border-color: rgba(224, 184, 74, 0.35);
     }
 
-    .notion-title-wrap {
-      flex: 1;
-      min-width: 0;
-    }
+    .notion-title-wrap { flex: 1; min-width: 0; }
     .notion-title {
-      font: 600 14.5px var(--font-body);
+      font: 600 14.5px 'Inter', sans-serif;
       color: var(--text-light);
       line-height: 1.35;
       overflow-wrap: break-word;
     }
-    .notion-subtitle {
+    .notion-sub {
       font-size: 11px;
       color: var(--text-muted);
       margin-top: 2px;
@@ -866,17 +687,15 @@
     .notion-toggle {
       width: 26px;
       height: 26px;
-      border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: transparent;
       color: var(--text-muted);
       font-size: 11px;
       flex-shrink: 0;
-      transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), color 0.2s ease;
+      transition: transform 0.3s ease, color 0.2s ease;
     }
-    .notion-item.open .notion-toggle {
+    .notion-card.open .notion-toggle {
       transform: rotate(180deg);
       color: var(--accent-bright);
     }
@@ -886,35 +705,41 @@
       overflow: hidden;
       transition: max-height 0.4s cubic-bezier(0.25, 1, 0.5, 1);
     }
-    .notion-item.open .notion-body {
-      max-height: 20000px;
+    .notion-card.open .notion-body {
+      max-height: 30000px;
     }
 
     .notion-content {
-      padding: 4px 16px 18px;
+      padding: 4px 16px 16px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
+      border-top: 1px solid var(--card-border);
+      padding-top: 14px;
+      margin-top: 4px;
     }
 
-    /* ── Bloc interne simple ── */
+    /* ═══════════════════════════════════════════════════════════
+       BLOC INTERNE UNIFIÉ (pour TOUS les types de contenu)
+       ═══════════════════════════════════════════════════════════ */
     .block {
+      background: var(--block-bg);
+      border: 1px solid var(--block-border);
+      border-radius: 10px;
       padding: 12px 14px;
-      border-radius: 8px;
-      background: rgba(0, 0, 0, 0.25);
-      border: 1px solid var(--border-soft);
       overflow-wrap: break-word;
     }
+
     .block-label {
       font-size: 11px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.06em;
+      color: var(--accent-bright);
       margin-bottom: 8px;
       display: flex;
       align-items: center;
       gap: 6px;
-      color: var(--accent-bright);
     }
     .block-label i { font-size: 11px; }
 
@@ -924,7 +749,7 @@
       line-height: 1.7;
     }
 
-    /* Formules — simple */
+    /* Formules */
     .formula-list {
       display: flex;
       flex-direction: column;
@@ -932,7 +757,7 @@
     }
     .formula-item {
       padding: 10px 12px;
-      border-radius: 6px;
+      border-radius: 8px;
       background: rgba(0, 0, 0, 0.3);
       border-left: 2px solid var(--accent);
     }
@@ -958,7 +783,7 @@
       color: var(--text-dim);
     }
 
-    /* Méthode — simple */
+    /* Méthode (steps) */
     .method-steps {
       list-style: none;
       padding: 0;
@@ -992,12 +817,12 @@
       justify-content: center;
     }
 
-    /* Exemple résolu — simple */
+    /* Exemple */
     .example-enonce {
       padding: 10px 12px;
-      border-radius: 6px;
-      background: rgba(155, 89, 182, 0.06);
-      border-left: 2px solid #b07cd0;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.3);
+      border-left: 2px solid var(--accent);
       font-size: 13.5px;
       color: var(--text-light);
       line-height: 1.6;
@@ -1026,13 +851,13 @@
       position: absolute;
       left: 0;
       top: 0;
-      color: #b07cd0;
+      color: var(--accent-bright);
       font-weight: 700;
       font-size: 12px;
     }
     .example-conclusion {
       padding: 8px 12px;
-      border-radius: 6px;
+      border-radius: 8px;
       background: rgba(69, 180, 125, 0.08);
       border-left: 2px solid var(--success-light);
       font-size: 13.5px;
@@ -1041,7 +866,7 @@
       overflow-wrap: break-word;
     }
 
-    /* Piège — simple */
+    /* Piège */
     .piege-trap {
       font-size: 13.5px;
       color: var(--text-light);
@@ -1066,7 +891,73 @@
     }
 
     /* ═══════════════════════════════════════════════════════════
-       FLASHCARDS
+       BLOCS GLOBAUX (points clés, pièges, récap)
+       ═══════════════════════════════════════════════════════════ */
+    .global-block {
+      padding: 14px 16px;
+      border-radius: 10px;
+      margin-bottom: 12px;
+      border: 1px solid var(--card-border);
+      background: rgba(255, 255, 255, 0.015);
+    }
+    .global-title {
+      font-size: 11.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--accent-bright);
+    }
+    .global-title i { font-size: 12px; }
+    .global-list {
+      list-style: none;
+      padding: 0;
+    }
+    .global-list li {
+      position: relative;
+      padding-left: 18px;
+      font-size: 14px;
+      color: var(--text-body);
+      line-height: 1.7;
+      margin-bottom: 6px;
+      overflow-wrap: break-word;
+    }
+    .global-list li:last-child { margin-bottom: 0; }
+    .global-list li::before {
+      content: '•';
+      position: absolute;
+      left: 4px;
+      top: 0;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .sections-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font: 700 16px 'Playfair Display', serif;
+      color: var(--text-light);
+      margin: 20px 0 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .sections-label i { color: var(--accent-bright); font-size: 14px; }
+    .sections-label .count {
+      margin-left: auto;
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       FLASHCARDS — UNIFIÉ
        ═══════════════════════════════════════════════════════════ */
     .flashcard-progress {
       display: flex;
@@ -1099,14 +990,14 @@
 
     .flashcard {
       perspective: 1400px;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
       min-height: 260px;
     }
     .flashcard-inner {
       position: relative;
       width: 100%;
-      height: 260px;
-      transition: transform 0.65s cubic-bezier(0.25, 1, 0.5, 1);
+      height: 280px;
+      transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
       transform-style: preserve-3d;
       cursor: pointer;
     }
@@ -1117,29 +1008,21 @@
       inset: 0;
       backface-visibility: hidden;
       -webkit-backface-visibility: hidden;
-      border-radius: 10px;
-      padding: 22px;
+      border-radius: 12px;
+      padding: 24px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
-      border: 1px solid var(--border-soft);
-      background: rgba(20, 20, 20, 0.6);
+      border: 1px solid var(--card-border);
+      background: var(--card-bg);
       overflow-y: auto;
     }
     .flashcard-back {
       transform: rotateY(180deg);
       border-color: rgba(224, 184, 74, 0.25);
-      background: rgba(30, 25, 15, 0.6);
-    }
-    .flashcard-label {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--accent-bright);
-      margin-bottom: 12px;
+      background: rgba(25, 22, 15, 0.6);
     }
     .flashcard-type-badge {
       display: inline-flex;
@@ -1151,9 +1034,18 @@
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      margin-bottom: 10px;
-      background: rgba(255, 255, 255, 0.04);
-      color: var(--text-dim);
+      margin-bottom: 12px;
+      background: rgba(224, 184, 74, 0.1);
+      color: var(--accent-bright);
+      border: 1px solid rgba(224, 184, 74, 0.15);
+    }
+    .flashcard-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 12px;
     }
     .flashcard-text {
       font-size: 16px;
@@ -1185,7 +1077,7 @@
     .flashcard-feedback {
       display: none;
       gap: 8px;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
     .flashcard-feedback.show {
       display: grid;
@@ -1199,8 +1091,8 @@
 
     .feedback-btn {
       padding: 12px 8px;
-      border-radius: 8px;
-      border: 1px solid var(--border-soft);
+      border-radius: 10px;
+      border: 1px solid var(--card-border);
       background: rgba(255, 255, 255, 0.02);
       font-family: inherit;
       font-size: 12px;
@@ -1220,14 +1112,14 @@
     .feedback-btn.easy:hover { background: rgba(69, 180, 125, 0.1); border-color: rgba(69, 180, 125, 0.3); color: #7ce0aa; }
 
     /* ═══════════════════════════════════════════════════════════
-       QUIZ
+       QUIZ — UNIFIÉ
        ═══════════════════════════════════════════════════════════ */
     .progress {
-      height: 6px;
+      height: 4px;
       border-radius: 10px;
       overflow: hidden;
       background: rgba(255, 255, 255, 0.06);
-      margin: 14px 0 22px;
+      margin: 12px 0 20px;
     }
     .progress span {
       display: block;
@@ -1238,9 +1130,9 @@
     }
 
     .quiz-question {
-      background: rgba(20, 20, 20, 0.5);
-      border: 1px solid var(--border-soft);
-      border-radius: 10px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
       padding: 16px 18px;
       margin-bottom: 12px;
     }
@@ -1285,8 +1177,8 @@
       align-items: flex-start;
       gap: 12px;
       padding: 12px 14px;
-      border-radius: 8px;
-      border: 1px solid var(--border-soft);
+      border-radius: 10px;
+      border: 1px solid var(--card-border);
       background: rgba(0, 0, 0, 0.25);
       cursor: pointer;
       transition: background 0.15s ease, border-color 0.15s ease;
@@ -1346,7 +1238,7 @@
       padding: 10px 12px;
       background: rgba(74, 175, 224, 0.06);
       border-left: 2px solid #4AAFE0;
-      border-radius: 0 6px 6px 0;
+      border-radius: 0 8px 8px 0;
       font-size: 13px;
       line-height: 1.65;
       color: var(--text-body);
@@ -1362,10 +1254,10 @@
     .result-hero {
       text-align: center;
       padding: 28px 22px;
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid var(--border-soft);
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
       border-radius: 12px;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
     .result-hero .emoji {
       font-size: 52px;
@@ -1373,15 +1265,8 @@
       margin-bottom: 12px;
       line-height: 1;
     }
-    .result-hero h2 {
-      font-size: clamp(20px, 4vw, 26px);
-      margin-bottom: 6px;
-    }
-    .result-hero p {
-      color: var(--text-dim);
-      margin: 0;
-      font-size: 14px;
-    }
+    .result-hero h2 { font-size: clamp(20px, 4vw, 26px); margin-bottom: 6px; }
+    .result-hero p { color: var(--text-dim); margin: 0; font-size: 14px; }
 
     .result-summary {
       display: grid;
@@ -1390,17 +1275,17 @@
       margin-bottom: 18px;
     }
     .metric {
-      border: 1px solid var(--border-soft);
+      border: 1px solid var(--card-border);
       border-radius: 10px;
       padding: 14px 10px;
-      background: rgba(255, 255, 255, 0.02);
+      background: var(--card-bg);
       text-align: center;
     }
     .metric strong {
       display: block;
       color: var(--accent-bright);
       font-size: 22px;
-      font-family: var(--font-serif);
+      font-family: 'Playfair Display', serif;
       line-height: 1.1;
       margin-bottom: 4px;
     }
@@ -1416,9 +1301,9 @@
     .mastery-block {
       padding: 16px 18px;
       border-radius: 10px;
-      border: 1px solid var(--border-soft);
+      border: 1px solid var(--card-border);
       margin-bottom: 14px;
-      background: rgba(255, 255, 255, 0.02);
+      background: var(--card-bg);
     }
     .mastery-head {
       display: flex;
@@ -1436,7 +1321,7 @@
       color: var(--text-dim);
     }
     .mastery-head .value {
-      font-family: var(--font-serif);
+      font-family: 'Playfair Display', serif;
       font-size: 20px;
       font-weight: 700;
       color: var(--accent-bright);
@@ -1451,7 +1336,7 @@
     .mastery-track-fill {
       height: 100%;
       border-radius: 6px;
-      transition: width 1s cubic-bezier(0.25, 1, 0.5, 1);
+      transition: width 1s ease;
     }
     .mastery-label-text {
       font-size: 13px;
@@ -1462,7 +1347,7 @@
     .recommendations {
       padding: 16px 18px;
       border-radius: 10px;
-      border: 1px solid var(--border-soft);
+      border: 1px solid var(--card-border);
       background: rgba(74, 175, 224, 0.04);
       margin-bottom: 14px;
     }
@@ -1508,14 +1393,14 @@
       padding: 40px 20px;
       color: var(--text-muted);
     }
-    .empty-state .empty-icon {
+    .empty-state i {
       font-size: 40px;
       margin-bottom: 10px;
       display: block;
-      opacity: 0.5;
+      opacity: 0.4;
     }
     .empty-state h3 {
-      font-family: var(--font-serif);
+      font-family: 'Playfair Display', serif;
       font-size: 17px;
       color: var(--text-dim);
       margin-bottom: 6px;
@@ -1523,7 +1408,7 @@
     .empty-state p { font-size: 13px; }
 
     /* ═══════════════════════════════════════════════════════════
-       BOUTON RETOUR EN HAUT
+       SCROLL TOP
        ═══════════════════════════════════════════════════════════ */
     .scroll-top {
       position: fixed;
@@ -1532,7 +1417,7 @@
       width: 40px;
       height: 40px;
       border-radius: 50%;
-      border: 1px solid var(--border-soft);
+      border: 1px solid var(--card-border);
       background: rgba(20, 20, 20, 0.95);
       color: var(--accent-bright);
       font-size: 14px;
@@ -1577,20 +1462,12 @@
       padding: 26px 22px 20px;
       border: 1px solid var(--accent);
       border-radius: 12px;
-      background: linear-gradient(145deg, #161616, #0a0a0a);
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
-      transform: scale(0.94) translateY(16px);
-      transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+      background: #161616;
+      transform: scale(0.94);
+      transition: transform 0.3s ease;
     }
     .premium-popup-overlay.show .premium-popup {
-      transform: scale(1) translateY(0);
-    }
-    .premium-popup::before {
-      content: '';
-      position: absolute;
-      inset: 0 0 auto;
-      height: 3px;
-      background: linear-gradient(90deg, var(--accent), var(--accent-bright), var(--accent));
+      transform: scale(1);
     }
     .popup-close {
       position: absolute;
@@ -1598,16 +1475,15 @@
       right: 10px;
       width: 30px;
       height: 30px;
-      border: 1px solid var(--border-soft);
+      border: 1px solid var(--card-border);
       border-radius: 8px;
-      background: rgba(255, 255, 255, 0.03);
+      background: transparent;
       color: var(--text-muted);
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 13px;
     }
-    .popup-close:hover { color: var(--text-light); }
     .popup-icon {
       display: block;
       text-align: center;
@@ -1618,7 +1494,7 @@
       text-align: center;
       font-size: 20px;
       margin-bottom: 6px;
-      font-family: var(--font-serif);
+      font-family: 'Playfair Display', serif;
     }
     .premium-popup h2 span { color: var(--accent-bright); font-style: italic; }
     .popup-subtitle {
@@ -1636,7 +1512,7 @@
       justify-content: center;
       gap: 6px;
       padding: 12px;
-      border-radius: 8px;
+      border-radius: 10px;
       background: linear-gradient(135deg, var(--accent-bright), var(--accent));
       color: #0A0A0A;
       font-weight: 700;
@@ -1675,7 +1551,6 @@
       opacity: 0;
       transition: var(--transition);
       max-width: 90%;
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
       display: flex;
       align-items: center;
       gap: 10px;
@@ -1702,7 +1577,7 @@
        RESPONSIVE
        ═══════════════════════════════════════════════════════════ */
     @media (max-width: 620px) {
-      .shell-inner { width: min(100% - 20px, 980px); padding-top: 12px; }
+      .shell { width: min(100% - 20px, 900px); padding: 14px 0 24px; }
       .panel { padding: 16px; }
       .form-grid { grid-template-columns: 1fr; }
       .field.full { grid-column: auto; }
@@ -1715,10 +1590,10 @@
       .notion-header { padding: 12px 14px; gap: 10px; }
       .notion-num { width: 28px; height: 28px; font-size: 12px; }
       .notion-title { font-size: 13.5px; }
-      .notion-content { padding: 4px 14px 16px; gap: 10px; }
+      .notion-content { padding: 12px 14px 14px; gap: 8px; }
       .block { padding: 11px 12px; }
 
-      .flashcard, .flashcard-inner { height: 240px; min-height: 240px; }
+      .flashcard, .flashcard-inner { height: 260px; min-height: 260px; }
       .flashcard-text { font-size: 15px; }
       .flashcard-face { padding: 18px; }
 
@@ -1750,317 +1625,352 @@
 
   <header>
     <a class="brand" href="index.html">ARVEX<span>A School</span></a>
-    <div class="header-right">
-      <div class="connection" id="connectionState">Vérification...</div>
-    </div>
+    <div class="connection" id="connectionState">Vérification...</div>
   </header>
 
-  <div class="shell" id="shell">
-    <div class="shell-inner">
+  <main class="shell">
 
-      <div class="step-bar" id="stepBar">
-        <div class="step-item active" data-step="fiche">
-          <div class="num"><span>1</span></div>
-          <span class="label">Fiche</span>
-        </div>
-        <span class="step-sep">›</span>
-        <div class="step-item" data-step="flashcard">
-          <div class="num"><span>2</span></div>
-          <span class="label">Flashcards</span>
-        </div>
-        <span class="step-sep">›</span>
-        <div class="step-item" data-step="quiz">
-          <div class="num"><span>3</span></div>
-          <span class="label">Quiz</span>
-        </div>
-        <span class="step-sep">›</span>
-        <div class="step-item" data-step="results">
-          <div class="num"><span>4</span></div>
-          <span class="label">Résultats</span>
-        </div>
+    <div class="step-bar" id="stepBar">
+      <div class="step-item active" data-step="fiche">
+        <div class="num"><span>1</span></div>
+        <span>Fiche</span>
       </div>
+      <span class="step-sep">›</span>
+      <div class="step-item" data-step="flashcard">
+        <div class="num"><span>2</span></div>
+        <span>Flashcards</span>
+      </div>
+      <span class="step-sep">›</span>
+      <div class="step-item" data-step="quiz">
+        <div class="num"><span>3</span></div>
+        <span>Quiz</span>
+      </div>
+      <span class="step-sep">›</span>
+      <div class="step-item" data-step="results">
+        <div class="num"><span>4</span></div>
+        <span>Résultats</span>
+      </div>
+    </div>
 
-      <!-- CONFIG -->
-      <section class="view active" id="configView">
-        <div class="panel">
-          <div class="eyebrow">Réviseur intelligent v4</div>
-          <h1>Génère ta révision <em style="color:var(--accent-bright);font-style:italic;">sur mesure</em>.</h1>
-          <p class="lead">
-            Une fiche ultra-détaillée, des flashcards typées et un quiz à 5 niveaux.
-            L'IA exploite <strong style="color:var(--accent-bright);">toute la base de connaissances</strong> du BAC.
-          </p>
+    <!-- CONFIG -->
+    <section class="view active" id="configView">
+      <div class="panel">
+        <div class="eyebrow">Réviseur intelligent</div>
+        <h1>Génère ta révision <em style="color:var(--accent-bright);font-style:italic;">sur mesure</em>.</h1>
+        <p class="lead">
+          Une fiche ultra-détaillée, des flashcards typées et un quiz progressif.
+          Toute la base de connaissances du BAC est exploitée.
+        </p>
 
-          <form id="configForm" class="form-grid">
-            <div class="field">
-              <label>Matière</label>
-              <div class="custom-select" id="subjectSelect" data-name="subject">
-                <button type="button" class="custom-select-trigger" aria-haspopup="listbox" aria-expanded="false">
-                  <span class="custom-select-value"></span>
-                  <i class="fas fa-chevron-down custom-select-arrow"></i>
-                </button>
-                <div class="custom-select-options" role="listbox">
-                  <div class="custom-select-option" data-value="mathematiques" role="option"><span class="option-prefix">📐</span> Mathématiques</div>
-                  <div class="custom-select-option" data-value="physique" role="option"><span class="option-prefix">⚡</span> Physique</div>
-                  <div class="custom-select-option" data-value="chimie" role="option"><span class="option-prefix">🧪</span> Chimie</div>
-                  <div class="custom-select-option" data-value="svt" role="option"><span class="option-prefix">🧬</span> SVT</div>
-                </div>
-              </div>
-            </div>
-
-            <div class="field">
-              <label>Chapitre</label>
-              <div class="custom-select" id="chapterSelect" data-name="chapter">
-                <button type="button" class="custom-select-trigger" aria-haspopup="listbox" aria-expanded="false">
-                  <span class="custom-select-value"></span>
-                  <i class="fas fa-chevron-down custom-select-arrow"></i>
-                </button>
-                <div class="custom-select-options" role="listbox" id="chapterOptions"></div>
-              </div>
-            </div>
-
-            <div class="field full">
-              <label>Mode de départ</label>
-              <div class="chips-row" id="modeChips">
-                <button type="button" class="chip active" data-mode="fiche">📝 Fiche de révision</button>
-                <button type="button" class="chip" data-mode="flashcard">⚡ Flashcards</button>
-              </div>
-            </div>
-
-            <div class="field">
-              <label>Nombre de flashcards</label>
-              <div class="chips-row" id="flashCountChips">
-                <button type="button" class="chip" data-count="5">5</button>
-                <button type="button" class="chip active" data-count="10">10</button>
-                <button type="button" class="chip" data-count="15">15</button>
-              </div>
-            </div>
-
-            <div class="field">
-              <label>Difficulté quiz</label>
-              <div class="chips-row" id="difficultyChips">
-                <button type="button" class="chip" data-diff="1">🟢 Facile</button>
-                <button type="button" class="chip active" data-diff="2">🟡 Moyen</button>
-                <button type="button" class="chip" data-diff="3">🟠 Difficile</button>
-                <button type="button" class="chip" data-diff="4">🔴 BAC</button>
-              </div>
-            </div>
-
-            <div class="field">
-              <label>Nombre de questions</label>
-              <div class="chips-row" id="quizCountChips">
-                <button type="button" class="chip" data-qcount="3">3</button>
-                <button type="button" class="chip active" data-qcount="5">5</button>
-                <button type="button" class="chip" data-qcount="10">10</button>
-              </div>
-            </div>
-
-            <div class="field full">
-              <button class="btn primary full" id="generateBtn" type="submit">
-                <span class="btn-text">Générer ma session</span>
-                <span class="loader"></span>
+        <form id="configForm" class="form-grid">
+          <div class="field">
+            <label>Matière</label>
+            <div class="custom-select" id="subjectSelect" data-name="subject">
+              <button type="button" class="custom-select-trigger">
+                <span class="custom-select-value"></span>
+                <i class="fas fa-chevron-down custom-select-arrow"></i>
               </button>
+              <div class="custom-select-options">
+                <div class="custom-select-option" data-value="mathematiques"><span class="option-prefix">📐</span> Mathématiques</div>
+                <div class="custom-select-option" data-value="physique"><span class="option-prefix">⚡</span> Physique</div>
+                <div class="custom-select-option" data-value="chimie"><span class="option-prefix">🧪</span> Chimie</div>
+                <div class="custom-select-option" data-value="svt"><span class="option-prefix">🧬</span> SVT</div>
+              </div>
             </div>
-          </form>
-
-          <div class="status" id="configStatus" role="status" aria-live="polite"></div>
-        </div>
-      </section>
-
-      <!-- LOADING -->
-      <section class="view" id="loadingView">
-        <div class="panel">
-          <div class="eyebrow">Génération en cours</div>
-          <h2>Préparation de ta révision...</h2>
-          <p class="lead">Cela prend généralement 20 à 40 secondes.</p>
-
-          <div class="loading-steps">
-            <div class="loader-spinner"></div>
-            <div class="steps-list">
-              <div class="loading-step" id="genStep1"><span class="step-icon">🔍</span><div class="step-content"><span class="step-label">Analyse du chapitre</span><span class="step-desc">Matière et mode sélectionnés</span></div></div>
-              <div class="loading-step" id="genStep2"><span class="step-icon">🧠</span><div class="step-content"><span class="step-label">Extraction des notions</span><span class="step-desc">Exploitation de la base de connaissances</span></div></div>
-              <div class="loading-step" id="genStep3"><span class="step-icon">✍️</span><div class="step-content"><span class="step-label">Rédaction enrichie</span><span class="step-desc">Sections, formules, méthodes, exemples</span></div></div>
-              <div class="loading-step" id="genStep4"><span class="step-icon">🧮</span><div class="step-content"><span class="step-label">Vérification</span><span class="step-desc">Contrôle de la complétude</span></div></div>
-              <div class="loading-step" id="genStep5"><span class="step-icon">✨</span><div class="step-content"><span class="step-label">Finalisation</span><span class="step-desc">Préparation de l'affichage</span></div></div>
-            </div>
-            <div class="loading-status" id="genLoadingStatus">Préparation...</div>
-          </div>
-        </div>
-      </section>
-
-      <!-- FICHE -->
-      <section class="view" id="ficheView">
-        <div class="panel">
-          <div class="session-head">
-            <div>
-              <div class="eyebrow">Fiche de révision</div>
-              <h2 id="ficheTitle">📝 Fiche</h2>
-              <div class="session-meta" id="ficheMeta"></div>
-            </div>
-            <button class="btn secondary" id="newFicheBtn">
-              <i class="fas fa-plus"></i> Nouvelle
-            </button>
           </div>
 
-          <div id="ficheContent"></div>
+          <div class="field">
+            <label>Chapitre</label>
+            <div class="custom-select" id="chapterSelect" data-name="chapter">
+              <button type="button" class="custom-select-trigger">
+                <span class="custom-select-value"></span>
+                <i class="fas fa-chevron-down custom-select-arrow"></i>
+              </button>
+              <div class="custom-select-options" id="chapterOptions"></div>
+            </div>
+          </div>
 
-          <div class="actions">
-            <button class="btn primary full" id="startFlashcardsBtn">
-              <span class="btn-icon"><i class="fas fa-clone"></i></span>
-              <span class="btn-text">Continuer avec les flashcards</span>
+          <div class="field full">
+            <label>Mode de départ</label>
+            <div class="chips-row" id="modeChips">
+              <button type="button" class="chip active" data-mode="fiche">📝 Fiche de révision</button>
+              <button type="button" class="chip" data-mode="flashcard">⚡ Flashcards</button>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Nombre de flashcards</label>
+            <div class="chips-row" id="flashCountChips">
+              <button type="button" class="chip" data-count="5">5</button>
+              <button type="button" class="chip active" data-count="10">10</button>
+              <button type="button" class="chip" data-count="15">15</button>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Difficulté quiz</label>
+            <div class="chips-row" id="difficultyChips">
+              <button type="button" class="chip" data-diff="1">🟢 Facile</button>
+              <button type="button" class="chip active" data-diff="2">🟡 Moyen</button>
+              <button type="button" class="chip" data-diff="3">🟠 Difficile</button>
+              <button type="button" class="chip" data-diff="4">🔴 BAC</button>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Nombre de questions</label>
+            <div class="chips-row" id="quizCountChips">
+              <button type="button" class="chip" data-qcount="3">3</button>
+              <button type="button" class="chip active" data-qcount="5">5</button>
+              <button type="button" class="chip" data-qcount="10">10</button>
+            </div>
+          </div>
+
+          <div class="field full">
+            <button class="btn primary full" id="generateBtn" type="submit">
+              <span class="btn-text">Générer ma session</span>
               <span class="loader"></span>
             </button>
-            <button class="btn secondary full" id="skipToQuizBtn">
-              <i class="fas fa-forward"></i> Passer au quiz
-            </button>
           </div>
+        </form>
+
+        <div class="status" id="configStatus"></div>
+      </div>
+    </section>
+
+    <!-- LOADING FICHE -->
+    <section class="view" id="loadingView">
+      <div class="panel">
+        <div class="eyebrow">Génération en cours</div>
+        <h2>Préparation de ta fiche...</h2>
+        <p class="lead">Cela prend généralement 20 à 40 secondes.</p>
+
+        <div class="loading-steps">
+          <div class="loader-spinner"></div>
+          <div class="steps-list">
+            <div class="loading-step" id="genStep1"><span class="step-icon">🔍</span><div class="step-content"><span class="step-label">Analyse du chapitre</span><span class="step-desc">Matière, chapitre et mode sélectionnés</span></div></div>
+            <div class="loading-step" id="genStep2"><span class="step-icon">🧠</span><div class="step-content"><span class="step-label">Extraction des notions</span><span class="step-desc">Exploitation de la base de connaissances</span></div></div>
+            <div class="loading-step" id="genStep3"><span class="step-icon">✍️</span><div class="step-content"><span class="step-label">Rédaction enrichie</span><span class="step-desc">Formules, méthodes, exemples, pièges</span></div></div>
+            <div class="loading-step" id="genStep4"><span class="step-icon">✅</span><div class="step-content"><span class="step-label">Vérification</span><span class="step-desc">Contrôle de la complétude</span></div></div>
+            <div class="loading-step" id="genStep5"><span class="step-icon">✨</span><div class="step-content"><span class="step-label">Finalisation</span><span class="step-desc">Préparation de l'affichage</span></div></div>
+          </div>
+          <div class="loading-status" id="genLoadingStatus">Préparation...</div>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- FLASHCARDS -->
-      <section class="view" id="flashcardView">
-        <div class="panel">
-          <div class="session-head">
-            <div>
-              <div class="eyebrow">Flashcards</div>
-              <h2>⚡ Cartes de mémorisation</h2>
-              <div class="session-meta" id="flashMeta"></div>
-            </div>
-            <button class="btn secondary" id="newFlashBtn">
-              <i class="fas fa-plus"></i> Nouvelle
-            </button>
+    <!-- LOADING FLASHCARDS -->
+    <section class="view" id="loadingFlashView">
+      <div class="panel">
+        <div class="eyebrow">Génération en cours</div>
+        <h2>Préparation des flashcards...</h2>
+        <p class="lead">Cela prend généralement 15 à 30 secondes.</p>
+
+        <div class="loading-steps">
+          <div class="loader-spinner"></div>
+          <div class="steps-list">
+            <div class="loading-step" id="flStep1"><span class="step-icon">🔍</span><div class="step-content"><span class="step-label">Analyse du chapitre</span><span class="step-desc">Matière et notions ciblées</span></div></div>
+            <div class="loading-step" id="flStep2"><span class="step-icon">🧠</span><div class="step-content"><span class="step-label">Extraction des notions</span><span class="step-desc">Base de connaissances activée</span></div></div>
+            <div class="loading-step" id="flStep3"><span class="step-icon">⚡</span><div class="step-content"><span class="step-label">Génération des cartes</span><span class="step-desc">Définitions, formules, méthodes, pièges</span></div></div>
+            <div class="loading-step" id="flStep4"><span class="step-icon">✅</span><div class="step-content"><span class="step-label">Vérification</span><span class="step-desc">Contrôle des réponses</span></div></div>
+            <div class="loading-step" id="flStep5"><span class="step-icon">✨</span><div class="step-content"><span class="step-label">Finalisation</span><span class="step-desc">Préparation de l'affichage</span></div></div>
           </div>
+          <div class="loading-status" id="flLoadingStatus">Préparation...</div>
+        </div>
+      </div>
+    </section>
 
-          <div class="flashcard-progress">
-            <span>Progression</span>
-            <div class="flashcard-track">
-              <div class="flashcard-track-fill" id="flashcardTrackFill" style="width: 0%"></div>
-            </div>
-            <span class="counter" id="flashCounter">0 / 10</span>
+    <!-- LOADING QUIZ -->
+    <section class="view" id="loadingQuizView">
+      <div class="panel">
+        <div class="eyebrow">Génération en cours</div>
+        <h2>Préparation du quiz...</h2>
+        <p class="lead">Cela prend généralement 15 à 30 secondes.</p>
+
+        <div class="loading-steps">
+          <div class="loader-spinner"></div>
+          <div class="steps-list">
+            <div class="loading-step" id="qzStep1"><span class="step-icon">🔍</span><div class="step-content"><span class="step-label">Analyse du chapitre</span><span class="step-desc">Matière et difficulté</span></div></div>
+            <div class="loading-step" id="qzStep2"><span class="step-icon">🧠</span><div class="step-content"><span class="step-label">Extraction des notions</span><span class="step-desc">Base de connaissances activée</span></div></div>
+            <div class="loading-step" id="qzStep3"><span class="step-icon">❓</span><div class="step-content"><span class="step-label">Génération des questions</span><span class="step-desc">5 niveaux de difficulté</span></div></div>
+            <div class="loading-step" id="qzStep4"><span class="step-icon">✅</span><div class="step-content"><span class="step-label">Vérification</span><span class="step-desc">Contrôle des réponses</span></div></div>
+            <div class="loading-step" id="qzStep5"><span class="step-icon">✨</span><div class="step-content"><span class="step-label">Finalisation</span><span class="step-desc">Préparation de l'affichage</span></div></div>
           </div>
+          <div class="loading-status" id="qzLoadingStatus">Préparation...</div>
+        </div>
+      </div>
+    </section>
 
-          <div class="flashcard" id="flashcardEl">
-            <div class="flashcard-inner">
-              <div class="flashcard-face flashcard-front">
-                <div class="flashcard-type-badge" id="flashTypeBadge" style="display:none;"></div>
-                <div class="flashcard-label">Question</div>
-                <div class="flashcard-text" id="flashFront"></div>
-                <div class="flashcard-hint" id="flashHint" style="display:none;">
-                  <i class="fas fa-lightbulb"></i>
-                  <span id="flashHintText"></span>
-                </div>
+    <!-- FICHE -->
+    <section class="view" id="ficheView">
+      <div class="panel">
+        <div class="session-head">
+          <div>
+            <div class="eyebrow">Fiche de révision</div>
+            <h2 id="ficheTitle">Fiche</h2>
+            <div class="session-meta" id="ficheMeta"></div>
+          </div>
+          <button class="btn secondary" id="newFicheBtn">
+            <i class="fas fa-plus"></i> Nouvelle
+          </button>
+        </div>
+
+        <div id="ficheContent"></div>
+
+        <div class="actions">
+          <button class="btn primary full" id="startFlashcardsBtn">
+            <span class="btn-icon"><i class="fas fa-clone"></i></span>
+            <span class="btn-text">Continuer avec les flashcards</span>
+            <span class="loader"></span>
+          </button>
+          <button class="btn secondary full" id="skipToQuizBtn">
+            <i class="fas fa-forward"></i> Passer au quiz
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- FLASHCARDS -->
+    <section class="view" id="flashcardView">
+      <div class="panel">
+        <div class="session-head">
+          <div>
+            <div class="eyebrow">Flashcards</div>
+            <h2>Cartes de mémorisation</h2>
+            <div class="session-meta" id="flashMeta"></div>
+          </div>
+          <button class="btn secondary" id="newFlashBtn">
+            <i class="fas fa-plus"></i> Nouvelle
+          </button>
+        </div>
+
+        <div class="flashcard-progress">
+          <span>Progression</span>
+          <div class="flashcard-track">
+            <div class="flashcard-track-fill" id="flashcardTrackFill"></div>
+          </div>
+          <span class="counter" id="flashCounter">0 / 10</span>
+        </div>
+
+        <div class="flashcard" id="flashcardEl">
+          <div class="flashcard-inner">
+            <div class="flashcard-face flashcard-front">
+              <div class="flashcard-type-badge" id="flashTypeBadge" style="display:none;"></div>
+              <div class="flashcard-label">Question</div>
+              <div class="flashcard-text" id="flashFront"></div>
+              <div class="flashcard-hint" id="flashHint" style="display:none;">
+                <i class="fas fa-lightbulb"></i>
+                <span id="flashHintText"></span>
               </div>
-              <div class="flashcard-face flashcard-back">
-                <div class="flashcard-label">Réponse</div>
-                <div class="flashcard-text" id="flashBack"></div>
-              </div>
             </div>
-          </div>
-
-          <div class="flashcard-flip-hint">
-            <i class="fas fa-hand-pointer"></i> Clique sur la carte pour voir la réponse
-          </div>
-
-          <div class="flashcard-feedback" id="flashFeedback">
-            <button class="feedback-btn hard" data-rating="hard">
-              <i class="fas fa-times-circle"></i>
-              <span>Oublié</span>
-            </button>
-            <button class="feedback-btn medium" data-rating="medium">
-              <i class="fas fa-circle-half-stroke"></i>
-              <span>Hésité</span>
-            </button>
-            <button class="feedback-btn easy" data-rating="easy">
-              <i class="fas fa-check-circle"></i>
-              <span>Je savais</span>
-            </button>
-          </div>
-
-          <div class="actions" style="margin-top:12px;">
-            <button class="btn primary full" id="finishFlashBtn">
-              <i class="fas fa-arrow-right"></i> Passer au quiz
-            </button>
+            <div class="flashcard-face flashcard-back">
+              <div class="flashcard-label">Réponse</div>
+              <div class="flashcard-text" id="flashBack"></div>
+            </div>
           </div>
         </div>
-      </section>
 
-      <!-- QUIZ -->
-      <section class="view" id="quizView">
-        <div class="panel">
-          <div class="session-head">
-            <div>
-              <div class="eyebrow">Quiz</div>
-              <h2>❓ Teste tes connaissances</h2>
-              <div class="session-meta" id="quizMeta"></div>
-            </div>
-          </div>
+        <div class="flashcard-flip-hint">
+          <i class="fas fa-hand-pointer"></i> Clique sur la carte pour voir la réponse
+        </div>
 
-          <div class="progress"><span id="quizProgress"></span></div>
-          <div id="quizContent"></div>
+        <div class="flashcard-feedback" id="flashFeedback">
+          <button class="feedback-btn hard" data-rating="hard">
+            <i class="fas fa-times-circle"></i>
+            <span>Oublié</span>
+          </button>
+          <button class="feedback-btn medium" data-rating="medium">
+            <i class="fas fa-circle-half-stroke"></i>
+            <span>Hésité</span>
+          </button>
+          <button class="feedback-btn easy" data-rating="easy">
+            <i class="fas fa-check-circle"></i>
+            <span>Je savais</span>
+          </button>
+        </div>
 
-          <div class="actions">
-            <button class="btn primary full" id="validateQuizBtn" disabled>
-              <i class="fas fa-check-circle"></i>
-              <span class="btn-text">Valider mes réponses</span>
-            </button>
+        <div class="actions">
+          <button class="btn primary full" id="finishFlashBtn">
+            <i class="fas fa-arrow-right"></i> Passer au quiz
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- QUIZ -->
+    <section class="view" id="quizView">
+      <div class="panel">
+        <div class="session-head">
+          <div>
+            <div class="eyebrow">Quiz</div>
+            <h2>Teste tes connaissances</h2>
+            <div class="session-meta" id="quizMeta"></div>
           </div>
         </div>
-      </section>
 
-      <!-- RÉSULTATS -->
-      <section class="view" id="resultsView">
-        <div class="panel">
-          <div class="result-hero">
-            <span class="emoji" id="resultsEmoji">🎉</span>
-            <h2 id="resultsTitle">Bravo !</h2>
-            <p id="resultsSub">Continue comme ça !</p>
+        <div class="progress"><span id="quizProgress"></span></div>
+        <div id="quizContent"></div>
+
+        <div class="actions">
+          <button class="btn primary full" id="validateQuizBtn" disabled>
+            <i class="fas fa-check-circle"></i>
+            <span class="btn-text">Valider mes réponses</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- RÉSULTATS -->
+    <section class="view" id="resultsView">
+      <div class="panel">
+        <div class="result-hero">
+          <span class="emoji" id="resultsEmoji">🎉</span>
+          <h2 id="resultsTitle">Bravo !</h2>
+          <p id="resultsSub">Continue comme ça !</p>
+        </div>
+
+        <div class="result-summary">
+          <div class="metric">
+            <strong id="metricCorrect">0/5</strong>
+            <small>Correctes</small>
           </div>
-
-          <div class="result-summary">
-            <div class="metric">
-              <strong id="metricCorrect">0/5</strong>
-              <small>Correctes</small>
-            </div>
-            <div class="metric">
-              <strong id="metricScore">0/20</strong>
-              <small>Score</small>
-            </div>
-            <div class="metric">
-              <strong id="metricPercent">0%</strong>
-              <small>Pourcentage</small>
-            </div>
+          <div class="metric">
+            <strong id="metricScore">0/20</strong>
+            <small>Score</small>
           </div>
-
-          <div class="mastery-block">
-            <div class="mastery-head">
-              <span class="label">Score de maîtrise</span>
-              <span class="value" id="masteryValue">0%</span>
-            </div>
-            <div class="mastery-track">
-              <div class="mastery-track-fill" id="masteryFill"></div>
-            </div>
-            <div class="mastery-label-text" id="masteryText"></div>
-          </div>
-
-          <div class="recommendations" id="recommendationsBlock">
-            <div class="rec-title">
-              <i class="fas fa-compass"></i>
-              Recommandations
-            </div>
-            <ul class="rec-list" id="recommendationsList"></ul>
-          </div>
-
-          <div class="actions">
-            <button class="btn primary full" id="restartBtn">
-              <i class="fas fa-redo"></i> Nouvelle révision
-            </button>
-            <a href="arv-progress.html" class="btn secondary full">
-              <i class="fas fa-graduation-cap"></i> Suivre ma progression
-            </a>
+          <div class="metric">
+            <strong id="metricPercent">0%</strong>
+            <small>Pourcentage</small>
           </div>
         </div>
-      </section>
-    </div>
-  </div>
+
+        <div class="mastery-block">
+          <div class="mastery-head">
+            <span class="label">Score de maîtrise</span>
+            <span class="value" id="masteryValue">0%</span>
+          </div>
+          <div class="mastery-track">
+            <div class="mastery-track-fill" id="masteryFill"></div>
+          </div>
+          <div class="mastery-label-text" id="masteryText"></div>
+        </div>
+
+        <div class="recommendations">
+          <div class="rec-title"><i class="fas fa-compass"></i> Recommandations</div>
+          <ul class="rec-list" id="recommendationsList"></ul>
+        </div>
+
+        <div class="actions">
+          <button class="btn primary full" id="restartBtn">
+            <i class="fas fa-redo"></i> Nouvelle révision
+          </button>
+          <a href="arv-progress.html" class="btn secondary full">
+            <i class="fas fa-graduation-cap"></i> Suivre ma progression
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
 
   <button class="scroll-top" id="scrollTop" aria-label="Retour en haut">
     <i class="fas fa-arrow-up"></i>
@@ -2075,7 +1985,7 @@
         Débloque les fiches IA et les quiz <strong>sans limite</strong>.
       </p>
       <div class="popup-buttons">
-        <a href="abonnement.html" class="btn-subscribe"><i class="fas fa-crown"></i> S'abonner maintenant</a>
+        <a href="abonnement.html" class="btn-subscribe"><i class="fas fa-crown"></i> S'abonner</a>
         <button class="btn-later" id="popupLaterBtn">Plus tard</button>
       </div>
     </div>
@@ -2098,7 +2008,7 @@
 
   <script type="module">
   // ═══════════════════════════════════════════════════════════════
-  // RÉVISEUR v4.1 — Corrigé
+  // RÉVISEUR v5.0 — Unifié
   // ═══════════════════════════════════════════════════════════════
 
   import { initializeApp } from "firebase/app";
@@ -2176,10 +2086,8 @@
   };
 
   const $ = (id) => document.getElementById(id);
-  const views = ['configView', 'loadingView', 'ficheView', 'flashcardView', 'quizView', 'resultsView'];
+  const views = ['configView', 'loadingView', 'loadingFlashView', 'loadingQuizView', 'ficheView', 'flashcardView', 'quizView', 'resultsView'];
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-
-  const GENERATION_STEPS = ['genStep1', 'genStep2', 'genStep3', 'genStep4', 'genStep5'];
 
   function showView(id) {
     views.forEach((v) => $(v).classList.toggle('active', v === id));
@@ -2204,7 +2112,7 @@
     } else {
       $('stepBar').classList.remove('show');
     }
-    $('shell').scrollTop = 0;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function setStatus(id, msg, type = '') {
@@ -2221,9 +2129,7 @@
   }
 
   function safeText(text) {
-    return String(text || '')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
+    return String(text || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
 
   function renderKaTeX(root) {
@@ -2267,20 +2173,14 @@
     window.__toastTimer = setTimeout(() => toast.classList.remove('show'), 3200);
   }
 
-  // ────────────────────────────────────────────────────────────────
-  // ⚡ NORMALISATION DES FORMULES (fix bug "objet")
-  // ────────────────────────────────────────────────────────────────
+  // ⚡ Fix formule "objet"
   function normalizeFormula(f) {
     if (!f) return null;
-
-    // Cas 1 : string → OK direct
     if (typeof f === 'string') {
       const trimmed = f.trim();
       if (!trimmed) return null;
       return { latex: trimmed, condition: '', usage: '' };
     }
-
-    // Cas 2 : objet { latex, condition, usage } → OK
     if (typeof f === 'object') {
       const latex = f.latex || f.formule || f.expression || '';
       if (!latex || typeof latex !== 'string') return null;
@@ -2290,32 +2190,31 @@
         usage: f.usage || f.description || ''
       };
     }
-
-    // Cas 3 : tout le reste → on ignore proprement
     return null;
   }
 
-  // ────────────────────────────────────────────────────────────────
-  // ⚡ CONTENU DE SECOURS (si section vide)
-  // ────────────────────────────────────────────────────────────────
-  function buildFallbackContent(notionTitle, notionId) {
+  // ⚡ Contenu de secours si section vide
+  function buildFallbackContent(notionTitle) {
     const cleanTitle = String(notionTitle || 'cette notion').trim();
     return {
-      comprendre: `Cette notion fait partie du programme du BAC. Elle est essentielle à maîtriser pour réussir l'épreuve. Prends le temps de la relire attentivement, puis fais des exercices d'application pour la fixer.`,
+      comprendre: `Cette notion fait partie du programme du BAC. Prends le temps de la relire et de faire des exercices d'application.`,
       tips: [
-        `📌 Note l'essentiel de « ${cleanTitle} » dans ton carnet.`,
-        `🔁 Revois cette notion dans 24h, puis dans 3 jours (répétition espacée).`,
-        `✍️ Refais au moins 2 exercices types sur cette notion.`,
-        `🤝 Explique « ${cleanTitle} » à un camarade — si tu peux l'expliquer, tu l'as comprise.`
+        `Note l'essentiel de « ${cleanTitle} » dans ton carnet`,
+        `Revois cette notion dans 24h puis 3 jours (répétition espacée)`,
+        `Refais au moins 2 exercices types`,
+        `Explique-la à un camarade pour vérifier ta compréhension`
       ]
     };
   }
 
   // ────────────────────────────────────────────────────────────────
-  // ÉTAPES
+  // ÉTAPES DE CHARGEMENT
   // ────────────────────────────────────────────────────────────────
-  function resetSteps(steps) {
-    steps.forEach((id) => { const el = $(id); if (el) el.classList.remove('active', 'done'); });
+  function resetSteps(prefix) {
+    ['1','2','3','4','5'].forEach((n) => {
+      const el = $(`${prefix}Step${n}`);
+      if (el) el.classList.remove('active', 'done');
+    });
   }
   function activateStep(stepId, statusEl, label) {
     document.querySelectorAll('.loading-step').forEach((s) => {
@@ -2324,9 +2223,9 @@
     });
     if (statusEl) { statusEl.textContent = label; statusEl.classList.add('active'); }
   }
-  function finishAllSteps(steps, statusEl, finalLabel = 'Terminé !') {
-    steps.forEach((id) => {
-      const el = $(id);
+  function finishAllSteps(prefix, statusEl, finalLabel = 'Terminé !') {
+    ['1','2','3','4','5'].forEach((n) => {
+      const el = $(`${prefix}Step${n}`);
       if (el) { el.classList.remove('active'); el.classList.add('done'); }
     });
     if (statusEl) { statusEl.textContent = finalLabel; statusEl.classList.remove('active'); }
@@ -2393,12 +2292,10 @@
     open() {
       document.querySelectorAll('.custom-select.open').forEach((el) => { if (el !== this.element) el.classList.remove('open'); });
       this.element.classList.add('open');
-      this.trigger.setAttribute('aria-expanded', 'true');
       this.isOpen = true;
     }
     close() {
       this.element.classList.remove('open');
-      this.trigger.setAttribute('aria-expanded', 'false');
       this.isOpen = false;
     }
     getValue() { return this.value; }
@@ -2412,7 +2309,6 @@
     customSelects.subject.select('mathematiques', true);
     updateChapters();
   }
-
   function updateChapters() {
     const subject = customSelects.subject.getValue();
     const chapters = CHAPTERS[subject] || [];
@@ -2423,44 +2319,28 @@
   }
 
   function initChips() {
-    document.querySelectorAll('#modeChips .chip').forEach((chip) => {
-      chip.addEventListener('click', () => {
-        document.querySelectorAll('#modeChips .chip').forEach((c) => c.classList.remove('active'));
-        chip.classList.add('active');
-        state.mode = chip.dataset.mode;
-      });
-    });
-    document.querySelectorAll('#flashCountChips .chip').forEach((chip) => {
-      chip.addEventListener('click', () => {
-        document.querySelectorAll('#flashCountChips .chip').forEach((c) => c.classList.remove('active'));
-        chip.classList.add('active');
-        state.flashCount = Number(chip.dataset.count);
-      });
-    });
-    document.querySelectorAll('#difficultyChips .chip').forEach((chip) => {
-      chip.addEventListener('click', () => {
-        document.querySelectorAll('#difficultyChips .chip').forEach((c) => c.classList.remove('active'));
-        chip.classList.add('active');
-        state.difficulty = Number(chip.dataset.diff);
-      });
-    });
-    document.querySelectorAll('#quizCountChips .chip').forEach((chip) => {
-      chip.addEventListener('click', () => {
-        document.querySelectorAll('#quizCountChips .chip').forEach((c) => c.classList.remove('active'));
-        chip.classList.add('active');
-        state.quizCount = Number(chip.dataset.qcount);
+    ['modeChips', 'flashCountChips', 'difficultyChips', 'quizCountChips'].forEach((id) => {
+      const chips = document.querySelectorAll(`#${id} .chip`);
+      chips.forEach((chip) => {
+        chip.addEventListener('click', () => {
+          chips.forEach((c) => c.classList.remove('active'));
+          chip.classList.add('active');
+          if (id === 'modeChips') state.mode = chip.dataset.mode;
+          if (id === 'flashCountChips') state.flashCount = Number(chip.dataset.count);
+          if (id === 'difficultyChips') state.difficulty = Number(chip.dataset.diff);
+          if (id === 'quizCountChips') state.quizCount = Number(chip.dataset.qcount);
+        });
       });
     });
   }
 
   // ═══════════════════════════════════════════════════════════════
-  // GÉNÉRATION
+  // GÉNÉRATION FICHE
   // ═══════════════════════════════════════════════════════════════
   $('configForm').addEventListener('submit', generateRevision);
 
   async function generateRevision(event) {
     event.preventDefault();
-
     if (state.isGenerating) return;
     if (!state.user) {
       setStatus('configStatus', 'Connecte-toi pour utiliser le Réviseur.', 'error');
@@ -2476,8 +2356,14 @@
     state.subject = customSelects.subject.getValue();
     state.chapter = customSelects.chapter.getValue();
 
+    // Si flashcards → vue dédiée
+    if (state.mode === 'flashcard') {
+      return generateFlashcardsDirect();
+    }
+
+    // Sinon fiche
     showView('loadingView');
-    resetSteps(GENERATION_STEPS);
+    resetSteps('gen');
     const statusEl = $('genLoadingStatus');
 
     try {
@@ -2497,13 +2383,12 @@
           action: 'generate',
           subject: state.subject,
           chapter: state.chapter,
-          mode: state.mode,
+          mode: 'fiche',
           level: 'auto'
         })
       });
 
       await sleep(1500);
-
       activateStep('genStep3', statusEl, 'Rédaction enrichie...');
 
       const response = await responsePromise;
@@ -2524,29 +2409,20 @@
 
       state.currentSession = payload.session;
       state.flashcards = [];
-      state.currentFlashIndex = 0;
-      state.flashRatings = {};
       state.quiz = [];
       state.quizAnswers = {};
 
       activateStep('genStep5', statusEl, 'Finalisation...');
       await sleep(500);
 
-      finishAllSteps(GENERATION_STEPS, statusEl, '✅ Ta révision est prête !');
+      finishAllSteps('gen', statusEl, '✅ Ta fiche est prête !');
       await sleep(400);
 
-      if (state.mode === 'flashcard' && Array.isArray(payload.session.flashcards)) {
-        state.flashcards = payload.session.flashcards;
-        state.currentFlashIndex = 0;
-        renderFlashcard();
-        showView('flashcardView');
-      } else {
-        renderFiche();
-        showView('ficheView');
-      }
+      renderFiche();
+      showView('ficheView');
 
     } catch (error) {
-      console.error('Erreur révision:', error);
+      console.error('Erreur génération:', error);
       showView('configView');
       setStatus('configStatus', error.message || 'Erreur inconnue.', 'error');
     } finally {
@@ -2557,17 +2433,163 @@
   }
 
   // ═══════════════════════════════════════════════════════════════
-  // RENDU FICHE v4.1 — Corrigé (formules + fallback)
+  // GÉNÉRATION FLASHCARDS (avec étapes)
+  // ═══════════════════════════════════════════════════════════════
+  async function generateFlashcardsDirect() {
+    const btn = $('generateBtn');
+
+    showView('loadingFlashView');
+    resetSteps('fl');
+    const statusEl = $('flLoadingStatus');
+
+    try {
+      activateStep('flStep1', statusEl, 'Analyse du chapitre...');
+      await sleep(500);
+
+      activateStep('flStep2', statusEl, 'Extraction des notions...');
+
+      const token = await getIdToken(state.user);
+      const responsePromise = fetch('/api/reviseur', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          action: 'generate',
+          subject: state.subject,
+          chapter: state.chapter,
+          mode: 'flashcard',
+          count: state.flashCount,
+          level: 'auto'
+        })
+      });
+
+      await sleep(1500);
+      activateStep('flStep3', statusEl, 'Génération des cartes...');
+
+      const response = await responsePromise;
+      const payload = await response.json().catch(() => null);
+
+      if (response.status === 429 && payload?.code === 'FREE_REVISEUR_LIMIT') {
+        showView('configView');
+        showPremiumPopup(payload.used, payload.limit);
+        return;
+      }
+
+      if (!response.ok || !payload?.success) {
+        throw new Error(payload?.error || 'Service temporairement indisponible.');
+      }
+
+      activateStep('flStep4', statusEl, 'Vérification...');
+      await sleep(700);
+
+      state.currentSession = payload.session;
+      state.flashcards = payload.session?.flashcards || [];
+      state.currentFlashIndex = 0;
+      state.flashRatings = {};
+
+      activateStep('flStep5', statusEl, 'Finalisation...');
+      await sleep(500);
+
+      finishAllSteps('fl', statusEl, '✅ Tes flashcards sont prêtes !');
+      await sleep(400);
+
+      if (state.flashcards.length === 0) {
+        throw new Error('Aucune flashcard générée.');
+      }
+
+      renderFlashcard();
+      showView('flashcardView');
+
+    } catch (error) {
+      console.error('Erreur flashcards:', error);
+      showView('configView');
+      setStatus('configStatus', error.message || 'Erreur inconnue.', 'error');
+    } finally {
+      state.isGenerating = false;
+      btn.disabled = false;
+      btn.classList.remove('loading');
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // GÉNÉRATION QUIZ (avec étapes)
+  // ═══════════════════════════════════════════════════════════════
+  async function generateQuizDirect() {
+    showView('loadingQuizView');
+    resetSteps('qz');
+    const statusEl = $('qzLoadingStatus');
+
+    try {
+      activateStep('qzStep1', statusEl, 'Analyse du chapitre...');
+      await sleep(500);
+
+      activateStep('qzStep2', statusEl, 'Extraction des notions...');
+
+      const token = await getIdToken(state.user);
+      const responsePromise = fetch('/api/reviseur', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          action: 'quiz',
+          subject: state.subject,
+          chapter: state.chapter,
+          difficulty: state.difficulty,
+          count: state.quizCount,
+          level: 'auto'
+        })
+      });
+
+      await sleep(1500);
+      activateStep('qzStep3', statusEl, 'Génération des questions...');
+
+      const response = await responsePromise;
+      const payload = await response.json().catch(() => null);
+
+      if (!response.ok || !payload?.success) {
+        throw new Error(payload?.error || 'Service temporairement indisponible.');
+      }
+
+      activateStep('qzStep4', statusEl, 'Vérification...');
+      await sleep(700);
+
+      state.quiz = payload.quiz || [];
+      state.quizAnswers = {};
+
+      activateStep('qzStep5', statusEl, 'Finalisation...');
+      await sleep(500);
+
+      finishAllSteps('qz', statusEl, '✅ Ton quiz est prêt !');
+      await sleep(400);
+
+      if (state.quiz.length === 0) {
+        throw new Error('Aucune question générée.');
+      }
+
+      renderQuiz();
+      showView('quizView');
+
+    } catch (error) {
+      console.error('Erreur quiz:', error);
+      showView('configView');
+      setStatus('configStatus', error.message || 'Erreur inconnue.', 'error');
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // RENDU FICHE — Style unifié
   // ═══════════════════════════════════════════════════════════════
   function renderFiche() {
     const session = state.currentSession;
     if (!session) return;
 
     const sections = session.sections || [];
-    const level = session.level || 'standard';
 
-    $('ficheTitle').textContent = `📝 ${session.chapterTitle || 'Fiche'}`;
-
+    $('ficheTitle').textContent = session.chapterTitle || 'Fiche';
     $('ficheMeta').innerHTML = `
       <span><i class="fas fa-book"></i> ${escapeHtml(SUBJECT_LABELS[state.subject])}</span>
       <span><i class="fas fa-list"></i> ${sections.length} section${sections.length > 1 ? 's' : ''}</span>
@@ -2576,20 +2598,20 @@
     const container = $('ficheContent');
     container.innerHTML = '';
 
-    // ═══ Points clés globaux ═══
+    // Points clés
     if (Array.isArray(session.keyPoints) && session.keyPoints.length > 0) {
       const block = document.createElement('div');
       block.className = 'global-block';
       block.innerHTML = `
         <div class="global-title"><i class="fas fa-star"></i> Points clés du chapitre</div>
         <ul class="global-list">
-          ${session.keyPoints.map((p) => `<li>${safeText(p)}</li>`).join('')}
+          ${session.keyPoints.map((p) => `<li>${safeText(typeof p === 'string' ? p : (p.text || ''))}</li>`).join('')}
         </ul>
       `;
       container.appendChild(block);
     }
 
-    // ═══ Label sections ═══
+    // Label sections
     const sectionsLabel = document.createElement('div');
     sectionsLabel.className = 'sections-label';
     sectionsLabel.innerHTML = `
@@ -2599,17 +2621,12 @@
     `;
     container.appendChild(sectionsLabel);
 
-    // ═══ Accordéon ═══
-    const accordion = document.createElement('div');
-    accordion.className = 'notion-accordion';
-
+    // Cartes
     sections.forEach((section, i) => {
-      accordion.appendChild(buildNotionItem(section, i));
+      container.appendChild(buildNotionCard(section, i));
     });
 
-    container.appendChild(accordion);
-
-    // ═══ Pièges globaux ═══
+    // Pièges globaux
     if (Array.isArray(session.examTraps) && session.examTraps.length > 0) {
       const block = document.createElement('div');
       block.className = 'global-block';
@@ -2620,7 +2637,7 @@
             const trap = typeof t === 'string' ? t : (t.trap || '');
             const solution = typeof t === 'object' ? (t.solution || '') : '';
             return `
-              <div style="padding:10px 12px;border-radius:6px;background:rgba(0,0,0,0.2);border-left:2px solid #ff9a84">
+              <div style="padding:10px 12px;border-radius:8px;background:rgba(0,0,0,0.2);border-left:2px solid #ff9a84">
                 <div style="font-size:13px;color:var(--text-light);margin-bottom:4px">${safeText(trap)}</div>
                 ${solution ? `<div style="font-size:12.5px;color:#7ce0aa;padding-left:14px;position:relative"><span style="position:absolute;left:0">→</span>${safeText(solution)}</div>` : ''}
               </div>
@@ -2631,7 +2648,7 @@
       container.appendChild(block);
     }
 
-    // ═══ Erreurs fréquentes ═══
+    // Erreurs fréquentes
     if (Array.isArray(session.commonMistakes) && session.commonMistakes.length > 0) {
       const block = document.createElement('div');
       block.className = 'global-block';
@@ -2644,7 +2661,7 @@
       container.appendChild(block);
     }
 
-    // ═══ Récap ═══
+    // Récap
     if (Array.isArray(session.recap) && session.recap.length > 0) {
       const block = document.createElement('div');
       block.className = 'global-block';
@@ -2659,24 +2676,24 @@
 
     renderKaTeX(container);
 
-    // Auto-ouvrir la 1ère section
-    const firstItem = accordion.querySelector('.notion-item');
-    if (firstItem) {
-      setTimeout(() => toggleNotion(firstItem), 250);
+    // Auto-ouvrir première
+    const firstCard = container.querySelector('.notion-card');
+    if (firstCard) {
+      setTimeout(() => toggleNotion(firstCard), 250);
     }
   }
 
   // ────────────────────────────────────────────────────────────────
-  // CONSTRUCTION ITEM ACCORDÉON
+  // CARTE NOTION — STYLE UNIFIÉ
   // ────────────────────────────────────────────────────────────────
-  function buildNotionItem(section, index) {
-    const item = document.createElement('div');
-    item.className = 'notion-item';
+  function buildNotionCard(section, index) {
+    const card = document.createElement('div');
+    card.className = 'notion-card';
 
-    const notionTitle = section.notionTitle || section.title || `Section ${index + 1}`;
+    const notionTitle = section.notionTitle || section.title || `Notion ${index + 1}`;
     const notionId = section.notionId || '';
 
-    // ═══ COMPRENDRE ═══
+    // COMPRENDRE
     let comprendreHTML = '';
     if (section.comprendre && typeof section.comprendre === 'string' && section.comprendre.trim()) {
       comprendreHTML = `
@@ -2687,11 +2704,10 @@
       `;
     }
 
-    // ═══ FORMULES (avec fix bug "objet") ═══
+    // FORMULES
     let formulesHTML = '';
     if (Array.isArray(section.formules) && section.formules.length > 0) {
       const validFormules = section.formules.map(normalizeFormula).filter(Boolean);
-
       if (validFormules.length > 0) {
         formulesHTML = `
           <div class="block">
@@ -2714,32 +2730,30 @@
       }
     }
 
-    // ═══ MÉTHODE ═══
+    // MÉTHODE
     let methodeHTML = '';
-    if (section.methode && typeof section.methode === 'object') {
-      const steps = Array.isArray(section.methode.steps) ? section.methode.steps : [];
-      if (steps.length > 0) {
-        methodeHTML = `
-          <div class="block">
-            <div class="block-label"><i class="fas fa-list-ol"></i> ${safeText(section.methode.title || 'Méthode pas-à-pas')}</div>
-            <ol class="method-steps">
-              ${steps.map((s) => `<li>${safeText(s)}</li>`).join('')}
-            </ol>
-          </div>
-        `;
-      }
-    } else if (Array.isArray(section.methode) && section.methode.length > 0) {
+    let methodeSteps = [];
+    let methodeTitle = 'Méthode pas-à-pas';
+
+    if (section.methode && typeof section.methode === 'object' && !Array.isArray(section.methode)) {
+      methodeTitle = section.methode.title || methodeTitle;
+      methodeSteps = Array.isArray(section.methode.steps) ? section.methode.steps : [];
+    } else if (Array.isArray(section.methode)) {
+      methodeSteps = section.methode;
+    }
+
+    if (methodeSteps.length > 0) {
       methodeHTML = `
         <div class="block">
-          <div class="block-label"><i class="fas fa-list-ol"></i> Méthode pas-à-pas</div>
+          <div class="block-label"><i class="fas fa-list-ol"></i> ${safeText(methodeTitle)}</div>
           <ol class="method-steps">
-            ${section.methode.map((s) => `<li>${safeText(s)}</li>`).join('')}
+            ${methodeSteps.map((s) => `<li>${safeText(typeof s === 'string' ? s : (s.text || ''))}</li>`).join('')}
           </ol>
         </div>
       `;
     }
 
-    // ═══ EXEMPLE RÉSOLU ═══
+    // EXEMPLE RÉSOLU
     let exempleHTML = '';
     if (section.exempleResolu && typeof section.exempleResolu === 'object') {
       const ex = section.exempleResolu;
@@ -2750,7 +2764,7 @@
           ${ex.enonce ? `<div class="example-enonce">${safeText(ex.enonce)}</div>` : ''}
           ${etapes.length > 0 ? `
             <ol class="example-steps">
-              ${etapes.map((e) => `<li>${safeText(e)}</li>`).join('')}
+              ${etapes.map((e) => `<li>${safeText(typeof e === 'string' ? e : (e.text || ''))}</li>`).join('')}
             </ol>
           ` : ''}
           ${ex.conclusion ? `<div class="example-conclusion">${safeText(ex.conclusion)}</div>` : ''}
@@ -2758,7 +2772,7 @@
       `;
     }
 
-    // ═══ PIÈGE BAC ═══
+    // PIÈGE BAC
     let piegeHTML = '';
     if (section.piegeBAC && typeof section.piegeBAC === 'object') {
       const p = section.piegeBAC;
@@ -2773,7 +2787,7 @@
       }
     }
 
-    // ═══ ASTUCE ═══
+    // ASTUCE
     let astuceHTML = '';
     if (section.astuce && typeof section.astuce === 'string' && section.astuce.trim()) {
       astuceHTML = `
@@ -2784,11 +2798,11 @@
       `;
     }
 
-    // ═══ FALLBACK : si AUCUN bloc n'a de contenu ═══
+    // FALLBACK si vide
     const hasContent = comprendreHTML || formulesHTML || methodeHTML || exempleHTML || piegeHTML || astuceHTML;
     let fallbackHTML = '';
     if (!hasContent) {
-      const fb = buildFallbackContent(notionTitle, notionId);
+      const fb = buildFallbackContent(notionTitle);
       fallbackHTML = `
         <div class="block">
           <div class="block-label"><i class="fas fa-lightbulb"></i> À retenir</div>
@@ -2803,14 +2817,12 @@
       `;
     }
 
-    item.innerHTML = `
+    card.innerHTML = `
       <div class="notion-header">
         <div class="notion-num">${index + 1}</div>
         <div class="notion-title-wrap">
           <div class="notion-title">${safeText(notionTitle)}</div>
-          <div class="notion-subtitle">
-            ${notionId ? escapeHtml(notionId) : 'Notion'}
-          </div>
+          <div class="notion-sub">${notionId ? escapeHtml(notionId) : 'Notion'}</div>
         </div>
         <div class="notion-toggle"><i class="fas fa-chevron-down"></i></div>
       </div>
@@ -2827,20 +2839,20 @@
       </div>
     `;
 
-    const header = item.querySelector('.notion-header');
-    header.addEventListener('click', () => toggleNotion(item));
+    const header = card.querySelector('.notion-header');
+    header.addEventListener('click', () => toggleNotion(card));
 
-    return item;
+    return card;
   }
 
-  function toggleNotion(item) {
-    const isOpen = item.classList.contains('open');
-    document.querySelectorAll('.notion-item.open').forEach((other) => {
-      if (other !== item) other.classList.remove('open');
+  function toggleNotion(card) {
+    const isOpen = card.classList.contains('open');
+    document.querySelectorAll('.notion-card.open').forEach((other) => {
+      if (other !== card) other.classList.remove('open');
     });
-    item.classList.toggle('open', !isOpen);
+    card.classList.toggle('open', !isOpen);
     if (!isOpen) {
-      const body = item.querySelector('.notion-content');
+      const body = card.querySelector('.notion-content');
       if (body) setTimeout(() => renderKaTeX(body), 150);
     }
   }
@@ -2935,101 +2947,17 @@
     });
   });
 
-  $('finishFlashBtn').addEventListener('click', () => startQuiz());
+  $('finishFlashBtn').addEventListener('click', () => generateQuizDirect());
 
   // ═══════════════════════════════════════════════════════════════
   // QUIZ
   // ═══════════════════════════════════════════════════════════════
-  async function startQuiz() {
-    if (!state.currentSession) return;
-
-    if (Array.isArray(state.currentSession.initialQuiz) && state.currentSession.initialQuiz.length > 0) {
-      state.quiz = state.currentSession.initialQuiz;
-      state.quizAnswers = {};
-      renderQuiz();
-      showView('quizView');
-      return;
-    }
-
-    try {
-      const token = await getIdToken(state.user);
-      const response = await fetch('/api/reviseur', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          action: 'quiz',
-          subject: state.subject,
-          chapter: state.chapter,
-          difficulty: state.difficulty,
-          count: state.quizCount
-        })
-      });
-
-      const payload = await response.json().catch(() => null);
-      if (!response.ok || !payload?.success) throw new Error(payload?.error || 'Erreur quiz');
-
-      state.quiz = payload.quiz || [];
-      state.quizAnswers = {};
-      renderQuiz();
-      showView('quizView');
-    } catch (e) {
-      alert('Impossible de générer le quiz : ' + e.message);
-    }
-  }
-
-  $('startFlashcardsBtn').addEventListener('click', async () => {
-    if (!state.flashcards || state.flashcards.length === 0) {
-      try {
-        const btn = $('startFlashcardsBtn');
-        btn.disabled = true;
-        btn.classList.add('loading');
-        const token = await getIdToken(state.user);
-        const response = await fetch('/api/reviseur', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({
-            action: 'generate',
-            subject: state.subject,
-            chapter: state.chapter,
-            mode: 'flashcard',
-            level: 'auto'
-          })
-        });
-        const payload = await response.json().catch(() => null);
-        if (!response.ok || !payload?.success) throw new Error(payload?.error || 'Erreur');
-        state.flashcards = payload.session?.flashcards || [];
-        state.currentFlashIndex = 0;
-        state.flashRatings = {};
-        renderFlashcard();
-        showView('flashcardView');
-      } catch (e) {
-        alert(e.message);
-      } finally {
-        const btn = $('startFlashcardsBtn');
-        btn.disabled = false;
-        btn.classList.remove('loading');
-      }
-    } else {
-      state.currentFlashIndex = 0;
-      renderFlashcard();
-      showView('flashcardView');
-    }
-  });
-
-  $('skipToQuizBtn').addEventListener('click', startQuiz);
-
   function renderQuiz() {
     const container = $('quizContent');
     container.innerHTML = '';
 
     if (!state.quiz || state.quiz.length === 0) {
-      container.innerHTML = '<div class="empty-state"><p>Aucune question disponible.</p></div>';
+      container.innerHTML = '<div class="empty-state"><i class="fas fa-question-circle"></i><h3>Aucune question</h3></div>';
       return;
     }
 
@@ -3048,7 +2976,9 @@
 
       const optionsHtml = (q.options || []).map((opt) => {
         const text = typeof opt === 'string' ? opt : (opt.text || '');
-        const id = typeof opt === 'string' ? String.fromCharCode(65 + q.options.indexOf(opt)) : (opt.id || '');
+        const id = typeof opt === 'string'
+          ? String.fromCharCode(65 + (q.options || []).indexOf(opt))
+          : (opt.id || '');
         return `
           <div class="quiz-option" data-option="${escapeHtml(id)}" data-qindex="${index}">
             <span class="quiz-option-letter">${escapeHtml(id)}</span>
@@ -3110,7 +3040,7 @@
   // ═══════════════════════════════════════════════════════════════
   // RÉSULTATS
   // ═══════════════════════════════════════════════════════════════
-  async function showQuizResults() {
+  function showQuizResults() {
     let correct = 0;
     state.quiz.forEach((q, i) => {
       if (state.quizAnswers[i] === q.correctAnswer) correct++;
@@ -3201,24 +3131,30 @@
   }
 
   // ═══════════════════════════════════════════════════════════════
-  // BOUTONS
+  // BOUTONS NAVIGATION
   // ═══════════════════════════════════════════════════════════════
   $('newFicheBtn').addEventListener('click', () => showView('configView'));
   $('newFlashBtn').addEventListener('click', () => showView('configView'));
   $('restartBtn').addEventListener('click', () => showView('configView'));
 
+  $('startFlashcardsBtn').addEventListener('click', () => {
+    state.flashcards = [];
+    state.currentFlashIndex = 0;
+    state.flashRatings = {};
+    generateFlashcardsDirect();
+  });
+
+  $('skipToQuizBtn').addEventListener('click', () => generateQuizDirect());
+
   // ═══════════════════════════════════════════════════════════════
   // SCROLL TOP
   // ═══════════════════════════════════════════════════════════════
-  const shell = $('shell');
   const scrollTopBtn = $('scrollTop');
-
-  shell.addEventListener('scroll', () => {
-    scrollTopBtn.classList.toggle('show', shell.scrollTop > 300);
+  window.addEventListener('scroll', () => {
+    scrollTopBtn.classList.toggle('show', window.scrollY > 300);
   }, { passive: true });
-
   scrollTopBtn.addEventListener('click', () => {
-    shell.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 
   // ═══════════════════════════════════════════════════════════════
@@ -3278,7 +3214,7 @@
   function init() {
     initCustomSelects();
     initChips();
-    console.log('🎓 ARVEXA — Réviseur v4.1');
+    console.log('🎓 ARVEXA — Réviseur v5.0 (unifié)');
   }
 
   init();

@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0A0A0A">
-  <meta name="description" content="ARVEXA School — Réviseur intelligent v4.0">
+  <meta name="description" content="ARVEXA School — Réviseur intelligent v4.1">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icon.png" type="image/png">
   <link rel="apple-touch-icon" href="icon.png">
@@ -54,12 +54,8 @@
       --transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
       --transition-fast: all 0.15s ease;
 
-      --radius-sm: 10px;
-      --radius: 16px;
-      --radius-lg: 20px;
-
-      --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-      --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.5);
+      --radius-sm: 8px;
+      --radius: 12px;
 
       --font-body: 'Inter', system-ui, sans-serif;
       --font-serif: 'Playfair Display', Georgia, serif;
@@ -75,21 +71,23 @@
       color-scheme: dark;
       min-width: 320px;
       width: 100%;
+      height: 100%;
+      overflow: hidden;
     }
 
     body {
       margin: 0;
-      min-height: 100vh;
-      overflow-x: hidden;
+      height: 100%;
+      overflow: hidden;
       background:
         radial-gradient(ellipse 40% 30% at 30% 15%, rgba(26, 58, 42, 0.16) 0%, transparent 70%),
         radial-gradient(ellipse 35% 25% at 75% 85%, rgba(184, 134, 11, 0.05) 0%, transparent 60%),
         linear-gradient(180deg, #0A0A0A 0%, #060606 100%);
       color: var(--text-light);
       font: 15px/1.6 var(--font-body);
-      padding-top: var(--safe-top);
-      padding-bottom: var(--safe-bottom);
       -webkit-font-smoothing: antialiased;
+      display: flex;
+      flex-direction: column;
     }
 
     button, input, select, textarea { font: inherit; font-family: inherit; }
@@ -97,10 +95,12 @@
     button:disabled { cursor: not-allowed; opacity: 0.55; }
 
     /* ═══════════════════════════════════════════════════════════
-       HEADER
+       HEADER (fixe)
        ═══════════════════════════════════════════════════════════ */
     header {
-      position: sticky; top: 0; z-index: 50;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 50;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -143,14 +143,31 @@
     .connection.online::before { background: var(--success-light); }
 
     /* ═══════════════════════════════════════════════════════════
-       STEP BAR
+       SHELL — Zone scrollable globale
        ═══════════════════════════════════════════════════════════ */
     .shell {
-      width: min(100% - 28px, 980px);
-      margin: auto;
-      padding: 18px 0 46px;
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: calc(60px + var(--safe-bottom));
+      width: 100%;
+    }
+    .shell::-webkit-scrollbar { width: 4px; }
+    .shell::-webkit-scrollbar-thumb {
+      background: rgba(224, 184, 74, 0.2);
+      border-radius: 10px;
     }
 
+    .shell-inner {
+      width: min(100% - 28px, 980px);
+      margin: auto;
+      padding: 18px 0 20px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       STEP BAR
+       ═══════════════════════════════════════════════════════════ */
     .step-bar {
       display: none;
       align-items: center;
@@ -238,7 +255,6 @@
       border: 1px solid var(--border-soft);
       border-radius: var(--radius);
       padding: 22px;
-      box-shadow: var(--shadow);
       position: relative;
     }
     .panel::before {
@@ -378,7 +394,6 @@
       background: linear-gradient(135deg, var(--accent-bright), var(--accent));
       color: #0A0A0A;
       border-color: transparent;
-      box-shadow: 0 4px 16px rgba(184, 134, 11, 0.2);
     }
     .btn.primary:hover:not(:disabled) {
       box-shadow: 0 8px 28px rgba(184, 134, 11, 0.35);
@@ -501,7 +516,7 @@
       background: linear-gradient(145deg, #171717, #101010);
       border: 1px solid var(--border-strong);
       border-radius: var(--radius-sm);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(224, 184, 74, 0.05);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
       padding: 6px;
       opacity: 0;
       visibility: hidden;
@@ -602,7 +617,6 @@
       border-left-color: var(--accent-bright);
       border-color: rgba(224, 184, 74, 0.2);
       transform: translateX(4px);
-      box-shadow: 0 4px 20px rgba(224, 184, 74, 0.08);
     }
     .loading-step.done {
       opacity: 0.85;
@@ -702,85 +716,64 @@
     .session-meta i { color: var(--accent-bright); font-size: 11px; }
 
     /* ═══════════════════════════════════════════════════════════
-       KEY POINTS GLOBAUX
+       BLOCS GLOBAUX
        ═══════════════════════════════════════════════════════════ */
     .global-block {
-      padding: 18px 20px;
-      border-radius: 14px;
-      margin-bottom: 16px;
+      padding: 14px 16px;
+      border-radius: 10px;
+      margin-bottom: 12px;
       border: 1px solid var(--border-soft);
+      background: rgba(255, 255, 255, 0.015);
       overflow-wrap: break-word;
     }
-    .global-block.key-points {
-      background: linear-gradient(135deg, rgba(69, 180, 125, 0.06), rgba(69, 180, 125, 0.02));
-      border-color: rgba(69, 180, 125, 0.2);
-    }
-    .global-block.key-points .global-title { color: #7ce0aa; }
-    .global-block.exam-traps {
-      background: linear-gradient(135deg, rgba(215, 101, 74, 0.06), rgba(215, 101, 74, 0.02));
-      border-color: rgba(215, 101, 74, 0.2);
-    }
-    .global-block.exam-traps .global-title { color: #ff9a84; }
-    .global-block.common-mistakes {
-      background: linear-gradient(135deg, rgba(212, 160, 23, 0.06), rgba(212, 160, 23, 0.02));
-      border-color: rgba(212, 160, 23, 0.2);
-    }
-    .global-block.common-mistakes .global-title { color: #fbbf24; }
-    .global-block.recap {
-      background: linear-gradient(135deg, rgba(224, 184, 74, 0.06), rgba(224, 184, 74, 0.02));
-      border-color: rgba(224, 184, 74, 0.2);
-    }
-    .global-block.recap .global-title { color: var(--accent-bright); }
 
     .global-title {
       font-size: 12px;
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       display: flex;
       align-items: center;
       gap: 8px;
+      color: var(--accent-bright);
     }
-    .global-title i { font-size: 13px; }
+    .global-title i { font-size: 12px; }
 
     .global-list {
       list-style: none;
       padding: 0;
-      display: block;
     }
     .global-list li {
-      display: block;
       position: relative;
-      padding-left: 20px;
+      padding-left: 18px;
       font-size: 14px;
       color: var(--text-body);
       line-height: 1.7;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       overflow-wrap: break-word;
     }
     .global-list li:last-child { margin-bottom: 0; }
     .global-list li::before {
-      content: '→';
+      content: '•';
       position: absolute;
-      left: 0;
+      left: 4px;
       top: 0;
-      color: currentColor;
-      opacity: 0.5;
+      color: var(--accent);
       font-weight: 700;
     }
 
     /* ═══════════════════════════════════════════════════════════
-       ACCORDÉON DE NOTIONS
+       ACCORDÉON DE NOTIONS — SIMPLE
        ═══════════════════════════════════════════════════════════ */
     .sections-label {
       display: flex;
       align-items: center;
       gap: 10px;
-      font: 700 17px var(--font-serif);
+      font: 700 16px var(--font-serif);
       color: var(--text-light);
-      margin: 22px 0 14px;
-      padding-bottom: 12px;
+      margin: 20px 0 12px;
+      padding-bottom: 10px;
       border-bottom: 1px solid var(--border-soft);
       position: relative;
     }
@@ -788,11 +781,11 @@
       content: '';
       position: absolute;
       bottom: -1px; left: 0;
-      width: 40px;
+      width: 36px;
       height: 2px;
       background: var(--accent-bright);
     }
-    .sections-label i { color: var(--accent-bright); font-size: 15px; }
+    .sections-label i { color: var(--accent-bright); font-size: 14px; }
     .sections-label .count {
       margin-left: auto;
       font-family: var(--font-body);
@@ -806,53 +799,52 @@
     .notion-accordion {
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      margin-bottom: 24px;
+      gap: 8px;
+      margin-bottom: 20px;
     }
 
     .notion-item {
-      background: rgba(20, 20, 20, 0.6);
+      background: rgba(20, 20, 20, 0.5);
       border: 1px solid var(--border-soft);
-      border-radius: 14px;
+      border-radius: 10px;
       overflow: hidden;
-      transition: var(--transition);
+      transition: border-color 0.2s ease;
     }
-    .notion-item:hover { border-color: rgba(224, 184, 74, 0.2); }
+    .notion-item:hover { border-color: rgba(255, 255, 255, 0.1); }
     .notion-item.open {
-      border-color: rgba(224, 184, 74, 0.3);
-      background: rgba(224, 184, 74, 0.02);
+      border-color: rgba(224, 184, 74, 0.25);
+      background: rgba(20, 20, 20, 0.7);
     }
 
     .notion-header {
       display: flex;
       align-items: center;
-      gap: 14px;
-      padding: 16px 18px;
+      gap: 12px;
+      padding: 14px 16px;
       cursor: pointer;
       user-select: none;
-      transition: var(--transition-fast);
+      transition: background 0.15s ease;
     }
     .notion-header:hover {
-      background: rgba(224, 184, 74, 0.03);
+      background: rgba(255, 255, 255, 0.02);
     }
 
     .notion-num {
-      width: 36px;
-      height: 36px;
-      border-radius: 10px;
+      width: 30px;
+      height: 30px;
+      border-radius: 6px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font: 800 14px var(--font-serif);
-      background: rgba(224, 184, 74, 0.1);
+      font: 700 13px var(--font-serif);
+      background: rgba(255, 255, 255, 0.04);
       color: var(--accent-bright);
-      border: 1px solid rgba(224, 184, 74, 0.15);
+      border: 1px solid var(--border-soft);
       flex-shrink: 0;
-      transition: var(--transition);
     }
     .notion-item.open .notion-num {
-      background: rgba(224, 184, 74, 0.18);
-      border-color: rgba(224, 184, 74, 0.35);
+      background: rgba(224, 184, 74, 0.15);
+      border-color: rgba(224, 184, 74, 0.3);
     }
 
     .notion-title-wrap {
@@ -860,41 +852,32 @@
       min-width: 0;
     }
     .notion-title {
-      font: 700 15px var(--font-serif);
+      font: 600 14.5px var(--font-body);
       color: var(--text-light);
-      line-height: 1.3;
+      line-height: 1.35;
       overflow-wrap: break-word;
     }
     .notion-subtitle {
-      font-size: 12px;
+      font-size: 11px;
       color: var(--text-muted);
       margin-top: 2px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .notion-subtitle i {
-      color: var(--accent);
-      font-size: 10px;
     }
 
     .notion-toggle {
-      width: 30px;
-      height: 30px;
+      width: 26px;
+      height: 26px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: rgba(255, 255, 255, 0.03);
+      background: transparent;
       color: var(--text-muted);
-      font-size: 12px;
+      font-size: 11px;
       flex-shrink: 0;
-      transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), background 0.2s ease;
+      transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), color 0.2s ease;
     }
     .notion-item.open .notion-toggle {
       transform: rotate(180deg);
-      background: rgba(224, 184, 74, 0.12);
       color: var(--accent-bright);
     }
 
@@ -904,114 +887,91 @@
       transition: max-height 0.4s cubic-bezier(0.25, 1, 0.5, 1);
     }
     .notion-item.open .notion-body {
-      max-height: 30000px;
+      max-height: 20000px;
     }
 
     .notion-content {
-      padding: 4px 18px 20px;
+      padding: 4px 16px 18px;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 12px;
     }
 
-    /* ── Bloc interne (comprendre, formules, méthode, exemple, piège, astuce) ── */
+    /* ── Bloc interne simple ── */
     .block {
-      padding: 14px 16px;
-      border-radius: 12px;
+      padding: 12px 14px;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.25);
       border: 1px solid var(--border-soft);
-      background: rgba(0, 0, 0, 0.2);
       overflow-wrap: break-word;
     }
     .block-label {
-      font-size: 10.5px;
-      font-weight: 800;
+      font-size: 11px;
+      font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 10px;
+      letter-spacing: 0.06em;
+      margin-bottom: 8px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
+      color: var(--accent-bright);
     }
-    .block-label i { font-size: 12px; }
+    .block-label i { font-size: 11px; }
 
-    /* Comprendre */
-    .block.comprendre {
-      background: linear-gradient(135deg, rgba(224, 184, 74, 0.05), rgba(224, 184, 74, 0.02));
-      border-color: rgba(224, 184, 74, 0.15);
-    }
-    .block.comprendre .block-label { color: var(--accent-bright); }
-    .block.comprendre .block-text {
+    .block-text {
       font-size: 14px;
       color: var(--text-body);
-      line-height: 1.75;
+      line-height: 1.7;
     }
 
-    /* Formules */
-    .block.formules {
-      background: linear-gradient(135deg, rgba(74, 175, 224, 0.05), rgba(74, 175, 224, 0.02));
-      border-color: rgba(74, 175, 224, 0.18);
-    }
-    .block.formules .block-label { color: var(--info); }
+    /* Formules — simple */
     .formula-list {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
     }
     .formula-item {
-      padding: 12px 14px;
-      border-radius: 10px;
+      padding: 10px 12px;
+      border-radius: 6px;
       background: rgba(0, 0, 0, 0.3);
-      border-left: 3px solid var(--info);
+      border-left: 2px solid var(--accent);
     }
     .formula-latex {
       font-size: 15px;
       color: var(--text-light);
       text-align: center;
-      padding: 6px 0;
+      padding: 4px 0;
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
     }
     .formula-meta {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 8px;
-      font-size: 11.5px;
+      gap: 6px;
+      margin-top: 6px;
+      font-size: 11px;
     }
     .formula-meta .tag {
       padding: 2px 8px;
-      border-radius: 8px;
+      border-radius: 6px;
       background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--border-soft);
       color: var(--text-dim);
     }
-    .formula-meta .tag.condition {
-      background: rgba(212, 160, 23, 0.08);
-      border-color: rgba(212, 160, 23, 0.2);
-      color: var(--warning);
-    }
 
-    /* Méthode */
-    .block.methode {
-      background: linear-gradient(135deg, rgba(69, 180, 125, 0.05), rgba(69, 180, 125, 0.02));
-      border-color: rgba(69, 180, 125, 0.18);
-    }
-    .block.methode .block-label { color: #7ce0aa; }
+    /* Méthode — simple */
     .method-steps {
       list-style: none;
       padding: 0;
       counter-reset: step;
-      display: block;
     }
     .method-steps li {
-      display: block;
       position: relative;
-      padding-left: 34px;
+      padding-left: 28px;
       counter-increment: step;
       font-size: 13.5px;
       color: var(--text-body);
       line-height: 1.7;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       overflow-wrap: break-word;
     }
     .method-steps li:last-child { margin-bottom: 0; }
@@ -1020,119 +980,81 @@
       position: absolute;
       left: 0;
       top: 2px;
-      width: 22px;
-      height: 22px;
+      width: 20px;
+      height: 20px;
       border-radius: 50%;
-      background: rgba(69, 180, 125, 0.15);
-      color: #7ce0aa;
-      font-size: 11px;
+      background: rgba(224, 184, 74, 0.12);
+      color: var(--accent-bright);
+      font-size: 10px;
       font-weight: 800;
       display: flex;
       align-items: center;
       justify-content: center;
-      line-height: 1;
     }
 
-    /* Exemple résolu */
-    .block.exemple {
-      background: linear-gradient(135deg, rgba(155, 89, 182, 0.06), rgba(155, 89, 182, 0.02));
-      border-color: rgba(155, 89, 182, 0.2);
-    }
-    .block.exemple .block-label { color: #b07cd0; }
+    /* Exemple résolu — simple */
     .example-enonce {
-      padding: 12px 14px;
-      border-radius: 10px;
-      background: rgba(155, 89, 182, 0.08);
-      border-left: 3px solid #b07cd0;
+      padding: 10px 12px;
+      border-radius: 6px;
+      background: rgba(155, 89, 182, 0.06);
+      border-left: 2px solid #b07cd0;
       font-size: 13.5px;
       color: var(--text-light);
-      line-height: 1.65;
-      font-weight: 500;
-      margin-bottom: 12px;
-    }
-    .example-enonce::before {
-      content: 'Énoncé';
-      display: block;
-      font-size: 10px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #b07cd0;
-      margin-bottom: 6px;
+      line-height: 1.6;
+      margin-bottom: 10px;
+      overflow-wrap: break-word;
     }
     .example-steps {
       list-style: none;
       padding: 0;
       counter-reset: estep;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
     .example-steps li {
-      display: block;
       position: relative;
-      padding-left: 30px;
+      padding-left: 26px;
       counter-increment: estep;
       font-size: 13.5px;
       color: var(--text-body);
       line-height: 1.7;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       overflow-wrap: break-word;
     }
     .example-steps li:last-child { margin-bottom: 0; }
     .example-steps li::before {
-      content: counter(estep);
+      content: counter(estep) '.';
       position: absolute;
       left: 0;
-      top: 2px;
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background: rgba(155, 89, 182, 0.15);
+      top: 0;
       color: #b07cd0;
-      font-size: 10px;
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      font-weight: 700;
+      font-size: 12px;
     }
     .example-conclusion {
-      padding: 10px 14px;
-      border-radius: 8px;
-      background: rgba(69, 180, 125, 0.1);
-      border: 1px solid rgba(69, 180, 125, 0.2);
+      padding: 8px 12px;
+      border-radius: 6px;
+      background: rgba(69, 180, 125, 0.08);
+      border-left: 2px solid var(--success-light);
       font-size: 13.5px;
       color: #7ce0aa;
       font-weight: 600;
-      display: flex;
-      align-items: flex-start;
-      gap: 8px;
-    }
-    .example-conclusion::before {
-      content: '✓';
-      font-weight: 800;
-      flex-shrink: 0;
+      overflow-wrap: break-word;
     }
 
-    /* Piège BAC */
-    .block.piege {
-      background: linear-gradient(135deg, rgba(215, 101, 74, 0.06), rgba(215, 101, 74, 0.02));
-      border-color: rgba(215, 101, 74, 0.2);
-    }
-    .block.piege .block-label { color: #ff9a84; }
+    /* Piège — simple */
     .piege-trap {
       font-size: 13.5px;
       color: var(--text-light);
       line-height: 1.65;
-      margin-bottom: 10px;
-      font-weight: 500;
+      margin-bottom: 8px;
       overflow-wrap: break-word;
     }
     .piege-solution {
       position: relative;
-      padding-left: 22px;
+      padding-left: 18px;
       font-size: 13px;
       color: #7ce0aa;
       line-height: 1.65;
-      display: block;
       overflow-wrap: break-word;
     }
     .piege-solution::before {
@@ -1140,20 +1062,7 @@
       position: absolute;
       left: 0;
       top: 0;
-      font-weight: 800;
-    }
-
-    /* Astuce */
-    .block.astuce {
-      background: linear-gradient(135deg, rgba(212, 160, 23, 0.06), rgba(212, 160, 23, 0.02));
-      border-color: rgba(212, 160, 23, 0.2);
-    }
-    .block.astuce .block-label { color: #fbbf24; }
-    .block.astuce .block-text {
-      font-size: 13.5px;
-      color: var(--text-body);
-      line-height: 1.7;
-      font-style: italic;
+      font-weight: 700;
     }
 
     /* ═══════════════════════════════════════════════════════════
@@ -1191,12 +1100,12 @@
     .flashcard {
       perspective: 1400px;
       margin-bottom: 18px;
-      min-height: 280px;
+      min-height: 260px;
     }
     .flashcard-inner {
       position: relative;
       width: 100%;
-      height: 280px;
+      height: 260px;
       transition: transform 0.65s cubic-bezier(0.25, 1, 0.5, 1);
       transform-style: preserve-3d;
       cursor: pointer;
@@ -1208,67 +1117,46 @@
       inset: 0;
       backface-visibility: hidden;
       -webkit-backface-visibility: hidden;
-      border-radius: 14px;
-      padding: 24px;
+      border-radius: 10px;
+      padding: 22px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
       border: 1px solid var(--border-soft);
-      background: var(--bg-card);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      background: rgba(20, 20, 20, 0.6);
       overflow-y: auto;
-      box-shadow: var(--shadow);
     }
     .flashcard-back {
       transform: rotateY(180deg);
-      border-color: rgba(224, 184, 74, 0.3);
-      background: linear-gradient(145deg, rgba(224, 184, 74, 0.06), rgba(26, 58, 42, 0.04));
+      border-color: rgba(224, 184, 74, 0.25);
+      background: rgba(30, 25, 15, 0.6);
     }
     .flashcard-label {
       font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 0.14em;
+      font-weight: 700;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
       color: var(--accent-bright);
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
     .flashcard-type-badge {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 10px;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 9.5px;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-bottom: 12px;
-    }
-    .flashcard-type-badge.definition {
-      background: rgba(224, 184, 74, 0.12);
-      color: var(--accent-bright);
-      border: 1px solid rgba(224, 184, 74, 0.2);
-    }
-    .flashcard-type-badge.formule {
-      background: rgba(74, 175, 224, 0.12);
-      color: var(--info);
-      border: 1px solid rgba(74, 175, 224, 0.2);
-    }
-    .flashcard-type-badge.methode {
-      background: rgba(69, 180, 125, 0.12);
-      color: #7ce0aa;
-      border: 1px solid rgba(69, 180, 125, 0.2);
-    }
-    .flashcard-type-badge.piege {
-      background: rgba(215, 101, 74, 0.12);
-      color: #ff9a84;
-      border: 1px solid rgba(215, 101, 74, 0.2);
+      letter-spacing: 0.05em;
+      margin-bottom: 10px;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-dim);
     }
     .flashcard-text {
-      font-size: 17px;
+      font-size: 16px;
       line-height: 1.6;
       color: var(--text-light);
       font-weight: 500;
@@ -1278,7 +1166,7 @@
     .flashcard-hint {
       font-size: 12px;
       color: var(--text-muted);
-      margin-top: 16px;
+      margin-top: 14px;
       font-style: italic;
       display: flex;
       align-items: center;
@@ -1310,37 +1198,26 @@
     }
 
     .feedback-btn {
-      padding: 14px 10px;
-      border-radius: 12px;
-      border: 1px solid;
+      padding: 12px 8px;
+      border-radius: 8px;
+      border: 1px solid var(--border-soft);
+      background: rgba(255, 255, 255, 0.02);
       font-family: inherit;
-      font-size: 12.5px;
-      font-weight: 700;
+      font-size: 12px;
+      font-weight: 600;
       cursor: pointer;
-      transition: var(--transition);
+      transition: background 0.15s ease, border-color 0.15s ease;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 4px;
       text-align: center;
+      color: var(--text-dim);
     }
-    .feedback-btn i { font-size: 18px; }
-    .feedback-btn:hover { transform: translateY(-2px); }
-    .feedback-btn.hard {
-      background: rgba(215, 101, 74, 0.1);
-      border-color: rgba(215, 101, 74, 0.3);
-      color: #ff9a84;
-    }
-    .feedback-btn.medium {
-      background: rgba(212, 160, 23, 0.1);
-      border-color: rgba(212, 160, 23, 0.3);
-      color: #fbbf24;
-    }
-    .feedback-btn.easy {
-      background: rgba(69, 180, 125, 0.1);
-      border-color: rgba(69, 180, 125, 0.3);
-      color: #7ce0aa;
-    }
+    .feedback-btn i { font-size: 16px; }
+    .feedback-btn.hard:hover { background: rgba(215, 101, 74, 0.1); border-color: rgba(215, 101, 74, 0.3); color: #ff9a84; }
+    .feedback-btn.medium:hover { background: rgba(212, 160, 23, 0.1); border-color: rgba(212, 160, 23, 0.3); color: #fbbf24; }
+    .feedback-btn.easy:hover { background: rgba(69, 180, 125, 0.1); border-color: rgba(69, 180, 125, 0.3); color: #7ce0aa; }
 
     /* ═══════════════════════════════════════════════════════════
        QUIZ
@@ -1363,8 +1240,8 @@
     .quiz-question {
       background: rgba(20, 20, 20, 0.5);
       border: 1px solid var(--border-soft);
-      border-radius: 12px;
-      padding: 18px 20px;
+      border-radius: 10px;
+      padding: 16px 18px;
       margin-bottom: 12px;
     }
     .quiz-q-header {
@@ -1377,24 +1254,21 @@
     }
     .quiz-q-number {
       font-size: 11px;
-      font-weight: 800;
-      letter-spacing: 0.12em;
+      font-weight: 700;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
       color: var(--accent-bright);
     }
     .quiz-q-level {
       font-size: 10px;
-      font-weight: 800;
+      font-weight: 700;
       padding: 3px 10px;
       border-radius: 10px;
       text-transform: uppercase;
       letter-spacing: 0.05em;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-dim);
     }
-    .quiz-q-level.l1 { background: rgba(69, 180, 125, 0.15); color: #7ce0aa; }
-    .quiz-q-level.l2 { background: rgba(74, 175, 224, 0.15); color: var(--info); }
-    .quiz-q-level.l3 { background: rgba(224, 184, 74, 0.15); color: var(--accent-bright); }
-    .quiz-q-level.l4 { background: rgba(212, 160, 23, 0.15); color: #fbbf24; }
-    .quiz-q-level.l5 { background: rgba(215, 101, 74, 0.15); color: #ff9a84; }
 
     .quiz-q-text {
       font-size: 15px;
@@ -1411,11 +1285,11 @@
       align-items: flex-start;
       gap: 12px;
       padding: 12px 14px;
-      border-radius: 10px;
+      border-radius: 8px;
       border: 1px solid var(--border-soft);
       background: rgba(0, 0, 0, 0.25);
       cursor: pointer;
-      transition: var(--transition-fast);
+      transition: background 0.15s ease, border-color 0.15s ease;
       font-size: 14px;
       color: var(--text-body);
       line-height: 1.5;
@@ -1442,15 +1316,15 @@
     .quiz-option.disabled { cursor: not-allowed; }
 
     .quiz-option-letter {
-      width: 26px;
-      height: 26px;
+      width: 24px;
+      height: 24px;
       border-radius: 6px;
       background: rgba(255, 255, 255, 0.04);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 12px;
-      font-weight: 800;
+      font-size: 11px;
+      font-weight: 700;
       flex-shrink: 0;
       color: var(--text-muted);
     }
@@ -1469,10 +1343,10 @@
 
     .quiz-explanation {
       margin-top: 12px;
-      padding: 12px 14px;
-      background: rgba(74, 175, 224, 0.08);
-      border-left: 3px solid #4AAFE0;
-      border-radius: 0 8px 8px 0;
+      padding: 10px 12px;
+      background: rgba(74, 175, 224, 0.06);
+      border-left: 2px solid #4AAFE0;
+      border-radius: 0 6px 6px 0;
       font-size: 13px;
       line-height: 1.65;
       color: var(--text-body);
@@ -1487,61 +1361,45 @@
        ═══════════════════════════════════════════════════════════ */
     .result-hero {
       text-align: center;
-      padding: 32px 24px;
-      background: linear-gradient(135deg, rgba(20, 20, 20, 0.85), rgba(26, 32, 26, 0.7));
-      border: 1px solid var(--border-gold);
-      border-radius: var(--radius);
+      padding: 28px 22px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-soft);
+      border-radius: 12px;
       margin-bottom: 20px;
-      position: relative;
-      overflow: hidden;
-    }
-    .result-hero::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, var(--accent), transparent);
     }
     .result-hero .emoji {
-      font-size: 60px;
+      font-size: 52px;
       display: block;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
       line-height: 1;
-      animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-    @keyframes popIn {
-      from { transform: scale(0); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
     }
     .result-hero h2 {
-      font-size: clamp(22px, 4vw, 28px);
-      margin-bottom: 8px;
+      font-size: clamp(20px, 4vw, 26px);
+      margin-bottom: 6px;
     }
     .result-hero p {
       color: var(--text-dim);
       margin: 0;
-      font-size: 14.5px;
+      font-size: 14px;
     }
 
     .result-summary {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-bottom: 20px;
+      gap: 10px;
+      margin-bottom: 18px;
     }
     .metric {
       border: 1px solid var(--border-soft);
-      border-radius: 12px;
-      padding: 16px 12px;
-      background: var(--bg-card);
-      backdrop-filter: blur(10px);
+      border-radius: 10px;
+      padding: 14px 10px;
+      background: rgba(255, 255, 255, 0.02);
       text-align: center;
-      transition: var(--transition);
     }
     .metric strong {
       display: block;
       color: var(--accent-bright);
-      font-size: 24px;
+      font-size: 22px;
       font-family: var(--font-serif);
       line-height: 1.1;
       margin-bottom: 4px;
@@ -1549,50 +1407,50 @@
     .metric small {
       display: block;
       color: var(--text-muted);
-      font-size: 10.5px;
+      font-size: 10px;
       text-transform: uppercase;
       letter-spacing: 0.05em;
       font-weight: 700;
     }
 
     .mastery-block {
-      padding: 18px 20px;
-      border-radius: 12px;
+      padding: 16px 18px;
+      border-radius: 10px;
       border: 1px solid var(--border-soft);
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       background: rgba(255, 255, 255, 0.02);
     }
     .mastery-head {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       gap: 12px;
       flex-wrap: wrap;
     }
     .mastery-head .label {
-      font-size: 12px;
-      font-weight: 800;
+      font-size: 11px;
+      font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.08em;
       color: var(--text-dim);
     }
     .mastery-head .value {
       font-family: var(--font-serif);
-      font-size: 22px;
+      font-size: 20px;
       font-weight: 700;
       color: var(--accent-bright);
     }
     .mastery-track {
-      height: 8px;
-      border-radius: 8px;
+      height: 6px;
+      border-radius: 6px;
       background: rgba(255, 255, 255, 0.06);
       overflow: hidden;
       margin-bottom: 10px;
     }
     .mastery-track-fill {
       height: 100%;
-      border-radius: 8px;
+      border-radius: 6px;
       transition: width 1s cubic-bezier(0.25, 1, 0.5, 1);
     }
     .mastery-label-text {
@@ -1602,19 +1460,19 @@
     }
 
     .recommendations {
-      padding: 18px 20px;
-      border-radius: 12px;
-      border: 1px solid rgba(74, 175, 224, 0.2);
+      padding: 16px 18px;
+      border-radius: 10px;
+      border: 1px solid var(--border-soft);
       background: rgba(74, 175, 224, 0.04);
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
     .recommendations .rec-title {
-      font-size: 12px;
-      font-weight: 800;
+      font-size: 11px;
+      font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.08em;
       color: #4AAFE0;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       display: flex;
       align-items: center;
       gap: 8px;
@@ -1622,26 +1480,24 @@
     .recommendations .rec-list {
       list-style: none;
       padding: 0;
-      display: block;
     }
     .recommendations .rec-list li {
-      display: block;
       position: relative;
-      padding-left: 20px;
+      padding-left: 18px;
       font-size: 13.5px;
       color: var(--text-body);
       line-height: 1.65;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       overflow-wrap: break-word;
     }
     .recommendations .rec-list li:last-child { margin-bottom: 0; }
     .recommendations .rec-list li::before {
-      content: '→';
+      content: '•';
       position: absolute;
-      left: 0;
+      left: 4px;
       top: 0;
       color: #4AAFE0;
-      font-weight: 800;
+      font-weight: 700;
     }
 
     /* ═══════════════════════════════════════════════════════════
@@ -1653,49 +1509,48 @@
       color: var(--text-muted);
     }
     .empty-state .empty-icon {
-      font-size: 44px;
-      margin-bottom: 12px;
+      font-size: 40px;
+      margin-bottom: 10px;
       display: block;
       opacity: 0.5;
-      line-height: 1;
     }
     .empty-state h3 {
       font-family: var(--font-serif);
-      font-size: 18px;
+      font-size: 17px;
       color: var(--text-dim);
       margin-bottom: 6px;
     }
     .empty-state p { font-size: 13px; }
 
     /* ═══════════════════════════════════════════════════════════
-       MODALES
+       BOUTON RETOUR EN HAUT
        ═══════════════════════════════════════════════════════════ */
-    .modal-backdrop {
+    .scroll-top {
       position: fixed;
-      inset: 0;
-      z-index: 20;
-      display: none;
-      place-items: center;
-      padding: 18px;
-      background: rgba(0, 0, 0, 0.78);
-      backdrop-filter: blur(10px);
+      bottom: calc(20px + var(--safe-bottom));
+      right: 20px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 1px solid var(--border-soft);
+      background: rgba(20, 20, 20, 0.95);
+      color: var(--accent-bright);
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(10px);
+      transition: all 0.3s ease;
+      z-index: 40;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
     }
-    .modal-backdrop.show { display: grid; animation: fadeIn 0.25s ease; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-    .modal {
-      max-width: 440px;
-      width: 100%;
-      background: linear-gradient(145deg, #161616, #0f0f0f);
-      border: 1px solid var(--border-strong);
-      border-radius: var(--radius);
-      padding: 24px 22px;
-      position: relative;
-      animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-    @keyframes modalPop {
-      from { transform: scale(0.9); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
+    .scroll-top.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
     }
 
     /* ═══════════════════════════════════════════════════════════
@@ -1719,11 +1574,9 @@
     .premium-popup {
       position: relative;
       width: min(100%, 400px);
-      max-height: 90vh;
-      overflow-y: auto;
-      padding: 28px 22px 20px;
+      padding: 26px 22px 20px;
       border: 1px solid var(--accent);
-      border-radius: var(--radius);
+      border-radius: 12px;
       background: linear-gradient(145deg, #161616, #0a0a0a);
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
       transform: scale(0.94) translateY(16px);
@@ -1745,42 +1598,35 @@
       right: 10px;
       width: 30px;
       height: 30px;
-      border: 1px solid rgba(184, 134, 11, 0.2);
+      border: 1px solid var(--border-soft);
       border-radius: 8px;
       background: rgba(255, 255, 255, 0.03);
       color: var(--text-muted);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 14px;
-      cursor: pointer;
-      transition: var(--transition);
+      font-size: 13px;
     }
-    .popup-close:hover {
-      color: var(--text-light);
-      border-color: rgba(184, 134, 11, 0.3);
-    }
+    .popup-close:hover { color: var(--text-light); }
     .popup-icon {
       display: block;
       text-align: center;
-      font-size: 44px;
+      font-size: 40px;
       margin-bottom: 6px;
-      line-height: 1;
     }
     .premium-popup h2 {
       text-align: center;
-      font-size: 22px;
+      font-size: 20px;
       margin-bottom: 6px;
       font-family: var(--font-serif);
-      letter-spacing: -0.01em;
     }
     .premium-popup h2 span { color: var(--accent-bright); font-style: italic; }
     .popup-subtitle {
       color: var(--text-dim);
       text-align: center;
-      font-size: 13.5px;
+      font-size: 13px;
       line-height: 1.6;
-      margin: 0 0 18px;
+      margin: 0 0 16px;
     }
     .popup-subtitle strong { color: var(--accent-bright); }
     .popup-buttons { display: flex; flex-direction: column; gap: 8px; }
@@ -1789,19 +1635,14 @@
       align-items: center;
       justify-content: center;
       gap: 6px;
-      padding: 13px;
-      border-radius: var(--radius-sm);
+      padding: 12px;
+      border-radius: 8px;
       background: linear-gradient(135deg, var(--accent-bright), var(--accent));
       color: #0A0A0A;
       font-weight: 700;
       text-decoration: none;
       font-size: 14px;
       min-height: 44px;
-      transition: var(--transition);
-    }
-    .btn-subscribe:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 8px 22px rgba(184, 134, 11, 0.3);
     }
     .btn-later {
       padding: 9px;
@@ -1810,7 +1651,6 @@
       color: var(--text-muted);
       font-size: 13px;
       cursor: pointer;
-      transition: var(--transition);
       font-family: inherit;
     }
     .btn-later:hover { color: var(--text-light); }
@@ -1824,7 +1664,7 @@
       left: 50%;
       transform: translateX(-50%) translateY(-100px);
       padding: 12px 20px;
-      border-radius: 12px;
+      border-radius: 10px;
       background: rgba(20, 22, 20, 0.96);
       backdrop-filter: blur(16px);
       border: 1px solid rgba(224, 184, 74, 0.3);
@@ -1845,18 +1685,14 @@
       opacity: 1;
       transform: translateX(-50%) translateY(0);
     }
-    .toast.success { border-color: rgba(58, 182, 126, 0.5); }
-    .toast.error { border-color: rgba(248, 113, 113, 0.5); }
     .toast i { font-size: 14px; flex-shrink: 0; }
-    .toast.success i { color: var(--success-light); }
-    .toast.error i { color: #f87171; }
 
     /* ═══════════════════════════════════════════════════════════
        KATEX
        ═══════════════════════════════════════════════════════════ */
     .katex { font-size: 1.05em; color: inherit; }
     .katex-display {
-      margin: 10px 0;
+      margin: 8px 0;
       overflow-x: auto;
       overflow-y: hidden;
       padding: 4px 0;
@@ -1866,8 +1702,8 @@
        RESPONSIVE
        ═══════════════════════════════════════════════════════════ */
     @media (max-width: 620px) {
-      .shell { width: min(100% - 20px, 980px); padding-top: 12px; }
-      .panel { padding: 17px; }
+      .shell-inner { width: min(100% - 20px, 980px); padding-top: 12px; }
+      .panel { padding: 16px; }
       .form-grid { grid-template-columns: 1fr; }
       .field.full { grid-column: auto; }
       .actions .btn { flex: 1 1 100%; }
@@ -1876,21 +1712,21 @@
       .step-item { padding: 5px 10px; font-size: 11px; }
       .step-item .num { width: 18px; height: 18px; font-size: 9px; }
 
-      .notion-header { padding: 14px 15px; gap: 12px; }
-      .notion-num { width: 32px; height: 32px; font-size: 13px; }
-      .notion-title { font-size: 14px; }
-      .notion-content { padding: 4px 15px 18px; gap: 12px; }
-      .block { padding: 12px 14px; }
-      .flashcard, .flashcard-inner { height: 260px; min-height: 260px; }
-      .flashcard-text { font-size: 15.5px; }
-      .flashcard-face { padding: 20px; }
-      .flashcard-feedback.show { grid-template-columns: repeat(3, 1fr); gap: 6px; }
-      .feedback-btn { padding: 11px 6px; font-size: 11px; }
-      .feedback-btn i { font-size: 16px; }
-      .result-summary { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+      .notion-header { padding: 12px 14px; gap: 10px; }
+      .notion-num { width: 28px; height: 28px; font-size: 12px; }
+      .notion-title { font-size: 13.5px; }
+      .notion-content { padding: 4px 14px 16px; gap: 10px; }
+      .block { padding: 11px 12px; }
+
+      .flashcard, .flashcard-inner { height: 240px; min-height: 240px; }
+      .flashcard-text { font-size: 15px; }
+      .flashcard-face { padding: 18px; }
+
+      .result-summary { gap: 8px; }
       .metric { padding: 12px 8px; }
       .metric strong { font-size: 20px; }
-      .metric small { font-size: 9.5px; }
+      .metric small { font-size: 9px; }
+
       .session-head { flex-direction: column; align-items: flex-start; }
       .custom-select-trigger { padding: 11px 12px; min-height: 44px; font-size: 13.5px; }
     }
@@ -1898,7 +1734,7 @@
     @media (max-width: 380px) {
       .panel { padding: 14px; }
       .btn { font-size: 13px; padding: 10px 14px; }
-      .notion-num { width: 28px; height: 28px; font-size: 12px; }
+      .notion-num { width: 26px; height: 26px; font-size: 11px; }
       .notion-title { font-size: 13px; }
     }
 
@@ -1911,317 +1747,324 @@
   </style>
 </head>
 <body>
-  <main class="shell">
 
-    <header>
-      <a class="brand" href="index.html">ARVEX<span>A School</span></a>
-      <div class="header-right">
-        <div class="connection" id="connectionState">Vérification...</div>
-      </div>
-    </header>
-
-    <div class="step-bar" id="stepBar">
-      <div class="step-item active" data-step="fiche">
-        <div class="num"><span>1</span></div>
-        <span class="label">Fiche</span>
-      </div>
-      <span class="step-sep">›</span>
-      <div class="step-item" data-step="flashcard">
-        <div class="num"><span>2</span></div>
-        <span class="label">Flashcards</span>
-      </div>
-      <span class="step-sep">›</span>
-      <div class="step-item" data-step="quiz">
-        <div class="num"><span>3</span></div>
-        <span class="label">Quiz</span>
-      </div>
-      <span class="step-sep">›</span>
-      <div class="step-item" data-step="results">
-        <div class="num"><span>4</span></div>
-        <span class="label">Résultats</span>
-      </div>
+  <header>
+    <a class="brand" href="index.html">ARVEX<span>A School</span></a>
+    <div class="header-right">
+      <div class="connection" id="connectionState">Vérification...</div>
     </div>
+  </header>
 
-    <!-- CONFIG -->
-    <section class="view active" id="configView">
-      <div class="panel">
-        <div class="eyebrow">Réviseur intelligent v4</div>
-        <h1>Génère ta révision <em style="color:var(--accent-bright);font-style:italic;">sur mesure</em>.</h1>
-        <p class="lead">
-          Une fiche ultra-détaillée, des flashcards typées et un quiz à 5 niveaux.
-          L'IA exploite <strong style="color:var(--accent-bright);">toute la base de connaissances</strong> du BAC.
-        </p>
+  <div class="shell" id="shell">
+    <div class="shell-inner">
 
-        <form id="configForm" class="form-grid">
-          <div class="field">
-            <label>Matière</label>
-            <div class="custom-select" id="subjectSelect" data-name="subject">
-              <button type="button" class="custom-select-trigger" aria-haspopup="listbox" aria-expanded="false">
-                <span class="custom-select-value"></span>
-                <i class="fas fa-chevron-down custom-select-arrow"></i>
-              </button>
-              <div class="custom-select-options" role="listbox">
-                <div class="custom-select-option" data-value="mathematiques" role="option"><span class="option-prefix">📐</span> Mathématiques</div>
-                <div class="custom-select-option" data-value="physique" role="option"><span class="option-prefix">⚡</span> Physique</div>
-                <div class="custom-select-option" data-value="chimie" role="option"><span class="option-prefix">🧪</span> Chimie</div>
-                <div class="custom-select-option" data-value="svt" role="option"><span class="option-prefix">🧬</span> SVT</div>
+      <div class="step-bar" id="stepBar">
+        <div class="step-item active" data-step="fiche">
+          <div class="num"><span>1</span></div>
+          <span class="label">Fiche</span>
+        </div>
+        <span class="step-sep">›</span>
+        <div class="step-item" data-step="flashcard">
+          <div class="num"><span>2</span></div>
+          <span class="label">Flashcards</span>
+        </div>
+        <span class="step-sep">›</span>
+        <div class="step-item" data-step="quiz">
+          <div class="num"><span>3</span></div>
+          <span class="label">Quiz</span>
+        </div>
+        <span class="step-sep">›</span>
+        <div class="step-item" data-step="results">
+          <div class="num"><span>4</span></div>
+          <span class="label">Résultats</span>
+        </div>
+      </div>
+
+      <!-- CONFIG -->
+      <section class="view active" id="configView">
+        <div class="panel">
+          <div class="eyebrow">Réviseur intelligent v4</div>
+          <h1>Génère ta révision <em style="color:var(--accent-bright);font-style:italic;">sur mesure</em>.</h1>
+          <p class="lead">
+            Une fiche ultra-détaillée, des flashcards typées et un quiz à 5 niveaux.
+            L'IA exploite <strong style="color:var(--accent-bright);">toute la base de connaissances</strong> du BAC.
+          </p>
+
+          <form id="configForm" class="form-grid">
+            <div class="field">
+              <label>Matière</label>
+              <div class="custom-select" id="subjectSelect" data-name="subject">
+                <button type="button" class="custom-select-trigger" aria-haspopup="listbox" aria-expanded="false">
+                  <span class="custom-select-value"></span>
+                  <i class="fas fa-chevron-down custom-select-arrow"></i>
+                </button>
+                <div class="custom-select-options" role="listbox">
+                  <div class="custom-select-option" data-value="mathematiques" role="option"><span class="option-prefix">📐</span> Mathématiques</div>
+                  <div class="custom-select-option" data-value="physique" role="option"><span class="option-prefix">⚡</span> Physique</div>
+                  <div class="custom-select-option" data-value="chimie" role="option"><span class="option-prefix">🧪</span> Chimie</div>
+                  <div class="custom-select-option" data-value="svt" role="option"><span class="option-prefix">🧬</span> SVT</div>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div class="field">
-            <label>Chapitre</label>
-            <div class="custom-select" id="chapterSelect" data-name="chapter">
-              <button type="button" class="custom-select-trigger" aria-haspopup="listbox" aria-expanded="false">
-                <span class="custom-select-value"></span>
-                <i class="fas fa-chevron-down custom-select-arrow"></i>
+            <div class="field">
+              <label>Chapitre</label>
+              <div class="custom-select" id="chapterSelect" data-name="chapter">
+                <button type="button" class="custom-select-trigger" aria-haspopup="listbox" aria-expanded="false">
+                  <span class="custom-select-value"></span>
+                  <i class="fas fa-chevron-down custom-select-arrow"></i>
+                </button>
+                <div class="custom-select-options" role="listbox" id="chapterOptions"></div>
+              </div>
+            </div>
+
+            <div class="field full">
+              <label>Mode de départ</label>
+              <div class="chips-row" id="modeChips">
+                <button type="button" class="chip active" data-mode="fiche">📝 Fiche de révision</button>
+                <button type="button" class="chip" data-mode="flashcard">⚡ Flashcards</button>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Nombre de flashcards</label>
+              <div class="chips-row" id="flashCountChips">
+                <button type="button" class="chip" data-count="5">5</button>
+                <button type="button" class="chip active" data-count="10">10</button>
+                <button type="button" class="chip" data-count="15">15</button>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Difficulté quiz</label>
+              <div class="chips-row" id="difficultyChips">
+                <button type="button" class="chip" data-diff="1">🟢 Facile</button>
+                <button type="button" class="chip active" data-diff="2">🟡 Moyen</button>
+                <button type="button" class="chip" data-diff="3">🟠 Difficile</button>
+                <button type="button" class="chip" data-diff="4">🔴 BAC</button>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Nombre de questions</label>
+              <div class="chips-row" id="quizCountChips">
+                <button type="button" class="chip" data-qcount="3">3</button>
+                <button type="button" class="chip active" data-qcount="5">5</button>
+                <button type="button" class="chip" data-qcount="10">10</button>
+              </div>
+            </div>
+
+            <div class="field full">
+              <button class="btn primary full" id="generateBtn" type="submit">
+                <span class="btn-text">Générer ma session</span>
+                <span class="loader"></span>
               </button>
-              <div class="custom-select-options" role="listbox" id="chapterOptions"></div>
             </div>
-          </div>
+          </form>
 
-          <div class="field full">
-            <label>Mode de départ</label>
-            <div class="chips-row" id="modeChips">
-              <button type="button" class="chip active" data-mode="fiche">📝 Fiche de révision</button>
-              <button type="button" class="chip" data-mode="flashcard">⚡ Flashcards</button>
+          <div class="status" id="configStatus" role="status" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <!-- LOADING -->
+      <section class="view" id="loadingView">
+        <div class="panel">
+          <div class="eyebrow">Génération en cours</div>
+          <h2>Préparation de ta révision...</h2>
+          <p class="lead">Cela prend généralement 20 à 40 secondes.</p>
+
+          <div class="loading-steps">
+            <div class="loader-spinner"></div>
+            <div class="steps-list">
+              <div class="loading-step" id="genStep1"><span class="step-icon">🔍</span><div class="step-content"><span class="step-label">Analyse du chapitre</span><span class="step-desc">Matière et mode sélectionnés</span></div></div>
+              <div class="loading-step" id="genStep2"><span class="step-icon">🧠</span><div class="step-content"><span class="step-label">Extraction des notions</span><span class="step-desc">Exploitation de la base de connaissances</span></div></div>
+              <div class="loading-step" id="genStep3"><span class="step-icon">✍️</span><div class="step-content"><span class="step-label">Rédaction enrichie</span><span class="step-desc">Sections, formules, méthodes, exemples</span></div></div>
+              <div class="loading-step" id="genStep4"><span class="step-icon">🧮</span><div class="step-content"><span class="step-label">Vérification</span><span class="step-desc">Contrôle de la complétude</span></div></div>
+              <div class="loading-step" id="genStep5"><span class="step-icon">✨</span><div class="step-content"><span class="step-label">Finalisation</span><span class="step-desc">Préparation de l'affichage</span></div></div>
             </div>
+            <div class="loading-status" id="genLoadingStatus">Préparation...</div>
           </div>
+        </div>
+      </section>
 
-          <div class="field">
-            <label>Nombre de flashcards</label>
-            <div class="chips-row" id="flashCountChips">
-              <button type="button" class="chip" data-count="5">5</button>
-              <button type="button" class="chip active" data-count="10">10</button>
-              <button type="button" class="chip" data-count="15">15</button>
+      <!-- FICHE -->
+      <section class="view" id="ficheView">
+        <div class="panel">
+          <div class="session-head">
+            <div>
+              <div class="eyebrow">Fiche de révision</div>
+              <h2 id="ficheTitle">📝 Fiche</h2>
+              <div class="session-meta" id="ficheMeta"></div>
             </div>
-          </div>
-
-          <div class="field">
-            <label>Difficulté quiz</label>
-            <div class="chips-row" id="difficultyChips">
-              <button type="button" class="chip" data-diff="1">🟢 Facile</button>
-              <button type="button" class="chip active" data-diff="2">🟡 Moyen</button>
-              <button type="button" class="chip" data-diff="3">🟠 Difficile</button>
-              <button type="button" class="chip" data-diff="4">🔴 BAC</button>
-            </div>
-          </div>
-
-          <div class="field">
-            <label>Nombre de questions</label>
-            <div class="chips-row" id="quizCountChips">
-              <button type="button" class="chip" data-qcount="3">3</button>
-              <button type="button" class="chip active" data-qcount="5">5</button>
-              <button type="button" class="chip" data-qcount="10">10</button>
-            </div>
-          </div>
-
-          <div class="field full">
-            <button class="btn primary full" id="generateBtn" type="submit">
-              <span class="btn-text">Générer ma session</span>
-              <span class="loader"></span>
+            <button class="btn secondary" id="newFicheBtn">
+              <i class="fas fa-plus"></i> Nouvelle
             </button>
           </div>
-        </form>
 
-        <div class="status" id="configStatus" role="status" aria-live="polite"></div>
-      </div>
-    </section>
+          <div id="ficheContent"></div>
 
-    <!-- LOADING -->
-    <section class="view" id="loadingView">
-      <div class="panel">
-        <div class="eyebrow">Génération en cours</div>
-        <h2>Préparation de ta révision...</h2>
-        <p class="lead">Cela prend généralement 20 à 40 secondes.</p>
-
-        <div class="loading-steps">
-          <div class="loader-spinner"></div>
-          <div class="steps-list">
-            <div class="loading-step" id="genStep1"><span class="step-icon">🔍</span><div class="step-content"><span class="step-label">Analyse du chapitre</span><span class="step-desc">Matière, chapitre et mode sélectionnés</span></div></div>
-            <div class="loading-step" id="genStep2"><span class="step-icon">🧠</span><div class="step-content"><span class="step-label">Extraction des notions clés</span><span class="step-desc">Exploitation de la base de connaissances</span></div></div>
-            <div class="loading-step" id="genStep3"><span class="step-icon">✍️</span><div class="step-content"><span class="step-label">Rédaction enrichie</span><span class="step-desc">Sections, formules, méthodes, exemples, pièges</span></div></div>
-            <div class="loading-step" id="genStep4"><span class="step-icon">🧮</span><div class="step-content"><span class="step-label">Vérification</span><span class="step-desc">Contrôle de la complétude</span></div></div>
-            <div class="loading-step" id="genStep5"><span class="step-icon">✨</span><div class="step-content"><span class="step-label">Finalisation</span><span class="step-desc">Préparation de l'affichage</span></div></div>
+          <div class="actions">
+            <button class="btn primary full" id="startFlashcardsBtn">
+              <span class="btn-icon"><i class="fas fa-clone"></i></span>
+              <span class="btn-text">Continuer avec les flashcards</span>
+              <span class="loader"></span>
+            </button>
+            <button class="btn secondary full" id="skipToQuizBtn">
+              <i class="fas fa-forward"></i> Passer au quiz
+            </button>
           </div>
-          <div class="loading-status" id="genLoadingStatus">Préparation...</div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- FICHE -->
-    <section class="view" id="ficheView">
-      <div class="panel">
-        <div class="session-head">
-          <div>
-            <div class="eyebrow">Fiche de révision</div>
-            <h2 id="ficheTitle">📝 Fiche ultra-riche</h2>
-            <div class="session-meta" id="ficheMeta"></div>
+      <!-- FLASHCARDS -->
+      <section class="view" id="flashcardView">
+        <div class="panel">
+          <div class="session-head">
+            <div>
+              <div class="eyebrow">Flashcards</div>
+              <h2>⚡ Cartes de mémorisation</h2>
+              <div class="session-meta" id="flashMeta"></div>
+            </div>
+            <button class="btn secondary" id="newFlashBtn">
+              <i class="fas fa-plus"></i> Nouvelle
+            </button>
           </div>
-          <button class="btn secondary" id="newFicheBtn">
-            <i class="fas fa-plus"></i> Nouvelle
-          </button>
-        </div>
 
-        <div id="ficheContent"></div>
-
-        <div class="actions">
-          <button class="btn primary full" id="startFlashcardsBtn">
-            <span class="btn-icon"><i class="fas fa-clone"></i></span>
-            <span class="btn-text">Continuer avec les flashcards</span>
-            <span class="loader"></span>
-          </button>
-          <button class="btn secondary full" id="skipToQuizBtn">
-            <i class="fas fa-forward"></i> Passer directement au quiz
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- FLASHCARDS -->
-    <section class="view" id="flashcardView">
-      <div class="panel">
-        <div class="session-head">
-          <div>
-            <div class="eyebrow">Flashcards actives</div>
-            <h2>⚡ Cartes de mémorisation</h2>
-            <div class="session-meta" id="flashMeta"></div>
+          <div class="flashcard-progress">
+            <span>Progression</span>
+            <div class="flashcard-track">
+              <div class="flashcard-track-fill" id="flashcardTrackFill" style="width: 0%"></div>
+            </div>
+            <span class="counter" id="flashCounter">0 / 10</span>
           </div>
-          <button class="btn secondary" id="newFlashBtn">
-            <i class="fas fa-plus"></i> Nouvelle
-          </button>
-        </div>
 
-        <div class="flashcard-progress">
-          <span>Progression</span>
-          <div class="flashcard-track">
-            <div class="flashcard-track-fill" id="flashcardTrackFill" style="width: 0%"></div>
-          </div>
-          <span class="counter" id="flashCounter">0 / 10</span>
-        </div>
-
-        <div class="flashcard" id="flashcardEl">
-          <div class="flashcard-inner">
-            <div class="flashcard-face flashcard-front">
-              <div class="flashcard-type-badge" id="flashTypeBadge" style="display:none;"></div>
-              <div class="flashcard-label">Question</div>
-              <div class="flashcard-text" id="flashFront"></div>
-              <div class="flashcard-hint" id="flashHint" style="display:none;">
-                <i class="fas fa-lightbulb"></i>
-                <span id="flashHintText"></span>
+          <div class="flashcard" id="flashcardEl">
+            <div class="flashcard-inner">
+              <div class="flashcard-face flashcard-front">
+                <div class="flashcard-type-badge" id="flashTypeBadge" style="display:none;"></div>
+                <div class="flashcard-label">Question</div>
+                <div class="flashcard-text" id="flashFront"></div>
+                <div class="flashcard-hint" id="flashHint" style="display:none;">
+                  <i class="fas fa-lightbulb"></i>
+                  <span id="flashHintText"></span>
+                </div>
+              </div>
+              <div class="flashcard-face flashcard-back">
+                <div class="flashcard-label">Réponse</div>
+                <div class="flashcard-text" id="flashBack"></div>
               </div>
             </div>
-            <div class="flashcard-face flashcard-back">
-              <div class="flashcard-label">Réponse</div>
-              <div class="flashcard-text" id="flashBack"></div>
+          </div>
+
+          <div class="flashcard-flip-hint">
+            <i class="fas fa-hand-pointer"></i> Clique sur la carte pour voir la réponse
+          </div>
+
+          <div class="flashcard-feedback" id="flashFeedback">
+            <button class="feedback-btn hard" data-rating="hard">
+              <i class="fas fa-times-circle"></i>
+              <span>Oublié</span>
+            </button>
+            <button class="feedback-btn medium" data-rating="medium">
+              <i class="fas fa-circle-half-stroke"></i>
+              <span>Hésité</span>
+            </button>
+            <button class="feedback-btn easy" data-rating="easy">
+              <i class="fas fa-check-circle"></i>
+              <span>Je savais</span>
+            </button>
+          </div>
+
+          <div class="actions" style="margin-top:12px;">
+            <button class="btn primary full" id="finishFlashBtn">
+              <i class="fas fa-arrow-right"></i> Passer au quiz
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- QUIZ -->
+      <section class="view" id="quizView">
+        <div class="panel">
+          <div class="session-head">
+            <div>
+              <div class="eyebrow">Quiz</div>
+              <h2>❓ Teste tes connaissances</h2>
+              <div class="session-meta" id="quizMeta"></div>
             </div>
           </div>
-        </div>
 
-        <div class="flashcard-flip-hint">
-          <i class="fas fa-hand-pointer"></i> Clique sur la carte pour voir la réponse
-        </div>
+          <div class="progress"><span id="quizProgress"></span></div>
+          <div id="quizContent"></div>
 
-        <div class="flashcard-feedback" id="flashFeedback">
-          <button class="feedback-btn hard" data-rating="hard">
-            <i class="fas fa-times-circle"></i>
-            <span>Oublié</span>
-          </button>
-          <button class="feedback-btn medium" data-rating="medium">
-            <i class="fas fa-circle-half-stroke"></i>
-            <span>Hésité</span>
-          </button>
-          <button class="feedback-btn easy" data-rating="easy">
-            <i class="fas fa-check-circle"></i>
-            <span>Je savais</span>
-          </button>
-        </div>
-
-        <div class="actions" style="margin-top:12px;">
-          <button class="btn primary full" id="finishFlashBtn">
-            <i class="fas fa-arrow-right"></i> Passer au quiz
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- QUIZ -->
-    <section class="view" id="quizView">
-      <div class="panel">
-        <div class="session-head">
-          <div>
-            <div class="eyebrow">Quiz de vérification</div>
-            <h2>❓ Teste tes connaissances</h2>
-            <div class="session-meta" id="quizMeta"></div>
+          <div class="actions">
+            <button class="btn primary full" id="validateQuizBtn" disabled>
+              <i class="fas fa-check-circle"></i>
+              <span class="btn-text">Valider mes réponses</span>
+            </button>
           </div>
         </div>
+      </section>
 
-        <div class="progress"><span id="quizProgress"></span></div>
-        <div id="quizContent"></div>
-
-        <div class="actions">
-          <button class="btn primary full" id="validateQuizBtn" disabled>
-            <i class="fas fa-check-circle"></i>
-            <span class="btn-text">Valider mes réponses</span>
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- RÉSULTATS -->
-    <section class="view" id="resultsView">
-      <div class="panel">
-        <div class="result-hero">
-          <span class="emoji" id="resultsEmoji">🎉</span>
-          <h2 id="resultsTitle">Bravo !</h2>
-          <p id="resultsSub">Continue comme ça !</p>
-        </div>
-
-        <div class="result-summary">
-          <div class="metric">
-            <strong id="metricCorrect">0/5</strong>
-            <small>Correctes</small>
+      <!-- RÉSULTATS -->
+      <section class="view" id="resultsView">
+        <div class="panel">
+          <div class="result-hero">
+            <span class="emoji" id="resultsEmoji">🎉</span>
+            <h2 id="resultsTitle">Bravo !</h2>
+            <p id="resultsSub">Continue comme ça !</p>
           </div>
-          <div class="metric">
-            <strong id="metricScore">0/20</strong>
-            <small>Score</small>
-          </div>
-          <div class="metric">
-            <strong id="metricPercent">0%</strong>
-            <small>Pourcentage</small>
-          </div>
-        </div>
 
-        <div class="mastery-block">
-          <div class="mastery-head">
-            <span class="label">Score de maîtrise</span>
-            <span class="value" id="masteryValue">0%</span>
+          <div class="result-summary">
+            <div class="metric">
+              <strong id="metricCorrect">0/5</strong>
+              <small>Correctes</small>
+            </div>
+            <div class="metric">
+              <strong id="metricScore">0/20</strong>
+              <small>Score</small>
+            </div>
+            <div class="metric">
+              <strong id="metricPercent">0%</strong>
+              <small>Pourcentage</small>
+            </div>
           </div>
-          <div class="mastery-track">
-            <div class="mastery-track-fill" id="masteryFill"></div>
-          </div>
-          <div class="mastery-label-text" id="masteryText"></div>
-        </div>
 
-        <div class="recommendations" id="recommendationsBlock">
-          <div class="rec-title">
-            <i class="fas fa-compass"></i>
-            Recommandations personnalisées
+          <div class="mastery-block">
+            <div class="mastery-head">
+              <span class="label">Score de maîtrise</span>
+              <span class="value" id="masteryValue">0%</span>
+            </div>
+            <div class="mastery-track">
+              <div class="mastery-track-fill" id="masteryFill"></div>
+            </div>
+            <div class="mastery-label-text" id="masteryText"></div>
           </div>
-          <ul class="rec-list" id="recommendationsList"></ul>
-        </div>
 
-        <div class="actions">
-          <button class="btn primary full" id="restartBtn">
-            <i class="fas fa-redo"></i> Nouvelle révision
-          </button>
-          <a href="arv-progress.html" class="btn secondary full">
-            <i class="fas fa-graduation-cap"></i> Suivre ma progression
-          </a>
+          <div class="recommendations" id="recommendationsBlock">
+            <div class="rec-title">
+              <i class="fas fa-compass"></i>
+              Recommandations
+            </div>
+            <ul class="rec-list" id="recommendationsList"></ul>
+          </div>
+
+          <div class="actions">
+            <button class="btn primary full" id="restartBtn">
+              <i class="fas fa-redo"></i> Nouvelle révision
+            </button>
+            <a href="arv-progress.html" class="btn secondary full">
+              <i class="fas fa-graduation-cap"></i> Suivre ma progression
+            </a>
+          </div>
         </div>
-      </div>
-    </section>
-  </main>
+      </section>
+    </div>
+  </div>
+
+  <button class="scroll-top" id="scrollTop" aria-label="Retour en haut">
+    <i class="fas fa-arrow-up"></i>
+  </button>
 
   <div class="premium-popup-overlay" id="premiumOverlay">
     <div class="premium-popup">
@@ -2229,7 +2072,7 @@
       <span class="popup-icon">👑</span>
       <h2>Réviseur <span>Premium</span></h2>
       <p class="popup-subtitle" id="premiumSubtitle">
-        Débloque les fiches IA, les flashcards actives et les quiz <strong>sans limite</strong>.
+        Débloque les fiches IA et les quiz <strong>sans limite</strong>.
       </p>
       <div class="popup-buttons">
         <a href="abonnement.html" class="btn-subscribe"><i class="fas fa-crown"></i> S'abonner maintenant</a>
@@ -2255,7 +2098,7 @@
 
   <script type="module">
   // ═══════════════════════════════════════════════════════════════
-  // RÉVISEUR v4 — Adapté au backend v4.0
+  // RÉVISEUR v4.1 — Corrigé
   // ═══════════════════════════════════════════════════════════════
 
   import { initializeApp } from "firebase/app";
@@ -2308,10 +2151,10 @@
   const DIFFICULTY_LABELS = { 1: 'Facile', 2: 'Moyen', 3: 'Difficile', 4: 'Niveau BAC' };
 
   const TYPE_LABELS = {
-    definition: { label: 'Définition', icon: '📖' },
-    formule: { label: 'Formule', icon: '📐' },
-    methode: { label: 'Méthode', icon: '🧮' },
-    piege: { label: 'Piège', icon: '⚠️' }
+    definition: 'Définition',
+    formule: 'Formule',
+    methode: 'Méthode',
+    piege: 'Piège'
   };
 
   const state = {
@@ -2357,8 +2200,11 @@
         el.classList.toggle('active', i === idx);
         el.classList.toggle('done', i < idx);
       });
+      $('stepBar').classList.add('show');
+    } else {
+      $('stepBar').classList.remove('show');
     }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    $('shell').scrollTop = 0;
   }
 
   function setStatus(id, msg, type = '') {
@@ -2374,10 +2220,6 @@
     return div.innerHTML;
   }
 
-  /**
-   * Sécurise le texte pour injection HTML :
-   * échappe < et > uniquement, préserve $ pour KaTeX.
-   */
   function safeText(text) {
     return String(text || '')
       .replace(/</g, '&lt;')
@@ -2407,9 +2249,7 @@
         strict: false,
         trust: true
       });
-    } catch (e) {
-      console.warn('KaTeX render error:', e);
-    }
+    } catch (e) {}
   }
 
   function showToast(message, type = 'info') {
@@ -2425,6 +2265,50 @@
     }
     clearTimeout(window.__toastTimer);
     window.__toastTimer = setTimeout(() => toast.classList.remove('show'), 3200);
+  }
+
+  // ────────────────────────────────────────────────────────────────
+  // ⚡ NORMALISATION DES FORMULES (fix bug "objet")
+  // ────────────────────────────────────────────────────────────────
+  function normalizeFormula(f) {
+    if (!f) return null;
+
+    // Cas 1 : string → OK direct
+    if (typeof f === 'string') {
+      const trimmed = f.trim();
+      if (!trimmed) return null;
+      return { latex: trimmed, condition: '', usage: '' };
+    }
+
+    // Cas 2 : objet { latex, condition, usage } → OK
+    if (typeof f === 'object') {
+      const latex = f.latex || f.formule || f.expression || '';
+      if (!latex || typeof latex !== 'string') return null;
+      return {
+        latex: latex.trim(),
+        condition: f.condition || '',
+        usage: f.usage || f.description || ''
+      };
+    }
+
+    // Cas 3 : tout le reste → on ignore proprement
+    return null;
+  }
+
+  // ────────────────────────────────────────────────────────────────
+  // ⚡ CONTENU DE SECOURS (si section vide)
+  // ────────────────────────────────────────────────────────────────
+  function buildFallbackContent(notionTitle, notionId) {
+    const cleanTitle = String(notionTitle || 'cette notion').trim();
+    return {
+      comprendre: `Cette notion fait partie du programme du BAC. Elle est essentielle à maîtriser pour réussir l'épreuve. Prends le temps de la relire attentivement, puis fais des exercices d'application pour la fixer.`,
+      tips: [
+        `📌 Note l'essentiel de « ${cleanTitle} » dans ton carnet.`,
+        `🔁 Revois cette notion dans 24h, puis dans 3 jours (répétition espacée).`,
+        `✍️ Refais au moins 2 exercices types sur cette notion.`,
+        `🤝 Explique « ${cleanTitle} » à un camarade — si tu peux l'expliquer, tu l'as comprise.`
+      ]
+    };
   }
 
   // ────────────────────────────────────────────────────────────────
@@ -2645,11 +2529,6 @@
       state.quiz = [];
       state.quizAnswers = {};
 
-      if (payload.quota && payload.quota.type === 'free') {
-        const remaining = Math.max(0, (payload.quota.limit || FREE_LIMIT) - (payload.quota.used || 0));
-        console.log(`Essais restants : ${remaining}`);
-      }
-
       activateStep('genStep5', statusEl, 'Finalisation...');
       await sleep(500);
 
@@ -2678,7 +2557,7 @@
   }
 
   // ═══════════════════════════════════════════════════════════════
-  // RENDU FICHE v4 — Accordéon + 6 blocs par notion
+  // RENDU FICHE v4.1 — Corrigé (formules + fallback)
   // ═══════════════════════════════════════════════════════════════
   function renderFiche() {
     const session = state.currentSession;
@@ -2692,7 +2571,6 @@
     $('ficheMeta').innerHTML = `
       <span><i class="fas fa-book"></i> ${escapeHtml(SUBJECT_LABELS[state.subject])}</span>
       <span><i class="fas fa-list"></i> ${sections.length} section${sections.length > 1 ? 's' : ''}</span>
-      <span><i class="fas fa-signal"></i> Niveau ${escapeHtml(level)}</span>
     `;
 
     const container = $('ficheContent');
@@ -2701,7 +2579,7 @@
     // ═══ Points clés globaux ═══
     if (Array.isArray(session.keyPoints) && session.keyPoints.length > 0) {
       const block = document.createElement('div');
-      block.className = 'global-block key-points';
+      block.className = 'global-block';
       block.innerHTML = `
         <div class="global-title"><i class="fas fa-star"></i> Points clés du chapitre</div>
         <ul class="global-list">
@@ -2711,7 +2589,7 @@
       container.appendChild(block);
     }
 
-    // ═══ Label des sections ═══
+    // ═══ Label sections ═══
     const sectionsLabel = document.createElement('div');
     sectionsLabel.className = 'sections-label';
     sectionsLabel.innerHTML = `
@@ -2731,62 +2609,65 @@
 
     container.appendChild(accordion);
 
-    // ═══ Pièges d'examen globaux ═══
+    // ═══ Pièges globaux ═══
     if (Array.isArray(session.examTraps) && session.examTraps.length > 0) {
       const block = document.createElement('div');
-      block.className = 'global-block exam-traps';
+      block.className = 'global-block';
       block.innerHTML = `
         <div class="global-title"><i class="fas fa-triangle-exclamation"></i> Pièges transversaux du BAC</div>
-        <div style="display:flex;flex-direction:column;gap:10px">
-          ${session.examTraps.map((t) => `
-            <div style="padding:10px 12px;border-radius:8px;background:rgba(0,0,0,0.2);border-left:3px solid #ff9a84">
-              <div style="font-size:13.5px;color:var(--text-light);margin-bottom:6px;font-weight:500">${safeText(t.trap || '')}</div>
-              <div style="font-size:12.5px;color:#7ce0aa;padding-left:16px;position:relative"><span style="position:absolute;left:0">→</span>${safeText(t.solution || '')}</div>
-            </div>
-          `).join('')}
+        <div style="display:flex;flex-direction:column;gap:8px">
+          ${session.examTraps.map((t) => {
+            const trap = typeof t === 'string' ? t : (t.trap || '');
+            const solution = typeof t === 'object' ? (t.solution || '') : '';
+            return `
+              <div style="padding:10px 12px;border-radius:6px;background:rgba(0,0,0,0.2);border-left:2px solid #ff9a84">
+                <div style="font-size:13px;color:var(--text-light);margin-bottom:4px">${safeText(trap)}</div>
+                ${solution ? `<div style="font-size:12.5px;color:#7ce0aa;padding-left:14px;position:relative"><span style="position:absolute;left:0">→</span>${safeText(solution)}</div>` : ''}
+              </div>
+            `;
+          }).join('')}
         </div>
       `;
       container.appendChild(block);
     }
 
-    // ═══ Erreurs fréquentes globales ═══
+    // ═══ Erreurs fréquentes ═══
     if (Array.isArray(session.commonMistakes) && session.commonMistakes.length > 0) {
       const block = document.createElement('div');
-      block.className = 'global-block common-mistakes';
+      block.className = 'global-block';
       block.innerHTML = `
         <div class="global-title"><i class="fas fa-circle-exclamation"></i> Erreurs fréquentes</div>
         <ul class="global-list">
-          ${session.commonMistakes.map((m) => `<li>${safeText(m)}</li>`).join('')}
+          ${session.commonMistakes.map((m) => `<li>${safeText(typeof m === 'string' ? m : (m.text || ''))}</li>`).join('')}
         </ul>
       `;
       container.appendChild(block);
     }
 
-    // ═══ Récap final ═══
+    // ═══ Récap ═══
     if (Array.isArray(session.recap) && session.recap.length > 0) {
       const block = document.createElement('div');
-      block.className = 'global-block recap';
+      block.className = 'global-block';
       block.innerHTML = `
         <div class="global-title"><i class="fas fa-flag-checkered"></i> Récap final</div>
         <ul class="global-list">
-          ${session.recap.map((r) => `<li>${safeText(r)}</li>`).join('')}
+          ${session.recap.map((r) => `<li>${safeText(typeof r === 'string' ? r : (r.text || ''))}</li>`).join('')}
         </ul>
       `;
       container.appendChild(block);
     }
 
-    // ═══ KaTeX ═══
     renderKaTeX(container);
 
-    // ═══ Auto-ouvrir la 1ère section ═══
+    // Auto-ouvrir la 1ère section
     const firstItem = accordion.querySelector('.notion-item');
     if (firstItem) {
-      setTimeout(() => toggleNotion(firstItem), 200);
+      setTimeout(() => toggleNotion(firstItem), 250);
     }
   }
 
   // ────────────────────────────────────────────────────────────────
-  // CONSTRUCTION D'UN ITEM ACCORDÉON
+  // CONSTRUCTION ITEM ACCORDÉON
   // ────────────────────────────────────────────────────────────────
   function buildNotionItem(section, index) {
     const item = document.createElement('div');
@@ -2795,49 +2676,51 @@
     const notionTitle = section.notionTitle || section.title || `Section ${index + 1}`;
     const notionId = section.notionId || '';
 
-    // Bloc COMPRENDRE
-    const comprendreHTML = section.comprendre
-      ? `<div class="block comprendre">
-           <div class="block-label"><i class="fas fa-lightbulb"></i> Comprendre</div>
-           <div class="block-text">${safeText(section.comprendre)}</div>
-         </div>`
-      : '';
-
-    // Bloc FORMULES
-    let formulesHTML = '';
-    if (Array.isArray(section.formules) && section.formules.length > 0) {
-      formulesHTML = `
-        <div class="block formules">
-          <div class="block-label"><i class="fas fa-square-root-variable"></i> Formules clés</div>
-          <div class="formula-list">
-            ${section.formules.map((f) => {
-              const latex = typeof f === 'string' ? f : (f.latex || '');
-              const condition = typeof f === 'object' ? (f.condition || '') : '';
-              const usage = typeof f === 'object' ? (f.usage || '') : '';
-              return `
-                <div class="formula-item">
-                  <div class="formula-latex">$$${safeText(latex)}$$</div>
-                  ${(condition || usage) ? `
-                    <div class="formula-meta">
-                      ${condition ? `<span class="tag condition">${safeText(condition)}</span>` : ''}
-                      ${usage ? `<span class="tag">${safeText(usage)}</span>` : ''}
-                    </div>
-                  ` : ''}
-                </div>
-              `;
-            }).join('')}
-          </div>
+    // ═══ COMPRENDRE ═══
+    let comprendreHTML = '';
+    if (section.comprendre && typeof section.comprendre === 'string' && section.comprendre.trim()) {
+      comprendreHTML = `
+        <div class="block">
+          <div class="block-label"><i class="fas fa-lightbulb"></i> Comprendre</div>
+          <div class="block-text">${safeText(section.comprendre)}</div>
         </div>
       `;
     }
 
-    // Bloc MÉTHODE
+    // ═══ FORMULES (avec fix bug "objet") ═══
+    let formulesHTML = '';
+    if (Array.isArray(section.formules) && section.formules.length > 0) {
+      const validFormules = section.formules.map(normalizeFormula).filter(Boolean);
+
+      if (validFormules.length > 0) {
+        formulesHTML = `
+          <div class="block">
+            <div class="block-label"><i class="fas fa-square-root-variable"></i> Formules clés</div>
+            <div class="formula-list">
+              ${validFormules.map((f) => `
+                <div class="formula-item">
+                  <div class="formula-latex">$$${safeText(f.latex)}$$</div>
+                  ${(f.condition || f.usage) ? `
+                    <div class="formula-meta">
+                      ${f.condition ? `<span class="tag">${safeText(f.condition)}</span>` : ''}
+                      ${f.usage ? `<span class="tag">${safeText(f.usage)}</span>` : ''}
+                    </div>
+                  ` : ''}
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    // ═══ MÉTHODE ═══
     let methodeHTML = '';
     if (section.methode && typeof section.methode === 'object') {
       const steps = Array.isArray(section.methode.steps) ? section.methode.steps : [];
       if (steps.length > 0) {
         methodeHTML = `
-          <div class="block methode">
+          <div class="block">
             <div class="block-label"><i class="fas fa-list-ol"></i> ${safeText(section.methode.title || 'Méthode pas-à-pas')}</div>
             <ol class="method-steps">
               ${steps.map((s) => `<li>${safeText(s)}</li>`).join('')}
@@ -2847,7 +2730,7 @@
       }
     } else if (Array.isArray(section.methode) && section.methode.length > 0) {
       methodeHTML = `
-        <div class="block methode">
+        <div class="block">
           <div class="block-label"><i class="fas fa-list-ol"></i> Méthode pas-à-pas</div>
           <ol class="method-steps">
             ${section.methode.map((s) => `<li>${safeText(s)}</li>`).join('')}
@@ -2856,13 +2739,13 @@
       `;
     }
 
-    // Bloc EXEMPLE RÉSOLU
+    // ═══ EXEMPLE RÉSOLU ═══
     let exempleHTML = '';
     if (section.exempleResolu && typeof section.exempleResolu === 'object') {
       const ex = section.exempleResolu;
       const etapes = Array.isArray(ex.etapes) ? ex.etapes : [];
       exempleHTML = `
-        <div class="block exemple">
+        <div class="block">
           <div class="block-label"><i class="fas fa-check-circle"></i> Exemple résolu</div>
           ${ex.enonce ? `<div class="example-enonce">${safeText(ex.enonce)}</div>` : ''}
           ${etapes.length > 0 ? `
@@ -2875,79 +2758,75 @@
       `;
     }
 
-    // Bloc PIÈGE BAC
+    // ═══ PIÈGE BAC ═══
     let piegeHTML = '';
     if (section.piegeBAC && typeof section.piegeBAC === 'object') {
       const p = section.piegeBAC;
-      piegeHTML = `
-        <div class="block piege">
-          <div class="block-label"><i class="fas fa-triangle-exclamation"></i> Piège du BAC</div>
-          ${p.trap ? `<div class="piege-trap">${safeText(p.trap)}</div>` : ''}
-          ${p.solution ? `<div class="piege-solution">${safeText(p.solution)}</div>` : ''}
-        </div>
-      `;
+      if (p.trap || p.solution) {
+        piegeHTML = `
+          <div class="block">
+            <div class="block-label"><i class="fas fa-triangle-exclamation"></i> Piège du BAC</div>
+            ${p.trap ? `<div class="piege-trap">${safeText(p.trap)}</div>` : ''}
+            ${p.solution ? `<div class="piege-solution">${safeText(p.solution)}</div>` : ''}
+          </div>
+        `;
+      }
     }
 
-    // Bloc ASTUCE
+    // ═══ ASTUCE ═══
     let astuceHTML = '';
-    if (section.astuce) {
+    if (section.astuce && typeof section.astuce === 'string' && section.astuce.trim()) {
       astuceHTML = `
-        <div class="block astuce">
+        <div class="block">
           <div class="block-label"><i class="fas fa-star"></i> Astuce</div>
           <div class="block-text">${safeText(section.astuce)}</div>
         </div>
       `;
     }
 
-    // Contenu fallback (ancien format)
-    if (!comprendreHTML && section.content) {
-      const fallback = `
-        <div class="block comprendre">
-          <div class="block-label"><i class="fas fa-bookmark"></i> Contenu</div>
-          <div class="block-text">${safeText(section.content)}</div>
+    // ═══ FALLBACK : si AUCUN bloc n'a de contenu ═══
+    const hasContent = comprendreHTML || formulesHTML || methodeHTML || exempleHTML || piegeHTML || astuceHTML;
+    let fallbackHTML = '';
+    if (!hasContent) {
+      const fb = buildFallbackContent(notionTitle, notionId);
+      fallbackHTML = `
+        <div class="block">
+          <div class="block-label"><i class="fas fa-lightbulb"></i> À retenir</div>
+          <div class="block-text">${safeText(fb.comprendre)}</div>
         </div>
-      `;
-      item.innerHTML = `
-        <div class="notion-header">
-          <div class="notion-num">${index + 1}</div>
-          <div class="notion-title-wrap">
-            <div class="notion-title">${safeText(notionTitle)}</div>
-            <div class="notion-subtitle">
-              <i class="fas fa-file-lines"></i> Section
-            </div>
-          </div>
-          <div class="notion-toggle"><i class="fas fa-chevron-down"></i></div>
-        </div>
-        <div class="notion-body">
-          <div class="notion-content">${fallback}</div>
-        </div>
-      `;
-    } else {
-      item.innerHTML = `
-        <div class="notion-header">
-          <div class="notion-num">${index + 1}</div>
-          <div class="notion-title-wrap">
-            <div class="notion-title">${safeText(notionTitle)}</div>
-            <div class="notion-subtitle">
-              ${notionId ? `<i class="fas fa-tag"></i> ${escapeHtml(notionId)}` : '<i class="fas fa-file-lines"></i> Notion'}
-            </div>
-          </div>
-          <div class="notion-toggle"><i class="fas fa-chevron-down"></i></div>
-        </div>
-        <div class="notion-body">
-          <div class="notion-content">
-            ${comprendreHTML}
-            ${formulesHTML}
-            ${methodeHTML}
-            ${exempleHTML}
-            ${piegeHTML}
-            ${astuceHTML}
-          </div>
+        <div class="block">
+          <div class="block-label"><i class="fas fa-check-circle"></i> Conseils d'étude</div>
+          <ol class="method-steps">
+            ${fb.tips.map((t) => `<li>${safeText(t)}</li>`).join('')}
+          </ol>
         </div>
       `;
     }
 
-    // Click sur le header → ouvrir/fermer
+    item.innerHTML = `
+      <div class="notion-header">
+        <div class="notion-num">${index + 1}</div>
+        <div class="notion-title-wrap">
+          <div class="notion-title">${safeText(notionTitle)}</div>
+          <div class="notion-subtitle">
+            ${notionId ? escapeHtml(notionId) : 'Notion'}
+          </div>
+        </div>
+        <div class="notion-toggle"><i class="fas fa-chevron-down"></i></div>
+      </div>
+      <div class="notion-body">
+        <div class="notion-content">
+          ${comprendreHTML}
+          ${formulesHTML}
+          ${methodeHTML}
+          ${exempleHTML}
+          ${piegeHTML}
+          ${astuceHTML}
+          ${fallbackHTML}
+        </div>
+      </div>
+    `;
+
     const header = item.querySelector('.notion-header');
     header.addEventListener('click', () => toggleNotion(item));
 
@@ -2956,12 +2835,10 @@
 
   function toggleNotion(item) {
     const isOpen = item.classList.contains('open');
-    // Ferme les autres
     document.querySelectorAll('.notion-item.open').forEach((other) => {
       if (other !== item) other.classList.remove('open');
     });
     item.classList.toggle('open', !isOpen);
-    // Re-render KaTeX dans le body ouvert
     if (!isOpen) {
       const body = item.querySelector('.notion-content');
       if (body) setTimeout(() => renderKaTeX(body), 150);
@@ -2969,7 +2846,7 @@
   }
 
   // ═══════════════════════════════════════════════════════════════
-  // RENDU FLASHCARDS
+  // FLASHCARDS
   // ═══════════════════════════════════════════════════════════════
   function renderFlashcard() {
     if (!state.flashcards || state.flashcards.length === 0) {
@@ -2997,11 +2874,9 @@
     $('flashFront').innerHTML = safeText(question);
     $('flashBack').innerHTML = safeText(answer);
 
-    // Badge type
     const badgeEl = $('flashTypeBadge');
     if (type && TYPE_LABELS[type]) {
-      badgeEl.className = `flashcard-type-badge ${type}`;
-      badgeEl.innerHTML = `${TYPE_LABELS[type].icon} ${TYPE_LABELS[type].label}`;
+      badgeEl.textContent = TYPE_LABELS[type];
       badgeEl.style.display = 'inline-flex';
     } else {
       badgeEl.style.display = 'none';
@@ -3076,7 +2951,6 @@
       return;
     }
 
-    // Sinon : appeler l'API pour générer
     try {
       const token = await getIdToken(state.user);
       const response = await fetch('/api/reviseur', {
@@ -3108,7 +2982,6 @@
 
   $('startFlashcardsBtn').addEventListener('click', async () => {
     if (!state.flashcards || state.flashcards.length === 0) {
-      // Générer les flashcards
       try {
         const btn = $('startFlashcardsBtn');
         btn.disabled = true;
@@ -3187,7 +3060,7 @@
       div.innerHTML = `
         <div class="quiz-q-header">
           <div class="quiz-q-number">Question ${index + 1}</div>
-          <div class="quiz-q-level l${level}">Niveau ${level}</div>
+          <div class="quiz-q-level">Niveau ${level}</div>
         </div>
         <div class="quiz-q-text">${safeText(questionText)}</div>
         <div class="quiz-options">${optionsHtml}</div>
@@ -3215,7 +3088,7 @@
 
         const exp = $(`explanation-${qIndex}`);
         if (q.explanation) {
-          exp.innerHTML = `<strong>💡 Explication :</strong> ${safeText(q.explanation)}`;
+          exp.innerHTML = `<strong>💡</strong> ${safeText(q.explanation)}`;
           exp.classList.add('show');
           renderKaTeX(exp);
         }
@@ -3267,7 +3140,7 @@
     let masteryColor, masteryLabel;
     if (masteryScore >= 80) {
       masteryColor = 'linear-gradient(90deg, #45b47d, #6fd99a)';
-      masteryLabel = 'Chapitre solide — tu peux passer au suivant ou approfondir.';
+      masteryLabel = 'Chapitre solide — tu peux passer au suivant.';
     } else if (masteryScore >= 60) {
       masteryColor = 'linear-gradient(90deg, #E0B84A, #F0CC65)';
       masteryLabel = 'Bonne maîtrise — quelques points à consolider.';
@@ -3285,17 +3158,16 @@
     setTimeout(() => { fill.style.width = `${masteryScore}%`; }, 100);
     $('masteryText').textContent = masteryLabel;
 
-    // Recommandations
     const recList = $('recommendationsList');
     recList.innerHTML = '';
 
     const recs = [];
     if (percent === 100) {
-      recs.push('Continue sur ce rythme, teste-toi sur un autre chapitre pour élargir ta maîtrise.');
+      recs.push('Continue sur ce rythme, teste-toi sur un autre chapitre.');
     } else if (percent >= 70) {
       recs.push('Revois rapidement les questions manquées, puis passe à un chapitre proche.');
     } else {
-      recs.push('Refais une session sur ce même chapitre dans 2-3 jours pour ancrer les notions.');
+      recs.push('Refais une session sur ce même chapitre dans 2-3 jours.');
     }
 
     const ratings = Object.values(state.flashRatings);
@@ -3334,6 +3206,20 @@
   $('newFicheBtn').addEventListener('click', () => showView('configView'));
   $('newFlashBtn').addEventListener('click', () => showView('configView'));
   $('restartBtn').addEventListener('click', () => showView('configView'));
+
+  // ═══════════════════════════════════════════════════════════════
+  // SCROLL TOP
+  // ═══════════════════════════════════════════════════════════════
+  const shell = $('shell');
+  const scrollTopBtn = $('scrollTop');
+
+  shell.addEventListener('scroll', () => {
+    scrollTopBtn.classList.toggle('show', shell.scrollTop > 300);
+  }, { passive: true });
+
+  scrollTopBtn.addEventListener('click', () => {
+    shell.scrollTo({ top: 0, behavior: 'smooth' });
+  });
 
   // ═══════════════════════════════════════════════════════════════
   // PREMIUM
@@ -3392,7 +3278,7 @@
   function init() {
     initCustomSelects();
     initChips();
-    console.log('🎓 ARVEXA — Réviseur v4 (accordéon 6 blocs)');
+    console.log('🎓 ARVEXA — Réviseur v4.1');
   }
 
   init();

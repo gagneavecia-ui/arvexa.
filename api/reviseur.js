@@ -1,16 +1,9 @@
 // ================================================================
-// API RÉVISEUR v3.0 — ARVEXA School
-// Génération GARANTIE de fiches/flashcards/quiz
-// Lecture de la base de connaissances (bac-mathematiques.json, etc.)
-// Vérification de complétude + retry ciblé
+// API RÉVISEUR v2.0 — ARVEXA School
+// Génère des fiches, flashcards et quiz GARANTIS COMPLETS
+// Utilise la base bac-mathematiques.js pour ne rien oublier
 // ================================================================
 
-const fs = require('fs');
-const path = require('path');
-
-// ────────────────────────────────────────────────────────────────
-// CONFIG
-// ────────────────────────────────────────────────────────────────
 const WINDOW_MS = 60 * 1000;
 const MAX_REQUESTS_PER_WINDOW = 8;
 const requestLog = new Map();
@@ -20,16 +13,57 @@ const ALLOWED_MODES = new Set(['fiche', 'flashcard']);
 const ALLOWED_ACTIONS = new Set(['generate', 'quiz']);
 
 const FREE_REVISEUR_LIMIT = 2;
-module.exports.config = { maxDuration: 60 };
+const MAX_REGENERATION_ATTEMPTS = 2;   // Nombre max de tentatives pour compléter
+const COVERAGE_THRESHOLD = 0.95;       // 95% minimum de couverture
 
-// Cache des bases de connaissances chargées en mémoire
-const KNOWLEDGE_CACHE = new Map();
+module.exports.config = { maxDuration: 60 };
 
 let adminServices;
 
-// ────────────────────────────────────────────────────────────────
+// ════════════════════════════════════════════════════════════════
+// BASE DE CONNAISSANCES
+// ════════════════════════════════════════════════════════════════
+let BAC_MATHEMATIQUES = null;
+
+function loadBacMathematiques() {
+  if (BAC_MATHEMATIQUES) return BAC_MATHEMATIQUES;
+  try {
+    BAC_MATHEMATIQUES = require('./bac-mathematiques');
+    return BAC_MATHEMATIQUES;
+  } catch (error) {
+    console.warn('[REVISEUR] Base bac-mathematiques indisponible:', error.message);
+    return null;
+  }
+}
+
+/**
+ * Charge la base de connaissances pour une matière donnée.
+ * Retourne null si la matière n'a pas encore de base.
+ */
+function getBaseForSubject(subject) {
+  if (subject === 'mathematiques') {
+    const bac = loadBacMathematiques();
+    return bac ? bac.BAC_MATHEMATIQUES : null;
+  }
+  // Autres matières : pas encore de base
+  return null;
+}
+
+/**
+ * Trouve un chapitre dans la base par son titre.
+ */
+function findChapitreByTitle(base, chapterTitle) {
+  if (!base || !chapterTitle) return null;
+  const normalized = String(chapterTitle).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  return base.chapitres.find((c) => {
+    const cNorm = c.titre.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    return cNorm.includes(normalized) || normalized.includes(cNorm) || c.id === chapterTitle;
+  }) || null;
+}
+
+// ════════════════════════════════════════════════════════════════
 // FIREBASE ADMIN
-// ────────────────────────────────────────────────────────────────
+// ════════════════════════════════════════════════════════════════
 function getAdminServices() {
   if (adminServices) return adminServices;
   const credentials = process.env.FIREBASE_ADMIN_CREDENTIALS;
@@ -47,115 +81,9 @@ function getAdminServices() {
   return adminServices;
 }
 
-// ────────────────────────────────────────────────────────────────
-// BASE DE CONNAISSANCES — Chargement
-// ────────────────────────────────────────────────────────────────
-/**
- * Charge le JSON de la matière depuis la racine du projet.
- * Retourne null si le fichier n'existe pas.
- * Met en cache pour éviter les lectures répétées.
- */
-function loadKnowledgeBase(subject) {
-  if (KNOWLEDGE_CACHE.has(subject)) {
-    return KNOWLEDGE_CACHE.get(subject);
-  }
-
-  const filename = `bac-${subject}.json`;
-  const filePath = path.join(process.cwd(), filename);
-
-  try {
-    if (!fs.existsSync(filePath)) {
-      console.log(`[REVISEUR] Base de connaissances absente : ${filename}`);
-      KNOWLEDGE_CACHE.set(subject, null);
-      return null;
-    }
-
-    const raw = fs.readFileSync(filePath, 'utf-8');
-    const data = JSON.parse(raw);
-    console.log(`[REVISEUR] ✅ Base chargée : ${filename} (${data.chapitres?.length || 0} chapitres)`);
-    KNOWLEDGE_CACHE.set(subject, data);
-    return data;
-  } catch (error) {
-    console.error(`[REVISEUR] Erreur chargement ${filename}:`, error.message);
-    KNOWLEDGE_CACHE.set(subject, null);
-    return null;
-  }
-}
-
-/**
- * Trouve un chapitre dans la base à partir de son nom (fuzzy match).
- */
-function findChapter(knowledgeBase, chapterName) {
-  if (!knowledgeBase || !chapterName) return null;
-
-  const normalize = (s) => String(s || '')
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9]/g, '');
-
-  const target = normalize(chapterName);
-
-  // Match exact d'abord
-  for (const ch of knowledgeBase.chapitres || []) {
-    if (normalize(ch.titre) === target || normalize(ch.id) === target) {
-      return ch;
-    }
-  }
-
-  // Match partiel ensuite
-  for (const ch of knowledgeBase.chapitres || []) {
-    const chNorm = normalize(ch.titre);
-    if (chNorm.includes(target) || target.includes(chNorm)) {
-      return ch;
-    }
-  }
-
-  return null;
-}
-
-/**
- * Retourne toutes les notions obligatoires d'un chapitre.
- */
-function getMandatoryNotions(chapter) {
-  if (!chapter || !Array.isArray(chapter.notions)) return [];
-  return chapter.notions.filter((n) => n.obligatoire !== false);
-}
-
-/**
- * Vérifie si une notion est présente dans une fiche générée.
- * Compare par id ou par titre (normalisé).
- */
-function isNotionCovered(notion, sections) {
-  if (!Array.isArray(sections)) return false;
-
-  const normalize = (s) => String(s || '')
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9]/g, '');
-
-  const notionIdNorm = normalize(notion.id);
-  const notionTitleNorm = normalize(notion.titre);
-
-  return sections.some((section) => {
-    const sectionTitleNorm = normalize(section.title || section.titre || '');
-    const sectionContentNorm = normalize(section.content || '');
-
-    // Match sur le titre (exact ou inclusion)
-    if (sectionTitleNorm.includes(notionTitleNorm)) return true;
-    if (notionTitleNorm.includes(sectionTitleNorm) && sectionTitleNorm.length > 4) return true;
-
-    // Match sur l'id
-    if (sectionContentNorm.includes(notionIdNorm)) return true;
-
-    return false;
-  });
-}
-
-// ────────────────────────────────────────────────────────────────
+// ════════════════════════════════════════════════════════════════
 // UTILITAIRES
-// ────────────────────────────────────────────────────────────────
+// ════════════════════════════════════════════════════════════════
 function clientIp(request) {
   return String(request.headers['x-forwarded-for'] || request.socket?.remoteAddress || 'unknown')
     .split(',')[0].trim();
@@ -197,9 +125,9 @@ function isPremiumUser(data) {
   return !end || end.getTime() > Date.now();
 }
 
-// ────────────────────────────────────────────────────────────────
+// ════════════════════════════════════════════════════════════════
 // QUOTA
-// ────────────────────────────────────────────────────────────────
+// ════════════════════════════════════════════════════════════════
 function getUsageDate() {
   return new Date().toISOString().slice(0, 10);
 }
@@ -237,34 +165,26 @@ async function releaseFreeGeneration(uid, usageDate) {
   });
 }
 
-// ────────────────────────────────────────────────────────────────
-// PROVIDERS IA
-// ────────────────────────────────────────────────────────────────
+// ════════════════════════════════════════════════════════════════
+// PROVIDERS
+// ════════════════════════════════════════════════════════════════
 function getProviders() {
   return [
     {
-      name: 'Groq',
-      key: process.env.GROQ_API_KEY,
+      name: 'Groq', key: process.env.GROQ_API_KEY,
       endpoint: 'https://api.groq.com/openai/v1/chat/completions',
-      model: process.env.GROQ_MODEL || 'openai/gpt-oss-120b',
-      headers: {}
+      model: process.env.GROQ_MODEL || 'openai/gpt-oss-120b', headers: {}
     },
     {
-      name: 'OpenRouter',
-      key: process.env.OPENROUTER_API_KEY,
+      name: 'OpenRouter', key: process.env.OPENROUTER_API_KEY,
       endpoint: 'https://openrouter.ai/api/v1/chat/completions',
       model: process.env.OPENROUTER_MODEL || 'openai/gpt-oss-120b',
-      headers: {
-        'HTTP-Referer': process.env.APP_ORIGIN || '',
-        'X-Title': 'ARVEXA School'
-      }
+      headers: { 'HTTP-Referer': process.env.APP_ORIGIN || '', 'X-Title': 'ARVEXA School' }
     },
     {
-      name: 'Mistral',
-      key: process.env.MISTRAL_API_KEY,
+      name: 'Mistral', key: process.env.MISTRAL_API_KEY,
       endpoint: 'https://api.mistral.ai/v1/chat/completions',
-      model: process.env.MISTRAL_MODEL || 'mistral-large-latest',
-      headers: {}
+      model: process.env.MISTRAL_MODEL || 'mistral-large-latest', headers: {}
     }
   ].filter((p) => Boolean(p.key));
 }
@@ -328,12 +248,10 @@ async function generateWithFallback(prompt, validator, maxTokens = 4000) {
     try {
       console.log(`[AI] Tentative ${provider.name}...`);
       const data = await callProvider(provider, prompt, maxTokens);
-
       if (validator(data)) {
         console.log(`[AI] ✅ ${provider.name} a répondu avec une structure valide`);
         return data;
       }
-
       errors.push(`${provider.name}: structure invalide`);
       console.warn(`[AI] ⚠️ ${provider.name} : structure invalide`);
     } catch (error) {
@@ -345,150 +263,200 @@ async function generateWithFallback(prompt, validator, maxTokens = 4000) {
   throw new Error('all_providers_failed: ' + errors.join(' | '));
 }
 
-// ────────────────────────────────────────────────────────────────
-// PROMPTS — Version v3 (avec notions obligatoires explicites)
-// ────────────────────────────────────────────────────────────────
-function fichePromptWithNotions(subjectLabel, chapterTitle, notions) {
-  const notionsList = notions.map((n, i) =>
-    `${i + 1}. [${n.id}] ${n.titre} — ${n.description || ''}`
-  ).join('\n');
+// ════════════════════════════════════════════════════════════════
+// PROMPTS — AVEC BASE DE CONNAISSANCES
+// ════════════════════════════════════════════════════════════════
 
-  return `Tu es un professeur expert du BAC au Niger. Tu prépares une FICHE DE RÉVISION COMPLÈTE pour un élève de Terminale D.
+/**
+ * Prompt FICHE — Garanti complet (1 section par notion obligatoire)
+ */
+function fichePromptWithBase(subject, chapter, base, chapitre) {
+  const notionsList = chapitre.notions.map((n, i) => {
+    return `  ${i + 1}. [${n.id}] ${n.titre}
+     Description : ${n.description}
+     Formules : ${(n.formules || []).join(' | ')}
+     Propriétés : ${(n.proprietes || []).join(' | ')}
+     Méthodes : ${(n.methodes || []).join(' | ')}
+     Erreurs : ${(n.erreurs_frequentes || []).join(' | ')}
+     Pièges : ${(n.pieges_examen || []).join(' | ')}`;
+  }).join('\n\n');
 
-Matière : ${subjectLabel}
-Chapitre : ${chapterTitle}
+  return `Tu es un professeur expert du BAC au Niger. Tu prépares une FICHE DE RÉVISION COMPLÈTE et GARANTIE.
+
+Matière : ${base.matiereLabel}
+Chapitre : ${chapitre.titre}
+Nombre de notions obligatoires : ${chapitre.notions.length}
 
 ═══════════════════════════════════════════════════════════════
-MISSION — GARANTIR 100% DE COUVERTURE
+RÈGLE ABSOLUE : COUVERTURE 100%
 ═══════════════════════════════════════════════════════════════
-Tu DOIS générer EXACTEMENT une section par notion ci-dessous.
-Il y a ${notions.length} notions obligatoires → ${notions.length} sections MINIMUM.
-NE SAUTE AUCUNE NOTION.
+Tu DOIS générer UNE SECTION DE FICHE pour CHAQUE notion obligatoire listée ci-dessous.
+Aucune notion ne doit être oubliée. Aucune notion ne doit être fusionnée avec une autre.
+Chaque section doit être autonome et pédagogique.
 
-LISTE DES NOTIONS OBLIGATOIRES :
+═══════════════════════════════════════════════════════════════
+NOTIONS OBLIGATOIRES À COUVRIR
+═══════════════════════════════════════════════════════════════
 ${notionsList}
 
 ═══════════════════════════════════════════════════════════════
-RÈGLES LATEX
+RÈGLES LATEX — TRÈS IMPORTANTES
 ═══════════════════════════════════════════════════════════════
-- Toute formule entre $...$ (inline) ou $$...$$ (display)
-- JAMAIS de symboles Unicode bruts (π → $\\pi$, √ → $\\sqrt{}$, ² → $^{2}$)
-- Commandes autorisées : \\frac, \\sqrt, ^{}, _{}, \\lim, \\int, \\sum,
-  \\sin, \\cos, \\tan, \\ln, \\log, \\alpha...\\omega, \\times, \\div, \\leq,
-  \\geq, \\neq, \\infty, \\to, \\Rightarrow
+1. Toute formule mathématique DOIT être entre délimiteurs :
+   • Inline : $...$  → "La fonction $f(x) = x^2$ est croissante."
+   • Display : $$...$$  → "$$\\lim_{x \\to 0} \\frac{\\sin x}{x} = 1$$"
+2. JAMAIS de symboles Unicode bruts :
+   ❌ "π" → ✅ "$\\pi$"
+   ❌ "√2" → ✅ "$\\sqrt{2}$"
+   ❌ "x²" → ✅ "$x^{2}$"
+   ❌ "1/2" → ✅ "$\\frac{1}{2}$"
+   ❌ "≤" → ✅ "$\\leq$"
+   ❌ "∞" → ✅ "$\\infty$"
+3. Commandes autorisées : \\frac, \\sqrt, ^{}, _{}, \\lim, \\int, \\sum,
+   \\sin, \\cos, \\tan, \\ln, \\log, \\alpha...\\omega, \\times, \\div,
+   \\leq, \\geq, \\neq, \\infty, \\to, \\Rightarrow, \\Leftrightarrow
 
 ═══════════════════════════════════════════════════════════════
 FORMAT DE RÉPONSE (JSON UNIQUEMENT)
 ═══════════════════════════════════════════════════════════════
 {
-  "chapterTitle": "${chapterTitle}",
+  "chapterTitle": "${chapitre.titre}",
   "sections": [
     {
-      "title": "Titre de la section (reprend le titre de la notion)",
-      "content": "Contenu avec **mots-clés** en gras et formules LaTeX."
+      "notionId": "${chapitre.notions[0].id}",
+      "title": "${chapitre.notions[0].titre}",
+      "content": "Contenu pédagogique complet avec formules LaTeX, méthodes, exemples."
     }
+    // ... UNE SECTION PAR NOTION OBLIGATOIRE
   ],
   "keyPoints": [
     "Point clé 1",
     "Point clé 2",
-    "Point clé 3",
-    "Point clé 4",
-    "Point clé 5"
+    "Point clé 3"
   ],
   "examTraps": [
-    { "trap": "Piège classique", "solution": "Comment l'éviter" }
+    { "trap": "Piège", "solution": "Solution" }
   ],
   "commonMistakes": [
-    "Erreur fréquente 1",
-    "Erreur fréquente 2"
+    "Erreur fréquente"
   ]
 }
 
 CONTRAINTES :
-- Exactement ${notions.length} sections (une par notion)
-- Chaque section a un titre clair
-- keyPoints : 5 à 8 points essentiels
-- examTraps : 2 à 4 pièges
-- commonMistakes : 3 à 5 erreurs
-- Pas de données personnelles
-- Réponds UNIQUEMENT avec le JSON`;
+- EXACTEMENT ${chapitre.notions.length} sections (une par notion obligatoire)
+- Chaque section : notionId EXACT + title + content pédagogique
+- Content : 3-6 phrases avec formules LaTeX
+- Ne mets JAMAIS de texte avant ou après le JSON
+- Ne mets JAMAIS de commentaires dans le JSON`;
 }
 
-function flashcardPromptWithNotions(subjectLabel, chapterTitle, notions, count) {
-  const notionsList = notions.map((n) => `- [${n.id}] ${n.titre}`).join('\n');
+/**
+ * Prompt FLASHCARDS — Garanti complet
+ */
+function flashcardPromptWithBase(subject, chapter, base, chapitre, count = 10) {
+  const notionsList = chapitre.notions.map((n, i) =>
+    `  ${i + 1}. [${n.id}] ${n.titre} — ${n.description}`
+  ).join('\n');
 
-  return `Tu es un professeur expert du BAC au Niger. Tu prépares des FLASHCARDS pour un élève de Terminale D.
+  const cardsPerNotion = Math.max(1, Math.floor(count / chapitre.notions.length));
 
-Matière : ${subjectLabel}
-Chapitre : ${chapterTitle}
+  return `Tu es un professeur expert du BAC au Niger. Tu prépares des FLASHCARDS de mémorisation.
 
-NOTIONS À COUVRIR :
+Matière : ${base.matiereLabel}
+Chapitre : ${chapitre.titre}
+Nombre de flashcards demandé : ${count}
+Nombre de notions obligatoires : ${chapitre.notions.length}
+
+═══════════════════════════════════════════════════════════════
+RÈGLE ABSOLUE : COUVERTURE 100%
+═══════════════════════════════════════════════════════════════
+Chaque notion obligatoire DOIT être couverte par AU MOINS 1 flashcard.
+Aucune notion ne doit être oubliée.
+
+═══════════════════════════════════════════════════════════════
+NOTIONS OBLIGATOIRES
+═══════════════════════════════════════════════════════════════
 ${notionsList}
-
-Génère exactement ${count} flashcards couvrant TOUTES les notions ci-dessus.
-Chaque notion doit avoir AU MOINS 1 flashcard.
 
 ═══════════════════════════════════════════════════════════════
 RÈGLES LATEX
 ═══════════════════════════════════════════════════════════════
-- Formule inline : $...$ / Display : $$...$$
+- Inline : $...$ / Display : $$...$$
 - JAMAIS de symboles Unicode bruts
-- Toujours utiliser \\frac, \\sqrt, ^{}, _{}, \\pi, \\times, \\leq, \\infty
+- Formules : \\frac, \\sqrt, ^{}, _{}, \\sin, \\cos, \\pi, \\infty
 
 ═══════════════════════════════════════════════════════════════
-FORMAT (JSON UNIQUEMENT)
+FORMAT DE RÉPONSE (JSON UNIQUEMENT)
 ═══════════════════════════════════════════════════════════════
 {
-  "chapterTitle": "${chapterTitle}",
+  "chapterTitle": "${chapitre.titre}",
   "flashcards": [
     {
-      "notionId": "id-de-la-notion",
-      "question": "Question courte et claire",
+      "notionId": "${chapitre.notions[0].id}",
+      "question": "Question courte",
       "answer": "Réponse concise avec LaTeX si besoin",
-      "hint": "Indice court ou null"
+      "hint": "Indice ou null"
     }
   ]
 }
 
 CONTRAINTES :
-- Exactement ${count} flashcards
-- Chaque flashcard a un notionId valide (voir liste)
-- Question courte, réponse concise
-- Dernière flashcard : question piège
-- Réponds UNIQUEMENT avec le JSON`;
+- EXACTEMENT ${count} flashcards
+- Chaque flashcard a un notionId EXACT de la liste
+- Chaque notion doit avoir AU MOINS 1 flashcard
+- La DERNIÈRE flashcard doit être un cas limite ou piège
+- Ne mets JAMAIS de texte avant ou après le JSON`;
 }
 
-function quizPromptWithNotions(subjectLabel, chapterTitle, notions, difficulty, count) {
-  const notionsList = notions.map((n) => `- [${n.id}] ${n.titre}`).join('\n');
+/**
+ * Prompt QUIZ — Garanti complet
+ */
+function quizPromptWithBase(subject, chapter, session, base, chapitre, count = 5, difficulty = 2) {
+  const notionsList = chapitre.notions.map((n) =>
+    `  [${n.id}] ${n.titre}`
+  ).join('\n');
+
   const difficultyLabels = { 1: 'Facile', 2: 'Moyen', 3: 'Difficile', 4: 'Niveau BAC' };
-  const difficultyLabel = difficultyLabels[difficulty] || 'Moyen';
 
-  return `Tu es un professeur expert du BAC au Niger. Tu crées un QUIZ pour un élève de Terminale D.
+  const ficheContent = session && session.sections
+    ? JSON.stringify(session.sections).slice(0, 3000)
+    : '';
 
-Matière : ${subjectLabel}
-Chapitre : ${chapterTitle}
-Difficulté : ${difficultyLabel} (${difficulty}/4)
+  return `Tu es un professeur expert du BAC au Niger. Tu crées un QUIZ de vérification.
 
-NOTIONS À COUVRIR :
+Matière : ${base.matiereLabel}
+Chapitre : ${chapitre.titre}
+Difficulté : ${difficultyLabels[difficulty] || 'Moyen'}
+Nombre de questions : ${count}
+
+═══════════════════════════════════════════════════════════════
+RÈGLE ABSOLUE : COUVERTURE DES NOTIONS
+═══════════════════════════════════════════════════════════════
+Répartis les questions sur les notions obligatoires.
+Si possible, 1 question par notion (max ${count} notions).
+
+═══════════════════════════════════════════════════════════════
+NOTIONS À TESTER
+═══════════════════════════════════════════════════════════════
 ${notionsList}
 
-Génère exactement ${count} questions à choix multiples couvrant ces notions.
+${ficheContent ? `Contenu de la fiche : ${ficheContent}` : ''}
 
 ═══════════════════════════════════════════════════════════════
 RÈGLES LATEX
 ═══════════════════════════════════════════════════════════════
-- Formule inline : $...$ / Display : $$...$$
+- Formules entre $...$ (inline) ou $$...$$ (display)
 - JAMAIS de symboles Unicode bruts
 - Exemples : "$3x^2$", "$\\frac{1}{2}$", "$\\lim_{x \\to 0}$"
 
 ═══════════════════════════════════════════════════════════════
-FORMAT (JSON UNIQUEMENT)
+FORMAT DE RÉPONSE (JSON UNIQUEMENT)
 ═══════════════════════════════════════════════════════════════
 {
   "quiz": [
     {
-      "notionId": "id-notion",
-      "question": "Énoncé avec LaTeX si besoin",
+      "notionId": "${chapitre.notions[0].id}",
+      "question": "Question",
       "options": [
         { "id": "A", "text": "Option A" },
         { "id": "B", "text": "Option B" },
@@ -496,163 +464,263 @@ FORMAT (JSON UNIQUEMENT)
         { "id": "D", "text": "Option D" }
       ],
       "correctAnswer": "A",
-      "explanation": "Explication pédagogique"
+      "explanation": "Explication pédagogique courte"
     }
   ]
 }
 
 CONTRAINTES :
-- Exactement ${count} questions
+- EXACTEMENT ${count} questions
 - 4 options par question
-- Une seule bonne réponse
-- Commence facile, termine difficile
+- Chaque question a un notionId EXACT de la liste
+- Niveau : ${difficultyLabels[difficulty] || 'Moyen'}
+- Ne mets JAMAIS de texte avant ou après le JSON`;
+}
+
+// ════════════════════════════════════════════════════════════════
+// PROMPTS — SANS BASE (fallback)
+// ════════════════════════════════════════════════════════════════
+function fichePromptSimple(subject, chapter) {
+  return `Tu es un professeur expert du BAC au Niger. Tu prépares une FICHE DE RÉVISION.
+
+Matière : ${subject}
+Chapitre : ${chapter}
+
+Génère une fiche structurée en JSON valide.
+
+{
+  "chapterTitle": "Titre du chapitre",
+  "sections": [
+    { "title": "Titre section", "content": "Contenu avec **gras** et formules LaTeX." }
+  ],
+  "keyPoints": ["Point 1", "Point 2", "Point 3"],
+  "examTraps": [{ "trap": "Piège", "solution": "Solution" }],
+  "commonMistakes": ["Erreur 1", "Erreur 2"]
+}
+
+RÈGLES LATEX :
+- Formules entre $...$ ou $$...$$
+- JAMAIS de symboles Unicode bruts
+- Commandes : \\frac, \\sqrt, ^{}, _{}, \\sin, \\cos, \\pi, \\infty
+
+- 5 à 7 sections
 - Réponds UNIQUEMENT avec le JSON`;
 }
 
-// ────────────────────────────────────────────────────────────────
-// VALIDATION DES RÉPONSES IA
-// ────────────────────────────────────────────────────────────────
-function validateFiche(data) {
-  return data && typeof data === 'object' &&
-    Array.isArray(data.sections) && data.sections.length >= 3 &&
-    data.sections.every((s) => s.title && s.content);
-}
+function flashcardPromptSimple(subject, chapter, count = 10) {
+  return `Tu es un professeur expert du BAC au Niger. Tu prépares ${count} FLASHCARDS.
 
-function validateFlashcards(data) {
-  return data && typeof data === 'object' &&
-    Array.isArray(data.flashcards) && data.flashcards.length >= 3 &&
-    data.flashcards.every((c) => c.question && c.answer);
-}
+Matière : ${subject}
+Chapitre : ${chapter}
 
-function validateQuiz(data) {
-  return data && typeof data === 'object' &&
-    Array.isArray(data.quiz) && data.quiz.length >= 3 &&
-    data.quiz.every((q) =>
-      q.question && Array.isArray(q.options) && q.options.length === 4 &&
-      q.options.every((o) => o.id && o.text) &&
-      ['A', 'B', 'C', 'D'].includes(q.correctAnswer)
-    );
-}
-
-// ────────────────────────────────────────────────────────────────
-// VÉRIFICATION DE COMPLÉTUDE
-// ────────────────────────────────────────────────────────────────
-function checkCompleteness(sections, notions) {
-  const missing = [];
-  for (const notion of notions) {
-    if (!isNotionCovered(notion, sections)) {
-      missing.push(notion);
-    }
-  }
-  return {
-    complete: missing.length === 0,
-    total: notions.length,
-    covered: notions.length - missing.length,
-    missing
-  };
-}
-
-// ────────────────────────────────────────────────────────────────
-// RETRY CIBLÉ SUR NOTIONS MANQUANTES
-// ────────────────────────────────────────────────────────────────
-async function retryMissingNotions(subjectLabel, chapterTitle, missingNotions, existingSections) {
-  if (missingNotions.length === 0) return existingSections;
-
-  console.log(`[AI-RETRY] ${missingNotions.length} notion(s) manquante(s), retry ciblé...`);
-
-  const notionsList = missingNotions.map((n) => `- [${n.id}] ${n.titre} — ${n.description || ''}`).join('\n');
-
-  const prompt = `Tu es un professeur expert du BAC au Niger.
-
-Chapitre : ${chapterTitle} (${subjectLabel})
-
-Il te manque ${missingNotions.length} section(s) de fiche. Génère UNIQUEMENT ces sections.
-
-NOTIONS MANQUANTES :
-${notionsList}
-
-═══════════════════════════════════════════════════════════════
-FORMAT DE RÉPONSE (JSON UNIQUEMENT)
-═══════════════════════════════════════════════════════════════
 {
-  "sections": [
+  "chapterTitle": "Titre",
+  "flashcards": [
+    { "question": "...", "answer": "...", "hint": "..." }
+  ]
+}
+
+RÈGLES LATEX : $...$ ou $$...$$
+EXACTEMENT ${count} flashcards.
+Réponds UNIQUEMENT avec le JSON`;
+}
+
+function quizPromptSimple(subject, chapter, session, count = 5, difficulty = 2) {
+  const ficheContent = JSON.stringify(session).slice(0, 3000);
+  return `Tu es un professeur expert du BAC au Niger. Tu crées un QUIZ.
+
+Matière : ${subject}
+Chapitre : ${chapter}
+Contenu : ${ficheContent}
+
+{
+  "quiz": [
     {
-      "title": "Titre de la section",
-      "content": "Contenu avec **gras** et formules $LaTeX$."
+      "question": "...",
+      "options": [
+        { "id": "A", "text": "..." },
+        { "id": "B", "text": "..." },
+        { "id": "C", "text": "..." },
+        { "id": "D", "text": "..." }
+      ],
+      "correctAnswer": "A",
+      "explanation": "..."
     }
   ]
 }
 
-- Toute formule entre $...$ ou $$...$$
-- JAMAIS de symboles Unicode bruts (π, √, ²...)
-- Exactement ${missingNotions.length} sections
-- Réponds UNIQUEMENT avec le JSON`;
-
-  try {
-    const data = await generateWithFallback(prompt, validateFiche, 2000);
-    if (Array.isArray(data.sections)) {
-      return [...existingSections, ...data.sections];
-    }
-  } catch (error) {
-    console.warn('[AI-RETRY] Échec retry:', error.message);
-  }
-
-  return existingSections;
+RÈGLES LATEX : $...$ ou $$...$$
+EXACTEMENT ${count} questions, 4 options chacune.
+Réponds UNIQUEMENT avec le JSON`;
 }
 
-// ────────────────────────────────────────────────────────────────
-// FALLBACK LOCAL (si base de connaissances disponible)
-// ────────────────────────────────────────────────────────────────
-function buildLocalFicheFromNotions(chapterTitle, notions) {
+// ════════════════════════════════════════════════════════════════
+// VALIDATION
+// ════════════════════════════════════════════════════════════════
+function validateFiche(data) {
+  return (
+    data &&
+    typeof data === 'object' &&
+    Array.isArray(data.sections) &&
+    data.sections.length >= 3 &&
+    data.sections.every((s) => s.title && s.content)
+  );
+}
+
+function validateFicheWithCoverage(data, chapitre) {
+  if (!validateFiche(data)) return false;
+  // Vérifier que chaque notion obligatoire a sa section
+  const notionIdsInFiche = new Set(
+    data.sections.map((s) => s.notionId).filter(Boolean)
+  );
+  const missingNotions = chapitre.notions.filter(
+    (n) => !notionIdsInFiche.has(n.id)
+  );
+  if (missingNotions.length > 0) {
+    console.warn(`[COVERAGE] ${missingNotions.length} notion(s) manquante(s):`,
+      missingNotions.map((n) => n.id).join(', '));
+    return false;
+  }
+  return true;
+}
+
+function validateFlashcards(data) {
+  return (
+    data &&
+    typeof data === 'object' &&
+    Array.isArray(data.flashcards) &&
+    data.flashcards.length >= 5 &&
+    data.flashcards.every((c) => c.question && c.answer)
+  );
+}
+
+function validateFlashcardsWithCoverage(data, chapitre) {
+  if (!validateFlashcards(data)) return false;
+  const notionIdsInCards = new Set(
+    data.flashcards.map((c) => c.notionId).filter(Boolean)
+  );
+  const missingNotions = chapitre.notions.filter(
+    (n) => !notionIdsInCards.has(n.id)
+  );
+  if (missingNotions.length > 0) {
+    console.warn(`[COVERAGE] ${missingNotions.length} notion(s) manquante(s) en flashcards`);
+    return false;
+  }
+  return true;
+}
+
+function validateQuiz(data) {
+  return (
+    data &&
+    typeof data === 'object' &&
+    Array.isArray(data.quiz) &&
+    data.quiz.length >= 3 &&
+    data.quiz.every(
+      (q) =>
+        q.question &&
+        Array.isArray(q.options) &&
+        q.options.length === 4 &&
+        q.options.every((o) => o.id && o.text) &&
+        ['A', 'B', 'C', 'D'].includes(q.correctAnswer)
+    )
+  );
+}
+
+// ════════════════════════════════════════════════════════════════
+// GÉNÉRATION AVEC VÉRIFICATION DE COUVERTURE + RETRY
+// ════════════════════════════════════════════════════════════════
+async function generateWithCoverageGuarantee(promptFn, validator, chapitre, maxTokens = 6000) {
+  let lastError = null;
+
+  for (let attempt = 1; attempt <= MAX_REGENERATION_ATTEMPTS; attempt++) {
+    try {
+      console.log(`[COVERAGE] Tentative ${attempt}/${MAX_REGENERATION_ATTEMPTS}`);
+      const prompt = promptFn(attempt);
+      const data = await generateWithFallback(prompt, (d) => validator(d, chapitre), maxTokens);
+
+      // Vérification de couverture
+      if (validator(data, chapitre)) {
+        console.log(`[COVERAGE] ✅ Couverture 100% validée`);
+        return data;
+      }
+
+      lastError = new Error('Couverture incomplète');
+      console.warn(`[COVERAGE] ⚠️ Tentative ${attempt} : couverture incomplète, retry...`);
+
+    } catch (error) {
+      lastError = error;
+      console.warn(`[COVERAGE] ⚠️ Tentative ${attempt} échouée:`, error.message);
+    }
+  }
+
+  throw lastError || new Error('Impossible de garantir la couverture');
+}
+
+// ════════════════════════════════════════════════════════════════
+// FALLBACKS LOCAUX
+// ════════════════════════════════════════════════════════════════
+function buildLocalFicheWithBase(chapitre) {
   return {
-    chapterTitle,
-    sections: notions.map((n) => ({
+    chapterTitle: chapitre.titre,
+    sections: chapitre.notions.map((n) => ({
+      notionId: n.id,
       title: n.titre,
-      content: [
-        n.description || '',
-        n.formules && n.formules.length > 0 ? '\n\n**Formules** :\n' + n.formules.map((f) => `- ${f}`).join('\n') : '',
-        n.proprietes && n.proprietes.length > 0 ? '\n\n**Propriétés** :\n' + n.proprietes.map((p) => `- ${p}`).join('\n') : ''
-      ].filter(Boolean).join('')
+      content: `${n.description}\n\nFormules : ${(n.formules || []).join(' | ')}`
     })),
-    keyPoints: notions.slice(0, 5).map((n) => n.titre),
-    examTraps: notions
-      .filter((n) => n.pieges_examen && n.pieges_examen.length > 0)
-      .slice(0, 3)
-      .map((n) => ({ trap: n.pieges_examen[0], solution: 'Voir le cours.' })),
-    commonMistakes: notions
-      .filter((n) => n.erreurs_frequentes && n.erreurs_frequentes.length > 0)
-      .slice(0, 5)
-      .map((n) => n.erreurs_frequentes[0])
+    keyPoints: chapitre.notions.slice(0, 5).map((n) => n.titre),
+    examTraps: chapitre.notions[0]?.pieges_examen?.map((p) => ({
+      trap: p, solution: 'À retenir'
+    })) || [],
+    commonMistakes: chapitre.notions[0]?.erreurs_frequentes || []
   };
 }
 
-function buildLocalFlashcardsFromNotions(chapterTitle, notions, count) {
-  const flashcards = [];
-  notions.forEach((n) => {
-    if (flashcards.length >= count) return;
-    flashcards.push({
+function buildLocalFlashcardsWithBase(chapitre, count = 10) {
+  const cards = [];
+  chapitre.notions.forEach((n) => {
+    cards.push({
       notionId: n.id,
       question: `Que retenir de "${n.titre}" ?`,
-      answer: n.description || 'Voir le cours.',
-      hint: n.formules && n.formules[0] ? n.formules[0] : null
+      answer: n.description,
+      hint: (n.formules || [])[0] || null
     });
   });
-  // Compléter si nécessaire
-  while (flashcards.length < count && notions.length > 0) {
-    const n = notions[flashcards.length % notions.length];
-    flashcards.push({
-      notionId: n.id,
-      question: `Formule ou propriété de "${n.titre}" ?`,
-      answer: (n.formules && n.formules[0]) || 'Voir le cours.',
-      hint: null
-    });
-  }
-  return { chapterTitle, flashcards: flashcards.slice(0, count) };
+  return {
+    chapterTitle: chapitre.titre,
+    flashcards: cards.slice(0, count)
+  };
 }
 
-// ────────────────────────────────────────────────────────────────
+function buildLocalFiche(body) {
+  return {
+    chapterTitle: body.chapter === 'all' ? 'Révision générale' : body.chapter,
+    sections: [
+      { title: 'Introduction', content: `Fiche de révision — ${body.chapter}` },
+      { title: 'Définitions clés', content: 'À compléter avec ton cours.' },
+      { title: 'Formules importantes', content: 'À compléter avec ton cours.' },
+      { title: 'Méthodes', content: 'À compléter.' },
+      { title: 'Erreurs fréquentes', content: 'À compléter.' }
+    ],
+    keyPoints: ['À retenir'],
+    examTraps: [],
+    commonMistakes: []
+  };
+}
+
+function buildLocalFlashcards(body, count = 10) {
+  return {
+    chapterTitle: body.chapter === 'all' ? 'Révision générale' : body.chapter,
+    flashcards: Array.from({ length: count }, (_, i) => ({
+      question: `Question ${i + 1}`,
+      answer: 'À compléter.',
+      hint: null
+    }))
+  };
+}
+
+// ════════════════════════════════════════════════════════════════
 // HANDLER
-// ────────────────────────────────────────────────────────────────
+// ════════════════════════════════════════════════════════════════
 module.exports = async function handler(request, response) {
   if (request.method !== 'POST') {
     response.setHeader('Allow', 'POST');
@@ -681,41 +749,21 @@ module.exports = async function handler(request, response) {
   if (!ALLOWED_ACTIONS.has(action)) {
     return jsonError(response, 400, 'Action invalide.');
   }
-
   if (!ALLOWED_SUBJECTS.has(body.subject)) {
     return jsonError(response, 400, 'Matière invalide.');
   }
-
   if (typeof body.chapter !== 'string' || body.chapter.length > 100) {
     return jsonError(response, 400, 'Chapitre invalide.');
   }
 
-  // ═══════════════════════════════════════════════════════════════
-  // Chargement de la base de connaissances
-  // ═══════════════════════════════════════════════════════════════
-  const knowledgeBase = loadKnowledgeBase(body.subject);
-  const chapterData = knowledgeBase ? findChapter(knowledgeBase, body.chapter) : null;
-  const mandatoryNotions = chapterData ? getMandatoryNotions(chapterData) : [];
-  const hasKnowledge = mandatoryNotions.length > 0;
-
-  const subjectLabel = knowledgeBase?.matiereLabel ||
-    { mathematiques: 'Mathématiques', physique: 'Physique', chimie: 'Chimie', svt: 'SVT' }[body.subject] ||
-    body.subject;
-
-  const chapterTitle = chapterData?.titre || body.chapter;
-
-  console.log(`[REVISEUR] Subject: ${body.subject}, Chapter: ${body.chapter}, Notions: ${mandatoryNotions.length}, Mode: ${hasKnowledge ? 'GARANTI' : 'LIBRE'}`);
-
-  // ═══════════════════════════════════════════════════════════════
-  // Quota
-  // ═══════════════════════════════════════════════════════════════
+  // ═══ Réservation du quota (génération uniquement) ═══
   let reservation = null;
   if (action === 'generate') {
     try {
       reservation = await reserveFreeGeneration(user.uid);
     } catch (error) {
       console.error('Quota check failed:', error.message);
-      return jsonError(response, 503, 'La vérification de votre quota est temporairement indisponible.');
+      return jsonError(response, 503, 'Vérification de votre quota temporairement indisponible.');
     }
 
     if (reservation.limitReached) {
@@ -730,9 +778,9 @@ module.exports = async function handler(request, response) {
   }
 
   try {
-    // ═══════════════════════════════════════════════════════════════
+    // ═══════════════════════════════════════════════════════
     // ACTION : GÉNÉRATION
-    // ═══════════════════════════════════════════════════════════════
+    // ═══════════════════════════════════════════════════════
     if (action === 'generate') {
       if (!ALLOWED_MODES.has(body.mode)) {
         if (reservation?.reserved) {
@@ -741,66 +789,53 @@ module.exports = async function handler(request, response) {
         return jsonError(response, 400, 'Mode invalide.');
       }
 
+      // ═══ Charger la base de connaissances ═══
+      const base = getBaseForSubject(body.subject);
+      const chapitre = base ? findChapitreByTitle(base, body.chapter) : null;
+
       const isFlashcard = body.mode === 'flashcard';
-      const flashCount = Number(body.count) || 10;
+      const count = Number(body.count) || 10;
 
       let data;
-      let mode = 'free'; // free | guaranteed | fallback
+      let usedBase = false;
 
-      try {
-        if (hasKnowledge) {
-          // ═══ MODE GARANTI ═══
-          const prompt = isFlashcard
-            ? flashcardPromptWithNotions(subjectLabel, chapterTitle, mandatoryNotions, flashCount)
-            : fichePromptWithNotions(subjectLabel, chapterTitle, mandatoryNotions);
+      if (base && chapitre) {
+        // ═══ MODE GARANTI (avec base de connaissances) ═══
+        console.log(`[REVISEUR] Mode garanti — chapitre "${chapitre.titre}" (${chapitre.notions.length} notions)`);
+        usedBase = true;
 
-          const validator = isFlashcard ? validateFlashcards : validateFiche;
-          data = await generateWithFallback(prompt, validator, isFlashcard ? 4000 : 6000);
-
-          // Vérification de complétude (uniquement pour les fiches)
-          if (!isFlashcard) {
-            const check = checkCompleteness(data.sections || [], mandatoryNotions);
-            if (!check.complete) {
-              console.log(`[REVISEUR] ⚠️ Complétude : ${check.covered}/${check.total}, retry ciblé...`);
-              data.sections = await retryMissingNotions(
-                subjectLabel,
-                chapterTitle,
-                check.missing,
-                data.sections || []
-              );
-              // 2e vérification
-              const finalCheck = checkCompleteness(data.sections, mandatoryNotions);
-              console.log(`[REVISEUR] Complétude finale : ${finalCheck.covered}/${finalCheck.total}`);
-              mode = finalCheck.complete ? 'guaranteed' : 'partial';
-            } else {
-              mode = 'guaranteed';
-            }
-          } else {
-            mode = 'guaranteed';
-          }
+        if (isFlashcard) {
+          data = await generateWithCoverageGuarantee(
+            () => flashcardPromptWithBase(body.subject, body.chapter, base, chapitre, count),
+            validateFlashcardsWithCoverage,
+            chapitre,
+            6000
+          );
         } else {
-          // ═══ MODE LIBRE (pas de base) ═══
-          console.log('[REVISEUR] Pas de base de connaissances pour ce chapitre, mode libre');
-          const prompt = isFlashcard
-            ? flashcardPromptWithNotions(subjectLabel, chapterTitle, [], flashCount)
-            : fichePromptWithNotions(subjectLabel, chapterTitle, []);
-          const validator = isFlashcard ? validateFlashcards : validateFiche;
-          data = await generateWithFallback(prompt, validator, isFlashcard ? 4000 : 6000);
-          mode = 'free';
+          data = await generateWithCoverageGuarantee(
+            () => fichePromptWithBase(body.subject, body.chapter, base, chapitre),
+            validateFicheWithCoverage,
+            chapitre,
+            8000
+          );
         }
-      } catch (aiError) {
-        console.warn('[REVISEUR] Fallback local :', aiError.message);
+      } else {
+        // ═══ MODE SIMPLE (pas de base pour cette matière) ═══
+        console.log(`[REVISEUR] Mode simple — pas de base pour "${body.subject}" / "${body.chapter}"`);
 
-        if (hasKnowledge) {
-          data = isFlashcard
-            ? buildLocalFlashcardsFromNotions(chapterTitle, mandatoryNotions, flashCount)
-            : buildLocalFicheFromNotions(chapterTitle, mandatoryNotions);
+        if (isFlashcard) {
+          data = await generateWithFallback(
+            flashcardPromptSimple(body.subject, body.chapter, count),
+            validateFlashcards,
+            4000
+          );
         } else {
-          data = isFlashcard
-            ? { chapterTitle, flashcards: [] }
-            : { chapterTitle, sections: [] };
+          data = await generateWithFallback(
+            fichePromptSimple(body.subject, body.chapter),
+            validateFiche,
+            4000
+          );
         }
-        mode = 'fallback';
       }
 
       return response.status(200).json({
@@ -810,37 +845,50 @@ module.exports = async function handler(request, response) {
           subject: body.subject,
           chapter: body.chapter,
           mode: body.mode,
-          generationMode: mode,
-          notionsCovered: hasKnowledge ? mandatoryNotions.length : 0,
+          usedBase,                                              // ⚡ Nouveau
+          coverage: usedBase ? '100%' : 'standard',              // ⚡ Nouveau
           generatedAt: new Date().toISOString()
         },
         quota: reservation?.premium
           ? { type: 'premium', unlimited: true }
-          : { type: 'free', used: reservation?.used, limit: FREE_REVISEUR_LIMIT }
+          : {
+              type: 'free',
+              used: reservation?.used,
+              limit: FREE_REVISEUR_LIMIT
+            }
       });
     }
 
-    // ═══════════════════════════════════════════════════════════════
-    // ACTION : QUIZ (gratuit, pas de quota)
-    // ═══════════════════════════════════════════════════════════════
+    // ═══════════════════════════════════════════════════════
+    // ACTION : QUIZ
+    // ═══════════════════════════════════════════════════════
     if (action === 'quiz') {
       if (!body.session) {
         return jsonError(response, 400, 'Session manquante.');
       }
 
+      const base = getBaseForSubject(body.subject);
+      const chapitre = base ? findChapitreByTitle(base, body.chapter) : null;
       const difficulty = Number(body.difficulty) || 2;
-      const quizCount = Number(body.count) || 5;
+      const count = Number(body.count) || 5;
 
       let data;
-      try {
-        const prompt = hasKnowledge
-          ? quizPromptWithNotions(subjectLabel, chapterTitle, mandatoryNotions, difficulty, quizCount)
-          : quizPromptWithNotions(subjectLabel, chapterTitle, [], difficulty, quizCount);
 
-        data = await generateWithFallback(prompt, validateQuiz, 3000);
-      } catch (e) {
-        console.warn('[REVISEUR] Quiz generation failed:', e.message);
-        return jsonError(response, 503, 'Impossible de générer le quiz. Réessaie.');
+      if (base && chapitre) {
+        // Quiz garanti avec notions
+        console.log(`[REVISEUR] Quiz garanti — ${chapitre.notions.length} notions disponibles`);
+        data = await generateWithFallback(
+          quizPromptWithBase(body.subject, body.chapter, body.session, base, chapitre, count, difficulty),
+          validateQuiz,
+          4000
+        );
+      } else {
+        // Quiz simple
+        data = await generateWithFallback(
+          quizPromptSimple(body.subject, body.chapter, body.session, count, difficulty),
+          validateQuiz,
+          3000
+        );
       }
 
       return response.status(200).json({
@@ -859,6 +907,36 @@ module.exports = async function handler(request, response) {
       } catch (releaseError) {
         console.error('Erreur libération crédit:', releaseError.message);
       }
+    }
+
+    // Fallback local
+    if (action === 'generate') {
+      const base = getBaseForSubject(body.subject);
+      const chapitre = base ? findChapitreByTitle(base, body.chapter) : null;
+
+      const fallback = body.mode === 'flashcard'
+        ? (chapitre ? buildLocalFlashcardsWithBase(chapitre, body.count || 10) : buildLocalFlashcards(body, body.count || 10))
+        : (chapitre ? buildLocalFicheWithBase(chapitre) : buildLocalFiche(body));
+
+      return response.status(200).json({
+        success: true,
+        session: {
+          ...fallback,
+          subject: body.subject,
+          chapter: body.chapter,
+          mode: body.mode,
+          usedBase: Boolean(chapitre),
+          coverage: chapitre ? 'fallback' : 'local'
+        },
+        quota: reservation?.premium
+          ? { type: 'premium', unlimited: true }
+          : {
+              type: 'free',
+              used: reservation?.used,
+              limit: FREE_REVISEUR_LIMIT
+            },
+        fallback: true
+      });
     }
 
     return jsonError(response, 503, 'Le Réviseur est temporairement indisponible. Réessaie.');

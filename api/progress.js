@@ -1,15 +1,11 @@
 // ================================================================
-// API PROGRESS v3.0 — ARVEXA School
+// API PROGRESS v4.0 — ARVEXA School
 // Cahier de notes intelligent : Matières → Chapitres → Sections
-// Modèle : users/{uid}/notebooks/{subject}/chapters/{chapterId}
-//                              └── sections/{sectionId}
+// 2 profils : scientifique (enrichi) / littéraire (strict)
 // ================================================================
 
 module.exports.config = { maxDuration: 60 };
 
-// ────────────────────────────────────────────────────────────────
-// CONSTANTES
-// ────────────────────────────────────────────────────────────────
 const WINDOW_MS = 60 * 1000;
 const MAX_REQUESTS_PER_WINDOW = 40;
 const requestLog = new Map();
@@ -30,33 +26,26 @@ const SUBJECT_INFO = {
   anglais:       { label: 'Anglais',          icon: 'fa-language',             profile: 'literary'   }
 };
 
-const MIN_CONTENT_LENGTH = 80;
+const MIN_CONTENT_LENGTH = 40;
 const MAX_CONTENT_LENGTH = 15000;
-const FREE_SECTION_LIMIT = 5;           // 5 sections/mois en gratuit
-
-const ALLOWED_CAPTURE_MODES = new Set(['text', 'voice']);
+const FREE_SECTION_LIMIT = 5;
 
 const MAX_AI_TOKENS = 6000;
 
 let adminServices = null;
 
 // ────────────────────────────────────────────────────────────────
-// INIT FIREBASE ADMIN
+// FIREBASE ADMIN
 // ────────────────────────────────────────────────────────────────
 function getAdminServices() {
   if (adminServices) return adminServices;
 
   const credentials = process.env.FIREBASE_ADMIN_CREDENTIALS;
-  if (!credentials || !credentials.trim()) {
-    throw new Error('firebase_admin_not_configured');
-  }
+  if (!credentials || !credentials.trim()) throw new Error('firebase_admin_not_configured');
 
   let serviceAccount;
-  try {
-    serviceAccount = JSON.parse(credentials);
-  } catch (e) {
-    throw new Error('firebase_admin_invalid_json');
-  }
+  try { serviceAccount = JSON.parse(credentials); }
+  catch (e) { throw new Error('firebase_admin_invalid_json'); }
 
   if (!serviceAccount.project_id || !serviceAccount.private_key) {
     throw new Error('firebase_admin_invalid_credentials');
@@ -149,13 +138,8 @@ function toISO(v) {
   return null;
 }
 
-function todayKey() {
-  return new Date().toISOString().slice(0, 10);
-}
-
-function monthKey() {
-  return new Date().toISOString().slice(0, 7);
-}
+function todayKey() { return new Date().toISOString().slice(0, 10); }
+function monthKey() { return new Date().toISOString().slice(0, 7); }
 
 function cleanId(str) {
   return String(str || '')
@@ -185,7 +169,58 @@ function formatRelativeDate(value) {
 }
 
 // ────────────────────────────────────────────────────────────────
-// FOURNISSEURS IA
+// NORMALISATION DES ENTRÉES ÉCRITES AU CLAVIER
+// Convertit les symboles Unicode / textuels en indices pour l'IA
+// ────────────────────────────────────────────────────────────────
+function normalizeMathInput(text) {
+  if (!text || typeof text !== 'string') return '';
+
+  let result = text;
+
+  // Puissances (Unicode → notation texte que l'IA comprend)
+  result = result.replace(/([a-zA-Z0-9\)])\s*²/g, '$1^2');
+  result = result.replace(/([a-zA-Z0-9\)])\s*³/g, '$1^3');
+  result = result.replace(/([a-zA-Z0-9\)])\s*⁴/g, '$1^4');
+  result = result.replace(/([a-zA-Z0-9\)])\s*⁵/g, '$1^5');
+  result = result.replace(/([a-zA-Z0-9\)])\s*⁰/g, '$1^0');
+  result = result.replace(/([a-zA-Z0-9\)])\s*¹/g, '$1^1');
+
+  // Racines
+  result = result.replace(/√\s*\(([^)]+)\)/g, 'racine($1)');
+  result = result.replace(/√\s*([a-zA-Z0-9]+)/g, 'racine($1)');
+
+  // Symboles mathématiques Unicode → texte
+  result = result.replace(/≤/g, ' <= ');
+  result = result.replace(/≥/g, ' >= ');
+  result = result.replace(/≠/g, ' != ');
+  result = result.replace(/∞/g, ' infini ');
+  result = result.replace(/π/g, ' pi ');
+  result = result.replace(/θ/g, ' theta ');
+  result = result.replace(/α/g, ' alpha ');
+  result = result.replace(/β/g, ' beta ');
+  result = result.replace(/γ/g, ' gamma ');
+  result = result.replace(/λ/g, ' lambda ');
+  result = result.replace(/μ/g, ' mu ');
+  result = result.replace(/σ/g, ' sigma ');
+  result = result.replace(/Δ/g, ' Delta ');
+  result = result.replace(/∑/g, ' somme ');
+  result = result.replace(/∫/g, ' integrale ');
+  result = result.replace(/→/g, ' tend vers ');
+  result = result.replace(/⇔/g, ' <=> ');
+  result = result.replace(/⇒/g, ' => ');
+  result = result.replace(/×/g, ' fois ');
+  result = result.replace(/÷/g, ' divise par ');
+  result = result.replace(/±/g, ' plus ou moins ');
+  result = result.replace(/≈/g, ' environ ');
+
+  // Fractions textuelles courantes
+  result = result.replace(/(\d+)\s*\/\s*(\d+)/g, '$1 sur $2');
+
+  return result;
+}
+
+// ────────────────────────────────────────────────────────────────
+// IA — FOURNISSEURS
 // ────────────────────────────────────────────────────────────────
 function getProviders() {
   return [
@@ -221,7 +256,7 @@ async function callProvider(provider, prompt, maxTokens = MAX_AI_TOKENS) {
   try {
     const body = {
       model: provider.model,
-      temperature: 0.2,
+      temperature: 0.25,
       max_tokens: maxTokens,
       messages: [
         {
@@ -275,45 +310,79 @@ async function generateWithFallback(prompt, validator, maxTokens = MAX_AI_TOKENS
       console.log(`[AI] Tentative ${provider.name}...`);
       const data = await callProvider(provider, prompt, maxTokens);
       if (!validator || validator(data)) {
-        console.log(`[AI] ✅ ${provider.name} OK`);
+        console.log(`[AI] ${provider.name} OK`);
         return data;
       }
       errors.push(`${provider.name}: structure invalide`);
     } catch (e) {
       errors.push(`${provider.name}: ${e.message}`);
-      console.warn(`[AI] ❌ ${provider.name}: ${e.message}`);
+      console.warn(`[AI] ${provider.name}: ${e.message}`);
     }
   }
   throw new Error('all_providers_failed: ' + errors.join(' | '));
 }
 
 // ────────────────────────────────────────────────────────────────
-// PROMPTS — 2 profils (scientific / literary)
+// RÈGLE LATEX — bloc commun à tous les prompts
+// ────────────────────────────────────────────────────────────────
+const LATEX_CONVERSION_RULES = `
+═══════════════════════════════════════════════════════════════
+RÈGLE DE CONVERSION EN LATEX — TRÈS IMPORTANTE
+═══════════════════════════════════════════════════════════════
+L'élève écrit au clavier normal, sans LaTeX. Tu DOIS convertir
+TOUTES les formules en LaTeX propre dans tes réponses.
+
+Exemples de conversion :
+- "z = a + bi"          → "$z = a + bi$"
+- "i2 = -1" ou "i²=-1"  → "$i^2 = -1$"
+- "racine de a² + b²"   → "$\\sqrt{a^2 + b^2}$"
+- "z barre = a - bi"    → "$\\bar{z} = a - bi$"
+- "1 sur 2"             → "$\\frac{1}{2}$"
+- "pi sur 4"            → "$\\frac{\\pi}{4}$"
+- "x tend vers 0"       → "$x \\to 0$"
+- "somme de k=1 à n"    → "$\\sum_{k=1}^{n}$"
+- "integrale de a à b"  → "$\\int_{a}^{b}$"
+- "x inférieur ou égal" → "$x \\leq$"
+- "plus ou moins"       → "$\\pm$"
+- "lambda"              → "$\\lambda$"
+
+RÈGLES DE RENDU :
+- Inline : $...$  (dans une phrase)
+- Display : $$...$$  (formule isolée)
+- JAMAIS de symboles Unicode bruts dans la sortie
+  (❌ π, √, ², ≤, ∞, →)
+  (✅ $\\pi$, $\\sqrt{}$, $^{2}$, $\\leq$, $\\infty$, $\\to$)
+`;
+
+// ────────────────────────────────────────────────────────────────
+// PROMPT — PROFIL SCIENTIFIQUE (enrichi autorisé)
 // ────────────────────────────────────────────────────────────────
 function buildScientificPrompt({ subjectLabel, rawInput }) {
   return `Tu es un professeur expert du BAC au Niger, spécialiste de ${subjectLabel}.
 
-Un élève vient de copier une petite partie de sa leçon. Tu vas l'expliquer comme un vrai professeur.
+Un élève vient de copier une partie de sa leçon. Ta mission est DOUBLE :
+1. Lui expliquer CLAIREMENT cette partie
+2. L'ENRICHIR avec les meilleures méthodes, astuces et exercices
 
 ═══════════════════════════════════════════════════════════════
 CONTENU COLLÉ PAR L'ÉLÈVE
 ═══════════════════════════════════════════════════════════════
 ${rawInput}
 
-═══════════════════════════════════════════════════════════════
-RÈGLE ABSOLUE — ANTI-INVENTION
-═══════════════════════════════════════════════════════════════
-- Tu ne peux utiliser QUE le contenu fourni ci-dessus.
-- INTERDICTION d'ajouter des connaissances extérieures.
-- INTERDICTION d'inventer des formules, des exemples, des valeurs.
-- Chaque élément doit être traçable à un passage du texte source.
-- Si une information manque, écris : "Non précisé dans ta leçon."
+${LATEX_CONVERSION_RULES}
 
 ═══════════════════════════════════════════════════════════════
-RÈGLES LATEX
+MISSION
 ═══════════════════════════════════════════════════════════════
-- Inline : $...$  /  Display : $$...$$
-- JAMAIS de symboles Unicode bruts (π → $\\pi$, √ → $\\sqrt{}$, ² → $^{2}$)
+Tu PEUX et DOIS utiliser tes connaissances pour :
+- Donner les méthodes LES PLUS RAPIDES et LES PLUS CLAIRES
+- Ajouter des astuces de calcul
+- Proposer des exemples chiffrés variés
+- Signaler les pièges classiques du BAC
+- Fournir des EXERCICES progressifs avec CORRECTIONS détaillées
+
+Le contenu de l'élève est le POINT DE DÉPART.
+Tu enrichis, tu ne te limites pas.
 
 ═══════════════════════════════════════════════════════════════
 FORMAT JSON ATTENDU
@@ -321,9 +390,9 @@ FORMAT JSON ATTENDU
 {
   "sectionTitle": "Titre court (max 60 caractères)",
   "profile": "scientific",
-  "summary": "Résumé en 3-4 phrases, uniquement à partir du texte",
+  "summary": "Résumé en 3-4 phrases claires de la notion",
   "keyIdeas": [
-    "Idée clé 1 (extraite du texte)",
+    "Idée clé 1",
     "Idée clé 2",
     "Idée clé 3"
   ],
@@ -331,7 +400,7 @@ FORMAT JSON ATTENDU
     {
       "latex": "$z = a + bi$",
       "condition": "avec $a, b \\in \\mathbb{R}$",
-      "source": "extrait exact du texte élève"
+      "usage": "Définition"
     }
   ],
   "method": [
@@ -340,27 +409,24 @@ FORMAT JSON ATTENDU
     "Étape 3 : ..."
   ],
   "example": {
-    "enonce": "Exemple COMPLET et CHIFFRÉ construit à partir d'un cas du texte",
-    "steps": ["Étape 1 : calcul détaillé", "Étape 2 : ...", "Étape 3 : ..."],
-    "result": "Résultat final"
+    "enonce": "Exemple chiffré complet",
+    "steps": [
+      "Étape 1 : calcul détaillé",
+      "Étape 2 : ...",
+      "Étape 3 : ..."
+    ],
+    "result": "$z = 4 - i$"
   },
   "trap": {
-    "text": "Piège classique au BAC sur cette notion",
+    "text": "Piège classique au BAC",
     "solution": "Comment l'éviter"
   },
-  "questions": [
-    {
-      "q": "Question probable au BAC ?",
-      "a": "Réponse extraite UNIQUEMENT du texte fourni",
-      "source": "extrait exact du texte élève"
-    }
-  ],
   "exercises": [
     {
       "enonce": "Exercice d'application",
       "indice": "Indice pour aider",
       "correction": {
-        "steps": ["Étape 1", "Étape 2", "Étape 3"],
+        "steps": ["Étape 1", "Étape 2"],
         "reponse": "Résultat final"
       },
       "difficulty": 1
@@ -368,19 +434,22 @@ FORMAT JSON ATTENDU
   ]
 }
 
-CONTRAINTES FINALES :
+CONTRAINTES :
 - keyIdeas : 3 à 5
-- formulas : 1 à 5 (si applicable)
+- formulas : 1 à 5
 - method : 2 à 5 étapes
-- questions : 4 à 8
-- exercises : 2 à 4
+- exercises : 2 à 4 exercices
 - Réponds UNIQUEMENT avec le JSON`;
 }
 
+// ────────────────────────────────────────────────────────────────
+// PROMPT — PROFIL LITTÉRAIRE (strict, anti-invention)
+// ────────────────────────────────────────────────────────────────
 function buildLiteraryPrompt({ subjectLabel, rawInput }) {
   return `Tu es un professeur expert du BAC au Niger, spécialiste de ${subjectLabel}.
 
-Un élève vient de copier une petite partie de sa leçon. Tu vas l'expliquer comme un vrai professeur.
+Un élève vient de copier une partie de sa leçon. Ta mission est STRICTE :
+tu dois l'aider à retenir uniquement ce qu'il a collé, sans rien inventer.
 
 ═══════════════════════════════════════════════════════════════
 CONTENU COLLÉ PAR L'ÉLÈVE
@@ -397,6 +466,20 @@ RÈGLE ABSOLUE — ANTI-INVENTION
 - Si une information manque, écris : "Non précisé dans ta leçon."
 
 ═══════════════════════════════════════════════════════════════
+RÈGLE DE RÉDACTION DES RÉPONSES
+═══════════════════════════════════════════════════════════════
+- Chaque réponse doit être UNE SEULE PHRASE complète.
+- La phrase doit répondre réellement à la question.
+- Sujet + verbe + complément obligatoires.
+- INTERDICTION d'un mot seul ou d'un bout de phrase.
+- INTERDICTION d'un développement de plusieurs paragraphes.
+
+Exemple :
+Q : "Qu'est-ce que l'homme ?"
+✅ Bonne réponse : "L'homme est un être vivant qui vit sur la Terre."
+❌ Mauvaise réponse : "vivant" ou "être vivant"
+
+═══════════════════════════════════════════════════════════════
 FORMAT JSON ATTENDU
 ═══════════════════════════════════════════════════════════════
 {
@@ -404,58 +487,49 @@ FORMAT JSON ATTENDU
   "profile": "literary",
   "summary": "Résumé en 3-4 phrases, uniquement à partir du texte",
   "keyIdeas": [
-    "Idée directrice 1 (extraite du texte)",
-    "Idée directrice 2",
-    "Idée directrice 3"
+    "Idée directrice 1",
+    "Idée directrice 2"
   ],
   "definitions": [
     {
-      "term": "Terme important",
-      "definition": "Définition extraite du texte",
-      "source": "extrait exact"
+      "term": "Terme",
+      "definition": "Une phrase complète qui définit le terme selon le texte",
+      "source": "extrait exact du texte élève"
     }
   ],
   "arguments": [
     {
-      "thesis": "Thèse défendue dans le texte",
+      "thesis": "Thèse du texte",
       "arguments": ["Argument 1", "Argument 2"],
       "source": "extrait exact"
     }
   ],
   "dates": [
-    { "date": "Date ou période", "event": "Événement", "source": "extrait" }
+    { "date": "Date", "event": "Événement", "source": "extrait" }
   ],
   "vocabulary": [
-    { "term": "Mot technique", "meaning": "Signification", "source": "extrait" }
+    { "term": "Mot", "meaning": "Signification", "source": "extrait" }
   ],
   "questions": [
     {
       "q": "Question probable au BAC ?",
-      "a": "Réponse extraite UNIQUEMENT du texte fourni",
+      "a": "UNE phrase complète qui répond, tirée du texte",
       "source": "extrait exact du texte élève"
-    }
-  ],
-  "planTypes": [
-    {
-      "title": "Plan dialectique possible",
-      "parties": ["Thèse", "Antithèse", "Synthèse"],
-      "source": "structuré à partir des arguments du texte"
     }
   ]
 }
 
-CONTRAINTES FINALES :
+CONTRAINTES :
 - keyIdeas : 3 à 5
-- definitions : 2 à 6 (si applicable)
-- arguments : 1 à 4 thèses
-- questions : 4 à 8 (PRIORITÉ ABSOLUE)
+- definitions : 2 à 6
+- questions : 4 à 8 (PRIORITÉ)
 - Réponds UNIQUEMENT avec le JSON`;
 }
 
 // ────────────────────────────────────────────────────────────────
-// FALLBACK LOCAL si IA indisponible
+// FALLBACK LOCAL
 // ────────────────────────────────────────────────────────────────
-function buildFallbackAnalysis({ subjectLabel, rawInput, profile }) {
+function buildFallbackAnalysis({ rawInput, profile }) {
   return {
     sectionTitle: 'Analyse',
     profile,
@@ -472,8 +546,7 @@ function buildFallbackAnalysis({ subjectLabel, rawInput, profile }) {
     definitions: [],
     arguments: [],
     dates: [],
-    vocabulary: [],
-    planTypes: []
+    vocabulary: []
   };
 }
 
@@ -524,7 +597,6 @@ async function markDailyActivity(uid, inc = {}) {
 async function getDashboard(uid) {
   const { db } = getAdminServices();
 
-  // Parcours des notebooks (8 matières possibles)
   const subjects = [];
   let totalChapters = 0;
   let totalSections = 0;
@@ -566,13 +638,10 @@ async function getDashboard(uid) {
     });
   }
 
-  // Tri : matières les plus récentes en premier
   subjects.sort((a, b) => b.sectionsCount - a.sectionsCount);
 
-  // Streak
   const streak = await computeStreak(uid);
 
-  // Activité récente : dernier chapitre modifié
   let recentActivity = [];
   if (subjects.length > 0) {
     const topSubject = subjects[0];
@@ -600,11 +669,7 @@ async function getDashboard(uid) {
 
   return {
     success: true,
-    summary: {
-      subjectsCount: subjects.length,
-      totalChapters,
-      totalSections
-    },
+    summary: { subjectsCount: subjects.length, totalChapters, totalSections },
     streak,
     subjects,
     recentActivity
@@ -711,7 +776,7 @@ async function createChapter(uid, body) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// ACTION 4 — getChapter (chapitre + sections)
+// ACTION 4 — getChapter
 // ═══════════════════════════════════════════════════════════════
 async function getChapter(uid, body) {
   const { subject, chapterId } = body;
@@ -767,22 +832,20 @@ async function getChapter(uid, body) {
 // ACTION 5 — createSection (avec analyse IA)
 // ═══════════════════════════════════════════════════════════════
 async function createSection(uid, body) {
-  const { subject, chapterId, rawInput, mode = 'text' } = body;
+  const { subject, chapterId, rawInput } = body;
 
   if (!ALLOWED_SUBJECTS.has(subject)) throw { status: 400, message: 'Matière invalide.' };
   if (!chapterId) throw { status: 400, message: 'chapterId requis.' };
   if (!rawInput || typeof rawInput !== 'string') throw { status: 400, message: 'Contenu manquant.' };
-  if (rawInput.length < MIN_CONTENT_LENGTH) {
+
+  const trimmed = rawInput.trim();
+  if (trimmed.length < MIN_CONTENT_LENGTH) {
     throw { status: 400, message: `Contenu trop court (min ${MIN_CONTENT_LENGTH} caractères).` };
   }
-  if (rawInput.length > MAX_CONTENT_LENGTH) {
+  if (trimmed.length > MAX_CONTENT_LENGTH) {
     throw { status: 400, message: `Contenu trop long (max ${MAX_CONTENT_LENGTH}).` };
   }
-  if (!ALLOWED_CAPTURE_MODES.has(mode)) {
-    throw { status: 400, message: 'Mode de capture invalide.' };
-  }
 
-  // Quota
   const quota = await checkSectionQuota(uid);
   if (!quota.allowed) {
     throw {
@@ -794,7 +857,6 @@ async function createSection(uid, body) {
 
   const { db, FieldValue } = getAdminServices();
 
-  // Vérifie que le chapitre existe
   const chapterRef = db
     .collection('users').doc(uid)
     .collection('notebooks').doc(subject)
@@ -803,17 +865,19 @@ async function createSection(uid, body) {
   const chapterSnap = await chapterRef.get();
   if (!chapterSnap.exists) throw { status: 404, message: 'Chapitre introuvable.' };
 
-  // Profil de la matière
   const info = SUBJECT_INFO[subject];
   const subjectLabel = info.label;
   const profile = info.profile;
+
+  // Normalisation (symboles Unicode → indices)
+  const normalizedInput = normalizeMathInput(trimmed);
 
   // Analyse IA
   let analysis;
   try {
     const prompt = profile === 'scientific'
-      ? buildScientificPrompt({ subjectLabel, rawInput })
-      : buildLiteraryPrompt({ subjectLabel, rawInput });
+      ? buildScientificPrompt({ subjectLabel, rawInput: normalizedInput })
+      : buildLiteraryPrompt({ subjectLabel, rawInput: normalizedInput });
 
     analysis = await generateWithFallback(
       prompt,
@@ -822,17 +886,15 @@ async function createSection(uid, body) {
     );
   } catch (aiError) {
     console.warn('[PROGRESS] Fallback local :', aiError.message);
-    analysis = buildFallbackAnalysis({ subjectLabel, rawInput, profile });
+    analysis = buildFallbackAnalysis({ rawInput: normalizedInput, profile });
   }
 
-  // Sauvegarde section
   const sectionRef = chapterRef.collection('sections').doc();
   const sectionId = sectionRef.id;
 
   await sectionRef.set({
     title: analysis.sectionTitle || 'Section',
-    rawInput,
-    mode,
+    rawInput: trimmed,
     profile,
     analysis,
     userNotes: '',
@@ -841,7 +903,6 @@ async function createSection(uid, body) {
     updatedAt: FieldValue.serverTimestamp()
   });
 
-  // Mise à jour compteur
   await chapterRef.set({
     sectionsCount: FieldValue.increment(1),
     updatedAt: FieldValue.serverTimestamp()
@@ -856,14 +917,11 @@ async function createSection(uid, body) {
     section: {
       id: sectionId,
       title: analysis.sectionTitle || 'Section',
-      rawInput,
+      rawInput: trimmed,
       analysis,
       userNotes: '',
       userImages: []
-    },
-    quota: quota.premium
-      ? { type: 'premium', unlimited: true }
-      : { type: 'free', used: quota.used + 1, limit: FREE_SECTION_LIMIT }
+    }
   };
 }
 
@@ -894,6 +952,7 @@ async function getSection(uid, body) {
       subject,
       chapterId,
       rawInput: s.rawInput || '',
+      profile: s.profile || 'scientific',
       analysis: s.analysis || {},
       userNotes: s.userNotes || '',
       userImages: s.userImages || [],
@@ -971,7 +1030,6 @@ async function deleteChapter(uid, body) {
   const snap = await chapterRef.get();
   if (!snap.exists) throw { status: 404, message: 'Chapitre introuvable.' };
 
-  // Supprime toutes les sections
   const sectionsSnap = await chapterRef.collection('sections').get();
   const batch = db.batch();
   sectionsSnap.docs.forEach((d) => batch.delete(d.ref));
@@ -1074,10 +1132,7 @@ module.exports = async function handler(request, response) {
     }
   } catch (error) {
     console.error(`[PROGRESS] "${action}" failed:`, error.message);
-    if (error.stack) console.error(error.stack);
-    if (error.status) {
-      return jsonError(response, error.status, error.message, error.code);
-    }
+    if (error.status) return jsonError(response, error.status, error.message, error.code);
     return jsonError(response, 500, error.message || 'Erreur serveur.');
   }
 };

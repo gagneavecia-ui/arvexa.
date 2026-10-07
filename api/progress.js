@@ -1,7 +1,7 @@
 // ================================================================
-// API PROGRESS v4.0 — ARVEXA School
+// API PROGRESS v5.0 — ARVEXA School
 // Cahier de notes intelligent : Matières → Chapitres → Sections
-// 2 profils : scientifique (enrichi) / littéraire (strict)
+// Approche LaTeX : tout en inline $...$ partout, validation stricte
 // ================================================================
 
 module.exports.config = { maxDuration: 60 };
@@ -141,17 +141,6 @@ function toISO(v) {
 function todayKey() { return new Date().toISOString().slice(0, 10); }
 function monthKey() { return new Date().toISOString().slice(0, 7); }
 
-function cleanId(str) {
-  return String(str || '')
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9_-]/g, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-|-$/g, '')
-    .slice(0, 60);
-}
-
 function formatRelativeDate(value) {
   const iso = toISO(value);
   if (!iso) return '';
@@ -170,14 +159,13 @@ function formatRelativeDate(value) {
 
 // ────────────────────────────────────────────────────────────────
 // NORMALISATION DES ENTRÉES ÉCRITES AU CLAVIER
-// Convertit les symboles Unicode / textuels en indices pour l'IA
 // ────────────────────────────────────────────────────────────────
 function normalizeMathInput(text) {
   if (!text || typeof text !== 'string') return '';
 
   let result = text;
 
-  // Puissances (Unicode → notation texte que l'IA comprend)
+  // Puissances (Unicode → notation texte)
   result = result.replace(/([a-zA-Z0-9\)])\s*²/g, '$1^2');
   result = result.replace(/([a-zA-Z0-9\)])\s*³/g, '$1^3');
   result = result.replace(/([a-zA-Z0-9\)])\s*⁴/g, '$1^4');
@@ -189,7 +177,7 @@ function normalizeMathInput(text) {
   result = result.replace(/√\s*\(([^)]+)\)/g, 'racine($1)');
   result = result.replace(/√\s*([a-zA-Z0-9]+)/g, 'racine($1)');
 
-  // Symboles mathématiques Unicode → texte
+  // Symboles math → texte
   result = result.replace(/≤/g, ' <= ');
   result = result.replace(/≥/g, ' >= ');
   result = result.replace(/≠/g, ' != ');
@@ -213,7 +201,7 @@ function normalizeMathInput(text) {
   result = result.replace(/±/g, ' plus ou moins ');
   result = result.replace(/≈/g, ' environ ');
 
-  // Fractions textuelles courantes
+  // Fractions textuelles
   result = result.replace(/(\d+)\s*\/\s*(\d+)/g, '$1 sur $2');
 
   return result;
@@ -261,7 +249,7 @@ async function callProvider(provider, prompt, maxTokens = MAX_AI_TOKENS) {
       messages: [
         {
           role: 'system',
-          content: 'Tu produis EXCLUSIVEMENT du JSON valide, sans markdown, sans texte avant ou après. Toute formule mathématique utilise LaTeX entre $...$ ou $$...$$.'
+          content: 'Tu produis EXCLUSIVEMENT du JSON valide, sans markdown, sans texte avant ou après. Toute formule mathématique DOIT être entre $...$ (inline) ou $$...$$ (display).'
         },
         { role: 'user', content: prompt }
       ]
@@ -323,39 +311,151 @@ async function generateWithFallback(prompt, validator, maxTokens = MAX_AI_TOKENS
 }
 
 // ────────────────────────────────────────────────────────────────
-// RÈGLE LATEX — bloc commun à tous les prompts
+// POST-TRAITEMENT LATEX
+// Enrobe automatiquement les LaTeX orphelins dans les champs texte
 // ────────────────────────────────────────────────────────────────
-const LATEX_CONVERSION_RULES = `
-═══════════════════════════════════════════════════════════════
-RÈGLE DE CONVERSION EN LATEX — TRÈS IMPORTANTE
-═══════════════════════════════════════════════════════════════
-L'élève écrit au clavier normal, sans LaTeX. Tu DOIS convertir
-TOUTES les formules en LaTeX propre dans tes réponses.
+function wrapOrphanLatex(text) {
+  if (!text || typeof text !== 'string') return text;
 
-Exemples de conversion :
-- "z = a + bi"          → "$z = a + bi$"
-- "i2 = -1" ou "i²=-1"  → "$i^2 = -1$"
-- "racine de a² + b²"   → "$\\sqrt{a^2 + b^2}$"
-- "z barre = a - bi"    → "$\\bar{z} = a - bi$"
-- "1 sur 2"             → "$\\frac{1}{2}$"
-- "pi sur 4"            → "$\\frac{\\pi}{4}$"
-- "x tend vers 0"       → "$x \\to 0$"
-- "somme de k=1 à n"    → "$\\sum_{k=1}^{n}$"
-- "integrale de a à b"  → "$\\int_{a}^{b}$"
-- "x inférieur ou égal" → "$x \\leq$"
-- "plus ou moins"       → "$\\pm$"
-- "lambda"              → "$\\lambda$"
+  let result = text;
 
-RÈGLES DE RENDU :
-- Inline : $...$  (dans une phrase)
-- Display : $$...$$  (formule isolée)
-- JAMAIS de symboles Unicode bruts dans la sortie
-  (❌ π, √, ², ≤, ∞, →)
-  (✅ $\\pi$, $\\sqrt{}$, $^{2}$, $\\leq$, $\\infty$, $\\to$)
+  // Détecte les commandes LaTeX isolées et les entoure de $
+  // Ex : "v = \sqrt{GM/R} avec..." → "v = $\sqrt{GM/R}$ avec..."
+  // Mais on évite de doubler les délimiteurs existants
+
+  // Cas 1 : passage "text = \command{...} text" hors $
+  result = result.replace(
+    /([^$]|^)(\\[a-zA-Z]+(?:\{[^}]*\})*(?:[_^]\{[^}]*\})*)/g,
+    (match, before, latex) => {
+      // Vérifie qu'on n'est pas déjà dans un $...$
+      return `${before}$$${latex}$$`;
+    }
+  );
+
+  // Nettoyage : élimine les $$ $$ vides ou en double
+  result = result.replace(/\${3,}/g, '$$');
+  result = result.replace(/\$\s*\$/g, '');
+
+  return result;
+}
+
+// Valide la structure générale d'une analyse
+function validateAnalysis(data, profile) {
+  if (!data || typeof data !== 'object') return false;
+  if (!data.summary && !data.keyIdeas) return false;
+
+  // Vérification : pas de \ orphelin hors des $...$
+  const fieldsToCheck = [
+    data.summary,
+    ...(Array.isArray(data.keyIdeas) ? data.keyIdeas : []),
+    ...(Array.isArray(data.method) ? data.method : []),
+    data.trap?.text,
+    data.trap?.solution,
+    data.example?.enonce,
+    ...(Array.isArray(data.example?.steps) ? data.example.steps : []),
+    data.example?.result
+  ].filter((x) => typeof x === 'string');
+
+  for (const field of fieldsToCheck) {
+    // Cherche un \command qui n'est pas entre $...$
+    // Méthode : on retire tous les $...$ puis on regarde s'il reste des \
+    const withoutMath = field.replace(/\$[^$]*\$/g, '');
+    if (/\\[a-zA-Z]/.test(withoutMath)) {
+      console.warn(`[VALIDATION] LaTeX orphelin détecté : "${field.slice(0, 80)}"`);
+      return false;
+    }
+  }
+
+  return true;
+}
+
+// ────────────────────────────────────────────────────────────────
+// RÈGLE LATEX — bloc commun
+// ────────────────────────────────────────────────────────────────
+const LATEX_RULES = `
+═══════════════════════════════════════════════════════════════
+RÈGLE LATEX — ABSOLUE, ULTRA-STRICTE, NON NÉGOCIABLE
+═══════════════════════════════════════════════════════════════
+C'est la règle la plus importante de ta mission. Lis-la 2 fois.
+
+PRINCIPE UNIQUE :
+TOUT symbole ou formule mathématique DOIT être entre $ et $.
+Un backslash \ SANS $ autour s'affiche EN TEXTE BRUT chez l'élève.
+
+═══════════════════════════════════════════════════════════════
+RÈGLE 1 — Délimiteurs obligatoires
+═══════════════════════════════════════════════════════════════
+Chaque formule commence ET finit par $.
+
+❌ INTERDIT :
+"v = \\sqrt{GM/R}"
+
+✅ CORRECT :
+"$v = \\sqrt{GM/R}$"
+
+═══════════════════════════════════════════════════════════════
+RÈGLE 2 — Le champ formulas[].latex CONTIENT DÉJÀ les $
+═══════════════════════════════════════════════════════════════
+⚠️ IMPORTANT : le champ "latex" de formulas[] DOIT contenir les $ lui-même.
+
+❌ INTERDIT :
+{ "latex": "z = a + bi" }
+
+✅ CORRECT :
+{ "latex": "$z = a + bi$" }
+
+Pour les formules affichées en grand, utilise $$ :
+{ "latex": "$$z = a + bi$$" }
+
+═══════════════════════════════════════════════════════════════
+RÈGLE 3 — Une phrase = plusieurs $...$ si besoin
+═══════════════════════════════════════════════════════════════
+Chaque formule dans une phrase est entourée séparément.
+
+❌ INTERDIT :
+"Le module vaut |z| = \\sqrt{a^2 + b^2} donc..."
+
+✅ CORRECT :
+"Le module vaut $|z| = \\sqrt{a^2 + b^2}$ donc..."
+
+═══════════════════════════════════════════════════════════════
+RÈGLE 4 — Unités dans \\text{}
+═══════════════════════════════════════════════════════════════
+Pour les unités, utilise \\text{} :
+
+❌ INTERDIT :
+"5 m\\cdot s^{-1}"
+
+✅ CORRECT :
+"$5\\ \\text{m}\\cdot\\text{s}^{-1}$"
+
+═══════════════════════════════════════════════════════════════
+RÈGLE 5 — Zéro symbole Unicode
+═══════════════════════════════════════════════════════════════
+INTERDIT : π √ ² ³ ≤ ≥ ∞ → × · ≠ ∈ ∑ ∫ Δ α β θ λ μ
+AUTORISÉ : $\\pi$ $\\sqrt{}$ $^{2}$ $^{3}$ $\\leq$ $\\geq$ $\\infty$ $\\to$
+          $\\times$ $\\cdot$ $\\neq$ $\\in$ $\\sum$ $\\int$ $\\Delta$
+          $\\alpha$ $\\beta$ $\\theta$ $\\lambda$ $\\mu$
+
+═══════════════════════════════════════════════════════════════
+RÈGLE 6 — Virgule décimale française
+═══════════════════════════════════════════════════════════════
+Utilise $6{,}67$ et non $6,67$ (sinon KaTeX ajoute un espace).
+
+═══════════════════════════════════════════════════════════════
+VÉRIFICATION OBLIGATOIRE — AVANT DE RÉPONDRE
+═══════════════════════════════════════════════════════════════
+Passe en revue CHAQUE champ de ton JSON :
+1. Y a-t-il un \\ hors des $...$ ? → Corrige.
+2. Y a-t-il un symbole Unicode (π, √, ²...) ? → Corrige en LaTeX.
+3. Le champ formulas[].latex contient-il bien les $ ?
+4. Chaque $ ouvert est-il fermé ?
+
+Si UNE SEULE réponse est "non" → corrige AVANT de répondre.
 `;
 
 // ────────────────────────────────────────────────────────────────
-// PROMPT — PROFIL SCIENTIFIQUE (enrichi autorisé)
+// PROMPT SCIENTIFIQUE
 // ────────────────────────────────────────────────────────────────
 function buildScientificPrompt({ subjectLabel, rawInput }) {
   return `Tu es un professeur expert du BAC au Niger, spécialiste de ${subjectLabel}.
@@ -369,7 +469,7 @@ CONTENU COLLÉ PAR L'ÉLÈVE
 ═══════════════════════════════════════════════════════════════
 ${rawInput}
 
-${LATEX_CONVERSION_RULES}
+${LATEX_RULES}
 
 ═══════════════════════════════════════════════════════════════
 MISSION
@@ -390,9 +490,9 @@ FORMAT JSON ATTENDU
 {
   "sectionTitle": "Titre court (max 60 caractères)",
   "profile": "scientific",
-  "summary": "Résumé en 3-4 phrases claires de la notion",
+  "summary": "Résumé en 3-4 phrases avec formules inline $...$ si besoin",
   "keyIdeas": [
-    "Idée clé 1",
+    "Idée clé 1 avec $formule$ si besoin",
     "Idée clé 2",
     "Idée clé 3"
   ],
@@ -404,14 +504,14 @@ FORMAT JSON ATTENDU
     }
   ],
   "method": [
-    "Étape 1 : ...",
+    "Étape 1 : description avec $formule$ si besoin",
     "Étape 2 : ...",
     "Étape 3 : ..."
   ],
   "example": {
-    "enonce": "Exemple chiffré complet",
+    "enonce": "Énoncé avec $valeurs$ chiffrées",
     "steps": [
-      "Étape 1 : calcul détaillé",
+      "Étape 1 : calcul avec $formule$",
       "Étape 2 : ...",
       "Étape 3 : ..."
     ],
@@ -424,10 +524,13 @@ FORMAT JSON ATTENDU
   "exercises": [
     {
       "enonce": "Exercice d'application",
-      "indice": "Indice pour aider",
+      "indice": "Indice avec $formule$ si besoin",
       "correction": {
-        "steps": ["Étape 1", "Étape 2"],
-        "reponse": "Résultat final"
+        "steps": [
+          "Étape 1 avec $calcul$",
+          "Étape 2 avec $calcul$"
+        ],
+        "reponse": "$résultat final$"
       },
       "difficulty": 1
     }
@@ -439,11 +542,17 @@ CONTRAINTES :
 - formulas : 1 à 5
 - method : 2 à 5 étapes
 - exercises : 2 à 4 exercices
-- Réponds UNIQUEMENT avec le JSON`;
+
+⚠️ RAPPEL FINAL ULTRA-IMPORTANT :
+- Le champ formulas[].latex DOIT contenir les $ (ex: "$z = a + bi$")
+- AUCUN \\ hors des $...$ dans les champs texte
+- AUCUN symbole Unicode (π, √, ², ≤, ∞, →, ×, ·, ≠)
+
+Réponds UNIQUEMENT avec le JSON`;
 }
 
 // ────────────────────────────────────────────────────────────────
-// PROMPT — PROFIL LITTÉRAIRE (strict, anti-invention)
+// PROMPT LITTÉRAIRE
 // ────────────────────────────────────────────────────────────────
 function buildLiteraryPrompt({ subjectLabel, rawInput }) {
   return `Tu es un professeur expert du BAC au Niger, spécialiste de ${subjectLabel}.
@@ -476,8 +585,8 @@ RÈGLE DE RÉDACTION DES RÉPONSES
 
 Exemple :
 Q : "Qu'est-ce que l'homme ?"
-✅ Bonne réponse : "L'homme est un être vivant qui vit sur la Terre."
-❌ Mauvaise réponse : "vivant" ou "être vivant"
+✅ "L'homme est un être vivant qui vit sur la Terre."
+❌ "vivant" ou "être vivant"
 
 ═══════════════════════════════════════════════════════════════
 FORMAT JSON ATTENDU
@@ -523,7 +632,128 @@ CONTRAINTES :
 - keyIdeas : 3 à 5
 - definitions : 2 à 6
 - questions : 4 à 8 (PRIORITÉ)
-- Réponds UNIQUEMENT avec le JSON`;
+
+⚠️ RAPPEL : si le texte contient des formules ou symboles,
+entoure-les de $...$. Sinon reste en texte simple.
+
+Réponds UNIQUEMENT avec le JSON`;
+}
+
+// ────────────────────────────────────────────────────────────────
+// POST-TRAITEMENT APRÈS IA
+// Corrige automatiquement les oublis
+// ────────────────────────────────────────────────────────────────
+function postProcessAnalysis(analysis, profile) {
+  if (!analysis) return analysis;
+
+  // Traite les champs texte : wrap les LaTeX orphelins
+  if (typeof analysis.summary === 'string') {
+    analysis.summary = wrapOrphanLatex(analysis.summary);
+  }
+
+  if (Array.isArray(analysis.keyIdeas)) {
+    analysis.keyIdeas = analysis.keyIdeas.map((x) =>
+      typeof x === 'string' ? wrapOrphanLatex(x) : x
+    );
+  }
+
+  if (Array.isArray(analysis.method)) {
+    analysis.method = analysis.method.map((x) =>
+      typeof x === 'string' ? wrapOrphanLatex(x) : x
+    );
+  }
+
+  // Formules : s'assurer que chaque latex a ses $
+  if (Array.isArray(analysis.formulas)) {
+    analysis.formulas = analysis.formulas.map((f) => {
+      if (!f || typeof f !== 'object') return f;
+      let latex = f.latex || '';
+      // Si pas de $, on en ajoute
+      if (latex && !latex.includes('$')) {
+        f.latex = `$${latex}$`;
+      }
+      // Condition : wrap orphelins
+      if (typeof f.condition === 'string') {
+        f.condition = wrapOrphanLatex(f.condition);
+      }
+      return f;
+    });
+  }
+
+  // Exemple
+  if (analysis.example) {
+    if (typeof analysis.example.enonce === 'string') {
+      analysis.example.enonce = wrapOrphanLatex(analysis.example.enonce);
+    }
+    if (Array.isArray(analysis.example.steps)) {
+      analysis.example.steps = analysis.example.steps.map((x) =>
+        typeof x === 'string' ? wrapOrphanLatex(x) : x
+      );
+    }
+    if (typeof analysis.example.result === 'string') {
+      analysis.example.result = wrapOrphanLatex(analysis.example.result);
+    }
+  }
+
+  // Trap
+  if (analysis.trap) {
+    if (typeof analysis.trap.text === 'string') {
+      analysis.trap.text = wrapOrphanLatex(analysis.trap.text);
+    }
+    if (typeof analysis.trap.solution === 'string') {
+      analysis.trap.solution = wrapOrphanLatex(analysis.trap.solution);
+    }
+  }
+
+  // Exercices
+  if (Array.isArray(analysis.exercises)) {
+    analysis.exercises = analysis.exercises.map((ex) => {
+      if (typeof ex.enonce === 'string') ex.enonce = wrapOrphanLatex(ex.enonce);
+      if (typeof ex.indice === 'string') ex.indice = wrapOrphanLatex(ex.indice);
+      if (ex.correction) {
+        if (Array.isArray(ex.correction.steps)) {
+          ex.correction.steps = ex.correction.steps.map((x) =>
+            typeof x === 'string' ? wrapOrphanLatex(x) : x
+          );
+        }
+        if (typeof ex.correction.reponse === 'string') {
+          ex.correction.reponse = wrapOrphanLatex(ex.correction.reponse);
+        }
+      }
+      return ex;
+    });
+  }
+
+  // Questions
+  if (Array.isArray(analysis.questions)) {
+    analysis.questions = analysis.questions.map((q) => {
+      if (typeof q.q === 'string') q.q = wrapOrphanLatex(q.q);
+      if (typeof q.a === 'string') q.a = wrapOrphanLatex(q.a);
+      return q;
+    });
+  }
+
+  // Définitions
+  if (Array.isArray(analysis.definitions)) {
+    analysis.definitions = analysis.definitions.map((d) => {
+      if (typeof d.definition === 'string') d.definition = wrapOrphanLatex(d.definition);
+      return d;
+    });
+  }
+
+  // Arguments
+  if (Array.isArray(analysis.arguments)) {
+    analysis.arguments = analysis.arguments.map((arg) => {
+      if (Array.isArray(arg.arguments)) {
+        arg.arguments = arg.arguments.map((x) =>
+          typeof x === 'string' ? wrapOrphanLatex(x) : x
+        );
+      }
+      return arg;
+    });
+  }
+
+  return analysis;
 }
 
 // ────────────────────────────────────────────────────────────────
@@ -829,7 +1059,7 @@ async function getChapter(uid, body) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// ACTION 5 — createSection (avec analyse IA)
+// ACTION 5 — createSection
 // ═══════════════════════════════════════════════════════════════
 async function createSection(uid, body) {
   const { subject, chapterId, rawInput } = body;
@@ -869,7 +1099,7 @@ async function createSection(uid, body) {
   const subjectLabel = info.label;
   const profile = info.profile;
 
-  // Normalisation (symboles Unicode → indices)
+  // Normalisation
   const normalizedInput = normalizeMathInput(trimmed);
 
   // Analyse IA
@@ -884,6 +1114,21 @@ async function createSection(uid, body) {
       (d) => d && typeof d === 'object' && (d.summary || d.keyIdeas),
       MAX_AI_TOKENS
     );
+
+    // Post-traitement : corriger les LaTeX orphelins
+    analysis = postProcessAnalysis(analysis, profile);
+
+    // Validation
+    if (!validateAnalysis(analysis, profile)) {
+      console.warn('[PROGRESS] Validation échouée — on retente une fois');
+      const retryData = await generateWithFallback(
+        prompt + '\n\n⚠️ ATTENTION : la génération précédente contenait du LaTeX SANS $ autour. Cette fois, VÉRIFIE BIEN que CHAQUE formule est entre $...$.',
+        (d) => d && typeof d === 'object' && (d.summary || d.keyIdeas),
+        MAX_AI_TOKENS
+      );
+      analysis = postProcessAnalysis(retryData, profile);
+    }
+
   } catch (aiError) {
     console.warn('[PROGRESS] Fallback local :', aiError.message);
     analysis = buildFallbackAnalysis({ rawInput: normalizedInput, profile });
@@ -944,6 +1189,9 @@ async function getSection(uid, body) {
   if (!snap.exists) throw { status: 404, message: 'Section introuvable.' };
 
   const s = snap.data();
+  // Post-traite à la lecture aussi (sécurité pour anciennes sections)
+  const analysis = postProcessAnalysis(s.analysis || {}, s.profile || 'scientific');
+
   return {
     success: true,
     section: {
@@ -953,7 +1201,7 @@ async function getSection(uid, body) {
       chapterId,
       rawInput: s.rawInput || '',
       profile: s.profile || 'scientific',
-      analysis: s.analysis || {},
+      analysis,
       userNotes: s.userNotes || '',
       userImages: s.userImages || [],
       createdAt: toISO(s.createdAt),
@@ -1062,10 +1310,11 @@ async function getFullLesson(uid, body) {
 
   const sections = sectionsSnap.docs.map((d) => {
     const s = d.data();
+    const analysis = postProcessAnalysis(s.analysis || {}, s.profile || 'scientific');
     return {
       id: d.id,
       title: s.title || 'Section',
-      analysis: s.analysis || {},
+      analysis,
       userNotes: s.userNotes || '',
       userImages: s.userImages || []
     };

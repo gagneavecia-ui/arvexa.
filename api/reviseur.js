@@ -1,12 +1,12 @@
 // ================================================================
-// API RÉVISEUR v5.0 — ARVEXA School
+// API RÉVISEUR v6.0 — ARVEXA School
 // - Fiche & Flashcards : cache permanent partagé (validé par admin)
 // - Quiz : TOUJOURS nouveau (pas de cache + seed aléatoire)
-// - Première génération complète : retry automatique
+// - Base connaissances : require statique (Vercel-safe)
+// - Support chapter = 'all' (programme complet)
 // ================================================================
 
-const fs = require('fs');
-const path = require('path');
+// NOTE : fs/path supprimés — la base est chargée via require statique.
 
 module.exports.config = { maxDuration: 60 };
 
@@ -18,7 +18,7 @@ const FREE_REVISEUR_LIMIT = 2;
 
 const ALLOWED_SUBJECTS = new Set(['mathematiques', 'physique', 'chimie', 'svt']);
 const ALLOWED_MODES = new Set(['fiche', 'flashcard']);
-const ALLOWED_ACTIONS = new Set(['generate', 'quiz', 'exercises']);
+const ALLOWED_ACTIONS = new Set(['generate', 'quiz', 'exercises', 'approveCache', 'listPendingCaches']);
 
 const MAX_TOKENS = {
   FICHE: 8000,
@@ -29,6 +29,7 @@ const MAX_TOKENS = {
 
 const NOTION_BATCH_SIZE = 4;
 const MAX_BATCHES = 8;
+const MAX_NOTIONS_ALL = 24;               // garde-fou pour chapter = 'all'
 const KNOWLEDGE_CACHE_COLLECTION = 'knowledgeCache';
 
 const KNOWLEDGE_MEMORY_CACHE = new Map();
@@ -64,44 +65,73 @@ function getAdminServices() {
 }
 
 // ════════════════════════════════════════════════════════════════
-// BASE DE CONNAISSANCES
+// BASE DE CONNAISSANCES — chargement statique (Vercel-safe)
 // ════════════════════════════════════════════════════════════════
+const KNOWLEDGE_MODULES = {
+  mathematiques: () => require('./bac-mathematiques.js')
+  // physique:    () => require('./bac-physique.js'),   // décommenter quand le fichier existe
+  // chimie:      () => require('./bac-chimie.js'),     // décommenter quand le fichier existe
+  // svt:         () => require('./bac-svt.js')         // décommenter quand le fichier existe
+};
+
+function extractKnowledge(mod) {
+  if (!mod) return null;
+  return mod.BAC_MATHEMATIQUES
+      || mod.BAC_PHYSIQUE
+      || mod.BAC_CHIMIE
+      || mod.BAC_SVT
+      || (mod.chapitres ? mod : null);
+}
+
 function loadKnowledgeBase(subject) {
   if (KNOWLEDGE_MEMORY_CACHE.has(subject)) return KNOWLEDGE_MEMORY_CACHE.get(subject);
-  const filename = `bac-${subject}.json`;
-  const filePath = path.join(process.cwd(), filename);
+
+  const loader = KNOWLEDGE_MODULES[subject];
+  if (!loader) {
+    console.warn(`[REVISEUR] Aucun module pour "${subject}"`);
+    KNOWLEDGE_MEMORY_CACHE.set(subject, null);
+    return null;
+  }
 
   try {
-    if (!fs.existsSync(filePath)) {
-      console.log(`[REVISEUR] Base absente : ${filename}`);
+    const mod = loader();
+    const data = extractKnowledge(mod);
+    if (!data || !Array.isArray(data.chapitres)) {
+      console.warn(`[REVISEUR] Base invalide pour "${subject}"`);
       KNOWLEDGE_MEMORY_CACHE.set(subject, null);
       return null;
     }
-    const raw = fs.readFileSync(filePath, 'utf-8');
-    const data = JSON.parse(raw);
-    console.log(`[REVISEUR] ✅ Base chargée : ${filename}`);
+    console.log(`[REVISEUR] ✅ Base "${subject}" : ${data.chapitres.length} chapitres`);
     KNOWLEDGE_MEMORY_CACHE.set(subject, data);
     return data;
-  } catch (error) {
-    console.error(`[REVISEUR] Erreur ${filename}:`, error.message);
+  } catch (err) {
+    console.error(`[REVISEUR] ❌ Chargement "${subject}" :`, err.message);
     KNOWLEDGE_MEMORY_CACHE.set(subject, null);
     return null;
   }
 }
 
 function normalizeText(str) {
-  return String(str || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, '');
+  return String(str || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[\u00A0\u2000-\u200B]/g, '')
+    .replace(/[''`]/g, '')
+    .replace(/[^a-z0-9]/g, '');
 }
 
 function findChapter(knowledgeBase, chapterName) {
   if (!knowledgeBase || !chapterName) return null;
   const target = normalizeText(chapterName);
+  if (!target) return null;
+
   for (const ch of knowledgeBase.chapitres || []) {
     if (normalizeText(ch.titre) === target || normalizeText(ch.id) === target) return ch;
   }
   for (const ch of knowledgeBase.chapitres || []) {
-    const chNorm = normalizeText(ch.titre);
-    if (chNorm.includes(target) || target.includes(chNorm)) return ch;
+    const t = normalizeText(ch.titre);
+    if (t && (t.includes(target) || target.includes(t))) return ch;
   }
   return null;
 }
@@ -109,6 +139,17 @@ function findChapter(knowledgeBase, chapterName) {
 function getMandatoryNotions(chapter) {
   if (!chapter || !Array.isArray(chapter.notions)) return [];
   return chapter.notions.filter((n) => n.obligatoire !== false);
+}
+
+function collectAllNotions(knowledgeBase, max = MAX_NOTIONS_ALL) {
+  const all = [];
+  for (const ch of knowledgeBase.chapitres || []) {
+    for (const n of getMandatoryNotions(ch)) {
+      all.push(n);
+      if (all.length >= max) return all;
+    }
+  }
+  return all;
 }
 
 // ════════════════════════════════════════════════════════════════
@@ -305,7 +346,6 @@ async function generateWithFallback(prompt, validator, maxTokens = 4000, tempera
 
 // ════════════════════════════════════════════════════════════════
 // CACHE PERMANENT (fiche + flashcards)
-// Statut : 'pending' (en attente de validation) | 'approved' | 'rejected'
 // ════════════════════════════════════════════════════════════════
 function buildCacheKey(subject, chapter, mode) {
   return `${subject}_${cleanId(chapter)}_${mode}`;
@@ -428,11 +468,7 @@ FORMAT DE RÉPONSE (JSON UNIQUEMENT) :
       },
       "astuce": "Mnémo court"
     }
-  ],
-  "keyPoints": ["Point clé 1", "Point clé 2", "Point clé 3", "Point clé 4", "Point clé 5"],
-  "examTraps": [{"trap": "Piège global", "solution": "Solution"}],
-  "commonMistakes": ["Erreur 1", "Erreur 2"],
-  "recap": ["Récap 1", "Récap 2"]
+  ]
 }
 
 CONTRAINTES FINALES :
@@ -559,14 +595,7 @@ function buildFallbackFiche(chapterTitle, notions) {
     };
   });
 
-  return {
-    chapterTitle,
-    sections,
-    keyPoints: notions.slice(0, 5).map((n) => n.titre),
-    examTraps: [],
-    commonMistakes: [],
-    recap: notions.slice(0, 5).map((n) => `Retenir : ${n.titre}`)
-  };
+  return { chapterTitle, sections };
 }
 
 function buildFallbackFlashcards(chapterTitle, notions) {
@@ -578,6 +607,28 @@ function buildFallbackFlashcards(chapterTitle, notions) {
     cards.push({ notionId: n.id, type: 'piege', question: `Piège de « ${n.titre} » ?`, answer: (n.pieges_examen && n.pieges_examen[0]) || 'Voir cours.', hint: null, difficulty: 2 });
   });
   return { chapterTitle, flashcards: cards };
+}
+
+function buildFallbackQuiz(chapterTitle, notions, count) {
+  const quiz = [];
+  const pool = notions.length > 0 ? notions : [{ id: 'default', titre: chapterTitle, description: 'Notion du chapitre' }];
+  for (let i = 0; i < count; i++) {
+    const n = pool[i % pool.length];
+    quiz.push({
+      notionId: n.id,
+      level: 1,
+      question: `Question de révision sur « ${n.titre} » (${i + 1})`,
+      options: [
+        { id: 'A', text: 'Réponse A' },
+        { id: 'B', text: 'Réponse B' },
+        { id: 'C', text: 'Réponse C' },
+        { id: 'D', text: 'Réponse D' }
+      ],
+      correctAnswer: 'A',
+      explanation: 'Quiz de secours — recharge la page pour retenter une génération IA.'
+    });
+  }
+  return { chapterTitle, quiz };
 }
 
 // ════════════════════════════════════════════════════════════════
@@ -604,17 +655,7 @@ async function generateFicheByBatches(subjectLabel, chapterTitle, notions) {
     allSections.push(...fb.sections);
   });
 
-  const firstValid = results.find((r) => r.status === 'fulfilled' && r.value?.data);
-  const extra = firstValid?.value?.data || {};
-
-  return {
-    chapterTitle,
-    sections: allSections,
-    keyPoints: extra.keyPoints || notions.slice(0, 5).map((n) => n.titre),
-    examTraps: extra.examTraps || [],
-    commonMistakes: extra.commonMistakes || [],
-    recap: extra.recap || []
-  };
+  return { chapterTitle, sections: allSections };
 }
 
 async function generateFlashcardsByBatches(subjectLabel, chapterTitle, notions) {
@@ -646,7 +687,6 @@ async function generateQuizByBatches(subjectLabel, chapterTitle, notions, level,
   const results = await Promise.allSettled(
     batches.map(async (batch) => {
       const prompt = buildQuizPrompt(subjectLabel, chapterTitle, batch, level, countPerBatch, seed);
-      // temperature élevée → plus de variété
       const data = await generateWithFallback(prompt, validateQuiz, MAX_TOKENS.QUIZ, 0.7);
       return { batch, data };
     })
@@ -656,6 +696,11 @@ async function generateQuizByBatches(subjectLabel, chapterTitle, notions, level,
   results.forEach((r) => {
     if (r.status === 'fulfilled' && r.value?.data?.quiz) allQuestions.push(...r.value.data.quiz);
   });
+
+  if (allQuestions.length === 0) {
+    console.warn('[REVISEUR] Quiz IA vide → fallback');
+    return buildFallbackQuiz(chapterTitle, notions, totalCount);
+  }
   return { chapterTitle, quiz: allQuestions.slice(0, totalCount) };
 }
 
@@ -681,7 +726,7 @@ module.exports = async function handler(request, response) {
   if (!ALLOWED_SUBJECTS.has(body.subject)) return jsonError(response, 400, 'Matière invalide.');
   if (typeof body.chapter !== 'string' || body.chapter.length > 100) return jsonError(response, 400, 'Chapitre invalide.');
 
-  // ── Cas spécial : admin valide un cache ──
+  // ── Admin : approuver un cache ──
   if (action === 'approveCache') {
     const admin = await isAdmin(user.uid);
     if (!admin) return jsonError(response, 403, 'Réservé aux admins.', 'ADMIN_REQUIRED');
@@ -694,7 +739,7 @@ module.exports = async function handler(request, response) {
     }
   }
 
-  // ── Cas : liste des caches en attente ──
+  // ── Admin : lister les caches en attente ──
   if (action === 'listPendingCaches') {
     const admin = await isAdmin(user.uid);
     if (!admin) return jsonError(response, 403, 'Réservé aux admins.', 'ADMIN_REQUIRED');
@@ -710,16 +755,35 @@ module.exports = async function handler(request, response) {
 
   // ── Chargement base ──
   const knowledgeBase = loadKnowledgeBase(body.subject);
-  const chapterData = knowledgeBase ? findChapter(knowledgeBase, body.chapter) : null;
-  const mandatoryNotions = chapterData ? getMandatoryNotions(chapterData) : [];
-  const hasKnowledge = mandatoryNotions.length > 0;
-
   const subjectLabel = knowledgeBase?.matiereLabel ||
     { mathematiques: 'Mathématiques', physique: 'Physique', chimie: 'Chimie', svt: 'SVT' }[body.subject] ||
     body.subject;
-  const chapterTitle = chapterData?.titre || body.chapter;
 
-  console.log(`[REVISEUR] ${action} | ${body.subject} > ${body.chapter} | ${mandatoryNotions.length} notions`);
+  if (!knowledgeBase) {
+    return jsonError(response, 400, `La matière « ${subjectLabel} » sera bientôt disponible.`, 'SUBJECT_NOT_READY');
+  }
+
+  let chapterData = null;
+  let mandatoryNotions = [];
+  let chapterTitle = body.chapter;
+
+  if (body.chapter === 'all') {
+    mandatoryNotions = collectAllNotions(knowledgeBase, MAX_NOTIONS_ALL);
+    chapterTitle = 'Programme complet';
+    chapterData = { titre: chapterTitle };
+  } else {
+    chapterData = findChapter(knowledgeBase, body.chapter);
+    if (!chapterData) {
+      console.warn(`[REVISEUR] Chapitre introuvable: "${body.chapter}"`);
+      console.warn(`[REVISEUR] Disponibles:`, (knowledgeBase.chapitres || []).map((c) => c.titre));
+      return jsonError(response, 400, `Chapitre « ${body.chapter} » introuvable.`, 'CHAPTER_NOT_FOUND');
+    }
+    mandatoryNotions = getMandatoryNotions(chapterData);
+    chapterTitle = chapterData.titre;
+  }
+
+  const hasKnowledge = mandatoryNotions.length > 0;
+  console.log(`[REVISEUR] ${action} | ${body.subject} > ${chapterTitle} | ${mandatoryNotions.length} notions`);
 
   // ── Réservation quota (generate seulement) ──
   let reservation = null;
@@ -752,7 +816,7 @@ module.exports = async function handler(request, response) {
 
       const isFlashcard = body.mode === 'flashcard';
 
-      // 1. Chercher le cache APPROUVÉ
+      // 1. Cache approuvé ?
       const cached = await getApprovedCache(body.subject, body.chapter, body.mode);
       if (cached) {
         console.log('[REVISEUR] ✅ Cache approuvé servi');
@@ -769,7 +833,7 @@ module.exports = async function handler(request, response) {
         });
       }
 
-      // 2. Cache absent → on génère
+      // 2. Génération IA
       let session;
       let source = 'ai';
 
@@ -786,13 +850,13 @@ module.exports = async function handler(request, response) {
         }
       } catch (aiError) {
         console.warn('[REVISEUR] IA échouée:', aiError.message);
-        session = hasKnowledge
-          ? (isFlashcard ? buildFallbackFlashcards(chapterTitle, mandatoryNotions) : buildFallbackFiche(chapterTitle, mandatoryNotions))
-          : (isFlashcard ? { chapterTitle, flashcards: [] } : { chapterTitle, sections: [] });
+        session = isFlashcard
+          ? buildFallbackFlashcards(chapterTitle, mandatoryNotions)
+          : buildFallbackFiche(chapterTitle, mandatoryNotions);
         source = 'fallback';
       }
 
-      // 3. Sauvegarder en PENDING (sera validé par admin)
+      // 3. Sauvegarde en pending (validation admin)
       if (hasKnowledge && source === 'ai') {
         saveCacheAsPending(body.subject, body.chapter, body.mode, session, user.uid).catch(() => {});
       }
@@ -816,14 +880,14 @@ module.exports = async function handler(request, response) {
     }
 
     // ═══════════════════════════════════════════════════════
-    // ACTION : QUIZ — PAS DE CACHE, TOUJOURS NOUVEAU
+    // ACTION : QUIZ — PAS DE CACHE
     // ═══════════════════════════════════════════════════════
     if (action === 'quiz') {
       const count = Math.min(20, Math.max(5, Number(body.count) || 5));
       const level = Number(body.difficulty) || 2;
       const seed = hashString(Date.now() + '_' + user.uid + '_' + Math.random());
 
-      console.log(`[REVISEUR] Quiz généré — seed: ${seed}`);
+      console.log(`[REVISEUR] Quiz — seed: ${seed}`);
 
       let quizData;
       let source = 'ai';
@@ -832,12 +896,12 @@ module.exports = async function handler(request, response) {
         if (hasKnowledge) {
           quizData = await generateQuizByBatches(subjectLabel, chapterTitle, mandatoryNotions, level, count, seed);
         } else {
-          quizData = { chapterTitle, quiz: [] };
+          quizData = buildFallbackQuiz(chapterTitle, [], count);
           source = 'fallback';
         }
       } catch (e) {
         console.warn('[REVISEUR] Quiz IA échoué:', e.message);
-        quizData = { chapterTitle, quiz: [] };
+        quizData = buildFallbackQuiz(chapterTitle, mandatoryNotions, count);
         source = 'fallback';
       }
 
@@ -850,7 +914,7 @@ module.exports = async function handler(request, response) {
     }
 
     // ═══════════════════════════════════════════════════════
-    // ACTION : EXERCISES — PAS DE CACHE, TOUJOURS NOUVEAU
+    // ACTION : EXERCISES — PAS DE CACHE
     // ═══════════════════════════════════════════════════════
     if (action === 'exercises') {
       const seed = hashString(Date.now() + '_' + user.uid);

@@ -1,49 +1,42 @@
 // ================================================================
-// API PROGRESS v2.0 — ARVEXA School
-// Moteur d'apprentissage actif :
-//   Envoyer cours → Comprendre → Mémoriser → Tester → Progresser
+// API PROGRESS v3.0 — ARVEXA School
+// Cahier de notes intelligent : Matières → Chapitres → Sections
+// Modèle : users/{uid}/notebooks/{subject}/chapters/{chapterId}
+//                              └── sections/{sectionId}
 // ================================================================
 
+module.exports.config = { maxDuration: 60 };
+
 // ────────────────────────────────────────────────────────────────
-// CONFIG
+// CONSTANTES
 // ────────────────────────────────────────────────────────────────
 const WINDOW_MS = 60 * 1000;
-const MAX_REQUESTS_PER_WINDOW = 30;
+const MAX_REQUESTS_PER_WINDOW = 40;
 const requestLog = new Map();
 
-const ALLOWED_SUBJECTS = new Set(['mathematiques', 'physique', 'chimie', 'svt']);
-const ALLOWED_CAPTURE_MODES = new Set(['text', 'voice']);
-const MIN_CONTENT_LENGTH = 100;
-const MAX_CONTENT_LENGTH = 15000;
-const MAX_NOTIONS_PER_COURSE = 12;
+const ALLOWED_SUBJECTS = new Set([
+  'mathematiques', 'physique', 'chimie', 'svt',
+  'philosophie', 'histoire-geo', 'francais', 'anglais'
+]);
 
-const FREE_CAPTURE_LIMIT = 3;         // 3 cours ajoutés / mois
-
-// SRS constants (SM-2 simplifié)
-const SRS_MIN_EASINESS = 1.3;
-const SRS_MAX_EASINESS = 2.8;
-const SRS_DEFAULT_EASINESS = 2.5;
-const SRS_MAX_INTERVAL_DAYS = 180;
-
-const ERROR_CATEGORIES = [
-  'formula_error',
-  'calculation_error',
-  'comprehension_error',
-  'method_error',
-  'forgetting',
-  'confusion',
-  'prerequisite_gap'
-];
-
-const SUBJECT_LABELS = {
-  mathematiques: { label: 'Mathématiques', icon: 'fa-square-root-variable' },
-  physique: { label: 'Physique', icon: 'fa-bolt' },
-  chimie: { label: 'Chimie', icon: 'fa-flask' },
-  svt: { label: 'SVT', icon: 'fa-dna' }
+const SUBJECT_INFO = {
+  mathematiques: { label: 'Mathématiques',    icon: 'fa-square-root-variable', profile: 'scientific' },
+  physique:      { label: 'Physique',         icon: 'fa-bolt',                 profile: 'scientific' },
+  chimie:        { label: 'Chimie',           icon: 'fa-flask',                profile: 'scientific' },
+  svt:           { label: 'SVT',              icon: 'fa-dna',                  profile: 'scientific' },
+  philosophie:   { label: 'Philosophie',      icon: 'fa-brain',                profile: 'literary'   },
+  'histoire-geo':{ label: 'Histoire-Géo',     icon: 'fa-earth-africa',         profile: 'literary'   },
+  francais:      { label: 'Français',         icon: 'fa-book-open',            profile: 'literary'   },
+  anglais:       { label: 'Anglais',          icon: 'fa-language',             profile: 'literary'   }
 };
 
-// Analyse IA unique : notions + fiche + flashcards + quiz
-const MAX_AI_TOKENS = 8000;
+const MIN_CONTENT_LENGTH = 80;
+const MAX_CONTENT_LENGTH = 15000;
+const FREE_SECTION_LIMIT = 5;           // 5 sections/mois en gratuit
+
+const ALLOWED_CAPTURE_MODES = new Set(['text', 'voice']);
+
+const MAX_AI_TOKENS = 6000;
 
 let adminServices = null;
 
@@ -55,35 +48,23 @@ function getAdminServices() {
 
   const credentials = process.env.FIREBASE_ADMIN_CREDENTIALS;
   if (!credentials || !credentials.trim()) {
-    const err = new Error('firebase_admin_not_configured');
-    err.details = 'FIREBASE_ADMIN_CREDENTIALS manquant.';
-    throw err;
+    throw new Error('firebase_admin_not_configured');
   }
 
   let serviceAccount;
   try {
     serviceAccount = JSON.parse(credentials);
-  } catch (parseError) {
-    const err = new Error('firebase_admin_invalid_json');
-    err.details = 'JSON invalide: ' + parseError.message;
-    throw err;
+  } catch (e) {
+    throw new Error('firebase_admin_invalid_json');
   }
 
   if (!serviceAccount.project_id || !serviceAccount.private_key) {
-    const err = new Error('firebase_admin_invalid_credentials');
-    err.details = 'Clés manquantes dans les credentials.';
-    throw err;
+    throw new Error('firebase_admin_invalid_credentials');
   }
 
   const admin = require('firebase-admin');
   if (!admin.apps.length) {
-    try {
-      admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
-    } catch (initError) {
-      const err = new Error('firebase_admin_init_failed');
-      err.details = initError.message;
-      throw err;
-    }
+    admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
   }
 
   adminServices = {
@@ -92,7 +73,6 @@ function getAdminServices() {
     FieldValue: admin.firestore.FieldValue,
     Timestamp: admin.firestore.Timestamp
   };
-
   return adminServices;
 }
 
@@ -100,9 +80,8 @@ function getAdminServices() {
 // HELPERS
 // ────────────────────────────────────────────────────────────────
 function clientIp(request) {
-  return String(
-    request.headers['x-forwarded-for'] || request.socket?.remoteAddress || 'unknown'
-  ).split(',')[0].trim();
+  return String(request.headers['x-forwarded-for'] || request.socket?.remoteAddress || 'unknown')
+    .split(',')[0].trim();
 }
 
 function rateLimited(ip) {
@@ -146,7 +125,7 @@ async function verifyFirebaseToken(request) {
     const { auth } = getAdminServices();
     return await auth.verifyIdToken(match[1]);
   } catch (error) {
-    console.error('[PROGRESS AUTH] verifyIdToken failed:', error.message);
+    console.error('[PROGRESS AUTH] failed:', error.message);
     return null;
   }
 }
@@ -175,7 +154,7 @@ function todayKey() {
 }
 
 function monthKey() {
-  return new Date().toISOString().slice(0, 7); // YYYY-MM
+  return new Date().toISOString().slice(0, 7);
 }
 
 function cleanId(str) {
@@ -189,1382 +168,6 @@ function cleanId(str) {
     .slice(0, 60);
 }
 
-// ────────────────────────────────────────────────────────────────
-// HASH (pour cache)
-// ────────────────────────────────────────────────────────────────
-function contentHash(text) {
-  // Hash léger (djb2). Pas cryptographique, suffisant pour du cache.
-  let hash = 5381;
-  const s = String(text || '');
-  for (let i = 0; i < s.length; i++) {
-    hash = ((hash << 5) + hash) + s.charCodeAt(i);
-    hash = hash & 0xffffffff;
-  }
-  return Math.abs(hash).toString(36);
-}
-
-// ────────────────────────────────────────────────────────────────
-// SRS — Spaced Repetition System (SM-2 simplifié)
-// ────────────────────────────────────────────────────────────────
-function computeNextReview(mastery, lastCorrect, responseTimeSeconds) {
-  let easiness = Number(mastery?.easiness) || SRS_DEFAULT_EASINESS;
-  let interval = Number(mastery?.interval) || 1;
-  let repetitions = Number(mastery?.repetitions) || 0;
-
-  if (!lastCorrect) {
-    // Échec → repart de zéro
-    repetitions = 0;
-    interval = 1;
-    easiness = Math.max(SRS_MIN_EASINESS, easiness - 0.2);
-  } else {
-    repetitions++;
-
-    if (repetitions === 1) {
-      interval = 1;
-    } else if (repetitions === 2) {
-      interval = 3;
-    } else {
-      interval = Math.min(SRS_MAX_INTERVAL_DAYS, Math.round(interval * easiness));
-    }
-
-    // Bonus / malus selon la vitesse de réponse
-    if (responseTimeSeconds != null) {
-      if (responseTimeSeconds < 8) {
-        easiness = Math.min(SRS_MAX_EASINESS, easiness + 0.15);
-      } else if (responseTimeSeconds > 30) {
-        easiness = Math.max(SRS_MIN_EASINESS, easiness - 0.1);
-      }
-    } else {
-      easiness = Math.min(SRS_MAX_EASINESS, easiness + 0.05);
-    }
-  }
-
-  const next = new Date();
-  next.setDate(next.getDate() + interval);
-
-  return {
-    easiness: Math.round(easiness * 100) / 100,
-    interval,
-    repetitions,
-    nextReviewAt: next
-  };
-}
-
-// ────────────────────────────────────────────────────────────────
-// SCORE DE MAÎTRISE UNIFIÉ (0-100)
-// ────────────────────────────────────────────────────────────────
-function computeMasteryScore(history, totalAttempts, totalCorrect) {
-  if (!Array.isArray(history) || history.length === 0) return 0;
-
-  // Fenêtre : 10 derniers essais
-  const recent = history.slice(-10);
-
-  // Pondération par récence : chaque essai compte plus que le précédent
-  let weighted = 0;
-  let weightSum = 0;
-  recent.forEach((h, i) => {
-    const w = Math.pow(1.2, i);
-    weightSum += w;
-    if (h.correct) weighted += w;
-  });
-
-  if (weightSum === 0) return 0;
-
-  const ratio = weighted / weightSum; // 0..1
-
-  // Bonus de volume : plus l'élève a travaillé, plus le score est stable
-  const volumeBonus = Math.min(0.1, (totalAttempts || 0) / 100);
-
-  const score = Math.round(Math.min(1, ratio + volumeBonus) * 100);
-  return Math.max(0, Math.min(100, score));
-}
-
-// ────────────────────────────────────────────────────────────────
-// CATÉGORISATION D'ERREURS (heuristique simple, sans IA)
-// ────────────────────────────────────────────────────────────────
-function categorizeError(question, studentAnswer, correctAnswer) {
-  if (!studentAnswer) return 'forgetting';
-
-  const q = String(question || '').toLowerCase();
-
-  // Heuristiques basiques par mots-clés
-  if (/formule|expression|équation|equation/.test(q)) {
-    return 'formula_error';
-  }
-  if (/calculer|calcule|résoudre|resoudre/.test(q) && studentAnswer !== correctAnswer) {
-    return 'calculation_error';
-  }
-  if (/pourquoi|expliquer|justifier|démontrer|demontrer/.test(q)) {
-    return 'comprehension_error';
-  }
-  if (/méthode|methode|étape|etape/.test(q)) {
-    return 'method_error';
-  }
-  if (/confusion|différence|difference/.test(q)) {
-    return 'confusion';
-  }
-
-  return 'comprehension_error';
-}
-
-// ────────────────────────────────────────────────────────────────
-// QUOTAS
-// ────────────────────────────────────────────────────────────────
-async function checkCaptureQuota(uid) {
-  const { db } = getAdminServices();
-
-  const userSnap = await db.collection('users').doc(uid).get();
-  const data = userSnap.data();
-
-  if (isPremiumUser(data)) {
-    return { allowed: true, premium: true, used: 0, limit: Infinity };
-  }
-
-  const period = monthKey(); // YYYY-MM
-  const quotaRef = db.collection('users').doc(uid).collection('progressQuota').doc(`captures-${period}`);
-  const quotaSnap = await quotaRef.get();
-  const used = Number(quotaSnap.data()?.count || 0);
-
-  if (used >= FREE_CAPTURE_LIMIT) {
-    return { allowed: false, used, limit: FREE_CAPTURE_LIMIT, premium: false };
-  }
-
-  return { allowed: true, used, limit: FREE_CAPTURE_LIMIT, premium: false };
-}
-
-async function incrementCaptureQuota(uid) {
-  const { db, FieldValue } = getAdminServices();
-  const period = monthKey();
-  const quotaRef = db.collection('users').doc(uid).collection('progressQuota').doc(`captures-${period}`);
-  await quotaRef.set(
-    { count: FieldValue.increment(1), updatedAt: FieldValue.serverTimestamp() },
-    { merge: true }
-  );
-}
-
-// ────────────────────────────────────────────────────────────────
-// FOURNISSEURS IA
-// ────────────────────────────────────────────────────────────────
-function getProviders() {
-  return [
-    {
-      name: 'Groq',
-      key: process.env.GROQ_API_KEY,
-      endpoint: 'https://api.groq.com/openai/v1/chat/completions',
-      model: process.env.GROQ_MODEL || 'openai/gpt-oss-120b',
-      headers: {}
-    },
-    {
-      name: 'OpenRouter',
-      key: process.env.OPENROUTER_API_KEY,
-      endpoint: 'https://openrouter.ai/api/v1/chat/completions',
-      model: process.env.OPENROUTER_MODEL || 'openai/gpt-oss-120b',
-      headers: {
-        'HTTP-Referer': process.env.APP_ORIGIN || '',
-        'X-Title': 'ARVEXA Progress'
-      }
-    },
-    {
-      name: 'Mistral',
-      key: process.env.MISTRAL_API_KEY,
-      endpoint: 'https://api.mistral.ai/v1/chat/completions',
-      model: process.env.MISTRAL_MODEL || 'mistral-large-latest',
-      headers: {}
-    }
-  ].filter((p) => Boolean(p.key));
-}
-
-async function callProvider(provider, prompt, maxTokens = MAX_AI_TOKENS) {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 60000);
-
-  try {
-    const body = {
-      model: provider.model,
-      temperature: 0.25,
-      max_tokens: maxTokens,
-      messages: [
-        { role: 'system', content: 'Tu produis exclusivement du JSON valide, sans markdown, sans texte avant ou après.' },
-        { role: 'user', content: prompt }
-      ]
-    };
-
-    // Mistral ne supporte pas response_format comme Groq/OpenRouter
-    if (provider.name !== 'Mistral') {
-      body.response_format = { type: 'json_object' };
-    }
-
-    const result = await fetch(provider.endpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${provider.key}`,
-        ...provider.headers
-      },
-      body: JSON.stringify(body),
-      signal: controller.signal
-    });
-
-    const data = await result.json().catch(() => null);
-    if (!result.ok) throw new Error(`${provider.name} HTTP ${result.status}`);
-
-    const content = data?.choices?.[0]?.message?.content;
-    if (!content) throw new Error(`${provider.name} réponse vide`);
-
-    const cleaned = content
-      .replace(/^```(?:json)?\s*/i, '')
-      .replace(/\s*```$/i, '')
-      .trim();
-
-    return JSON.parse(cleaned);
-  } finally {
-    clearTimeout(timeout);
-  }
-}
-
-async function generateWithFallback(prompt, maxTokens = MAX_AI_TOKENS) {
-  const providers = getProviders();
-  if (!providers.length) throw new Error('provider_missing');
-
-  const errors = [];
-  for (const provider of providers) {
-    try {
-      return await callProvider(provider, prompt, maxTokens);
-    } catch (error) {
-      errors.push(`${provider.name}: ${error.message}`);
-      console.warn(`[AI] ${provider.name} indisponible:`, error.message);
-    }
-  }
-  throw new Error('all_providers_failed: ' + errors.join(' | '));
-}
-
-// ────────────────────────────────────────────────────────────────
-// NORMALISATION LATEX (dictée vocale)
-// ────────────────────────────────────────────────────────────────
-function normalizeLatexInput(text) {
-  if (!text || typeof text !== 'string') return '';
-
-  const replacements = [
-    [/\b(\w)\s*au carr[ée]\b/gi, '$1^2'],
-    [/\b(\w)\s*au cube\b/gi, '$1^3'],
-    [/\b(\w)\s*carr[ée]\b/gi, '$1^2'],
-    [/\bracine\s+carr[ée]e?\s+de\s+/gi, '\\sqrt{'],
-    [/\bracine\s+de\s+/gi, '\\sqrt{'],
-    [/\bf\s*prime\s+de\s+(\w)/gi, "f'($1)"],
-    [/\bf\s*prime\b/gi, "f'"],
-    [/\bg\s*prime\s+de\s+(\w)/gi, "g'($1)"],
-    [/\bint[ée]grale\s+de\s+([^\s]+)\s+[àa]\s+([^\s]+)/gi, '\\int_{$1}^{$2}'],
-    [/\blimite\s+quand\s+(\w)\s+tend\s+vers\s+([^\s,;]+)/gi, '\\lim_{$1 \\to $2}'],
-    [/\b(\w)\s+indice\s+(\d+)/gi, '$1_{$2}'],
-    [/\b(\w)\s+index\s+(\d+)/gi, '$1_{$2}'],
-    [/\bdelta\b/gi, '\\Delta'],
-    [/\balpha\b/gi, '\\alpha'],
-    [/\bbeta\b/gi, '\\beta'],
-    [/\bgamma\b/gi, '\\gamma'],
-    [/\bpi\b/gi, '\\pi'],
-    [/\btheta\b/gi, '\\theta'],
-    [/\blambda\b/gi, '\\lambda'],
-    [/\bmu\b/gi, '\\mu'],
-    [/\bsigma\b/gi, '\\sigma'],
-    [/\bfois\b/gi, '\\times'],
-    [/\bdivis[ée]\s+par\b/gi, '\\div'],
-    [/\bplus\s+ou\s+moins\b/gi, '\\pm'],
-    [/\binf[ée]rieur\s+ou\s+[ée]gal\b/gi, '\\leq'],
-    [/\bsup[ée]rieur\s+ou\s+[ée]gal\b/gi, '\\geq'],
-    [/\bdiff[ée]rent\s+de\b/gi, '\\neq'],
-    [/\binfini\b/gi, '\\infty']
-  ];
-
-  let result = text;
-  replacements.forEach(([pattern, replacement]) => {
-    result = result.replace(pattern, replacement);
-  });
-
-  return result;
-}
-
-// ────────────────────────────────────────────────────────────────
-// PROMPT UNIQUE — Analyse cours complète
-// (notions + fiche + flashcards + quiz initial)
-// ────────────────────────────────────────────────────────────────
-function buildFullCourseAnalysisPrompt({ subject, title, content, mode }) {
-  const subjectLabel = SUBJECT_LABELS[subject]?.label || subject;
-  const modeLabel = mode === 'voice' ? 'dictée vocale' : 'saisie texte';
-
-  return `Tu es un professeur expert du BAC au Niger, spécialisé en ${subjectLabel} pour la Terminale.
-
-Un élève vient d'ajouter un cours via ${modeLabel}. Tu vas générer une ANALYSE COMPLÈTE et PÉDAGOGIQUE.
-
-═══════════════════════════════════════════════════════════════
-CONTENU DU COURS
-═══════════════════════════════════════════════════════════════
-Titre : ${title || '(sans titre)'}
-Matière : ${subjectLabel}
-
-${content}
-
-═══════════════════════════════════════════════════════════════
-MISSION — 4 ÉTAPES EN UNE SEULE ANALYSE
-═══════════════════════════════════════════════════════════════
-1. Identifier 5 à ${MAX_NOTIONS_PER_COURSE} notions essentielles du cours
-2. Générer une FICHE DE RÉVISION complète et enrichie
-3. Générer 10 FLASHCARDS de mémorisation
-4. Générer 5 QUESTIONS de quiz de compréhension
-
-═══════════════════════════════════════════════════════════════
-RÈGLES LATEX — TRÈS IMPORTANTES
-═══════════════════════════════════════════════════════════════
-- Toute formule DOIT être entourée de délimiteurs :
-  • Inline : $...$  → "Soit $f(x) = x^2$"
-  • Display : $$...$$  → "$$\\lim_{x \\to 0} \\frac{\\sin x}{x} = 1$$"
-- JAMAIS de symboles Unicode bruts :
-  ❌ "π" → ✅ "$\\pi$"
-  ❌ "√2" → ✅ "$\\sqrt{2}$"
-  ❌ "x²" → ✅ "$x^{2}$"
-  ❌ "1/2" → ✅ "$\\frac{1}{2}$"
-  ❌ "→" → ✅ "$\\to$"
-  ❌ "∫" → ✅ "$\\int$"
-  ❌ "∑" → ✅ "$\\sum$"
-  ❌ "Δ" → ✅ "$\\Delta$"
-  ❌ "≤" → ✅ "$\\leq$"
-  ❌ "∞" → ✅ "$\\infty$"
-
-- Commandes autorisées :
-  \\frac, \\sqrt, ^{}, _{}, \\lim, \\int, \\sum, \\sin, \\cos, \\tan,
-  \\ln, \\log, \\alpha...\\omega, \\times, \\div, \\leq, \\geq, \\neq,
-  \\infty, \\to, \\Rightarrow, \\Leftrightarrow
-
-═══════════════════════════════════════════════════════════════
-FORMAT DE RÉPONSE (JSON UNIQUEMENT)
-═══════════════════════════════════════════════════════════════
-{
-  "courseTitle": "Titre court et clair du cours",
-  "chapter": "Chapitre identifié (ex: Dérivation, Dynamique...)",
-  "summary": {
-    "oneLiner": "Phrase de 15 mots max qui résume tout le cours",
-    "keyPoints": [
-      "Point clé 1",
-      "Point clé 2",
-      "Point clé 3",
-      "Point clé 4",
-      "Point clé 5"
-    ],
-    "mnemonics": [
-      "Astuce mnémotechnique 1 si pertinent",
-      "Astuce 2"
-    ],
-    "mustRemember": [
-      "$formule_1$ à connaître par cœur",
-      "$formule_2$",
-      "Définition essentielle"
-    ]
-  },
-  "sections": [
-    {
-      "title": "Titre de la section",
-      "content": "Contenu avec **mots-clés** en gras et formules LaTeX."
-    }
-  ],
-  "examTraps": [
-    {
-      "trap": "Piège classique au BAC",
-      "solution": "Comment l'éviter"
-    }
-  ],
-  "commonMistakes": [
-    "Erreur fréquente 1",
-    "Erreur fréquente 2"
-  ],
-  "illisibleZones": [
-    "« Cette formule semble incomplète. Peux-tu préciser ? »"
-  ],
-  "notions": [
-    {
-      "id": "notion-1-slug-court",
-      "name": "Nom court de la notion (max 60 caractères)",
-      "description": "Description en 1-2 phrases claires",
-      "importance": 3,
-      "difficulty": 2,
-      "prerequisites": [],
-      "keyFormula": "$formule$ si pertinent ou null",
-      "commonMistake": "Erreur fréquente à éviter"
-    }
-  ],
-  "flashcards": [
-    {
-      "notionId": "notion-1-slug-court",
-      "question": "Question courte (max 120 caractères)",
-      "answer": "Réponse claire (max 250 caractères)",
-      "hint": "Indice court ou null"
-    }
-  ],
-  "initialQuiz": [
-    {
-      "id": "q-1",
-      "notionId": "notion-1-slug-court",
-      "text": "Question avec formules LaTeX si besoin",
-      "type": "choice",
-      "options": [
-        { "id": "A", "text": "Proposition A" },
-        { "id": "B", "text": "Proposition B" },
-        { "id": "C", "text": "Proposition C" },
-        { "id": "D", "text": "Proposition D" }
-      ],
-      "correctAnswer": "A",
-      "explanation": "Explication courte de la bonne réponse"
-    }
-  ]
-}
-
-═══════════════════════════════════════════════════════════════
-RÈGLES FINALES
-═══════════════════════════════════════════════════════════════
-- 5 à ${MAX_NOTIONS_PER_COURSE} notions (obligatoire)
-- 5 à 8 sections de fiche
-- 3 à 5 points clés
-- 2 à 4 pièges d'examen
-- 3 à 5 erreurs fréquentes
-- 10 flashcards exactement
-- 5 questions de quiz exactement
-- 4 options par question de quiz
-- importance : 1 (peu) à 5 (crucial)
-- difficulty : 1 (facile) à 5 (très difficile)
-- Si le contenu est trop court (< 100 caractères), retourne { "error": "content_too_short" }
-- Ne mets JAMAIS de texte avant ou après le JSON
-- Ne mets JAMAIS de commentaires dans le JSON`;
-}
-
-// ────────────────────────────────────────────────────────────────
-// FALLBACK LOCAL (si IA indisponible)
-// ────────────────────────────────────────────────────────────────
-function buildLocalCourseAnalysis(body) {
-  const subjectLabel = SUBJECT_LABELS[body.subject]?.label || body.subject;
-
-  const notions = Array.from({ length: 5 }, (_, i) => ({
-    id: cleanId(`notion-${i + 1}`),
-    name: `Notion ${i + 1}`,
-    description: `À compléter avec ton cours (${subjectLabel}).`,
-    importance: 3,
-    difficulty: 2,
-    prerequisites: [],
-    keyFormula: null,
-    commonMistake: 'À identifier en révisant'
-  }));
-
-  return {
-    courseTitle: body.title || `Cours de ${subjectLabel}`,
-    chapter: 'Général',
-    summary: {
-      oneLiner: `Cours de ${subjectLabel} en attente d'analyse complète.`,
-      keyPoints: [
-        'Lire le cours en entier avant de réviser',
-        'Identifier les notions clés',
-        'Faire des exercices d\'application',
-        'Vérifier sa compréhension',
-        'Revoir régulièrement'
-      ],
-      mnemonics: ['Astuce : révise en petites sessions courtes et régulières.'],
-      mustRemember: ['Complète cette fiche avec tes notes.']
-    },
-    sections: [
-      {
-        title: 'Contenu du cours',
-        content: body.content.slice(0, 1000) + (body.content.length > 1000 ? '...' : '')
-      }
-    ],
-    examTraps: [
-      { trap: 'Aller trop vite', solution: 'Prends le temps de comprendre chaque étape.' }
-    ],
-    commonMistakes: [
-      'Apprendre par cœur sans comprendre',
-      'Ne pas faire d\'exercices'
-    ],
-    illisibleZones: [],
-    notions,
-    flashcards: notions.flatMap((n, i) => [
-      {
-        notionId: n.id,
-        question: `Que retenir de la notion "${n.name}" ?`,
-        answer: 'Réponse à compléter avec ton cours.',
-        hint: null
-      },
-      {
-        notionId: n.id,
-        question: `Formule ou point clé de "${n.name}" ?`,
-        answer: 'À compléter.',
-        hint: null
-      }
-    ]).slice(0, 10),
-    initialQuiz: notions.slice(0, 5).map((n, i) => ({
-      id: `q-${i + 1}`,
-      notionId: n.id,
-      text: `Question sur la notion "${n.name}" ?`,
-      type: 'choice',
-      options: [
-        { id: 'A', text: 'Réponse A' },
-        { id: 'B', text: 'Réponse B' },
-        { id: 'C', text: 'Réponse C' },
-        { id: 'D', text: 'Réponse D' }
-      ],
-      correctAnswer: 'A',
-      explanation: 'Correction locale (IA indisponible).'
-    }))
-  };
-}
-
-// ═══════════════════════════════════════════════════════════════
-// ACTION 1 — getDashboard
-// ═══════════════════════════════════════════════════════════════
-async function getDashboard(uid) {
-  const { db } = getAdminServices();
-
-  // 1. Maîtrise globale
-  const masterySnap = await db.collection('users').doc(uid).collection('mastery').limit(500).get();
-
-  let totalNotions = 0;
-  let mastered = 0;
-  let reinforce = 0;
-  let critical = 0;
-  let totalScore = 0;
-  const allMastery = [];
-  const subjectStats = {};
-
-  masterySnap.docs.forEach((docSnap) => {
-    const m = docSnap.data();
-    const score = Number(m.score) || 0;
-    const subject = m.subject || 'mathematiques';
-
-    if (!subjectStats[subject]) {
-      subjectStats[subject] = {
-        key: subject,
-        label: SUBJECT_LABELS[subject]?.label || subject,
-        icon: SUBJECT_LABELS[subject]?.icon || 'fa-book',
-        scores: []
-      };
-    }
-    subjectStats[subject].scores.push(score);
-
-    totalNotions++;
-    totalScore += score;
-
-    if (score >= 75) mastered++;
-    else if (score >= 45) reinforce++;
-    else critical++;
-
-    allMastery.push({ id: docSnap.id, ...m, computedScore: score });
-  });
-
-  const percentUpToDate = totalNotions > 0 ? Math.round(totalScore / totalNotions) : 0;
-
-  const subjectProgress = Object.values(subjectStats).map((s) => ({
-    key: s.key,
-    label: s.label,
-    icon: s.icon,
-    percent: s.scores.length > 0
-      ? Math.round(s.scores.reduce((a, b) => a + b, 0) / s.scores.length)
-      : 0
-  }));
-
-  // 2. Streak (jours consécutifs d'activité)
-  const streak = await computeStreak(uid);
-
-  // 3. Cours récents
-  const coursesSnap = await db.collection('users').doc(uid).collection('courses')
-    .orderBy('createdAt', 'desc')
-    .limit(5)
-    .get();
-
-  const recentCourses = await Promise.all(coursesSnap.docs.map(async (docSnap) => {
-    const c = docSnap.data();
-    const notionIds = c.notionIds || [];
-    let courseScore = 0;
-    let counted = 0;
-
-    for (const nid of notionIds.slice(0, 20)) {
-      const m = allMastery.find((x) => x.id === nid);
-      if (m) { courseScore += m.computedScore; counted++; }
-    }
-
-    const masteryPercent = counted > 0 ? Math.round(courseScore / counted) : 0;
-
-    return {
-      id: docSnap.id,
-      title: c.title || 'Cours',
-      subjectLabel: SUBJECT_LABELS[c.subject]?.label || '',
-      icon: SUBJECT_LABELS[c.subject]?.icon || 'fa-book',
-      notionsCount: c.notionsCount || 0,
-      masteredCount: notionIds.filter((nid) => {
-        const m = allMastery.find((x) => x.id === nid);
-        return m && m.computedScore >= 75;
-      }).length,
-      masteryPercent,
-      addedLabel: formatRelativeDate(c.createdAt)
-    };
-  }));
-
-  // 4. Plan du jour (notions à réviser)
-  const todayPlan = await buildTodayPlan(uid, allMastery);
-
-  // 5. Lacunes actives
-  const weaknessesSnap = await db.collection('users').doc(uid).collection('weaknesses')
-    .orderBy('lastDetectedAt', 'desc')
-    .limit(5)
-    .get();
-
-  const activeWeaknesses = weaknessesSnap.docs.map((d) => {
-    const w = d.data();
-    const labels = {
-      formula_error: 'Erreurs de formule',
-      calculation_error: 'Erreurs de calcul',
-      comprehension_error: 'Erreurs de compréhension',
-      method_error: 'Erreurs de méthode',
-      forgetting: 'Oublis fréquents',
-      confusion: 'Confusion entre notions',
-      prerequisite_gap: 'Prérequis insuffisants'
-    };
-    return {
-      id: d.id,
-      type: w.type,
-      label: labels[w.type] || w.type,
-      count: w.count || 0,
-      suggestedFix: w.suggestedFix || '',
-      subject: w.subject || null,
-      subjectLabel: w.subject ? (SUBJECT_LABELS[w.subject]?.label || w.subject) : null
-    };
-  });
-
-  return {
-    success: true,
-    summary: {
-      percentUpToDate,
-      totalNotions,
-      mastered,
-      reinforce,
-      critical
-    },
-    streak,
-    todayPlan,
-    subjectProgress,
-    recentCourses,
-    activeWeaknesses
-  };
-}
-
-// ────────────────────────────────────────────────────────────────
-// CALCUL DU STREAK
-// ────────────────────────────────────────────────────────────────
-async function computeStreak(uid) {
-  const { db } = getAdminServices();
-
-  const snap = await db.collection('users').doc(uid).collection('dailyActivity')
-    .orderBy('date', 'desc')
-    .limit(60)
-    .get()
-    .catch(() => ({ docs: [] }));
-
-  if (snap.docs.length === 0) return { current: 0, best: 0, history: [] };
-
-  const activeDates = new Set(
-    snap.docs
-      .map((d) => d.data().date)
-      .filter((date) => date)
-  );
-
-  // Streak actuel : remonte depuis aujourd'hui
-  let current = 0;
-  const today = new Date();
-  for (let i = 0; i < 60; i++) {
-    const d = new Date(today);
-    d.setDate(today.getDate() - i);
-    const key = d.toISOString().slice(0, 10);
-    if (activeDates.has(key)) current++;
-    else break;
-  }
-
-  // Meilleur streak : parcourt l'historique
-  const sorted = Array.from(activeDates).sort();
-  let best = 0;
-  let run = 0;
-  let prev = null;
-
-  sorted.forEach((dateStr) => {
-    if (prev) {
-      const prevDate = new Date(prev);
-      const currDate = new Date(dateStr);
-      const diffDays = Math.round((currDate - prevDate) / (24 * 60 * 60 * 1000));
-      if (diffDays === 1) run++;
-      else run = 1;
-    } else {
-      run = 1;
-    }
-    best = Math.max(best, run);
-    prev = dateStr;
-  });
-
-  const history = sorted.slice(-30); // 30 derniers jours d'activité
-
-  return { current, best, history };
-}
-
-// ────────────────────────────────────────────────────────────────
-// PLAN DU JOUR
-// ────────────────────────────────────────────────────────────────
-async function buildTodayPlan(uid, allMastery) {
-  const items = [];
-  const now = Date.now();
-
-  // 1. Notions à réviser (SRS : nextReviewAt <= maintenant)
-  const candidates = allMastery
-    .filter((m) => {
-      const next = toISO(m.nextReviewAt);
-      return !next || new Date(next).getTime() <= now + 12 * 60 * 60 * 1000;
-    })
-    .sort((a, b) => {
-      // Priorité : score faible d'abord, puis nextReviewAt ancien
-      if (a.computedScore !== b.computedScore) return a.computedScore - b.computedScore;
-      const aNext = toISO(a.nextReviewAt) || '9999';
-      const bNext = toISO(b.nextReviewAt) || '9999';
-      return aNext.localeCompare(bNext);
-    })
-    .slice(0, 4);
-
-  candidates.forEach((m, i) => {
-    const subject = m.subject || 'mathematiques';
-    const subjInfo = SUBJECT_LABELS[subject];
-    items.push({
-      id: `revision-${m.id}-${i}`,
-      kind: 'revision',
-      notionId: m.id,
-      title: m.notionName || 'Notion',
-      subject,
-      subjectLabel: subjInfo?.label || '',
-      icon: subjInfo?.icon || 'fa-book',
-      duration: m.computedScore < 30 ? 12 : m.computedScore < 60 ? 9 : 7,
-      task: m.computedScore < 30 ? 'Réviser' : m.computedScore < 60 ? 'S\'entraîner' : 'Réactiver'
-    });
-  });
-
-  // 2. Ajouter un test surprise si assez de notions
-  if (allMastery.length >= 5) {
-    const hasWeak = allMastery.some((m) => m.computedScore < 50);
-    if (hasWeak) {
-      items.push({
-        id: 'surprise-today',
-        kind: 'surprise_test',
-        title: 'Test surprise',
-        duration: 6,
-        task: 'Tester mes réflexes'
-      });
-    }
-  }
-
-  return items;
-}
-
-// ═══════════════════════════════════════════════════════════════
-// ACTION 2 — analyzeCourse (texte/voix)
-// ═══════════════════════════════════════════════════════════════
-  async function analyzeCourse(uid, body) {
-  const { subject, title, content, mode = 'text' } = body;
-
-  if (!ALLOWED_SUBJECTS.has(subject)) {
-    throw { status: 400, message: 'Matière invalide.' };
-  }
-  if (!content || typeof content !== 'string') {
-    throw { status: 400, message: 'Contenu manquant.' };
-  }
-  if (content.length < MIN_CONTENT_LENGTH) {
-    throw { status: 400, message: `Contenu trop court (min ${MIN_CONTENT_LENGTH} caractères).` };
-  }
-  if (content.length > MAX_CONTENT_LENGTH) {
-    throw { status: 400, message: `Contenu trop long (max ${MAX_CONTENT_LENGTH} caractères).` };
-  }
-  if (!ALLOWED_CAPTURE_MODES.has(mode)) {
-    throw { status: 400, message: 'Mode de capture invalide.' };
-  }
-
-  // Quota
-  const quota = await checkCaptureQuota(uid);
-  if (!quota.allowed) {
-    throw {
-      status: 429,
-      message: `Limite gratuite atteinte (${quota.limit} cours/mois). Passe à Premium pour continuer.`,
-      code: 'FREE_CAPTURE_LIMIT'
-    };
-  }
-
-  // Normaliser LaTeX (dictée vocale)
-  const normalizedContent = normalizeLatexInput(content);
-
-  // ── CACHE ──
-  const hash = contentHash(normalizedContent + subject + (title || ''));
-  const { db, FieldValue } = getAdminServices();
-
-  const cacheRef = db.collection('users').doc(uid).collection('analysisCache').doc(hash);
-  const cacheSnap = await cacheRef.get();
-
-  if (cacheSnap.exists) {                                          // ← CORRIGÉ
-    const cached = cacheSnap.data();
-    const cachedAt = toISO(cached.cachedAt);
-    const ageDays = cachedAt
-      ? (Date.now() - new Date(cachedAt).getTime()) / (24 * 60 * 60 * 1000)
-      : 999;
-
-    if (ageDays < 30) {
-      console.log('[PROGRESS] Cache hit pour analyse cours');
-      if (!quota.premium) await incrementCaptureQuota(uid);
-      return {
-        success: true,
-        cached: true,
-        courseId: null,
-        analysis: cached.analysis,
-        notionsCount: (cached.analysis?.notions || []).length,
-        message: 'Analyse récupérée depuis le cache.'
-      };
-    }
-  }
-
-  // ── APPEL IA ──
-  let analysis;
-  try {
-    const prompt = buildFullCourseAnalysisPrompt({
-      subject,
-      title,
-      content: normalizedContent,
-      mode
-    });
-
-    analysis = await generateWithFallback(prompt, MAX_AI_TOKENS);
-
-    if (analysis.error === 'content_too_short') {
-      throw { status: 400, message: 'Contenu trop court pour être analysé.' };
-    }
-  } catch (aiError) {
-    console.warn('[PROGRESS] Fallback local :', aiError.message);
-    analysis = buildLocalCourseAnalysis({ subject, title, content: normalizedContent, mode });
-  }
-
-  const notions = Array.isArray(analysis.notions)
-    ? analysis.notions.slice(0, MAX_NOTIONS_PER_COURSE)
-    : [];
-
-  if (notions.length === 0) {
-    throw { status: 500, message: 'Analyse échouée. Réessaie avec un contenu plus structuré.' };
-  }
-
-  // ── SAUVEGARDE FIRESTORE ──
-  const courseRef = db.collection('users').doc(uid).collection('courses').doc();
-  const courseId = courseRef.id;
-
-  const notionIds = notions.map((n) => cleanId(n.id || n.name));
-
-  await courseRef.set({
-    subject,
-    title: analysis.courseTitle || title || 'Cours',
-    chapter: analysis.chapter || null,
-    content: normalizedContent.slice(0, 8000),
-    summary: analysis.summary || null,
-    sections: analysis.sections || [],
-    examTraps: analysis.examTraps || [],
-    commonMistakes: analysis.commonMistakes || [],
-    illisibleZones: analysis.illisibleZones || [],
-    notionIds,
-    notionsCount: notions.length,
-    captureMode: mode,
-    createdAt: FieldValue.serverTimestamp(),
-    updatedAt: FieldValue.serverTimestamp()
-  });
-
-  const batch = db.batch();
-
-  notions.forEach((n) => {
-    const notionId = cleanId(n.id || n.name);
-    const notionRef = courseRef.collection('notions').doc(notionId);
-
-    batch.set(notionRef, {
-      id: notionId,
-      name: n.name || 'Notion',
-      description: n.description || '',
-      importance: Math.max(1, Math.min(5, Number(n.importance) || 3)),
-      difficulty: Math.max(1, Math.min(5, Number(n.difficulty) || 2)),
-      prerequisites: Array.isArray(n.prerequisites) ? n.prerequisites : [],
-      keyFormula: n.keyFormula || null,
-      commonMistake: n.commonMistake || null,
-      courseId,
-      subject,
-      createdAt: FieldValue.serverTimestamp()
-    });
-
-    const masteryRef = db.collection('users').doc(uid).collection('mastery').doc(notionId);
-    batch.set(masteryRef, {
-      notionId,
-      notionName: n.name || 'Notion',
-      courseId,
-      subject,
-      score: 0,
-      easiness: SRS_DEFAULT_EASINESS,
-      interval: 1,
-      repetitions: 0,
-      nextReviewAt: FieldValue.serverTimestamp(),
-      history: [],
-      totalAttempts: 0,
-      totalCorrect: 0,
-      createdAt: FieldValue.serverTimestamp(),
-      updatedAt: FieldValue.serverTimestamp()
-    }, { merge: true });
-  });
-
-  await batch.commit();
-
-  // Cache l'analyse
-  await cacheRef.set({
-    analysis,
-    cachedAt: FieldValue.serverTimestamp()
-  }, { merge: true });
-
-  if (!quota.premium) await incrementCaptureQuota(uid);
-
-  return {
-    success: true,
-    cached: false,
-    courseId,
-    notionsCount: notions.length,
-    analysis,
-    message: `${notions.length} notion(s) extraite(s). Fiche + flashcards + quiz prêts !`
-  };
-    }
-
-// ═══════════════════════════════════════════════════════════════
-// ACTION 3 — getCourseDetail
-// ═══════════════════════════════════════════════════════════════
-async function getCourseDetail(uid, body) {
-  const { courseId } = body;
-  if (!courseId) throw { status: 400, message: 'courseId requis.' };
-
-  const { db } = getAdminServices();
-
-  const courseRef = db.collection('users').doc(uid).collection('courses').doc(courseId);
-  const courseSnap = await courseRef.get();
-
-  if (!courseSnap.exists) throw { status: 404, message: 'Cours introuvable.' };
-
-  const course = courseSnap.data();
-
-  const notionsSnap = await courseRef.collection('notions').get();
-  const notions = notionsSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
-
-  // Récupérer la maîtrise de chaque notion
-  const masterySnap = await db.collection('users').doc(uid).collection('mastery')
-    .where('courseId', '==', courseId)
-    .get();
-
-  const masteryMap = {};
-  masterySnap.docs.forEach((d) => {
-    const m = d.data();
-    masteryMap[d.id] = {
-      score: Number(m.score) || 0,
-      nextReviewAt: toISO(m.nextReviewAt),
-      totalAttempts: m.totalAttempts || 0
-    };
-  });
-
-  const notionsWithMastery = notions.map((n) => ({
-    ...n,
-    mastery: masteryMap[n.id] || { score: 0, nextReviewAt: null, totalAttempts: 0 }
-  }));
-
-  return {
-    success: true,
-    course: {
-      id: courseId,
-      subject: course.subject,
-      subjectLabel: SUBJECT_LABELS[course.subject]?.label || '',
-      title: course.title,
-      chapter: course.chapter,
-      summary: course.summary,
-      sections: course.sections || [],
-      examTraps: course.examTraps || [],
-      commonMistakes: course.commonMistakes || [],
-      createdAt: toISO(course.createdAt)
-    },
-    notions: notionsWithMastery
-  };
-}
-
-// ═══════════════════════════════════════════════════════════════
-// ACTION 4 — reviewFlashcard (feedback actif)
-// ═══════════════════════════════════════════════════════════════
-async function reviewFlashcard(uid, body) {
-  const { notionId, rating } = body;
-
-  if (!notionId) throw { status: 400, message: 'notionId requis.' };
-  if (!['easy', 'medium', 'hard'].includes(rating)) {
-    throw { status: 400, message: 'Rating invalide.' };
-  }
-
-  const { db, FieldValue } = getAdminServices();
-
-  const masteryRef = db.collection('users').doc(uid).collection('mastery').doc(notionId);
-  const snap = await masteryRef.get();
-  if (!snap.exists) throw { status: 404, message: 'Notion introuvable.' };
-
-  const m = snap.data();
-  const isCorrect = rating === 'easy'; // seul "easy" compte comme succès pour le SRS
-  const isFailure = rating === 'hard';
-
-  // Mise à jour historique
-  const history = Array.isArray(m.history) ? [...m.history] : [];
-  history.push({
-    date: new Date().toISOString(),
-    correct: isCorrect,
-    rating,
-    source: 'flashcard'
-  });
-  if (history.length > 50) history.splice(0, history.length - 50);
-
-  const totalAttempts = (Number(m.totalAttempts) || 0) + 1;
-  const totalCorrect = (Number(m.totalCorrect) || 0) + (isCorrect ? 1 : 0);
-
-  // Recalcul du score
-  const score = computeMasteryScore(history, totalAttempts, totalCorrect);
-
-  // SRS
-  const srs = computeNextReview(
-    { easiness: m.easiness, interval: m.interval, repetitions: m.repetitions },
-    !isFailure,
-    null
-  );
-
-  await masteryRef.set({
-    score,
-    history,
-    totalAttempts,
-    totalCorrect,
-    easiness: srs.easiness,
-    interval: srs.interval,
-    repetitions: srs.repetitions,
-    nextReviewAt: srs.nextReviewAt,
-    lastAttemptAt: FieldValue.serverTimestamp(),
-    updatedAt: FieldValue.serverTimestamp()
-  }, { merge: true });
-
-  // Track activité quotidienne
-  await markDailyActivity(uid, { reviewed: 1, correct: isCorrect ? 1 : 0 });
-
-  return {
-    success: true,
-    newScore: score,
-    nextReviewIn: srs.interval
-  };
-}
-
-// ═══════════════════════════════════════════════════════════════
-// ACTION 5 — generateQuiz
-// ═══════════════════════════════════════════════════════════════
-async function generateQuiz(uid, body) {
-  const { courseId, count = 5, difficulty = 2 } = body;
-  if (!courseId) throw { status: 400, message: 'courseId requis.' };
-
-  const { db } = getAdminServices();
-
-  const courseRef = db.collection('users').doc(uid).collection('courses').doc(courseId);
-  const courseSnap = await courseRef.get();
-  if (!courseSnap.exists) throw { status: 404, message: 'Cours introuvable.' };
-
-  const course = courseSnap.data();
-  const notionsSnap = await courseRef.collection('notions').get();
-  const notions = notionsSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
-
-  if (notions.length === 0) throw { status: 400, message: 'Aucune notion dans ce cours.' };
-
-  const subjectLabel = SUBJECT_LABELS[course.subject]?.label || course.subject;
-
-  const prompt = `Tu es un professeur expert du BAC au Niger. Génère un quiz en JSON.
-
-Matière : ${subjectLabel}
-Chapitre : ${course.chapter || course.title}
-Notions : ${notions.map((n) => `- ${n.name}: ${n.description}`).join('\n')}
-Difficulté : ${difficulty}/4
-Nombre de questions : ${count}
-
-═══════════════════════════════════════════════════════════════
-RÈGLES LATEX
-═══════════════════════════════════════════════════════════════
-- Formules entre $...$ (inline) ou $$...$$ (display)
-- JAMAIS de symboles Unicode bruts
-- Exemples : "$3x^2$", "$\\frac{1}{2}$", "$\\lim_{x \\to 0}$"
-
-═══════════════════════════════════════════════════════════════
-FORMAT (JSON UNIQUEMENT)
-═══════════════════════════════════════════════════════════════
-{
-  "quiz": [
-    {
-      "notionId": "id-notion-concernée",
-      "text": "Question",
-      "options": [
-        { "id": "A", "text": "Option A" },
-        { "id": "B", "text": "Option B" },
-        { "id": "C", "text": "Option C" },
-        { "id": "D", "text": "Option D" }
-      ],
-      "correctAnswer": "A",
-      "explanation": "Explication pédagogique"
-    }
-  ]
-}
-
-- Exactement ${count} questions
-- 4 options par question
-- Une seule bonne réponse
-- Commence facile, termine difficile`;
-
-  let quizData;
-  try {
-    quizData = await generateWithFallback(prompt, 4000);
-    if (!Array.isArray(quizData.questions) && !Array.isArray(quizData.quiz)) {
-      throw new Error('format invalide');
-    }
-  } catch (e) {
-    // Fallback local
-    quizData = {
-      quiz: notions.slice(0, count).map((n, i) => ({
-        notionId: n.id,
-        text: `Question sur "${n.name}"`,
-        options: [
-          { id: 'A', text: 'Réponse A' },
-          { id: 'B', text: 'Réponse B' },
-          { id: 'C', text: 'Réponse C' },
-          { id: 'D', text: 'Réponse D' }
-        ],
-        correctAnswer: 'A',
-        explanation: 'Correction locale.'
-      }))
-    };
-  }
-
-  const questions = quizData.quiz || quizData.questions || [];
-
-  return {
-    success: true,
-    questions: questions.slice(0, count)
-  };
-}
-
-// ═══════════════════════════════════════════════════════════════
-// ACTION 6 — submitQuiz
-// ═══════════════════════════════════════════════════════════════
-async function submitQuiz(uid, body) {
-  const { courseId, answers = [] } = body;
-
-  if (!Array.isArray(answers) || answers.length === 0) {
-    throw { status: 400, message: 'Aucune réponse fournie.' };
-  }
-
-  const { db, FieldValue } = getAdminServices();
-
-  const correct = answers.filter((a) => a.isCorrect).length;
-  const total = answers.length;
-  const scorePercent = Math.round((correct / total) * 100);
-
-  // Enregistrer la session
-  const sessionRef = db.collection('users').doc(uid).collection('sessions').doc();
-  await sessionRef.set({
-    type: 'quiz',
-    courseId: courseId || null,
-    score: correct,
-    total,
-    scorePercent,
-    answers: answers.map((a) => ({
-      notionId: a.notionId || null,
-      questionText: (a.text || '').slice(0, 400),
-      selected: a.selected || null,
-      correct: a.correct || null,
-      isCorrect: Boolean(a.isCorrect)
-    })),
-    createdAt: FieldValue.serverTimestamp()
-  });
-
-  // Mise à jour de la maîtrise pour chaque notion
-  const notionGroups = {};
-  answers.forEach((a) => {
-    if (!a.notionId) return;
-    if (!notionGroups[a.notionId]) notionGroups[a.notionId] = [];
-    notionGroups[a.notionId].push(a);
-  });
-
-  for (const [notionId, notionAnswers] of Object.entries(notionGroups)) {
-    await updateMasteryFromAnswers(uid, notionId, notionAnswers);
-  }
-
-  // Activité quotidienne
-  await markDailyActivity(uid, { reviewed: total, correct });
-
-  // Détection de lacunes
-  const detected = await detectWeaknesses(uid, answers);
-
-  // Message personnalisé
-  let message = 'Ta maîtrise a été mise à jour.';
-  if (scorePercent >= 90) message = '🎉 Excellent ! Notion bientôt maîtrisée.';
-  else if (scorePercent >= 70) message = '👍 Bien joué ! Continue comme ça.';
-  else if (scorePercent >= 50) message = '💪 Bon début, une révision de plus s\'impose.';
-  else message = '📚 Cette notion a besoin de plus de travail.';
-
-  return {
-    success: true,
-    score: correct,
-    total,
-    scorePercent,
-    message,
-    weaknessDetected: detected.length > 0
-  };
-}
-
-// ────────────────────────────────────────────────────────────────
-// MISE À JOUR MAÎTRISE À PARTIR DES RÉPONSES
-// ────────────────────────────────────────────────────────────────
-async function updateMasteryFromAnswers(uid, notionId, answers) {
-  const { db, FieldValue } = getAdminServices();
-
-  const masteryRef = db.collection('users').doc(uid).collection('mastery').doc(notionId);
-  const snap = await masteryRef.get();
-  if (!snap.exists) return;
-
-  const m = snap.data();
-  const history = Array.isArray(m.history) ? [...m.history] : [];
-
-  // Ajouter chaque réponse à l'historique
-  answers.forEach((a) => {
-    history.push({
-      date: new Date().toISOString(),
-      correct: Boolean(a.isCorrect),
-      source: 'quiz'
-    });
-  });
-
-  if (history.length > 50) history.splice(0, history.length - 50);
-
-  const totalAttempts = (Number(m.totalAttempts) || 0) + answers.length;
-  const totalCorrect = (Number(m.totalCorrect) || 0) + answers.filter((a) => a.isCorrect).length;
-
-  const score = computeMasteryScore(history, totalAttempts, totalCorrect);
-
-  // SRS : le quiz est considéré comme correct si ≥ 60% de réussite sur la notion
-  const correctRate = answers.filter((a) => a.isCorrect).length / answers.length;
-  const srs = computeNextReview(
-    { easiness: m.easiness, interval: m.interval, repetitions: m.repetitions },
-    correctRate >= 0.6,
-    null
-  );
-
-  await masteryRef.set({
-    score,
-    history,
-    totalAttempts,
-    totalCorrect,
-    easiness: srs.easiness,
-    interval: srs.interval,
-    repetitions: srs.repetitions,
-    nextReviewAt: srs.nextReviewAt,
-    lastAttemptAt: FieldValue.serverTimestamp(),
-    updatedAt: FieldValue.serverTimestamp()
-  }, { merge: true });
-}
-
-// ═══════════════════════════════════════════════════════════════
-// ACTION 7 — getReviewQueue
-// ═══════════════════════════════════════════════════════════════
-async function getReviewQueue(uid) {
-  const { db } = getAdminServices();
-
-  const now = new Date();
-  const masterySnap = await db.collection('users').doc(uid).collection('mastery')
-    .where('nextReviewAt', '<=', now)
-    .limit(20)
-    .get()
-    .catch(() => ({ docs: [] }));
-
-  const items = masterySnap.docs.map((d) => {
-    const m = d.data();
-    return {
-      notionId: d.id,
-      notionName: m.notionName || 'Notion',
-      subject: m.subject,
-      subjectLabel: SUBJECT_LABELS[m.subject]?.label || '',
-      score: Number(m.score) || 0,
-      nextReviewAt: toISO(m.nextReviewAt)
-    };
-  });
-
-  return { success: true, items };
-}
-
-// ═══════════════════════════════════════════════════════════════
-// ACTION 8 — getStreak
-// ═══════════════════════════════════════════════════════════════
-async function getStreak(uid) {
-  const streak = await computeStreak(uid);
-  return { success: true, ...streak };
-}
-
-// ═══════════════════════════════════════════════════════════════
-// UTILITAIRES INTERNES
-// ═══════════════════════════════════════════════════════════════
-
-// Marque une activité quotidienne (pour streak)
-async function markDailyActivity(uid, { reviewed = 0, correct = 0 } = {}) {
-  const { db, FieldValue } = getAdminServices();
-  const dateKey = todayKey();
-  const ref = db.collection('users').doc(uid).collection('dailyActivity').doc(dateKey);
-
-  await ref.set({
-    date: dateKey,
-    reviewed: FieldValue.increment(reviewed),
-    correct: FieldValue.increment(correct),
-    lastAt: FieldValue.serverTimestamp()
-  }, { merge: true });
-}
-
-// Détecte les faiblesses à partir des réponses
-async function detectWeaknesses(uid, answers) {
-  const { db, FieldValue } = getAdminServices();
-
-  // Grouper les mauvaises réponses par catégorie
-  const wrongByCategory = {};
-  answers.forEach((a) => {
-    if (a.isCorrect) return;
-    const cat = categorizeError(a.text, a.selected, a.correct);
-    wrongByCategory[cat] = (wrongByCategory[cat] || 0) + 1;
-  });
-
-  const detected = [];
-
-  for (const [category, count] of Object.entries(wrongByCategory)) {
-    if (count < 3) continue; // seuil
-
-    const weaknessId = cleanId(`weakness-${category}`);
-    const ref = db.collection('users').doc(uid).collection('weaknesses').doc(weaknessId);
-    const existing = await ref.get();
-
-    const existingCount = existing.exists ? Number(existing.data().count || 0) : 0;
-
-    await ref.set({
-      type: category,
-      count: existingCount + count,
-      lastDetectedAt: FieldValue.serverTimestamp(),
-      suggestedFix: 'Refais quelques exercices sur cette notion.',
-      resolved: false
-    }, { merge: true });
-
-    detected.push(category);
-  }
-
-  return detected;
-}
-
-// ────────────────────────────────────────────────────────────────
-// FORMAT RELATIVE DATE
-// ────────────────────────────────────────────────────────────────
 function formatRelativeDate(value) {
   const iso = toISO(value);
   if (!iso) return '';
@@ -1579,6 +182,846 @@ function formatRelativeDate(value) {
   if (day < 7) return `il y a ${day}j`;
   if (day < 30) return `il y a ${Math.floor(day / 7)} sem.`;
   return d.toLocaleDateString('fr-FR');
+}
+
+// ────────────────────────────────────────────────────────────────
+// FOURNISSEURS IA
+// ────────────────────────────────────────────────────────────────
+function getProviders() {
+  return [
+    {
+      name: 'Groq', key: process.env.GROQ_API_KEY,
+      endpoint: 'https://api.groq.com/openai/v1/chat/completions',
+      model: process.env.GROQ_MODEL || 'openai/gpt-oss-120b',
+      jsonMode: true
+    },
+    {
+      name: 'OpenRouter', key: process.env.OPENROUTER_API_KEY,
+      endpoint: 'https://openrouter.ai/api/v1/chat/completions',
+      model: process.env.OPENROUTER_MODEL || 'openai/gpt-oss-120b',
+      jsonMode: true,
+      headers: {
+        'HTTP-Referer': process.env.APP_ORIGIN || '',
+        'X-Title': 'ARVEXA Notebook'
+      }
+    },
+    {
+      name: 'Mistral', key: process.env.MISTRAL_API_KEY,
+      endpoint: 'https://api.mistral.ai/v1/chat/completions',
+      model: process.env.MISTRAL_MODEL || 'mistral-large-latest',
+      jsonMode: false
+    }
+  ].filter((p) => Boolean(p.key));
+}
+
+async function callProvider(provider, prompt, maxTokens = MAX_AI_TOKENS) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 55000);
+
+  try {
+    const body = {
+      model: provider.model,
+      temperature: 0.2,
+      max_tokens: maxTokens,
+      messages: [
+        {
+          role: 'system',
+          content: 'Tu produis EXCLUSIVEMENT du JSON valide, sans markdown, sans texte avant ou après. Toute formule mathématique utilise LaTeX entre $...$ ou $$...$$.'
+        },
+        { role: 'user', content: prompt }
+      ]
+    };
+
+    if (provider.jsonMode) body.response_format = { type: 'json_object' };
+
+    const result = await fetch(provider.endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${provider.key}`,
+        ...(provider.headers || {})
+      },
+      body: JSON.stringify(body),
+      signal: controller.signal
+    });
+
+    const data = await result.json().catch(() => null);
+    if (!result.ok) {
+      const msg = data?.error?.message || `HTTP ${result.status}`;
+      throw new Error(`${provider.name}: ${msg}`);
+    }
+
+    const content = data?.choices?.[0]?.message?.content;
+    if (!content) throw new Error(`${provider.name}: réponse vide`);
+
+    const cleaned = content
+      .replace(/^```(?:json)?\s*/i, '')
+      .replace(/\s*```$/i, '')
+      .trim();
+
+    return JSON.parse(cleaned);
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+async function generateWithFallback(prompt, validator, maxTokens = MAX_AI_TOKENS) {
+  const providers = getProviders();
+  if (!providers.length) throw new Error('provider_missing');
+
+  const errors = [];
+  for (const provider of providers) {
+    try {
+      console.log(`[AI] Tentative ${provider.name}...`);
+      const data = await callProvider(provider, prompt, maxTokens);
+      if (!validator || validator(data)) {
+        console.log(`[AI] ✅ ${provider.name} OK`);
+        return data;
+      }
+      errors.push(`${provider.name}: structure invalide`);
+    } catch (e) {
+      errors.push(`${provider.name}: ${e.message}`);
+      console.warn(`[AI] ❌ ${provider.name}: ${e.message}`);
+    }
+  }
+  throw new Error('all_providers_failed: ' + errors.join(' | '));
+}
+
+// ────────────────────────────────────────────────────────────────
+// PROMPTS — 2 profils (scientific / literary)
+// ────────────────────────────────────────────────────────────────
+function buildScientificPrompt({ subjectLabel, rawInput }) {
+  return `Tu es un professeur expert du BAC au Niger, spécialiste de ${subjectLabel}.
+
+Un élève vient de copier une petite partie de sa leçon. Tu vas l'expliquer comme un vrai professeur.
+
+═══════════════════════════════════════════════════════════════
+CONTENU COLLÉ PAR L'ÉLÈVE
+═══════════════════════════════════════════════════════════════
+${rawInput}
+
+═══════════════════════════════════════════════════════════════
+RÈGLE ABSOLUE — ANTI-INVENTION
+═══════════════════════════════════════════════════════════════
+- Tu ne peux utiliser QUE le contenu fourni ci-dessus.
+- INTERDICTION d'ajouter des connaissances extérieures.
+- INTERDICTION d'inventer des formules, des exemples, des valeurs.
+- Chaque élément doit être traçable à un passage du texte source.
+- Si une information manque, écris : "Non précisé dans ta leçon."
+
+═══════════════════════════════════════════════════════════════
+RÈGLES LATEX
+═══════════════════════════════════════════════════════════════
+- Inline : $...$  /  Display : $$...$$
+- JAMAIS de symboles Unicode bruts (π → $\\pi$, √ → $\\sqrt{}$, ² → $^{2}$)
+
+═══════════════════════════════════════════════════════════════
+FORMAT JSON ATTENDU
+═══════════════════════════════════════════════════════════════
+{
+  "sectionTitle": "Titre court (max 60 caractères)",
+  "profile": "scientific",
+  "summary": "Résumé en 3-4 phrases, uniquement à partir du texte",
+  "keyIdeas": [
+    "Idée clé 1 (extraite du texte)",
+    "Idée clé 2",
+    "Idée clé 3"
+  ],
+  "formulas": [
+    {
+      "latex": "$z = a + bi$",
+      "condition": "avec $a, b \\in \\mathbb{R}$",
+      "source": "extrait exact du texte élève"
+    }
+  ],
+  "method": [
+    "Étape 1 : ...",
+    "Étape 2 : ...",
+    "Étape 3 : ..."
+  ],
+  "example": {
+    "enonce": "Exemple COMPLET et CHIFFRÉ construit à partir d'un cas du texte",
+    "steps": ["Étape 1 : calcul détaillé", "Étape 2 : ...", "Étape 3 : ..."],
+    "result": "Résultat final"
+  },
+  "trap": {
+    "text": "Piège classique au BAC sur cette notion",
+    "solution": "Comment l'éviter"
+  },
+  "questions": [
+    {
+      "q": "Question probable au BAC ?",
+      "a": "Réponse extraite UNIQUEMENT du texte fourni",
+      "source": "extrait exact du texte élève"
+    }
+  ],
+  "exercises": [
+    {
+      "enonce": "Exercice d'application",
+      "indice": "Indice pour aider",
+      "correction": {
+        "steps": ["Étape 1", "Étape 2", "Étape 3"],
+        "reponse": "Résultat final"
+      },
+      "difficulty": 1
+    }
+  ]
+}
+
+CONTRAINTES FINALES :
+- keyIdeas : 3 à 5
+- formulas : 1 à 5 (si applicable)
+- method : 2 à 5 étapes
+- questions : 4 à 8
+- exercises : 2 à 4
+- Réponds UNIQUEMENT avec le JSON`;
+}
+
+function buildLiteraryPrompt({ subjectLabel, rawInput }) {
+  return `Tu es un professeur expert du BAC au Niger, spécialiste de ${subjectLabel}.
+
+Un élève vient de copier une petite partie de sa leçon. Tu vas l'expliquer comme un vrai professeur.
+
+═══════════════════════════════════════════════════════════════
+CONTENU COLLÉ PAR L'ÉLÈVE
+═══════════════════════════════════════════════════════════════
+${rawInput}
+
+═══════════════════════════════════════════════════════════════
+RÈGLE ABSOLUE — ANTI-INVENTION
+═══════════════════════════════════════════════════════════════
+- Tu ne peux utiliser QUE le contenu fourni ci-dessus.
+- INTERDICTION d'ajouter des connaissances extérieures.
+- INTERDICTION d'inventer des dates, des noms, des citations.
+- Chaque élément doit être traçable à un passage du texte source.
+- Si une information manque, écris : "Non précisé dans ta leçon."
+
+═══════════════════════════════════════════════════════════════
+FORMAT JSON ATTENDU
+═══════════════════════════════════════════════════════════════
+{
+  "sectionTitle": "Titre court (max 60 caractères)",
+  "profile": "literary",
+  "summary": "Résumé en 3-4 phrases, uniquement à partir du texte",
+  "keyIdeas": [
+    "Idée directrice 1 (extraite du texte)",
+    "Idée directrice 2",
+    "Idée directrice 3"
+  ],
+  "definitions": [
+    {
+      "term": "Terme important",
+      "definition": "Définition extraite du texte",
+      "source": "extrait exact"
+    }
+  ],
+  "arguments": [
+    {
+      "thesis": "Thèse défendue dans le texte",
+      "arguments": ["Argument 1", "Argument 2"],
+      "source": "extrait exact"
+    }
+  ],
+  "dates": [
+    { "date": "Date ou période", "event": "Événement", "source": "extrait" }
+  ],
+  "vocabulary": [
+    { "term": "Mot technique", "meaning": "Signification", "source": "extrait" }
+  ],
+  "questions": [
+    {
+      "q": "Question probable au BAC ?",
+      "a": "Réponse extraite UNIQUEMENT du texte fourni",
+      "source": "extrait exact du texte élève"
+    }
+  ],
+  "planTypes": [
+    {
+      "title": "Plan dialectique possible",
+      "parties": ["Thèse", "Antithèse", "Synthèse"],
+      "source": "structuré à partir des arguments du texte"
+    }
+  ]
+}
+
+CONTRAINTES FINALES :
+- keyIdeas : 3 à 5
+- definitions : 2 à 6 (si applicable)
+- arguments : 1 à 4 thèses
+- questions : 4 à 8 (PRIORITÉ ABSOLUE)
+- Réponds UNIQUEMENT avec le JSON`;
+}
+
+// ────────────────────────────────────────────────────────────────
+// FALLBACK LOCAL si IA indisponible
+// ────────────────────────────────────────────────────────────────
+function buildFallbackAnalysis({ subjectLabel, rawInput, profile }) {
+  return {
+    sectionTitle: 'Analyse',
+    profile,
+    summary: rawInput.slice(0, 300) + (rawInput.length > 300 ? '...' : ''),
+    keyIdeas: ['Contenu à structurer', 'IA indisponible — réessaie plus tard'],
+    formulas: [],
+    method: ['Lis le texte source'],
+    example: null,
+    trap: null,
+    questions: [
+      { q: 'Que retenir de cette partie ?', a: rawInput.slice(0, 200), source: rawInput.slice(0, 100) }
+    ],
+    exercises: [],
+    definitions: [],
+    arguments: [],
+    dates: [],
+    vocabulary: [],
+    planTypes: []
+  };
+}
+
+// ────────────────────────────────────────────────────────────────
+// QUOTAS
+// ────────────────────────────────────────────────────────────────
+async function checkSectionQuota(uid) {
+  const { db } = getAdminServices();
+  const userSnap = await db.collection('users').doc(uid).get();
+  const data = userSnap.data();
+  if (isPremiumUser(data)) return { allowed: true, premium: true, used: 0, limit: Infinity };
+
+  const period = monthKey();
+  const ref = db.collection('users').doc(uid).collection('notebookQuota').doc(`sections-${period}`);
+  const snap = await ref.get();
+  const used = Number(snap.data()?.count || 0);
+
+  if (used >= FREE_SECTION_LIMIT) {
+    return { allowed: false, used, limit: FREE_SECTION_LIMIT, premium: false };
+  }
+  return { allowed: true, used, limit: FREE_SECTION_LIMIT, premium: false };
+}
+
+async function incrementSectionQuota(uid) {
+  const { db, FieldValue } = getAdminServices();
+  const period = monthKey();
+  const ref = db.collection('users').doc(uid).collection('notebookQuota').doc(`sections-${period}`);
+  await ref.set(
+    { count: FieldValue.increment(1), updatedAt: FieldValue.serverTimestamp() },
+    { merge: true }
+  );
+}
+
+async function markDailyActivity(uid, inc = {}) {
+  const { db, FieldValue } = getAdminServices();
+  const dateKey = todayKey();
+  const ref = db.collection('users').doc(uid).collection('dailyActivity').doc(dateKey);
+  await ref.set({
+    date: dateKey,
+    sectionsCreated: FieldValue.increment(inc.sectionsCreated || 0),
+    lastAt: FieldValue.serverTimestamp()
+  }, { merge: true });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ACTION 1 — getDashboard
+// ═══════════════════════════════════════════════════════════════
+async function getDashboard(uid) {
+  const { db } = getAdminServices();
+
+  // Parcours des notebooks (8 matières possibles)
+  const subjects = [];
+  let totalChapters = 0;
+  let totalSections = 0;
+
+  for (const subjectKey of ALLOWED_SUBJECTS) {
+    const info = SUBJECT_INFO[subjectKey];
+    const chaptersSnap = await db
+      .collection('users').doc(uid)
+      .collection('notebooks').doc(subjectKey)
+      .collection('chapters')
+      .orderBy('updatedAt', 'desc')
+      .limit(50)
+      .get()
+      .catch(() => ({ docs: [] }));
+
+    if (chaptersSnap.docs.length === 0) continue;
+
+    const chapters = chaptersSnap.docs.map((d) => {
+      const data = d.data();
+      return {
+        id: d.id,
+        title: data.title || 'Chapitre',
+        sectionsCount: data.sectionsCount || 0,
+        last: formatRelativeDate(data.updatedAt || data.createdAt)
+      };
+    });
+
+    const totalSubjectSections = chapters.reduce((s, c) => s + c.sectionsCount, 0);
+    totalChapters += chapters.length;
+    totalSections += totalSubjectSections;
+
+    subjects.push({
+      key: subjectKey,
+      label: info.label,
+      icon: info.icon,
+      chaptersCount: chapters.length,
+      sectionsCount: totalSubjectSections,
+      last: chapters[0]?.last || ''
+    });
+  }
+
+  // Tri : matières les plus récentes en premier
+  subjects.sort((a, b) => b.sectionsCount - a.sectionsCount);
+
+  // Streak
+  const streak = await computeStreak(uid);
+
+  // Activité récente : dernier chapitre modifié
+  let recentActivity = [];
+  if (subjects.length > 0) {
+    const topSubject = subjects[0];
+    const lastChaptersSnap = await db
+      .collection('users').doc(uid)
+      .collection('notebooks').doc(topSubject.key)
+      .collection('chapters')
+      .orderBy('updatedAt', 'desc')
+      .limit(3)
+      .get()
+      .catch(() => ({ docs: [] }));
+
+    recentActivity = lastChaptersSnap.docs.map((d) => {
+      const data = d.data();
+      return {
+        subject: topSubject.key,
+        subjectLabel: topSubject.label,
+        chapterId: d.id,
+        chapterTitle: data.title || 'Chapitre',
+        sectionsCount: data.sectionsCount || 0,
+        time: formatRelativeDate(data.updatedAt || data.createdAt)
+      };
+    });
+  }
+
+  return {
+    success: true,
+    summary: {
+      subjectsCount: subjects.length,
+      totalChapters,
+      totalSections
+    },
+    streak,
+    subjects,
+    recentActivity
+  };
+}
+
+async function computeStreak(uid) {
+  const { db } = getAdminServices();
+  const snap = await db.collection('users').doc(uid).collection('dailyActivity')
+    .orderBy('date', 'desc').limit(90).get().catch(() => ({ docs: [] }));
+
+  if (snap.docs.length === 0) return { current: 0, best: 0 };
+
+  const activeDates = new Set(snap.docs.map((d) => d.data().date).filter(Boolean));
+  let current = 0;
+  const today = new Date();
+  for (let i = 0; i < 90; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    const key = d.toISOString().slice(0, 10);
+    if (activeDates.has(key)) current++;
+    else break;
+  }
+
+  const sorted = Array.from(activeDates).sort();
+  let best = 0, run = 0, prev = null;
+  sorted.forEach((dateStr) => {
+    if (prev) {
+      const diff = Math.round((new Date(dateStr) - new Date(prev)) / 86400000);
+      run = diff === 1 ? run + 1 : 1;
+    } else run = 1;
+    best = Math.max(best, run);
+    prev = dateStr;
+  });
+
+  return { current, best };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ACTION 2 — listChapters
+// ═══════════════════════════════════════════════════════════════
+async function listChapters(uid, body) {
+  const { subject } = body;
+  if (!ALLOWED_SUBJECTS.has(subject)) throw { status: 400, message: 'Matière invalide.' };
+
+  const { db } = getAdminServices();
+  const snap = await db
+    .collection('users').doc(uid)
+    .collection('notebooks').doc(subject)
+    .collection('chapters')
+    .orderBy('updatedAt', 'desc')
+    .limit(100)
+    .get();
+
+  const chapters = snap.docs.map((d) => {
+    const data = d.data();
+    return {
+      id: d.id,
+      title: data.title || 'Chapitre',
+      sectionsCount: data.sectionsCount || 0,
+      createdAt: toISO(data.createdAt),
+      updatedAt: toISO(data.updatedAt),
+      last: formatRelativeDate(data.updatedAt || data.createdAt)
+    };
+  });
+
+  return { success: true, chapters };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ACTION 3 — createChapter
+// ═══════════════════════════════════════════════════════════════
+async function createChapter(uid, body) {
+  const { subject, title } = body;
+  if (!ALLOWED_SUBJECTS.has(subject)) throw { status: 400, message: 'Matière invalide.' };
+  if (!title || typeof title !== 'string' || title.trim().length < 2) {
+    throw { status: 400, message: 'Titre trop court.' };
+  }
+
+  const { db, FieldValue } = getAdminServices();
+  const cleanTitle = title.trim().slice(0, 100);
+
+  const ref = db
+    .collection('users').doc(uid)
+    .collection('notebooks').doc(subject)
+    .collection('chapters').doc();
+
+  await ref.set({
+    title: cleanTitle,
+    sectionsCount: 0,
+    createdAt: FieldValue.serverTimestamp(),
+    updatedAt: FieldValue.serverTimestamp()
+  });
+
+  return {
+    success: true,
+    chapter: {
+      id: ref.id,
+      title: cleanTitle,
+      sectionsCount: 0,
+      last: 'à l\'instant'
+    }
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ACTION 4 — getChapter (chapitre + sections)
+// ═══════════════════════════════════════════════════════════════
+async function getChapter(uid, body) {
+  const { subject, chapterId } = body;
+  if (!ALLOWED_SUBJECTS.has(subject)) throw { status: 400, message: 'Matière invalide.' };
+  if (!chapterId) throw { status: 400, message: 'chapterId requis.' };
+
+  const { db } = getAdminServices();
+  const chapterRef = db
+    .collection('users').doc(uid)
+    .collection('notebooks').doc(subject)
+    .collection('chapters').doc(chapterId);
+
+  const chapterSnap = await chapterRef.get();
+  if (!chapterSnap.exists) throw { status: 404, message: 'Chapitre introuvable.' };
+
+  const data = chapterSnap.data();
+
+  const sectionsSnap = await chapterRef.collection('sections')
+    .orderBy('createdAt', 'asc')
+    .get();
+
+  const sections = sectionsSnap.docs.map((d) => {
+    const s = d.data();
+    const analysis = s.analysis || {};
+    const questionsCount = Array.isArray(analysis.questions) ? analysis.questions.length : 0;
+    const exercisesCount = Array.isArray(analysis.exercises) ? analysis.exercises.length : 0;
+
+    return {
+      id: d.id,
+      title: s.title || analysis.sectionTitle || 'Section',
+      questionsCount,
+      exercisesCount,
+      time: formatRelativeDate(s.createdAt),
+      status: 'done'
+    };
+  });
+
+  return {
+    success: true,
+    chapter: {
+      id: chapterId,
+      title: data.title || 'Chapitre',
+      subject,
+      sectionsCount: sections.length,
+      createdAt: toISO(data.createdAt),
+      updatedAt: toISO(data.updatedAt)
+    },
+    sections
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ACTION 5 — createSection (avec analyse IA)
+// ═══════════════════════════════════════════════════════════════
+async function createSection(uid, body) {
+  const { subject, chapterId, rawInput, mode = 'text' } = body;
+
+  if (!ALLOWED_SUBJECTS.has(subject)) throw { status: 400, message: 'Matière invalide.' };
+  if (!chapterId) throw { status: 400, message: 'chapterId requis.' };
+  if (!rawInput || typeof rawInput !== 'string') throw { status: 400, message: 'Contenu manquant.' };
+  if (rawInput.length < MIN_CONTENT_LENGTH) {
+    throw { status: 400, message: `Contenu trop court (min ${MIN_CONTENT_LENGTH} caractères).` };
+  }
+  if (rawInput.length > MAX_CONTENT_LENGTH) {
+    throw { status: 400, message: `Contenu trop long (max ${MAX_CONTENT_LENGTH}).` };
+  }
+  if (!ALLOWED_CAPTURE_MODES.has(mode)) {
+    throw { status: 400, message: 'Mode de capture invalide.' };
+  }
+
+  // Quota
+  const quota = await checkSectionQuota(uid);
+  if (!quota.allowed) {
+    throw {
+      status: 429,
+      message: `Limite gratuite atteinte (${quota.limit} sections/mois). Passe à Premium.`,
+      code: 'FREE_SECTION_LIMIT'
+    };
+  }
+
+  const { db, FieldValue } = getAdminServices();
+
+  // Vérifie que le chapitre existe
+  const chapterRef = db
+    .collection('users').doc(uid)
+    .collection('notebooks').doc(subject)
+    .collection('chapters').doc(chapterId);
+
+  const chapterSnap = await chapterRef.get();
+  if (!chapterSnap.exists) throw { status: 404, message: 'Chapitre introuvable.' };
+
+  // Profil de la matière
+  const info = SUBJECT_INFO[subject];
+  const subjectLabel = info.label;
+  const profile = info.profile;
+
+  // Analyse IA
+  let analysis;
+  try {
+    const prompt = profile === 'scientific'
+      ? buildScientificPrompt({ subjectLabel, rawInput })
+      : buildLiteraryPrompt({ subjectLabel, rawInput });
+
+    analysis = await generateWithFallback(
+      prompt,
+      (d) => d && typeof d === 'object' && (d.summary || d.keyIdeas),
+      MAX_AI_TOKENS
+    );
+  } catch (aiError) {
+    console.warn('[PROGRESS] Fallback local :', aiError.message);
+    analysis = buildFallbackAnalysis({ subjectLabel, rawInput, profile });
+  }
+
+  // Sauvegarde section
+  const sectionRef = chapterRef.collection('sections').doc();
+  const sectionId = sectionRef.id;
+
+  await sectionRef.set({
+    title: analysis.sectionTitle || 'Section',
+    rawInput,
+    mode,
+    profile,
+    analysis,
+    userNotes: '',
+    userImages: [],
+    createdAt: FieldValue.serverTimestamp(),
+    updatedAt: FieldValue.serverTimestamp()
+  });
+
+  // Mise à jour compteur
+  await chapterRef.set({
+    sectionsCount: FieldValue.increment(1),
+    updatedAt: FieldValue.serverTimestamp()
+  }, { merge: true });
+
+  if (!quota.premium) await incrementSectionQuota(uid);
+  await markDailyActivity(uid, { sectionsCreated: 1 });
+
+  return {
+    success: true,
+    sectionId,
+    section: {
+      id: sectionId,
+      title: analysis.sectionTitle || 'Section',
+      rawInput,
+      analysis,
+      userNotes: '',
+      userImages: []
+    },
+    quota: quota.premium
+      ? { type: 'premium', unlimited: true }
+      : { type: 'free', used: quota.used + 1, limit: FREE_SECTION_LIMIT }
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ACTION 6 — getSection
+// ═══════════════════════════════════════════════════════════════
+async function getSection(uid, body) {
+  const { subject, chapterId, sectionId } = body;
+  if (!ALLOWED_SUBJECTS.has(subject)) throw { status: 400, message: 'Matière invalide.' };
+  if (!chapterId || !sectionId) throw { status: 400, message: 'IDs manquants.' };
+
+  const { db } = getAdminServices();
+  const ref = db
+    .collection('users').doc(uid)
+    .collection('notebooks').doc(subject)
+    .collection('chapters').doc(chapterId)
+    .collection('sections').doc(sectionId);
+
+  const snap = await ref.get();
+  if (!snap.exists) throw { status: 404, message: 'Section introuvable.' };
+
+  const s = snap.data();
+  return {
+    success: true,
+    section: {
+      id: sectionId,
+      title: s.title || 'Section',
+      subject,
+      chapterId,
+      rawInput: s.rawInput || '',
+      analysis: s.analysis || {},
+      userNotes: s.userNotes || '',
+      userImages: s.userImages || [],
+      createdAt: toISO(s.createdAt),
+      time: formatRelativeDate(s.createdAt)
+    }
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ACTION 7 — updateNotes
+// ═══════════════════════════════════════════════════════════════
+async function updateNotes(uid, body) {
+  const { subject, chapterId, sectionId, userNotes } = body;
+  if (!ALLOWED_SUBJECTS.has(subject)) throw { status: 400, message: 'Matière invalide.' };
+  if (!chapterId || !sectionId) throw { status: 400, message: 'IDs manquants.' };
+  if (typeof userNotes !== 'string') throw { status: 400, message: 'userNotes invalide.' };
+
+  const { db, FieldValue } = getAdminServices();
+  const ref = db
+    .collection('users').doc(uid)
+    .collection('notebooks').doc(subject)
+    .collection('chapters').doc(chapterId)
+    .collection('sections').doc(sectionId);
+
+  await ref.set({
+    userNotes: userNotes.slice(0, 5000),
+    updatedAt: FieldValue.serverTimestamp()
+  }, { merge: true });
+
+  return { success: true };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ACTION 8 — deleteSection
+// ═══════════════════════════════════════════════════════════════
+async function deleteSection(uid, body) {
+  const { subject, chapterId, sectionId } = body;
+  if (!ALLOWED_SUBJECTS.has(subject)) throw { status: 400, message: 'Matière invalide.' };
+  if (!chapterId || !sectionId) throw { status: 400, message: 'IDs manquants.' };
+
+  const { db, FieldValue } = getAdminServices();
+  const chapterRef = db
+    .collection('users').doc(uid)
+    .collection('notebooks').doc(subject)
+    .collection('chapters').doc(chapterId);
+
+  const sectionRef = chapterRef.collection('sections').doc(sectionId);
+  const snap = await sectionRef.get();
+  if (!snap.exists) throw { status: 404, message: 'Section introuvable.' };
+
+  await sectionRef.delete();
+  await chapterRef.set({
+    sectionsCount: FieldValue.increment(-1),
+    updatedAt: FieldValue.serverTimestamp()
+  }, { merge: true });
+
+  return { success: true };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ACTION 9 — deleteChapter
+// ═══════════════════════════════════════════════════════════════
+async function deleteChapter(uid, body) {
+  const { subject, chapterId } = body;
+  if (!ALLOWED_SUBJECTS.has(subject)) throw { status: 400, message: 'Matière invalide.' };
+  if (!chapterId) throw { status: 400, message: 'chapterId requis.' };
+
+  const { db } = getAdminServices();
+  const chapterRef = db
+    .collection('users').doc(uid)
+    .collection('notebooks').doc(subject)
+    .collection('chapters').doc(chapterId);
+
+  const snap = await chapterRef.get();
+  if (!snap.exists) throw { status: 404, message: 'Chapitre introuvable.' };
+
+  // Supprime toutes les sections
+  const sectionsSnap = await chapterRef.collection('sections').get();
+  const batch = db.batch();
+  sectionsSnap.docs.forEach((d) => batch.delete(d.ref));
+  batch.delete(chapterRef);
+  await batch.commit();
+
+  return { success: true };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ACTION 10 — getFullLesson
+// ═══════════════════════════════════════════════════════════════
+async function getFullLesson(uid, body) {
+  const { subject, chapterId } = body;
+  if (!ALLOWED_SUBJECTS.has(subject)) throw { status: 400, message: 'Matière invalide.' };
+  if (!chapterId) throw { status: 400, message: 'chapterId requis.' };
+
+  const { db } = getAdminServices();
+  const chapterRef = db
+    .collection('users').doc(uid)
+    .collection('notebooks').doc(subject)
+    .collection('chapters').doc(chapterId);
+
+  const chapterSnap = await chapterRef.get();
+  if (!chapterSnap.exists) throw { status: 404, message: 'Chapitre introuvable.' };
+
+  const sectionsSnap = await chapterRef.collection('sections')
+    .orderBy('createdAt', 'asc')
+    .get();
+
+  const sections = sectionsSnap.docs.map((d) => {
+    const s = d.data();
+    return {
+      id: d.id,
+      title: s.title || 'Section',
+      analysis: s.analysis || {},
+      userNotes: s.userNotes || '',
+      userImages: s.userImages || []
+    };
+  });
+
+  return {
+    success: true,
+    chapter: {
+      id: chapterId,
+      title: chapterSnap.data().title || 'Chapitre',
+      subject
+    },
+    sections
+  };
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1606,29 +1049,31 @@ module.exports = async function handler(request, response) {
     return jsonError(response, 503, 'Service temporairement indisponible.');
   }
 
-  if (!user) {
-    return jsonError(response, 401, 'Connexion requise.', 'AUTH_REQUIRED');
-  }
+  if (!user) return jsonError(response, 401, 'Connexion requise.', 'AUTH_REQUIRED');
 
   const body = request.body && typeof request.body === 'object' ? request.body : {};
   const action = body.action;
   const uid = user.uid;
 
+  console.log(`[PROGRESS] ${action} | uid=${uid.slice(0, 8)}`);
+
   try {
     switch (action) {
-      case 'getDashboard':      return response.status(200).json(await getDashboard(uid));
-      case 'analyzeCourse':     return response.status(200).json(await analyzeCourse(uid, body));
-      case 'getCourseDetail':   return response.status(200).json(await getCourseDetail(uid, body));
-      case 'reviewFlashcard':   return response.status(200).json(await reviewFlashcard(uid, body));
-      case 'generateQuiz':      return response.status(200).json(await generateQuiz(uid, body));
-      case 'submitQuiz':        return response.status(200).json(await submitQuiz(uid, body));
-      case 'getReviewQueue':    return response.status(200).json(await getReviewQueue(uid));
-      case 'getStreak':         return response.status(200).json(await getStreak(uid));
+      case 'getDashboard':    return response.status(200).json(await getDashboard(uid));
+      case 'listChapters':    return response.status(200).json(await listChapters(uid, body));
+      case 'createChapter':   return response.status(200).json(await createChapter(uid, body));
+      case 'getChapter':      return response.status(200).json(await getChapter(uid, body));
+      case 'createSection':   return response.status(200).json(await createSection(uid, body));
+      case 'getSection':      return response.status(200).json(await getSection(uid, body));
+      case 'updateNotes':     return response.status(200).json(await updateNotes(uid, body));
+      case 'deleteSection':   return response.status(200).json(await deleteSection(uid, body));
+      case 'deleteChapter':   return response.status(200).json(await deleteChapter(uid, body));
+      case 'getFullLesson':   return response.status(200).json(await getFullLesson(uid, body));
       default:
         return jsonError(response, 400, `Action inconnue : "${action}"`);
     }
   } catch (error) {
-    console.error(`Progress action "${action}" failed:`, error.message);
+    console.error(`[PROGRESS] "${action}" failed:`, error.message);
     if (error.stack) console.error(error.stack);
     if (error.status) {
       return jsonError(response, error.status, error.message, error.code);

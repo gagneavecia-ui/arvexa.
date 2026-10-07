@@ -45,12 +45,17 @@
       color-scheme: dark;
       min-width: 320px;
       width: 100%;
+      height: 100%;
     }
 
     body {
       margin: 0;
       min-height: 100vh;
+      min-height: 100dvh;
       overflow-x: hidden;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
       background:
         radial-gradient(ellipse 40% 30% at 30% 15%, rgba(26, 58, 42, 0.16) 0%, transparent 70%),
         radial-gradient(ellipse 35% 25% at 75% 85%, rgba(184, 134, 11, 0.05) 0%, transparent 60%),
@@ -68,6 +73,7 @@
     header {
       position: sticky;
       top: 0;
+      flex-shrink: 0;
       z-index: 50;
       display: flex;
       align-items: center;
@@ -107,6 +113,7 @@
       width: min(100% - 28px, 900px);
       margin: 0 auto;
       padding: 20px 0 30px;
+      flex: 1 1 auto;
     }
 
     /* STEP BAR */
@@ -165,7 +172,16 @@
     }
 
     .view { display: none; }
-    .view.active { display: block; animation: appear 0.3s ease; }
+    .view.active {
+      display: block;
+      animation: appear 0.3s ease;
+    }
+    .view:not(.active) {
+      height: 0;
+      overflow: hidden;
+      pointer-events: none;
+      visibility: hidden;
+    }
     @keyframes appear {
       from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: none; }
@@ -417,7 +433,7 @@
     }
     .session-meta i { color: var(--accent-bright); font-size: 11px; }
 
-    /* CARTE NOTION — ULTRA SIMPLE */
+    /* CARTE NOTION */
     .notion-card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
@@ -469,8 +485,12 @@
       max-height: 0;
       overflow: hidden;
       transition: max-height 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+      will-change: max-height;
     }
-    .notion-card.open .notion-body { max-height: 5000px; }
+    .notion-card.open .notion-body {
+      max-height: 5000px;
+      overflow: visible;
+    }
 
     .notion-content {
       padding: 14px 16px 16px;
@@ -480,7 +500,7 @@
       border-top: 1px solid var(--card-border);
     }
 
-    /* BLOC INTERNE — SIMPLE, SANS BORDURE COLORÉE */
+    /* BLOC INTERNE */
     .block {
       background: var(--block-bg);
       border-radius: 10px;
@@ -505,7 +525,7 @@
       line-height: 1.7;
     }
 
-    /* FORMULES — SANS BORDURE COLORÉE, CENTRÉES */
+    /* FORMULES */
     .formula-list {
       display: flex;
       flex-direction: column;
@@ -1485,8 +1505,6 @@
   const auth = getAuth(app);
   const db = getFirestore(app);
 
-  const FREE_LIMIT = 2;
-
   const CHAPTERS = {
     mathematiques: ['Nombres complexes','Similitudes planes directes','Calcul de probabilités','Variable aléatoire','Fonctions numériques','Fonction logarithme','Fonction exponentielle','Calcul intégral','Équations différentielles','Suites numériques','Statistiques'],
     physique: ['Cinématique','Mouvement du centre d\'inertie','Champ de pesanteur','Particules chargées','Oscillateurs mécaniques','Vibrations','Propagation des ondes','Superposition','Interférences lumineuses','Champ magnétique','Force de Lorentz','Force de Laplace','Induction électromagnétique','Auto-Induction','Circuit LC','Régime sinusoïdal','Radioactivité'],
@@ -1521,8 +1539,59 @@
   const $ = (id) => document.getElementById(id);
   const views = ['configView','loadingView','loadingFlashView','loadingQuizView','ficheView','flashcardView','quizView','resultsView'];
 
-  // ── KaTeX attempts guard (évite boucle infinie si CDN bloqué) ──
   let katexAttempts = 0;
+
+  // ────────────────────────────────────────────────────────────
+  // UTILITAIRES TEXTE — anti "[object Object]"
+  // ────────────────────────────────────────────────────────────
+
+  // Convertit n'importe quelle valeur en chaîne propre et sûre.
+  function toPlainText(value) {
+    if (value === null || value === undefined) return '';
+    if (typeof value === 'string') return value;
+    if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+    if (Array.isArray(value)) {
+      return value.map((v) => toPlainText(v)).filter(Boolean).join('\n');
+    }
+    if (typeof value === 'object') {
+      // Essaie les clés classiques d'abord
+      const keys = ['text', 'latex', 'formule', 'expression', 'content', 'value', 'label', 'titre', 'title', 'description'];
+      for (const k of keys) {
+        if (typeof value[k] === 'string' && value[k].trim()) return value[k];
+      }
+      // Sinon : concatène les valeurs string
+      return Object.values(value)
+        .map((v) => (typeof v === 'string' ? v : (typeof v === 'number' ? String(v) : '')))
+        .filter(Boolean)
+        .join(' — ');
+    }
+    return '';
+  }
+
+  // Convertit en texte + échappe HTML pour innerHTML sécurisé.
+  function safeText(value) {
+    const txt = toPlainText(value);
+    return txt.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  // Pour préserver les $ LaTeX, on n'échappe que < > &
+  function safeLatex(value) {
+    const txt = toPlainText(value);
+    return txt.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  // Nettoie une chaîne LaTeX : enlève les $ déjà présents (on les rajoute nous-mêmes)
+  function cleanLatex(value) {
+    let txt = toPlainText(value).trim();
+    // retire $$...$$, $...$, \[...\], \(...\)
+    txt = txt.replace(/^\$\$([\s\S]*)\$\$$/, '$1');
+    txt = txt.replace(/^\$([\s\S]*)\$$/, '$1');
+    txt = txt.replace(/^\\\[([\s\S]*)\\\]$/, '$1');
+    txt = txt.replace(/^\\\(([\s\S]*)\\\)$/, '$1');
+    return txt.trim();
+  }
+
+  // ────────────────────────────────────────────────────────────
 
   function showView(id) {
     views.forEach((v) => $(v).classList.toggle('active', v === id));
@@ -1552,12 +1621,8 @@
 
   function escapeHtml(text) {
     const div = document.createElement('div');
-    div.textContent = String(text || '');
+    div.textContent = toPlainText(text);
     return div.innerHTML;
-  }
-
-  function safeText(text) {
-    return String(text || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
 
   function renderKaTeX(root) {
@@ -1583,7 +1648,7 @@
 
   function showToast(message, type = 'info') {
     const toast = $('toast');
-    $('toastText').textContent = message;
+    $('toastText').textContent = toPlainText(message);
     toast.className = `toast show ${type}`;
     clearTimeout(window.__toastTimer);
     window.__toastTimer = setTimeout(() => toast.classList.remove('show'), 3200);
@@ -1591,16 +1656,23 @@
 
   function normalizeFormula(f) {
     if (!f) return null;
-    if (typeof f === 'string') return f.trim() ? { latex: f.trim(), condition: '', usage: '' } : null;
+    if (typeof f === 'string') {
+      const t = f.trim();
+      return t ? { latex: t, condition: '', usage: '' } : null;
+    }
     if (typeof f === 'object') {
-      const latex = f.latex || f.formule || f.expression || '';
+      const latex = f.latex || f.formule || f.expression || f.text || '';
       if (!latex || typeof latex !== 'string') return null;
-      return { latex: latex.trim(), condition: f.condition || '', usage: f.usage || '' };
+      return {
+        latex: latex.trim(),
+        condition: toPlainText(f.condition || ''),
+        usage: toPlainText(f.usage || '')
+      };
     }
     return null;
   }
 
-  function buildFallbackContent(notionTitle) {
+  function buildFallbackContent() {
     return {
       comprendre: `Cette notion fait partie du programme du BAC. Relis-la et fais des exercices d'application.`,
       tips: ['Note l\'essentiel dans ton carnet','Revois dans 24h puis 3 jours','Refais 2 exercices types','Explique-la à un camarade']
@@ -1700,14 +1772,12 @@
       }));
     });
   }
-
-  // Synchronise state.mode depuis les chips actifs
   function syncModeFromChips() {
     const active = document.querySelector('#modeChips .chip.active');
     if (active) state.mode = active.dataset.mode;
   }
 
-  // ── Appel API générique avec gestion erreurs ──
+  // ── API ──
   async function callApi(payload) {
     const token = await getIdToken(state.user);
     const res = await fetch('/api/reviseur', {
@@ -1750,14 +1820,9 @@
       const { res, data: payload } = await resPromise;
 
       if (res.status === 429) { showView('configView'); showPremiumPopup(payload?.used, payload?.limit); return; }
-      if (res.status === 400 && payload?.code === 'SUBJECT_NOT_READY') {
+      if (res.status === 400 && (payload?.code === 'SUBJECT_NOT_READY' || payload?.code === 'CHAPTER_NOT_FOUND')) {
         showView('configView');
-        setStatus('configStatus', payload.error, 'error');
-        return;
-      }
-      if (res.status === 400 && payload?.code === 'CHAPTER_NOT_FOUND') {
-        showView('configView');
-        setStatus('configStatus', payload.error || 'Chapitre introuvable.', 'error');
+        setStatus('configStatus', payload.error || 'Erreur.', 'error');
         return;
       }
       if (!res.ok || !payload?.success) throw new Error(payload?.error || 'Erreur de génération.');
@@ -1811,7 +1876,7 @@
 
       activateStep('flStep4', $('flLoadingStatus'), 'Vérification...');
       await new Promise((r) => setTimeout(r, 500));
-      state.flashcards = payload.session?.flashcards || [];
+      state.flashcards = Array.isArray(payload.session?.flashcards) ? payload.session.flashcards : [];
       state.currentFlashIndex = 0;
       state.flashRatings = {};
 
@@ -1868,7 +1933,7 @@
 
       activateStep('qzStep4', $('qzLoadingStatus'), 'Vérification...');
       await new Promise((r) => setTimeout(r, 500));
-      state.quiz = payload.quiz || [];
+      state.quiz = Array.isArray(payload.quiz) ? payload.quiz : [];
       state.quizAnswers = {};
 
       if (state.quiz.length === 0) {
@@ -1894,7 +1959,7 @@
     const s = state.currentSession;
     if (!s) return;
     const sections = Array.isArray(s.sections) ? s.sections : [];
-    $('ficheTitle').textContent = s.chapterTitle || 'Fiche';
+    $('ficheTitle').textContent = toPlainText(s.chapterTitle) || 'Fiche';
     $('ficheMeta').innerHTML = `
       <span><i class="fas fa-book"></i> ${escapeHtml(SUBJECT_LABELS[state.subject] || state.subject)}</span>
       <span><i class="fas fa-list"></i> ${sections.length} sections</span>
@@ -1930,14 +1995,17 @@
   function buildNotionCard(section, index) {
     const card = document.createElement('div');
     card.className = 'notion-card';
-    const title = section.notionTitle || section.title || `Notion ${index + 1}`;
-    const id = section.notionId || '';
+    const title = toPlainText(section.notionTitle || section.title || `Notion ${index + 1}`);
+    const id = toPlainText(section.notionId || '');
 
+    // COMPRENDRE
     let comprendreHTML = '';
-    if (section.comprendre && typeof section.comprendre === 'string' && section.comprendre.trim()) {
-      comprendreHTML = `<div class="block"><div class="block-label"><i class="fas fa-lightbulb"></i> Comprendre</div><div class="block-text">${safeText(section.comprendre)}</div></div>`;
+    const comprendreTxt = toPlainText(section.comprendre);
+    if (comprendreTxt.trim()) {
+      comprendreHTML = `<div class="block"><div class="block-label"><i class="fas fa-lightbulb"></i> Comprendre</div><div class="block-text">${safeText(comprendreTxt)}</div></div>`;
     }
 
+    // FORMULES
     let formulesHTML = '';
     if (Array.isArray(section.formules) && section.formules.length > 0) {
       const valid = section.formules.map(normalizeFormula).filter(Boolean);
@@ -1946,59 +2014,78 @@
           <div class="block">
             <div class="block-label"><i class="fas fa-square-root-variable"></i> Formules clés</div>
             <div class="formula-list">
-              ${valid.map((f) => `
-                <div class="formula-item">
-                  <div class="formula-latex">$$${safeText(f.latex)}$$</div>
-                  ${(f.condition || f.usage) ? `<div class="formula-meta">${f.condition ? `<span class="tag">${safeText(f.condition)}</span>` : ''}${f.usage ? `<span class="tag">${safeText(f.usage)}</span>` : ''}</div>` : ''}
-                </div>
-              `).join('')}
+              ${valid.map((f) => {
+                const latexClean = cleanLatex(f.latex);
+                if (!latexClean) return '';
+                return `
+                  <div class="formula-item">
+                    <div class="formula-latex">$$${safeLatex(latexClean)}$$</div>
+                    ${(f.condition || f.usage) ? `<div class="formula-meta">${f.condition ? `<span class="tag">${safeText(f.condition)}</span>` : ''}${f.usage ? `<span class="tag">${safeText(f.usage)}</span>` : ''}</div>` : ''}
+                  </div>
+                `;
+              }).join('')}
             </div>
           </div>
         `;
       }
     }
 
+    // MÉTHODE
     let methodeHTML = '';
     let steps = [];
     let methTitle = 'Méthode pas-à-pas';
     if (section.methode && typeof section.methode === 'object' && !Array.isArray(section.methode)) {
-      methTitle = section.methode.title || methTitle;
+      methTitle = toPlainText(section.methode.title) || methTitle;
       steps = Array.isArray(section.methode.steps) ? section.methode.steps : [];
     } else if (Array.isArray(section.methode)) {
       steps = section.methode;
+    } else if (typeof section.methode === 'string') {
+      steps = [section.methode];
     }
     if (steps.length > 0) {
       methodeHTML = `<div class="block"><div class="block-label"><i class="fas fa-list-ol"></i> ${safeText(methTitle)}</div><ol class="method-steps">${steps.map((st) => `<li>${safeText(st)}</li>`).join('')}</ol></div>`;
     }
 
+    // EXEMPLE RÉSOLU
     let exempleHTML = '';
     if (section.exempleResolu && typeof section.exempleResolu === 'object') {
       const ex = section.exempleResolu;
+      const enonce = toPlainText(ex.enonce);
       const et = Array.isArray(ex.etapes) ? ex.etapes : [];
-      exempleHTML = `
-        <div class="block">
-          <div class="block-label"><i class="fas fa-check-circle"></i> Exemple résolu</div>
-          ${ex.enonce ? `<div class="example-enonce">${safeText(ex.enonce)}</div>` : ''}
-          ${et.length > 0 ? `<ol class="example-steps">${et.map((e) => `<li>${safeText(e)}</li>`).join('')}</ol>` : ''}
-          ${ex.conclusion ? `<div class="example-conclusion">${safeText(ex.conclusion)}</div>` : ''}
-        </div>
-      `;
+      const conclusion = toPlainText(ex.conclusion);
+      if (enonce || et.length > 0 || conclusion) {
+        exempleHTML = `
+          <div class="block">
+            <div class="block-label"><i class="fas fa-check-circle"></i> Exemple résolu</div>
+            ${enonce ? `<div class="example-enonce">${safeText(enonce)}</div>` : ''}
+            ${et.length > 0 ? `<ol class="example-steps">${et.map((e) => `<li>${safeText(e)}</li>`).join('')}</ol>` : ''}
+            ${conclusion ? `<div class="example-conclusion">${safeText(conclusion)}</div>` : ''}
+          </div>
+        `;
+      }
     }
 
+    // PIÈGE
     let piegeHTML = '';
-    if (section.piegeBAC && typeof section.piegeBAC === 'object' && (section.piegeBAC.trap || section.piegeBAC.solution)) {
-      piegeHTML = `<div class="block"><div class="block-label"><i class="fas fa-triangle-exclamation"></i> Piège du BAC</div>${section.piegeBAC.trap ? `<div class="piege-trap">${safeText(section.piegeBAC.trap)}</div>` : ''}${section.piegeBAC.solution ? `<div class="piege-solution">${safeText(section.piegeBAC.solution)}</div>` : ''}</div>`;
+    if (section.piegeBAC && typeof section.piegeBAC === 'object') {
+      const trap = toPlainText(section.piegeBAC.trap);
+      const solution = toPlainText(section.piegeBAC.solution);
+      if (trap || solution) {
+        piegeHTML = `<div class="block"><div class="block-label"><i class="fas fa-triangle-exclamation"></i> Piège du BAC</div>${trap ? `<div class="piege-trap">${safeText(trap)}</div>` : ''}${solution ? `<div class="piege-solution">${safeText(solution)}</div>` : ''}</div>`;
+      }
     }
 
+    // ASTUCE
     let astuceHTML = '';
-    if (section.astuce && typeof section.astuce === 'string' && section.astuce.trim()) {
-      astuceHTML = `<div class="block"><div class="block-label"><i class="fas fa-star"></i> Astuce</div><div class="block-text">${safeText(section.astuce)}</div></div>`;
+    const astuceTxt = toPlainText(section.astuce);
+    if (astuceTxt.trim()) {
+      astuceHTML = `<div class="block"><div class="block-label"><i class="fas fa-star"></i> Astuce</div><div class="block-text">${safeText(astuceTxt)}</div></div>`;
     }
 
     const hasContent = comprendreHTML || formulesHTML || methodeHTML || exempleHTML || piegeHTML || astuceHTML;
     let fallbackHTML = '';
     if (!hasContent) {
-      const fb = buildFallbackContent(title);
+      const fb = buildFallbackContent();
       fallbackHTML = `
         <div class="block"><div class="block-label"><i class="fas fa-lightbulb"></i> À retenir</div><div class="block-text">${safeText(fb.comprendre)}</div></div>
         <div class="block"><div class="block-label"><i class="fas fa-check-circle"></i> Conseils</div><ol class="method-steps">${fb.tips.map((t) => `<li>${safeText(t)}</li>`).join('')}</ol></div>
@@ -2044,14 +2131,18 @@
   function updateFlashcardContent() {
     const c = state.flashcards[state.currentFlashIndex];
     if (!c) return;
-    $('flashFront').innerHTML = safeText(c.question || '');
-    $('flashBack').innerHTML = safeText(c.answer || '');
+    const question = toPlainText(c.question || c.front || '');
+    const answer = toPlainText(c.answer || c.back || c.reponse || '');
+    $('flashFront').innerHTML = safeText(question);
+    $('flashBack').innerHTML = safeText(answer);
     const badge = $('flashTypeBadge');
-    if (c.type && TYPE_LABELS[c.type]) {
-      badge.textContent = TYPE_LABELS[c.type];
+    const typeKey = toPlainText(c.type || '');
+    if (typeKey && TYPE_LABELS[typeKey]) {
+      badge.textContent = TYPE_LABELS[typeKey];
       badge.style.display = 'inline-flex';
     } else badge.style.display = 'none';
-    if (c.hint) { $('flashHint').style.display = 'flex'; $('flashHintText').textContent = c.hint; }
+    const hint = toPlainText(c.hint);
+    if (hint) { $('flashHint').style.display = 'flex'; $('flashHintText').textContent = hint; }
     else $('flashHint').style.display = 'none';
     $('flashCounter').textContent = `${state.currentFlashIndex + 1} / ${state.flashcards.length}`;
     $('flashcardTrackFill').style.width = `${((state.currentFlashIndex) / state.flashcards.length) * 100}%`;
@@ -2099,7 +2190,6 @@
     const container = $('quizContent');
     container.innerHTML = '';
 
-    // Filtre : ne garde que les questions avec 4 options valides
     state.quiz = (state.quiz || []).filter((q) => q && Array.isArray(q.options) && q.options.length === 4);
     if (state.quiz.length === 0) {
       showView('configView');
@@ -2116,9 +2206,10 @@
       const div = document.createElement('div');
       div.className = 'quiz-question';
       div.dataset.index = i;
+      const questionTxt = toPlainText(q.question || q.text || '');
       const opts = (q.options || []).map((opt, optIdx) => {
-        const text = typeof opt === 'string' ? opt : (opt.text || '');
-        const id = typeof opt === 'string' ? String.fromCharCode(65 + optIdx) : (opt.id || String.fromCharCode(65 + optIdx));
+        const text = toPlainText(typeof opt === 'string' ? opt : (opt.text || opt.label || ''));
+        const id = typeof opt === 'string' ? String.fromCharCode(65 + optIdx) : toPlainText(opt.id || String.fromCharCode(65 + optIdx));
         return `<div class="quiz-option" data-option="${escapeHtml(id)}" data-qindex="${i}"><span class="quiz-option-letter">${escapeHtml(id)}</span><span>${safeText(text)}</span></div>`;
       }).join('');
       div.innerHTML = `
@@ -2126,7 +2217,7 @@
           <div class="quiz-q-number">Question ${i + 1}</div>
           <div class="quiz-q-level">Niveau ${q.level || 1}</div>
         </div>
-        <div class="quiz-q-text">${safeText(q.question || q.text || '')}</div>
+        <div class="quiz-q-text">${safeText(questionTxt)}</div>
         <div class="quiz-options">${opts}</div>
         <div class="quiz-explanation" id="exp-${i}"></div>
       `;
@@ -2146,8 +2237,9 @@
           else if (o.dataset.option === opt.dataset.option) o.classList.add('wrong');
         });
         const exp = $(`exp-${i}`);
-        if (q.explanation) {
-          exp.innerHTML = `<strong>💡</strong> ${safeText(q.explanation)}`;
+        const explTxt = toPlainText(q.explanation);
+        if (explTxt) {
+          exp.innerHTML = `<strong>💡</strong> ${safeText(explTxt)}`;
           exp.classList.add('show');
           renderKaTeX(exp);
         }
@@ -2176,13 +2268,12 @@
     $('resultsTitle').textContent = title;
     $('resultsSub').textContent = sub;
 
-    const masteryScore = percent;
-    $('masteryValue').textContent = `${masteryScore}%`;
+    $('masteryValue').textContent = `${percent}%`;
     const fill = $('masteryFill');
-    fill.style.background = masteryScore >= 75 ? 'linear-gradient(90deg, #45b47d, #6fd99a)' : masteryScore >= 50 ? 'linear-gradient(90deg, #E0B84A, #F0CC65)' : 'linear-gradient(90deg, #d7654a, #e88a72)';
+    fill.style.background = percent >= 75 ? 'linear-gradient(90deg, #45b47d, #6fd99a)' : percent >= 50 ? 'linear-gradient(90deg, #E0B84A, #F0CC65)' : 'linear-gradient(90deg, #d7654a, #e88a72)';
     fill.style.width = '0%';
-    setTimeout(() => { fill.style.width = `${masteryScore}%`; }, 100);
-    $('masteryText').textContent = masteryScore >= 75 ? 'Chapitre solide.' : masteryScore >= 50 ? 'À consolider.' : 'À retravailler.';
+    setTimeout(() => { fill.style.width = `${percent}%`; }, 100);
+    $('masteryText').textContent = percent >= 75 ? 'Chapitre solide.' : percent >= 50 ? 'À consolider.' : 'À retravailler.';
 
     const recs = [
       percent === 100 ? 'Continue, teste un autre chapitre.' : percent >= 70 ? 'Revois les questions manquées.' : 'Refais une session dans 2-3 jours.'
@@ -2203,13 +2294,11 @@
   });
   $('skipToQuizBtn').addEventListener('click', generateQuiz);
 
-  // SCROLL TOP
   window.addEventListener('scroll', () => {
     $('scrollTop').classList.toggle('show', window.scrollY > 300);
   }, { passive: true });
   $('scrollTop').addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
-  // PREMIUM
   function showPremiumPopup(used, limit) {
     if (used && limit) $('premiumSubtitle').innerHTML = `Tu as utilisé tes <strong>${limit} essais gratuits</strong>. Passe à Premium.`;
     $('premiumOverlay').classList.add('show');
@@ -2218,7 +2307,6 @@
   $('popupLaterBtn').addEventListener('click', () => $('premiumOverlay').classList.remove('show'));
   $('premiumOverlay').addEventListener('click', (e) => { if (e.target === $('premiumOverlay')) $('premiumOverlay').classList.remove('show'); });
 
-  // AUTH
   function isUserPremium(data) {
     if (!data) return false;
     const active = data.premium === true || data.isUnlocked === true || data.hasDeposited === true;
@@ -2244,7 +2332,7 @@
 
   initCustomSelects();
   initChips();
-  console.log('🎓 ARVEXA — Réviseur v6.0');
+  console.log('🎓 ARVEXA — Réviseur v6.1');
   </script>
 </body>
 </html>

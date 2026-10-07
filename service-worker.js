@@ -1,9 +1,9 @@
 // ================================================================
 // SERVICE WORKER — ARVEXA School
-// Version : 5.0.0 — Cache complet + contenu cours
+// Version : 5.1.0 — Cache complet + Permissions micro
 // ================================================================
 
-const CACHE_VERSION = 'arvexa-v5.0.0';
+const CACHE_VERSION = 'arvexa-v5.1.0';
 const CACHE_SHELL = 'arvexa-shell-v5';      // Pages de base
 const CACHE_COURS = 'arvexa-cours-v5';      // Contenu cours/exo/corr
 const CACHE_IMAGES = 'arvexa-images-v5';    // Images/fonts/icônes
@@ -40,21 +40,20 @@ const PRECACHE_SHELL = [
   './confidentialite.html',
   './404.html',
   './manifest.json',
-  './icon.png'
+  './icon.png',
   './arv-progress.html',
-  './katex-utils.js',
+  './katex-utils.js'
 ];
 
 // ================================================================
 // INSTALLATION
 // ================================================================
 self.addEventListener('install', (event) => {
-  console.log('[SW] Installation v5.0.0...');
+  console.log('[SW] Installation v5.1.0...');
   self.skipWaiting();
 
   event.waitUntil(
     caches.open(CACHE_SHELL).then((cache) => {
-      // addAll échoue si UN seul fichier manque → on utilise add() individuel
       return Promise.all(
         PRECACHE_SHELL.map((url) =>
           cache.add(url).catch((e) => {
@@ -70,7 +69,7 @@ self.addEventListener('install', (event) => {
 // ACTIVATION
 // ================================================================
 self.addEventListener('activate', (event) => {
-  console.log('[SW] Activation v5.0.0...');
+  console.log('[SW] Activation v5.1.0...');
   event.waitUntil(
     caches.keys().then((names) => {
       return Promise.all(
@@ -123,26 +122,26 @@ self.addEventListener('fetch', (event) => {
   }
 
   // ─────────────────────────────────────────────────────────────
-// 3️⃣ PAGES HTML principales → network-first avec fallback
-// ─────────────────────────────────────────────────────────────
-if (request.mode === 'navigate' ||
-    request.destination === 'document' ||
-    url.pathname.endsWith('.html')) {
-  event.respondWith(handlePageRequest(request));
-  return;
-}
-
-// ─────────────────────────────────────────────────────────────
-// 6️⃣ ASSETS CDN KaTeX + Tesseract → cache-first permanent
-// ─────────────────────────────────────────────────────────────
-if (url.hostname === 'cdn.jsdelivr.net' &&
-    (url.pathname.includes('/katex') || url.pathname.includes('/tesseract'))) {
-  event.respondWith(handleAssetRequest(request, CACHE_IMAGES));
-  return;
-}
+  // 3️⃣ PAGES HTML principales → network-first avec fallback
+  // ─────────────────────────────────────────────────────────────
+  if (request.mode === 'navigate' ||
+      request.destination === 'document' ||
+      url.pathname.endsWith('.html')) {
+    event.respondWith(handlePageRequest(request));
+    return;
+  }
 
   // ─────────────────────────────────────────────────────────────
-  // 4️⃣ IMAGES / FONTS / ICÔNES → cache-first
+  // 4️⃣ ASSETS CDN KaTeX + Tesseract → cache-first permanent
+  // ─────────────────────────────────────────────────────────────
+  if (url.hostname === 'cdn.jsdelivr.net' &&
+      (url.pathname.includes('/katex') || url.pathname.includes('/tesseract'))) {
+    event.respondWith(handleAssetRequest(request, CACHE_IMAGES));
+    return;
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // 5️⃣ IMAGES / FONTS / ICÔNES → cache-first
   // ─────────────────────────────────────────────────────────────
   if (request.destination === 'image' ||
       request.destination === 'font' ||
@@ -152,7 +151,7 @@ if (url.hostname === 'cdn.jsdelivr.net' &&
   }
 
   // ─────────────────────────────────────────────────────────────
-  // 5️⃣ CSS / JS externes → stale-while-revalidate
+  // 6️⃣ CSS / JS externes → stale-while-revalidate
   // ─────────────────────────────────────────────────────────────
   if (request.destination === 'style' || request.destination === 'script') {
     event.respondWith(handleAssetRequest(request, CACHE_IMAGES));
@@ -199,7 +198,6 @@ async function handleCoursRequest(request) {
     }
     return response;
   } catch (error) {
-    // Fallback : page offline
     const offlinePage = await caches.match('./offline.html');
     if (offlinePage) return offlinePage;
 
@@ -275,7 +273,7 @@ self.addEventListener('message', (event) => {
     return;
   }
 
-  // ─── DOWNLOAD_ALL : télécharge toute une liste de fichiers
+  // ─── DOWNLOAD_ALL
   if (event.data.type === 'DOWNLOAD_ALL') {
     event.waitUntil(
       downloadAllFiles(event.data.files || [], event.source)
@@ -283,15 +281,21 @@ self.addEventListener('message', (event) => {
     return;
   }
 
-  // ─── CACHE_URL : cache une URL unique
+  // ─── CACHE_URL
   if (event.data.type === 'CACHE_URL') {
     event.waitUntil(cacheUrl(event.data.url));
     return;
   }
 
-  // ─── STATS : renvoie le nombre d'éléments en cache
+  // ─── STATS
   if (event.data.type === 'STATS') {
     event.waitUntil(sendStats(event.source));
+    return;
+  }
+
+  // ─── MIC_REQUESTED : accusé de réception pour debug
+  if (event.data.type === 'REQUEST_MIC') {
+    event.source?.postMessage({ type: 'MIC_ACK' });
     return;
   }
 });
@@ -309,7 +313,6 @@ async function downloadAllFiles(files, client) {
 
   for (const file of files) {
     try {
-      // Vérifier si déjà en cache
       const already = await caches.match(file);
       if (already) {
         done++;
@@ -330,7 +333,6 @@ async function downloadAllFiles(files, client) {
       failed++;
     }
 
-    // Progress
     if (client) {
       client.postMessage({
         type: 'DOWNLOAD_PROGRESS',
@@ -368,9 +370,7 @@ async function cacheUrl(url) {
       const cache = await caches.open(cacheName);
       cache.put(url, response);
     }
-  } catch (e) {
-    // Ignore
-  }
+  } catch (e) {}
 }
 
 // ================================================================
@@ -379,28 +379,16 @@ async function cacheUrl(url) {
 async function sendStats(client) {
   if (!client) return;
 
-  const stats = {
-    shell: 0,
-    cours: 0,
-    manifests: 0,
-    images: 0
-  };
+  const stats = { shell: 0, cours: 0, manifests: 0, images: 0 };
 
   try {
-    const shellCache = await caches.open(CACHE_SHELL);
-    stats.shell = (await shellCache.keys()).length;
-
-    const coursCache = await caches.open(CACHE_COURS);
-    stats.cours = (await coursCache.keys()).length;
-
-    const manifestCache = await caches.open(CACHE_MANIFESTS);
-    stats.manifests = (await manifestCache.keys()).length;
-
-    const imgCache = await caches.open(CACHE_IMAGES);
-    stats.images = (await imgCache.keys()).length;
+    stats.shell = (await (await caches.open(CACHE_SHELL)).keys()).length;
+    stats.cours = (await (await caches.open(CACHE_COURS)).keys()).length;
+    stats.manifests = (await (await caches.open(CACHE_MANIFESTS)).keys()).length;
+    stats.images = (await (await caches.open(CACHE_IMAGES)).keys()).length;
   } catch (e) {}
 
   client.postMessage({ type: 'STATS_RESULT', stats });
 }
 
-console.log('[SW] Service Worker v5.0.0 chargé');
+console.log('[SW] Service Worker v5.1.0 chargé');

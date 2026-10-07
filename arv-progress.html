@@ -2022,6 +2022,7 @@ function openAddSectionModal(subject, chapterId) {
 let voiceRecognition = null;
 let isRecording = false;
 let voiceAccumulated = '';
+let mediaStream = null;
 
 async function toggleVoiceRecognition(textarea, onChange) {
   if (isRecording) {
@@ -2029,57 +2030,66 @@ async function toggleVoiceRecognition(textarea, onChange) {
     return;
   }
 
-  // 1. Vérifie le contexte sécurisé (HTTPS ou localhost)
+  // 1. HTTPS ou localhost obligatoire
   if (!window.isSecureContext) {
-    showToast('La dictée nécessite HTTPS. Ouvre via https:// ou localhost.', 'error', 5000);
+    showToast('La dictée nécessite HTTPS.', 'error', 5000);
     return;
   }
 
-  // 2. Vérifie le support
+  // 2. Support navigateur
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) {
     showToast('Dictée non supportée. Utilise Chrome.', 'error');
     return;
   }
 
-  // 3. Vérifie que getUserMedia est disponible
-  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-    showToast('Micro non disponible sur ce navigateur.', 'error', 5000);
+  // 3. Support getUserMedia
+  if (!navigator.mediaDevices?.getUserMedia) {
+    showToast('Micro non disponible.', 'error', 5000);
     return;
   }
 
-  // 4. DEMANDE EXPLICITE DE PERMISSION via getUserMedia
-  // (c'est ce qui déclenche la popup native sur Android/iOS)
+  // 4. Ouvre le micro et garde le stream ACTIF
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    // Stoppe immédiatement les tracks pour ne pas bloquer le micro
-    stream.getTracks().forEach((track) => track.stop());
-  } catch (permissionError) {
-    console.error('[MIC] Permission refusée :', permissionError.name);
+    if (!mediaStream) {
+      mediaStream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true
+        }
+      });
+    }
+    // ⚠️ ON NE FERME PAS LE STREAM ICI
+    // On le garde ouvert pendant toute la session de dictée
+  } catch (err) {
+    console.error('[MIC]', err.name, err.message);
 
-    if (permissionError.name === 'NotAllowedError') {
-      showToast('Micro refusé. Autorise dans les paramètres du navigateur.', 'error', 6000);
-    } else if (permissionError.name === 'NotFoundError') {
-      showToast('Aucun microphone détecté.', 'error', 5000);
-    } else if (permissionError.name === 'NotReadableError') {
-      showToast('Micro occupé par une autre app.', 'error', 5000);
+    if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+      showToast('Micro refusé. Réinitialise les permissions du site.', 'error', 6000);
+    } else if (err.name === 'NotFoundError') {
+      showToast('Aucun micro détecté.', 'error', 5000);
+    } else if (err.name === 'NotReadableError') {
+      showToast('Micro occupé par une autre application.', 'error', 5000);
     } else {
-      showToast('Erreur micro : ' + permissionError.message, 'error', 5000);
+      showToast('Erreur micro : ' + err.name, 'error', 5000);
     }
     return;
   }
 
-  // 5. Permission accordée → on lance SpeechRecognition
+  // 5. Crée et configure SpeechRecognition
   voiceRecognition = new SR();
   voiceRecognition.lang = 'fr-FR';
   voiceRecognition.continuous = true;
   voiceRecognition.interimResults = true;
+  voiceRecognition.maxAlternatives = 1;
 
   voiceRecognition.onstart = () => {
     isRecording = true;
     $('voiceBtn')?.classList.add('recording');
     const st = $('voiceStatus');
     if (st) { st.textContent = '🔴 Enregistrement...'; st.classList.add('recording'); }
+    console.log('[VOICE] started');
   };
 
   voiceRecognition.onresult = (event) => {
@@ -2097,22 +2107,41 @@ async function toggleVoiceRecognition(textarea, onChange) {
     onChange?.();
   };
 
-  voiceRecognition.onerror = (e) => {
-    console.error('[VOICE] erreur:', e.error);
+  voiceRecognition.onerror = async (e) => {
+    console.error('[VOICE] error:', e.error);
+
+    // ⚠️ BUG CHROME ANDROID : "not-allowed" au 1er lancement alors que la permission est OK
+    // → on retente automatiquement UNE FOIS après 300ms
+    if (e.error === 'not-allowed' && !voiceRecognition.__retried) {
+      voiceRecognition.__retried = true;
+      console.log('[VOICE] Retry après not-allowed (bug Chrome Android)');
+      try { voiceRecognition.stop(); } catch (_) {}
+      setTimeout(() => {
+        try {
+          voiceRecognition.start();
+        } catch (err) {
+          showToast('Impossible de démarrer la dictée.', 'error');
+          stopVoiceRecognition();
+        }
+      }, 300);
+      return;
+    }
 
     if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
-      showToast('Micro refusé. Vérifie les permissions du site.', 'error', 6000);
+      showToast('Micro refusé. Vérifie les permissions du site dans Chrome.', 'error', 6000);
     } else if (e.error === 'audio-capture') {
       showToast('Aucun micro détecté.', 'error', 5000);
     } else if (e.error === 'network') {
-      showToast('Erreur réseau du service vocal. Réessaie.', 'error', 5000);
+      showToast('Erreur réseau du service vocal.', 'error', 5000);
     } else if (e.error === 'no-speech') {
-      // Silencieux : l'utilisateur n'a pas parlé
+      // Silencieux
     } else if (e.error !== 'aborted') {
       showToast('Erreur vocale : ' + e.error, 'error', 5000);
     }
 
-    stopVoiceRecognition();
+    if (e.error !== 'not-allowed' || voiceRecognition.__retried) {
+      stopVoiceRecognition();
+    }
   };
 
   voiceRecognition.onend = () => {
@@ -2120,15 +2149,32 @@ async function toggleVoiceRecognition(textarea, onChange) {
     $('voiceBtn')?.classList.remove('recording');
     const st = $('voiceStatus');
     if (st) { st.textContent = 'Appuie pour reprendre'; st.classList.remove('recording'); }
+    console.log('[VOICE] ended');
   };
 
+  // 6. Démarre
   try {
     voiceRecognition.start();
   } catch (e) {
     console.error('[VOICE] start error:', e);
     showToast('Impossible de démarrer le micro.', 'error');
+    stopVoiceRecognition();
   }
-      }
+}
+
+function stopVoiceRecognition() {
+  if (voiceRecognition && isRecording) {
+    try { voiceRecognition.stop(); } catch (_) {}
+  }
+  // ⚠️ On ferme le stream SEULEMENT ici, quand on arrête tout
+  if (mediaStream) {
+    try { mediaStream.getTracks().forEach((t) => t.stop()); } catch (_) {}
+    mediaStream = null;
+  }
+  isRecording = false;
+  $('voiceBtn')?.classList.remove('recording');
+  }
+
   
 function stopVoiceRecognition() {
   if (voiceRecognition && isRecording) {

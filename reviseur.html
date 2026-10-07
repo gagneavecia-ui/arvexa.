@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0A0A0A">
-  <meta name="description" content="ARVEXA School — Réviseur intelligent">
+  <title>ARVEXA — Réviseur</title>
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icon.png" type="image/png">
   <link rel="apple-touch-icon" href="icon.png">
@@ -20,33 +20,20 @@
   <script src="register-sw.js" defer></script>
 
   <style>
-    /* ═══════════════════════════════════════════════════════════
-       ROOT — Design unifié ARVEXA
-       ═══════════════════════════════════════════════════════════ */
     :root {
       --accent: #B8860B;
       --accent-bright: #E0B84A;
-      --success: #2D7D5A;
       --success-light: #3AB67E;
       --danger: #B85C3A;
-      --danger-light: #E07A5F;
-      --warning: #D4A017;
-
       --bg-dark: #0A0A0A;
-      --bg-surface: #141414;
       --card-bg: rgba(20, 20, 20, 0.6);
       --card-border: rgba(255, 255, 255, 0.06);
-      --card-border-hover: rgba(224, 184, 74, 0.2);
       --block-bg: rgba(0, 0, 0, 0.25);
-      --block-border: rgba(255, 255, 255, 0.04);
-
       --text-light: #F5F0E8;
       --text-dim: #8A8A7A;
       --text-muted: #5A5A4A;
       --text-body: #cfd0cc;
-
       --transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
-
       --safe-top: env(safe-area-inset-top, 0px);
       --safe-bottom: env(safe-area-inset-bottom, 0px);
     }
@@ -71,17 +58,13 @@
       color: var(--text-light);
       font: 15px/1.6 'Inter', system-ui, sans-serif;
       padding-top: var(--safe-top);
-      padding-bottom: calc(80px + var(--safe-bottom));
       -webkit-font-smoothing: antialiased;
     }
 
-    button, input, select, textarea { font: inherit; font-family: inherit; }
-    button { cursor: pointer; }
+    button { cursor: pointer; font-family: inherit; }
     button:disabled { cursor: not-allowed; opacity: 0.55; }
 
-    /* ═══════════════════════════════════════════════════════════
-       HEADER (sticky)
-       ═══════════════════════════════════════════════════════════ */
+    /* HEADER */
     header {
       position: sticky;
       top: 0;
@@ -96,7 +79,6 @@
       border-bottom: 1px solid var(--card-border);
       gap: 12px;
     }
-
     .brand {
       color: var(--text-light);
       text-decoration: none;
@@ -104,7 +86,6 @@
       letter-spacing: 0.04em;
     }
     .brand span { color: var(--accent-bright); font-style: italic; }
-
     .connection {
       color: var(--text-muted);
       font-size: 12px;
@@ -121,18 +102,14 @@
     }
     .connection.online::before { background: var(--success-light); }
 
-    /* ═══════════════════════════════════════════════════════════
-       SHELL
-       ═══════════════════════════════════════════════════════════ */
+    /* SHELL */
     .shell {
       width: min(100% - 28px, 900px);
       margin: 0 auto;
       padding: 20px 0 30px;
     }
 
-    /* ═══════════════════════════════════════════════════════════
-       STEP BAR
-       ═══════════════════════════════════════════════════════════ */
+    /* STEP BAR */
     .step-bar {
       display: none;
       align-items: center;
@@ -140,19 +117,11 @@
       padding: 12px 16px;
       margin-bottom: 20px;
       background: var(--card-bg);
-      backdrop-filter: blur(10px);
       border: 1px solid var(--card-border);
       border-radius: 12px;
       overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
     }
     .step-bar.show { display: flex; }
-    .step-bar::-webkit-scrollbar { height: 3px; }
-    .step-bar::-webkit-scrollbar-thumb {
-      background: rgba(224, 184, 74, 0.2);
-      border-radius: 10px;
-    }
-
     .step-item {
       display: flex;
       align-items: center;
@@ -165,59 +134,34 @@
       color: var(--text-muted);
       background: rgba(255, 255, 255, 0.02);
       border: 1px solid transparent;
-      transition: var(--transition);
       flex-shrink: 0;
     }
     .step-item .num {
-      width: 20px;
-      height: 20px;
+      width: 20px; height: 20px;
       border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 10px;
-      font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 800;
       background: rgba(255, 255, 255, 0.05);
       color: var(--text-muted);
-      flex-shrink: 0;
     }
     .step-item.active {
       background: rgba(224, 184, 74, 0.1);
       border-color: rgba(224, 184, 74, 0.25);
       color: var(--accent-bright);
     }
-    .step-item.active .num {
-      background: var(--accent-bright);
-      color: #0A0A0A;
-    }
-    .step-item.done {
-      color: var(--success-light);
-      background: rgba(69, 180, 125, 0.06);
-      border-color: rgba(69, 180, 125, 0.15);
-    }
-    .step-item.done .num {
-      background: var(--success-light);
-      color: #0A0A0A;
-    }
+    .step-item.active .num { background: var(--accent-bright); color: #0A0A0A; }
+    .step-item.done { color: var(--success-light); background: rgba(69, 180, 125, 0.06); }
+    .step-item.done .num { background: var(--success-light); color: #0A0A0A; }
     .step-item.done .num::before { content: '✓'; }
     .step-item.done .num span { display: none; }
-    .step-sep {
-      color: var(--text-muted);
-      font-size: 10px;
-      flex-shrink: 0;
-      opacity: 0.5;
-    }
+    .step-sep { color: var(--text-muted); font-size: 10px; opacity: 0.5; }
 
-    /* ═══════════════════════════════════════════════════════════
-       PANELS / VUES
-       ═══════════════════════════════════════════════════════════ */
+    /* PANEL */
     .panel {
       background: var(--card-bg);
-      backdrop-filter: blur(12px);
       border: 1px solid var(--card-border);
       border-radius: 14px;
       padding: 22px;
-      position: relative;
     }
 
     .view { display: none; }
@@ -227,17 +171,14 @@
       to { opacity: 1; transform: none; }
     }
 
-    /* ═══════════════════════════════════════════════════════════
-       TYPOGRAPHIE
-       ═══════════════════════════════════════════════════════════ */
-    h1, h2, h3 {
+    h1, h2 {
       margin: 0;
       line-height: 1.2;
       font-family: 'Playfair Display', serif;
       color: var(--text-light);
     }
-    h1 { font-size: clamp(24px, 4.5vw, 36px); letter-spacing: -0.01em; }
-    h2 { font-size: clamp(19px, 3.5vw, 24px); letter-spacing: -0.01em; }
+    h1 { font-size: clamp(24px, 4.5vw, 36px); }
+    h2 { font-size: clamp(19px, 3.5vw, 24px); }
 
     .eyebrow {
       color: var(--accent-bright);
@@ -247,7 +188,6 @@
       text-transform: uppercase;
       margin-bottom: 10px;
     }
-
     .lead {
       color: var(--text-dim);
       max-width: 620px;
@@ -256,36 +196,19 @@
       font-size: 14.5px;
     }
 
-    /* ═══════════════════════════════════════════════════════════
-       FORMULAIRE CONFIG
-       ═══════════════════════════════════════════════════════════ */
+    /* FORM */
     .form-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 16px;
       margin-top: 22px;
     }
-    .field {
-      display: flex;
-      flex-direction: column;
-      gap: 7px;
-      min-width: 0;
-    }
+    .field { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
     .field.full { grid-column: 1 / -1; }
-    label {
-      color: var(--text-light);
-      font-size: 13px;
-      font-weight: 600;
-    }
+    label { color: var(--text-light); font-size: 13px; font-weight: 600; }
 
-    /* ═══════════════════════════════════════════════════════════
-       CHIPS
-       ═══════════════════════════════════════════════════════════ */
-    .chips-row {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
+    /* CHIPS */
+    .chips-row { display: flex; gap: 8px; flex-wrap: wrap; }
     .chip {
       padding: 8px 16px;
       border-radius: 20px;
@@ -294,26 +217,16 @@
       color: var(--text-dim);
       font-size: 12.5px;
       font-weight: 600;
-      cursor: pointer;
       transition: var(--transition);
-      font-family: inherit;
     }
-    .chip:hover { border-color: rgba(224, 184, 74, 0.3); color: var(--text-light); }
     .chip.active {
       background: rgba(224, 184, 74, 0.12);
       border-color: rgba(224, 184, 74, 0.3);
       color: var(--accent-bright);
     }
 
-    /* ═══════════════════════════════════════════════════════════
-       BOUTONS
-       ═══════════════════════════════════════════════════════════ */
-    .actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 22px;
-    }
+    /* BUTTONS */
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
     .btn {
       min-height: 44px;
       border: 1px solid transparent;
@@ -324,77 +237,41 @@
       font-weight: 600;
       font-size: 14px;
       transition: var(--transition);
-      font-family: inherit;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
-    }
-    .btn:hover:not(:disabled) {
-      transform: translateY(-1px);
-      border-color: rgba(224, 184, 74, 0.3);
-      background: rgba(255, 255, 255, 0.06);
     }
     .btn.primary {
       background: linear-gradient(135deg, var(--accent-bright), var(--accent));
       color: #0A0A0A;
       font-weight: 700;
     }
-    .btn.primary:hover:not(:disabled) {
-      box-shadow: 0 8px 24px rgba(184, 134, 11, 0.3);
-    }
     .btn.secondary {
       background: transparent;
       border-color: rgba(255, 255, 255, 0.08);
       color: var(--text-dim);
     }
-    .btn.secondary:hover:not(:disabled) {
-      border-color: rgba(224, 184, 74, 0.3);
-      color: var(--text-light);
-    }
     .btn.full { width: 100%; }
 
-    /* ═══════════════════════════════════════════════════════════
-       LOADER
-       ═══════════════════════════════════════════════════════════ */
+    /* LOADER */
     .loader {
       display: none;
-      width: 18px;
-      height: 18px;
+      width: 18px; height: 18px;
       border: 2px solid rgba(10, 10, 10, 0.25);
       border-top-color: currentColor;
       border-radius: 50%;
       animation: spin 0.7s linear infinite;
     }
-    .btn.secondary .loader {
-      border-color: rgba(255, 255, 255, 0.2);
-      border-top-color: var(--text-light);
-    }
     .btn.loading .loader { display: inline-block; }
     .btn.loading .btn-text { display: none; }
-    .btn.loading .btn-icon { display: none; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ═══════════════════════════════════════════════════════════
-       STATUS
-       ═══════════════════════════════════════════════════════════ */
-    .status {
-      min-height: 20px;
-      margin-top: 12px;
-      color: var(--text-dim);
-      font-size: 13px;
-    }
+    .status { min-height: 20px; margin-top: 12px; color: var(--text-dim); font-size: 13px; }
     .status.error { color: #ff9a84; }
-    .status.success { color: #7ce0aa; }
 
-    /* ═══════════════════════════════════════════════════════════
-       CUSTOM SELECT
-       ═══════════════════════════════════════════════════════════ */
-    .custom-select {
-      position: relative;
-      width: 100%;
-      user-select: none;
-    }
+    /* CUSTOM SELECT */
+    .custom-select { position: relative; width: 100%; user-select: none; }
     .custom-select-trigger {
       display: flex;
       align-items: center;
@@ -408,49 +285,27 @@
       border-radius: 10px;
       color: var(--text-light);
       font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: var(--transition);
       text-align: left;
-      font-family: inherit;
-    }
-    .custom-select-trigger:hover {
-      border-color: rgba(224, 184, 74, 0.3);
+      cursor: pointer;
     }
     .custom-select.open .custom-select-trigger {
       border-color: var(--accent-bright);
-      background: rgba(184, 134, 11, 0.02);
     }
     .custom-select-value {
-      flex: 1;
-      min-width: 0;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      flex: 1; min-width: 0;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      display: flex; align-items: center; gap: 8px;
     }
-    .custom-select-value .icon-prefix {
-      color: var(--accent-bright);
-      font-size: 13px;
-      flex-shrink: 0;
-    }
+    .custom-select-value .icon-prefix { color: var(--accent-bright); font-size: 13px; }
     .custom-select-arrow {
-      color: var(--text-muted);
-      font-size: 12px;
-      flex-shrink: 0;
+      color: var(--text-muted); font-size: 12px;
       transition: transform 0.25s ease;
     }
-    .custom-select.open .custom-select-arrow {
-      transform: rotate(180deg);
-      color: var(--accent-bright);
-    }
+    .custom-select.open .custom-select-arrow { transform: rotate(180deg); color: var(--accent-bright); }
     .custom-select-options {
       position: absolute;
       top: calc(100% + 6px);
-      left: 0;
-      right: 0;
+      left: 0; right: 0;
       z-index: 50;
       max-height: 280px;
       overflow-y: auto;
@@ -465,9 +320,7 @@
       transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
     }
     .custom-select.open .custom-select-options {
-      opacity: 1;
-      visibility: visible;
-      transform: translateY(0);
+      opacity: 1; visibility: visible; transform: translateY(0);
     }
     .custom-select-option {
       display: flex;
@@ -479,28 +332,12 @@
       font-size: 14px;
       font-weight: 500;
       cursor: pointer;
-      transition: background 0.15s ease;
     }
-    .custom-select-option:hover {
-      background: rgba(224, 184, 74, 0.08);
-      color: var(--text-light);
-    }
-    .custom-select-option.selected {
-      background: rgba(224, 184, 74, 0.12);
-      color: var(--accent-bright);
-      font-weight: 600;
-    }
-    .custom-select-option .option-prefix {
-      color: var(--accent-bright);
-      font-size: 13px;
-      flex-shrink: 0;
-      width: 18px;
-      text-align: center;
-    }
+    .custom-select-option:hover { background: rgba(224, 184, 74, 0.08); color: var(--text-light); }
+    .custom-select-option.selected { background: rgba(224, 184, 74, 0.12); color: var(--accent-bright); font-weight: 600; }
+    .custom-select-option .option-prefix { color: var(--accent-bright); font-size: 13px; width: 18px; text-align: center; }
 
-    /* ═══════════════════════════════════════════════════════════
-       ÉTAPES DE CHARGEMENT (unifiées)
-       ═══════════════════════════════════════════════════════════ */
+    /* LOADING STEPS */
     .loading-steps {
       margin-top: 26px;
       display: flex;
@@ -509,13 +346,11 @@
       gap: 22px;
     }
     .loader-spinner {
-      width: 52px;
-      height: 52px;
+      width: 52px; height: 52px;
       border: 3px solid rgba(224, 184, 74, 0.15);
       border-top-color: var(--accent-bright);
       border-radius: 50%;
       animation: spin 0.9s linear infinite;
-      flex-shrink: 0;
     }
     .steps-list {
       display: flex;
@@ -532,73 +367,29 @@
       border-radius: 10px;
       background: rgba(20, 20, 20, 0.5);
       border: 1px solid var(--card-border);
-      border-left: 2px solid transparent;
-      transition: all 0.3s ease;
       opacity: 0.5;
+      transition: all 0.3s ease;
     }
-    .loading-step.active {
-      opacity: 1;
-      background: rgba(224, 184, 74, 0.06);
-      border-left-color: var(--accent-bright);
-      border-color: rgba(224, 184, 74, 0.2);
-    }
-    .loading-step.done {
-      opacity: 0.85;
-      background: rgba(69, 180, 125, 0.04);
-      border-left-color: var(--success);
-      border-color: rgba(69, 180, 125, 0.15);
-    }
+    .loading-step.active { opacity: 1; background: rgba(224, 184, 74, 0.06); border-color: rgba(224, 184, 74, 0.2); }
+    .loading-step.done { opacity: 0.85; background: rgba(69, 180, 125, 0.04); border-color: rgba(69, 180, 125, 0.15); }
     .loading-step.done::after {
       content: '✓';
       margin-left: auto;
       color: var(--success-light);
       font-weight: 800;
       font-size: 15px;
-      flex-shrink: 0;
     }
-    .step-icon {
-      font-size: 20px;
-      line-height: 1;
-      flex-shrink: 0;
-      width: 26px;
-      text-align: center;
-      opacity: 0.7;
-    }
+    .step-icon { font-size: 20px; line-height: 1; width: 26px; text-align: center; opacity: 0.7; }
     .loading-step.active .step-icon { opacity: 1; }
-    .step-content {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      min-width: 0;
-      flex: 1;
-    }
-    .step-label {
-      font-size: 13.5px;
-      font-weight: 600;
-      color: var(--text-light);
-      line-height: 1.3;
-    }
+    .step-content { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+    .step-label { font-size: 13.5px; font-weight: 600; color: var(--text-light); }
     .loading-step.active .step-label { color: var(--accent-bright); }
     .loading-step.done .step-label { color: var(--success-light); }
-    .step-desc {
-      font-size: 11.5px;
-      color: var(--text-muted);
-      line-height: 1.4;
-    }
-    .loading-status {
-      font-size: 13px;
-      color: var(--text-muted);
-      text-align: center;
-      min-height: 20px;
-    }
-    .loading-status.active {
-      color: var(--accent-bright);
-      font-weight: 600;
-    }
+    .step-desc { font-size: 11.5px; color: var(--text-muted); }
+    .loading-status { font-size: 13px; color: var(--text-muted); text-align: center; min-height: 20px; }
+    .loading-status.active { color: var(--accent-bright); font-weight: 600; }
 
-    /* ═══════════════════════════════════════════════════════════
-       SESSION HEAD
-       ═══════════════════════════════════════════════════════════ */
+    /* SESSION HEAD */
     .session-head {
       display: flex;
       justify-content: space-between;
@@ -608,7 +399,6 @@
       flex-wrap: wrap;
     }
     .session-head h2 { font-size: clamp(18px, 3vw, 22px); }
-
     .session-meta {
       display: flex;
       gap: 8px;
@@ -628,9 +418,7 @@
     }
     .session-meta i { color: var(--accent-bright); font-size: 11px; }
 
-    /* ═══════════════════════════════════════════════════════════
-       CARTE NOTION — STYLE UNIFIÉ
-       ═══════════════════════════════════════════════════════════ */
+    /* CARTE NOTION — ULTRA SIMPLE */
     .notion-card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
@@ -639,7 +427,6 @@
       overflow: hidden;
       transition: var(--transition);
     }
-    .notion-card:hover { border-color: var(--card-border-hover); }
     .notion-card.open { border-color: rgba(224, 184, 74, 0.25); }
 
     .notion-header {
@@ -649,87 +436,58 @@
       padding: 14px 16px;
       cursor: pointer;
       user-select: none;
-      transition: background 0.15s ease;
     }
     .notion-header:hover { background: rgba(255, 255, 255, 0.02); }
 
     .notion-num {
-      width: 30px;
-      height: 30px;
+      width: 30px; height: 30px;
       border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: flex; align-items: center; justify-content: center;
       font: 700 13px 'Playfair Display', serif;
       background: rgba(224, 184, 74, 0.1);
       color: var(--accent-bright);
       border: 1px solid rgba(224, 184, 74, 0.15);
       flex-shrink: 0;
     }
-    .notion-card.open .notion-num {
-      background: rgba(224, 184, 74, 0.18);
-      border-color: rgba(224, 184, 74, 0.35);
-    }
-
     .notion-title-wrap { flex: 1; min-width: 0; }
     .notion-title {
       font: 600 14.5px 'Inter', sans-serif;
       color: var(--text-light);
       line-height: 1.35;
-      overflow-wrap: break-word;
     }
-    .notion-sub {
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-top: 2px;
-    }
-
+    .notion-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
     .notion-toggle {
-      width: 26px;
-      height: 26px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      width: 26px; height: 26px;
+      display: flex; align-items: center; justify-content: center;
       color: var(--text-muted);
       font-size: 11px;
       flex-shrink: 0;
       transition: transform 0.3s ease, color 0.2s ease;
     }
-    .notion-card.open .notion-toggle {
-      transform: rotate(180deg);
-      color: var(--accent-bright);
-    }
+    .notion-card.open .notion-toggle { transform: rotate(180deg); color: var(--accent-bright); }
 
     .notion-body {
       max-height: 0;
       overflow: hidden;
       transition: max-height 0.4s cubic-bezier(0.25, 1, 0.5, 1);
     }
-    .notion-card.open .notion-body {
-      max-height: 30000px;
-    }
+    .notion-card.open .notion-body { max-height: 30000px; }
 
     .notion-content {
-      padding: 4px 16px 16px;
+      padding: 14px 16px 16px;
       display: flex;
       flex-direction: column;
       gap: 10px;
       border-top: 1px solid var(--card-border);
-      padding-top: 14px;
-      margin-top: 4px;
     }
 
-    /* ═══════════════════════════════════════════════════════════
-       BLOC INTERNE UNIFIÉ (pour TOUS les types de contenu)
-       ═══════════════════════════════════════════════════════════ */
+    /* BLOC INTERNE — SIMPLE, SANS BORDURE COLORÉE */
     .block {
       background: var(--block-bg);
-      border: 1px solid var(--block-border);
       border-radius: 10px;
       padding: 12px 14px;
       overflow-wrap: break-word;
     }
-
     .block-label {
       font-size: 11px;
       font-weight: 700;
@@ -742,29 +500,25 @@
       gap: 6px;
     }
     .block-label i { font-size: 11px; }
-
     .block-text {
       font-size: 14px;
       color: var(--text-body);
       line-height: 1.7;
     }
 
-    /* Formules */
+    /* FORMULES — SANS BORDURE COLORÉE, CENTRÉES */
     .formula-list {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
     }
     .formula-item {
-      padding: 10px 12px;
-      border-radius: 8px;
-      background: rgba(0, 0, 0, 0.3);
-      border-left: 2px solid var(--accent);
+      padding: 10px 0;
+      text-align: center;
     }
     .formula-latex {
       font-size: 15px;
       color: var(--text-light);
-      text-align: center;
       padding: 4px 0;
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
@@ -772,8 +526,9 @@
     .formula-meta {
       display: flex;
       flex-wrap: wrap;
+      justify-content: center;
       gap: 6px;
-      margin-top: 6px;
+      margin-top: 8px;
       font-size: 11px;
     }
     .formula-meta .tag {
@@ -783,7 +538,7 @@
       color: var(--text-dim);
     }
 
-    /* Méthode (steps) */
+    /* MÉTHODE */
     .method-steps {
       list-style: none;
       padding: 0;
@@ -797,37 +552,30 @@
       color: var(--text-body);
       line-height: 1.7;
       margin-bottom: 8px;
-      overflow-wrap: break-word;
     }
     .method-steps li:last-child { margin-bottom: 0; }
     .method-steps li::before {
       content: counter(step);
       position: absolute;
-      left: 0;
-      top: 2px;
-      width: 20px;
-      height: 20px;
+      left: 0; top: 2px;
+      width: 20px; height: 20px;
       border-radius: 50%;
       background: rgba(224, 184, 74, 0.12);
       color: var(--accent-bright);
       font-size: 10px;
       font-weight: 800;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: flex; align-items: center; justify-content: center;
     }
 
-    /* Exemple */
+    /* EXEMPLE */
     .example-enonce {
       padding: 10px 12px;
       border-radius: 8px;
       background: rgba(0, 0, 0, 0.3);
-      border-left: 2px solid var(--accent);
       font-size: 13.5px;
       color: var(--text-light);
       line-height: 1.6;
       margin-bottom: 10px;
-      overflow-wrap: break-word;
     }
     .example-steps {
       list-style: none;
@@ -843,36 +591,29 @@
       color: var(--text-body);
       line-height: 1.7;
       margin-bottom: 6px;
-      overflow-wrap: break-word;
     }
-    .example-steps li:last-child { margin-bottom: 0; }
     .example-steps li::before {
       content: counter(estep) '.';
       position: absolute;
-      left: 0;
-      top: 0;
+      left: 0; top: 0;
       color: var(--accent-bright);
       font-weight: 700;
-      font-size: 12px;
     }
     .example-conclusion {
       padding: 8px 12px;
       border-radius: 8px;
       background: rgba(69, 180, 125, 0.08);
-      border-left: 2px solid var(--success-light);
       font-size: 13.5px;
       color: #7ce0aa;
       font-weight: 600;
-      overflow-wrap: break-word;
     }
 
-    /* Piège */
+    /* PIÈGE */
     .piege-trap {
       font-size: 13.5px;
       color: var(--text-light);
       line-height: 1.65;
       margin-bottom: 8px;
-      overflow-wrap: break-word;
     }
     .piege-solution {
       position: relative;
@@ -880,42 +621,34 @@
       font-size: 13px;
       color: #7ce0aa;
       line-height: 1.65;
-      overflow-wrap: break-word;
     }
     .piege-solution::before {
       content: '→';
       position: absolute;
-      left: 0;
-      top: 0;
+      left: 0; top: 0;
       font-weight: 700;
     }
 
-    /* ═══════════════════════════════════════════════════════════
-       BLOCS GLOBAUX (points clés, pièges, récap)
-       ═══════════════════════════════════════════════════════════ */
+    /* GLOBAL BLOCK */
     .global-block {
       padding: 14px 16px;
       border-radius: 10px;
       margin-bottom: 12px;
-      border: 1px solid var(--card-border);
       background: rgba(255, 255, 255, 0.015);
+      border: 1px solid var(--card-border);
     }
     .global-title {
       font-size: 11.5px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.08em;
+      color: var(--accent-bright);
       margin-bottom: 10px;
       display: flex;
       align-items: center;
       gap: 8px;
-      color: var(--accent-bright);
     }
-    .global-title i { font-size: 12px; }
-    .global-list {
-      list-style: none;
-      padding: 0;
-    }
+    .global-list { list-style: none; padding: 0; }
     .global-list li {
       position: relative;
       padding-left: 18px;
@@ -923,14 +656,11 @@
       color: var(--text-body);
       line-height: 1.7;
       margin-bottom: 6px;
-      overflow-wrap: break-word;
     }
-    .global-list li:last-child { margin-bottom: 0; }
     .global-list li::before {
       content: '•';
       position: absolute;
-      left: 4px;
-      top: 0;
+      left: 4px; top: 0;
       color: var(--accent);
       font-weight: 700;
     }
@@ -953,41 +683,30 @@
       color: var(--text-muted);
       font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
     }
 
-    /* ═══════════════════════════════════════════════════════════
-       FLASHCARDS — UNIFIÉ
-       ═══════════════════════════════════════════════════════════ */
+    /* FLASHCARD */
     .flashcard-progress {
       display: flex;
       align-items: center;
-      justify-content: space-between;
       gap: 12px;
       margin-bottom: 16px;
       font-size: 12px;
       color: var(--text-muted);
       flex-wrap: wrap;
     }
-    .flashcard-progress .counter {
-      font-weight: 700;
-      color: var(--accent-bright);
-    }
+    .flashcard-progress .counter { font-weight: 700; color: var(--accent-bright); }
     .flashcard-track {
-      flex: 1;
-      min-width: 100px;
-      height: 4px;
+      flex: 1; min-width: 100px; height: 4px;
       border-radius: 4px;
       background: rgba(255, 255, 255, 0.06);
       overflow: hidden;
     }
     .flashcard-track-fill {
-      height: 100%;
-      border-radius: 4px;
+      height: 100%; border-radius: 4px;
       background: linear-gradient(90deg, var(--accent), var(--accent-bright));
       transition: width 0.4s ease;
     }
-
     .flashcard {
       perspective: 1400px;
       margin-bottom: 16px;
@@ -995,17 +714,14 @@
     }
     .flashcard-inner {
       position: relative;
-      width: 100%;
-      height: 280px;
+      width: 100%; height: 280px;
       transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
       transform-style: preserve-3d;
       cursor: pointer;
     }
     .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
-
     .flashcard-face {
-      position: absolute;
-      inset: 0;
+      position: absolute; inset: 0;
       backface-visibility: hidden;
       -webkit-backface-visibility: hidden;
       border-radius: 12px;
@@ -1022,12 +738,10 @@
     .flashcard-back {
       transform: rotateY(180deg);
       border-color: rgba(224, 184, 74, 0.25);
-      background: rgba(25, 22, 15, 0.6);
     }
     .flashcard-type-badge {
       display: inline-flex;
       align-items: center;
-      gap: 5px;
       padding: 3px 10px;
       border-radius: 12px;
       font-size: 9.5px;
@@ -1037,7 +751,6 @@
       margin-bottom: 12px;
       background: rgba(224, 184, 74, 0.1);
       color: var(--accent-bright);
-      border: 1px solid rgba(224, 184, 74, 0.15);
     }
     .flashcard-label {
       font-size: 10px;
@@ -1052,8 +765,8 @@
       line-height: 1.6;
       color: var(--text-light);
       font-weight: 500;
-      width: 100%;
       word-break: break-word;
+      width: 100%;
     }
     .flashcard-hint {
       font-size: 12px;
@@ -1082,38 +795,28 @@
     .flashcard-feedback.show {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      animation: fadeUp 0.3s ease;
     }
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
     .feedback-btn {
       padding: 12px 8px;
       border-radius: 10px;
       border: 1px solid var(--card-border);
       background: rgba(255, 255, 255, 0.02);
-      font-family: inherit;
       font-size: 12px;
       font-weight: 600;
       cursor: pointer;
-      transition: background 0.15s ease, border-color 0.15s ease;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 4px;
-      text-align: center;
       color: var(--text-dim);
+      transition: all 0.15s ease;
     }
     .feedback-btn i { font-size: 16px; }
     .feedback-btn.hard:hover { background: rgba(215, 101, 74, 0.1); border-color: rgba(215, 101, 74, 0.3); color: #ff9a84; }
     .feedback-btn.medium:hover { background: rgba(212, 160, 23, 0.1); border-color: rgba(212, 160, 23, 0.3); color: #fbbf24; }
     .feedback-btn.easy:hover { background: rgba(69, 180, 125, 0.1); border-color: rgba(69, 180, 125, 0.3); color: #7ce0aa; }
 
-    /* ═══════════════════════════════════════════════════════════
-       QUIZ — UNIFIÉ
-       ═══════════════════════════════════════════════════════════ */
+    /* QUIZ */
     .progress {
       height: 4px;
       border-radius: 10px;
@@ -1128,7 +831,6 @@
       transition: width 0.3s ease;
       width: 0%;
     }
-
     .quiz-question {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
@@ -1157,21 +859,17 @@
       padding: 3px 10px;
       border-radius: 10px;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
       background: rgba(255, 255, 255, 0.04);
       color: var(--text-dim);
     }
-
     .quiz-q-text {
       font-size: 15px;
       line-height: 1.65;
       color: var(--text-light);
       font-weight: 500;
       margin-bottom: 14px;
-      overflow-wrap: break-word;
     }
     .quiz-options { display: flex; flex-direction: column; gap: 8px; }
-
     .quiz-option {
       display: flex;
       align-items: flex-start;
@@ -1181,76 +879,47 @@
       border: 1px solid var(--card-border);
       background: rgba(0, 0, 0, 0.25);
       cursor: pointer;
-      transition: background 0.15s ease, border-color 0.15s ease;
       font-size: 14px;
       color: var(--text-body);
       line-height: 1.5;
+      transition: all 0.15s ease;
     }
     .quiz-option:hover:not(.disabled) {
       border-color: rgba(224, 184, 74, 0.4);
       background: rgba(224, 184, 74, 0.04);
     }
-    .quiz-option.selected {
-      border-color: var(--accent-bright);
-      background: rgba(224, 184, 74, 0.1);
-      color: var(--text-light);
-    }
-    .quiz-option.correct {
-      border-color: var(--success);
-      background: rgba(69, 180, 125, 0.12);
-      color: #7ce0aa;
-    }
-    .quiz-option.wrong {
-      border-color: var(--danger);
-      background: rgba(215, 101, 74, 0.12);
-      color: #ff9a84;
-    }
+    .quiz-option.selected { border-color: var(--accent-bright); background: rgba(224, 184, 74, 0.1); color: var(--text-light); }
+    .quiz-option.correct { border-color: var(--success-light); background: rgba(69, 180, 125, 0.12); color: #7ce0aa; }
+    .quiz-option.wrong { border-color: var(--danger); background: rgba(215, 101, 74, 0.12); color: #ff9a84; }
     .quiz-option.disabled { cursor: not-allowed; }
-
     .quiz-option-letter {
-      width: 24px;
-      height: 24px;
+      width: 24px; height: 24px;
       border-radius: 6px;
       background: rgba(255, 255, 255, 0.04);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: flex; align-items: center; justify-content: center;
       font-size: 11px;
       font-weight: 700;
-      flex-shrink: 0;
       color: var(--text-muted);
+      flex-shrink: 0;
     }
-    .quiz-option.selected .quiz-option-letter {
-      background: var(--accent-bright);
-      color: #0A0A0A;
-    }
-    .quiz-option.correct .quiz-option-letter {
-      background: var(--success);
-      color: #fff;
-    }
-    .quiz-option.wrong .quiz-option-letter {
-      background: var(--danger);
-      color: #fff;
-    }
+    .quiz-option.selected .quiz-option-letter { background: var(--accent-bright); color: #0A0A0A; }
+    .quiz-option.correct .quiz-option-letter { background: var(--success-light); color: #fff; }
+    .quiz-option.wrong .quiz-option-letter { background: var(--danger); color: #fff; }
 
     .quiz-explanation {
       margin-top: 12px;
       padding: 10px 12px;
       background: rgba(74, 175, 224, 0.06);
-      border-left: 2px solid #4AAFE0;
-      border-radius: 0 8px 8px 0;
+      border-radius: 8px;
       font-size: 13px;
       line-height: 1.65;
       color: var(--text-body);
       display: none;
-      overflow-wrap: break-word;
     }
     .quiz-explanation.show { display: block; }
     .quiz-explanation strong { color: #4AAFE0; }
 
-    /* ═══════════════════════════════════════════════════════════
-       RÉSULTATS
-       ═══════════════════════════════════════════════════════════ */
+    /* RESULT */
     .result-hero {
       text-align: center;
       padding: 28px 22px;
@@ -1259,14 +928,9 @@
       border-radius: 12px;
       margin-bottom: 18px;
     }
-    .result-hero .emoji {
-      font-size: 52px;
-      display: block;
-      margin-bottom: 12px;
-      line-height: 1;
-    }
+    .result-hero .emoji { font-size: 52px; display: block; margin-bottom: 12px; }
     .result-hero h2 { font-size: clamp(20px, 4vw, 26px); margin-bottom: 6px; }
-    .result-hero p { color: var(--text-dim); margin: 0; font-size: 14px; }
+    .result-hero p { color: var(--text-dim); font-size: 14px; }
 
     .result-summary {
       display: grid;
@@ -1334,15 +998,10 @@
       margin-bottom: 10px;
     }
     .mastery-track-fill {
-      height: 100%;
-      border-radius: 6px;
+      height: 100%; border-radius: 6px;
       transition: width 1s ease;
     }
-    .mastery-label-text {
-      font-size: 13px;
-      color: var(--text-dim);
-      line-height: 1.55;
-    }
+    .mastery-label-text { font-size: 13px; color: var(--text-dim); line-height: 1.55; }
 
     .recommendations {
       padding: 16px 18px;
@@ -1358,14 +1017,8 @@
       letter-spacing: 0.08em;
       color: #4AAFE0;
       margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
     }
-    .recommendations .rec-list {
-      list-style: none;
-      padding: 0;
-    }
+    .recommendations .rec-list { list-style: none; padding: 0; }
     .recommendations .rec-list li {
       position: relative;
       padding-left: 18px;
@@ -1373,89 +1026,47 @@
       color: var(--text-body);
       line-height: 1.65;
       margin-bottom: 6px;
-      overflow-wrap: break-word;
     }
-    .recommendations .rec-list li:last-child { margin-bottom: 0; }
     .recommendations .rec-list li::before {
       content: '•';
       position: absolute;
-      left: 4px;
-      top: 0;
+      left: 4px; top: 0;
       color: #4AAFE0;
       font-weight: 700;
     }
 
-    /* ═══════════════════════════════════════════════════════════
-       EMPTY
-       ═══════════════════════════════════════════════════════════ */
-    .empty-state {
-      text-align: center;
-      padding: 40px 20px;
-      color: var(--text-muted);
-    }
-    .empty-state i {
-      font-size: 40px;
-      margin-bottom: 10px;
-      display: block;
-      opacity: 0.4;
-    }
-    .empty-state h3 {
-      font-family: 'Playfair Display', serif;
-      font-size: 17px;
-      color: var(--text-dim);
-      margin-bottom: 6px;
-    }
-    .empty-state p { font-size: 13px; }
-
-    /* ═══════════════════════════════════════════════════════════
-       SCROLL TOP
-       ═══════════════════════════════════════════════════════════ */
+    /* SCROLL TOP */
     .scroll-top {
       position: fixed;
       bottom: calc(20px + var(--safe-bottom));
       right: 20px;
-      width: 40px;
-      height: 40px;
+      width: 40px; height: 40px;
       border-radius: 50%;
       border: 1px solid var(--card-border);
       background: rgba(20, 20, 20, 0.95);
       color: var(--accent-bright);
       font-size: 14px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      visibility: hidden;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; visibility: hidden;
       transform: translateY(10px);
       transition: all 0.3s ease;
       z-index: 40;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
     }
-    .scroll-top.show {
-      opacity: 1;
-      visibility: visible;
-      transform: translateY(0);
-    }
+    .scroll-top.show { opacity: 1; visibility: visible; transform: translateY(0); }
 
-    /* ═══════════════════════════════════════════════════════════
-       POPUP PREMIUM
-       ═══════════════════════════════════════════════════════════ */
+    /* PREMIUM */
     .premium-popup-overlay {
-      position: fixed;
-      inset: 0;
+      position: fixed; inset: 0;
       z-index: 100;
-      display: grid;
-      place-items: center;
+      display: grid; place-items: center;
       padding: 16px;
       background: rgba(0, 0, 0, 0.85);
       backdrop-filter: blur(16px);
-      opacity: 0;
-      visibility: hidden;
+      opacity: 0; visibility: hidden;
       transition: opacity 0.25s ease, visibility 0.25s ease;
     }
     .premium-popup-overlay.show { opacity: 1; visibility: visible; }
-
     .premium-popup {
       position: relative;
       width: min(100%, 400px);
@@ -1466,30 +1077,19 @@
       transform: scale(0.94);
       transition: transform 0.3s ease;
     }
-    .premium-popup-overlay.show .premium-popup {
-      transform: scale(1);
-    }
+    .premium-popup-overlay.show .premium-popup { transform: scale(1); }
     .popup-close {
       position: absolute;
-      top: 10px;
-      right: 10px;
-      width: 30px;
-      height: 30px;
+      top: 10px; right: 10px;
+      width: 30px; height: 30px;
       border: 1px solid var(--card-border);
       border-radius: 8px;
       background: transparent;
       color: var(--text-muted);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: flex; align-items: center; justify-content: center;
       font-size: 13px;
     }
-    .popup-icon {
-      display: block;
-      text-align: center;
-      font-size: 40px;
-      margin-bottom: 6px;
-    }
+    .popup-icon { display: block; text-align: center; font-size: 40px; margin-bottom: 6px; }
     .premium-popup h2 {
       text-align: center;
       font-size: 20px;
@@ -1518,7 +1118,6 @@
       font-weight: 700;
       text-decoration: none;
       font-size: 14px;
-      min-height: 44px;
     }
     .btn-later {
       padding: 9px;
@@ -1526,14 +1125,9 @@
       background: transparent;
       color: var(--text-muted);
       font-size: 13px;
-      cursor: pointer;
-      font-family: inherit;
     }
-    .btn-later:hover { color: var(--text-light); }
 
-    /* ═══════════════════════════════════════════════════════════
-       TOAST
-       ═══════════════════════════════════════════════════════════ */
+    /* TOAST */
     .toast {
       position: fixed;
       top: calc(var(--safe-top) + 20px);
@@ -1542,82 +1136,32 @@
       padding: 12px 20px;
       border-radius: 10px;
       background: rgba(20, 22, 20, 0.96);
-      backdrop-filter: blur(16px);
       border: 1px solid rgba(224, 184, 74, 0.3);
       color: var(--text-light);
       font-size: 13px;
-      font-weight: 500;
       z-index: 300;
       opacity: 0;
-      transition: var(--transition);
-      max-width: 90%;
-      display: flex;
-      align-items: center;
-      gap: 10px;
+      transition: all 0.3s ease;
+      display: flex; align-items: center; gap: 10px;
       pointer-events: none;
     }
-    .toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-    .toast i { font-size: 14px; flex-shrink: 0; }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    /* ═══════════════════════════════════════════════════════════
-       KATEX
-       ═══════════════════════════════════════════════════════════ */
-    .katex { font-size: 1.05em; color: inherit; }
-    .katex-display {
-      margin: 8px 0;
-      overflow-x: auto;
-      overflow-y: hidden;
-      padding: 4px 0;
-    }
+    .katex { font-size: 1.05em; }
+    .katex-display { margin: 8px 0; overflow-x: auto; padding: 4px 0; }
 
-    /* ═══════════════════════════════════════════════════════════
-       RESPONSIVE
-       ═══════════════════════════════════════════════════════════ */
     @media (max-width: 620px) {
-      .shell { width: min(100% - 20px, 900px); padding: 14px 0 24px; }
+      .shell { width: min(100% - 20px, 900px); padding: 14px 0 20px; }
       .panel { padding: 16px; }
       .form-grid { grid-template-columns: 1fr; }
       .field.full { grid-column: auto; }
       .actions .btn { flex: 1 1 100%; }
-
-      .step-bar { padding: 10px 12px; gap: 6px; }
-      .step-item { padding: 5px 10px; font-size: 11px; }
-      .step-item .num { width: 18px; height: 18px; font-size: 9px; }
-
-      .notion-header { padding: 12px 14px; gap: 10px; }
-      .notion-num { width: 28px; height: 28px; font-size: 12px; }
-      .notion-title { font-size: 13.5px; }
-      .notion-content { padding: 12px 14px 14px; gap: 8px; }
-      .block { padding: 11px 12px; }
-
-      .flashcard, .flashcard-inner { height: 260px; min-height: 260px; }
-      .flashcard-text { font-size: 15px; }
-      .flashcard-face { padding: 18px; }
-
-      .result-summary { gap: 8px; }
-      .metric { padding: 12px 8px; }
-      .metric strong { font-size: 20px; }
-      .metric small { font-size: 9px; }
-
-      .session-head { flex-direction: column; align-items: flex-start; }
-      .custom-select-trigger { padding: 11px 12px; min-height: 44px; font-size: 13.5px; }
-    }
-
-    @media (max-width: 380px) {
-      .panel { padding: 14px; }
-      .btn { font-size: 13px; padding: 10px 14px; }
-      .notion-num { width: 26px; height: 26px; font-size: 11px; }
-      .notion-title { font-size: 13px; }
+      .notion-content { padding: 12px 14px 14px; }
+      .flashcard, .flashcard-inner { height: 260px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation-duration: 0.01ms !important;
-        transition-duration: 0.01ms !important;
-      }
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
     }
   </style>
 </head>
@@ -1631,36 +1175,21 @@
   <main class="shell">
 
     <div class="step-bar" id="stepBar">
-      <div class="step-item active" data-step="fiche">
-        <div class="num"><span>1</span></div>
-        <span>Fiche</span>
-      </div>
+      <div class="step-item active" data-step="fiche"><div class="num"><span>1</span></div><span>Fiche</span></div>
       <span class="step-sep">›</span>
-      <div class="step-item" data-step="flashcard">
-        <div class="num"><span>2</span></div>
-        <span>Flashcards</span>
-      </div>
+      <div class="step-item" data-step="flashcard"><div class="num"><span>2</span></div><span>Flashcards</span></div>
       <span class="step-sep">›</span>
-      <div class="step-item" data-step="quiz">
-        <div class="num"><span>3</span></div>
-        <span>Quiz</span>
-      </div>
+      <div class="step-item" data-step="quiz"><div class="num"><span>3</span></div><span>Quiz</span></div>
       <span class="step-sep">›</span>
-      <div class="step-item" data-step="results">
-        <div class="num"><span>4</span></div>
-        <span>Résultats</span>
-      </div>
+      <div class="step-item" data-step="results"><div class="num"><span>4</span></div><span>Résultats</span></div>
     </div>
 
     <!-- CONFIG -->
     <section class="view active" id="configView">
       <div class="panel">
-        <div class="eyebrow">Réviseur intelligent</div>
-        <h1>Génère ta révision <em style="color:var(--accent-bright);font-style:italic;">sur mesure</em>.</h1>
-        <p class="lead">
-          Une fiche ultra-détaillée, des flashcards typées et un quiz progressif.
-          Toute la base de connaissances du BAC est exploitée.
-        </p>
+        <div class="eyebrow">Réviseur</div>
+        <h1>Révise <em style="color:var(--accent-bright);font-style:italic;">efficacement</em>.</h1>
+        <p class="lead">Fiche détaillée, flashcards actives, quiz varié. Un seul objectif : ta réussite.</p>
 
         <form id="configForm" class="form-grid">
           <div class="field">
@@ -1693,42 +1222,33 @@
           <div class="field full">
             <label>Mode de départ</label>
             <div class="chips-row" id="modeChips">
-              <button type="button" class="chip active" data-mode="fiche">📝 Fiche de révision</button>
-              <button type="button" class="chip" data-mode="flashcard">⚡ Flashcards</button>
-            </div>
-          </div>
-
-          <div class="field">
-            <label>Nombre de flashcards</label>
-            <div class="chips-row" id="flashCountChips">
-              <button type="button" class="chip" data-count="5">5</button>
-              <button type="button" class="chip active" data-count="10">10</button>
-              <button type="button" class="chip" data-count="15">15</button>
+              <button type="button" class="chip active" data-mode="fiche">Fiche</button>
+              <button type="button" class="chip" data-mode="flashcard">Flashcards</button>
             </div>
           </div>
 
           <div class="field">
             <label>Difficulté quiz</label>
             <div class="chips-row" id="difficultyChips">
-              <button type="button" class="chip" data-diff="1">🟢 Facile</button>
-              <button type="button" class="chip active" data-diff="2">🟡 Moyen</button>
-              <button type="button" class="chip" data-diff="3">🟠 Difficile</button>
-              <button type="button" class="chip" data-diff="4">🔴 BAC</button>
+              <button type="button" class="chip" data-diff="1">Facile</button>
+              <button type="button" class="chip active" data-diff="2">Moyen</button>
+              <button type="button" class="chip" data-diff="3">Difficile</button>
+              <button type="button" class="chip" data-diff="4">BAC</button>
             </div>
           </div>
 
           <div class="field">
             <label>Nombre de questions</label>
             <div class="chips-row" id="quizCountChips">
-              <button type="button" class="chip" data-qcount="3">3</button>
-              <button type="button" class="chip active" data-qcount="5">5</button>
-              <button type="button" class="chip" data-qcount="10">10</button>
+              <button type="button" class="chip" data-qcount="5">5</button>
+              <button type="button" class="chip active" data-qcount="10">10</button>
+              <button type="button" class="chip" data-qcount="15">15</button>
             </div>
           </div>
 
           <div class="field full">
             <button class="btn primary full" id="generateBtn" type="submit">
-              <span class="btn-text">Générer ma session</span>
+              <span class="btn-text">Générer</span>
               <span class="loader"></span>
             </button>
           </div>
@@ -1741,18 +1261,16 @@
     <!-- LOADING FICHE -->
     <section class="view" id="loadingView">
       <div class="panel">
-        <div class="eyebrow">Génération en cours</div>
-        <h2>Préparation de ta fiche...</h2>
-        <p class="lead">Cela prend généralement 20 à 40 secondes.</p>
-
+        <div class="eyebrow">Génération</div>
+        <h2>Préparation de la fiche...</h2>
         <div class="loading-steps">
           <div class="loader-spinner"></div>
           <div class="steps-list">
-            <div class="loading-step" id="genStep1"><span class="step-icon">🔍</span><div class="step-content"><span class="step-label">Analyse du chapitre</span><span class="step-desc">Matière, chapitre et mode sélectionnés</span></div></div>
-            <div class="loading-step" id="genStep2"><span class="step-icon">🧠</span><div class="step-content"><span class="step-label">Extraction des notions</span><span class="step-desc">Exploitation de la base de connaissances</span></div></div>
-            <div class="loading-step" id="genStep3"><span class="step-icon">✍️</span><div class="step-content"><span class="step-label">Rédaction enrichie</span><span class="step-desc">Formules, méthodes, exemples, pièges</span></div></div>
-            <div class="loading-step" id="genStep4"><span class="step-icon">✅</span><div class="step-content"><span class="step-label">Vérification</span><span class="step-desc">Contrôle de la complétude</span></div></div>
-            <div class="loading-step" id="genStep5"><span class="step-icon">✨</span><div class="step-content"><span class="step-label">Finalisation</span><span class="step-desc">Préparation de l'affichage</span></div></div>
+            <div class="loading-step" id="genStep1"><span class="step-icon">🔍</span><div class="step-content"><span class="step-label">Analyse du chapitre</span></div></div>
+            <div class="loading-step" id="genStep2"><span class="step-icon">🧠</span><div class="step-content"><span class="step-label">Extraction des notions</span></div></div>
+            <div class="loading-step" id="genStep3"><span class="step-icon">✍️</span><div class="step-content"><span class="step-label">Rédaction enrichie</span></div></div>
+            <div class="loading-step" id="genStep4"><span class="step-icon">✅</span><div class="step-content"><span class="step-label">Vérification</span></div></div>
+            <div class="loading-step" id="genStep5"><span class="step-icon">✨</span><div class="step-content"><span class="step-label">Finalisation</span></div></div>
           </div>
           <div class="loading-status" id="genLoadingStatus">Préparation...</div>
         </div>
@@ -1762,18 +1280,16 @@
     <!-- LOADING FLASHCARDS -->
     <section class="view" id="loadingFlashView">
       <div class="panel">
-        <div class="eyebrow">Génération en cours</div>
+        <div class="eyebrow">Génération</div>
         <h2>Préparation des flashcards...</h2>
-        <p class="lead">Cela prend généralement 15 à 30 secondes.</p>
-
         <div class="loading-steps">
           <div class="loader-spinner"></div>
           <div class="steps-list">
-            <div class="loading-step" id="flStep1"><span class="step-icon">🔍</span><div class="step-content"><span class="step-label">Analyse du chapitre</span><span class="step-desc">Matière et notions ciblées</span></div></div>
-            <div class="loading-step" id="flStep2"><span class="step-icon">🧠</span><div class="step-content"><span class="step-label">Extraction des notions</span><span class="step-desc">Base de connaissances activée</span></div></div>
-            <div class="loading-step" id="flStep3"><span class="step-icon">⚡</span><div class="step-content"><span class="step-label">Génération des cartes</span><span class="step-desc">Définitions, formules, méthodes, pièges</span></div></div>
-            <div class="loading-step" id="flStep4"><span class="step-icon">✅</span><div class="step-content"><span class="step-label">Vérification</span><span class="step-desc">Contrôle des réponses</span></div></div>
-            <div class="loading-step" id="flStep5"><span class="step-icon">✨</span><div class="step-content"><span class="step-label">Finalisation</span><span class="step-desc">Préparation de l'affichage</span></div></div>
+            <div class="loading-step" id="flStep1"><span class="step-icon">🔍</span><div class="step-content"><span class="step-label">Analyse du chapitre</span></div></div>
+            <div class="loading-step" id="flStep2"><span class="step-icon">🧠</span><div class="step-content"><span class="step-label">Extraction des notions</span></div></div>
+            <div class="loading-step" id="flStep3"><span class="step-icon">⚡</span><div class="step-content"><span class="step-label">Génération des cartes</span></div></div>
+            <div class="loading-step" id="flStep4"><span class="step-icon">✅</span><div class="step-content"><span class="step-label">Vérification</span></div></div>
+            <div class="loading-step" id="flStep5"><span class="step-icon">✨</span><div class="step-content"><span class="step-label">Finalisation</span></div></div>
           </div>
           <div class="loading-status" id="flLoadingStatus">Préparation...</div>
         </div>
@@ -1783,18 +1299,16 @@
     <!-- LOADING QUIZ -->
     <section class="view" id="loadingQuizView">
       <div class="panel">
-        <div class="eyebrow">Génération en cours</div>
+        <div class="eyebrow">Génération</div>
         <h2>Préparation du quiz...</h2>
-        <p class="lead">Cela prend généralement 15 à 30 secondes.</p>
-
         <div class="loading-steps">
           <div class="loader-spinner"></div>
           <div class="steps-list">
-            <div class="loading-step" id="qzStep1"><span class="step-icon">🔍</span><div class="step-content"><span class="step-label">Analyse du chapitre</span><span class="step-desc">Matière et difficulté</span></div></div>
-            <div class="loading-step" id="qzStep2"><span class="step-icon">🧠</span><div class="step-content"><span class="step-label">Extraction des notions</span><span class="step-desc">Base de connaissances activée</span></div></div>
-            <div class="loading-step" id="qzStep3"><span class="step-icon">❓</span><div class="step-content"><span class="step-label">Génération des questions</span><span class="step-desc">5 niveaux de difficulté</span></div></div>
-            <div class="loading-step" id="qzStep4"><span class="step-icon">✅</span><div class="step-content"><span class="step-label">Vérification</span><span class="step-desc">Contrôle des réponses</span></div></div>
-            <div class="loading-step" id="qzStep5"><span class="step-icon">✨</span><div class="step-content"><span class="step-label">Finalisation</span><span class="step-desc">Préparation de l'affichage</span></div></div>
+            <div class="loading-step" id="qzStep1"><span class="step-icon">🔍</span><div class="step-content"><span class="step-label">Analyse du chapitre</span></div></div>
+            <div class="loading-step" id="qzStep2"><span class="step-icon">🧠</span><div class="step-content"><span class="step-label">Extraction des notions</span></div></div>
+            <div class="loading-step" id="qzStep3"><span class="step-icon">❓</span><div class="step-content"><span class="step-label">Génération des questions</span></div></div>
+            <div class="loading-step" id="qzStep4"><span class="step-icon">✅</span><div class="step-content"><span class="step-label">Vérification</span></div></div>
+            <div class="loading-step" id="qzStep5"><span class="step-icon">✨</span><div class="step-content"><span class="step-label">Finalisation</span></div></div>
           </div>
           <div class="loading-status" id="qzLoadingStatus">Préparation...</div>
         </div>
@@ -1806,17 +1320,13 @@
       <div class="panel">
         <div class="session-head">
           <div>
-            <div class="eyebrow">Fiche de révision</div>
+            <div class="eyebrow">Fiche</div>
             <h2 id="ficheTitle">Fiche</h2>
             <div class="session-meta" id="ficheMeta"></div>
           </div>
-          <button class="btn secondary" id="newFicheBtn">
-            <i class="fas fa-plus"></i> Nouvelle
-          </button>
+          <button class="btn secondary" id="newFicheBtn"><i class="fas fa-plus"></i> Nouvelle</button>
         </div>
-
         <div id="ficheContent"></div>
-
         <div class="actions">
           <button class="btn primary full" id="startFlashcardsBtn">
             <span class="btn-icon"><i class="fas fa-clone"></i></span>
@@ -1839,16 +1349,12 @@
             <h2>Cartes de mémorisation</h2>
             <div class="session-meta" id="flashMeta"></div>
           </div>
-          <button class="btn secondary" id="newFlashBtn">
-            <i class="fas fa-plus"></i> Nouvelle
-          </button>
+          <button class="btn secondary" id="newFlashBtn"><i class="fas fa-plus"></i> Nouvelle</button>
         </div>
 
         <div class="flashcard-progress">
           <span>Progression</span>
-          <div class="flashcard-track">
-            <div class="flashcard-track-fill" id="flashcardTrackFill"></div>
-          </div>
+          <div class="flashcard-track"><div class="flashcard-track-fill" id="flashcardTrackFill"></div></div>
           <span class="counter" id="flashCounter">0 / 10</span>
         </div>
 
@@ -1859,8 +1365,7 @@
               <div class="flashcard-label">Question</div>
               <div class="flashcard-text" id="flashFront"></div>
               <div class="flashcard-hint" id="flashHint" style="display:none;">
-                <i class="fas fa-lightbulb"></i>
-                <span id="flashHintText"></span>
+                <i class="fas fa-lightbulb"></i><span id="flashHintText"></span>
               </div>
             </div>
             <div class="flashcard-face flashcard-back">
@@ -1870,29 +1375,16 @@
           </div>
         </div>
 
-        <div class="flashcard-flip-hint">
-          <i class="fas fa-hand-pointer"></i> Clique sur la carte pour voir la réponse
-        </div>
+        <div class="flashcard-flip-hint"><i class="fas fa-hand-pointer"></i> Clique pour voir la réponse</div>
 
         <div class="flashcard-feedback" id="flashFeedback">
-          <button class="feedback-btn hard" data-rating="hard">
-            <i class="fas fa-times-circle"></i>
-            <span>Oublié</span>
-          </button>
-          <button class="feedback-btn medium" data-rating="medium">
-            <i class="fas fa-circle-half-stroke"></i>
-            <span>Hésité</span>
-          </button>
-          <button class="feedback-btn easy" data-rating="easy">
-            <i class="fas fa-check-circle"></i>
-            <span>Je savais</span>
-          </button>
+          <button class="feedback-btn hard" data-rating="hard"><i class="fas fa-times-circle"></i><span>Oublié</span></button>
+          <button class="feedback-btn medium" data-rating="medium"><i class="fas fa-circle-half-stroke"></i><span>Hésité</span></button>
+          <button class="feedback-btn easy" data-rating="easy"><i class="fas fa-check-circle"></i><span>Je savais</span></button>
         </div>
 
         <div class="actions">
-          <button class="btn primary full" id="finishFlashBtn">
-            <i class="fas fa-arrow-right"></i> Passer au quiz
-          </button>
+          <button class="btn primary full" id="finishFlashBtn"><i class="fas fa-arrow-right"></i> Passer au quiz</button>
         </div>
       </div>
     </section>
@@ -1907,20 +1399,18 @@
             <div class="session-meta" id="quizMeta"></div>
           </div>
         </div>
-
         <div class="progress"><span id="quizProgress"></span></div>
         <div id="quizContent"></div>
-
         <div class="actions">
           <button class="btn primary full" id="validateQuizBtn" disabled>
             <i class="fas fa-check-circle"></i>
-            <span class="btn-text">Valider mes réponses</span>
+            <span class="btn-text">Valider</span>
           </button>
         </div>
       </div>
     </section>
 
-    <!-- RÉSULTATS -->
+    <!-- RESULTS -->
     <section class="view" id="resultsView">
       <div class="panel">
         <div class="result-hero">
@@ -1928,89 +1418,56 @@
           <h2 id="resultsTitle">Bravo !</h2>
           <p id="resultsSub">Continue comme ça !</p>
         </div>
-
         <div class="result-summary">
-          <div class="metric">
-            <strong id="metricCorrect">0/5</strong>
-            <small>Correctes</small>
-          </div>
-          <div class="metric">
-            <strong id="metricScore">0/20</strong>
-            <small>Score</small>
-          </div>
-          <div class="metric">
-            <strong id="metricPercent">0%</strong>
-            <small>Pourcentage</small>
-          </div>
+          <div class="metric"><strong id="metricCorrect">0/5</strong><small>Correctes</small></div>
+          <div class="metric"><strong id="metricScore">0/20</strong><small>Score</small></div>
+          <div class="metric"><strong id="metricPercent">0%</strong><small>Pourcentage</small></div>
         </div>
-
         <div class="mastery-block">
           <div class="mastery-head">
             <span class="label">Score de maîtrise</span>
             <span class="value" id="masteryValue">0%</span>
           </div>
-          <div class="mastery-track">
-            <div class="mastery-track-fill" id="masteryFill"></div>
-          </div>
+          <div class="mastery-track"><div class="mastery-track-fill" id="masteryFill"></div></div>
           <div class="mastery-label-text" id="masteryText"></div>
         </div>
-
         <div class="recommendations">
-          <div class="rec-title"><i class="fas fa-compass"></i> Recommandations</div>
+          <div class="rec-title">Recommandations</div>
           <ul class="rec-list" id="recommendationsList"></ul>
         </div>
-
         <div class="actions">
-          <button class="btn primary full" id="restartBtn">
-            <i class="fas fa-redo"></i> Nouvelle révision
-          </button>
-          <a href="arv-progress.html" class="btn secondary full">
-            <i class="fas fa-graduation-cap"></i> Suivre ma progression
-          </a>
+          <button class="btn primary full" id="restartBtn"><i class="fas fa-redo"></i> Nouvelle révision</button>
         </div>
       </div>
     </section>
   </main>
 
-  <button class="scroll-top" id="scrollTop" aria-label="Retour en haut">
-    <i class="fas fa-arrow-up"></i>
-  </button>
+  <button class="scroll-top" id="scrollTop"><i class="fas fa-arrow-up"></i></button>
 
   <div class="premium-popup-overlay" id="premiumOverlay">
     <div class="premium-popup">
       <button class="popup-close" id="premiumClose"><i class="fas fa-times"></i></button>
       <span class="popup-icon">👑</span>
-      <h2>Réviseur <span>Premium</span></h2>
-      <p class="popup-subtitle" id="premiumSubtitle">
-        Débloque les fiches IA et les quiz <strong>sans limite</strong>.
-      </p>
+      <h2>Premium</h2>
+      <p class="popup-subtitle" id="premiumSubtitle">Débloque l'accès illimité.</p>
       <div class="popup-buttons">
-        <a href="abonnement.html" class="btn-subscribe"><i class="fas fa-crown"></i> S'abonner</a>
+        <a href="abonnement.html" class="btn-subscribe">S'abonner</a>
         <button class="btn-later" id="popupLaterBtn">Plus tard</button>
       </div>
     </div>
   </div>
 
-  <div class="toast" id="toast">
-    <i class="fas fa-info-circle"></i>
-    <span id="toastText"></span>
-  </div>
+  <div class="toast" id="toast"><i class="fas fa-info-circle"></i><span id="toastText"></span></div>
 
   <script type="importmap">
-  {
-    "imports": {
-      "firebase/app": "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
-      "firebase/auth": "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js",
-      "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js"
-    }
-  }
+  { "imports": {
+    "firebase/app": "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
+    "firebase/auth": "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js",
+    "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js"
+  } }
   </script>
 
   <script type="module">
-  // ═══════════════════════════════════════════════════════════════
-  // RÉVISEUR v5.0 — Unifié
-  // ═══════════════════════════════════════════════════════════════
-
   import { initializeApp } from "firebase/app";
   import { getAuth, onAuthStateChanged, getIdToken } from "firebase/auth";
   import { getFirestore, doc, getDoc } from "firebase/firestore";
@@ -2029,51 +1486,25 @@
   const FREE_LIMIT = 2;
 
   const CHAPTERS = {
-    mathematiques: [
-      'Nombres complexes', 'Similitudes planes directes', 'Calcul de probabilités',
-      'Variable aléatoire', 'Fonctions numériques', 'Fonction logarithme',
-      'Fonction exponentielle', 'Calcul intégral', 'Équations différentielles',
-      'Suites numériques', 'Statistiques'
-    ],
-    physique: [
-      'Cinématique', 'Mouvement du centre d\'inertie', 'Champ de pesanteur',
-      'Particules chargées', 'Oscillateurs mécaniques', 'Vibrations',
-      'Propagation des ondes', 'Superposition', 'Interférences lumineuses',
-      'Champ magnétique', 'Force de Lorentz', 'Force de Laplace',
-      'Induction électromagnétique', 'Auto-Induction', 'Circuit LC',
-      'Régime sinusoïdal', 'Radioactivité'
-    ],
-    chimie: [
-      'Solutions aqueuses', 'Acide chlorhydrique / Soude', 'Couples acide/base',
-      'Réaction acide-base', 'Solution tampon', 'Alcools', 'Acides carboxyliques',
-      'Amines', 'Acides α-aminés'
-    ],
-    svt: ['Génétique', 'Immunologie', 'Écologie', 'Évolution']
+    mathematiques: ['Nombres complexes','Similitudes planes directes','Calcul de probabilités','Variable aléatoire','Fonctions numériques','Fonction logarithme','Fonction exponentielle','Calcul intégral','Équations différentielles','Suites numériques','Statistiques'],
+    physique: ['Cinématique','Mouvement du centre d\'inertie','Champ de pesanteur','Particules chargées','Oscillateurs mécaniques','Vibrations','Propagation des ondes','Superposition','Interférences lumineuses','Champ magnétique','Force de Lorentz','Force de Laplace','Induction électromagnétique','Auto-Induction','Circuit LC','Régime sinusoïdal','Radioactivité'],
+    chimie: ['Solutions aqueuses','Acide chlorhydrique / Soude','Couples acide/base','Réaction acide-base','Solution tampon','Alcools','Acides carboxyliques','Amines','Acides α-aminés'],
+    svt: ['Génétique','Immunologie','Écologie','Évolution']
   };
 
   const SUBJECT_LABELS = {
-    mathematiques: 'Mathématiques',
-    physique: 'Physique',
-    chimie: 'Chimie',
-    svt: 'SVT'
+    mathematiques: 'Mathématiques', physique: 'Physique', chimie: 'Chimie', svt: 'SVT'
   };
 
   const DIFFICULTY_LABELS = { 1: 'Facile', 2: 'Moyen', 3: 'Difficile', 4: 'Niveau BAC' };
-
-  const TYPE_LABELS = {
-    definition: 'Définition',
-    formule: 'Formule',
-    methode: 'Méthode',
-    piege: 'Piège'
-  };
+  const TYPE_LABELS = { definition: 'Définition', formule: 'Formule', methode: 'Méthode', piege: 'Piège' };
 
   const state = {
     subject: 'mathematiques',
     chapter: 'all',
     mode: 'fiche',
-    flashCount: 10,
     difficulty: 2,
-    quizCount: 5,
+    quizCount: 10,
     user: null,
     isPremium: false,
     currentSession: null,
@@ -2086,25 +1517,17 @@
   };
 
   const $ = (id) => document.getElementById(id);
-  const views = ['configView', 'loadingView', 'loadingFlashView', 'loadingQuizView', 'ficheView', 'flashcardView', 'quizView', 'resultsView'];
-  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const views = ['configView','loadingView','loadingFlashView','loadingQuizView','ficheView','flashcardView','quizView','resultsView'];
 
   function showView(id) {
     views.forEach((v) => $(v).classList.toggle('active', v === id));
-
-    const stepMap = {
-      ficheView: 'fiche',
-      flashcardView: 'flashcard',
-      quizView: 'quiz',
-      resultsView: 'results'
-    };
+    const stepMap = { ficheView: 'fiche', flashcardView: 'flashcard', quizView: 'quiz', resultsView: 'results' };
     const current = stepMap[id];
     if (current) {
-      const order = ['fiche', 'flashcard', 'quiz', 'results'];
+      const order = ['fiche','flashcard','quiz','results'];
       const idx = order.indexOf(current);
       document.querySelectorAll('.step-item').forEach((el) => {
-        const step = el.dataset.step;
-        const i = order.indexOf(step);
+        const i = order.indexOf(el.dataset.step);
         el.classList.toggle('active', i === idx);
         el.classList.toggle('done', i < idx);
       });
@@ -2134,14 +1557,8 @@
 
   function renderKaTeX(root) {
     if (!root) return;
-    if (window.KaTeXUtils?.renderMath) {
-      window.KaTeXUtils.renderMath(root);
-      return;
-    }
-    if (typeof renderMathInElement !== 'function') {
-      setTimeout(() => renderKaTeX(root), 200);
-      return;
-    }
+    if (window.KaTeXUtils?.renderMath) { window.KaTeXUtils.renderMath(root); return; }
+    if (typeof renderMathInElement !== 'function') { setTimeout(() => renderKaTeX(root), 200); return; }
     try {
       renderMathInElement(root, {
         delimiters: [
@@ -2150,71 +1567,39 @@
           { left: '$', right: '$', display: false },
           { left: '\\(', right: '\\)', display: false }
         ],
-        throwOnError: false,
-        errorColor: '#ff9a84',
-        strict: false,
-        trust: true
+        throwOnError: false, errorColor: '#ff9a84', strict: false, trust: true
       });
     } catch (e) {}
   }
 
   function showToast(message, type = 'info') {
     const toast = $('toast');
-    const text = $('toastText');
-    text.textContent = message;
+    $('toastText').textContent = message;
     toast.className = `toast show ${type}`;
-    const icon = toast.querySelector('i');
-    if (icon) {
-      icon.className = type === 'success' ? 'fas fa-check-circle'
-        : type === 'error' ? 'fas fa-exclamation-circle'
-        : 'fas fa-info-circle';
-    }
     clearTimeout(window.__toastTimer);
     window.__toastTimer = setTimeout(() => toast.classList.remove('show'), 3200);
   }
 
-  // ⚡ Fix formule "objet"
   function normalizeFormula(f) {
     if (!f) return null;
-    if (typeof f === 'string') {
-      const trimmed = f.trim();
-      if (!trimmed) return null;
-      return { latex: trimmed, condition: '', usage: '' };
-    }
+    if (typeof f === 'string') return f.trim() ? { latex: f.trim(), condition: '', usage: '' } : null;
     if (typeof f === 'object') {
       const latex = f.latex || f.formule || f.expression || '';
       if (!latex || typeof latex !== 'string') return null;
-      return {
-        latex: latex.trim(),
-        condition: f.condition || '',
-        usage: f.usage || f.description || ''
-      };
+      return { latex: latex.trim(), condition: f.condition || '', usage: f.usage || '' };
     }
     return null;
   }
 
-  // ⚡ Contenu de secours si section vide
   function buildFallbackContent(notionTitle) {
-    const cleanTitle = String(notionTitle || 'cette notion').trim();
     return {
-      comprendre: `Cette notion fait partie du programme du BAC. Prends le temps de la relire et de faire des exercices d'application.`,
-      tips: [
-        `Note l'essentiel de « ${cleanTitle} » dans ton carnet`,
-        `Revois cette notion dans 24h puis 3 jours (répétition espacée)`,
-        `Refais au moins 2 exercices types`,
-        `Explique-la à un camarade pour vérifier ta compréhension`
-      ]
+      comprendre: `Cette notion fait partie du programme du BAC. Relis-la et fais des exercices d'application.`,
+      tips: ['Note l\'essentiel dans ton carnet','Revois dans 24h puis 3 jours','Refais 2 exercices types','Explique-la à un camarade']
     };
   }
 
-  // ────────────────────────────────────────────────────────────────
-  // ÉTAPES DE CHARGEMENT
-  // ────────────────────────────────────────────────────────────────
   function resetSteps(prefix) {
-    ['1','2','3','4','5'].forEach((n) => {
-      const el = $(`${prefix}Step${n}`);
-      if (el) el.classList.remove('active', 'done');
-    });
+    ['1','2','3','4','5'].forEach((n) => $(`${prefix}Step${n}`)?.classList.remove('active','done'));
   }
   function activateStep(stepId, statusEl, label) {
     document.querySelectorAll('.loading-step').forEach((s) => {
@@ -2223,17 +1608,12 @@
     });
     if (statusEl) { statusEl.textContent = label; statusEl.classList.add('active'); }
   }
-  function finishAllSteps(prefix, statusEl, finalLabel = 'Terminé !') {
-    ['1','2','3','4','5'].forEach((n) => {
-      const el = $(`${prefix}Step${n}`);
-      if (el) { el.classList.remove('active'); el.classList.add('done'); }
-    });
+  function finishAllSteps(prefix, statusEl, finalLabel) {
+    ['1','2','3','4','5'].forEach((n) => $(`${prefix}Step${n}`)?.classList.remove('active'));
+    ['1','2','3','4','5'].forEach((n) => $(`${prefix}Step${n}`)?.classList.add('done'));
     if (statusEl) { statusEl.textContent = finalLabel; statusEl.classList.remove('active'); }
   }
 
-  // ────────────────────────────────────────────────────────────────
-  // CUSTOM SELECT
-  // ────────────────────────────────────────────────────────────────
   class CustomSelect {
     constructor(element) {
       this.element = element;
@@ -2241,9 +1621,7 @@
       this.trigger = element.querySelector('.custom-select-trigger');
       this.valueEl = element.querySelector('.custom-select-value');
       this.optionsContainer = element.querySelector('.custom-select-options');
-      this.options = [];
-      this.value = null;
-      this.isOpen = false;
+      this.options = []; this.value = null; this.isOpen = false;
       this.init();
     }
     init() {
@@ -2253,9 +1631,7 @@
     }
     refreshOptions() {
       this.options = Array.from(this.optionsContainer.querySelectorAll('.custom-select-option'));
-      this.options.forEach((opt) => {
-        opt.addEventListener('click', (e) => { e.stopPropagation(); this.select(opt.dataset.value); });
-      });
+      this.options.forEach((opt) => opt.addEventListener('click', (e) => { e.stopPropagation(); this.select(opt.dataset.value); }));
       if (!this.value && this.options.length > 0) this.select(this.options[0].dataset.value, true);
     }
     setOptions(options) {
@@ -2264,17 +1640,13 @@
         const div = document.createElement('div');
         div.className = 'custom-select-option';
         div.dataset.value = opt.value;
-        if (opt.prefix) {
-          div.innerHTML = `<span class="option-prefix">${escapeHtml(opt.prefix)}</span> ${escapeHtml(opt.label)}`;
-        } else {
-          div.textContent = opt.label;
-        }
+        div.innerHTML = opt.prefix ? `<span class="option-prefix">${escapeHtml(opt.prefix)}</span> ${escapeHtml(opt.label)}` : escapeHtml(opt.label);
         this.optionsContainer.appendChild(div);
       });
       this.value = null;
       this.refreshOptions();
     }
-    select(value, silent = false) {
+    select(value, silent) {
       this.value = value;
       const selected = this.options.find((o) => o.dataset.value === String(value));
       if (!selected) return;
@@ -2284,444 +1656,241 @@
       this.valueEl.innerHTML = `${prefixHTML} <span>${escapeHtml(label)}</span>`;
       this.options.forEach((o) => o.classList.toggle('selected', o.dataset.value === String(value)));
       this.close();
-      if (!silent) {
-        this.element.dispatchEvent(new CustomEvent('change', { detail: { name: this.name, value: this.value } }));
-      }
+      if (!silent) this.element.dispatchEvent(new CustomEvent('change'));
     }
     toggle() { this.isOpen ? this.close() : this.open(); }
-    open() {
-      document.querySelectorAll('.custom-select.open').forEach((el) => { if (el !== this.element) el.classList.remove('open'); });
-      this.element.classList.add('open');
-      this.isOpen = true;
-    }
-    close() {
-      this.element.classList.remove('open');
-      this.isOpen = false;
-    }
+    open() { this.element.classList.add('open'); this.isOpen = true; }
+    close() { this.element.classList.remove('open'); this.isOpen = false; }
     getValue() { return this.value; }
   }
 
-  const customSelects = { subject: null, chapter: null };
+  const cs = { subject: null, chapter: null };
   function initCustomSelects() {
-    customSelects.subject = new CustomSelect($('subjectSelect'));
-    customSelects.chapter = new CustomSelect($('chapterSelect'));
-    customSelects.subject.element.addEventListener('change', updateChapters);
-    customSelects.subject.select('mathematiques', true);
+    cs.subject = new CustomSelect($('subjectSelect'));
+    cs.chapter = new CustomSelect($('chapterSelect'));
+    cs.subject.element.addEventListener('change', updateChapters);
+    cs.subject.select('mathematiques', true);
     updateChapters();
   }
   function updateChapters() {
-    const subject = customSelects.subject.getValue();
-    const chapters = CHAPTERS[subject] || [];
-    customSelects.chapter.setOptions([
+    const s = cs.subject.getValue();
+    cs.chapter.setOptions([
       { value: 'all', label: 'Tous les chapitres', prefix: '📚' },
-      ...chapters.map((ch) => ({ value: ch, label: ch, prefix: '📖' }))
+      ...(CHAPTERS[s] || []).map((ch) => ({ value: ch, label: ch, prefix: '📖' }))
     ]);
   }
-
   function initChips() {
-    ['modeChips', 'flashCountChips', 'difficultyChips', 'quizCountChips'].forEach((id) => {
+    ['modeChips','difficultyChips','quizCountChips'].forEach((id) => {
       const chips = document.querySelectorAll(`#${id} .chip`);
-      chips.forEach((chip) => {
-        chip.addEventListener('click', () => {
-          chips.forEach((c) => c.classList.remove('active'));
-          chip.classList.add('active');
-          if (id === 'modeChips') state.mode = chip.dataset.mode;
-          if (id === 'flashCountChips') state.flashCount = Number(chip.dataset.count);
-          if (id === 'difficultyChips') state.difficulty = Number(chip.dataset.diff);
-          if (id === 'quizCountChips') state.quizCount = Number(chip.dataset.qcount);
-        });
-      });
+      chips.forEach((c) => c.addEventListener('click', () => {
+        chips.forEach((x) => x.classList.remove('active'));
+        c.classList.add('active');
+        if (id === 'modeChips') state.mode = c.dataset.mode;
+        if (id === 'difficultyChips') state.difficulty = Number(c.dataset.diff);
+        if (id === 'quizCountChips') state.quizCount = Number(c.dataset.qcount);
+      }));
     });
   }
 
-  // ═══════════════════════════════════════════════════════════════
-  // GÉNÉRATION FICHE
-  // ═══════════════════════════════════════════════════════════════
-  $('configForm').addEventListener('submit', generateRevision);
-
-  async function generateRevision(event) {
-    event.preventDefault();
+  // ── FICHE ──
+  $('configForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
     if (state.isGenerating) return;
-    if (!state.user) {
-      setStatus('configStatus', 'Connecte-toi pour utiliser le Réviseur.', 'error');
-      return;
-    }
-
+    if (!state.user) return;
     state.isGenerating = true;
-    const btn = $('generateBtn');
-    btn.disabled = true;
-    btn.classList.add('loading');
-    setStatus('configStatus', '');
+    state.subject = cs.subject.getValue();
+    state.chapter = cs.chapter.getValue();
 
-    state.subject = customSelects.subject.getValue();
-    state.chapter = customSelects.chapter.getValue();
+    if (state.mode === 'flashcard') return generateFlashcards();
 
-    // Si flashcards → vue dédiée
-    if (state.mode === 'flashcard') {
-      return generateFlashcardsDirect();
-    }
+    $('generateBtn').disabled = true;
+    $('generateBtn').classList.add('loading');
 
-    // Sinon fiche
     showView('loadingView');
     resetSteps('gen');
-    const statusEl = $('genLoadingStatus');
 
     try {
-      activateStep('genStep1', statusEl, 'Analyse du chapitre...');
-      await sleep(500);
-
-      activateStep('genStep2', statusEl, 'Extraction des notions...');
+      activateStep('genStep1', $('genLoadingStatus'), 'Analyse...');
+      await new Promise((r) => setTimeout(r, 400));
+      activateStep('genStep2', $('genLoadingStatus'), 'Extraction...');
 
       const token = await getIdToken(state.user);
-      const responsePromise = fetch('/api/reviseur', {
+      const resPromise = fetch('/api/reviseur', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          action: 'generate',
-          subject: state.subject,
-          chapter: state.chapter,
-          mode: 'fiche',
-          level: 'auto'
-        })
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ action: 'generate', subject: state.subject, chapter: state.chapter, mode: 'fiche' })
       });
 
-      await sleep(1500);
-      activateStep('genStep3', statusEl, 'Rédaction enrichie...');
+      await new Promise((r) => setTimeout(r, 1200));
+      activateStep('genStep3', $('genLoadingStatus'), 'Rédaction...');
 
-      const response = await responsePromise;
-      const payload = await response.json().catch(() => null);
+      const res = await resPromise;
+      const payload = await res.json().catch(() => null);
 
-      if (response.status === 429 && payload?.code === 'FREE_REVISEUR_LIMIT') {
-        showView('configView');
-        showPremiumPopup(payload.used, payload.limit);
-        return;
-      }
+      if (res.status === 429) { showView('configView'); showPremiumPopup(payload?.used, payload?.limit); return; }
+      if (!res.ok || !payload?.success) throw new Error(payload?.error || 'Erreur.');
 
-      if (!response.ok || !payload?.success) {
-        throw new Error(payload?.error || 'Service temporairement indisponible.');
-      }
-
-      activateStep('genStep4', statusEl, 'Vérification...');
-      await sleep(800);
-
+      activateStep('genStep4', $('genLoadingStatus'), 'Vérification...');
+      await new Promise((r) => setTimeout(r, 600));
       state.currentSession = payload.session;
-      state.flashcards = [];
-      state.quiz = [];
-      state.quizAnswers = {};
-
-      activateStep('genStep5', statusEl, 'Finalisation...');
-      await sleep(500);
-
-      finishAllSteps('gen', statusEl, '✅ Ta fiche est prête !');
-      await sleep(400);
+      activateStep('genStep5', $('genLoadingStatus'), 'Finalisation...');
+      await new Promise((r) => setTimeout(r, 400));
+      finishAllSteps('gen', $('genLoadingStatus'), '✅ Prête !');
+      await new Promise((r) => setTimeout(r, 300));
 
       renderFiche();
       showView('ficheView');
-
-    } catch (error) {
-      console.error('Erreur génération:', error);
+    } catch (err) {
       showView('configView');
-      setStatus('configStatus', error.message || 'Erreur inconnue.', 'error');
+      setStatus('configStatus', err.message, 'error');
     } finally {
       state.isGenerating = false;
-      btn.disabled = false;
-      btn.classList.remove('loading');
+      $('generateBtn').disabled = false;
+      $('generateBtn').classList.remove('loading');
     }
-  }
+  });
 
-  // ═══════════════════════════════════════════════════════════════
-  // GÉNÉRATION FLASHCARDS (avec étapes)
-  // ═══════════════════════════════════════════════════════════════
-  async function generateFlashcardsDirect() {
-    const btn = $('generateBtn');
-
+  async function generateFlashcards() {
+    $('generateBtn').disabled = true;
+    $('generateBtn').classList.add('loading');
     showView('loadingFlashView');
     resetSteps('fl');
-    const statusEl = $('flLoadingStatus');
 
     try {
-      activateStep('flStep1', statusEl, 'Analyse du chapitre...');
-      await sleep(500);
-
-      activateStep('flStep2', statusEl, 'Extraction des notions...');
+      activateStep('flStep1', $('flLoadingStatus'), 'Analyse...');
+      await new Promise((r) => setTimeout(r, 400));
+      activateStep('flStep2', $('flLoadingStatus'), 'Extraction...');
 
       const token = await getIdToken(state.user);
-      const responsePromise = fetch('/api/reviseur', {
+      const resPromise = fetch('/api/reviseur', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          action: 'generate',
-          subject: state.subject,
-          chapter: state.chapter,
-          mode: 'flashcard',
-          count: state.flashCount,
-          level: 'auto'
-        })
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ action: 'generate', subject: state.subject, chapter: state.chapter, mode: 'flashcard' })
       });
 
-      await sleep(1500);
-      activateStep('flStep3', statusEl, 'Génération des cartes...');
+      await new Promise((r) => setTimeout(r, 1200));
+      activateStep('flStep3', $('flLoadingStatus'), 'Génération...');
 
-      const response = await responsePromise;
-      const payload = await response.json().catch(() => null);
+      const res = await resPromise;
+      const payload = await res.json().catch(() => null);
+      if (res.status === 429) { showView('configView'); showPremiumPopup(payload?.used, payload?.limit); return; }
+      if (!res.ok || !payload?.success) throw new Error(payload?.error || 'Erreur.');
 
-      if (response.status === 429 && payload?.code === 'FREE_REVISEUR_LIMIT') {
-        showView('configView');
-        showPremiumPopup(payload.used, payload.limit);
-        return;
-      }
-
-      if (!response.ok || !payload?.success) {
-        throw new Error(payload?.error || 'Service temporairement indisponible.');
-      }
-
-      activateStep('flStep4', statusEl, 'Vérification...');
-      await sleep(700);
-
-      state.currentSession = payload.session;
+      activateStep('flStep4', $('flLoadingStatus'), 'Vérification...');
+      await new Promise((r) => setTimeout(r, 500));
       state.flashcards = payload.session?.flashcards || [];
       state.currentFlashIndex = 0;
       state.flashRatings = {};
-
-      activateStep('flStep5', statusEl, 'Finalisation...');
-      await sleep(500);
-
-      finishAllSteps('fl', statusEl, '✅ Tes flashcards sont prêtes !');
-      await sleep(400);
-
-      if (state.flashcards.length === 0) {
-        throw new Error('Aucune flashcard générée.');
-      }
-
+      activateStep('flStep5', $('flLoadingStatus'), 'Finalisation...');
+      await new Promise((r) => setTimeout(r, 400));
+      finishAllSteps('fl', $('flLoadingStatus'), '✅ Prêtes !');
+      await new Promise((r) => setTimeout(r, 300));
       renderFlashcard();
       showView('flashcardView');
-
-    } catch (error) {
-      console.error('Erreur flashcards:', error);
+    } catch (err) {
       showView('configView');
-      setStatus('configStatus', error.message || 'Erreur inconnue.', 'error');
+      setStatus('configStatus', err.message, 'error');
     } finally {
       state.isGenerating = false;
-      btn.disabled = false;
-      btn.classList.remove('loading');
+      $('generateBtn').disabled = false;
+      $('generateBtn').classList.remove('loading');
     }
   }
 
-  // ═══════════════════════════════════════════════════════════════
-  // GÉNÉRATION QUIZ (avec étapes)
-  // ═══════════════════════════════════════════════════════════════
-  async function generateQuizDirect() {
+  async function generateQuiz() {
     showView('loadingQuizView');
     resetSteps('qz');
-    const statusEl = $('qzLoadingStatus');
 
     try {
-      activateStep('qzStep1', statusEl, 'Analyse du chapitre...');
-      await sleep(500);
-
-      activateStep('qzStep2', statusEl, 'Extraction des notions...');
+      activateStep('qzStep1', $('qzLoadingStatus'), 'Analyse...');
+      await new Promise((r) => setTimeout(r, 400));
+      activateStep('qzStep2', $('qzLoadingStatus'), 'Extraction...');
 
       const token = await getIdToken(state.user);
-      const responsePromise = fetch('/api/reviseur', {
+      const resPromise = fetch('/api/reviseur', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          action: 'quiz',
-          subject: state.subject,
-          chapter: state.chapter,
-          difficulty: state.difficulty,
-          count: state.quizCount,
-          level: 'auto'
-        })
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ action: 'quiz', subject: state.subject, chapter: state.chapter, difficulty: state.difficulty, count: state.quizCount })
       });
 
-      await sleep(1500);
-      activateStep('qzStep3', statusEl, 'Génération des questions...');
+      await new Promise((r) => setTimeout(r, 1200));
+      activateStep('qzStep3', $('qzLoadingStatus'), 'Génération...');
 
-      const response = await responsePromise;
-      const payload = await response.json().catch(() => null);
+      const res = await resPromise;
+      const payload = await res.json().catch(() => null);
+      if (!res.ok || !payload?.success) throw new Error(payload?.error || 'Erreur.');
 
-      if (!response.ok || !payload?.success) {
-        throw new Error(payload?.error || 'Service temporairement indisponible.');
-      }
-
-      activateStep('qzStep4', statusEl, 'Vérification...');
-      await sleep(700);
-
+      activateStep('qzStep4', $('qzLoadingStatus'), 'Vérification...');
+      await new Promise((r) => setTimeout(r, 500));
       state.quiz = payload.quiz || [];
       state.quizAnswers = {};
-
-      activateStep('qzStep5', statusEl, 'Finalisation...');
-      await sleep(500);
-
-      finishAllSteps('qz', statusEl, '✅ Ton quiz est prêt !');
-      await sleep(400);
-
-      if (state.quiz.length === 0) {
-        throw new Error('Aucune question générée.');
-      }
-
+      activateStep('qzStep5', $('qzLoadingStatus'), 'Finalisation...');
+      await new Promise((r) => setTimeout(r, 400));
+      finishAllSteps('qz', $('qzLoadingStatus'), '✅ Prêt !');
+      await new Promise((r) => setTimeout(r, 300));
       renderQuiz();
       showView('quizView');
-
-    } catch (error) {
-      console.error('Erreur quiz:', error);
+    } catch (err) {
       showView('configView');
-      setStatus('configStatus', error.message || 'Erreur inconnue.', 'error');
+      setStatus('configStatus', err.message, 'error');
     }
   }
 
-  // ═══════════════════════════════════════════════════════════════
-  // RENDU FICHE — Style unifié
-  // ═══════════════════════════════════════════════════════════════
   function renderFiche() {
-    const session = state.currentSession;
-    if (!session) return;
-
-    const sections = session.sections || [];
-
-    $('ficheTitle').textContent = session.chapterTitle || 'Fiche';
+    const s = state.currentSession;
+    if (!s) return;
+    const sections = s.sections || [];
+    $('ficheTitle').textContent = s.chapterTitle || 'Fiche';
     $('ficheMeta').innerHTML = `
       <span><i class="fas fa-book"></i> ${escapeHtml(SUBJECT_LABELS[state.subject])}</span>
-      <span><i class="fas fa-list"></i> ${sections.length} section${sections.length > 1 ? 's' : ''}</span>
+      <span><i class="fas fa-list"></i> ${sections.length} sections</span>
     `;
-
     const container = $('ficheContent');
     container.innerHTML = '';
 
-    // Points clés
-    if (Array.isArray(session.keyPoints) && session.keyPoints.length > 0) {
-      const block = document.createElement('div');
-      block.className = 'global-block';
-      block.innerHTML = `
-        <div class="global-title"><i class="fas fa-star"></i> Points clés du chapitre</div>
-        <ul class="global-list">
-          ${session.keyPoints.map((p) => `<li>${safeText(typeof p === 'string' ? p : (p.text || ''))}</li>`).join('')}
-        </ul>
-      `;
-      container.appendChild(block);
+    if (Array.isArray(s.keyPoints) && s.keyPoints.length > 0) {
+      const b = document.createElement('div');
+      b.className = 'global-block';
+      b.innerHTML = `<div class="global-title"><i class="fas fa-star"></i> Points clés</div><ul class="global-list">${s.keyPoints.map((p) => `<li>${safeText(p)}</li>`).join('')}</ul>`;
+      container.appendChild(b);
     }
 
-    // Label sections
-    const sectionsLabel = document.createElement('div');
-    sectionsLabel.className = 'sections-label';
-    sectionsLabel.innerHTML = `
-      <i class="fas fa-layer-group"></i>
-      Détail par notion
-      <span class="count">${sections.length} notion${sections.length > 1 ? 's' : ''}</span>
-    `;
-    container.appendChild(sectionsLabel);
+    const label = document.createElement('div');
+    label.className = 'sections-label';
+    label.innerHTML = `<i class="fas fa-layer-group"></i> Détail par notion <span class="count">${sections.length} notions</span>`;
+    container.appendChild(label);
 
-    // Cartes
-    sections.forEach((section, i) => {
-      container.appendChild(buildNotionCard(section, i));
-    });
-
-    // Pièges globaux
-    if (Array.isArray(session.examTraps) && session.examTraps.length > 0) {
-      const block = document.createElement('div');
-      block.className = 'global-block';
-      block.innerHTML = `
-        <div class="global-title"><i class="fas fa-triangle-exclamation"></i> Pièges transversaux du BAC</div>
-        <div style="display:flex;flex-direction:column;gap:8px">
-          ${session.examTraps.map((t) => {
-            const trap = typeof t === 'string' ? t : (t.trap || '');
-            const solution = typeof t === 'object' ? (t.solution || '') : '';
-            return `
-              <div style="padding:10px 12px;border-radius:8px;background:rgba(0,0,0,0.2);border-left:2px solid #ff9a84">
-                <div style="font-size:13px;color:var(--text-light);margin-bottom:4px">${safeText(trap)}</div>
-                ${solution ? `<div style="font-size:12.5px;color:#7ce0aa;padding-left:14px;position:relative"><span style="position:absolute;left:0">→</span>${safeText(solution)}</div>` : ''}
-              </div>
-            `;
-          }).join('')}
-        </div>
-      `;
-      container.appendChild(block);
-    }
-
-    // Erreurs fréquentes
-    if (Array.isArray(session.commonMistakes) && session.commonMistakes.length > 0) {
-      const block = document.createElement('div');
-      block.className = 'global-block';
-      block.innerHTML = `
-        <div class="global-title"><i class="fas fa-circle-exclamation"></i> Erreurs fréquentes</div>
-        <ul class="global-list">
-          ${session.commonMistakes.map((m) => `<li>${safeText(typeof m === 'string' ? m : (m.text || ''))}</li>`).join('')}
-        </ul>
-      `;
-      container.appendChild(block);
-    }
-
-    // Récap
-    if (Array.isArray(session.recap) && session.recap.length > 0) {
-      const block = document.createElement('div');
-      block.className = 'global-block';
-      block.innerHTML = `
-        <div class="global-title"><i class="fas fa-flag-checkered"></i> Récap final</div>
-        <ul class="global-list">
-          ${session.recap.map((r) => `<li>${safeText(typeof r === 'string' ? r : (r.text || ''))}</li>`).join('')}
-        </ul>
-      `;
-      container.appendChild(block);
-    }
+    sections.forEach((sec, i) => container.appendChild(buildNotionCard(sec, i)));
 
     renderKaTeX(container);
 
-    // Auto-ouvrir première
-    const firstCard = container.querySelector('.notion-card');
-    if (firstCard) {
-      setTimeout(() => toggleNotion(firstCard), 250);
-    }
+    const first = container.querySelector('.notion-card');
+    if (first) setTimeout(() => toggleNotion(first), 200);
   }
 
-  // ────────────────────────────────────────────────────────────────
-  // CARTE NOTION — STYLE UNIFIÉ
-  // ────────────────────────────────────────────────────────────────
   function buildNotionCard(section, index) {
     const card = document.createElement('div');
     card.className = 'notion-card';
+    const title = section.notionTitle || section.title || `Notion ${index + 1}`;
+    const id = section.notionId || '';
 
-    const notionTitle = section.notionTitle || section.title || `Notion ${index + 1}`;
-    const notionId = section.notionId || '';
-
-    // COMPRENDRE
     let comprendreHTML = '';
     if (section.comprendre && typeof section.comprendre === 'string' && section.comprendre.trim()) {
-      comprendreHTML = `
-        <div class="block">
-          <div class="block-label"><i class="fas fa-lightbulb"></i> Comprendre</div>
-          <div class="block-text">${safeText(section.comprendre)}</div>
-        </div>
-      `;
+      comprendreHTML = `<div class="block"><div class="block-label"><i class="fas fa-lightbulb"></i> Comprendre</div><div class="block-text">${safeText(section.comprendre)}</div></div>`;
     }
 
-    // FORMULES
     let formulesHTML = '';
     if (Array.isArray(section.formules) && section.formules.length > 0) {
-      const validFormules = section.formules.map(normalizeFormula).filter(Boolean);
-      if (validFormules.length > 0) {
+      const valid = section.formules.map(normalizeFormula).filter(Boolean);
+      if (valid.length > 0) {
         formulesHTML = `
           <div class="block">
             <div class="block-label"><i class="fas fa-square-root-variable"></i> Formules clés</div>
             <div class="formula-list">
-              ${validFormules.map((f) => `
+              ${valid.map((f) => `
                 <div class="formula-item">
                   <div class="formula-latex">$$${safeText(f.latex)}$$</div>
-                  ${(f.condition || f.usage) ? `
-                    <div class="formula-meta">
-                      ${f.condition ? `<span class="tag">${safeText(f.condition)}</span>` : ''}
-                      ${f.usage ? `<span class="tag">${safeText(f.usage)}</span>` : ''}
-                    </div>
-                  ` : ''}
+                  ${(f.condition || f.usage) ? `<div class="formula-meta">${f.condition ? `<span class="tag">${safeText(f.condition)}</span>` : ''}${f.usage ? `<span class="tag">${safeText(f.usage)}</span>` : ''}</div>` : ''}
                 </div>
               `).join('')}
             </div>
@@ -2730,90 +1899,50 @@
       }
     }
 
-    // MÉTHODE
     let methodeHTML = '';
-    let methodeSteps = [];
-    let methodeTitle = 'Méthode pas-à-pas';
-
+    let steps = [];
+    let methTitle = 'Méthode pas-à-pas';
     if (section.methode && typeof section.methode === 'object' && !Array.isArray(section.methode)) {
-      methodeTitle = section.methode.title || methodeTitle;
-      methodeSteps = Array.isArray(section.methode.steps) ? section.methode.steps : [];
+      methTitle = section.methode.title || methTitle;
+      steps = Array.isArray(section.methode.steps) ? section.methode.steps : [];
     } else if (Array.isArray(section.methode)) {
-      methodeSteps = section.methode;
+      steps = section.methode;
+    }
+    if (steps.length > 0) {
+      methodeHTML = `<div class="block"><div class="block-label"><i class="fas fa-list-ol"></i> ${safeText(methTitle)}</div><ol class="method-steps">${steps.map((st) => `<li>${safeText(st)}</li>`).join('')}</ol></div>`;
     }
 
-    if (methodeSteps.length > 0) {
-      methodeHTML = `
-        <div class="block">
-          <div class="block-label"><i class="fas fa-list-ol"></i> ${safeText(methodeTitle)}</div>
-          <ol class="method-steps">
-            ${methodeSteps.map((s) => `<li>${safeText(typeof s === 'string' ? s : (s.text || ''))}</li>`).join('')}
-          </ol>
-        </div>
-      `;
-    }
-
-    // EXEMPLE RÉSOLU
     let exempleHTML = '';
     if (section.exempleResolu && typeof section.exempleResolu === 'object') {
       const ex = section.exempleResolu;
-      const etapes = Array.isArray(ex.etapes) ? ex.etapes : [];
+      const et = Array.isArray(ex.etapes) ? ex.etapes : [];
       exempleHTML = `
         <div class="block">
           <div class="block-label"><i class="fas fa-check-circle"></i> Exemple résolu</div>
           ${ex.enonce ? `<div class="example-enonce">${safeText(ex.enonce)}</div>` : ''}
-          ${etapes.length > 0 ? `
-            <ol class="example-steps">
-              ${etapes.map((e) => `<li>${safeText(typeof e === 'string' ? e : (e.text || ''))}</li>`).join('')}
-            </ol>
-          ` : ''}
+          ${et.length > 0 ? `<ol class="example-steps">${et.map((e) => `<li>${safeText(e)}</li>`).join('')}</ol>` : ''}
           ${ex.conclusion ? `<div class="example-conclusion">${safeText(ex.conclusion)}</div>` : ''}
         </div>
       `;
     }
 
-    // PIÈGE BAC
     let piegeHTML = '';
-    if (section.piegeBAC && typeof section.piegeBAC === 'object') {
-      const p = section.piegeBAC;
-      if (p.trap || p.solution) {
-        piegeHTML = `
-          <div class="block">
-            <div class="block-label"><i class="fas fa-triangle-exclamation"></i> Piège du BAC</div>
-            ${p.trap ? `<div class="piege-trap">${safeText(p.trap)}</div>` : ''}
-            ${p.solution ? `<div class="piege-solution">${safeText(p.solution)}</div>` : ''}
-          </div>
-        `;
-      }
+    if (section.piegeBAC && typeof section.piegeBAC === 'object' && (section.piegeBAC.trap || section.piegeBAC.solution)) {
+      piegeHTML = `<div class="block"><div class="block-label"><i class="fas fa-triangle-exclamation"></i> Piège du BAC</div>${section.piegeBAC.trap ? `<div class="piege-trap">${safeText(section.piegeBAC.trap)}</div>` : ''}${section.piegeBAC.solution ? `<div class="piege-solution">${safeText(section.piegeBAC.solution)}</div>` : ''}</div>`;
     }
 
-    // ASTUCE
     let astuceHTML = '';
     if (section.astuce && typeof section.astuce === 'string' && section.astuce.trim()) {
-      astuceHTML = `
-        <div class="block">
-          <div class="block-label"><i class="fas fa-star"></i> Astuce</div>
-          <div class="block-text">${safeText(section.astuce)}</div>
-        </div>
-      `;
+      astuceHTML = `<div class="block"><div class="block-label"><i class="fas fa-star"></i> Astuce</div><div class="block-text">${safeText(section.astuce)}</div></div>`;
     }
 
-    // FALLBACK si vide
     const hasContent = comprendreHTML || formulesHTML || methodeHTML || exempleHTML || piegeHTML || astuceHTML;
     let fallbackHTML = '';
     if (!hasContent) {
-      const fb = buildFallbackContent(notionTitle);
+      const fb = buildFallbackContent(title);
       fallbackHTML = `
-        <div class="block">
-          <div class="block-label"><i class="fas fa-lightbulb"></i> À retenir</div>
-          <div class="block-text">${safeText(fb.comprendre)}</div>
-        </div>
-        <div class="block">
-          <div class="block-label"><i class="fas fa-check-circle"></i> Conseils d'étude</div>
-          <ol class="method-steps">
-            ${fb.tips.map((t) => `<li>${safeText(t)}</li>`).join('')}
-          </ol>
-        </div>
+        <div class="block"><div class="block-label"><i class="fas fa-lightbulb"></i> À retenir</div><div class="block-text">${safeText(fb.comprendre)}</div></div>
+        <div class="block"><div class="block-label"><i class="fas fa-check-circle"></i> Conseils</div><ol class="method-steps">${fb.tips.map((t) => `<li>${safeText(t)}</li>`).join('')}</ol></div>
       `;
     }
 
@@ -2821,93 +1950,54 @@
       <div class="notion-header">
         <div class="notion-num">${index + 1}</div>
         <div class="notion-title-wrap">
-          <div class="notion-title">${safeText(notionTitle)}</div>
-          <div class="notion-sub">${notionId ? escapeHtml(notionId) : 'Notion'}</div>
+          <div class="notion-title">${safeText(title)}</div>
+          <div class="notion-sub">${id ? escapeHtml(id) : 'Notion'}</div>
         </div>
         <div class="notion-toggle"><i class="fas fa-chevron-down"></i></div>
       </div>
       <div class="notion-body">
         <div class="notion-content">
-          ${comprendreHTML}
-          ${formulesHTML}
-          ${methodeHTML}
-          ${exempleHTML}
-          ${piegeHTML}
-          ${astuceHTML}
-          ${fallbackHTML}
+          ${comprendreHTML}${formulesHTML}${methodeHTML}${exempleHTML}${piegeHTML}${astuceHTML}${fallbackHTML}
         </div>
       </div>
     `;
 
-    const header = card.querySelector('.notion-header');
-    header.addEventListener('click', () => toggleNotion(card));
-
+    card.querySelector('.notion-header').addEventListener('click', () => toggleNotion(card));
     return card;
   }
 
   function toggleNotion(card) {
-    const isOpen = card.classList.contains('open');
-    document.querySelectorAll('.notion-card.open').forEach((other) => {
-      if (other !== card) other.classList.remove('open');
-    });
-    card.classList.toggle('open', !isOpen);
-    if (!isOpen) {
+    const open = card.classList.contains('open');
+    document.querySelectorAll('.notion-card.open').forEach((o) => { if (o !== card) o.classList.remove('open'); });
+    card.classList.toggle('open', !open);
+    if (!open) {
       const body = card.querySelector('.notion-content');
       if (body) setTimeout(() => renderKaTeX(body), 150);
     }
   }
 
-  // ═══════════════════════════════════════════════════════════════
-  // FLASHCARDS
-  // ═══════════════════════════════════════════════════════════════
   function renderFlashcard() {
-    if (!state.flashcards || state.flashcards.length === 0) {
-      showView('configView');
-      return;
-    }
-
-    $('flashMeta').innerHTML = `
-      <span><i class="fas fa-book"></i> ${escapeHtml(SUBJECT_LABELS[state.subject])}</span>
-      <span><i class="fas fa-layer-group"></i> ${state.flashcards.length} cartes</span>
-    `;
-
+    if (!state.flashcards || state.flashcards.length === 0) { showView('configView'); return; }
+    $('flashMeta').innerHTML = `<span><i class="fas fa-layer-group"></i> ${state.flashcards.length} cartes</span>`;
     updateFlashcardContent();
   }
 
   function updateFlashcardContent() {
-    const card = state.flashcards[state.currentFlashIndex];
-    if (!card) return;
-
-    const question = card.question || '';
-    const answer = card.answer || '';
-    const hint = card.hint || '';
-    const type = card.type || null;
-
-    $('flashFront').innerHTML = safeText(question);
-    $('flashBack').innerHTML = safeText(answer);
-
-    const badgeEl = $('flashTypeBadge');
-    if (type && TYPE_LABELS[type]) {
-      badgeEl.textContent = TYPE_LABELS[type];
-      badgeEl.style.display = 'inline-flex';
-    } else {
-      badgeEl.style.display = 'none';
-    }
-
-    if (hint) {
-      $('flashHint').style.display = 'flex';
-      $('flashHintText').textContent = hint;
-    } else {
-      $('flashHint').style.display = 'none';
-    }
-
+    const c = state.flashcards[state.currentFlashIndex];
+    if (!c) return;
+    $('flashFront').innerHTML = safeText(c.question || '');
+    $('flashBack').innerHTML = safeText(c.answer || '');
+    const badge = $('flashTypeBadge');
+    if (c.type && TYPE_LABELS[c.type]) {
+      badge.textContent = TYPE_LABELS[c.type];
+      badge.style.display = 'inline-flex';
+    } else badge.style.display = 'none';
+    if (c.hint) { $('flashHint').style.display = 'flex'; $('flashHintText').textContent = c.hint; }
+    else $('flashHint').style.display = 'none';
     $('flashCounter').textContent = `${state.currentFlashIndex + 1} / ${state.flashcards.length}`;
-    const percent = ((state.currentFlashIndex) / state.flashcards.length) * 100;
-    $('flashcardTrackFill').style.width = `${percent}%`;
-
+    $('flashcardTrackFill').style.width = `${((state.currentFlashIndex) / state.flashcards.length) * 100}%`;
     $('flashcardEl').classList.remove('flipped');
     $('flashFeedback').classList.remove('show');
-
     renderKaTeX($('flashFront'));
     renderKaTeX($('flashBack'));
   }
@@ -2915,23 +2005,16 @@
   $('flashcardEl').addEventListener('click', () => {
     const el = $('flashcardEl');
     el.classList.toggle('flipped');
-    if (el.classList.contains('flipped')) {
-      setTimeout(() => $('flashFeedback').classList.add('show'), 300);
-    } else {
-      $('flashFeedback').classList.remove('show');
-    }
+    if (el.classList.contains('flipped')) setTimeout(() => $('flashFeedback').classList.add('show'), 300);
+    else $('flashFeedback').classList.remove('show');
   });
 
   document.querySelectorAll('.feedback-btn').forEach((btn) => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
-      const rating = btn.dataset.rating;
-      state.flashRatings[state.currentFlashIndex] = rating;
-
+      state.flashRatings[state.currentFlashIndex] = btn.dataset.rating;
       const card = $('flashcardEl');
-      card.style.transition = 'opacity 0.2s ease';
       card.style.opacity = '0';
-
       setTimeout(() => {
         if (state.currentFlashIndex < state.flashcards.length - 1) {
           state.currentFlashIndex++;
@@ -2940,284 +2023,155 @@
         } else {
           card.style.opacity = '1';
           $('flashFeedback').classList.remove('show');
-          $('flashCounter').textContent = `${state.flashcards.length} / ${state.flashcards.length}`;
           $('flashcardTrackFill').style.width = '100%';
         }
       }, 200);
     });
   });
 
-  $('finishFlashBtn').addEventListener('click', () => generateQuizDirect());
+  $('finishFlashBtn').addEventListener('click', generateQuiz);
 
-  // ═══════════════════════════════════════════════════════════════
-  // QUIZ
-  // ═══════════════════════════════════════════════════════════════
   function renderQuiz() {
     const container = $('quizContent');
     container.innerHTML = '';
-
-    if (!state.quiz || state.quiz.length === 0) {
-      container.innerHTML = '<div class="empty-state"><i class="fas fa-question-circle"></i><h3>Aucune question</h3></div>';
-      return;
-    }
+    if (!state.quiz || state.quiz.length === 0) return;
 
     $('quizMeta').innerHTML = `
       <span><i class="fas fa-question-circle"></i> ${state.quiz.length} questions</span>
-      <span><i class="fas fa-signal"></i> ${escapeHtml(DIFFICULTY_LABELS[state.difficulty] || '')}</span>
+      <span><i class="fas fa-signal"></i> ${DIFFICULTY_LABELS[state.difficulty]}</span>
     `;
 
-    state.quiz.forEach((q, index) => {
+    state.quiz.forEach((q, i) => {
       const div = document.createElement('div');
       div.className = 'quiz-question';
-      div.dataset.index = index;
-
-      const questionText = q.question || q.text || '';
-      const level = q.level || 1;
-
-      const optionsHtml = (q.options || []).map((opt) => {
+      div.dataset.index = i;
+      const opts = (q.options || []).map((opt) => {
         const text = typeof opt === 'string' ? opt : (opt.text || '');
-        const id = typeof opt === 'string'
-          ? String.fromCharCode(65 + (q.options || []).indexOf(opt))
-          : (opt.id || '');
-        return `
-          <div class="quiz-option" data-option="${escapeHtml(id)}" data-qindex="${index}">
-            <span class="quiz-option-letter">${escapeHtml(id)}</span>
-            <span>${safeText(text)}</span>
-          </div>
-        `;
+        const id = typeof opt === 'string' ? String.fromCharCode(65 + q.options.indexOf(opt)) : (opt.id || '');
+        return `<div class="quiz-option" data-option="${escapeHtml(id)}" data-qindex="${i}"><span class="quiz-option-letter">${escapeHtml(id)}</span><span>${safeText(text)}</span></div>`;
       }).join('');
-
       div.innerHTML = `
         <div class="quiz-q-header">
-          <div class="quiz-q-number">Question ${index + 1}</div>
-          <div class="quiz-q-level">Niveau ${level}</div>
+          <div class="quiz-q-number">Question ${i + 1}</div>
+          <div class="quiz-q-level">Niveau ${q.level || 1}</div>
         </div>
-        <div class="quiz-q-text">${safeText(questionText)}</div>
-        <div class="quiz-options">${optionsHtml}</div>
-        <div class="quiz-explanation" id="explanation-${index}"></div>
+        <div class="quiz-q-text">${safeText(q.question || q.text || '')}</div>
+        <div class="quiz-options">${opts}</div>
+        <div class="quiz-explanation" id="exp-${i}"></div>
       `;
-
       container.appendChild(div);
     });
 
     container.querySelectorAll('.quiz-option').forEach((opt) => {
       opt.addEventListener('click', () => {
-        const qIndex = parseInt(opt.dataset.qindex);
-        if (state.quizAnswers[qIndex]) return;
-
-        const q = state.quiz[qIndex];
-        const selected = opt.dataset.option;
-        state.quizAnswers[qIndex] = selected;
-
-        const question = container.querySelector(`[data-index="${qIndex}"]`);
+        const i = parseInt(opt.dataset.qindex);
+        if (state.quizAnswers[i]) return;
+        const q = state.quiz[i];
+        state.quizAnswers[i] = opt.dataset.option;
+        const question = container.querySelector(`[data-index="${i}"]`);
         question.querySelectorAll('.quiz-option').forEach((o) => {
           o.classList.add('disabled');
           if (o.dataset.option === q.correctAnswer) o.classList.add('correct');
-          else if (o.dataset.option === selected) o.classList.add('wrong');
+          else if (o.dataset.option === opt.dataset.option) o.classList.add('wrong');
         });
-
-        const exp = $(`explanation-${qIndex}`);
+        const exp = $(`exp-${i}`);
         if (q.explanation) {
           exp.innerHTML = `<strong>💡</strong> ${safeText(q.explanation)}`;
           exp.classList.add('show');
           renderKaTeX(exp);
         }
-
-        if (Object.keys(state.quizAnswers).length === state.quiz.length) {
-          $('validateQuizBtn').disabled = false;
-        }
-
-        const percent = (Object.keys(state.quizAnswers).length / state.quiz.length) * 100;
-        $('quizProgress').style.width = percent + '%';
+        if (Object.keys(state.quizAnswers).length === state.quiz.length) $('validateQuizBtn').disabled = false;
+        $('quizProgress').style.width = `${(Object.keys(state.quizAnswers).length / state.quiz.length) * 100}%`;
       });
     });
-
     renderKaTeX(container);
   }
 
-  $('validateQuizBtn').addEventListener('click', showQuizResults);
-
-  // ═══════════════════════════════════════════════════════════════
-  // RÉSULTATS
-  // ═══════════════════════════════════════════════════════════════
-  function showQuizResults() {
+  $('validateQuizBtn').addEventListener('click', () => {
     let correct = 0;
-    state.quiz.forEach((q, i) => {
-      if (state.quizAnswers[i] === q.correctAnswer) correct++;
-    });
-
+    state.quiz.forEach((q, i) => { if (state.quizAnswers[i] === q.correctAnswer) correct++; });
     const total = state.quiz.length;
     const score = Math.round((correct / total) * 20);
     const percent = Math.round((correct / total) * 100);
-
     $('metricCorrect').textContent = `${correct}/${total}`;
     $('metricScore').textContent = `${score}/20`;
     $('metricPercent').textContent = `${percent}%`;
-
-    let emoji, title, sub;
-    if (percent >= 90) { emoji = '🏆'; title = 'Excellent !'; sub = 'Tu maîtrises ce chapitre !'; }
-    else if (percent >= 70) { emoji = '🎉'; title = 'Bravo !'; sub = 'Tu es sur la bonne voie.'; }
-    else if (percent >= 50) { emoji = '📚'; title = 'Pas mal'; sub = 'Continue à réviser.'; }
-    else { emoji = '💪'; title = 'Courage'; sub = 'Retravaille ce chapitre.'; }
-
+    let emoji = percent >= 90 ? '🏆' : percent >= 70 ? '🎉' : percent >= 50 ? '📚' : '💪';
+    let title = percent >= 90 ? 'Excellent !' : percent >= 70 ? 'Bravo !' : percent >= 50 ? 'Pas mal' : 'Courage';
+    let sub = percent >= 90 ? 'Chapitre maîtrisé !' : percent >= 70 ? 'Bonne voie.' : percent >= 50 ? 'Continue.' : 'Retravaille.';
     $('resultsEmoji').textContent = emoji;
     $('resultsTitle').textContent = title;
     $('resultsSub').textContent = sub;
 
-    const masteryScore = computeMasteryScore(percent);
+    const masteryScore = Math.round(percent * 0.7 + percent * 0.3);
     $('masteryValue').textContent = `${masteryScore}%`;
-
-    let masteryColor, masteryLabel;
-    if (masteryScore >= 80) {
-      masteryColor = 'linear-gradient(90deg, #45b47d, #6fd99a)';
-      masteryLabel = 'Chapitre solide — tu peux passer au suivant.';
-    } else if (masteryScore >= 60) {
-      masteryColor = 'linear-gradient(90deg, #E0B84A, #F0CC65)';
-      masteryLabel = 'Bonne maîtrise — quelques points à consolider.';
-    } else if (masteryScore >= 40) {
-      masteryColor = 'linear-gradient(90deg, #D4A017, #E8C158)';
-      masteryLabel = 'Maîtrise partielle — une nouvelle session te fera du bien.';
-    } else {
-      masteryColor = 'linear-gradient(90deg, #d7654a, #e88a72)';
-      masteryLabel = 'Chapitre à retravailler en profondeur.';
-    }
-
     const fill = $('masteryFill');
-    fill.style.background = masteryColor;
+    fill.style.background = masteryScore >= 75 ? 'linear-gradient(90deg, #45b47d, #6fd99a)' : masteryScore >= 50 ? 'linear-gradient(90deg, #E0B84A, #F0CC65)' : 'linear-gradient(90deg, #d7654a, #e88a72)';
     fill.style.width = '0%';
     setTimeout(() => { fill.style.width = `${masteryScore}%`; }, 100);
-    $('masteryText').textContent = masteryLabel;
+    $('masteryText').textContent = masteryScore >= 75 ? 'Chapitre solide.' : masteryScore >= 50 ? 'À consolider.' : 'À retravailler.';
 
-    const recList = $('recommendationsList');
-    recList.innerHTML = '';
-
-    const recs = [];
-    if (percent === 100) {
-      recs.push('Continue sur ce rythme, teste-toi sur un autre chapitre.');
-    } else if (percent >= 70) {
-      recs.push('Revois rapidement les questions manquées, puis passe à un chapitre proche.');
-    } else {
-      recs.push('Refais une session sur ce même chapitre dans 2-3 jours.');
-    }
-
-    const ratings = Object.values(state.flashRatings);
-    if (ratings.length > 0) {
-      const hard = ratings.filter((r) => r === 'hard').length;
-      if (hard > 0) recs.push(`${hard} flashcard${hard > 1 ? 's' : ''} difficile${hard > 1 ? 's' : ''} à retravailler.`);
-    }
-
-    recs.forEach((r) => {
-      const li = document.createElement('li');
-      li.textContent = r;
-      recList.appendChild(li);
-    });
-
+    const recs = [
+      percent === 100 ? 'Continue, teste un autre chapitre.' : percent >= 70 ? 'Revois les questions manquées.' : 'Refais une session dans 2-3 jours.'
+    ];
+    $('recommendationsList').innerHTML = recs.map((r) => `<li>${r}</li>`).join('');
     showView('resultsView');
-  }
+  });
 
-  function computeMasteryScore(quizPercent) {
-    let flashBonus = 0;
-    const ratings = Object.values(state.flashRatings);
-    if (ratings.length > 0) {
-      const easy = ratings.filter((r) => r === 'easy').length;
-      const medium = ratings.filter((r) => r === 'medium').length;
-      const hard = ratings.filter((r) => r === 'hard').length;
-      const score = (easy * 100 + medium * 60 + hard * 20) / ratings.length;
-      flashBonus = score * 0.3;
-    } else {
-      flashBonus = quizPercent * 0.3;
-    }
-    return Math.round(quizPercent * 0.7 + flashBonus);
-  }
-
-  // ═══════════════════════════════════════════════════════════════
-  // BOUTONS NAVIGATION
-  // ═══════════════════════════════════════════════════════════════
   $('newFicheBtn').addEventListener('click', () => showView('configView'));
   $('newFlashBtn').addEventListener('click', () => showView('configView'));
   $('restartBtn').addEventListener('click', () => showView('configView'));
-
-  $('startFlashcardsBtn').addEventListener('click', () => {
+  $('startFlashcardsBtn').addEventListener('click', async () => {
     state.flashcards = [];
     state.currentFlashIndex = 0;
     state.flashRatings = {};
-    generateFlashcardsDirect();
+    state.mode = 'flashcard';
+    await generateFlashcards();
   });
+  $('skipToQuizBtn').addEventListener('click', generateQuiz);
 
-  $('skipToQuizBtn').addEventListener('click', () => generateQuizDirect());
-
-  // ═══════════════════════════════════════════════════════════════
   // SCROLL TOP
-  // ═══════════════════════════════════════════════════════════════
-  const scrollTopBtn = $('scrollTop');
   window.addEventListener('scroll', () => {
-    scrollTopBtn.classList.toggle('show', window.scrollY > 300);
+    $('scrollTop').classList.toggle('show', window.scrollY > 300);
   }, { passive: true });
-  scrollTopBtn.addEventListener('click', () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  });
+  $('scrollTop').addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
-  // ═══════════════════════════════════════════════════════════════
   // PREMIUM
-  // ═══════════════════════════════════════════════════════════════
-  function showPremiumPopup(used = 0, limit = FREE_LIMIT) {
-    const subtitle = $('premiumSubtitle');
-    if (used && limit) {
-      subtitle.innerHTML = `Tu as utilisé tes <strong>${limit} essais gratuits</strong> du jour. Passe à <strong>Premium</strong> pour générer sans limite.`;
-    }
+  function showPremiumPopup(used, limit) {
+    if (used && limit) $('premiumSubtitle').innerHTML = `Tu as utilisé tes <strong>${limit} essais gratuits</strong>. Passe à Premium.`;
     $('premiumOverlay').classList.add('show');
   }
   $('premiumClose').addEventListener('click', () => $('premiumOverlay').classList.remove('show'));
   $('popupLaterBtn').addEventListener('click', () => $('premiumOverlay').classList.remove('show'));
-  $('premiumOverlay').addEventListener('click', (e) => {
-    if (e.target === $('premiumOverlay')) $('premiumOverlay').classList.remove('show');
-  });
+  $('premiumOverlay').addEventListener('click', (e) => { if (e.target === $('premiumOverlay')) $('premiumOverlay').classList.remove('show'); });
 
-  // ═══════════════════════════════════════════════════════════════
   // AUTH
-  // ═══════════════════════════════════════════════════════════════
   function isUserPremium(data) {
     if (!data) return false;
     const active = data.premium === true || data.isUnlocked === true || data.hasDeposited === true;
     if (!active) return false;
-    const end = data.subscriptionEndDate?.toDate?.() ||
-      (data.subscriptionEndDate?.seconds ? new Date(data.subscriptionEndDate.seconds * 1000) : null);
+    const end = data.subscriptionEndDate?.toDate?.() || (data.subscriptionEndDate?.seconds ? new Date(data.subscriptionEndDate.seconds * 1000) : null);
     return !end || end.getTime() > Date.now();
   }
-
   onAuthStateChanged(auth, async (user) => {
     const conn = $('connectionState');
-
-    if (!user) {
-      window.location.replace('login.html');
-      return;
-    }
-
+    if (!user) { window.location.replace('login.html'); return; }
     state.user = user;
     conn.textContent = 'Connecté';
     conn.classList.add('online');
-
     try {
-      const userDoc = await getDoc(doc(db, 'users', user.uid));
-      if (userDoc.exists()) {
-        const data = userDoc.data();
-        state.isPremium = isUserPremium(data);
-        conn.textContent = state.isPremium ? 'Premium actif' : 'Compte gratuit';
-        conn.classList.toggle('online', state.isPremium);
+      const snap = await getDoc(doc(db, 'users', user.uid));
+      if (snap.exists()) {
+        const d = snap.data();
+        state.isPremium = isUserPremium(d);
+        conn.textContent = state.isPremium ? 'Premium' : 'Gratuit';
       }
     } catch (e) {}
   });
 
-  // ═══════════════════════════════════════════════════════════════
-  // INIT
-  // ═══════════════════════════════════════════════════════════════
-  function init() {
-    initCustomSelects();
-    initChips();
-    console.log('🎓 ARVEXA — Réviseur v5.0 (unifié)');
-  }
-
-  init();
+  initCustomSelects();
+  initChips();
+  console.log('🎓 ARVEXA — Réviseur v5.0');
   </script>
 </body>
 </html>

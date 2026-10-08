@@ -19,15 +19,13 @@
 <script src="katex-utils.js" defer></script>
 
 <style>
-/* ═══════════════════════════════════════════════════════════════
-   TOKENS — uniforme ARVEXA
-   ═══════════════════════════════════════════════════════════════ */
 :root {
   --accent: #B8860B;
   --accent-bright: #E0B84A;
   --success-light: #3AB67E;
   --danger: #B85C3A;
   --danger-light: #E07A5F;
+  --info: #4AAFE0;
   --bg-dark: #0A0A0A;
   --card-bg: rgba(20, 20, 20, 0.6);
   --card-border: rgba(255, 255, 255, 0.06);
@@ -65,7 +63,6 @@ a { color: inherit; text-decoration: none; }
 button { cursor: pointer; font-family: inherit; border: none; background: none; color: inherit; }
 button:disabled { cursor: not-allowed; opacity: 0.55; }
 
-/* HEADER */
 .header {
   position: sticky; top: 0; flex-shrink: 0; z-index: 50;
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
@@ -132,7 +129,6 @@ main {
   to { opacity: 1; transform: none; }
 }
 
-/* GREETING */
 .greeting { margin-bottom: 20px; }
 .greeting h1 {
   font-family: 'Playfair Display', serif;
@@ -729,29 +725,51 @@ main {
 }
 .notes-status.saved { color: var(--success-light); }
 
-.download-btn {
+/* CTA EXAMEN */
+.cta-exam {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 10px;
+  gap: 14px;
   width: 100%;
-  padding: 14px 20px;
+  padding: 16px 18px;
   border-radius: 12px;
-  background: transparent;
+  background: linear-gradient(135deg, rgba(224, 184, 74, 0.1), rgba(184, 134, 11, 0.05));
   border: 1px solid rgba(224, 184, 74, 0.3);
-  color: var(--accent-bright);
-  font-size: 14px;
-  font-weight: 700;
-  font-family: inherit;
+  color: var(--text-light);
+  cursor: pointer;
   transition: var(--transition);
-  margin-top: 20px;
+  text-align: left;
+  font-family: inherit;
+  margin-bottom: 12px;
 }
-.download-btn:hover {
-  background: rgba(224, 184, 74, 0.06);
+.cta-exam:hover {
   border-color: var(--accent-bright);
+  background: linear-gradient(135deg, rgba(224, 184, 74, 0.15), rgba(184, 134, 11, 0.08));
   transform: translateY(-1px);
 }
-.download-btn i { font-size: 14px; }
+.cta-exam > i:first-child {
+  font-size: 24px;
+  color: var(--accent-bright);
+  flex-shrink: 0;
+}
+.cta-exam-body { flex: 1; min-width: 0; }
+.cta-exam-title {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--accent-bright);
+  margin-bottom: 3px;
+}
+.cta-exam-sub {
+  font-size: 12.5px;
+  color: var(--text-dim);
+  line-height: 1.4;
+}
+.cta-exam-arrow {
+  color: var(--text-muted);
+  font-size: 14px;
+  flex-shrink: 0;
+  margin-left: auto;
+}
 
 .loading-state {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -1227,6 +1245,10 @@ main {
   .part { padding: 15px 15px 14px; }
   .modal { padding: 20px 16px; padding-bottom: calc(20px + var(--safe-bottom)); }
   .premium-modal { padding: 24px 20px 18px; }
+  .cta-exam { padding: 14px 15px; }
+  .cta-exam > i:first-child { font-size: 20px; }
+  .cta-exam-title { font-size: 13.5px; }
+  .cta-exam-sub { font-size: 11.5px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1239,334 +1261,6 @@ main {
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(184, 134, 11, 0.25); border-radius: 10px; }
-
-/* ═══════════════════════════════════════════════════════════════
-   PRINT — Télécharger en PDF / Imprimer
-   ═══════════════════════════════════════════════════════════════ */
-@media print {
-  @page { margin: 15mm 12mm; }
-
-  html, body {
-    background: #FFFFFF !important;
-    color: #000000 !important;
-    font-size: 11.5pt !important;
-    line-height: 1.5 !important;
-  }
-
-  /* Masquer éléments d'interface */
-  .header,
-  .back-btn,
-  .icon-btn,
-  .premium-badge,
-  .toast-container,
-  .modal-backdrop,
-  .expand-btn,
-  .download-btn,
-  .notes-area,
-  .notes-status,
-  .list-item-delete,
-  .cta-card,
-  .qa-toggle,
-  .section-hero .sub,
-  .content-section-title .count,
-  .qa-level,
-  .toast {
-    display: none !important;
-  }
-
-  /* Reset des couleurs */
-  * {
-    background: transparent !important;
-    color: #000000 !important;
-    box-shadow: none !important;
-    text-shadow: none !important;
-  }
-
-  main {
-    max-width: 100% !important;
-    padding: 0 !important;
-    margin: 0 !important;
-  }
-
-  .view { display: none !important; }
-  .view.active { display: block !important; }
-
-  /* Titres */
-  .section-hero {
-    margin-bottom: 18pt;
-    padding-bottom: 12pt;
-    border-bottom: 2pt solid #000 !important;
-    page-break-after: avoid;
-  }
-  .section-hero h1 {
-    font-family: 'Playfair Display', serif !important;
-    font-size: 20pt !important;
-    color: #000 !important;
-    margin-bottom: 6pt;
-  }
-  .section-hero .breadcrumb {
-    font-size: 10pt !important;
-    color: #555 !important;
-  }
-
-  .page-hero {
-    border-bottom: 2pt solid #000 !important;
-    padding-bottom: 12pt;
-    margin-bottom: 18pt;
-  }
-  .page-hero h1 {
-    font-family: 'Playfair Display', serif !important;
-    font-size: 20pt !important;
-    color: #000 !important;
-  }
-  .page-hero .hero-sub {
-    font-size: 10pt !important;
-    color: #555 !important;
-  }
-
-  .content-section {
-    margin-bottom: 16pt;
-    page-break-inside: auto;
-  }
-  .content-section-title {
-    font-size: 10pt !important;
-    color: #333 !important;
-    border-bottom: 1pt solid #999 !important;
-    padding-bottom: 4pt;
-    margin-bottom: 10pt;
-    page-break-after: avoid;
-  }
-
-  /* Blocs : bordures nettes pour l'impression */
-  .block {
-    border: 1pt solid #999 !important;
-    border-left: 3pt solid #333 !important;
-    padding: 10pt 12pt !important;
-    margin-bottom: 10pt !important;
-    page-break-inside: avoid;
-  }
-  .block-head {
-    font-size: 10pt !important;
-    color: #333 !important;
-    margin-bottom: 6pt !important;
-  }
-  .block-body {
-    font-size: 11pt !important;
-    color: #000 !important;
-  }
-
-  /* Parties d'explication */
-  .part {
-    border: 1pt solid #999 !important;
-    padding: 10pt 12pt !important;
-    margin-bottom: 10pt !important;
-    page-break-inside: avoid;
-  }
-  .part-title {
-    font-size: 12pt !important;
-    color: #000 !important;
-    margin-bottom: 8pt !important;
-  }
-  .part-title::before {
-    background: #333 !important;
-  }
-  .part-idea {
-    font-size: 11pt !important;
-    color: #000 !important;
-    border-left: 2pt solid #333 !important;
-    padding-left: 8pt !important;
-  }
-  .part-explanation {
-    font-size: 11pt !important;
-    color: #000 !important;
-  }
-  .part-terms {
-    background: #F5F5F5 !important;
-    border: 1pt solid #CCC !important;
-    padding: 8pt 10pt !important;
-  }
-  .part-terms-title {
-    font-size: 9pt !important;
-    color: #333 !important;
-  }
-  .part-term {
-    font-size: 10.5pt !important;
-    color: #000 !important;
-  }
-  .part-term strong { color: #000 !important; font-weight: 700 !important; }
-  .part-remember {
-    background: #F5F5F5 !important;
-    border-left: 2pt solid #333 !important;
-    color: #000 !important;
-    padding: 8pt 10pt !important;
-  }
-  .part-remember strong { color: #333 !important; }
-
-  /* Formules */
-  .formula-block {
-    background: #F5F5F5 !important;
-    border: 1pt solid #CCC !important;
-    padding: 10pt !important;
-  }
-  .formula-description, .formula-condition {
-    color: #555 !important;
-    font-size: 10pt !important;
-  }
-  .formula-variable { color: #000 !important; font-size: 10.5pt !important; }
-  .formula-variable strong { color: #333 !important; }
-
-  /* Listes */
-  .simple-list li { font-size: 11pt !important; color: #000 !important; }
-  .simple-list li .num { color: #333 !important; }
-  .method-list li { font-size: 11pt !important; color: #000 !important; }
-  .method-list li::before {
-    background: #333 !important;
-    color: #FFF !important;
-  }
-  .example-enonce {
-    background: #F5F5F5 !important;
-    border: 1pt solid #CCC !important;
-    color: #000 !important;
-  }
-  .example-steps li { color: #000 !important; font-size: 11pt !important; }
-  .example-steps li::before { color: #333 !important; }
-  .example-result {
-    background: #F0F8F0 !important;
-    border-left: 2pt solid #333 !important;
-    color: #000 !important;
-  }
-  .trap-text { color: #000 !important; font-size: 11pt !important; }
-  .trap-solution { color: #333 !important; font-size: 10.5pt !important; }
-
-  /* Q/R : tout déplié */
-  .qa-item {
-    border: 1pt solid #999 !important;
-    margin-bottom: 8pt !important;
-    page-break-inside: avoid;
-  }
-  .qa-question {
-    padding: 8pt 10pt !important;
-    background: #F5F5F5 !important;
-  }
-  .qa-q-text {
-    font-size: 11pt !important;
-    color: #000 !important;
-    font-weight: 700 !important;
-  }
-  .qa-q-icon {
-    background: #333 !important;
-    color: #FFF !important;
-    font-size: 10pt !important;
-  }
-  .qa-answer {
-    max-height: none !important;
-    overflow: visible !important;
-  }
-  .qa-answer-inner {
-    padding: 8pt 10pt !important;
-    background: transparent !important;
-    border-top: 1pt dashed #999 !important;
-  }
-  .qa-answer-label {
-    color: #333 !important;
-    font-size: 9pt !important;
-    margin-bottom: 4pt !important;
-  }
-  .qa-answer-text {
-    font-size: 11pt !important;
-    color: #000 !important;
-  }
-  .qa-musthave {
-    background: #F5F5F5 !important;
-    border-left: 2pt solid #333 !important;
-    padding: 6pt 8pt !important;
-  }
-  .qa-musthave-title { color: #333 !important; font-size: 9pt !important; }
-  .qa-musthave-list li { color: #000 !important; font-size: 10.5pt !important; }
-
-  /* QCM */
-  .qcm-item {
-    border: 1pt solid #999 !important;
-    padding: 10pt !important;
-    margin-bottom: 10pt !important;
-    page-break-inside: avoid;
-  }
-  .qcm-question {
-    font-size: 11pt !important;
-    color: #000 !important;
-    font-weight: 700 !important;
-  }
-  .qcm-option {
-    background: #F5F5F5 !important;
-    border: 1pt solid #CCC !important;
-    color: #000 !important;
-    padding: 6pt 10pt !important;
-    font-size: 11pt !important;
-  }
-  .qcm-option-letter {
-    background: #333 !important;
-    color: #FFF !important;
-  }
-  .qcm-option.correct {
-    background: #E8F5E8 !important;
-    border-color: #333 !important;
-    color: #000 !important;
-  }
-  .qcm-option.correct .qcm-option-letter {
-    background: #333 !important;
-    color: #FFF !important;
-  }
-  .qcm-explanation {
-    display: block !important;
-    background: #F5F5F5 !important;
-    color: #000 !important;
-    padding: 6pt 10pt !important;
-    margin-top: 8pt !important;
-    font-size: 10.5pt !important;
-  }
-  .qcm-explanation strong { color: #333 !important; }
-
-  /* KaTeX */
-  .katex { font-size: 11pt !important; color: #000 !important; }
-  .katex-display { margin: 6pt 0 !important; }
-
-  /* Notes personnelles (facultatif — décommenter pour inclure) */
-  /* .notes-area {
-    display: block !important;
-    border: 1pt solid #999 !important;
-    padding: 10pt !important;
-    min-height: auto !important;
-    resize: none !important;
-  } */
-
-  /* Leçon complète */
-  .lesson-section { margin-bottom: 20pt !important; }
-  .lesson-section-head {
-    border-bottom: 1pt solid #999 !important;
-    padding-bottom: 6pt;
-    margin-bottom: 10pt;
-  }
-  .lesson-section-title {
-    font-size: 14pt !important;
-    color: #000 !important;
-  }
-  .lesson-section-num {
-    font-size: 9pt !important;
-    color: #555 !important;
-  }
-
-  /* Titre du document */
-  .print-only-title {
-    display: block !important;
-    text-align: center;
-    font-size: 10pt;
-    color: #666 !important;
-    margin-bottom: 12pt;
-    border-bottom: 1pt solid #CCC !important;
-    padding-bottom: 8pt;
-  }
-}
-.print-only-title { display: none; }
 </style>
 </head>
 <body>
@@ -1593,7 +1287,6 @@ main {
 </header>
 
 <main>
-  <div class="print-only-title" id="printTitle"></div>
   <section class="view active" id="view-notebooks"></section>
   <section class="view" id="view-notebook"></section>
   <section class="view" id="view-chapter"></section>
@@ -1637,16 +1330,28 @@ const MIN_CONTENT_LENGTH = 40;
 const MAX_CONTENT_LENGTH = 15000;
 
 const SUBJECTS = {
-  mathematiques: { label: 'Mathématiques', emoji: '📐', profile: 'scientific' },
-  physique:      { label: 'Physique',      emoji: '⚡', profile: 'scientific' },
-  chimie:        { label: 'Chimie',        emoji: '🧪', profile: 'scientific' },
-  svt:           { label: 'SVT',           emoji: '🧬', profile: 'svt'        },
-  philosophie:   { label: 'Philosophie',   emoji: '🧠', profile: 'philosophy' },
-  'histoire-geo':{ label: 'Histoire-Géo',  emoji: '🌍', profile: 'history'    },
-  francais:      { label: 'Français',      emoji: '📖', profile: 'french'     },
-  anglais:       { label: 'Anglais',       emoji: '🌐', profile: 'language'   }
+  mathematiques: { label: 'Mathématiques', emoji: '📐' },
+  physique:      { label: 'Physique',      emoji: '⚡' },
+  chimie:        { label: 'Chimie',        emoji: '🧪' },
+  svt:           { label: 'SVT',           emoji: '🧬' },
+  philosophie:   { label: 'Philosophie',   emoji: '🧠' },
+  'histoire-geo':{ label: 'Histoire-Géo',  emoji: '🌍' },
+  francais:      { label: 'Français',      emoji: '📖' },
+  anglais:       { label: 'Anglais',       emoji: '🌐' }
 };
 const ALL_SUBJECT_KEYS = Object.keys(SUBJECTS);
+
+// Mapping matière cahier → matière exam
+const EXAM_SUBJECT_MAP = {
+  mathematiques: 'Mathématiques',
+  physique: 'Physique',
+  chimie: 'Chimie',
+  svt: 'SVT',
+  francais: 'Français',
+  philosophie: 'Philosophie',
+  'histoire-geo': 'Histoire-Géographie',
+  anglais: 'Anglais'
+};
 
 const SYMBOL_GROUPS = [
   { name: 'Opérations', symbols: ['+','−','×','÷','±','=','≠','≈','·','%','<','>','≤','≥','∝','∞'] },
@@ -1668,9 +1373,6 @@ const state = {
 
 const $ = (id) => document.getElementById(id);
 
-// ═══════════════════════════════════════════════════════════════
-// UTILITAIRES
-// ═══════════════════════════════════════════════════════════════
 function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = String(text || '');
@@ -1787,9 +1489,7 @@ function showGeneratingState(el, profile) {
     }
     steps[currentStep - 1].classList.remove('active');
     steps[currentStep - 1].classList.add('done');
-    if (currentStep < steps.length) {
-      steps[currentStep].classList.add('active');
-    }
+    if (currentStep < steps.length) steps[currentStep].classList.add('active');
     currentStep++;
   }, 6000);
 
@@ -1817,9 +1517,6 @@ function getFirstName() {
   return state.userData?.firstName || state.userData?.displayName?.split(' ')[0] || 'Élève';
 }
 
-// ═══════════════════════════════════════════════════════════════
-// API
-// ═══════════════════════════════════════════════════════════════
 async function callApi(action, params = {}) {
   if (!state.user) throw new Error('Non authentifié.');
   const token = await getIdToken(state.user);
@@ -1841,9 +1538,6 @@ async function callApi(action, params = {}) {
   return data;
 }
 
-// ═══════════════════════════════════════════════════════════════
-// ROUTER
-// ═══════════════════════════════════════════════════════════════
 function routeFromHash() {
   const hash = window.location.hash.replace(/^#\/?/, '');
   if (!hash) return { view: 'notebooks', params: {} };
@@ -2249,10 +1943,17 @@ async function renderSectionView(params) {
         <div class="notes-status" id="notesStatus"></div>
       </div>
 
-      <button class="download-btn" id="downloadBtn">
-        <i class="fas fa-file-pdf"></i>
-        <span>Télécharger en PDF</span>
-      </button>
+      <div class="content-section">
+        <div class="content-section-title"><i class="fas fa-graduation-cap"></i>Teste-toi sur cette partie</div>
+        <button class="cta-exam" id="goToExamBtn" data-subject="${escapeHtml(subject)}" data-chapter="${escapeHtml(chapterTitle)}">
+          <i class="fas fa-file-circle-check"></i>
+          <div class="cta-exam-body">
+            <div class="cta-exam-title">Passer en mode examen</div>
+            <div class="cta-exam-sub">Teste-toi dans les conditions du BAC</div>
+          </div>
+          <i class="fas fa-chevron-right cta-exam-arrow"></i>
+        </button>
+      </div>
     `;
 
     const container = $('analysisContainer');
@@ -2262,7 +1963,6 @@ async function renderSectionView(params) {
       setTimeout(() => renderKaTeX(el), 0);
     });
 
-    // Events
     $('expandRawBtn')?.addEventListener('click', () => {
       const raw = $('rawInput');
       raw.classList.toggle('expanded');
@@ -2301,7 +2001,6 @@ async function renderSectionView(params) {
       });
     });
 
-    // Auto-save notes
     let notesTimer = null;
     $('notesArea')?.addEventListener('input', () => {
       const status = $('notesStatus');
@@ -2320,10 +2019,14 @@ async function renderSectionView(params) {
       }, 1400);
     });
 
-    // Bouton PDF
-    $('downloadBtn')?.addEventListener('click', () => {
-      preparePrint(`${info.label} — ${chapterTitle ? chapterTitle + ' — ' : ''}${s.title}`);
-      setTimeout(() => window.print(), 100);
+    $('goToExamBtn')?.addEventListener('click', () => {
+      const subj = $('goToExamBtn').dataset.subject;
+      const chap = $('goToExamBtn').dataset.chapter;
+      const examSubject = EXAM_SUBJECT_MAP[subj] || '';
+      const params = new URLSearchParams();
+      if (examSubject) params.set('subject', examSubject);
+      if (chap) params.set('chapter', chap);
+      window.location.href = `exam.html?${params.toString()}`;
     });
 
   } catch (err) {
@@ -2333,7 +2036,7 @@ async function renderSectionView(params) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// RENDU ANALYSE PAR PROFIL
+// RENDU ANALYSE
 // ═══════════════════════════════════════════════════════════════
 function renderAnalysis(a, profile) {
   let html = '';
@@ -2850,7 +2553,6 @@ async function renderLessonView(params) {
 
     const sectionsHtml = sections.map((s, i) => {
       const a = s.analysis || {};
-      const profile = s.profile || 'scientific';
       let content = '';
 
       if (a.explanation?.understanding) {
@@ -2861,11 +2563,11 @@ async function renderLessonView(params) {
       }
 
       if (a.explanation?.parts) {
-        content += a.explanation.parts.map((p) => renderPart(p, profile)).join('');
+        content += a.explanation.parts.map((p) => renderPart(p, s.profile || 'scientific')).join('');
       }
 
       if (a.structure) {
-        content += renderStructure(a.structure, profile);
+        content += renderStructure(a.structure, s.profile || 'scientific');
       }
 
       if (s.userNotes && s.userNotes.trim()) {
@@ -2876,54 +2578,55 @@ async function renderLessonView(params) {
       }
 
       return `
-        <div class="lesson-section" style="margin-bottom:32px;">
-          <div class="lesson-section-head">
-            <div class="lesson-section-num" style="font-size:11px;font-weight:700;color:var(--accent-bright);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;">Section ${i + 1}</div>
-            <div class="lesson-section-title" style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--text-light);margin-bottom:14px;">${escapeHtml(s.title)}</div>
-          </div>
+        <div style="margin-bottom:32px;">
+          <div style="font-size:11px;font-weight:700;color:var(--accent-bright);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;">Section ${i + 1}</div>
+          <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--text-light);margin-bottom:14px;">${escapeHtml(s.title)}</div>
           ${content}
         </div>
       `;
     }).join('');
 
+    const examSubject = EXAM_SUBJECT_MAP[subject] || '';
+    const chapterTitle = data.chapter.title || '';
+
     el.innerHTML = `
       <div class="page-hero" style="text-align:center;">
         <div style="font-size:32px;margin-bottom:8px;">${info.emoji}</div>
         <div style="font-size:11px;font-weight:700;color:var(--accent-bright);text-transform:uppercase;letter-spacing:0.15em;margin-bottom:6px;">${escapeHtml(info.label)}</div>
-        <h1 style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--text-light);margin-bottom:6px;">${escapeHtml(data.chapter.title)}</h1>
+        <h1 style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--text-light);margin-bottom:6px;">${escapeHtml(chapterTitle)}</h1>
         <div style="font-size:13px;color:var(--text-dim);">${sections.length} section${sections.length > 1 ? 's' : ''}</div>
       </div>
-      ${sectionsHtml}
 
-      <button class="download-btn" id="downloadLessonBtn">
-        <i class="fas fa-file-pdf"></i>
-        <span>Télécharger en PDF</span>
-      </button>
+      <div class="content-section" style="margin-bottom:32px;">
+        <button class="cta-exam" id="goToExamLessonBtn" data-subject="${escapeHtml(subject)}" data-chapter="${escapeHtml(chapterTitle)}">
+          <i class="fas fa-file-circle-check"></i>
+          <div class="cta-exam-body">
+            <div class="cta-exam-title">Passer en mode examen</div>
+            <div class="cta-exam-sub">Teste tout le chapitre dans les conditions du BAC</div>
+          </div>
+          <i class="fas fa-chevron-right cta-exam-arrow"></i>
+        </button>
+      </div>
+
+      ${sectionsHtml}
     `;
 
     requestAnimationFrame(() => {
       setTimeout(() => renderKaTeX(el), 0);
     });
 
-    $('downloadLessonBtn')?.addEventListener('click', () => {
-      preparePrint(`${info.label} — ${data.chapter.title}`);
-      setTimeout(() => window.print(), 100);
+    $('goToExamLessonBtn')?.addEventListener('click', () => {
+      const subj = $('goToExamLessonBtn').dataset.subject;
+      const chap = $('goToExamLessonBtn').dataset.chapter;
+      const examSubject = EXAM_SUBJECT_MAP[subj] || '';
+      const params = new URLSearchParams();
+      if (examSubject) params.set('subject', examSubject);
+      if (chap) params.set('chapter', chap);
+      window.location.href = `exam.html?${params.toString()}`;
     });
 
   } catch (err) {
     showEmptyState(el, 'fa-exclamation-triangle', 'Erreur', err.message || 'Erreur réseau.');
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════
-// PRINT — prépare le titre du document
-// ═══════════════════════════════════════════════════════════════
-function preparePrint(title) {
-  document.title = `ARVEXA — ${title}`;
-  const printTitle = $('printTitle');
-  if (printTitle) {
-    printTitle.textContent = title;
-    printTitle.style.display = 'block';
   }
 }
 
@@ -2979,18 +2682,22 @@ function confirmDelete({ title, message, onConfirm }) {
   });
 }
 
-function showPremiumModal() {
+function showPremiumModal(used, limit) {
+  const message = (used && limit)
+    ? `Tu as utilisé tes <strong>${limit} sections gratuites</strong> ce mois-ci.`
+    : `Cette fonctionnalité est réservée aux membres <strong>Premium</strong>.`;
+
   openModal(`
     <div class="premium-modal">
       <div class="premium-icon">👑</div>
       <h2>Passe à <span>Premium</span></h2>
-      <p>Tu as utilisé tes <strong>5 sections gratuites</strong> ce mois-ci.</p>
+      <p>${message}</p>
 
       <ul class="premium-features">
-        <li><i class="fas fa-check-circle"></i> Sections illimitées</li>
+        <li><i class="fas fa-check-circle"></i> Sections illimitées (au lieu de 5/mois)</li>
         <li><i class="fas fa-check-circle"></i> Analyses IA sans limite</li>
         <li><i class="fas fa-check-circle"></i> Accès illimité à tous les outils</li>
-        <li><i class="fas fa-check-circle"></i> Support prioritaire</li>
+        <li><i class="fas fa-check-circle"></i> Examens complets</li>
       </ul>
 
       <a href="abonnement.html" class="btn-premium-subscribe">
@@ -3161,6 +2868,7 @@ function openAddSectionModal(subject, chapterId) {
     submitBtn.classList.add('loading');
 
     const container = $('view-section');
+    const info = SUBJECTS[subject];
     document.querySelectorAll('.view').forEach((v) => v.classList.remove('active'));
     container.classList.add('active');
     const cleanupProgress = showGeneratingState(container, info?.profile || 'scientific');
@@ -3188,7 +2896,7 @@ function openAddSectionModal(subject, chapterId) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// ÉVÉNEMENTS GLOBAUX
+// ÉVÉNEMENTS
 // ═══════════════════════════════════════════════════════════════
 $('backBtn').addEventListener('click', () => window.history.back());
 
@@ -3198,9 +2906,6 @@ $('refreshBtn').addEventListener('click', () => {
   showToast('Actualisé', 'success', 1200);
 });
 
-// ═══════════════════════════════════════════════════════════════
-// AUTH
-// ═══════════════════════════════════════════════════════════════
 function isUserPremium(data) {
   if (!data) return false;
   const status = data.subscriptionStatus || 'none';
@@ -3248,7 +2953,7 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
-console.log('ARVEXA — Mon cahier v8.0 — Sans images, sans Vrai/Faux, avec PDF');
+console.log('ARVEXA — Mon cahier v7.0 — Multi-profils + Mode examen');
 </script>
 </body>
 </html>

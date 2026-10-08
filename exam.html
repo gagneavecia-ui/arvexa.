@@ -20,59 +20,41 @@
   <script src="register-sw.js" defer></script>
 
   <style>
-    /* ═══════════════════════════════════════════════════════════
-       ROOT — Design tokens ARVEXA
-       ═══════════════════════════════════════════════════════════ */
     :root {
       --accent: #B8860B;
       --accent-bright: #E0B84A;
       --accent-dim: rgba(184, 134, 11, 0.08);
-
       --success: #2D7D5A;
       --success-light: #3AB67E;
       --danger: #B85C3A;
       --danger-light: #E07A5F;
       --warning: #D4A017;
       --info: #4AAFE0;
-
       --bg-dark: #0A0A0A;
       --bg-surface: #141414;
       --bg-card: rgba(20, 20, 20, 0.7);
-
       --text-light: #F5F0E8;
       --text-dim: #8A8A7A;
       --text-muted: #5A5A4A;
       --text-body: #cfd0cc;
-
       --border-soft: rgba(255, 255, 255, 0.05);
       --border-strong: rgba(255, 255, 255, 0.08);
       --border-gold: rgba(184, 134, 11, 0.15);
-
       --transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
       --transition-fast: all 0.15s ease;
-
       --radius-sm: 10px;
       --radius: 16px;
       --radius-lg: 20px;
-
       --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
       --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.5);
-
       --font-body: 'Inter', system-ui, sans-serif;
       --font-serif: 'Playfair Display', Georgia, serif;
-
       --safe-top: env(safe-area-inset-top, 0px);
       --safe-bottom: env(safe-area-inset-bottom, 0px);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
-    html {
-      background: var(--bg-dark);
-      color-scheme: dark;
-      min-width: 320px;
-      width: 100%;
-    }
+    html { background: var(--bg-dark); color-scheme: dark; min-width: 320px; width: 100%; }
 
     body {
       min-height: 100vh;
@@ -92,14 +74,7 @@
     button { cursor: pointer; }
     button:disabled { cursor: not-allowed; opacity: 0.55; }
 
-    /* ═══════════════════════════════════════════════════════════
-       SHELL & HEADER
-       ═══════════════════════════════════════════════════════════ */
-    .shell {
-      width: min(100% - 28px, 980px);
-      margin: auto;
-      padding: 18px 0 46px;
-    }
+    .shell { width: min(100% - 28px, 980px); margin: auto; padding: 18px 0 46px; }
 
     header {
       display: flex;
@@ -139,9 +114,6 @@
       box-shadow: 0 0 8px var(--success-light);
     }
 
-    /* ═══════════════════════════════════════════════════════════
-       PANELS
-       ═══════════════════════════════════════════════════════════ */
     .panel {
       background: var(--bg-card);
       backdrop-filter: blur(12px);
@@ -155,18 +127,13 @@
     .panel::before {
       content: '';
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
+      top: 0; left: 0; right: 0;
       height: 2px;
       border-radius: var(--radius) var(--radius) 0 0;
       background: linear-gradient(90deg, transparent, var(--accent), transparent);
       opacity: 0.6;
     }
 
-    /* ═══════════════════════════════════════════════════════════
-       VUES
-       ═══════════════════════════════════════════════════════════ */
     .view { display: none; animation: appear 0.28s ease both; }
     .view.active { display: block; }
     @keyframes appear {
@@ -174,9 +141,6 @@
       to { opacity: 1; transform: none; }
     }
 
-    /* ═══════════════════════════════════════════════════════════
-       TYPOGRAPHIE
-       ═══════════════════════════════════════════════════════════ */
     h1, h2, h3 {
       margin: 0;
       line-height: 1.2;
@@ -203,9 +167,35 @@
       line-height: 1.7;
     }
 
-    /* ═══════════════════════════════════════════════════════════
-       FORMULAIRE
-       ═══════════════════════════════════════════════════════════ */
+    /* Bandeau "mode cahier" */
+    .notebook-banner {
+      display: none;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, rgba(224, 184, 74, 0.1), rgba(184, 134, 11, 0.05));
+      border: 1px solid rgba(224, 184, 74, 0.25);
+      margin-top: 18px;
+      color: var(--text-light);
+      font-size: 13.5px;
+      line-height: 1.5;
+    }
+    .notebook-banner.show { display: flex; }
+    .notebook-banner i {
+      color: var(--accent-bright);
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .notebook-banner strong {
+      color: var(--accent-bright);
+      font-weight: 700;
+      display: block;
+      margin-bottom: 2px;
+      font-size: 14px;
+    }
+    .notebook-banner span { color: var(--text-dim); }
+
     .form-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -213,12 +203,7 @@
       margin-top: 24px;
     }
 
-    .field {
-      display: flex;
-      flex-direction: column;
-      gap: 7px;
-      min-width: 0;
-    }
+    .field { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
     .field.full { grid-column: 1 / -1; }
 
     label {
@@ -246,15 +231,7 @@
     }
     input::placeholder { color: var(--text-muted); }
 
-    /* ═══════════════════════════════════════════════════════════
-       BOUTONS
-       ═══════════════════════════════════════════════════════════ */
-    .actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 24px;
-    }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
 
     .btn {
       min-height: 44px;
@@ -308,9 +285,6 @@
     }
     .btn.full { width: 100%; }
 
-    /* ═══════════════════════════════════════════════════════════
-       LOADER
-       ═══════════════════════════════════════════════════════════ */
     .loader {
       display: none;
       width: 18px;
@@ -330,9 +304,6 @@
 
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ═══════════════════════════════════════════════════════════
-       STATUS
-       ═══════════════════════════════════════════════════════════ */
     .status {
       min-height: 22px;
       margin-top: 14px;
@@ -342,14 +313,7 @@
     .status.error { color: #ff9a84; }
     .status.success { color: #7ce0aa; }
 
-    /* ═══════════════════════════════════════════════════════════
-       CUSTOM SELECT
-       ═══════════════════════════════════════════════════════════ */
-    .custom-select {
-      position: relative;
-      width: 100%;
-      user-select: none;
-    }
+    .custom-select { position: relative; width: 100%; user-select: none; }
     .custom-select-trigger {
       display: flex;
       align-items: center;
@@ -406,8 +370,7 @@
     .custom-select-options {
       position: absolute;
       top: calc(100% + 6px);
-      left: 0;
-      right: 0;
+      left: 0; right: 0;
       z-index: 50;
       max-height: 280px;
       overflow-y: auto;
@@ -471,9 +434,6 @@
       text-align: center;
     }
 
-    /* ═══════════════════════════════════════════════════════════
-       ÉTAPES DE CHARGEMENT
-       ═══════════════════════════════════════════════════════════ */
     .loading-steps {
       margin-top: 28px;
       display: flex;
@@ -582,9 +542,6 @@
       font-weight: 600;
     }
 
-    /* ═══════════════════════════════════════════════════════════
-       CARTES DE SUJETS
-       ═══════════════════════════════════════════════════════════ */
     .subject-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -653,10 +610,26 @@
       background: rgba(184, 134, 11, 0.08);
       border: 1px solid rgba(184, 134, 11, 0.12);
     }
+    .subject-level-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 10px;
+      font-size: 10.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .subject-level-badge.consolidation {
+      background: rgba(58, 182, 126, 0.1);
+      color: var(--success-light);
+      border: 1px solid rgba(58, 182, 126, 0.25);
+    }
+    .subject-level-badge.approfondissement {
+      background: rgba(224, 122, 95, 0.1);
+      color: var(--danger-light);
+      border: 1px solid rgba(224, 122, 95, 0.25);
+    }
 
-    /* ═══════════════════════════════════════════════════════════
-       EXAMEN EN COURS
-       ═══════════════════════════════════════════════════════════ */
     .exam-top {
       position: sticky;
       top: 0;
@@ -799,7 +772,6 @@
       background: rgba(184, 134, 11, 0.02);
     }
     .answer::placeholder { color: var(--text-muted); }
-    .answer[type="number"] { min-height: auto; }
 
     .answer-options {
       display: grid;
@@ -836,9 +808,6 @@
       flex-shrink: 0;
     }
 
-    /* ═══════════════════════════════════════════════════════════
-       RÉSULTATS
-       ═══════════════════════════════════════════════════════════ */
     .result-summary {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -1032,7 +1001,6 @@
       flex-shrink: 0;
     }
 
-    /* Détail exercice */
     .exercise-detail-header { margin-bottom: 20px; }
     .back-btn-detail {
       display: inline-flex;
@@ -1233,9 +1201,6 @@
       color: var(--text-body);
     }
 
-    /* ═══════════════════════════════════════════════════════════
-       MODALES
-       ═══════════════════════════════════════════════════════════ */
     .modal-backdrop {
       position: fixed;
       inset: 0;
@@ -1315,9 +1280,6 @@
       font-weight: 600;
     }
 
-    /* ═══════════════════════════════════════════════════════════
-       POPUP PREMIUM
-       ═══════════════════════════════════════════════════════════ */
     .premium-popup-overlay {
       position: fixed;
       inset: 0;
@@ -1462,9 +1424,6 @@
     }
     .btn-later:hover { color: var(--text-light); }
 
-    /* ═══════════════════════════════════════════════════════════
-       KATEX
-       ═══════════════════════════════════════════════════════════ */
     .katex { color: inherit; font-size: 1.05em; }
     .katex-display {
       max-width: 100%;
@@ -1473,9 +1432,6 @@
       padding: 6px 0;
     }
 
-    /* ═══════════════════════════════════════════════════════════
-       RESPONSIVE
-       ═══════════════════════════════════════════════════════════ */
     @media (max-width: 620px) {
       .shell { width: min(100% - 20px, 980px); padding-top: 12px; }
       .panel { padding: 17px; }
@@ -1520,16 +1476,25 @@
       <div class="connection" id="connectionState">Vérification...</div>
     </header>
 
-    <!-- ═══════════════════════════════════════════════════════
-         VUE 1 : CONFIGURATION
-         ═══════════════════════════════════════════════════════ -->
+    <!-- VUE 1 : CONFIGURATION -->
     <section class="view active" id="configView" aria-labelledby="configTitle">
       <div class="panel">
         <div class="eyebrow">Mode examen</div>
         <h1 id="configTitle">Prépare ton examen dans les conditions du BAC.</h1>
         <p class="lead">
-          Choisis tes paramètres. Le serveur générera deux sujets différents de difficulté comparable.
+          Choisis tes paramètres. Le serveur générera deux sujets de niveaux progressifs :
+          <strong style="color:var(--accent-bright)">Consolidation</strong> (facile à moyen) puis
+          <strong style="color:var(--accent-bright)">Approfondissement</strong> (moyen à difficile).
         </p>
+
+        <!-- Bandeau contexte cahier -->
+        <div class="notebook-banner" id="notebookBanner">
+          <i class="fas fa-book-open"></i>
+          <div>
+            <strong id="notebookBannerTitle">📖 Basé sur ton cahier</strong>
+            <span id="notebookBannerSub">L'examen sera généré à partir de ce que tu as étudié.</span>
+          </div>
+        </div>
 
         <form id="configForm" class="form-grid">
           <div class="field">
@@ -1609,7 +1574,7 @@
           <div class="field">
             <label for="exerciseCount">Nombre d'exercices</label>
             <input id="exerciseCount" type="number" min="5" max="5" value="5" readonly required>
-            <small style="color:var(--text-muted);font-size:12px;">Chaque sujet contient 5 exercices et 10 questions par exercice.</small>
+            <small style="color:var(--text-muted);font-size:12px;">Chaque sujet contient 5 exercices × 10 questions.</small>
           </div>
 
           <div class="field full">
@@ -1624,37 +1589,33 @@
       </div>
     </section>
 
-    <!-- ═══════════════════════════════════════════════════════
-         VUE 2 : CHARGEMENT GÉNÉRATION
-         ═══════════════════════════════════════════════════════ -->
+    <!-- VUE 2 : CHARGEMENT -->
     <section class="view" id="loadingView" aria-labelledby="loadingTitle">
       <div class="panel">
         <div class="eyebrow">Génération en cours</div>
-        <h2 id="loadingTitle">L'IA prépare tes deux sujets d'examen...</h2>
-        <p class="lead">Cela prend généralement 30 à 60 secondes. Chaque étape indique la progression exacte.</p>
+        <h2 id="loadingTitle">L'IA prépare tes deux sujets...</h2>
+        <p class="lead">30 à 60 secondes. Chaque étape indique la progression exacte.</p>
 
         <div class="loading-steps">
           <div class="loader-spinner"></div>
           <div class="steps-list">
             <div class="loading-step" id="genStep1"><span class="step-icon">🔍</span><div class="step-content"><span class="step-label">Analyse de la configuration</span><span class="step-desc">Matière, chapitre, difficulté et durée</span></div></div>
-            <div class="loading-step" id="genStep2"><span class="step-icon">🎲</span><div class="step-content"><span class="step-label">Génération des sujets</span><span class="step-desc">L'IA crée 2 sujets de difficulté comparable</span></div></div>
+            <div class="loading-step" id="genStep2"><span class="step-icon">🎲</span><div class="step-content"><span class="step-label">Génération des sujets</span><span class="step-desc">2 sujets de niveaux progressifs</span></div></div>
             <div class="loading-step" id="genStep3"><span class="step-icon">📝</span><div class="step-content"><span class="step-label">Rédaction des exercices</span><span class="step-desc">5 exercices × 10 questions par sujet</span></div></div>
-            <div class="loading-step" id="genStep4"><span class="step-icon">🧮</span><div class="step-content"><span class="step-label">Vérification des questions</span><span class="step-desc">Contrôle de la cohérence et des réponses</span></div></div>
-            <div class="loading-step" id="genStep5"><span class="step-icon">✨</span><div class="step-content"><span class="step-label">Finalisation</span><span class="step-desc">Préparation de l'affichage des sujets</span></div></div>
+            <div class="loading-step" id="genStep4"><span class="step-icon">🧮</span><div class="step-content"><span class="step-label">Vérification</span><span class="step-desc">Contrôle cohérence et réponses</span></div></div>
+            <div class="loading-step" id="genStep5"><span class="step-icon">✨</span><div class="step-content"><span class="step-label">Finalisation</span><span class="step-desc">Préparation de l'affichage</span></div></div>
           </div>
           <div class="loading-status" id="genLoadingStatus">Préparation...</div>
         </div>
       </div>
     </section>
 
-    <!-- ═══════════════════════════════════════════════════════
-         VUE 3 : CHOIX DU SUJET
-         ═══════════════════════════════════════════════════════ -->
+    <!-- VUE 3 : CHOIX DU SUJET -->
     <section class="view" id="subjectsView" aria-labelledby="subjectsTitle">
       <div class="panel">
         <div class="eyebrow">Génération terminée</div>
-        <h2 id="subjectsTitle">Votre examen est prêt</h2>
-        <p class="lead">Choisis un seul sujet. L'autre restera disponible si tu souhaites recommencer.</p>
+        <h2 id="subjectsTitle">Ton examen est prêt</h2>
+        <p class="lead">Choisis un seul sujet. L'autre reste disponible si tu veux recommencer.</p>
         <div class="subject-grid" id="subjectsList"></div>
         <div class="actions">
           <button class="btn secondary" id="backConfigButton" type="button">Modifier la configuration</button>
@@ -1662,9 +1623,7 @@
       </div>
     </section>
 
-    <!-- ═══════════════════════════════════════════════════════
-         VUE 4 : EXAMEN EN COURS
-         ═══════════════════════════════════════════════════════ -->
+    <!-- VUE 4 : EXAMEN -->
     <section class="view" id="examView" aria-labelledby="examTitle">
       <div class="exam-top">
         <div class="exam-topline">
@@ -1701,14 +1660,12 @@
       </div>
     </section>
 
-    <!-- ═══════════════════════════════════════════════════════
-         VUE 5 : CHARGEMENT CORRECTION
-         ═══════════════════════════════════════════════════════ -->
+    <!-- VUE 5 : CHARGEMENT CORRECTION -->
     <section class="view" id="loadingCorrectionView" aria-labelledby="loadingCorrTitle">
       <div class="panel">
         <div class="eyebrow">Correction en cours</div>
         <h2 id="loadingCorrTitle">L'IA corrige ta copie...</h2>
-        <p class="lead">L'analyse de chaque exercice peut prendre 30 à 45 secondes. Les étapes s'affichent en temps réel.</p>
+        <p class="lead">30 à 45 secondes par exercice. Les étapes s'affichent en temps réel.</p>
 
         <div class="loading-steps">
           <div class="loader-spinner"></div>
@@ -1716,7 +1673,7 @@
             <div class="loading-step" id="corrStep1"><span class="step-icon">📥</span><div class="step-content"><span class="step-label">Réception des réponses</span><span class="step-desc">Envoi de ta copie au correcteur</span></div></div>
             <div class="loading-step" id="corrStep2"><span class="step-icon">🔍</span><div class="step-content"><span class="step-label">Analyse des exercices</span><span class="step-desc">Vérification de chaque réponse</span></div></div>
             <div class="loading-step" id="corrStep3"><span class="step-icon">🧠</span><div class="step-content"><span class="step-label">Évaluation pédagogique</span><span class="step-desc">Identification des erreurs et points forts</span></div></div>
-            <div class="loading-step" id="corrStep4"><span class="step-icon">📊</span><div class="step-content"><span class="step-label">Calcul du score</span><span class="step-desc">Attribution des points par exercice</span></div></div>
+            <div class="loading-step" id="corrStep4"><span class="step-icon">📊</span><div class="step-content"><span class="step-label">Calcul du score</span><span class="step-desc">Attribution des points</span></div></div>
             <div class="loading-step" id="corrStep5"><span class="step-icon">✅</span><div class="step-content"><span class="step-label">Finalisation</span><span class="step-desc">Préparation du bilan détaillé</span></div></div>
           </div>
           <div class="loading-status" id="corrLoadingStatus">Préparation...</div>
@@ -1724,9 +1681,7 @@
       </div>
     </section>
 
-    <!-- ═══════════════════════════════════════════════════════
-         VUE 6 : RÉSULTATS
-         ═══════════════════════════════════════════════════════ -->
+    <!-- VUE 6 : RÉSULTATS -->
     <section class="view" id="resultsView" aria-labelledby="resultsTitle">
       <div class="panel">
         <div class="eyebrow">Correction</div>
@@ -1752,9 +1707,7 @@
     </section>
   </main>
 
-  <!-- ═══════════════════════════════════════════════════════════
-       MODALE CONFIRMATION
-       ═══════════════════════════════════════════════════════════ -->
+  <!-- MODALES -->
   <div class="modal-backdrop" id="confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
     <div class="modal">
       <h3 id="confirmTitle">Terminer l'examen ?</h3>
@@ -1766,9 +1719,6 @@
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════════════════════════════
-       MODALE REPRISE DE SESSION
-       ═══════════════════════════════════════════════════════════ -->
   <div class="modal-backdrop" id="resumeModal" role="dialog" aria-modal="true" aria-labelledby="resumeTitle">
     <div class="modal">
       <div class="resume-modal-content">
@@ -1783,9 +1733,6 @@
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════════════════════════════
-       POPUP PREMIUM
-       ═══════════════════════════════════════════════════════════ -->
   <div class="premium-popup-overlay" id="premiumPopup" role="dialog" aria-modal="true" aria-labelledby="premiumTitle">
     <div class="premium-popup">
       <button class="popup-close" id="popupCloseBtn" type="button" aria-label="Fermer"><i class="fas fa-times"></i></button>
@@ -1807,9 +1754,6 @@
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════════════════════════════
-       IMPORTS & SCRIPT PRINCIPAL
-       ═══════════════════════════════════════════════════════════ -->
   <script type="importmap">
   {
     "imports": {
@@ -1822,7 +1766,7 @@
 
   <script type="module">
   // ═══════════════════════════════════════════════════════════════
-  // EXAM — Mode examen BAC
+  // EXAM — Mode examen BAC (avec contexte cahier)
   // ═══════════════════════════════════════════════════════════════
 
   import { initializeApp } from 'firebase/app';
@@ -1833,9 +1777,6 @@
     serverTimestamp
   } from 'firebase/firestore';
 
-  // ────────────────────────────────────────────────────────────────
-  // CONFIG
-  // ────────────────────────────────────────────────────────────────
   const firebaseConfig = {
     apiKey: 'AIzaSyDHscOXw3rLuhV6z1Cny-bdYCumqpnG7QE',
     authDomain: 'arvexa-fbf10.firebaseapp.com',
@@ -1868,9 +1809,6 @@
   const GENERATION_STEPS = ['genStep1', 'genStep2', 'genStep3', 'genStep4', 'genStep5'];
   const CORRECTION_STEPS = ['corrStep1', 'corrStep2', 'corrStep3', 'corrStep4', 'corrStep5'];
 
-  // ────────────────────────────────────────────────────────────────
-  // ÉTAT GLOBAL
-  // ────────────────────────────────────────────────────────────────
   const state = {
     user: null,
     exam: null,
@@ -1881,12 +1819,10 @@
     remainingSeconds: 0,
     timerId: null,
     submitting: false,
-    lastResult: null
+    lastResult: null,
+    notebookContext: null
   };
 
-  // ────────────────────────────────────────────────────────────────
-  // HELPERS GÉNÉRAUX
-  // ────────────────────────────────────────────────────────────────
   const $ = (id) => document.getElementById(id);
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -1926,9 +1862,9 @@
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  // ────────────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════
   // CUSTOM SELECT
-  // ────────────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════
   class CustomSelect {
     constructor(element) {
       this.element = element;
@@ -2092,9 +2028,81 @@
     };
   }
 
-  // ────────────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════
+  // PRÉ-REMPLISSAGE DEPUIS URL (venant du cahier)
+  // ═══════════════════════════════════════════════════════════════
+  function prefillFromUrl() {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const preSubject = urlParams.get('subject');
+      const preChapter = urlParams.get('chapter');
+      const preChapterId = urlParams.get('chapterId');
+      const useNotebook = urlParams.get('useNotebook') === 'true';
+
+      // Activer le mode cahier si demandé
+      if (useNotebook && (preChapterId || preChapter)) {
+        state.notebookContext = {
+          chapterId: preChapterId || null,
+          chapterTitle: preChapter || '',
+          useNotebook: true
+        };
+        $('notebookBanner').classList.add('show');
+        if (preChapter) {
+          $('notebookBannerTitle').textContent = `📖 Basé sur ton cahier : ${preChapter}`;
+          $('notebookBannerSub').textContent = 'L\'examen sera généré à partir des sections que tu as étudiées.';
+        }
+        console.log('[EXAM] Contexte cahier activé :', state.notebookContext);
+      }
+
+      // Pré-remplir la matière
+      if (preSubject) {
+        const optionExists = Array.from(document.querySelectorAll('#subjectSelect .custom-select-option'))
+          .some((o) => o.dataset.value === preSubject);
+        if (optionExists) {
+          selects.subject.select(preSubject, true);
+          updateChapters();
+        }
+      }
+
+      // Pré-remplir le chapitre (détection floue)
+      if (preChapter) {
+        setTimeout(() => {
+          const chapterOptions = Array.from(
+            document.querySelectorAll('#chapterOptions .custom-select-option')
+          );
+
+          const normalize = (s) => String(s || '')
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-z0-9]/g, '');
+
+          const target = normalize(preChapter);
+          let match = chapterOptions.find((o) => normalize(o.dataset.value) === target);
+
+          if (!match && target.length > 3) {
+            match = chapterOptions.find((o) => {
+              const v = normalize(o.dataset.value);
+              return v && v.length > 3 && (v.includes(target) || target.includes(v));
+            });
+          }
+
+          if (match && match.dataset.value !== 'all') {
+            selects.chapter.select(match.dataset.value, true);
+            console.log('[EXAM] Chapitre pré-sélectionné :', match.dataset.value);
+          } else {
+            console.log('[EXAM] Pas de correspondance exacte, laissé sur "Tous les chapitres"');
+          }
+        }, 150);
+      }
+    } catch (e) {
+      console.warn('[EXAM] Prefill error:', e.message);
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════
   // ÉTAPES DE CHARGEMENT
-  // ────────────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════
   function resetSteps(steps) {
     steps.forEach((id) => {
       const el = $(id);
@@ -2132,9 +2140,9 @@
     }
   }
 
-  // ────────────────────────────────────────────────────────────────
-  // SESSION FIRESTORE (reprise d'examen)
-  // ────────────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════
+  // SESSION FIRESTORE
+  // ═══════════════════════════════════════════════════════════════
   async function saveActiveSession() {
     if (!state.user || !state.selectedSubject) return;
     try {
@@ -2188,9 +2196,9 @@
     saveSessionTimer = setTimeout(saveActiveSession, 2000);
   }
 
-  // ────────────────────────────────────────────────────────────────
-  // VALIDATION DE L'EXAMEN
-  // ────────────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════
+  // VALIDATION
+  // ═══════════════════════════════════════════════════════════════
   function normalizeExam(payload) {
     const exam = payload?.exam;
     if (!exam || !Array.isArray(exam.subjects) || exam.subjects.length < 2) {
@@ -2213,9 +2221,9 @@
     return exam;
   }
 
-  // ────────────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════
   // GÉNÉRATION
-  // ────────────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════
   $('configForm').addEventListener('submit', generateExam);
 
   async function generateExam(event) {
@@ -2253,10 +2261,19 @@
       };
 
       activateStep('genStep2', statusEl, 'Génération des deux sujets...');
+
+      // ⚡ Injection du contexte cahier
+      const notebookContextPayload = state.notebookContext
+        ? { subject: config.subject, chapterId: state.notebookContext.chapterId, chapterTitle: state.notebookContext.chapterTitle }
+        : null;
+
       const responsePromise = fetch('/api/exam', {
         method: 'POST',
         headers,
-        body: JSON.stringify(config)
+        body: JSON.stringify({
+          ...config,
+          notebookContext: notebookContextPayload
+        })
       });
       await sleep(1500);
 
@@ -2307,9 +2324,9 @@
     }
   }
 
-  // ────────────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════
   // AFFICHAGE DES SUJETS
-  // ────────────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════
   function displaySubjects() {
     const list = $('subjectsList');
     list.replaceChildren();
@@ -2317,12 +2334,18 @@
     state.exam.subjects.forEach((subject, index) => {
       const exerciseCount = subject.exercises.length;
       const points = subject.exercises.reduce((sum, ex) => sum + (Number(ex.points) || 0), 0);
+      const level = subject.level || (index === 0 ? 'consolidation' : 'approfondissement');
+      const levelLabel = level === 'consolidation' ? 'Consolidation' : 'Approfondissement';
+      const levelClass = level === 'consolidation' ? 'consolidation' : 'approfondissement';
 
       const card = document.createElement('article');
       card.className = 'subject-card';
       card.innerHTML = `
         <div class="subject-kicker">Version ${index + 1}</div>
         <h3>${escapeHtml(subject.title || `Sujet ${index + 1}`)}</h3>
+        <div style="margin-bottom:6px;">
+          <span class="subject-level-badge ${levelClass}">${levelLabel}</span>
+        </div>
         <p>${escapeHtml(subject.instructions || 'Sujet complet à traiter dans le temps imparti.')}</p>
         <div class="subject-meta">
           <span>${exerciseCount} exercices</span>
@@ -2342,9 +2365,9 @@
     });
   }
 
-  // ────────────────────────────────────────────────────────────────
-  // DÉMARRAGE DE L'EXAMEN
-  // ────────────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════
+  // DÉMARRAGE
+  // ═══════════════════════════════════════════════════════════════
   async function startExam(subject) {
     state.selectedSubject = subject;
     state.exerciseIndex = 0;
@@ -2360,9 +2383,9 @@
     startTimer();
   }
 
-  // ────────────────────────────────────────────────────────────────
-  // RENDU D'UN EXERCICE
-  // ────────────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════
+  // RENDU EXERCICE
+  // ═══════════════════════════════════════════════════════════════
   function answerKey(exerciseIndex, questionIndex) {
     return `${state.selectedSubject.id}:${exerciseIndex}:${questionIndex}`;
   }
@@ -2460,9 +2483,9 @@
     }
   }
 
-  // ────────────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════
   // TIMER
-  // ────────────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════
   function startTimer() {
     clearInterval(state.timerId);
     state.timerId = setInterval(() => {
@@ -2489,9 +2512,9 @@
     timer.classList.toggle('urgent', s <= EXAM_CONSTANTS.TIMER_WARNING_SEC);
   }
 
-  // ────────────────────────────────────────────────────────────────
-  // MODALE CONFIRMATION
-  // ────────────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════
+  // CONFIRMATION
+  // ═══════════════════════════════════════════════════════════════
   function askFinish() {
     $('confirmModal').classList.add('show');
     $('confirmFinishButton').focus();
@@ -2501,9 +2524,9 @@
     $('confirmModal').classList.remove('show');
   }
 
-  // ────────────────────────────────────────────────────────────────
-  // SOUMISSION & CORRECTION
-  // ────────────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════
+  // SOUMISSION
+  // ═══════════════════════════════════════════════════════════════
   async function submitExam(auto = false) {
     if (state.submitting || !state.selectedSubject) return;
 
@@ -2548,7 +2571,7 @@
       activateStep('corrStep4', statusEl, 'Calcul du score...');
       await sleep(900);
 
-      activateStep('corrStep5', statusEl, 'Finalisation de la correction...');
+      activateStep('corrStep5', statusEl, 'Finalisation...');
       await sleep(600);
 
       finishAllSteps(CORRECTION_STEPS, statusEl, '✅ Ta copie est corrigée !');
@@ -2559,7 +2582,7 @@
 
     } catch (error) {
       console.error('Correction échouée:', error);
-      finishAllSteps(CORRECTION_STEPS, statusEl, '⚠️ Correction indisponible. Réessaie.');
+      finishAllSteps(CORRECTION_STEPS, statusEl, '⚠️ Correction indisponible.');
       await sleep(1200);
       showView('examView');
       setStatus('examStatus', 'Correction temporairement indisponible. Réessaie dans quelques minutes.', 'error');
@@ -2569,9 +2592,9 @@
     }
   }
 
-  // ────────────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════
   // RÉSULTATS
-  // ────────────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════
   function getGrade(percentage) {
     if (percentage >= 90) return 'Excellent';
     if (percentage >= 80) return 'Très bien';
@@ -2782,9 +2805,9 @@
     });
   }
 
-  // ────────────────────────────────────────────────────────────────
-  // POPUP PREMIUM
-  // ────────────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════
+  // PREMIUM
+  // ═══════════════════════════════════════════════════════════════
   function showPremiumPopup() {
     $('premiumPopup').classList.add('show');
     $('popupCloseBtn').focus();
@@ -2793,9 +2816,9 @@
     $('premiumPopup').classList.remove('show');
   }
 
-  // ────────────────────────────────────────────────────────────────
-  // REPRISE DE SESSION
-  // ────────────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════
+  // REPRISE
+  // ═══════════════════════════════════════════════════════════════
   async function checkActiveSession() {
     const session = await loadActiveSession();
     if (!session || !session.exam) return;
@@ -2821,8 +2844,7 @@
       state.exerciseIndex = Number(session.exerciseIndex) || 0;
       state.answers = session.answers || {};
       state.startedAt = Number(session.startedAt) || Date.now();
-      state.remainingSeconds = Number(session.remainingSeconds) ||
-        state.exam.duration * 60;
+      state.remainingSeconds = Number(session.remainingSeconds) || state.exam.duration * 60;
 
       $('resumeModal').classList.remove('show');
       $('examTitle').textContent = subject.title || 'Sujet';
@@ -2840,9 +2862,9 @@
     };
   }
 
-  // ────────────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════
   // ÉVÉNEMENTS
-  // ────────────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════
   $('backConfigButton').addEventListener('click', () => showView('configView'));
   $('previousButton').addEventListener('click', goPrevious);
   $('nextButton').addEventListener('click', goNext);
@@ -2862,6 +2884,7 @@
     state.selectedSubject = null;
     state.submitting = false;
     state.lastResult = null;
+    state.notebookContext = null;
     showView('configView');
   });
 
@@ -2881,9 +2904,9 @@
     }
   });
 
-  // ────────────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════
   // AUTH
-  // ────────────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════
   onAuthStateChanged(auth, async (user) => {
     if (!user) {
       window.location.replace('auth-choice.html');
@@ -2894,88 +2917,17 @@
     $('connectionState').textContent = 'Compte connecté';
     $('connectionState').classList.add('online');
 
+    // Pré-remplir avant de vérifier la session
+    prefillFromUrl();
+
     await checkActiveSession();
   });
 
-  // ────────────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════
   // INIT
-  // ────────────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════
   initSelects();
-
-    // ═══════════════════════════════════════════════════════════════
-// PRÉ-REMPLISSAGE DEPUIS URL (venant du cahier)
-// ═══════════════════════════════════════════════════════════════
-(function prefillFromUrl() {
-  try {
-    const urlParams = new URLSearchParams(window.location.search);
-    const preSubject = urlParams.get('subject');
-    const preChapter = urlParams.get('chapter');
-
-    // Map étendu : matières cahier → matières exam
-    const SUBJECT_MAP = {
-      'Mathématiques': 'Mathématiques',
-      'Physique': 'Physique',
-      'Chimie': 'Chimie',
-      'SVT': 'SVT',
-      'Français': 'Français',
-      'Philosophie': 'Philosophie',
-      'Histoire-Géographie': 'Histoire-Géographie',
-      'Anglais': 'Anglais'
-    };
-
-    if (preSubject && SUBJECT_MAP[preSubject]) {
-      const mapped = SUBJECT_MAP[preSubject];
-      // Vérifie que la matière est bien dans la liste des options
-      const optionExists = Array.from(document.querySelectorAll('#subjectSelect .custom-select-option'))
-        .some((o) => o.dataset.value === mapped);
-
-      if (optionExists) {
-        selects.subject.select(mapped, true);
-        if (typeof updateChapters === 'function') updateChapters();
-      }
-    }
-
-    // Détection floue du chapitre
-    if (preChapter && preSubject) {
-      setTimeout(() => {
-        const chapterOptions = Array.from(
-          document.querySelectorAll('#chapterOptions .custom-select-option')
-        );
-
-        // Normalisation pour comparaison
-        const normalize = (s) => String(s || '')
-          .toLowerCase()
-          .normalize('NFD')
-          .replace(/[\u0300-\u036f]/g, '')
-          .replace(/[^a-z0-9]/g, '');
-
-        const target = normalize(preChapter);
-
-        // 1) Match exact
-        let match = chapterOptions.find((o) => normalize(o.dataset.value) === target);
-
-        // 2) Match par inclusion
-        if (!match) {
-          match = chapterOptions.find((o) => {
-            const v = normalize(o.dataset.value);
-            return v && (v.includes(target) || target.includes(v)) && target.length > 3;
-          });
-        }
-
-        if (match && match.dataset.value !== 'all') {
-          selects.chapter.select(match.dataset.value, true);
-          console.log('[EXAM] Chapitre pré-sélectionné :', match.dataset.value);
-        } else {
-          console.log('[EXAM] Pas de correspondance de chapitre, laissé sur "Tous"');
-        }
-      }, 150);
-    }
-  } catch (e) {
-    console.warn('[EXAM] Prefill error:', e.message);
-  }
-})();
-    
-  console.log('🚀 ARVEXA — Mode examen (design unifié)');
+  console.log('🚀 ARVEXA — Mode examen v2.0 (avec contexte cahier)');
   </script>
 </body>
 </html>

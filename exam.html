@@ -2901,6 +2901,80 @@
   // INIT
   // ────────────────────────────────────────────────────────────────
   initSelects();
+
+    // ═══════════════════════════════════════════════════════════════
+// PRÉ-REMPLISSAGE DEPUIS URL (venant du cahier)
+// ═══════════════════════════════════════════════════════════════
+(function prefillFromUrl() {
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const preSubject = urlParams.get('subject');
+    const preChapter = urlParams.get('chapter');
+
+    // Map étendu : matières cahier → matières exam
+    const SUBJECT_MAP = {
+      'Mathématiques': 'Mathématiques',
+      'Physique': 'Physique',
+      'Chimie': 'Chimie',
+      'SVT': 'SVT',
+      'Français': 'Français',
+      'Philosophie': 'Philosophie',
+      'Histoire-Géographie': 'Histoire-Géographie',
+      'Anglais': 'Anglais'
+    };
+
+    if (preSubject && SUBJECT_MAP[preSubject]) {
+      const mapped = SUBJECT_MAP[preSubject];
+      // Vérifie que la matière est bien dans la liste des options
+      const optionExists = Array.from(document.querySelectorAll('#subjectSelect .custom-select-option'))
+        .some((o) => o.dataset.value === mapped);
+
+      if (optionExists) {
+        selects.subject.select(mapped, true);
+        if (typeof updateChapters === 'function') updateChapters();
+      }
+    }
+
+    // Détection floue du chapitre
+    if (preChapter && preSubject) {
+      setTimeout(() => {
+        const chapterOptions = Array.from(
+          document.querySelectorAll('#chapterOptions .custom-select-option')
+        );
+
+        // Normalisation pour comparaison
+        const normalize = (s) => String(s || '')
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/[^a-z0-9]/g, '');
+
+        const target = normalize(preChapter);
+
+        // 1) Match exact
+        let match = chapterOptions.find((o) => normalize(o.dataset.value) === target);
+
+        // 2) Match par inclusion
+        if (!match) {
+          match = chapterOptions.find((o) => {
+            const v = normalize(o.dataset.value);
+            return v && (v.includes(target) || target.includes(v)) && target.length > 3;
+          });
+        }
+
+        if (match && match.dataset.value !== 'all') {
+          selects.chapter.select(match.dataset.value, true);
+          console.log('[EXAM] Chapitre pré-sélectionné :', match.dataset.value);
+        } else {
+          console.log('[EXAM] Pas de correspondance de chapitre, laissé sur "Tous"');
+        }
+      }, 150);
+    }
+  } catch (e) {
+    console.warn('[EXAM] Prefill error:', e.message);
+  }
+})();
+    
   console.log('🚀 ARVEXA — Mode examen (design unifié)');
   </script>
 </body>

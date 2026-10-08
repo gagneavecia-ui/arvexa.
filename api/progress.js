@@ -1,6 +1,6 @@
 // ================================================================
-// API PROGRESS v6.0 — ARVEXA School
-// Cahier intelligent multi-profils + fan-out IA + vision
+// API PROGRESS v8.0 — ARVEXA School
+// Cahier intelligent multi-profils (sans images, sans Vrai/Faux)
 // 6 profils : scientifique / svt / philosophie / histoire-geo /
 //             francais / langue
 // ================================================================
@@ -11,34 +11,26 @@ const WINDOW_MS = 60 * 1000;
 const MAX_REQUESTS_PER_WINDOW = 60;
 const requestLog = new Map();
 
-// ────────────────────────────────────────────────────────────────
-// CONFIG GLOBALE
-// ────────────────────────────────────────────────────────────────
 const ALLOWED_SUBJECTS = new Set([
   'mathematiques', 'physique', 'chimie', 'svt',
   'philosophie', 'histoire-geo', 'francais', 'anglais'
 ]);
 
 const SUBJECT_INFO = {
-  mathematiques: { label: 'Mathématiques',  profile: 'scientific' },
-  physique:      { label: 'Physique',       profile: 'scientific' },
-  chimie:        { label: 'Chimie',         profile: 'scientific' },
-  svt:           { label: 'SVT',            profile: 'svt' },
-  philosophie:   { label: 'Philosophie',    profile: 'philosophy' },
-  'histoire-geo':{ label: 'Histoire-Géo',   profile: 'history' },
-  francais:      { label: 'Français',       profile: 'french' },
-  anglais:       { label: 'Anglais',        profile: 'language' }
+  mathematiques: { label: 'Mathématiques', profile: 'scientific' },
+  physique:      { label: 'Physique',      profile: 'scientific' },
+  chimie:        { label: 'Chimie',        profile: 'scientific' },
+  svt:           { label: 'SVT',           profile: 'svt' },
+  philosophie:   { label: 'Philosophie',   profile: 'philosophy' },
+  'histoire-geo':{ label: 'Histoire-Géo',  profile: 'history' },
+  francais:      { label: 'Français',      profile: 'french' },
+  anglais:       { label: 'Anglais',       profile: 'language' }
 };
 
 const MIN_CONTENT_LENGTH = 40;
 const MAX_CONTENT_LENGTH = 15000;
 
-const FREE_SECTION_LIMIT = 5;      // 5 sections/mois pour les gratuits
-const FREE_MAX_IMAGES = 3;         // 3 images max par section en gratuit
-const PREMIUM_MAX_IMAGES = 10;     // 10 images max par section en premium
-
-const MAX_IMAGE_SIZE_BASE64 = 700 * 1024;      // ~700 Ko base64 par image
-const MAX_TOTAL_IMAGES_SIZE = 6 * 1024 * 1024; // 6 Mo total par section
+const FREE_SECTION_LIMIT = 5;
 
 let adminServices = null;
 
@@ -207,15 +199,14 @@ function normalizeMathInput(text) {
 // ────────────────────────────────────────────────────────────────
 // IA — FOURNISSEURS
 // ────────────────────────────────────────────────────────────────
-function getTextProviders() {
+function getProviders() {
   return [
     {
       name: 'Groq',
       key: process.env.GROQ_API_KEY,
       endpoint: 'https://api.groq.com/openai/v1/chat/completions',
       model: process.env.GROQ_MODEL || 'openai/gpt-oss-120b',
-      jsonMode: true,
-      vision: false
+      jsonMode: true
     },
     {
       name: 'OpenRouter',
@@ -223,7 +214,6 @@ function getTextProviders() {
       endpoint: 'https://openrouter.ai/api/v1/chat/completions',
       model: process.env.OPENROUTER_MODEL || 'openai/gpt-oss-120b',
       jsonMode: true,
-      vision: true,
       headers: {
         'HTTP-Referer': process.env.APP_ORIGIN || '',
         'X-Title': 'ARVEXA Notebook'
@@ -234,49 +224,27 @@ function getTextProviders() {
       key: process.env.MISTRAL_API_KEY,
       endpoint: 'https://api.mistral.ai/v1/chat/completions',
       model: process.env.MISTRAL_MODEL || 'mistral-large-latest',
-      jsonMode: false,
-      vision: false
+      jsonMode: false
     }
   ].filter((p) => Boolean(p.key));
 }
 
-function getVisionProviders() {
-  return getTextProviders().filter((p) => p.vision);
-}
-
-// Appel générique — supporte texte ET images
-async function callProvider(provider, { systemPrompt, userPrompt, images = [], maxTokens = 4000 }) {
+async function callProvider(provider, { systemPrompt, userPrompt, maxTokens = 4000 }) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 60000);
 
   try {
-    // Construction du contenu (texte + images)
-    let content;
-    if (images && images.length > 0 && provider.vision) {
-      content = [{ type: 'text', text: userPrompt }];
-      for (const img of images) {
-        content.push({
-          type: 'image_url',
-          image_url: { url: img.dataUrl }
-        });
-      }
-    } else {
-      content = userPrompt;
-    }
-
     const body = {
       model: provider.model,
       temperature: 0.3,
       max_tokens: maxTokens,
       messages: [
         { role: 'system', content: systemPrompt },
-        { role: 'user', content }
+        { role: 'user', content: userPrompt }
       ]
     };
 
-    if (provider.jsonMode && !images.length) {
-      body.response_format = { type: 'json_object' };
-    }
+    if (provider.jsonMode) body.response_format = { type: 'json_object' };
 
     const result = await fetch(provider.endpoint, {
       method: 'POST',
@@ -298,12 +266,10 @@ async function callProvider(provider, { systemPrompt, userPrompt, images = [], m
     const rawContent = data?.choices?.[0]?.message?.content;
     if (!rawContent) throw new Error(`${provider.name}: réponse vide`);
 
-    // Si JSON mode attendu, on parse ; sinon on renvoie brut
     const cleaned = String(rawContent).replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
     try {
       return JSON.parse(cleaned);
     } catch (e) {
-      // Pas de JSON valide → on renvoie { raw: texte }
       return { raw: cleaned };
     }
   } finally {
@@ -311,7 +277,6 @@ async function callProvider(provider, { systemPrompt, userPrompt, images = [], m
   }
 }
 
-// Distribution round-robin des tâches
 function distributeTasks(tasks, providers) {
   return tasks.map((task, i) => ({
     ...task,
@@ -319,17 +284,15 @@ function distributeTasks(tasks, providers) {
   }));
 }
 
-// Exécution parallèle avec fallback
 async function runParallelTasks(tasks, providers) {
   const assignments = distributeTasks(tasks, providers);
 
   const results = await Promise.allSettled(
-    assignments.map(({ provider, systemPrompt, userPrompt, images, maxTokens }) =>
-      callProvider(provider, { systemPrompt, userPrompt, images, maxTokens })
+    assignments.map(({ provider, systemPrompt, userPrompt, maxTokens }) =>
+      callProvider(provider, { systemPrompt, userPrompt, maxTokens })
     )
   );
 
-  // Fallback pour les tâches échouées
   const fallbackedResults = await Promise.all(
     results.map(async (r, i) => {
       if (r.status === 'fulfilled') {
@@ -338,14 +301,12 @@ async function runParallelTasks(tasks, providers) {
 
       console.warn(`[FAN-OUT] Tâche "${tasks[i].name}" échouée sur ${assignments[i].provider.name}, fallback...`);
 
-      // Essaie les autres fournisseurs
       for (const provider of providers) {
         if (provider.name === assignments[i].provider.name) continue;
         try {
           const value = await callProvider(provider, {
             systemPrompt: tasks[i].systemPrompt,
             userPrompt: tasks[i].userPrompt,
-            images: tasks[i].images,
             maxTokens: tasks[i].maxTokens
           });
           return { status: 'fulfilled', value, task: tasks[i], provider: provider.name };
@@ -361,7 +322,7 @@ async function runParallelTasks(tasks, providers) {
 }
 
 // ────────────────────────────────────────────────────────────────
-// FUSION FINALE
+// FUSION
 // ────────────────────────────────────────────────────────────────
 function mergeAnalysis(results, profile) {
   const merged = {
@@ -370,9 +331,7 @@ function mergeAnalysis(results, profile) {
     explanation: null,
     structure: null,
     questions: [],
-    qcm: [],
-    trueFalse: [],
-    imagesAnalysis: []
+    qcm: []
   };
 
   for (const r of results) {
@@ -395,12 +354,8 @@ function mergeAnalysis(results, profile) {
       case 'questions':
         merged.questions = data.questions || [];
         break;
-      case 'qcm_tf':
+      case 'qcm':
         merged.qcm = data.qcm || [];
-        merged.trueFalse = data.trueFalse || [];
-        break;
-      case 'images':
-        merged.imagesAnalysis = data.imagesAnalysis || [];
         break;
     }
   }
@@ -409,7 +364,7 @@ function mergeAnalysis(results, profile) {
 }
 
 // ────────────────────────────────────────────────────────────────
-// RÈGLES COMMUNES À TOUS LES PROMPTS
+// RÈGLES COMMUNES
 // ────────────────────────────────────────────────────────────────
 const LATEX_RULES = `
 RÈGLE LATEX — OBLIGATOIRE :
@@ -421,42 +376,35 @@ RÈGLE LATEX — OBLIGATOIRE :
 `.trim();
 
 const PERIMETER_RULES = `
-RÈGLE DE PÉRIMÈTRE STRICT (TRÈS IMPORTANTE) :
+RÈGLE DE PÉRIMÈTRE STRICT :
 - Tu travailles UNIQUEMENT sur la section fournie par l'élève.
-- INTERDICTION de mentionner, expliquer ou poser des questions sur des notions
+- INTERDICTION de mentionner ou poser des questions sur des notions
   qui ne sont PAS dans la section fournie.
 - INTERDICTION d'anticiper les autres parties du chapitre.
-- INTERDICTION d'utiliser une connaissance externe au texte fourni (sauf pour
-  la reformulation et la pédagogie).
-- Si tu identifies un lien avec une notion absente, ignore-le.
+- INTERDICTION d'utiliser une connaissance externe au texte fourni
+  (sauf pour la reformulation et la pédagogie).
 `.trim();
 
-// ────────────────────────────────────────────────────────────────
-// PROMPTS PAR PROFIL
-// ────────────────────────────────────────────────────────────────
-
-// ═══ PROFIL 1 : SCIENTIFIQUE (Maths, Physique, Chimie) ═══
-function buildScientificPrompts({ subjectLabel, rawInput, images }) {
-  const baseContext = `
+// ═══════════════════════════════════════════════════════════════
+// PROFIL 1 — SCIENTIFIQUE
+// ═══════════════════════════════════════════════════════════════
+function buildScientificPrompts({ subjectLabel, rawInput }) {
+  const ctx = `
 Matière : ${subjectLabel}
 ═══════════════════════════════════════════════════════════════
 CONTENU DE LA SECTION FOURNIE PAR L'ÉLÈVE
 ═══════════════════════════════════════════════════════════════
 ${rawInput}
 ═══════════════════════════════════════════════════════════════
-${images.length > 0 ? `IMAGES FOURNIES : ${images.length} image(s) à analyser.` : ''}
 `.trim();
 
   return [
-    // Tâche 1 — Extraction des concepts
     {
-      name: 'extraction',
-      maxTokens: 1500,
-      images: [],
+      name: 'extraction', maxTokens: 1500,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Analyse cette section de cours scientifique.
 
-${baseContext}
+${ctx}
 
 ${PERIMETER_RULES}
 
@@ -464,26 +412,21 @@ Extrait UNIQUEMENT les concepts présents dans cette section.
 
 Format JSON :
 {
-  "sectionTitle": "Titre court de la section (max 60 caractères)",
+  "sectionTitle": "Titre court (max 60 caractères)",
   "mainConcepts": ["concept 1", "concept 2"],
-  "formulas": ["formule 1", "formule 2"],
+  "formulas": ["formule 1"],
   "variables": [{"symbol": "x", "meaning": "signification", "unit": "unité si présente"}],
-  "definitions": [{"term": "terme", "definition": "définition du cours"}],
-  "methods": ["méthode 1", "méthode 2"]
+  "definitions": [{"term": "terme", "definition": "définition du cours"}]
 }
 
 Réponds UNIQUEMENT avec le JSON.`
     },
-
-    // Tâche 2 — Explication pédagogique
     {
-      name: 'explanation',
-      maxTokens: 4000,
-      images: images.slice(0, 3),
+      name: 'explanation', maxTokens: 4000,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Tu es professeur expert du BAC. Explique cette section comme à un élève qui découvre.
 
-${baseContext}
+${ctx}
 
 ${PERIMETER_RULES}
 ${LATEX_RULES}
@@ -491,17 +434,8 @@ ${LATEX_RULES}
 RÈGLE D'EXPLICATION :
 - Chaque idée doit être EXPLIQUÉE en français simple.
 - Pas de jargon non expliqué.
-- Utilise des phrases complètes, pas des listes télégraphiques.
-- Nombre de parties = nombre d'idées distinctes dans la section.
-- Ne force PAS un nombre fixe de parties : adapte-toi au contenu.
-
-${images.length > 0 ? `
-RÈGLE IMAGES :
-- Analyse les images fournies.
-- Décris ce qu'elles montrent.
-- Relie-les au texte.
-- Explique les schémas, montages ou courbes.
-` : ''}
+- Phrases complètes, pas des listes télégraphiques.
+- Nombre de parties adapté au contenu (pas de quota).
 
 Format JSON :
 {
@@ -514,7 +448,7 @@ Format JSON :
       "simpleExplanation": "Explication en français simple (3-6 phrases).",
       "keyTerms": [{"term": "...", "meaning": "..."}],
       "relations": ["Relation avec d'autres éléments du cours"],
-      "example": "Exemple chiffré complet du cours ou cohérent avec le cours",
+      "example": "Exemple chiffré cohérent avec le cours",
       "toRemember": "Ce qu'il faut absolument retenir"
     }
   ]
@@ -522,22 +456,17 @@ Format JSON :
 
 Réponds UNIQUEMENT avec le JSON.`
     },
-
-    // Tâche 3 — Structure (formules + méthode + exemples)
     {
-      name: 'structure',
-      maxTokens: 3500,
-      images: [],
+      name: 'structure', maxTokens: 3500,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Extrait la structure scientifique de cette section.
 
-${baseContext}
+${ctx}
 
 ${PERIMETER_RULES}
 ${LATEX_RULES}
 
-Ne mets QUE ce qui est présent dans la section. Si la section ne contient pas de formule,
-laisse le tableau vide. Si elle ne contient pas d'exercice, laisse le tableau vide.
+Ne mets QUE ce qui est présent. Si pas de formule → tableau vide. Si pas d'exemple → tableau vide.
 
 Format JSON :
 {
@@ -546,7 +475,7 @@ Format JSON :
       "latex": "$z = a + bi$",
       "description": "Description simple",
       "variables": [{"symbol": "a", "meaning": "partie réelle"}],
-      "condition": "condition d'application si présente"
+      "condition": "condition si présente"
     }
   ],
   "method": {
@@ -567,28 +496,21 @@ Format JSON :
 
 Réponds UNIQUEMENT avec le JSON.`
     },
-
-    // Tâche 4 — Questions
     {
-      name: 'questions',
-      maxTokens: 4000,
-      images: [],
+      name: 'questions', maxTokens: 4000,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Génère une banque de questions basée UNIQUEMENT sur cette section.
 
-${baseContext}
+${ctx}
 
 ${PERIMETER_RULES}
 ${LATEX_RULES}
 
 RÈGLE DE QUANTITÉ ADAPTATIVE :
 - Analyse la richesse de la section.
-- Nombre de questions ≈ 2 à 3 par notion importante identifiée.
-- Ne force PAS un quota.
-- Si la section est petite → peu de questions (5-8).
-- Si la section est riche → beaucoup (15-25).
-- Chaque question doit porter sur un élément RÉEL de la section.
-- Pas de questions redondantes.
+- ~2 à 3 questions par notion importante identifiée.
+- Ne force PAS de quota.
+- Chaque question porte sur un élément RÉEL de la section.
 
 Format JSON :
 {
@@ -599,7 +521,7 @@ Format JSON :
       "type": "definition" | "calcul" | "application" | "comprehension" | "analyse",
       "question": "...",
       "answer": "...",
-      "mustHave": ["élément indispensable 1", "élément 2"],
+      "mustHave": ["élément indispensable 1"],
       "importance": 1 | 2 | 3
     }
   ]
@@ -607,21 +529,17 @@ Format JSON :
 
 Réponds UNIQUEMENT avec le JSON.`
     },
-
-    // Tâche 5 — QCM + Vrai/Faux
     {
-      name: 'qcm_tf',
-      maxTokens: 3000,
-      images: [],
+      name: 'qcm', maxTokens: 3000,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
-      userPrompt: `Génère des QCM et Vrai/Faux UNIQUEMENT sur cette section.
+      userPrompt: `Génère des QCM UNIQUEMENT sur cette section.
 
-${baseContext}
+${ctx}
 
 ${PERIMETER_RULES}
 ${LATEX_RULES}
 
-Nombre adaptatif : environ 1 QCM par notion importante.
+Nombre adaptatif : ~1 QCM par notion importante.
 
 Format JSON :
 {
@@ -637,13 +555,6 @@ Format JSON :
       "correct": "A",
       "explanation": "..."
     }
-  ],
-  "trueFalse": [
-    {
-      "statement": "...",
-      "answer": true,
-      "justification": "..."
-    }
   ]
 }
 
@@ -652,9 +563,11 @@ Réponds UNIQUEMENT avec le JSON.`
   ];
 }
 
-// ═══ PROFIL 2 : SVT ═══
-function buildSvtPrompts({ subjectLabel, rawInput, images }) {
-  const baseContext = `
+// ═══════════════════════════════════════════════════════════════
+// PROFIL 2 — SVT
+// ═══════════════════════════════════════════════════════════════
+function buildSvtPrompts({ subjectLabel, rawInput }) {
+  const ctx = `
 Matière : ${subjectLabel}
 ═══════════════════════════════════════════════════════════════
 CONTENU DE LA SECTION FOURNIE PAR L'ÉLÈVE
@@ -665,23 +578,15 @@ ${rawInput}
 
   return [
     {
-      name: 'extraction',
-      maxTokens: 1500,
-      images: [],
+      name: 'extraction', maxTokens: 1500,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Analyse cette section de SVT.
 
-${baseContext}
+${ctx}
 
 ${PERIMETER_RULES}
 
-RÈGLE SVT : Ce n'est PAS une matière de formules. Priorise :
-- les mécanismes biologiques,
-- les relations entre organes / structures,
-- les étapes,
-- les définitions biologiques.
-
-Si la section ne contient pas de formule, N'INVENTE PAS de formule.
+RÈGLE SVT : pas de formules. Priorise mécanismes, relations, étapes, définitions.
 
 Format JSON :
 {
@@ -694,13 +599,11 @@ Format JSON :
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'explanation',
-      maxTokens: 4500,
-      images: images.slice(0, 3),
+      name: 'explanation', maxTokens: 4500,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Tu es professeur de SVT. Explique cette section comme à un élève qui découvre.
 
-${baseContext}
+${ctx}
 
 ${PERIMETER_RULES}
 
@@ -708,16 +611,7 @@ RÈGLES SVT :
 - Explication EN FRANÇAIS simple.
 - Décris chaque MÉCANISME étape par étape.
 - Explique les RELATIONS (organe A → organe B, cause → conséquence).
-- Utilise des termes biologiques précis MAIS explique-les.
-- Pas de formules inventées.
-- Pas de calculs inutiles.
-
-${images.length > 0 ? `
-RÈGLE IMAGES :
-- Analyse les schémas d'organes, cycles, coupes, expériences.
-- Décris ce que l'image montre.
-- Explique le lien avec le texte.
-` : ''}
+- Pas de formules inventées, pas de calculs inutiles.
 
 Format JSON :
 {
@@ -733,7 +627,7 @@ Format JSON :
         "description": "Description du mécanisme",
         "steps": ["Étape 1", "Étape 2"]
       },
-      "relations": ["relation 1", "relation 2"],
+      "relations": ["relation 1"],
       "toRemember": "..."
     }
   ]
@@ -742,17 +636,13 @@ Format JSON :
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'structure',
-      maxTokens: 3000,
-      images: [],
+      name: 'structure', maxTokens: 3000,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Structure cette section de SVT.
 
-${baseContext}
+${ctx}
 
 ${PERIMETER_RULES}
-
-N'invente JAMAIS de formule. Si la section ne contient pas de formule → tableau vide.
 
 Format JSON :
 {
@@ -771,19 +661,15 @@ Format JSON :
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'questions',
-      maxTokens: 4000,
-      images: [],
+      name: 'questions', maxTokens: 4000,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
-      userPrompt: `Génère une banque de questions de SVT sur cette section UNIQUEMENT.
+      userPrompt: `Banque de questions de SVT sur cette section UNIQUEMENT.
 
-${baseContext}
+${ctx}
 
 ${PERIMETER_RULES}
 
 Quantité adaptative : ~2 à 3 questions par notion importante.
-
-Types : définition, compréhension, mécanisme, relation, comparaison, analyse.
 
 Format JSON :
 {
@@ -791,7 +677,7 @@ Format JSON :
     {
       "id": "q1",
       "level": 1,
-      "type": "definition",
+      "type": "definition" | "comprehension" | "mecanisme" | "relation" | "analyse",
       "question": "...",
       "answer": "...",
       "mustHave": ["..."],
@@ -803,20 +689,24 @@ Format JSON :
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'qcm_tf',
-      maxTokens: 3000,
-      images: [],
+      name: 'qcm', maxTokens: 3000,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
-      userPrompt: `QCM et Vrai/Faux de SVT sur cette section UNIQUEMENT.
+      userPrompt: `QCM de SVT sur cette section UNIQUEMENT.
 
-${baseContext}
+${ctx}
 
 ${PERIMETER_RULES}
 
 Format JSON :
 {
-  "qcm": [{"question": "...", "options": [{"id":"A","text":"..."},{"id":"B","text":"..."},{"id":"C","text":"..."},{"id":"D","text":"..."}], "correct": "A", "explanation": "..."}],
-  "trueFalse": [{"statement": "...", "answer": true, "justification": "..."}]
+  "qcm": [
+    {
+      "question": "...",
+      "options": [{"id":"A","text":"..."},{"id":"B","text":"..."},{"id":"C","text":"..."},{"id":"D","text":"..."}],
+      "correct": "A",
+      "explanation": "..."
+    }
+  ]
 }
 
 Réponds UNIQUEMENT avec le JSON.`
@@ -824,9 +714,11 @@ Réponds UNIQUEMENT avec le JSON.`
   ];
 }
 
-// ═══ PROFIL 3 : PHILOSOPHIE ═══
-function buildPhilosophyPrompts({ subjectLabel, rawInput, images }) {
-  const baseContext = `
+// ═══════════════════════════════════════════════════════════════
+// PROFIL 3 — PHILOSOPHIE
+// ═══════════════════════════════════════════════════════════════
+function buildPhilosophyPrompts({ subjectLabel, rawInput }) {
+  const ctx = `
 Matière : ${subjectLabel}
 ═══════════════════════════════════════════════════════════════
 CONTENU DE LA SECTION FOURNIE PAR L'ÉLÈVE
@@ -837,21 +729,13 @@ ${rawInput}
 
   return [
     {
-      name: 'extraction',
-      maxTokens: 1500,
-      images: [],
+      name: 'extraction', maxTokens: 1500,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Analyse cette section de philosophie.
 
-${baseContext}
+${ctx}
 
 ${PERIMETER_RULES}
-
-RÈGLE PHILO : ce n'est PAS une matière de formules. Priorise :
-- les concepts philosophiques,
-- les thèses,
-- les arguments,
-- les objections.
 
 Format JSON :
 {
@@ -866,29 +750,25 @@ Format JSON :
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'explanation',
-      maxTokens: 5000,
-      images: images.slice(0, 3),
+      name: 'explanation', maxTokens: 5000,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Tu es professeur de philosophie. Explique cette section COMME SI L'ÉLÈVE N'Y CONNAISSAIT RIEN.
 
-${baseContext}
+${ctx}
 
 ${PERIMETER_RULES}
 
-RÈGLES PHILO (explication maximale) :
+RÈGLES PHILO :
 - VULGARISE chaque concept philosophique.
 - Décompose chaque argument.
-- Donne des exemples de la vie quotidienne pour illustrer.
+- Donne des exemples de la vie quotidienne.
 - Situe l'auteur dans son contexte SI présent dans le cours.
-- Utilise des phrases simples, pas de jargon non expliqué.
 - Ne résume PAS : explique en profondeur.
-- Nombre de parties adapté à la richesse.
 
 Format JSON :
 {
   "sectionTitle": "...",
-  "understanding": "Ce que tu dois comprendre en 2-3 phrases simples.",
+  "understanding": "Ce que tu dois comprendre en 2-3 phrases.",
   "parts": [
     {
       "partTitle": "...",
@@ -896,7 +776,7 @@ Format JSON :
       "simpleExplanation": "Explication longue et claire (5-10 phrases).",
       "keyTerms": [{"term": "...", "meaning": "..."}],
       "arguments": ["Argument 1", "Argument 2"],
-      "everydayExamples": ["Exemple du quotidien 1", "Exemple 2"],
+      "everydayExamples": ["Exemple du quotidien 1"],
       "toRemember": "..."
     }
   ]
@@ -905,13 +785,11 @@ Format JSON :
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'structure',
-      maxTokens: 3000,
-      images: [],
+      name: 'structure', maxTokens: 3000,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Structure cette section de philosophie.
 
-${baseContext}
+${ctx}
 
 ${PERIMETER_RULES}
 
@@ -925,19 +803,15 @@ Format JSON :
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'questions',
-      maxTokens: 4000,
-      images: [],
+      name: 'questions', maxTokens: 4000,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
-      userPrompt: `Génère des questions de philosophie sur cette section UNIQUEMENT.
+      userPrompt: `Questions de philosophie sur cette section UNIQUEMENT.
 
-${baseContext}
+${ctx}
 
 ${PERIMETER_RULES}
 
-Types : définition, compréhension, explication, comparaison, argumentation.
-
-Chaque réponse doit être UNE PHRASE complète (pas un mot).
+Chaque réponse doit être UNE PHRASE complète.
 
 Format JSON :
 {
@@ -945,7 +819,7 @@ Format JSON :
     {
       "id": "q1",
       "level": 1,
-      "type": "definition",
+      "type": "definition" | "comprehension" | "explication" | "comparaison" | "argumentation",
       "question": "...",
       "answer": "Une phrase complète.",
       "mustHave": ["..."],
@@ -957,20 +831,24 @@ Format JSON :
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'qcm_tf',
-      maxTokens: 2500,
-      images: [],
+      name: 'qcm', maxTokens: 2500,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
-      userPrompt: `QCM et Vrai/Faux de philosophie sur cette section.
+      userPrompt: `QCM de philosophie sur cette section.
 
-${baseContext}
+${ctx}
 
 ${PERIMETER_RULES}
 
 Format JSON :
 {
-  "qcm": [{"question": "...", "options": [{"id":"A","text":"..."},{"id":"B","text":"..."},{"id":"C","text":"..."},{"id":"D","text":"..."}], "correct": "A", "explanation": "..."}],
-  "trueFalse": [{"statement": "...", "answer": true, "justification": "..."}]
+  "qcm": [
+    {
+      "question": "...",
+      "options": [{"id":"A","text":"..."},{"id":"B","text":"..."},{"id":"C","text":"..."},{"id":"D","text":"..."}],
+      "correct": "A",
+      "explanation": "..."
+    }
+  ]
 }
 
 Réponds UNIQUEMENT avec le JSON.`
@@ -978,9 +856,11 @@ Réponds UNIQUEMENT avec le JSON.`
   ];
 }
 
-// ═══ PROFIL 4 : HISTOIRE-GÉO ═══
-function buildHistoryPrompts({ subjectLabel, rawInput, images }) {
-  const baseContext = `
+// ═══════════════════════════════════════════════════════════════
+// PROFIL 4 — HISTOIRE-GÉO
+// ═══════════════════════════════════════════════════════════════
+function buildHistoryPrompts({ subjectLabel, rawInput }) {
+  const ctx = `
 Matière : ${subjectLabel}
 ═══════════════════════════════════════════════════════════════
 CONTENU DE LA SECTION FOURNIE PAR L'ÉLÈVE
@@ -991,23 +871,15 @@ ${rawInput}
 
   return [
     {
-      name: 'extraction',
-      maxTokens: 1800,
-      images: [],
+      name: 'extraction', maxTokens: 1800,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Analyse cette section d'histoire-géographie.
 
-${baseContext}
+${ctx}
 
 ${PERIMETER_RULES}
 
-Extrait UNIQUEMENT les FAITS présents :
-- Dates
-- Lieux
-- Personnages
-- Événements
-- Causes
-- Conséquences
+Extrait UNIQUEMENT les FAITS.
 
 Format JSON :
 {
@@ -1023,25 +895,15 @@ Format JSON :
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'explanation',
-      maxTokens: 2500,
-      images: images.slice(0, 3),
+      name: 'explanation', maxTokens: 2500,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Présente cette section d'histoire-géo de manière CLAIRE et CONCISE.
 
-${baseContext}
+${ctx}
 
 ${PERIMETER_RULES}
 
-RÈGLE HIST-GÉO : résumé bref (5-10 phrases max) + accent sur les faits.
-PAS d'explication longue comme en philo.
-
-${images.length > 0 ? `
-RÈGLE IMAGES :
-- Si carte : décris-la, localise, explique les enjeux.
-- Si frise : relève les dates.
-- Si tableau : décris-le.
-` : ''}
+RÈGLE : résumé bref (5-10 phrases max) + accent sur les faits.
 
 Format JSON :
 {
@@ -1054,13 +916,11 @@ Format JSON :
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'structure',
-      maxTokens: 2500,
-      images: [],
+      name: 'structure', maxTokens: 2500,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Structure cette section d'histoire-géo.
 
-${baseContext}
+${ctx}
 
 ${PERIMETER_RULES}
 
@@ -1075,23 +935,18 @@ Format JSON :
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'questions',
-      maxTokens: 4500,
-      images: [],
+      name: 'questions', maxTokens: 4500,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
-      userPrompt: `Génère une BANQUE MASSIVE de questions d'histoire-géo sur cette section.
+      userPrompt: `BANQUE MASSIVE de questions d'histoire-géo sur cette section.
 
-${baseContext}
+${ctx}
 
 ${PERIMETER_RULES}
 
-RÈGLE HIST-GÉO : génère le MAX de questions possibles basées sur les faits.
+RÈGLE HIST-GÉO : génère le MAX de questions sur les faits.
 - 3 à 4 questions par fait important.
 - Toutes les dates → au moins 1 question.
 - Tous les personnages → au moins 1 question.
-- Toutes les causes/conséquences → au moins 1 question.
-
-Objectif : l'élève peut se tester sur CHAQUE fait de la section.
 
 Format JSON :
 {
@@ -1111,20 +966,24 @@ Format JSON :
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'qcm_tf',
-      maxTokens: 3500,
-      images: [],
+      name: 'qcm', maxTokens: 3500,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
-      userPrompt: `QCM et Vrai/Faux d'histoire-géo sur cette section.
+      userPrompt: `QCM d'histoire-géo sur cette section.
 
-${baseContext}
+${ctx}
 
 ${PERIMETER_RULES}
 
 Format JSON :
 {
-  "qcm": [{"question": "...", "options": [{"id":"A","text":"..."},{"id":"B","text":"..."},{"id":"C","text":"..."},{"id":"D","text":"..."}], "correct": "A", "explanation": "..."}],
-  "trueFalse": [{"statement": "...", "answer": true, "justification": "..."}]
+  "qcm": [
+    {
+      "question": "...",
+      "options": [{"id":"A","text":"..."},{"id":"B","text":"..."},{"id":"C","text":"..."},{"id":"D","text":"..."}],
+      "correct": "A",
+      "explanation": "..."
+    }
+  ]
 }
 
 Réponds UNIQUEMENT avec le JSON.`
@@ -1132,9 +991,11 @@ Réponds UNIQUEMENT avec le JSON.`
   ];
 }
 
-// ═══ PROFIL 5 : FRANÇAIS ═══
-function buildFrenchPrompts({ subjectLabel, rawInput, images }) {
-  const baseContext = `
+// ═══════════════════════════════════════════════════════════════
+// PROFIL 5 — FRANÇAIS
+// ═══════════════════════════════════════════════════════════════
+function buildFrenchPrompts({ subjectLabel, rawInput }) {
+  const ctx = `
 Matière : ${subjectLabel}
 ═══════════════════════════════════════════════════════════════
 CONTENU DE LA SECTION FOURNIE PAR L'ÉLÈVE
@@ -1145,13 +1006,11 @@ ${rawInput}
 
   return [
     {
-      name: 'extraction',
-      maxTokens: 1500,
-      images: [],
+      name: 'extraction', maxTokens: 1500,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Analyse cette section de français.
 
-${baseContext}
+${ctx}
 
 ${PERIMETER_RULES}
 
@@ -1168,21 +1027,13 @@ Format JSON :
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'explanation',
-      maxTokens: 4000,
-      images: images.slice(0, 3),
+      name: 'explanation', maxTokens: 4000,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Tu es professeur de français. Explique cette section clairement.
 
-${baseContext}
+${ctx}
 
 ${PERIMETER_RULES}
-
-RÈGLES :
-- Explication des textes / mouvements / procédés littéraires.
-- Vulgarise les figures de style.
-- Explique les termes techniques.
-- Ne résume pas : explique.
 
 Format JSON :
 {
@@ -1202,13 +1053,11 @@ Format JSON :
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'structure',
-      maxTokens: 2500,
-      images: [],
+      name: 'structure', maxTokens: 2500,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Structure cette section de français.
 
-${baseContext}
+${ctx}
 
 ${PERIMETER_RULES}
 
@@ -1222,13 +1071,11 @@ Format JSON :
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'questions',
-      maxTokens: 3500,
-      images: [],
+      name: 'questions', maxTokens: 3500,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
-      userPrompt: `Génère des questions de français sur cette section.
+      userPrompt: `Questions de français sur cette section.
 
-${baseContext}
+${ctx}
 
 ${PERIMETER_RULES}
 
@@ -1250,20 +1097,24 @@ Format JSON :
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'qcm_tf',
-      maxTokens: 2500,
-      images: [],
+      name: 'qcm', maxTokens: 2500,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
-      userPrompt: `QCM et Vrai/Faux de français.
+      userPrompt: `QCM de français.
 
-${baseContext}
+${ctx}
 
 ${PERIMETER_RULES}
 
 Format JSON :
 {
-  "qcm": [{"question": "...", "options": [{"id":"A","text":"..."},{"id":"B","text":"..."},{"id":"C","text":"..."},{"id":"D","text":"..."}], "correct": "A", "explanation": "..."}],
-  "trueFalse": [{"statement": "...", "answer": true, "justification": "..."}]
+  "qcm": [
+    {
+      "question": "...",
+      "options": [{"id":"A","text":"..."},{"id":"B","text":"..."},{"id":"C","text":"..."},{"id":"D","text":"..."}],
+      "correct": "A",
+      "explanation": "..."
+    }
+  ]
 }
 
 Réponds UNIQUEMENT avec le JSON.`
@@ -1271,9 +1122,11 @@ Réponds UNIQUEMENT avec le JSON.`
   ];
 }
 
-// ═══ PROFIL 6 : LANGUE (Anglais) ═══
-function buildLanguagePrompts({ subjectLabel, rawInput, images }) {
-  const baseContext = `
+// ═══════════════════════════════════════════════════════════════
+// PROFIL 6 — LANGUE (Anglais)
+// ═══════════════════════════════════════════════════════════════
+function buildLanguagePrompts({ subjectLabel, rawInput }) {
+  const ctx = `
 Matière : ${subjectLabel}
 ═══════════════════════════════════════════════════════════════
 CONTENU DE LA SECTION FOURNIE PAR L'ÉLÈVE
@@ -1284,17 +1137,13 @@ ${rawInput}
 
   return [
     {
-      name: 'extraction',
-      maxTokens: 1500,
-      images: [],
+      name: 'extraction', maxTokens: 1500,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Analyse cette section d'anglais.
 
-${baseContext}
+${ctx}
 
 ${PERIMETER_RULES}
-
-RÈGLE LANGUE : extraire le vocabulaire, la grammaire, les structures.
 
 Format JSON :
 {
@@ -1308,23 +1157,20 @@ Format JSON :
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'explanation',
-      maxTokens: 4500,
-      images: images.slice(0, 3),
+      name: 'explanation', maxTokens: 4500,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Tu es professeur d'anglais pour des FRANCOPHONES DÉBUTANTS.
 
-${baseContext}
+${ctx}
 
 ${PERIMETER_RULES}
 
-RÈGLES LANGUE (IMPORTANT) :
+RÈGLES LANGUE :
 - EXPLICATIONS TOUJOURS EN FRANÇAIS.
 - EXEMPLES EN ANGLAIS avec TRADUCTION SYSTÉMATIQUE.
 - Grammaire expliquée comme à un débutant.
 - Vocabulaire : chaque mot anglais → traduction → exemple.
-- Signale les pièges pour francophones (faux-amis, structures différentes).
-- Format exemple : "English example. → Traduction française."
+- Signale les pièges pour francophones.
 
 Format JSON :
 {
@@ -1334,7 +1180,7 @@ Format JSON :
     {
       "partTitle": "...",
       "mainIdea": "...",
-      "simpleExplanation": "Explication EN FRANÇAIS (5-10 phrases).",
+      "simpleExplanation": "Explication EN FRANÇAIS.",
       "keyTerms": [{"english": "word", "french": "traduction", "example": "example sentence"}],
       "examples": [{"english": "English sentence.", "french": "Traduction."}],
       "commonMistakes": [{"mistake": "erreur fréquente", "correction": "correction"}],
@@ -1346,13 +1192,11 @@ Format JSON :
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'structure',
-      maxTokens: 3000,
-      images: [],
+      name: 'structure', maxTokens: 3000,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Structure cette section d'anglais.
 
-${baseContext}
+${ctx}
 
 ${PERIMETER_RULES}
 
@@ -1366,13 +1210,11 @@ Format JSON :
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'questions',
-      maxTokens: 3500,
-      images: [],
+      name: 'questions', maxTokens: 3500,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
-      userPrompt: `Génère des questions d'anglais (en français pour la compréhension).
+      userPrompt: `Questions d'anglais (en français pour la compréhension).
 
-${baseContext}
+${ctx}
 
 ${PERIMETER_RULES}
 
@@ -1394,20 +1236,24 @@ Format JSON :
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'qcm_tf',
-      maxTokens: 2500,
-      images: [],
+      name: 'qcm', maxTokens: 2500,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
-      userPrompt: `QCM et Vrai/Faux d'anglais.
+      userPrompt: `QCM d'anglais.
 
-${baseContext}
+${ctx}
 
 ${PERIMETER_RULES}
 
 Format JSON :
 {
-  "qcm": [{"question": "...", "options": [{"id":"A","text":"..."},{"id":"B","text":"..."},{"id":"C","text":"..."},{"id":"D","text":"..."}], "correct": "A", "explanation": "..."}],
-  "trueFalse": [{"statement": "...", "answer": true, "justification": "..."}]
+  "qcm": [
+    {
+      "question": "...",
+      "options": [{"id":"A","text":"..."},{"id":"B","text":"..."},{"id":"C","text":"..."},{"id":"D","text":"..."}],
+      "correct": "A",
+      "explanation": "..."
+    }
+  ]
 }
 
 Réponds UNIQUEMENT avec le JSON.`
@@ -1431,45 +1277,7 @@ function getPromptsForProfile(profile, context) {
 }
 
 // ────────────────────────────────────────────────────────────────
-// IMAGES — VALIDATION
-// ────────────────────────────────────────────────────────────────
-function validateImages(images, isPremium) {
-  if (!Array.isArray(images)) images = [];
-  const maxImages = isPremium ? PREMIUM_MAX_IMAGES : FREE_MAX_IMAGES;
-
-  if (images.length > maxImages) {
-    throw {
-      status: 400,
-      message: `Maximum ${maxImages} images par section.`
-    };
-  }
-
-  const normalized = images.map((img, i) => {
-    if (!img || typeof img !== 'object') throw { status: 400, message: `Image ${i + 1} invalide.` };
-
-    const dataUrl = img.dataUrl || '';
-    if (!dataUrl.startsWith('data:image/')) {
-      throw { status: 400, message: `Image ${i + 1} : format non supporté.` };
-    }
-    if (dataUrl.length > MAX_IMAGE_SIZE_BASE64) {
-      throw { status: 400, message: `Image ${i + 1} trop volumineuse (max ~500 Ko).` };
-    }
-    return {
-      dataUrl,
-      caption: (img.caption || '').slice(0, 200)
-    };
-  });
-
-  const totalSize = normalized.reduce((s, img) => s + img.dataUrl.length, 0);
-  if (totalSize > MAX_TOTAL_IMAGES_SIZE) {
-    throw { status: 400, message: 'Total des images trop lourd.' };
-  }
-
-  return normalized;
-}
-
-// ────────────────────────────────────────────────────────────────
-// POST-TRAITEMENT (wrap LaTeX orphelins)
+// POST-TRAITEMENT
 // ────────────────────────────────────────────────────────────────
 function wrapOrphanLatex(text) {
   if (!text || typeof text !== 'string') return text;
@@ -1494,7 +1302,7 @@ function deepClean(obj) {
 }
 
 // ────────────────────────────────────────────────────────────────
-// FALLBACK LOCAL
+// FALLBACK
 // ────────────────────────────────────────────────────────────────
 function buildFallbackAnalysis({ rawInput, profile }) {
   return {
@@ -1502,20 +1310,18 @@ function buildFallbackAnalysis({ rawInput, profile }) {
     sectionTitle: 'Section',
     explanation: {
       sectionTitle: 'Section',
-      understanding: 'Analyse automatique indisponible. Contenu brut disponible ci-dessous.',
+      understanding: 'Analyse indisponible. Réessaie plus tard.',
       parts: [{
-        partTitle: 'Contenu',
-        mainIdea: 'Contenu fourni',
+        partTitle: 'Contenu fourni',
+        mainIdea: '',
         simpleExplanation: rawInput.slice(0, 500),
         keyTerms: [],
-        toRemember: 'Réessayer plus tard.'
+        toRemember: ''
       }]
     },
     structure: null,
     questions: [],
     qcm: [],
-    trueFalse: [],
-    imagesAnalysis: [],
     fallback: true
   };
 }
@@ -1562,11 +1368,10 @@ async function markDailyActivity(uid, inc = {}) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// ACTION 1 — getDashboard
+// ACTIONS
 // ═══════════════════════════════════════════════════════════════
 async function getDashboard(uid) {
   const { db } = getAdminServices();
-
   const subjects = [];
   let totalChapters = 0;
   let totalSections = 0;
@@ -1608,7 +1413,6 @@ async function getDashboard(uid) {
   }
 
   subjects.sort((a, b) => b.sectionsCount - a.sectionsCount);
-
   const streak = await computeStreak(uid);
 
   let recentActivity = [];
@@ -1677,9 +1481,6 @@ async function computeStreak(uid) {
   return { current, best };
 }
 
-// ═══════════════════════════════════════════════════════════════
-// ACTION 2 — listChapters
-// ═══════════════════════════════════════════════════════════════
 async function listChapters(uid, body) {
   const { subject } = body;
   if (!ALLOWED_SUBJECTS.has(subject)) throw { status: 400, message: 'Matière invalide.' };
@@ -1708,9 +1509,6 @@ async function listChapters(uid, body) {
   return { success: true, chapters };
 }
 
-// ═══════════════════════════════════════════════════════════════
-// ACTION 3 — createChapter
-// ═══════════════════════════════════════════════════════════════
 async function createChapter(uid, body) {
   const { subject, title } = body;
   if (!ALLOWED_SUBJECTS.has(subject)) throw { status: 400, message: 'Matière invalide.' };
@@ -1739,9 +1537,6 @@ async function createChapter(uid, body) {
   };
 }
 
-// ═══════════════════════════════════════════════════════════════
-// ACTION 4 — getChapter
-// ═══════════════════════════════════════════════════════════════
 async function getChapter(uid, body) {
   const { subject, chapterId } = body;
   if (!ALLOWED_SUBJECTS.has(subject)) throw { status: 400, message: 'Matière invalide.' };
@@ -1773,9 +1568,7 @@ async function getChapter(uid, body) {
       title: s.title || 'Section',
       questionsCount,
       qcmCount,
-      imagesCount: Array.isArray(s.images) ? s.images.length : 0,
-      time: formatRelativeDate(s.createdAt),
-      status: 'done'
+      time: formatRelativeDate(s.createdAt)
     };
   });
 
@@ -1793,12 +1586,8 @@ async function getChapter(uid, body) {
   };
 }
 
-// ═══════════════════════════════════════════════════════════════
-// ACTION 5 — createSection (fan-out multi-profils + images)
-// ═══════════════════════════════════════════════════════════════
 async function createSection(uid, body) {
   const { subject, chapterId, rawInput } = body;
-  let { images } = body;
 
   if (!ALLOWED_SUBJECTS.has(subject)) throw { status: 400, message: 'Matière invalide.' };
   if (!chapterId) throw { status: 400, message: 'chapterId requis.' };
@@ -1821,9 +1610,6 @@ async function createSection(uid, body) {
     };
   }
 
-  const isPremium = quota.premium;
-  const normalizedImages = validateImages(images, isPremium);
-
   const { db, FieldValue } = getAdminServices();
 
   const chapterRef = db
@@ -1840,10 +1626,9 @@ async function createSection(uid, body) {
 
   const normalizedInput = normalizeMathInput(trimmed);
 
-  // Fan-out : génération des prompts selon le profil
-  const context = { subjectLabel, rawInput: normalizedInput, images: normalizedImages };
+  const context = { subjectLabel, rawInput: normalizedInput };
   const tasks = getPromptsForProfile(profile, context);
-  const providers = getTextProviders();
+  const providers = getProviders();
 
   if (!providers.length) {
     throw { status: 503, message: 'Aucun fournisseur IA disponible.' };
@@ -1851,23 +1636,16 @@ async function createSection(uid, body) {
 
   console.log(`[FAN-OUT] ${tasks.length} tâches, ${providers.length} fournisseurs pour profil "${profile}"`);
 
-  // Exécution parallèle
   const results = await runParallelTasks(tasks, providers);
-
-  // Fusion
   let analysis = mergeAnalysis(results, profile);
-
-  // Post-traitement LaTeX
   analysis = deepClean(analysis);
 
-  // Fallback si rien n'a fonctionné
   const hasContent = analysis.explanation || analysis.questions.length > 0;
   if (!hasContent) {
     console.warn('[FAN-OUT] Tout a échoué → fallback');
     analysis = buildFallbackAnalysis({ rawInput: normalizedInput, profile });
   }
 
-  // Sauvegarde
   const sectionRef = chapterRef.collection('sections').doc();
   const sectionId = sectionRef.id;
 
@@ -1875,7 +1653,6 @@ async function createSection(uid, body) {
     title: analysis.sectionTitle || analysis.explanation?.sectionTitle || 'Section',
     rawInput: trimmed,
     profile,
-    images: normalizedImages.map((img) => ({ dataUrl: img.dataUrl, caption: img.caption })),
     analysis,
     userNotes: '',
     createdAt: FieldValue.serverTimestamp(),
@@ -1899,7 +1676,6 @@ async function createSection(uid, body) {
       rawInput: trimmed,
       profile,
       analysis,
-      images: normalizedImages,
       userNotes: ''
     },
     meta: {
@@ -1910,9 +1686,6 @@ async function createSection(uid, body) {
   };
 }
 
-// ═══════════════════════════════════════════════════════════════
-// ACTION 6 — getSection
-// ═══════════════════════════════════════════════════════════════
 async function getSection(uid, body) {
   const { subject, chapterId, sectionId } = body;
   if (!ALLOWED_SUBJECTS.has(subject)) throw { status: 400, message: 'Matière invalide.' };
@@ -1939,7 +1712,6 @@ async function getSection(uid, body) {
       rawInput: s.rawInput || '',
       profile: s.profile || 'scientific',
       analysis: s.analysis || {},
-      images: s.images || [],
       userNotes: s.userNotes || '',
       createdAt: toISO(s.createdAt),
       time: formatRelativeDate(s.createdAt)
@@ -1947,9 +1719,6 @@ async function getSection(uid, body) {
   };
 }
 
-// ═══════════════════════════════════════════════════════════════
-// ACTION 7 — updateNotes
-// ═══════════════════════════════════════════════════════════════
 async function updateNotes(uid, body) {
   const { subject, chapterId, sectionId, userNotes } = body;
   if (!ALLOWED_SUBJECTS.has(subject)) throw { status: 400, message: 'Matière invalide.' };
@@ -1971,9 +1740,6 @@ async function updateNotes(uid, body) {
   return { success: true };
 }
 
-// ═══════════════════════════════════════════════════════════════
-// ACTION 8 — deleteSection
-// ═══════════════════════════════════════════════════════════════
 async function deleteSection(uid, body) {
   const { subject, chapterId, sectionId } = body;
   if (!ALLOWED_SUBJECTS.has(subject)) throw { status: 400, message: 'Matière invalide.' };
@@ -1998,9 +1764,6 @@ async function deleteSection(uid, body) {
   return { success: true };
 }
 
-// ═══════════════════════════════════════════════════════════════
-// ACTION 9 — deleteChapter
-// ═══════════════════════════════════════════════════════════════
 async function deleteChapter(uid, body) {
   const { subject, chapterId } = body;
   if (!ALLOWED_SUBJECTS.has(subject)) throw { status: 400, message: 'Matière invalide.' };
@@ -2024,9 +1787,6 @@ async function deleteChapter(uid, body) {
   return { success: true };
 }
 
-// ═══════════════════════════════════════════════════════════════
-// ACTION 10 — getFullLesson
-// ═══════════════════════════════════════════════════════════════
 async function getFullLesson(uid, body) {
   const { subject, chapterId } = body;
   if (!ALLOWED_SUBJECTS.has(subject)) throw { status: 400, message: 'Matière invalide.' };
@@ -2052,7 +1812,6 @@ async function getFullLesson(uid, body) {
       title: s.title || 'Section',
       profile: s.profile || 'scientific',
       analysis: s.analysis || {},
-      images: s.images || [],
       userNotes: s.userNotes || ''
     };
   });
@@ -2069,7 +1828,7 @@ async function getFullLesson(uid, body) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// HANDLER PRINCIPAL
+// HANDLER
 // ═══════════════════════════════════════════════════════════════
 module.exports = async function handler(request, response) {
   applyCors(request, response);
@@ -2099,7 +1858,7 @@ module.exports = async function handler(request, response) {
   const action = body.action;
   const uid = user.uid;
 
-  console.log(`[PROGRESS v6] ${action} | uid=${uid.slice(0, 8)}`);
+  console.log(`[PROGRESS v8] ${action} | uid=${uid.slice(0, 8)}`);
 
   try {
     switch (action) {
@@ -2117,7 +1876,7 @@ module.exports = async function handler(request, response) {
         return jsonError(response, 400, `Action inconnue : "${action}"`);
     }
   } catch (error) {
-    console.error(`[PROGRESS v6] "${action}" failed:`, error.message);
+    console.error(`[PROGRESS v8] "${action}" failed:`, error.message);
     if (error.status) return jsonError(response, error.status, error.message, error.code);
     return jsonError(response, 500, error.message || 'Erreur serveur.');
   }

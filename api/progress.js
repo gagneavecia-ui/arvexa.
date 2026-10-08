@@ -1,36 +1,44 @@
 // ================================================================
-// API PROGRESS v5.0 — ARVEXA School
-// Cahier de notes intelligent : Matières → Chapitres → Sections
-// Approche LaTeX : tout en inline $...$ partout, validation stricte
+// API PROGRESS v6.0 — ARVEXA School
+// Cahier intelligent multi-profils + fan-out IA + vision
+// 6 profils : scientifique / svt / philosophie / histoire-geo /
+//             francais / langue
 // ================================================================
 
-module.exports.config = { maxDuration: 60 };
+module.exports.config = { maxDuration: 90 };
 
 const WINDOW_MS = 60 * 1000;
-const MAX_REQUESTS_PER_WINDOW = 40;
+const MAX_REQUESTS_PER_WINDOW = 60;
 const requestLog = new Map();
 
+// ────────────────────────────────────────────────────────────────
+// CONFIG GLOBALE
+// ────────────────────────────────────────────────────────────────
 const ALLOWED_SUBJECTS = new Set([
   'mathematiques', 'physique', 'chimie', 'svt',
   'philosophie', 'histoire-geo', 'francais', 'anglais'
 ]);
 
 const SUBJECT_INFO = {
-  mathematiques: { label: 'Mathématiques',    icon: 'fa-square-root-variable', profile: 'scientific' },
-  physique:      { label: 'Physique',         icon: 'fa-bolt',                 profile: 'scientific' },
-  chimie:        { label: 'Chimie',           icon: 'fa-flask',                profile: 'scientific' },
-  svt:           { label: 'SVT',              icon: 'fa-dna',                  profile: 'scientific' },
-  philosophie:   { label: 'Philosophie',      icon: 'fa-brain',                profile: 'literary'   },
-  'histoire-geo':{ label: 'Histoire-Géo',     icon: 'fa-earth-africa',         profile: 'literary'   },
-  francais:      { label: 'Français',         icon: 'fa-book-open',            profile: 'literary'   },
-  anglais:       { label: 'Anglais',          icon: 'fa-language',             profile: 'literary'   }
+  mathematiques: { label: 'Mathématiques',  profile: 'scientific' },
+  physique:      { label: 'Physique',       profile: 'scientific' },
+  chimie:        { label: 'Chimie',         profile: 'scientific' },
+  svt:           { label: 'SVT',            profile: 'svt' },
+  philosophie:   { label: 'Philosophie',    profile: 'philosophy' },
+  'histoire-geo':{ label: 'Histoire-Géo',   profile: 'history' },
+  francais:      { label: 'Français',       profile: 'french' },
+  anglais:       { label: 'Anglais',        profile: 'language' }
 };
 
 const MIN_CONTENT_LENGTH = 40;
 const MAX_CONTENT_LENGTH = 15000;
-const FREE_SECTION_LIMIT = 5;
 
-const MAX_AI_TOKENS = 6000;
+const FREE_SECTION_LIMIT = 5;      // 5 sections/mois pour les gratuits
+const FREE_MAX_IMAGES = 3;         // 3 images max par section en gratuit
+const PREMIUM_MAX_IMAGES = 10;     // 10 images max par section en premium
+
+const MAX_IMAGE_SIZE_BASE64 = 700 * 1024;      // ~700 Ko base64 par image
+const MAX_TOTAL_IMAGES_SIZE = 6 * 1024 * 1024; // 6 Mo total par section
 
 let adminServices = null;
 
@@ -121,11 +129,20 @@ async function verifyFirebaseToken(request) {
 
 function isPremiumUser(data) {
   if (!data) return false;
-  const active = data.premium === true || data.isUnlocked === true || data.hasDeposited === true;
-  if (!active) return false;
+  const status = data.subscriptionStatus || 'none';
+  if (status === 'pending') return false;
+
+  const hasPremium = data.premium === true ||
+                     data.isUnlocked === true ||
+                     data.hasDeposited === true;
+
   const end = data.subscriptionEndDate?.toDate?.() ||
     (data.subscriptionEndDate?.seconds ? new Date(data.subscriptionEndDate.seconds * 1000) : null);
-  return !end || end.getTime() > Date.now();
+
+  if (hasPremium && end) return end.getTime() > Date.now();
+  if (status === 'expired') return false;
+  if (hasPremium && !end) return true;
+  return false;
 }
 
 function toISO(v) {
@@ -139,7 +156,7 @@ function toISO(v) {
 }
 
 function todayKey() { return new Date().toISOString().slice(0, 10); }
-function monthKey() { return new Date().toISOString().slice(0, 7); }
+function monthKey()  { return new Date().toISOString().slice(0, 7); }
 
 function formatRelativeDate(value) {
   const iso = toISO(value);
@@ -158,104 +175,108 @@ function formatRelativeDate(value) {
 }
 
 // ────────────────────────────────────────────────────────────────
-// NORMALISATION DES ENTRÉES ÉCRITES AU CLAVIER
+// NORMALISATION DES ENTRÉES CLAVIER
 // ────────────────────────────────────────────────────────────────
 function normalizeMathInput(text) {
   if (!text || typeof text !== 'string') return '';
-
-  let result = text;
-
-  // Puissances (Unicode → notation texte)
-  result = result.replace(/([a-zA-Z0-9\)])\s*²/g, '$1^2');
-  result = result.replace(/([a-zA-Z0-9\)])\s*³/g, '$1^3');
-  result = result.replace(/([a-zA-Z0-9\)])\s*⁴/g, '$1^4');
-  result = result.replace(/([a-zA-Z0-9\)])\s*⁵/g, '$1^5');
-  result = result.replace(/([a-zA-Z0-9\)])\s*⁰/g, '$1^0');
-  result = result.replace(/([a-zA-Z0-9\)])\s*¹/g, '$1^1');
-
-  // Racines
-  result = result.replace(/√\s*\(([^)]+)\)/g, 'racine($1)');
-  result = result.replace(/√\s*([a-zA-Z0-9]+)/g, 'racine($1)');
-
-  // Symboles math → texte
-  result = result.replace(/≤/g, ' <= ');
-  result = result.replace(/≥/g, ' >= ');
-  result = result.replace(/≠/g, ' != ');
-  result = result.replace(/∞/g, ' infini ');
-  result = result.replace(/π/g, ' pi ');
-  result = result.replace(/θ/g, ' theta ');
-  result = result.replace(/α/g, ' alpha ');
-  result = result.replace(/β/g, ' beta ');
-  result = result.replace(/γ/g, ' gamma ');
-  result = result.replace(/λ/g, ' lambda ');
-  result = result.replace(/μ/g, ' mu ');
-  result = result.replace(/σ/g, ' sigma ');
-  result = result.replace(/Δ/g, ' Delta ');
-  result = result.replace(/∑/g, ' somme ');
-  result = result.replace(/∫/g, ' integrale ');
-  result = result.replace(/→/g, ' tend vers ');
-  result = result.replace(/⇔/g, ' <=> ');
-  result = result.replace(/⇒/g, ' => ');
-  result = result.replace(/×/g, ' fois ');
-  result = result.replace(/÷/g, ' divise par ');
-  result = result.replace(/±/g, ' plus ou moins ');
-  result = result.replace(/≈/g, ' environ ');
-
-  // Fractions textuelles
-  result = result.replace(/(\d+)\s*\/\s*(\d+)/g, '$1 sur $2');
-
-  return result;
+  let r = text;
+  r = r.replace(/([a-zA-Z0-9\)])\s*²/g, '$1^2');
+  r = r.replace(/([a-zA-Z0-9\)])\s*³/g, '$1^3');
+  r = r.replace(/([a-zA-Z0-9\)])\s*⁴/g, '$1^4');
+  r = r.replace(/([a-zA-Z0-9\)])\s*⁵/g, '$1^5');
+  r = r.replace(/√\s*\(([^)]+)\)/g, 'racine($1)');
+  r = r.replace(/√\s*([a-zA-Z0-9]+)/g, 'racine($1)');
+  r = r.replace(/≤/g, ' <= ');
+  r = r.replace(/≥/g, ' >= ');
+  r = r.replace(/≠/g, ' != ');
+  r = r.replace(/∞/g, ' infini ');
+  r = r.replace(/π/g, ' pi ');
+  r = r.replace(/θ/g, ' theta ');
+  r = r.replace(/α/g, ' alpha ');
+  r = r.replace(/β/g, ' beta ');
+  r = r.replace(/Δ/g, ' Delta ');
+  r = r.replace(/∑/g, ' somme ');
+  r = r.replace(/∫/g, ' integrale ');
+  r = r.replace(/→/g, ' tend vers ');
+  r = r.replace(/×/g, ' fois ');
+  r = r.replace(/÷/g, ' divise par ');
+  r = r.replace(/±/g, ' plus ou moins ');
+  return r;
 }
 
 // ────────────────────────────────────────────────────────────────
 // IA — FOURNISSEURS
 // ────────────────────────────────────────────────────────────────
-function getProviders() {
+function getTextProviders() {
   return [
     {
-      name: 'Groq', key: process.env.GROQ_API_KEY,
+      name: 'Groq',
+      key: process.env.GROQ_API_KEY,
       endpoint: 'https://api.groq.com/openai/v1/chat/completions',
       model: process.env.GROQ_MODEL || 'openai/gpt-oss-120b',
-      jsonMode: true
+      jsonMode: true,
+      vision: false
     },
     {
-      name: 'OpenRouter', key: process.env.OPENROUTER_API_KEY,
+      name: 'OpenRouter',
+      key: process.env.OPENROUTER_API_KEY,
       endpoint: 'https://openrouter.ai/api/v1/chat/completions',
       model: process.env.OPENROUTER_MODEL || 'openai/gpt-oss-120b',
       jsonMode: true,
+      vision: true,
       headers: {
         'HTTP-Referer': process.env.APP_ORIGIN || '',
         'X-Title': 'ARVEXA Notebook'
       }
     },
     {
-      name: 'Mistral', key: process.env.MISTRAL_API_KEY,
+      name: 'Mistral',
+      key: process.env.MISTRAL_API_KEY,
       endpoint: 'https://api.mistral.ai/v1/chat/completions',
       model: process.env.MISTRAL_MODEL || 'mistral-large-latest',
-      jsonMode: false
+      jsonMode: false,
+      vision: false
     }
   ].filter((p) => Boolean(p.key));
 }
 
-async function callProvider(provider, prompt, maxTokens = MAX_AI_TOKENS) {
+function getVisionProviders() {
+  return getTextProviders().filter((p) => p.vision);
+}
+
+// Appel générique — supporte texte ET images
+async function callProvider(provider, { systemPrompt, userPrompt, images = [], maxTokens = 4000 }) {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 55000);
+  const timeout = setTimeout(() => controller.abort(), 60000);
 
   try {
+    // Construction du contenu (texte + images)
+    let content;
+    if (images && images.length > 0 && provider.vision) {
+      content = [{ type: 'text', text: userPrompt }];
+      for (const img of images) {
+        content.push({
+          type: 'image_url',
+          image_url: { url: img.dataUrl }
+        });
+      }
+    } else {
+      content = userPrompt;
+    }
+
     const body = {
       model: provider.model,
-      temperature: 0.25,
+      temperature: 0.3,
       max_tokens: maxTokens,
       messages: [
-        {
-          role: 'system',
-          content: 'Tu produis EXCLUSIVEMENT du JSON valide, sans markdown, sans texte avant ou après. Toute formule mathématique DOIT être entre $...$ (inline) ou $$...$$ (display).'
-        },
-        { role: 'user', content: prompt }
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content }
       ]
     };
 
-    if (provider.jsonMode) body.response_format = { type: 'json_object' };
+    if (provider.jsonMode && !images.length) {
+      body.response_format = { type: 'json_object' };
+    }
 
     const result = await fetch(provider.endpoint, {
       method: 'POST',
@@ -274,486 +295,1202 @@ async function callProvider(provider, prompt, maxTokens = MAX_AI_TOKENS) {
       throw new Error(`${provider.name}: ${msg}`);
     }
 
-    const content = data?.choices?.[0]?.message?.content;
-    if (!content) throw new Error(`${provider.name}: réponse vide`);
+    const rawContent = data?.choices?.[0]?.message?.content;
+    if (!rawContent) throw new Error(`${provider.name}: réponse vide`);
 
-    const cleaned = content
-      .replace(/^```(?:json)?\s*/i, '')
-      .replace(/\s*```$/i, '')
-      .trim();
-
-    return JSON.parse(cleaned);
+    // Si JSON mode attendu, on parse ; sinon on renvoie brut
+    const cleaned = String(rawContent).replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+    try {
+      return JSON.parse(cleaned);
+    } catch (e) {
+      // Pas de JSON valide → on renvoie { raw: texte }
+      return { raw: cleaned };
+    }
   } finally {
     clearTimeout(timeout);
   }
 }
 
-async function generateWithFallback(prompt, validator, maxTokens = MAX_AI_TOKENS) {
-  const providers = getProviders();
-  if (!providers.length) throw new Error('provider_missing');
-
-  const errors = [];
-  for (const provider of providers) {
-    try {
-      console.log(`[AI] Tentative ${provider.name}...`);
-      const data = await callProvider(provider, prompt, maxTokens);
-      if (!validator || validator(data)) {
-        console.log(`[AI] ${provider.name} OK`);
-        return data;
-      }
-      errors.push(`${provider.name}: structure invalide`);
-    } catch (e) {
-      errors.push(`${provider.name}: ${e.message}`);
-      console.warn(`[AI] ${provider.name}: ${e.message}`);
-    }
-  }
-  throw new Error('all_providers_failed: ' + errors.join(' | '));
+// Distribution round-robin des tâches
+function distributeTasks(tasks, providers) {
+  return tasks.map((task, i) => ({
+    ...task,
+    provider: providers[i % providers.length]
+  }));
 }
 
-// ────────────────────────────────────────────────────────────────
-// POST-TRAITEMENT LATEX
-// Enrobe automatiquement les LaTeX orphelins dans les champs texte
-// ────────────────────────────────────────────────────────────────
-function wrapOrphanLatex(text) {
-  if (!text || typeof text !== 'string') return text;
+// Exécution parallèle avec fallback
+async function runParallelTasks(tasks, providers) {
+  const assignments = distributeTasks(tasks, providers);
 
-  let result = text;
-
-  // Détecte les commandes LaTeX isolées et les entoure de $
-  // Ex : "v = \sqrt{GM/R} avec..." → "v = $\sqrt{GM/R}$ avec..."
-  // Mais on évite de doubler les délimiteurs existants
-
-  // Cas 1 : passage "text = \command{...} text" hors $
-  result = result.replace(
-    /([^$]|^)(\\[a-zA-Z]+(?:\{[^}]*\})*(?:[_^]\{[^}]*\})*)/g,
-    (match, before, latex) => {
-      // Vérifie qu'on n'est pas déjà dans un $...$
-      return `${before}$$${latex}$$`;
-    }
+  const results = await Promise.allSettled(
+    assignments.map(({ provider, systemPrompt, userPrompt, images, maxTokens }) =>
+      callProvider(provider, { systemPrompt, userPrompt, images, maxTokens })
+    )
   );
 
-  // Nettoyage : élimine les $$ $$ vides ou en double
-  result = result.replace(/\${3,}/g, '$$');
-  result = result.replace(/\$\s*\$/g, '');
+  // Fallback pour les tâches échouées
+  const fallbackedResults = await Promise.all(
+    results.map(async (r, i) => {
+      if (r.status === 'fulfilled') {
+        return { status: 'fulfilled', value: r.value, task: tasks[i], provider: assignments[i].provider.name };
+      }
 
-  return result;
+      console.warn(`[FAN-OUT] Tâche "${tasks[i].name}" échouée sur ${assignments[i].provider.name}, fallback...`);
+
+      // Essaie les autres fournisseurs
+      for (const provider of providers) {
+        if (provider.name === assignments[i].provider.name) continue;
+        try {
+          const value = await callProvider(provider, {
+            systemPrompt: tasks[i].systemPrompt,
+            userPrompt: tasks[i].userPrompt,
+            images: tasks[i].images,
+            maxTokens: tasks[i].maxTokens
+          });
+          return { status: 'fulfilled', value, task: tasks[i], provider: provider.name };
+        } catch (e) {
+          console.warn(`[FAN-OUT] Fallback ${provider.name} échoué pour "${tasks[i].name}": ${e.message}`);
+        }
+      }
+      return { status: 'rejected', error: r.reason, task: tasks[i], provider: 'none' };
+    })
+  );
+
+  return fallbackedResults;
 }
 
-// Valide la structure générale d'une analyse
-function validateAnalysis(data, profile) {
-  if (!data || typeof data !== 'object') return false;
-  if (!data.summary && !data.keyIdeas) return false;
+// ────────────────────────────────────────────────────────────────
+// FUSION FINALE
+// ────────────────────────────────────────────────────────────────
+function mergeAnalysis(results, profile) {
+  const merged = {
+    profile,
+    sectionTitle: null,
+    explanation: null,
+    structure: null,
+    questions: [],
+    qcm: [],
+    trueFalse: [],
+    imagesAnalysis: []
+  };
 
-  // Vérification : pas de \ orphelin hors des $...$
-  const fieldsToCheck = [
-    data.summary,
-    ...(Array.isArray(data.keyIdeas) ? data.keyIdeas : []),
-    ...(Array.isArray(data.method) ? data.method : []),
-    data.trap?.text,
-    data.trap?.solution,
-    data.example?.enonce,
-    ...(Array.isArray(data.example?.steps) ? data.example.steps : []),
-    data.example?.result
-  ].filter((x) => typeof x === 'string');
+  for (const r of results) {
+    if (r.status !== 'fulfilled' || !r.value) continue;
+    const data = r.value;
+    const taskName = r.task.name;
 
-  for (const field of fieldsToCheck) {
-    // Cherche un \command qui n'est pas entre $...$
-    // Méthode : on retire tous les $...$ puis on regarde s'il reste des \
-    const withoutMath = field.replace(/\$[^$]*\$/g, '');
-    if (/\\[a-zA-Z]/.test(withoutMath)) {
-      console.warn(`[VALIDATION] LaTeX orphelin détecté : "${field.slice(0, 80)}"`);
-      return false;
+    switch (taskName) {
+      case 'extraction':
+        merged.sectionTitle = data.sectionTitle || merged.sectionTitle;
+        merged.extracted = data;
+        break;
+      case 'explanation':
+        merged.explanation = data;
+        merged.sectionTitle = data.sectionTitle || merged.sectionTitle;
+        break;
+      case 'structure':
+        merged.structure = data;
+        break;
+      case 'questions':
+        merged.questions = data.questions || [];
+        break;
+      case 'qcm_tf':
+        merged.qcm = data.qcm || [];
+        merged.trueFalse = data.trueFalse || [];
+        break;
+      case 'images':
+        merged.imagesAnalysis = data.imagesAnalysis || [];
+        break;
     }
   }
 
-  return true;
+  return merged;
 }
 
 // ────────────────────────────────────────────────────────────────
-// RÈGLE LATEX — bloc commun
+// RÈGLES COMMUNES À TOUS LES PROMPTS
 // ────────────────────────────────────────────────────────────────
 const LATEX_RULES = `
-═══════════════════════════════════════════════════════════════
-RÈGLE LATEX — ABSOLUE, ULTRA-STRICTE, NON NÉGOCIABLE
-═══════════════════════════════════════════════════════════════
-C'est la règle la plus importante de ta mission. Lis-la 2 fois.
+RÈGLE LATEX — OBLIGATOIRE :
+- Toute formule mathématique DOIT être entre $...$ (inline) ou $$...$$ (display).
+- INTERDIT : LaTeX brut sans $ (ex : "v = \\sqrt{x}" doit devenir "$v = \\sqrt{x}$").
+- INTERDIT : symboles Unicode mathématiques bruts (π, √, ², ≤, ≥, ∞, →, ×, ·, ≠, ∈, ∑, ∫, Δ).
+  Remplacer par $\\pi$, $\\sqrt{}$, $^{2}$, $\\leq$, $\\geq$, $\\infty$, $\\to$, $\\times$, $\\cdot$, $\\neq$, $\\in$, $\\sum$, $\\int$, $\\Delta$.
+- Les formules du champ "latex" doivent contenir leurs propres $ (ex : "$z = a + bi$").
+`.trim();
 
-PRINCIPE UNIQUE :
-TOUT symbole ou formule mathématique DOIT être entre $ et $.
-Un backslash \ SANS $ autour s'affiche EN TEXTE BRUT chez l'élève.
-
-═══════════════════════════════════════════════════════════════
-RÈGLE 1 — Délimiteurs obligatoires
-═══════════════════════════════════════════════════════════════
-Chaque formule commence ET finit par $.
-
-❌ INTERDIT :
-"v = \\sqrt{GM/R}"
-
-✅ CORRECT :
-"$v = \\sqrt{GM/R}$"
-
-═══════════════════════════════════════════════════════════════
-RÈGLE 2 — Le champ formulas[].latex CONTIENT DÉJÀ les $
-═══════════════════════════════════════════════════════════════
-⚠️ IMPORTANT : le champ "latex" de formulas[] DOIT contenir les $ lui-même.
-
-❌ INTERDIT :
-{ "latex": "z = a + bi" }
-
-✅ CORRECT :
-{ "latex": "$z = a + bi$" }
-
-Pour les formules affichées en grand, utilise $$ :
-{ "latex": "$$z = a + bi$$" }
-
-═══════════════════════════════════════════════════════════════
-RÈGLE 3 — Une phrase = plusieurs $...$ si besoin
-═══════════════════════════════════════════════════════════════
-Chaque formule dans une phrase est entourée séparément.
-
-❌ INTERDIT :
-"Le module vaut |z| = \\sqrt{a^2 + b^2} donc..."
-
-✅ CORRECT :
-"Le module vaut $|z| = \\sqrt{a^2 + b^2}$ donc..."
-
-═══════════════════════════════════════════════════════════════
-RÈGLE 4 — Unités dans \\text{}
-═══════════════════════════════════════════════════════════════
-Pour les unités, utilise \\text{} :
-
-❌ INTERDIT :
-"5 m\\cdot s^{-1}"
-
-✅ CORRECT :
-"$5\\ \\text{m}\\cdot\\text{s}^{-1}$"
-
-═══════════════════════════════════════════════════════════════
-RÈGLE 5 — Zéro symbole Unicode
-═══════════════════════════════════════════════════════════════
-INTERDIT : π √ ² ³ ≤ ≥ ∞ → × · ≠ ∈ ∑ ∫ Δ α β θ λ μ
-AUTORISÉ : $\\pi$ $\\sqrt{}$ $^{2}$ $^{3}$ $\\leq$ $\\geq$ $\\infty$ $\\to$
-          $\\times$ $\\cdot$ $\\neq$ $\\in$ $\\sum$ $\\int$ $\\Delta$
-          $\\alpha$ $\\beta$ $\\theta$ $\\lambda$ $\\mu$
-
-═══════════════════════════════════════════════════════════════
-RÈGLE 6 — Virgule décimale française
-═══════════════════════════════════════════════════════════════
-Utilise $6{,}67$ et non $6,67$ (sinon KaTeX ajoute un espace).
-
-═══════════════════════════════════════════════════════════════
-VÉRIFICATION OBLIGATOIRE — AVANT DE RÉPONDRE
-═══════════════════════════════════════════════════════════════
-Passe en revue CHAQUE champ de ton JSON :
-1. Y a-t-il un \\ hors des $...$ ? → Corrige.
-2. Y a-t-il un symbole Unicode (π, √, ²...) ? → Corrige en LaTeX.
-3. Le champ formulas[].latex contient-il bien les $ ?
-4. Chaque $ ouvert est-il fermé ?
-
-Si UNE SEULE réponse est "non" → corrige AVANT de répondre.
-`;
+const PERIMETER_RULES = `
+RÈGLE DE PÉRIMÈTRE STRICT (TRÈS IMPORTANTE) :
+- Tu travailles UNIQUEMENT sur la section fournie par l'élève.
+- INTERDICTION de mentionner, expliquer ou poser des questions sur des notions
+  qui ne sont PAS dans la section fournie.
+- INTERDICTION d'anticiper les autres parties du chapitre.
+- INTERDICTION d'utiliser une connaissance externe au texte fourni (sauf pour
+  la reformulation et la pédagogie).
+- Si tu identifies un lien avec une notion absente, ignore-le.
+`.trim();
 
 // ────────────────────────────────────────────────────────────────
-// PROMPT SCIENTIFIQUE
+// PROMPTS PAR PROFIL
 // ────────────────────────────────────────────────────────────────
-function buildScientificPrompt({ subjectLabel, rawInput }) {
-  return `Tu es un professeur expert du BAC au Niger, spécialiste de ${subjectLabel}.
 
-Un élève vient de copier une partie de sa leçon. Ta mission est DOUBLE :
-1. Lui expliquer CLAIREMENT cette partie
-2. L'ENRICHIR avec les meilleures méthodes, astuces et exercices
-
+// ═══ PROFIL 1 : SCIENTIFIQUE (Maths, Physique, Chimie) ═══
+function buildScientificPrompts({ subjectLabel, rawInput, images }) {
+  const baseContext = `
+Matière : ${subjectLabel}
 ═══════════════════════════════════════════════════════════════
-CONTENU COLLÉ PAR L'ÉLÈVE
+CONTENU DE LA SECTION FOURNIE PAR L'ÉLÈVE
 ═══════════════════════════════════════════════════════════════
 ${rawInput}
+═══════════════════════════════════════════════════════════════
+${images.length > 0 ? `IMAGES FOURNIES : ${images.length} image(s) à analyser.` : ''}
+`.trim();
 
+  return [
+    // Tâche 1 — Extraction des concepts
+    {
+      name: 'extraction',
+      maxTokens: 1500,
+      images: [],
+      systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
+      userPrompt: `Analyse cette section de cours scientifique.
+
+${baseContext}
+
+${PERIMETER_RULES}
+
+Extrait UNIQUEMENT les concepts présents dans cette section.
+
+Format JSON :
+{
+  "sectionTitle": "Titre court de la section (max 60 caractères)",
+  "mainConcepts": ["concept 1", "concept 2"],
+  "formulas": ["formule 1", "formule 2"],
+  "variables": [{"symbol": "x", "meaning": "signification", "unit": "unité si présente"}],
+  "definitions": [{"term": "terme", "definition": "définition du cours"}],
+  "methods": ["méthode 1", "méthode 2"]
+}
+
+Réponds UNIQUEMENT avec le JSON.`
+    },
+
+    // Tâche 2 — Explication pédagogique
+    {
+      name: 'explanation',
+      maxTokens: 4000,
+      images: images.slice(0, 3),
+      systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
+      userPrompt: `Tu es professeur expert du BAC. Explique cette section comme à un élève qui découvre.
+
+${baseContext}
+
+${PERIMETER_RULES}
 ${LATEX_RULES}
 
-═══════════════════════════════════════════════════════════════
-MISSION
-═══════════════════════════════════════════════════════════════
-Tu PEUX et DOIS utiliser tes connaissances pour :
-- Donner les méthodes LES PLUS RAPIDES et LES PLUS CLAIRES
-- Ajouter des astuces de calcul
-- Proposer des exemples chiffrés variés
-- Signaler les pièges classiques du BAC
-- Fournir des EXERCICES progressifs avec CORRECTIONS détaillées
+RÈGLE D'EXPLICATION :
+- Chaque idée doit être EXPLIQUÉE en français simple.
+- Pas de jargon non expliqué.
+- Utilise des phrases complètes, pas des listes télégraphiques.
+- Nombre de parties = nombre d'idées distinctes dans la section.
+- Ne force PAS un nombre fixe de parties : adapte-toi au contenu.
 
-Le contenu de l'élève est le POINT DE DÉPART.
-Tu enrichis, tu ne te limites pas.
+${images.length > 0 ? `
+RÈGLE IMAGES :
+- Analyse les images fournies.
+- Décris ce qu'elles montrent.
+- Relie-les au texte.
+- Explique les schémas, montages ou courbes.
+` : ''}
 
-═══════════════════════════════════════════════════════════════
-FORMAT JSON ATTENDU
-═══════════════════════════════════════════════════════════════
+Format JSON :
 {
-  "sectionTitle": "Titre court (max 60 caractères)",
-  "profile": "scientific",
-  "summary": "Résumé en 3-4 phrases avec formules inline $...$ si besoin",
-  "keyIdeas": [
-    "Idée clé 1 avec $formule$ si besoin",
-    "Idée clé 2",
-    "Idée clé 3"
-  ],
+  "sectionTitle": "...",
+  "understanding": "Ce que tu dois comprendre en 2-3 phrases simples.",
+  "parts": [
+    {
+      "partTitle": "Partie 1 : ...",
+      "mainIdea": "Idée principale",
+      "simpleExplanation": "Explication en français simple (3-6 phrases).",
+      "keyTerms": [{"term": "...", "meaning": "..."}],
+      "relations": ["Relation avec d'autres éléments du cours"],
+      "example": "Exemple chiffré complet du cours ou cohérent avec le cours",
+      "toRemember": "Ce qu'il faut absolument retenir"
+    }
+  ]
+}
+
+Réponds UNIQUEMENT avec le JSON.`
+    },
+
+    // Tâche 3 — Structure (formules + méthode + exemples)
+    {
+      name: 'structure',
+      maxTokens: 3500,
+      images: [],
+      systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
+      userPrompt: `Extrait la structure scientifique de cette section.
+
+${baseContext}
+
+${PERIMETER_RULES}
+${LATEX_RULES}
+
+Ne mets QUE ce qui est présent dans la section. Si la section ne contient pas de formule,
+laisse le tableau vide. Si elle ne contient pas d'exercice, laisse le tableau vide.
+
+Format JSON :
+{
   "formulas": [
     {
       "latex": "$z = a + bi$",
-      "condition": "avec $a, b \\in \\mathbb{R}$",
-      "usage": "Définition"
+      "description": "Description simple",
+      "variables": [{"symbol": "a", "meaning": "partie réelle"}],
+      "condition": "condition d'application si présente"
     }
   ],
-  "method": [
-    "Étape 1 : description avec $formule$ si besoin",
-    "Étape 2 : ...",
-    "Étape 3 : ..."
-  ],
-  "example": {
-    "enonce": "Énoncé avec $valeurs$ chiffrées",
-    "steps": [
-      "Étape 1 : calcul avec $formule$",
-      "Étape 2 : ...",
-      "Étape 3 : ..."
-    ],
-    "result": "$z = 4 - i$"
+  "method": {
+    "title": "Méthode d'application",
+    "steps": ["Étape 1 : ...", "Étape 2 : ..."]
   },
-  "trap": {
-    "text": "Piège classique au BAC",
-    "solution": "Comment l'éviter"
-  },
-  "exercises": [
+  "examples": [
     {
-      "enonce": "Exercice d'application",
-      "indice": "Indice avec $formule$ si besoin",
-      "correction": {
-        "steps": [
-          "Étape 1 avec $calcul$",
-          "Étape 2 avec $calcul$"
-        ],
-        "reponse": "$résultat final$"
-      },
-      "difficulty": 1
+      "enonce": "Énoncé de l'exemple",
+      "steps": ["Étape 1", "Étape 2"],
+      "result": "$résultat final$"
     }
+  ],
+  "traps": [
+    {"trap": "Piège classique", "solution": "Comment l'éviter"}
   ]
 }
 
-CONTRAINTES :
-- keyIdeas : 3 à 5
-- formulas : 1 à 5
-- method : 2 à 5 étapes
-- exercises : 2 à 4 exercices
+Réponds UNIQUEMENT avec le JSON.`
+    },
 
-⚠️ RAPPEL FINAL ULTRA-IMPORTANT :
-- Le champ formulas[].latex DOIT contenir les $ (ex: "$z = a + bi$")
-- AUCUN \\ hors des $...$ dans les champs texte
-- AUCUN symbole Unicode (π, √, ², ≤, ∞, →, ×, ·, ≠)
+    // Tâche 4 — Questions
+    {
+      name: 'questions',
+      maxTokens: 4000,
+      images: [],
+      systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
+      userPrompt: `Génère une banque de questions basée UNIQUEMENT sur cette section.
 
-Réponds UNIQUEMENT avec le JSON`;
-}
+${baseContext}
 
-// ────────────────────────────────────────────────────────────────
-// PROMPT LITTÉRAIRE
-// ────────────────────────────────────────────────────────────────
-function buildLiteraryPrompt({ subjectLabel, rawInput }) {
-  return `Tu es un professeur expert du BAC au Niger, spécialiste de ${subjectLabel}.
+${PERIMETER_RULES}
+${LATEX_RULES}
 
-Un élève vient de copier une partie de sa leçon. Ta mission est STRICTE :
-tu dois l'aider à retenir uniquement ce qu'il a collé, sans rien inventer.
+RÈGLE DE QUANTITÉ ADAPTATIVE :
+- Analyse la richesse de la section.
+- Nombre de questions ≈ 2 à 3 par notion importante identifiée.
+- Ne force PAS un quota.
+- Si la section est petite → peu de questions (5-8).
+- Si la section est riche → beaucoup (15-25).
+- Chaque question doit porter sur un élément RÉEL de la section.
+- Pas de questions redondantes.
 
-═══════════════════════════════════════════════════════════════
-CONTENU COLLÉ PAR L'ÉLÈVE
-═══════════════════════════════════════════════════════════════
-${rawInput}
-
-═══════════════════════════════════════════════════════════════
-RÈGLE ABSOLUE — ANTI-INVENTION
-═══════════════════════════════════════════════════════════════
-- Tu ne peux utiliser QUE le contenu fourni ci-dessus.
-- INTERDICTION d'ajouter des connaissances extérieures.
-- INTERDICTION d'inventer des dates, des noms, des citations.
-- Chaque élément doit être traçable à un passage du texte source.
-- Si une information manque, écris : "Non précisé dans ta leçon."
-
-═══════════════════════════════════════════════════════════════
-RÈGLE DE RÉDACTION DES RÉPONSES
-═══════════════════════════════════════════════════════════════
-- Chaque réponse doit être UNE SEULE PHRASE complète.
-- La phrase doit répondre réellement à la question.
-- Sujet + verbe + complément obligatoires.
-- INTERDICTION d'un mot seul ou d'un bout de phrase.
-- INTERDICTION d'un développement de plusieurs paragraphes.
-
-Exemple :
-Q : "Qu'est-ce que l'homme ?"
-✅ "L'homme est un être vivant qui vit sur la Terre."
-❌ "vivant" ou "être vivant"
-
-═══════════════════════════════════════════════════════════════
-FORMAT JSON ATTENDU
-═══════════════════════════════════════════════════════════════
+Format JSON :
 {
-  "sectionTitle": "Titre court (max 60 caractères)",
-  "profile": "literary",
-  "summary": "Résumé en 3-4 phrases, uniquement à partir du texte",
-  "keyIdeas": [
-    "Idée directrice 1",
-    "Idée directrice 2"
-  ],
-  "definitions": [
-    {
-      "term": "Terme",
-      "definition": "Une phrase complète qui définit le terme selon le texte",
-      "source": "extrait exact du texte élève"
-    }
-  ],
-  "arguments": [
-    {
-      "thesis": "Thèse du texte",
-      "arguments": ["Argument 1", "Argument 2"],
-      "source": "extrait exact"
-    }
-  ],
-  "dates": [
-    { "date": "Date", "event": "Événement", "source": "extrait" }
-  ],
-  "vocabulary": [
-    { "term": "Mot", "meaning": "Signification", "source": "extrait" }
-  ],
   "questions": [
     {
-      "q": "Question probable au BAC ?",
-      "a": "UNE phrase complète qui répond, tirée du texte",
-      "source": "extrait exact du texte élève"
+      "id": "q1",
+      "level": 1,
+      "type": "definition" | "calcul" | "application" | "comprehension" | "analyse",
+      "question": "...",
+      "answer": "...",
+      "mustHave": ["élément indispensable 1", "élément 2"],
+      "importance": 1 | 2 | 3
     }
   ]
 }
 
-CONTRAINTES :
-- keyIdeas : 3 à 5
-- definitions : 2 à 6
-- questions : 4 à 8 (PRIORITÉ)
+Réponds UNIQUEMENT avec le JSON.`
+    },
 
-⚠️ RAPPEL : si le texte contient des formules ou symboles,
-entoure-les de $...$. Sinon reste en texte simple.
+    // Tâche 5 — QCM + Vrai/Faux
+    {
+      name: 'qcm_tf',
+      maxTokens: 3000,
+      images: [],
+      systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
+      userPrompt: `Génère des QCM et Vrai/Faux UNIQUEMENT sur cette section.
 
-Réponds UNIQUEMENT avec le JSON`;
+${baseContext}
+
+${PERIMETER_RULES}
+${LATEX_RULES}
+
+Nombre adaptatif : environ 1 QCM par notion importante.
+
+Format JSON :
+{
+  "qcm": [
+    {
+      "question": "...",
+      "options": [
+        {"id": "A", "text": "..."},
+        {"id": "B", "text": "..."},
+        {"id": "C", "text": "..."},
+        {"id": "D", "text": "..."}
+      ],
+      "correct": "A",
+      "explanation": "..."
+    }
+  ],
+  "trueFalse": [
+    {
+      "statement": "...",
+      "answer": true,
+      "justification": "..."
+    }
+  ]
+}
+
+Réponds UNIQUEMENT avec le JSON.`
+    }
+  ];
+}
+
+// ═══ PROFIL 2 : SVT ═══
+function buildSvtPrompts({ subjectLabel, rawInput, images }) {
+  const baseContext = `
+Matière : ${subjectLabel}
+═══════════════════════════════════════════════════════════════
+CONTENU DE LA SECTION FOURNIE PAR L'ÉLÈVE
+═══════════════════════════════════════════════════════════════
+${rawInput}
+═══════════════════════════════════════════════════════════════
+`.trim();
+
+  return [
+    {
+      name: 'extraction',
+      maxTokens: 1500,
+      images: [],
+      systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
+      userPrompt: `Analyse cette section de SVT.
+
+${baseContext}
+
+${PERIMETER_RULES}
+
+RÈGLE SVT : Ce n'est PAS une matière de formules. Priorise :
+- les mécanismes biologiques,
+- les relations entre organes / structures,
+- les étapes,
+- les définitions biologiques.
+
+Si la section ne contient pas de formule, N'INVENTE PAS de formule.
+
+Format JSON :
+{
+  "sectionTitle": "...",
+  "mainConcepts": ["..."],
+  "terms": [{"term": "...", "definition": "..."}],
+  "mechanisms": ["mécanisme 1"]
+}
+
+Réponds UNIQUEMENT avec le JSON.`
+    },
+    {
+      name: 'explanation',
+      maxTokens: 4500,
+      images: images.slice(0, 3),
+      systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
+      userPrompt: `Tu es professeur de SVT. Explique cette section comme à un élève qui découvre.
+
+${baseContext}
+
+${PERIMETER_RULES}
+
+RÈGLES SVT :
+- Explication EN FRANÇAIS simple.
+- Décris chaque MÉCANISME étape par étape.
+- Explique les RELATIONS (organe A → organe B, cause → conséquence).
+- Utilise des termes biologiques précis MAIS explique-les.
+- Pas de formules inventées.
+- Pas de calculs inutiles.
+
+${images.length > 0 ? `
+RÈGLE IMAGES :
+- Analyse les schémas d'organes, cycles, coupes, expériences.
+- Décris ce que l'image montre.
+- Explique le lien avec le texte.
+` : ''}
+
+Format JSON :
+{
+  "sectionTitle": "...",
+  "understanding": "Ce que tu dois comprendre en 2-3 phrases.",
+  "parts": [
+    {
+      "partTitle": "...",
+      "mainIdea": "...",
+      "simpleExplanation": "...",
+      "terms": [{"term": "...", "meaning": "..."}],
+      "mechanism": {
+        "description": "Description du mécanisme",
+        "steps": ["Étape 1", "Étape 2"]
+      },
+      "relations": ["relation 1", "relation 2"],
+      "toRemember": "..."
+    }
+  ]
+}
+
+Réponds UNIQUEMENT avec le JSON.`
+    },
+    {
+      name: 'structure',
+      maxTokens: 3000,
+      images: [],
+      systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
+      userPrompt: `Structure cette section de SVT.
+
+${baseContext}
+
+${PERIMETER_RULES}
+
+N'invente JAMAIS de formule. Si la section ne contient pas de formule → tableau vide.
+
+Format JSON :
+{
+  "mechanisms": [
+    {
+      "name": "...",
+      "steps": ["Étape 1", "Étape 2"],
+      "relations": ["..."],
+      "consequences": ["..."]
+    }
+  ],
+  "definitions": [{"term": "...", "definition": "..."}],
+  "classifications": [{"category": "...", "items": ["..."]}]
+}
+
+Réponds UNIQUEMENT avec le JSON.`
+    },
+    {
+      name: 'questions',
+      maxTokens: 4000,
+      images: [],
+      systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
+      userPrompt: `Génère une banque de questions de SVT sur cette section UNIQUEMENT.
+
+${baseContext}
+
+${PERIMETER_RULES}
+
+Quantité adaptative : ~2 à 3 questions par notion importante.
+
+Types : définition, compréhension, mécanisme, relation, comparaison, analyse.
+
+Format JSON :
+{
+  "questions": [
+    {
+      "id": "q1",
+      "level": 1,
+      "type": "definition",
+      "question": "...",
+      "answer": "...",
+      "mustHave": ["..."],
+      "importance": 1 | 2 | 3
+    }
+  ]
+}
+
+Réponds UNIQUEMENT avec le JSON.`
+    },
+    {
+      name: 'qcm_tf',
+      maxTokens: 3000,
+      images: [],
+      systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
+      userPrompt: `QCM et Vrai/Faux de SVT sur cette section UNIQUEMENT.
+
+${baseContext}
+
+${PERIMETER_RULES}
+
+Format JSON :
+{
+  "qcm": [{"question": "...", "options": [{"id":"A","text":"..."},{"id":"B","text":"..."},{"id":"C","text":"..."},{"id":"D","text":"..."}], "correct": "A", "explanation": "..."}],
+  "trueFalse": [{"statement": "...", "answer": true, "justification": "..."}]
+}
+
+Réponds UNIQUEMENT avec le JSON.`
+    }
+  ];
+}
+
+// ═══ PROFIL 3 : PHILOSOPHIE ═══
+function buildPhilosophyPrompts({ subjectLabel, rawInput, images }) {
+  const baseContext = `
+Matière : ${subjectLabel}
+═══════════════════════════════════════════════════════════════
+CONTENU DE LA SECTION FOURNIE PAR L'ÉLÈVE
+═══════════════════════════════════════════════════════════════
+${rawInput}
+═══════════════════════════════════════════════════════════════
+`.trim();
+
+  return [
+    {
+      name: 'extraction',
+      maxTokens: 1500,
+      images: [],
+      systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
+      userPrompt: `Analyse cette section de philosophie.
+
+${baseContext}
+
+${PERIMETER_RULES}
+
+RÈGLE PHILO : ce n'est PAS une matière de formules. Priorise :
+- les concepts philosophiques,
+- les thèses,
+- les arguments,
+- les objections.
+
+Format JSON :
+{
+  "sectionTitle": "...",
+  "mainConcepts": ["..."],
+  "theses": [{"author": "nom si présent", "thesis": "..."}],
+  "arguments": ["..."],
+  "objections": ["..."],
+  "keyTerms": [{"term": "...", "definition": "..."}]
+}
+
+Réponds UNIQUEMENT avec le JSON.`
+    },
+    {
+      name: 'explanation',
+      maxTokens: 5000,
+      images: images.slice(0, 3),
+      systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
+      userPrompt: `Tu es professeur de philosophie. Explique cette section COMME SI L'ÉLÈVE N'Y CONNAISSAIT RIEN.
+
+${baseContext}
+
+${PERIMETER_RULES}
+
+RÈGLES PHILO (explication maximale) :
+- VULGARISE chaque concept philosophique.
+- Décompose chaque argument.
+- Donne des exemples de la vie quotidienne pour illustrer.
+- Situe l'auteur dans son contexte SI présent dans le cours.
+- Utilise des phrases simples, pas de jargon non expliqué.
+- Ne résume PAS : explique en profondeur.
+- Nombre de parties adapté à la richesse.
+
+Format JSON :
+{
+  "sectionTitle": "...",
+  "understanding": "Ce que tu dois comprendre en 2-3 phrases simples.",
+  "parts": [
+    {
+      "partTitle": "...",
+      "mainIdea": "...",
+      "simpleExplanation": "Explication longue et claire (5-10 phrases).",
+      "keyTerms": [{"term": "...", "meaning": "..."}],
+      "arguments": ["Argument 1", "Argument 2"],
+      "everydayExamples": ["Exemple du quotidien 1", "Exemple 2"],
+      "toRemember": "..."
+    }
+  ]
+}
+
+Réponds UNIQUEMENT avec le JSON.`
+    },
+    {
+      name: 'structure',
+      maxTokens: 3000,
+      images: [],
+      systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
+      userPrompt: `Structure cette section de philosophie.
+
+${baseContext}
+
+${PERIMETER_RULES}
+
+Format JSON :
+{
+  "theses": [{"thesis": "...", "arguments": ["..."]}],
+  "vocabulary": [{"term": "...", "meaning": "..."}],
+  "plans": [{"title": "Plan possible", "parties": ["I. ...", "II. ...", "III. ..."]}]
+}
+
+Réponds UNIQUEMENT avec le JSON.`
+    },
+    {
+      name: 'questions',
+      maxTokens: 4000,
+      images: [],
+      systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
+      userPrompt: `Génère des questions de philosophie sur cette section UNIQUEMENT.
+
+${baseContext}
+
+${PERIMETER_RULES}
+
+Types : définition, compréhension, explication, comparaison, argumentation.
+
+Chaque réponse doit être UNE PHRASE complète (pas un mot).
+
+Format JSON :
+{
+  "questions": [
+    {
+      "id": "q1",
+      "level": 1,
+      "type": "definition",
+      "question": "...",
+      "answer": "Une phrase complète.",
+      "mustHave": ["..."],
+      "importance": 1 | 2 | 3
+    }
+  ]
+}
+
+Réponds UNIQUEMENT avec le JSON.`
+    },
+    {
+      name: 'qcm_tf',
+      maxTokens: 2500,
+      images: [],
+      systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
+      userPrompt: `QCM et Vrai/Faux de philosophie sur cette section.
+
+${baseContext}
+
+${PERIMETER_RULES}
+
+Format JSON :
+{
+  "qcm": [{"question": "...", "options": [{"id":"A","text":"..."},{"id":"B","text":"..."},{"id":"C","text":"..."},{"id":"D","text":"..."}], "correct": "A", "explanation": "..."}],
+  "trueFalse": [{"statement": "...", "answer": true, "justification": "..."}]
+}
+
+Réponds UNIQUEMENT avec le JSON.`
+    }
+  ];
+}
+
+// ═══ PROFIL 4 : HISTOIRE-GÉO ═══
+function buildHistoryPrompts({ subjectLabel, rawInput, images }) {
+  const baseContext = `
+Matière : ${subjectLabel}
+═══════════════════════════════════════════════════════════════
+CONTENU DE LA SECTION FOURNIE PAR L'ÉLÈVE
+═══════════════════════════════════════════════════════════════
+${rawInput}
+═══════════════════════════════════════════════════════════════
+`.trim();
+
+  return [
+    {
+      name: 'extraction',
+      maxTokens: 1800,
+      images: [],
+      systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
+      userPrompt: `Analyse cette section d'histoire-géographie.
+
+${baseContext}
+
+${PERIMETER_RULES}
+
+Extrait UNIQUEMENT les FAITS présents :
+- Dates
+- Lieux
+- Personnages
+- Événements
+- Causes
+- Conséquences
+
+Format JSON :
+{
+  "sectionTitle": "...",
+  "dates": [{"date": "...", "event": "..."}],
+  "persons": [{"name": "...", "role": "..."}],
+  "places": [{"place": "...", "stake": "..."}],
+  "events": [{"event": "...", "date": "..."}],
+  "causes": ["..."],
+  "consequences": ["..."]
+}
+
+Réponds UNIQUEMENT avec le JSON.`
+    },
+    {
+      name: 'explanation',
+      maxTokens: 2500,
+      images: images.slice(0, 3),
+      systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
+      userPrompt: `Présente cette section d'histoire-géo de manière CLAIRE et CONCISE.
+
+${baseContext}
+
+${PERIMETER_RULES}
+
+RÈGLE HIST-GÉO : résumé bref (5-10 phrases max) + accent sur les faits.
+PAS d'explication longue comme en philo.
+
+${images.length > 0 ? `
+RÈGLE IMAGES :
+- Si carte : décris-la, localise, explique les enjeux.
+- Si frise : relève les dates.
+- Si tableau : décris-le.
+` : ''}
+
+Format JSON :
+{
+  "sectionTitle": "...",
+  "understanding": "Résumé en 5-8 phrases.",
+  "context": "...",
+  "keyFacts": ["fait 1", "fait 2"]
+}
+
+Réponds UNIQUEMENT avec le JSON.`
+    },
+    {
+      name: 'structure',
+      maxTokens: 2500,
+      images: [],
+      systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
+      userPrompt: `Structure cette section d'histoire-géo.
+
+${baseContext}
+
+${PERIMETER_RULES}
+
+Format JSON :
+{
+  "timeline": [{"date": "...", "event": "..."}],
+  "causesConsequences": [{"cause": "...", "consequence": "..."}],
+  "keyFigures": [{"name": "...", "role": "..."}],
+  "vocabulary": [{"term": "...", "meaning": "..."}]
+}
+
+Réponds UNIQUEMENT avec le JSON.`
+    },
+    {
+      name: 'questions',
+      maxTokens: 4500,
+      images: [],
+      systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
+      userPrompt: `Génère une BANQUE MASSIVE de questions d'histoire-géo sur cette section.
+
+${baseContext}
+
+${PERIMETER_RULES}
+
+RÈGLE HIST-GÉO : génère le MAX de questions possibles basées sur les faits.
+- 3 à 4 questions par fait important.
+- Toutes les dates → au moins 1 question.
+- Tous les personnages → au moins 1 question.
+- Toutes les causes/conséquences → au moins 1 question.
+
+Objectif : l'élève peut se tester sur CHAQUE fait de la section.
+
+Format JSON :
+{
+  "questions": [
+    {
+      "id": "q1",
+      "level": 1,
+      "type": "date" | "personnage" | "evenement" | "cause" | "consequence" | "analyse",
+      "question": "...",
+      "answer": "...",
+      "mustHave": ["..."],
+      "importance": 1 | 2 | 3
+    }
+  ]
+}
+
+Réponds UNIQUEMENT avec le JSON.`
+    },
+    {
+      name: 'qcm_tf',
+      maxTokens: 3500,
+      images: [],
+      systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
+      userPrompt: `QCM et Vrai/Faux d'histoire-géo sur cette section.
+
+${baseContext}
+
+${PERIMETER_RULES}
+
+Format JSON :
+{
+  "qcm": [{"question": "...", "options": [{"id":"A","text":"..."},{"id":"B","text":"..."},{"id":"C","text":"..."},{"id":"D","text":"..."}], "correct": "A", "explanation": "..."}],
+  "trueFalse": [{"statement": "...", "answer": true, "justification": "..."}]
+}
+
+Réponds UNIQUEMENT avec le JSON.`
+    }
+  ];
+}
+
+// ═══ PROFIL 5 : FRANÇAIS ═══
+function buildFrenchPrompts({ subjectLabel, rawInput, images }) {
+  const baseContext = `
+Matière : ${subjectLabel}
+═══════════════════════════════════════════════════════════════
+CONTENU DE LA SECTION FOURNIE PAR L'ÉLÈVE
+═══════════════════════════════════════════════════════════════
+${rawInput}
+═══════════════════════════════════════════════════════════════
+`.trim();
+
+  return [
+    {
+      name: 'extraction',
+      maxTokens: 1500,
+      images: [],
+      systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
+      userPrompt: `Analyse cette section de français.
+
+${baseContext}
+
+${PERIMETER_RULES}
+
+Format JSON :
+{
+  "sectionTitle": "...",
+  "mainConcepts": ["..."],
+  "texts": [{"title": "...", "author": "..."}],
+  "literaryDevices": ["..."],
+  "movements": ["..."],
+  "keyTerms": [{"term": "...", "definition": "..."}]
+}
+
+Réponds UNIQUEMENT avec le JSON.`
+    },
+    {
+      name: 'explanation',
+      maxTokens: 4000,
+      images: images.slice(0, 3),
+      systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
+      userPrompt: `Tu es professeur de français. Explique cette section clairement.
+
+${baseContext}
+
+${PERIMETER_RULES}
+
+RÈGLES :
+- Explication des textes / mouvements / procédés littéraires.
+- Vulgarise les figures de style.
+- Explique les termes techniques.
+- Ne résume pas : explique.
+
+Format JSON :
+{
+  "sectionTitle": "...",
+  "understanding": "...",
+  "parts": [
+    {
+      "partTitle": "...",
+      "mainIdea": "...",
+      "simpleExplanation": "...",
+      "keyTerms": [{"term": "...", "meaning": "..."}],
+      "toRemember": "..."
+    }
+  ]
+}
+
+Réponds UNIQUEMENT avec le JSON.`
+    },
+    {
+      name: 'structure',
+      maxTokens: 2500,
+      images: [],
+      systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
+      userPrompt: `Structure cette section de français.
+
+${baseContext}
+
+${PERIMETER_RULES}
+
+Format JSON :
+{
+  "literaryDevices": [{"name": "...", "definition": "...", "example": "..."}],
+  "vocabulary": [{"term": "...", "meaning": "..."}],
+  "texts": [{"title": "...", "author": "...", "analysis": "..."}]
+}
+
+Réponds UNIQUEMENT avec le JSON.`
+    },
+    {
+      name: 'questions',
+      maxTokens: 3500,
+      images: [],
+      systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
+      userPrompt: `Génère des questions de français sur cette section.
+
+${baseContext}
+
+${PERIMETER_RULES}
+
+Format JSON :
+{
+  "questions": [
+    {
+      "id": "q1",
+      "level": 1,
+      "type": "definition" | "analyse" | "comprehension",
+      "question": "...",
+      "answer": "Une phrase complète.",
+      "mustHave": ["..."],
+      "importance": 1 | 2 | 3
+    }
+  ]
+}
+
+Réponds UNIQUEMENT avec le JSON.`
+    },
+    {
+      name: 'qcm_tf',
+      maxTokens: 2500,
+      images: [],
+      systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
+      userPrompt: `QCM et Vrai/Faux de français.
+
+${baseContext}
+
+${PERIMETER_RULES}
+
+Format JSON :
+{
+  "qcm": [{"question": "...", "options": [{"id":"A","text":"..."},{"id":"B","text":"..."},{"id":"C","text":"..."},{"id":"D","text":"..."}], "correct": "A", "explanation": "..."}],
+  "trueFalse": [{"statement": "...", "answer": true, "justification": "..."}]
+}
+
+Réponds UNIQUEMENT avec le JSON.`
+    }
+  ];
+}
+
+// ═══ PROFIL 6 : LANGUE (Anglais) ═══
+function buildLanguagePrompts({ subjectLabel, rawInput, images }) {
+  const baseContext = `
+Matière : ${subjectLabel}
+═══════════════════════════════════════════════════════════════
+CONTENU DE LA SECTION FOURNIE PAR L'ÉLÈVE
+═══════════════════════════════════════════════════════════════
+${rawInput}
+═══════════════════════════════════════════════════════════════
+`.trim();
+
+  return [
+    {
+      name: 'extraction',
+      maxTokens: 1500,
+      images: [],
+      systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
+      userPrompt: `Analyse cette section d'anglais.
+
+${baseContext}
+
+${PERIMETER_RULES}
+
+RÈGLE LANGUE : extraire le vocabulaire, la grammaire, les structures.
+
+Format JSON :
+{
+  "sectionTitle": "...",
+  "vocabulary": [{"english": "word", "french": "traduction"}],
+  "grammarRules": [{"rule": "...", "explanation": "..."}],
+  "structures": ["structure 1"],
+  "keyTerms": [{"term": "...", "definition": "..."}]
+}
+
+Réponds UNIQUEMENT avec le JSON.`
+    },
+    {
+      name: 'explanation',
+      maxTokens: 4500,
+      images: images.slice(0, 3),
+      systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
+      userPrompt: `Tu es professeur d'anglais pour des FRANCOPHONES DÉBUTANTS.
+
+${baseContext}
+
+${PERIMETER_RULES}
+
+RÈGLES LANGUE (IMPORTANT) :
+- EXPLICATIONS TOUJOURS EN FRANÇAIS.
+- EXEMPLES EN ANGLAIS avec TRADUCTION SYSTÉMATIQUE.
+- Grammaire expliquée comme à un débutant.
+- Vocabulaire : chaque mot anglais → traduction → exemple.
+- Signale les pièges pour francophones (faux-amis, structures différentes).
+- Format exemple : "English example. → Traduction française."
+
+Format JSON :
+{
+  "sectionTitle": "...",
+  "understanding": "Ce que tu dois comprendre (en français).",
+  "parts": [
+    {
+      "partTitle": "...",
+      "mainIdea": "...",
+      "simpleExplanation": "Explication EN FRANÇAIS (5-10 phrases).",
+      "keyTerms": [{"english": "word", "french": "traduction", "example": "example sentence"}],
+      "examples": [{"english": "English sentence.", "french": "Traduction."}],
+      "commonMistakes": [{"mistake": "erreur fréquente", "correction": "correction"}],
+      "toRemember": "..."
+    }
+  ]
+}
+
+Réponds UNIQUEMENT avec le JSON.`
+    },
+    {
+      name: 'structure',
+      maxTokens: 3000,
+      images: [],
+      systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
+      userPrompt: `Structure cette section d'anglais.
+
+${baseContext}
+
+${PERIMETER_RULES}
+
+Format JSON :
+{
+  "vocabulary": [{"english": "...", "french": "...", "phonetic": "..."}],
+  "grammar": [{"rule": "...", "explanation_fr": "...", "examples": [{"english": "...", "french": "..."}]}],
+  "phrases": [{"english": "...", "french": "..."}]
+}
+
+Réponds UNIQUEMENT avec le JSON.`
+    },
+    {
+      name: 'questions',
+      maxTokens: 3500,
+      images: [],
+      systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
+      userPrompt: `Génère des questions d'anglais (en français pour la compréhension).
+
+${baseContext}
+
+${PERIMETER_RULES}
+
+Format JSON :
+{
+  "questions": [
+    {
+      "id": "q1",
+      "level": 1,
+      "type": "vocabulary" | "grammar" | "translation" | "comprehension",
+      "question": "...",
+      "answer": "...",
+      "mustHave": ["..."],
+      "importance": 1 | 2 | 3
+    }
+  ]
+}
+
+Réponds UNIQUEMENT avec le JSON.`
+    },
+    {
+      name: 'qcm_tf',
+      maxTokens: 2500,
+      images: [],
+      systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
+      userPrompt: `QCM et Vrai/Faux d'anglais.
+
+${baseContext}
+
+${PERIMETER_RULES}
+
+Format JSON :
+{
+  "qcm": [{"question": "...", "options": [{"id":"A","text":"..."},{"id":"B","text":"..."},{"id":"C","text":"..."},{"id":"D","text":"..."}], "correct": "A", "explanation": "..."}],
+  "trueFalse": [{"statement": "...", "answer": true, "justification": "..."}]
+}
+
+Réponds UNIQUEMENT avec le JSON.`
+    }
+  ];
 }
 
 // ────────────────────────────────────────────────────────────────
-// POST-TRAITEMENT APRÈS IA
-// Corrige automatiquement les oublis
+// SÉLECTION DU PROFIL
 // ────────────────────────────────────────────────────────────────
-function postProcessAnalysis(analysis, profile) {
-  if (!analysis) return analysis;
+function getPromptsForProfile(profile, context) {
+  switch (profile) {
+    case 'scientific': return buildScientificPrompts(context);
+    case 'svt':        return buildSvtPrompts(context);
+    case 'philosophy': return buildPhilosophyPrompts(context);
+    case 'history':    return buildHistoryPrompts(context);
+    case 'french':     return buildFrenchPrompts(context);
+    case 'language':   return buildLanguagePrompts(context);
+    default:           return buildScientificPrompts(context);
+  }
+}
 
-  // Traite les champs texte : wrap les LaTeX orphelins
-  if (typeof analysis.summary === 'string') {
-    analysis.summary = wrapOrphanLatex(analysis.summary);
+// ────────────────────────────────────────────────────────────────
+// IMAGES — VALIDATION
+// ────────────────────────────────────────────────────────────────
+function validateImages(images, isPremium) {
+  if (!Array.isArray(images)) images = [];
+  const maxImages = isPremium ? PREMIUM_MAX_IMAGES : FREE_MAX_IMAGES;
+
+  if (images.length > maxImages) {
+    throw {
+      status: 400,
+      message: `Maximum ${maxImages} images par section.`
+    };
   }
 
-  if (Array.isArray(analysis.keyIdeas)) {
-    analysis.keyIdeas = analysis.keyIdeas.map((x) =>
-      typeof x === 'string' ? wrapOrphanLatex(x) : x
-    );
-  }
+  const normalized = images.map((img, i) => {
+    if (!img || typeof img !== 'object') throw { status: 400, message: `Image ${i + 1} invalide.` };
 
-  if (Array.isArray(analysis.method)) {
-    analysis.method = analysis.method.map((x) =>
-      typeof x === 'string' ? wrapOrphanLatex(x) : x
-    );
-  }
-
-  // Formules : s'assurer que chaque latex a ses $
-  if (Array.isArray(analysis.formulas)) {
-    analysis.formulas = analysis.formulas.map((f) => {
-      if (!f || typeof f !== 'object') return f;
-      let latex = f.latex || '';
-      // Si pas de $, on en ajoute
-      if (latex && !latex.includes('$')) {
-        f.latex = `$${latex}$`;
-      }
-      // Condition : wrap orphelins
-      if (typeof f.condition === 'string') {
-        f.condition = wrapOrphanLatex(f.condition);
-      }
-      return f;
-    });
-  }
-
-  // Exemple
-  if (analysis.example) {
-    if (typeof analysis.example.enonce === 'string') {
-      analysis.example.enonce = wrapOrphanLatex(analysis.example.enonce);
+    const dataUrl = img.dataUrl || '';
+    if (!dataUrl.startsWith('data:image/')) {
+      throw { status: 400, message: `Image ${i + 1} : format non supporté.` };
     }
-    if (Array.isArray(analysis.example.steps)) {
-      analysis.example.steps = analysis.example.steps.map((x) =>
-        typeof x === 'string' ? wrapOrphanLatex(x) : x
-      );
+    if (dataUrl.length > MAX_IMAGE_SIZE_BASE64) {
+      throw { status: 400, message: `Image ${i + 1} trop volumineuse (max ~500 Ko).` };
     }
-    if (typeof analysis.example.result === 'string') {
-      analysis.example.result = wrapOrphanLatex(analysis.example.result);
-    }
+    return {
+      dataUrl,
+      caption: (img.caption || '').slice(0, 200)
+    };
+  });
+
+  const totalSize = normalized.reduce((s, img) => s + img.dataUrl.length, 0);
+  if (totalSize > MAX_TOTAL_IMAGES_SIZE) {
+    throw { status: 400, message: 'Total des images trop lourd.' };
   }
 
-  // Trap
-  if (analysis.trap) {
-    if (typeof analysis.trap.text === 'string') {
-      analysis.trap.text = wrapOrphanLatex(analysis.trap.text);
-    }
-    if (typeof analysis.trap.solution === 'string') {
-      analysis.trap.solution = wrapOrphanLatex(analysis.trap.solution);
-    }
-  }
+  return normalized;
+}
 
-  // Exercices
-  if (Array.isArray(analysis.exercises)) {
-    analysis.exercises = analysis.exercises.map((ex) => {
-      if (typeof ex.enonce === 'string') ex.enonce = wrapOrphanLatex(ex.enonce);
-      if (typeof ex.indice === 'string') ex.indice = wrapOrphanLatex(ex.indice);
-      if (ex.correction) {
-        if (Array.isArray(ex.correction.steps)) {
-          ex.correction.steps = ex.correction.steps.map((x) =>
-            typeof x === 'string' ? wrapOrphanLatex(x) : x
-          );
-        }
-        if (typeof ex.correction.reponse === 'string') {
-          ex.correction.reponse = wrapOrphanLatex(ex.correction.reponse);
-        }
-      }
-      return ex;
-    });
-  }
+// ────────────────────────────────────────────────────────────────
+// POST-TRAITEMENT (wrap LaTeX orphelins)
+// ────────────────────────────────────────────────────────────────
+function wrapOrphanLatex(text) {
+  if (!text || typeof text !== 'string') return text;
+  if (text.includes('$')) return text;
+  let r = text;
+  r = r.replace(/(\\[a-zA-Z]+(?:\{[^}]*\}){1,2})/g, ' $$$1$$ ');
+  r = r.replace(/(\\[a-zA-Z]+)(?![a-zA-Z{]|\$)/g, ' $$$1$$ ');
+  r = r.replace(/([_^]\{[^}]*\})/g, ' $$$1$$ ');
+  r = r.replace(/\${3,}/g, '$$').replace(/\$\s*\$/g, '').replace(/\s+/g, ' ').trim();
+  return r;
+}
 
-  // Questions
-  if (Array.isArray(analysis.questions)) {
-    analysis.questions = analysis.questions.map((q) => {
-      if (typeof q.q === 'string') q.q = wrapOrphanLatex(q.q);
-      if (typeof q.a === 'string') q.a = wrapOrphanLatex(q.a);
-      return q;
-    });
+function deepClean(obj) {
+  if (typeof obj === 'string') return wrapOrphanLatex(obj);
+  if (Array.isArray(obj)) return obj.map(deepClean);
+  if (obj && typeof obj === 'object') {
+    const cleaned = {};
+    for (const k in obj) cleaned[k] = deepClean(obj[k]);
+    return cleaned;
   }
-
-  // Définitions
-  if (Array.isArray(analysis.definitions)) {
-    analysis.definitions = analysis.definitions.map((d) => {
-      if (typeof d.definition === 'string') d.definition = wrapOrphanLatex(d.definition);
-      return d;
-    });
-  }
-
-  // Arguments
-  if (Array.isArray(analysis.arguments)) {
-    analysis.arguments = analysis.arguments.map((arg) => {
-      if (Array.isArray(arg.arguments)) {
-        arg.arguments = arg.arguments.map((x) =>
-          typeof x === 'string' ? wrapOrphanLatex(x) : x
-        );
-      }
-      return arg;
-    });
-  }
-
-  return analysis;
+  return obj;
 }
 
 // ────────────────────────────────────────────────────────────────
@@ -761,22 +1498,25 @@ function postProcessAnalysis(analysis, profile) {
 // ────────────────────────────────────────────────────────────────
 function buildFallbackAnalysis({ rawInput, profile }) {
   return {
-    sectionTitle: 'Analyse',
     profile,
-    summary: rawInput.slice(0, 300) + (rawInput.length > 300 ? '...' : ''),
-    keyIdeas: ['Contenu à structurer', 'IA indisponible — réessaie plus tard'],
-    formulas: [],
-    method: ['Lis le texte source'],
-    example: null,
-    trap: null,
-    questions: [
-      { q: 'Que retenir de cette partie ?', a: rawInput.slice(0, 200), source: rawInput.slice(0, 100) }
-    ],
-    exercises: [],
-    definitions: [],
-    arguments: [],
-    dates: [],
-    vocabulary: []
+    sectionTitle: 'Section',
+    explanation: {
+      sectionTitle: 'Section',
+      understanding: 'Analyse automatique indisponible. Contenu brut disponible ci-dessous.',
+      parts: [{
+        partTitle: 'Contenu',
+        mainIdea: 'Contenu fourni',
+        simpleExplanation: rawInput.slice(0, 500),
+        keyTerms: [],
+        toRemember: 'Réessayer plus tard.'
+      }]
+    },
+    structure: null,
+    questions: [],
+    qcm: [],
+    trueFalse: [],
+    imagesAnalysis: [],
+    fallback: true
   };
 }
 
@@ -861,7 +1601,6 @@ async function getDashboard(uid) {
     subjects.push({
       key: subjectKey,
       label: info.label,
-      icon: info.icon,
       chaptersCount: chapters.length,
       sectionsCount: totalSubjectSections,
       last: chapters[0]?.last || ''
@@ -996,12 +1735,7 @@ async function createChapter(uid, body) {
 
   return {
     success: true,
-    chapter: {
-      id: ref.id,
-      title: cleanTitle,
-      sectionsCount: 0,
-      last: 'à l\'instant'
-    }
+    chapter: { id: ref.id, title: cleanTitle, sectionsCount: 0, last: 'à l\'instant' }
   };
 }
 
@@ -1032,13 +1766,14 @@ async function getChapter(uid, body) {
     const s = d.data();
     const analysis = s.analysis || {};
     const questionsCount = Array.isArray(analysis.questions) ? analysis.questions.length : 0;
-    const exercisesCount = Array.isArray(analysis.exercises) ? analysis.exercises.length : 0;
+    const qcmCount = Array.isArray(analysis.qcm) ? analysis.qcm.length : 0;
 
     return {
       id: d.id,
-      title: s.title || analysis.sectionTitle || 'Section',
+      title: s.title || 'Section',
       questionsCount,
-      exercisesCount,
+      qcmCount,
+      imagesCount: Array.isArray(s.images) ? s.images.length : 0,
       time: formatRelativeDate(s.createdAt),
       status: 'done'
     };
@@ -1059,10 +1794,11 @@ async function getChapter(uid, body) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// ACTION 5 — createSection
+// ACTION 5 — createSection (fan-out multi-profils + images)
 // ═══════════════════════════════════════════════════════════════
 async function createSection(uid, body) {
   const { subject, chapterId, rawInput } = body;
+  let { images } = body;
 
   if (!ALLOWED_SUBJECTS.has(subject)) throw { status: 400, message: 'Matière invalide.' };
   if (!chapterId) throw { status: 400, message: 'chapterId requis.' };
@@ -1085,6 +1821,9 @@ async function createSection(uid, body) {
     };
   }
 
+  const isPremium = quota.premium;
+  const normalizedImages = validateImages(images, isPremium);
+
   const { db, FieldValue } = getAdminServices();
 
   const chapterRef = db
@@ -1099,51 +1838,46 @@ async function createSection(uid, body) {
   const subjectLabel = info.label;
   const profile = info.profile;
 
-  // Normalisation
   const normalizedInput = normalizeMathInput(trimmed);
 
-  // Analyse IA
-  let analysis;
-  try {
-    const prompt = profile === 'scientific'
-      ? buildScientificPrompt({ subjectLabel, rawInput: normalizedInput })
-      : buildLiteraryPrompt({ subjectLabel, rawInput: normalizedInput });
+  // Fan-out : génération des prompts selon le profil
+  const context = { subjectLabel, rawInput: normalizedInput, images: normalizedImages };
+  const tasks = getPromptsForProfile(profile, context);
+  const providers = getTextProviders();
 
-    analysis = await generateWithFallback(
-      prompt,
-      (d) => d && typeof d === 'object' && (d.summary || d.keyIdeas),
-      MAX_AI_TOKENS
-    );
+  if (!providers.length) {
+    throw { status: 503, message: 'Aucun fournisseur IA disponible.' };
+  }
 
-    // Post-traitement : corriger les LaTeX orphelins
-    analysis = postProcessAnalysis(analysis, profile);
+  console.log(`[FAN-OUT] ${tasks.length} tâches, ${providers.length} fournisseurs pour profil "${profile}"`);
 
-    // Validation
-    if (!validateAnalysis(analysis, profile)) {
-      console.warn('[PROGRESS] Validation échouée — on retente une fois');
-      const retryData = await generateWithFallback(
-        prompt + '\n\n⚠️ ATTENTION : la génération précédente contenait du LaTeX SANS $ autour. Cette fois, VÉRIFIE BIEN que CHAQUE formule est entre $...$.',
-        (d) => d && typeof d === 'object' && (d.summary || d.keyIdeas),
-        MAX_AI_TOKENS
-      );
-      analysis = postProcessAnalysis(retryData, profile);
-    }
+  // Exécution parallèle
+  const results = await runParallelTasks(tasks, providers);
 
-  } catch (aiError) {
-    console.warn('[PROGRESS] Fallback local :', aiError.message);
+  // Fusion
+  let analysis = mergeAnalysis(results, profile);
+
+  // Post-traitement LaTeX
+  analysis = deepClean(analysis);
+
+  // Fallback si rien n'a fonctionné
+  const hasContent = analysis.explanation || analysis.questions.length > 0;
+  if (!hasContent) {
+    console.warn('[FAN-OUT] Tout a échoué → fallback');
     analysis = buildFallbackAnalysis({ rawInput: normalizedInput, profile });
   }
 
+  // Sauvegarde
   const sectionRef = chapterRef.collection('sections').doc();
   const sectionId = sectionRef.id;
 
   await sectionRef.set({
-    title: analysis.sectionTitle || 'Section',
+    title: analysis.sectionTitle || analysis.explanation?.sectionTitle || 'Section',
     rawInput: trimmed,
     profile,
+    images: normalizedImages.map((img) => ({ dataUrl: img.dataUrl, caption: img.caption })),
     analysis,
     userNotes: '',
-    userImages: [],
     createdAt: FieldValue.serverTimestamp(),
     updatedAt: FieldValue.serverTimestamp()
   });
@@ -1163,9 +1897,15 @@ async function createSection(uid, body) {
       id: sectionId,
       title: analysis.sectionTitle || 'Section',
       rawInput: trimmed,
+      profile,
       analysis,
-      userNotes: '',
-      userImages: []
+      images: normalizedImages,
+      userNotes: ''
+    },
+    meta: {
+      profile,
+      tasksCount: tasks.length,
+      providersUsed: results.filter((r) => r.status === 'fulfilled').map((r) => r.provider)
     }
   };
 }
@@ -1189,9 +1929,6 @@ async function getSection(uid, body) {
   if (!snap.exists) throw { status: 404, message: 'Section introuvable.' };
 
   const s = snap.data();
-  // Post-traite à la lecture aussi (sécurité pour anciennes sections)
-  const analysis = postProcessAnalysis(s.analysis || {}, s.profile || 'scientific');
-
   return {
     success: true,
     section: {
@@ -1201,9 +1938,9 @@ async function getSection(uid, body) {
       chapterId,
       rawInput: s.rawInput || '',
       profile: s.profile || 'scientific',
-      analysis,
+      analysis: s.analysis || {},
+      images: s.images || [],
       userNotes: s.userNotes || '',
-      userImages: s.userImages || [],
       createdAt: toISO(s.createdAt),
       time: formatRelativeDate(s.createdAt)
     }
@@ -1227,7 +1964,7 @@ async function updateNotes(uid, body) {
     .collection('sections').doc(sectionId);
 
   await ref.set({
-    userNotes: userNotes.slice(0, 5000),
+    userNotes: userNotes.slice(0, 8000),
     updatedAt: FieldValue.serverTimestamp()
   }, { merge: true });
 
@@ -1310,13 +2047,13 @@ async function getFullLesson(uid, body) {
 
   const sections = sectionsSnap.docs.map((d) => {
     const s = d.data();
-    const analysis = postProcessAnalysis(s.analysis || {}, s.profile || 'scientific');
     return {
       id: d.id,
       title: s.title || 'Section',
-      analysis,
-      userNotes: s.userNotes || '',
-      userImages: s.userImages || []
+      profile: s.profile || 'scientific',
+      analysis: s.analysis || {},
+      images: s.images || [],
+      userNotes: s.userNotes || ''
     };
   });
 
@@ -1362,7 +2099,7 @@ module.exports = async function handler(request, response) {
   const action = body.action;
   const uid = user.uid;
 
-  console.log(`[PROGRESS] ${action} | uid=${uid.slice(0, 8)}`);
+  console.log(`[PROGRESS v6] ${action} | uid=${uid.slice(0, 8)}`);
 
   try {
     switch (action) {
@@ -1380,7 +2117,7 @@ module.exports = async function handler(request, response) {
         return jsonError(response, 400, `Action inconnue : "${action}"`);
     }
   } catch (error) {
-    console.error(`[PROGRESS] "${action}" failed:`, error.message);
+    console.error(`[PROGRESS v6] "${action}" failed:`, error.message);
     if (error.status) return jsonError(response, error.status, error.message, error.code);
     return jsonError(response, 500, error.message || 'Erreur serveur.');
   }

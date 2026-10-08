@@ -725,7 +725,6 @@ main {
 }
 .notes-status.saved { color: var(--success-light); }
 
-/* CTA EXAMEN */
 .cta-exam {
   display: flex;
   align-items: center;
@@ -1341,7 +1340,6 @@ const SUBJECTS = {
 };
 const ALL_SUBJECT_KEYS = Object.keys(SUBJECTS);
 
-// Mapping matière cahier → matière exam
 const EXAM_SUBJECT_MAP = {
   mathematiques: 'Mathématiques',
   physique: 'Physique',
@@ -2019,6 +2017,7 @@ async function renderSectionView(params) {
       }, 1400);
     });
 
+    // ⚡ Lien vers mode examen (avec contexte cahier)
     $('goToExamBtn')?.addEventListener('click', () => {
       const subj = $('goToExamBtn').dataset.subject;
       const chap = $('goToExamBtn').dataset.chapter;
@@ -2026,6 +2025,8 @@ async function renderSectionView(params) {
       const params = new URLSearchParams();
       if (examSubject) params.set('subject', examSubject);
       if (chap) params.set('chapter', chap);
+      if (chapterId) params.set('chapterId', chapterId);
+      params.set('useNotebook', 'true');
       window.location.href = `exam.html?${params.toString()}`;
     });
 
@@ -2586,7 +2587,6 @@ async function renderLessonView(params) {
       `;
     }).join('');
 
-    const examSubject = EXAM_SUBJECT_MAP[subject] || '';
     const chapterTitle = data.chapter.title || '';
 
     el.innerHTML = `
@@ -2615,6 +2615,7 @@ async function renderLessonView(params) {
       setTimeout(() => renderKaTeX(el), 0);
     });
 
+    // ⚡ Lien vers mode examen (avec contexte cahier)
     $('goToExamLessonBtn')?.addEventListener('click', () => {
       const subj = $('goToExamLessonBtn').dataset.subject;
       const chap = $('goToExamLessonBtn').dataset.chapter;
@@ -2622,6 +2623,8 @@ async function renderLessonView(params) {
       const params = new URLSearchParams();
       if (examSubject) params.set('subject', examSubject);
       if (chap) params.set('chapter', chap);
+      if (chapterId) params.set('chapterId', chapterId);
+      params.set('useNotebook', 'true');
       window.location.href = `exam.html?${params.toString()}`;
     });
 
@@ -2682,16 +2685,12 @@ function confirmDelete({ title, message, onConfirm }) {
   });
 }
 
-function showPremiumModal(used, limit) {
-  const message = (used && limit)
-    ? `Tu as utilisé tes <strong>${limit} sections gratuites</strong> ce mois-ci.`
-    : `Cette fonctionnalité est réservée aux membres <strong>Premium</strong>.`;
-
+function showPremiumModal() {
   openModal(`
     <div class="premium-modal">
       <div class="premium-icon">👑</div>
       <h2>Passe à <span>Premium</span></h2>
-      <p>${message}</p>
+      <p>Tu as utilisé tes <strong>5 sections gratuites</strong> ce mois-ci.</p>
 
       <ul class="premium-features">
         <li><i class="fas fa-check-circle"></i> Sections illimitées (au lieu de 5/mois)</li>
@@ -2953,7 +2952,7 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
-console.log('ARVEXA — Mon cahier v7.0 — Multi-profils + Mode examen');
+console.log('ARVEXA — Mon cahier v8.0 — Mode examen intégré');
 </script>
 </body>
 </html>

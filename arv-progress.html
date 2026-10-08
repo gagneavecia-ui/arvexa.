@@ -19,11 +19,15 @@
 <script src="katex-utils.js" defer></script>
 
 <style>
+/* ═══════════════════════════════════════════════════════════════
+   TOKENS — uniforme ARVEXA
+   ═══════════════════════════════════════════════════════════════ */
 :root {
   --accent: #B8860B;
   --accent-bright: #E0B84A;
   --success-light: #3AB67E;
   --danger: #B85C3A;
+  --danger-light: #E07A5F;
   --bg-dark: #0A0A0A;
   --card-bg: rgba(20, 20, 20, 0.6);
   --card-border: rgba(255, 255, 255, 0.06);
@@ -38,7 +42,13 @@
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html { background: var(--bg-dark); color-scheme: dark; min-width: 320px; width: 100%; }
+
+html {
+  background: var(--bg-dark);
+  color-scheme: dark;
+  min-width: 320px;
+  width: 100%;
+}
 
 body {
   margin: 0;
@@ -61,6 +71,9 @@ a { color: inherit; text-decoration: none; }
 button { cursor: pointer; font-family: inherit; border: none; background: none; color: inherit; }
 button:disabled { cursor: not-allowed; opacity: 0.55; }
 
+/* ═══════════════════════════════════════════════════════════════
+   HEADER
+   ═══════════════════════════════════════════════════════════════ */
 .header {
   position: sticky; top: 0; flex-shrink: 0; z-index: 50;
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
@@ -98,6 +111,27 @@ button:disabled { cursor: not-allowed; opacity: 0.55; }
 }
 .icon-btn:hover { border-color: rgba(224, 184, 74, 0.3); color: var(--accent-bright); }
 
+/* Badge Premium */
+.premium-badge {
+  display: none;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(224, 184, 74, 0.15), rgba(184, 134, 11, 0.08));
+  border: 1px solid rgba(224, 184, 74, 0.3);
+  color: var(--accent-bright);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.premium-badge.show { display: flex; }
+.premium-badge i { font-size: 11px; }
+
+/* ═══════════════════════════════════════════════════════════════
+   MAIN
+   ═══════════════════════════════════════════════════════════════ */
 main {
   flex: 1 1 auto; width: 100%; max-width: 820px;
   margin: 0 auto; padding: 20px 16px 60px;
@@ -110,6 +144,9 @@ main {
   to { opacity: 1; transform: none; }
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   VUE 1 — MES CAHIERS
+   ═══════════════════════════════════════════════════════════════ */
 .greeting { margin-bottom: 20px; }
 .greeting h1 {
   font-family: 'Playfair Display', serif;
@@ -252,6 +289,9 @@ main {
   width: 24px; height: 24px; font-size: 16px;
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   PAGE HERO
+   ═══════════════════════════════════════════════════════════════ */
 .page-hero {
   padding: 20px 22px; border-radius: 14px;
   background: var(--card-bg); border: 1px solid var(--card-border);
@@ -278,6 +318,9 @@ main {
 .cta-card:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(184, 134, 11, 0.35); }
 .cta-card i { font-size: 13px; }
 
+/* ═══════════════════════════════════════════════════════════════
+   SECTION HERO
+   ═══════════════════════════════════════════════════════════════ */
 .section-hero { margin-bottom: 20px; }
 .section-hero .breadcrumb {
   font-size: 12px; color: var(--text-muted); margin-bottom: 8px;
@@ -293,6 +336,9 @@ main {
 }
 .section-hero .sub { font-size: 12.5px; color: var(--text-muted); }
 
+/* ═══════════════════════════════════════════════════════════════
+   CONTENT SECTIONS
+   ═══════════════════════════════════════════════════════════════ */
 .content-section { margin-bottom: 24px; }
 .content-section-title {
   display: flex; align-items: center; gap: 10px;
@@ -305,6 +351,7 @@ main {
 .content-section-title i { color: var(--accent-bright); font-size: 12px; }
 .content-section-title .count { margin-left: auto; color: var(--text-muted); font-weight: 600; }
 
+/* RAW INPUT */
 .raw-input {
   padding: 16px 18px; border-radius: 12px;
   background: var(--block-bg);
@@ -325,6 +372,7 @@ main {
 }
 .expand-btn:hover { border-color: rgba(224, 184, 74, 0.3); background: rgba(224, 184, 74, 0.05); }
 
+/* BLOCS */
 .block {
   padding: 14px 16px; border-radius: 12px;
   background: var(--card-bg);
@@ -342,6 +390,7 @@ main {
 .block-head i { font-size: 11px; }
 .block-body { font-size: 14px; color: var(--text-body); line-height: 1.7; }
 
+/* LISTES */
 .simple-list {
   list-style: none; padding: 0;
   display: flex; flex-direction: column; gap: 8px;
@@ -355,17 +404,123 @@ main {
   flex-shrink: 0; min-width: 18px;
 }
 
+/* PARTIES (explication) */
+.part {
+  padding: 18px 18px 16px;
+  border-radius: 12px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  margin-bottom: 12px;
+}
+.part-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-light);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.part-title::before {
+  content: '';
+  width: 4px;
+  height: 20px;
+  background: linear-gradient(180deg, var(--accent-bright), var(--accent));
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.part-idea {
+  font-size: 14.5px;
+  color: var(--text-light);
+  font-weight: 600;
+  line-height: 1.6;
+  margin-bottom: 12px;
+  padding-left: 14px;
+  border-left: 2px solid rgba(224, 184, 74, 0.3);
+}
+.part-explanation {
+  font-size: 14.5px;
+  color: var(--text-body);
+  line-height: 1.75;
+  margin-bottom: 14px;
+}
+.part-terms {
+  margin-top: 10px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--block-bg);
+}
+.part-terms-title {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+}
+.part-terms-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.part-term {
+  font-size: 13.5px;
+  color: var(--text-body);
+  line-height: 1.55;
+}
+.part-term strong { color: var(--text-light); }
+.part-remember {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(69, 180, 125, 0.06);
+  border-left: 3px solid var(--success-light);
+  font-size: 13.5px;
+  color: #7ce0aa;
+  line-height: 1.6;
+}
+.part-remember strong {
+  color: var(--success-light);
+  font-weight: 700;
+  display: block;
+  margin-bottom: 4px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* FORMULES */
 .formula-block {
   padding: 14px 12px; text-align: center;
   background: var(--block-bg); border-radius: 10px;
   margin-bottom: 8px; overflow-x: auto;
 }
 .formula-block:last-child { margin-bottom: 0; }
+.formula-description {
+  font-size: 12.5px;
+  color: var(--text-dim);
+  margin-top: 6px;
+  font-style: italic;
+}
 .formula-condition {
   font-size: 11.5px; color: var(--text-muted);
-  margin-top: 6px; font-style: italic;
+  margin-top: 6px;
 }
+.formula-variables {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+}
+.formula-variable {
+  font-size: 12.5px;
+  color: var(--text-body);
+}
+.formula-variable strong { color: var(--accent-bright); }
 
+/* MÉTHODE */
 .method-list { list-style: none; padding: 0; counter-reset: m; }
 .method-list li {
   position: relative; padding-left: 28px; counter-increment: m;
@@ -380,6 +535,7 @@ main {
   display: flex; align-items: center; justify-content: center;
 }
 
+/* EXEMPLE */
 .example-enonce {
   padding: 10px 12px; border-radius: 8px;
   background: var(--block-bg); font-size: 13.5px;
@@ -401,6 +557,7 @@ main {
   font-weight: 600; margin-top: 8px;
 }
 
+/* PIÈGE */
 .trap-text { font-size: 13.5px; color: var(--text-light); line-height: 1.65; margin-bottom: 8px; }
 .trap-solution {
   padding-left: 18px; position: relative;
@@ -408,6 +565,9 @@ main {
 }
 .trap-solution::before { content: '→'; position: absolute; left: 0; top: 0; font-weight: 700; }
 
+/* ═══════════════════════════════════════════════════════════════
+   QUESTIONS / QCM / VRAI-FAUX
+   ═══════════════════════════════════════════════════════════════ */
 .qa-list { display: flex; flex-direction: column; gap: 10px; }
 .qa-item {
   border-radius: 12px; background: var(--card-bg);
@@ -421,15 +581,34 @@ main {
 }
 .qa-question:hover { background: rgba(255, 255, 255, 0.015); }
 .qa-q-icon {
-  width: 24px; height: 24px; border-radius: 7px;
+  min-width: 28px;
+  height: 24px; padding: 0 8px;
+  border-radius: 7px;
   background: rgba(224, 184, 74, 0.1); color: var(--accent-bright);
   display: flex; align-items: center; justify-content: center;
   font-size: 11px; font-weight: 800; flex-shrink: 0;
 }
+.qa-q-icon.important { background: rgba(224, 184, 74, 0.15); color: var(--accent-bright); }
+.qa-q-icon.very-important { background: rgba(224, 122, 95, 0.15); color: var(--danger-light); }
 .qa-q-text {
   flex: 1; font-size: 14px; font-weight: 600;
   color: var(--text-light); line-height: 1.5;
 }
+.qa-level {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+.qa-level.l1 { color: #6ec5ff; background: rgba(110, 197, 255, 0.08); }
+.qa-level.l2 { color: #f0c14b; background: rgba(240, 193, 75, 0.08); }
+.qa-level.l3 { color: #ff9a84; background: rgba(255, 154, 132, 0.08); }
+
 .qa-toggle {
   color: var(--text-muted); font-size: 11px;
   flex-shrink: 0; margin-top: 5px;
@@ -455,14 +634,229 @@ main {
   display: flex; align-items: center; gap: 6px;
 }
 .qa-answer-text { font-size: 14px; color: var(--text-body); line-height: 1.7; }
-.qa-source {
-  margin-top: 9px; padding-top: 9px;
-  border-top: 1px dashed var(--card-border);
-  font-size: 11.5px; color: var(--text-muted);
-  font-style: italic; line-height: 1.55;
+.qa-musthave {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(224, 184, 74, 0.05);
+  border-left: 3px solid var(--accent);
 }
-.qa-source strong { color: var(--text-dim); font-style: normal; font-weight: 700; }
+.qa-musthave-title {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent-bright);
+  margin-bottom: 6px;
+}
+.qa-musthave-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.qa-musthave-list li {
+  font-size: 13px;
+  color: var(--text-body);
+  line-height: 1.55;
+  padding-left: 14px;
+  position: relative;
+}
+.qa-musthave-list li::before {
+  content: '•';
+  position: absolute;
+  left: 2px;
+  color: var(--accent-bright);
+}
 
+/* QCM */
+.qcm-item {
+  border-radius: 12px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  padding: 16px;
+  margin-bottom: 10px;
+}
+.qcm-question {
+  font-size: 14.5px;
+  color: var(--text-light);
+  font-weight: 600;
+  line-height: 1.55;
+  margin-bottom: 12px;
+}
+.qcm-options {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.qcm-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--block-bg);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: var(--transition);
+  font-size: 13.5px;
+  color: var(--text-body);
+  line-height: 1.5;
+  text-align: left;
+  width: 100%;
+}
+.qcm-option:hover { border-color: rgba(224, 184, 74, 0.25); }
+.qcm-option.correct {
+  background: rgba(58, 182, 126, 0.1);
+  border-color: var(--success-light);
+  color: #7ce0aa;
+}
+.qcm-option.wrong {
+  background: rgba(184, 92, 58, 0.1);
+  border-color: var(--danger-light);
+  color: #ff9a84;
+}
+.qcm-option-letter {
+  width: 24px; height: 24px;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.04);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 800;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+.qcm-option.correct .qcm-option-letter {
+  background: var(--success-light);
+  color: #fff;
+}
+.qcm-option.wrong .qcm-option-letter {
+  background: var(--danger-light);
+  color: #fff;
+}
+.qcm-explanation {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(74, 175, 224, 0.06);
+  font-size: 13px;
+  color: var(--text-body);
+  line-height: 1.6;
+  display: none;
+}
+.qcm-explanation.show { display: block; }
+.qcm-explanation strong { color: #4AAFE0; }
+
+/* VRAI/FAUX */
+.tf-item {
+  border-radius: 12px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  padding: 14px 16px;
+  margin-bottom: 8px;
+}
+.tf-statement {
+  font-size: 14px;
+  color: var(--text-light);
+  font-weight: 500;
+  line-height: 1.55;
+  margin-bottom: 10px;
+}
+.tf-buttons {
+  display: flex;
+  gap: 8px;
+}
+.tf-btn {
+  flex: 1;
+  padding: 9px 14px;
+  border-radius: 10px;
+  background: var(--block-bg);
+  border: 1px solid transparent;
+  color: var(--text-dim);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: inherit;
+}
+.tf-btn:hover { border-color: rgba(224, 184, 74, 0.25); color: var(--text-light); }
+.tf-btn.correct {
+  background: rgba(58, 182, 126, 0.1);
+  border-color: var(--success-light);
+  color: #7ce0aa;
+}
+.tf-btn.wrong {
+  background: rgba(184, 92, 58, 0.1);
+  border-color: var(--danger-light);
+  color: #ff9a84;
+}
+.tf-justification {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(74, 175, 224, 0.06);
+  font-size: 13px;
+  color: var(--text-body);
+  line-height: 1.6;
+  display: none;
+}
+.tf-justification.show { display: block; }
+
+/* ═══════════════════════════════════════════════════════════════
+   IMAGES
+   ═══════════════════════════════════════════════════════════════ */
+.images-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+  margin-top: 8px;
+}
+.image-tile {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--block-bg);
+  border: 1px solid var(--card-border);
+  cursor: pointer;
+  transition: var(--transition);
+}
+.image-tile:hover { border-color: rgba(224, 184, 74, 0.3); }
+.image-tile img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  display: block;
+}
+.image-tile-caption {
+  padding: 8px 10px;
+  font-size: 11.5px;
+  color: var(--text-dim);
+  line-height: 1.4;
+  background: rgba(0, 0, 0, 0.3);
+}
+.image-tile-remove {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.75);
+  border: none;
+  color: #ff9a84;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+  opacity: 0;
+}
+.image-tile:hover .image-tile-remove { opacity: 1; }
+
+/* ═══════════════════════════════════════════════════════════════
+   NOTES
+   ═══════════════════════════════════════════════════════════════ */
 .notes-area {
   width: 100%; min-height: 110px;
   padding: 14px 16px; border-radius: 12px;
@@ -480,6 +874,9 @@ main {
 }
 .notes-status.saved { color: var(--success-light); }
 
+/* ═══════════════════════════════════════════════════════════════
+   LOADING / EMPTY
+   ═══════════════════════════════════════════════════════════════ */
 .loading-state {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: 14px; padding: 60px 20px;
@@ -492,6 +889,42 @@ main {
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 .loading-state p { font-size: 13px; color: var(--text-muted); }
+
+/* Loading avancé pour génération */
+.generating-state {
+  display: flex; flex-direction: column; align-items: center; gap: 20px;
+  padding: 60px 20px; text-align: center;
+}
+.generating-spinner {
+  width: 44px; height: 44px;
+  border: 3px solid rgba(224, 184, 74, 0.15);
+  border-top-color: var(--accent-bright);
+  border-radius: 50%; animation: spin 0.9s linear infinite;
+}
+.generating-state h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px; font-weight: 700;
+  color: var(--text-light);
+}
+.generating-steps {
+  display: flex; flex-direction: column;
+  gap: 8px; width: 100%; max-width: 380px;
+  margin-top: 8px;
+}
+.generating-step {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  font-size: 13px;
+  color: var(--text-dim);
+  transition: var(--transition);
+  opacity: 0.4;
+}
+.generating-step.active { opacity: 1; color: var(--accent-bright); border-color: rgba(224, 184, 74, 0.3); }
+.generating-step.done { opacity: 0.9; color: var(--success-light); border-color: rgba(58, 182, 126, 0.2); }
+.generating-step-icon { font-size: 15px; width: 20px; text-align: center; }
 
 .empty-state {
   text-align: center; padding: 40px 20px;
@@ -511,6 +944,9 @@ main {
 }
 .empty-state p { font-size: 13px; color: var(--text-dim); max-width: 320px; line-height: 1.6; }
 
+/* ═══════════════════════════════════════════════════════════════
+   MODALES
+   ═══════════════════════════════════════════════════════════════ */
 .modal-backdrop {
   position: fixed; inset: 0; z-index: 200;
   display: none; align-items: flex-end; justify-content: center;
@@ -639,6 +1075,7 @@ main {
   color: var(--text-muted); margin-top: 6px;
 }
 
+/* Symboles */
 .symbols-toggle {
   display: flex; align-items: center; gap: 8px;
   padding: 8px 14px; border-radius: 20px;
@@ -734,6 +1171,84 @@ main {
 }
 .symbol-btn:active { transform: scale(0.94); }
 
+/* Upload images dans modale */
+.image-upload-zone {
+  border: 2px dashed rgba(224, 184, 74, 0.25);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: var(--transition);
+  background: transparent;
+  width: 100%;
+  font-family: inherit;
+  color: var(--text-dim);
+}
+.image-upload-zone:hover {
+  border-color: var(--accent-bright);
+  background: rgba(224, 184, 74, 0.04);
+  color: var(--accent-bright);
+}
+.image-upload-zone i { font-size: 24px; margin-bottom: 8px; display: block; }
+.image-upload-zone .zone-title { font-size: 13.5px; font-weight: 600; margin-bottom: 4px; }
+.image-upload-zone .zone-hint { font-size: 11.5px; color: var(--text-muted); }
+.image-upload-zone .zone-limit {
+  font-size: 11px;
+  color: var(--accent-bright);
+  margin-top: 6px;
+  font-weight: 600;
+}
+
+.image-uploads-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+.image-uploads-grid:empty { display: none; }
+
+.image-upload-tile {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--block-bg);
+  border: 1px solid var(--card-border);
+}
+.image-upload-tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.image-upload-tile-remove {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.8);
+  border: none;
+  color: #ff9a84;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.image-upload-tile-uploading {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-bright);
+  font-size: 16px;
+}
+
+/* BOUTONS */
 .btn-full {
   width: 100%; min-height: 48px;
   padding: 14px 20px; border-radius: 12px;
@@ -764,6 +1279,121 @@ main {
 .btn-full.loading .spinner { display: block; }
 .btn-full.loading .btn-text, .btn-full.loading .btn-icon { display: none; }
 
+/* ═══════════════════════════════════════════════════════════════
+   PREMIUM MODAL
+   ═══════════════════════════════════════════════════════════════ */
+.premium-modal {
+  width: 100%; max-width: 400px;
+  background: #141414;
+  border: 1px solid rgba(224, 184, 74, 0.3);
+  border-radius: 18px;
+  padding: 28px 24px 22px;
+  text-align: center;
+  position: relative;
+  animation: popIn 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.premium-modal::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  border-radius: 18px 18px 0 0;
+  background: linear-gradient(90deg, var(--accent), var(--accent-bright), var(--accent));
+}
+.premium-modal .premium-icon {
+  width: 62px; height: 62px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(224, 184, 74, 0.15), rgba(184, 134, 11, 0.08));
+  border: 2px solid rgba(224, 184, 74, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  font-size: 28px;
+  animation: crownPulse 2s ease-in-out infinite;
+}
+@keyframes crownPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(224, 184, 74, 0.3); }
+  50% { box-shadow: 0 0 20px 6px rgba(224, 184, 74, 0.12); }
+}
+.premium-modal h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-light);
+  margin-bottom: 8px;
+}
+.premium-modal h2 span {
+  color: var(--accent-bright);
+  font-style: italic;
+}
+.premium-modal p {
+  font-size: 13.5px;
+  color: var(--text-dim);
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+.premium-modal p strong { color: var(--accent-bright); }
+.premium-modal .premium-features {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 22px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.premium-modal .premium-features li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13.5px;
+  color: var(--text-body);
+}
+.premium-modal .premium-features li i {
+  color: var(--accent-bright);
+  font-size: 13px;
+  flex-shrink: 0;
+}
+.premium-modal .btn-premium-subscribe {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 15px 20px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--accent-bright), var(--accent));
+  color: #0A0A0A;
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: var(--transition);
+  font-family: inherit;
+  border: none;
+  box-shadow: 0 4px 16px rgba(184, 134, 11, 0.3);
+}
+.premium-modal .btn-premium-subscribe:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(184, 134, 11, 0.4);
+}
+.premium-modal .btn-premium-later {
+  display: block;
+  width: 100%;
+  padding: 11px;
+  margin-top: 8px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 13px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.premium-modal .btn-premium-later:hover { color: var(--text-dim); }
+
+/* ═══════════════════════════════════════════════════════════════
+   TOASTS
+   ═══════════════════════════════════════════════════════════════ */
 .toast-container {
   position: fixed; top: calc(var(--safe-top) + 16px); left: 50%;
   transform: translateX(-50%); z-index: 9999;
@@ -794,10 +1424,16 @@ main {
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   KATEX
+   ═══════════════════════════════════════════════════════════════ */
 .katex { font-size: 1.05em; color: inherit; }
 .katex-display { margin: 8px 0; overflow-x: auto; padding: 4px 0; }
 .katex-error { color: #ff9a84 !important; }
 
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════════════════════ */
 @media (max-width: 520px) {
   main { padding: 16px 12px 50px; }
   .greeting h1 { font-size: 22px; }
@@ -807,7 +1443,9 @@ main {
   .subject-card { padding: 16px 14px; }
   .list-item { padding: 13px 14px; }
   .block { padding: 13px 15px; }
+  .part { padding: 15px 15px 14px; }
   .modal { padding: 20px 16px; padding-bottom: calc(20px + var(--safe-bottom)); }
+  .premium-modal { padding: 24px 20px 18px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -824,6 +1462,9 @@ main {
 </head>
 <body>
 
+<!-- ═══════════════════════════════════════════════════════════════
+     HEADER
+     ═══════════════════════════════════════════════════════════════ -->
 <header class="header">
   <div class="header-left">
     <button class="back-btn hidden" id="backBtn" aria-label="Retour">
@@ -835,12 +1476,19 @@ main {
     </h1>
   </div>
   <div class="header-right">
+    <div class="premium-badge" id="premiumBadge">
+      <i class="fas fa-crown"></i>
+      <span>Premium</span>
+    </div>
     <button class="icon-btn" id="refreshBtn" title="Rafraîchir">
       <i class="fas fa-rotate"></i>
     </button>
   </div>
 </header>
 
+<!-- ═══════════════════════════════════════════════════════════════
+     MAIN — 5 VUES
+     ═══════════════════════════════════════════════════════════════ -->
 <main>
   <section class="view active" id="view-notebooks"></section>
   <section class="view" id="view-notebook"></section>
@@ -849,9 +1497,15 @@ main {
   <section class="view" id="view-lesson"></section>
 </main>
 
+<!-- ═══════════════════════════════════════════════════════════════
+     MODALES / TOASTS
+     ═══════════════════════════════════════════════════════════════ -->
 <div class="modal-backdrop" id="modalBackdrop"></div>
 <div class="toast-container" id="toastContainer"></div>
 
+<!-- ═══════════════════════════════════════════════════════════════
+     SCRIPT IMPORTMAP (le module viendra au message 3)
+     ═══════════════════════════════════════════════════════════════ -->
 <script type="importmap">
 { "imports": {
   "firebase/app": "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
@@ -865,6 +1519,9 @@ import { initializeApp } from "firebase/app";
 import { getAuth, onAuthStateChanged, getIdToken } from "firebase/auth";
 import { getFirestore, doc, getDoc } from "firebase/firestore";
 
+// ═══════════════════════════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════════════════════════
 const firebaseConfig = {
   apiKey: "AIzaSyDHscOXw3rLuhV6z1Cny-bdYCumqpnG7QE",
   authDomain: "arvexa-fbf10.firebaseapp.com",
@@ -880,16 +1537,19 @@ const db = getFirestore(app);
 
 const MIN_CONTENT_LENGTH = 40;
 const MAX_CONTENT_LENGTH = 15000;
+const MAX_IMAGE_DIMENSION = 1400;      // px
+const IMAGE_QUALITY = 0.75;            // JPEG
+const MAX_IMAGE_SIZE_BYTES = 500 * 1024; // ~500 Ko par image après compression
 
 const SUBJECTS = {
-  mathematiques: { label: 'Mathématiques',    emoji: '📐' },
-  physique:      { label: 'Physique',         emoji: '⚡' },
-  chimie:        { label: 'Chimie',           emoji: '🧪' },
-  svt:           { label: 'SVT',              emoji: '🧬' },
-  philosophie:   { label: 'Philosophie',      emoji: '🧠' },
-  'histoire-geo':{ label: 'Histoire-Géo',     emoji: '🌍' },
-  francais:      { label: 'Français',         emoji: '📖' },
-  anglais:       { label: 'Anglais',          emoji: '🌐' }
+  mathematiques: { label: 'Mathématiques', emoji: '📐', profile: 'scientific' },
+  physique:      { label: 'Physique',      emoji: '⚡', profile: 'scientific' },
+  chimie:        { label: 'Chimie',        emoji: '🧪', profile: 'scientific' },
+  svt:           { label: 'SVT',           emoji: '🧬', profile: 'svt'        },
+  philosophie:   { label: 'Philosophie',   emoji: '🧠', profile: 'philosophy' },
+  'histoire-geo':{ label: 'Histoire-Géo',  emoji: '🌍', profile: 'history'    },
+  francais:      { label: 'Français',      emoji: '📖', profile: 'french'     },
+  anglais:       { label: 'Anglais',       emoji: '🌐', profile: 'language'   }
 };
 const ALL_SUBJECT_KEYS = Object.keys(SUBJECTS);
 
@@ -902,17 +1562,24 @@ const SYMBOL_GROUPS = [
   { name: 'Physique',   symbols: ['⇌','Å','°C','K','mol','pH','⌬','⚛','⚡','Ω','λ','ν','ΔE','Δt','Δx','F'] }
 ];
 
+// ═══════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════
 const state = {
   user: null,
   userData: null,
   isPremium: false,
   view: 'notebooks',
   params: {},
-  cache: { dashboard: null, chapters: {}, chapter: {} }
+  cache: { dashboard: null, chapters: {}, chapter: {} },
+  uploadImages: []      // images en attente d'envoi dans la modale
 };
 
 const $ = (id) => document.getElementById(id);
 
+// ═══════════════════════════════════════════════════════════════
+// UTILITAIRES
+// ═══════════════════════════════════════════════════════════════
 function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = String(text || '');
@@ -923,31 +1590,18 @@ function safeText(text) {
   return String(text || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-// ═══════════════════════════════════════════════════════════════
-// KATEX — version robuste finale
-// ═══════════════════════════════════════════════════════════════
+// KaTeX robuste
 let katexAttempts = 0;
-
-function isKatexReady() {
-  return typeof renderMathInElement === 'function';
-}
+function isKatexReady() { return typeof renderMathInElement === 'function'; }
 
 function renderKaTeX(root) {
   if (!root) return;
-
-  // Déjà rendu ?
   if (root.dataset.katexDone === '1') return;
 
-  // KaTeX n'est pas encore chargé → attendre
   if (!isKatexReady()) {
-    if (katexAttempts++ < 60) {
-      setTimeout(() => renderKaTeX(root), 100);
-    } else {
-      console.warn('[KaTeX] Non chargé après 6s — abandon');
-    }
+    if (katexAttempts++ < 60) setTimeout(() => renderKaTeX(root), 100);
     return;
   }
-
   katexAttempts = 0;
 
   try {
@@ -966,7 +1620,7 @@ function renderKaTeX(root) {
     });
     root.dataset.katexDone = '1';
   } catch (e) {
-    console.error('[KaTeX] Erreur:', e);
+    console.error('[KaTeX]', e);
   }
 }
 
@@ -975,10 +1629,8 @@ function resetKaTeX(root) {
   root.dataset.katexDone = '';
 }
 
-// ═══════════════════════════════════════════════════════════════
-// TOASTS
-// ═══════════════════════════════════════════════════════════════
-function showToast(message, type = 'info', duration = 2800) {
+// Toasts
+function showToast(message, type = 'info', duration = 3000) {
   const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', info: 'fa-info-circle' };
   const toast = document.createElement('div');
   toast.className = `toast ${type}`;
@@ -992,6 +1644,68 @@ function showToast(message, type = 'info', duration = 2800) {
 
 function showLoadingState(el, text = 'Chargement...') {
   el.innerHTML = `<div class="loading-state"><div class="loading-spinner"></div><p>${escapeHtml(text)}</p></div>`;
+}
+
+function showGeneratingState(el, profile) {
+  const profileLabels = {
+    scientific: 'Analyse scientifique',
+    svt: 'Analyse SVT',
+    philosophy: 'Analyse philosophique',
+    history: 'Analyse historique',
+    french: 'Analyse littéraire',
+    language: 'Analyse linguistique'
+  };
+  const label = profileLabels[profile] || 'Analyse en cours';
+
+  el.innerHTML = `
+    <div class="generating-state">
+      <div class="generating-spinner"></div>
+      <h3>${escapeHtml(label)}...</h3>
+      <div class="generating-steps">
+        <div class="generating-step active" data-step="1">
+          <span class="generating-step-icon">🔍</span>
+          <span>Extraction des concepts</span>
+        </div>
+        <div class="generating-step" data-step="2">
+          <span class="generating-step-icon">📖</span>
+          <span>Explication pédagogique</span>
+        </div>
+        <div class="generating-step" data-step="3">
+          <span class="generating-step-icon">🧩</span>
+          <span>Structuration</span>
+        </div>
+        <div class="generating-step" data-step="4">
+          <span class="generating-step-icon">❓</span>
+          <span>Banque de questions</span>
+        </div>
+        <div class="generating-step" data-step="5">
+          <span class="generating-step-icon">🎯</span>
+          <span>QCM et Vrai/Faux</span>
+        </div>
+      </div>
+      <p style="font-size:12px; color:var(--text-muted); margin-top:8px;">
+        Cela peut prendre 30 à 60 secondes.
+      </p>
+    </div>
+  `;
+
+  // Animation de progression
+  let currentStep = 1;
+  const interval = setInterval(() => {
+    const steps = el.querySelectorAll('.generating-step');
+    if (!steps.length || currentStep >= steps.length) {
+      clearInterval(interval);
+      return;
+    }
+    steps[currentStep - 1].classList.remove('active');
+    steps[currentStep - 1].classList.add('done');
+    if (currentStep < steps.length) {
+      steps[currentStep].classList.add('active');
+    }
+    currentStep++;
+  }, 6000);
+
+  return () => clearInterval(interval);
 }
 
 function showEmptyState(el, icon, title, message) {
@@ -1015,12 +1729,18 @@ function getFirstName() {
   return state.userData?.firstName || state.userData?.displayName?.split(' ')[0] || 'Élève';
 }
 
+// ═══════════════════════════════════════════════════════════════
+// API
+// ═══════════════════════════════════════════════════════════════
 async function callApi(action, params = {}) {
   if (!state.user) throw new Error('Non authentifié.');
   const token = await getIdToken(state.user);
   const response = await fetch('/api/progress', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
     body: JSON.stringify({ action, ...params })
   });
   const data = await response.json().catch(() => null);
@@ -1111,7 +1831,7 @@ function updateBackButton() {
 window.addEventListener('hashchange', () => applyRoute(routeFromHash()));
 
 // ═══════════════════════════════════════════════════════════════
-// VUE 1
+// VUE 1 — MES CAHIERS
 // ═══════════════════════════════════════════════════════════════
 async function renderNotebooksView() {
   const el = $('view-notebooks');
@@ -1201,7 +1921,7 @@ async function renderNotebooksView() {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// VUE 2
+// VUE 2 — CHAPITRES
 // ═══════════════════════════════════════════════════════════════
 async function renderNotebookView(params) {
   const el = $('view-notebook');
@@ -1294,7 +2014,7 @@ async function renderNotebookView(params) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// VUE 3
+// VUE 3 — SECTIONS
 // ═══════════════════════════════════════════════════════════════
 async function renderChapterView(params) {
   const el = $('view-chapter');
@@ -1323,7 +2043,8 @@ async function renderChapterView(params) {
               <div class="list-item-title">${idx + 1}. ${escapeHtml(s.title)}</div>
               <div class="list-item-meta">
                 ${s.questionsCount > 0 ? `<span>${s.questionsCount} Q/R</span><span class="dot"></span>` : ''}
-                ${s.exercisesCount > 0 ? `<span>${s.exercisesCount} exo${s.exercisesCount > 1 ? 's' : ''}</span><span class="dot"></span>` : ''}
+                ${s.qcmCount > 0 ? `<span>${s.qcmCount} QCM</span><span class="dot"></span>` : ''}
+                ${s.imagesCount > 0 ? `<span>${s.imagesCount} image${s.imagesCount > 1 ? 's' : ''}</span><span class="dot"></span>` : ''}
                 <span>${escapeHtml(s.time)}</span>
               </div>
             </div>
@@ -1397,7 +2118,7 @@ async function renderChapterView(params) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// VUE 4
+// VUE 4 — SECTION DÉTAILLÉE (rendu multi-profils)
 // ═══════════════════════════════════════════════════════════════
 async function renderSectionView(params) {
   const el = $('view-section');
@@ -1411,135 +2132,8 @@ async function renderSectionView(params) {
     const data = await callApi('getSection', { subject, chapterId, sectionId });
     const s = data.section;
     const a = s.analysis || {};
+    const profile = s.profile || info.profile || 'scientific';
     const chapterTitle = state.cache.chapter[`${subject}/${chapterId}`]?.chapter?.title || '';
-
-    let blocksHtml = '';
-
-    if (a.summary) {
-      blocksHtml += `<div class="block"><div class="block-head"><i class="fas fa-align-left"></i>Résumé</div><div class="block-body">${safeText(a.summary)}</div></div>`;
-    }
-
-    if (Array.isArray(a.keyIdeas) && a.keyIdeas.length > 0) {
-      blocksHtml += `<div class="block"><div class="block-head"><i class="fas fa-lightbulb"></i>Idées clés</div>
-        <ul class="simple-list">${a.keyIdeas.map((x, i) => `<li><span class="num">${i + 1}.</span><span>${safeText(x)}</span></li>`).join('')}</ul>
-      </div>`;
-    }
-
-    if (Array.isArray(a.definitions) && a.definitions.length > 0) {
-      blocksHtml += `<div class="block"><div class="block-head"><i class="fas fa-book"></i>Définitions</div>
-        <ul class="simple-list">${a.definitions.map((d, i) => `<li><span class="num">${i + 1}.</span><span><strong style="color:var(--text-light)">${safeText(d.term)}</strong> — ${safeText(d.definition)}</span></li>`).join('')}</ul>
-      </div>`;
-    }
-
-    if (Array.isArray(a.formulas) && a.formulas.length > 0) {
-      blocksHtml += `<div class="block"><div class="block-head"><i class="fas fa-square-root-variable"></i>Formules clés</div>
-        ${a.formulas.map((f) => {
-          const latex = String(f.latex || '');
-          // Si l'IA a oublié les $, on les ajoute
-          const wrapped = latex.includes('$') ? latex : `$$${latex}$$`;
-          return `<div class="formula-block"><div>${safeText(wrapped)}</div>${f.condition ? `<div class="formula-condition">${safeText(f.condition)}</div>` : ''}</div>`;
-        }).join('')}
-      </div>`;
-    }
-
-    if (Array.isArray(a.method) && a.method.length > 0) {
-      blocksHtml += `<div class="block"><div class="block-head"><i class="fas fa-list-ol"></i>Méthode</div>
-        <ol class="method-list">${a.method.map((m) => `<li>${safeText(m)}</li>`).join('')}</ol>
-      </div>`;
-    }
-
-    if (Array.isArray(a.arguments) && a.arguments.length > 0) {
-      blocksHtml += `<div class="block"><div class="block-head"><i class="fas fa-scale-balanced"></i>Arguments</div>
-        ${a.arguments.map((arg) => `
-          <div style="margin-bottom:10px;">
-            <div style="font-weight:700; color:var(--text-light); margin-bottom:6px;">${safeText(arg.thesis || '')}</div>
-            <ul class="simple-list">${(arg.arguments || []).map((x, i) => `<li><span class="num">${i + 1}.</span><span>${safeText(x)}</span></li>`).join('')}</ul>
-          </div>
-        `).join('')}
-      </div>`;
-    }
-
-    if (Array.isArray(a.dates) && a.dates.length > 0) {
-      blocksHtml += `<div class="block"><div class="block-head"><i class="fas fa-calendar"></i>Dates</div>
-        <ul class="simple-list">${a.dates.map((d, i) => `<li><span class="num">${i + 1}.</span><span><strong>${safeText(d.date)}</strong> — ${safeText(d.event)}</span></li>`).join('')}</ul>
-      </div>`;
-    }
-
-    if (Array.isArray(a.vocabulary) && a.vocabulary.length > 0) {
-      blocksHtml += `<div class="block"><div class="block-head"><i class="fas fa-spell-check"></i>Vocabulaire</div>
-        <ul class="simple-list">${a.vocabulary.map((v, i) => `<li><span class="num">${i + 1}.</span><span><strong>${safeText(v.term)}</strong> — ${safeText(v.meaning)}</span></li>`).join('')}</ul>
-      </div>`;
-    }
-
-    if (a.example && (a.example.enonce || a.example.steps)) {
-      blocksHtml += `<div class="block"><div class="block-head"><i class="fas fa-check-circle"></i>Exemple guidé</div>
-        ${a.example.enonce ? `<div class="example-enonce">${safeText(a.example.enonce)}</div>` : ''}
-        ${Array.isArray(a.example.steps) && a.example.steps.length > 0 ? `<ol class="example-steps">${a.example.steps.map((st) => `<li>${safeText(st)}</li>`).join('')}</ol>` : ''}
-        ${a.example.result ? `<div class="example-result">${safeText(a.example.result)}</div>` : ''}
-      </div>`;
-    }
-
-    if (a.trap && (a.trap.text || a.trap.solution)) {
-      blocksHtml += `<div class="block"><div class="block-head"><i class="fas fa-triangle-exclamation"></i>Piège du BAC</div>
-        ${a.trap.text ? `<div class="trap-text">${safeText(a.trap.text)}</div>` : ''}
-        ${a.trap.solution ? `<div class="trap-solution">${safeText(a.trap.solution)}</div>` : ''}
-      </div>`;
-    }
-
-    let questionsHtml = '';
-    if (Array.isArray(a.questions) && a.questions.length > 0) {
-      questionsHtml = `
-        <div class="content-section">
-          <div class="content-section-title"><i class="fas fa-circle-question"></i>Questions probables <span class="count">${a.questions.length}</span></div>
-          <div class="qa-list">
-            ${a.questions.map((q, i) => `
-              <div class="qa-item" data-qa="${i}">
-                <div class="qa-question">
-                  <div class="qa-q-icon">Q${i + 1}</div>
-                  <div class="qa-q-text">${safeText(q.q)}</div>
-                  <div class="qa-toggle"><i class="fas fa-chevron-down"></i></div>
-                </div>
-                <div class="qa-answer">
-                  <div class="qa-answer-inner">
-                    <div class="qa-answer-label"><i class="fas fa-check"></i>Réponse</div>
-                    <div class="qa-answer-text">${safeText(q.a)}</div>
-                    ${q.source ? `<div class="qa-source"><strong>📎 Source :</strong> ${safeText(q.source)}</div>` : ''}
-                  </div>
-                </div>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-      `;
-    }
-
-    let exercisesHtml = '';
-    if (Array.isArray(a.exercises) && a.exercises.length > 0) {
-      exercisesHtml = `
-        <div class="content-section">
-          <div class="content-section-title"><i class="fas fa-pencil"></i>Exercices corrigés <span class="count">${a.exercises.length}</span></div>
-          <div class="qa-list">
-            ${a.exercises.map((ex, i) => `
-              <div class="qa-item" data-qa="ex-${i}">
-                <div class="qa-question">
-                  <div class="qa-q-icon">E${i + 1}</div>
-                  <div class="qa-q-text">${safeText(ex.enonce)}</div>
-                  <div class="qa-toggle"><i class="fas fa-chevron-down"></i></div>
-                </div>
-                <div class="qa-answer">
-                  <div class="qa-answer-inner">
-                    ${ex.indice ? `<div class="qa-answer-label" style="color:var(--text-dim)"><i class="fas fa-lightbulb"></i>Indice</div><div class="qa-answer-text" style="margin-bottom:10px;">${safeText(ex.indice)}</div>` : ''}
-                    <div class="qa-answer-label"><i class="fas fa-check"></i>Correction</div>
-                    ${ex.correction && Array.isArray(ex.correction.steps) ? `<ol class="example-steps" style="margin-top:8px;">${ex.correction.steps.map((st) => `<li>${safeText(st)}</li>`).join('')}</ol>` : ''}
-                    ${ex.correction?.reponse ? `<div class="example-result" style="margin-top:10px;">${safeText(ex.correction.reponse)}</div>` : ''}
-                  </div>
-                </div>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-      `;
-    }
 
     el.innerHTML = `
       <div class="section-hero">
@@ -1552,7 +2146,7 @@ async function renderSectionView(params) {
       </div>
 
       <div class="content-section">
-        <div class="content-section-title"><i class="fas fa-paste"></i>Ce que tu as collé</div>
+        <div class="content-section-title"><i class="fas fa-paste"></i>Ton cours</div>
         <div class="raw-input" id="rawInput">${safeText(s.rawInput)}</div>
         <button class="expand-btn" id="expandRawBtn">
           <i class="fas fa-chevron-down"></i>
@@ -1560,13 +2154,9 @@ async function renderSectionView(params) {
         </button>
       </div>
 
-      <div class="content-section">
-        <div class="content-section-title"><i class="fas fa-graduation-cap"></i>L'explication du prof</div>
-        ${blocksHtml}
-      </div>
+      ${renderImagesSection(s.images)}
 
-      ${questionsHtml}
-      ${exercisesHtml}
+      <div id="analysisContainer"></div>
 
       <div class="content-section">
         <div class="content-section-title"><i class="fas fa-pen"></i>Mes notes</div>
@@ -1575,11 +2165,16 @@ async function renderSectionView(params) {
       </div>
     `;
 
-    // KaTeX : attendre le prochain frame + le délai KaTeX
+    // Rendu de l'analyse selon profil
+    const container = $('analysisContainer');
+    container.innerHTML = renderAnalysis(a, profile, s.images || []);
+
+    // KaTeX
     requestAnimationFrame(() => {
       setTimeout(() => renderKaTeX(el), 0);
     });
 
+    // Events
     $('expandRawBtn')?.addEventListener('click', () => {
       const raw = $('rawInput');
       raw.classList.toggle('expanded');
@@ -1587,6 +2182,7 @@ async function renderSectionView(params) {
       span.textContent = raw.classList.contains('expanded') ? 'Réduire' : 'Voir tout';
     });
 
+    // Q/R toggle
     el.querySelectorAll('.qa-item').forEach((item) => {
       item.querySelector('.qa-question').addEventListener('click', () => {
         item.classList.toggle('open');
@@ -1598,6 +2194,49 @@ async function renderSectionView(params) {
       });
     });
 
+    // QCM interactive
+    el.querySelectorAll('.qcm-item').forEach((qcm) => {
+      const correct = qcm.dataset.correct;
+      const options = qcm.querySelectorAll('.qcm-option');
+      const explanation = qcm.querySelector('.qcm-explanation');
+
+      options.forEach((opt) => {
+        opt.addEventListener('click', () => {
+          if (qcm.dataset.answered === '1') return;
+          qcm.dataset.answered = '1';
+          const letter = opt.dataset.letter;
+          options.forEach((o) => {
+            if (o.dataset.letter === correct) o.classList.add('correct');
+            else if (o.dataset.letter === letter) o.classList.add('wrong');
+          });
+          if (explanation) explanation.classList.add('show');
+          renderKaTeX(qcm);
+        });
+      });
+    });
+
+    // Vrai/Faux interactive
+    el.querySelectorAll('.tf-item').forEach((tf) => {
+      const answer = tf.dataset.answer === 'true';
+      const buttons = tf.querySelectorAll('.tf-btn');
+      const justification = tf.querySelector('.tf-justification');
+
+      buttons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          if (tf.dataset.answered === '1') return;
+          tf.dataset.answered = '1';
+          const chosen = btn.dataset.value === 'true';
+          buttons.forEach((b) => {
+            const bVal = b.dataset.value === 'true';
+            if (bVal === answer) b.classList.add('correct');
+            else if (bVal === chosen) b.classList.add('wrong');
+          });
+          if (justification) justification.classList.add('show');
+        });
+      });
+    });
+
+    // Auto-save notes
     let notesTimer = null;
     $('notesArea')?.addEventListener('input', () => {
       const status = $('notesStatus');
@@ -1623,7 +2262,574 @@ async function renderSectionView(params) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// VUE 5
+// RENDU ANALYSE PAR PROFIL
+// ═══════════════════════════════════════════════════════════════
+function renderAnalysis(a, profile, images) {
+  let html = '';
+
+  // ═══ EXPLICATION ═══
+  const expl = a.explanation || {};
+  if (expl.understanding) {
+    html += `<div class="content-section">
+      <div class="content-section-title"><i class="fas fa-graduation-cap"></i>L'explication du prof</div>
+      <div class="block">
+        <div class="block-head"><i class="fas fa-lightbulb"></i>Ce que tu dois comprendre</div>
+        <div class="block-body">${safeText(expl.understanding)}</div>
+      </div>
+      ${(expl.parts || []).map((p) => renderPart(p, profile)).join('')}
+    </div>`;
+  }
+
+  // ═══ STRUCTURE (formules / mécanismes / thèses) ═══
+  if (a.structure) {
+    html += renderStructure(a.structure, profile);
+  }
+
+  // ═══ IMAGES ANALYSÉES ═══
+  if (images && images.length > 0) {
+    html += `<div class="content-section">
+      <div class="content-section-title"><i class="fas fa-image"></i>Analyse des images <span class="count">${images.length}</span></div>
+      <div class="images-grid">
+        ${images.map((img, i) => `
+          <div class="image-tile">
+            <img src="${img.dataUrl}" alt="Image ${i + 1}" loading="lazy">
+            ${img.caption ? `<div class="image-tile-caption">${escapeHtml(img.caption)}</div>` : ''}
+          </div>
+        `).join('')}
+      </div>
+    </div>`;
+  }
+
+  // ═══ BANQUE DE QUESTIONS ═══
+  if (Array.isArray(a.questions) && a.questions.length > 0) {
+    html += `<div class="content-section">
+      <div class="content-section-title"><i class="fas fa-circle-question"></i>Banque de questions <span class="count">${a.questions.length}</span></div>
+      <div class="qa-list">
+        ${a.questions.map((q, i) => renderQuestion(q, i)).join('')}
+      </div>
+    </div>`;
+  }
+
+  // ═══ QCM ═══
+  if (Array.isArray(a.qcm) && a.qcm.length > 0) {
+    html += `<div class="content-section">
+      <div class="content-section-title"><i class="fas fa-list-check"></i>QCM <span class="count">${a.qcm.length}</span></div>
+      <div>${a.qcm.map((q, i) => renderQcm(q, i)).join('')}</div>
+    </div>`;
+  }
+
+  // ═══ VRAI/FAUX ═══
+  if (Array.isArray(a.trueFalse) && a.trueFalse.length > 0) {
+    html += `<div class="content-section">
+      <div class="content-section-title"><i class="fas fa-check-double"></i>Vrai ou Faux <span class="count">${a.trueFalse.length}</span></div>
+      <div>${a.trueFalse.map((tf, i) => renderTrueFalse(tf, i)).join('')}</div>
+    </div>`;
+  }
+
+  // Fallback
+  if (!html && a.fallback) {
+    html = `<div class="block">
+      <div class="block-head"><i class="fas fa-info-circle"></i>Information</div>
+      <div class="block-body">L'analyse automatique est indisponible. Réessaie en ajoutant une nouvelle section ou en réessayant plus tard.</div>
+    </div>`;
+  }
+
+  return html;
+}
+
+function renderPart(p, profile) {
+  const partTitle = p.partTitle || p.title || 'Partie';
+  const mainIdea = p.mainIdea || p.idea || '';
+  const explanation = p.simpleExplanation || p.explanation || '';
+  const terms = p.keyTerms || p.terms || [];
+  const toRemember = p.toRemember || p.memorize || '';
+
+  let extra = '';
+
+  // Pour SVT : mécanisme
+  if (profile === 'svt' && p.mechanism) {
+    const steps = p.mechanism.steps || [];
+    if (steps.length > 0) {
+      extra += `<div class="part-terms" style="margin-top:10px;">
+        <div class="part-terms-title">⚙️ ${escapeHtml(p.mechanism.description || 'Mécanisme')}</div>
+        <ol class="method-list">${steps.map((s) => `<li>${safeText(s)}</li>`).join('')}</ol>
+      </div>`;
+    }
+  }
+
+  // Pour philosophie : arguments + exemples
+  if (profile === 'philosophy') {
+    if (Array.isArray(p.arguments) && p.arguments.length > 0) {
+      extra += `<div class="part-terms" style="margin-top:10px;">
+        <div class="part-terms-title">⚖️ Arguments</div>
+        <ul class="simple-list">${p.arguments.map((arg, i) => `<li><span class="num">${i + 1}.</span><span>${safeText(arg)}</span></li>`).join('')}</ul>
+      </div>`;
+    }
+    if (Array.isArray(p.everydayExamples) && p.everydayExamples.length > 0) {
+      extra += `<div class="part-terms" style="margin-top:10px;">
+        <div class="part-terms-title">💡 Exemples du quotidien</div>
+        <ul class="simple-list">${p.everydayExamples.map((ex, i) => `<li><span class="num">${i + 1}.</span><span>${safeText(ex)}</span></li>`).join('')}</ul>
+      </div>`;
+    }
+  }
+
+  // Pour langue : exemples anglais + pièges
+  if (profile === 'language') {
+    if (Array.isArray(p.examples) && p.examples.length > 0) {
+      extra += `<div class="part-terms" style="margin-top:10px;">
+        <div class="part-terms-title">🌐 Exemples</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          ${p.examples.map((ex) => `
+            <div>
+              <div style="font-size:14px;color:var(--text-light);font-weight:600;">${safeText(ex.english)}</div>
+              <div style="font-size:13px;color:var(--text-dim);font-style:italic;">→ ${safeText(ex.french)}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>`;
+    }
+    if (Array.isArray(p.commonMistakes) && p.commonMistakes.length > 0) {
+      extra += `<div class="part-terms" style="margin-top:10px;">
+        <div class="part-terms-title">⚠️ Pièges pour francophones</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          ${p.commonMistakes.map((m) => `
+            <div style="font-size:13px;color:var(--text-body);line-height:1.55;">
+              <span style="color:#ff9a84;">❌ ${safeText(m.mistake)}</span><br>
+              <span style="color:#7ce0aa;">✅ ${safeText(m.correction)}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>`;
+    }
+  }
+
+  // Relations (SVT + scientifique)
+  if (Array.isArray(p.relations) && p.relations.length > 0) {
+    extra += `<div class="part-terms" style="margin-top:10px;">
+      <div class="part-terms-title">🔗 Relations</div>
+      <ul class="simple-list">${p.relations.map((r, i) => `<li><span class="num">${i + 1}.</span><span>${safeText(r)}</span></li>`).join('')}</ul>
+    </div>`;
+  }
+
+  // Exemple scientifique
+  if (profile === 'scientific' && p.example && typeof p.example === 'string') {
+    extra += `<div class="part-terms" style="margin-top:10px;">
+      <div class="part-terms-title">📝 Exemple</div>
+      <div style="font-size:13.5px;color:var(--text-body);line-height:1.6;">${safeText(p.example)}</div>
+    </div>`;
+  }
+
+  // Termes
+  let termsHtml = '';
+  if (Array.isArray(terms) && terms.length > 0) {
+    termsHtml = `<div class="part-terms">
+      <div class="part-terms-title">📚 Termes importants</div>
+      <div class="part-terms-list">
+        ${terms.map((t) => {
+          if (profile === 'language' && t.english) {
+            return `<div class="part-term"><strong>${safeText(t.english)}</strong> — ${safeText(t.french || t.meaning || '')}${t.example ? ` <span style="color:var(--text-muted);">(${safeText(t.example)})</span>` : ''}</div>`;
+          }
+          const term = t.term || t.name || '';
+          const meaning = t.meaning || t.definition || '';
+          return `<div class="part-term"><strong>${safeText(term)}</strong> — ${safeText(meaning)}</div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }
+
+  // À retenir
+  let rememberHtml = '';
+  if (toRemember && typeof toRemember === 'string' && toRemember.trim()) {
+    rememberHtml = `<div class="part-remember"><strong>À retenir</strong>${safeText(toRemember)}</div>`;
+  }
+
+  return `
+    <div class="part">
+      <div class="part-title">${safeText(partTitle)}</div>
+      ${mainIdea ? `<div class="part-idea">${safeText(mainIdea)}</div>` : ''}
+      ${explanation ? `<div class="part-explanation">${safeText(explanation)}</div>` : ''}
+      ${termsHtml}
+      ${extra}
+      ${rememberHtml}
+    </div>
+  `;
+}
+
+function renderStructure(structure, profile) {
+  let html = '';
+
+  // ═══ SCIENTIFIQUE : Formules + Méthode + Exemples + Pièges ═══
+  if (profile === 'scientific') {
+    if (Array.isArray(structure.formulas) && structure.formulas.length > 0) {
+      html += `<div class="content-section">
+        <div class="content-section-title"><i class="fas fa-square-root-variable"></i>Formules clés</div>
+        <div class="block">
+          ${structure.formulas.map((f) => {
+            let latex = String(f.latex || '');
+            if (latex && !latex.includes('$')) latex = `$$${latex}$$`;
+            return `
+              <div class="formula-block">
+                <div>${safeText(latex)}</div>
+                ${f.description ? `<div class="formula-description">${safeText(f.description)}</div>` : ''}
+                ${f.condition ? `<div class="formula-condition">${safeText(f.condition)}</div>` : ''}
+                ${Array.isArray(f.variables) && f.variables.length > 0 ? `
+                  <div class="formula-variables">
+                    ${f.variables.map((v) => `<div class="formula-variable"><strong>${safeText(v.symbol)}</strong> : ${safeText(v.meaning)}${v.unit ? ` (${safeText(v.unit)})` : ''}</div>`).join('')}
+                  </div>
+                ` : ''}
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>`;
+    }
+
+    if (structure.method && Array.isArray(structure.method.steps) && structure.method.steps.length > 0) {
+      html += `<div class="content-section">
+        <div class="content-section-title"><i class="fas fa-list-ol"></i>${escapeHtml(structure.method.title || 'Méthode')}</div>
+        <div class="block">
+          <ol class="method-list">${structure.method.steps.map((s) => `<li>${safeText(s)}</li>`).join('')}</ol>
+        </div>
+      </div>`;
+    }
+
+    if (Array.isArray(structure.examples) && structure.examples.length > 0) {
+      html += `<div class="content-section">
+        <div class="content-section-title"><i class="fas fa-check-circle"></i>Exemples corrigés <span class="count">${structure.examples.length}</span></div>
+        ${structure.examples.map((ex) => `
+          <div class="block">
+            <div class="example-enonce">${safeText(ex.enonce)}</div>
+            ${Array.isArray(ex.steps) ? `<ol class="example-steps">${ex.steps.map((s) => `<li>${safeText(s)}</li>`).join('')}</ol>` : ''}
+            ${ex.result ? `<div class="example-result">${safeText(ex.result)}</div>` : ''}
+          </div>
+        `).join('')}
+      </div>`;
+    }
+
+    if (Array.isArray(structure.traps) && structure.traps.length > 0) {
+      html += `<div class="content-section">
+        <div class="content-section-title"><i class="fas fa-triangle-exclamation"></i>Pièges à éviter</div>
+        ${structure.traps.map((t) => `
+          <div class="block">
+            <div class="trap-text">${safeText(t.trap)}</div>
+            <div class="trap-solution">${safeText(t.solution)}</div>
+          </div>
+        `).join('')}
+      </div>`;
+    }
+  }
+
+  // ═══ SVT : Mécanismes + Définitions + Classifications ═══
+  if (profile === 'svt') {
+    if (Array.isArray(structure.mechanisms) && structure.mechanisms.length > 0) {
+      html += `<div class="content-section">
+        <div class="content-section-title"><i class="fas fa-cogs"></i>Mécanismes <span class="count">${structure.mechanisms.length}</span></div>
+        ${structure.mechanisms.map((m) => `
+          <div class="block">
+            <div class="block-head"><i class="fas fa-arrow-right"></i>${escapeHtml(m.name || 'Mécanisme')}</div>
+            ${Array.isArray(m.steps) && m.steps.length > 0 ? `<ol class="method-list">${m.steps.map((s) => `<li>${safeText(s)}</li>`).join('')}</ol>` : ''}
+            ${Array.isArray(m.relations) && m.relations.length > 0 ? `<div style="margin-top:10px;"><div class="part-terms-title">🔗 Relations</div><ul class="simple-list">${m.relations.map((r, i) => `<li><span class="num">${i + 1}.</span><span>${safeText(r)}</span></li>`).join('')}</ul></div>` : ''}
+            ${Array.isArray(m.consequences) && m.consequences.length > 0 ? `<div style="margin-top:10px;"><div class="part-terms-title">➡️ Conséquences</div><ul class="simple-list">${m.consequences.map((c, i) => `<li><span class="num">${i + 1}.</span><span>${safeText(c)}</span></li>`).join('')}</ul></div>` : ''}
+          </div>
+        `).join('')}
+      </div>`;
+    }
+
+    if (Array.isArray(structure.definitions) && structure.definitions.length > 0) {
+      html += `<div class="content-section">
+        <div class="content-section-title"><i class="fas fa-book"></i>Définitions</div>
+        <div class="block">
+          <ul class="simple-list">
+            ${structure.definitions.map((d, i) => `<li><span class="num">${i + 1}.</span><span><strong>${safeText(d.term)}</strong> — ${safeText(d.definition)}</span></li>`).join('')}
+          </ul>
+        </div>
+      </div>`;
+    }
+
+    if (Array.isArray(structure.classifications) && structure.classifications.length > 0) {
+      html += `<div class="content-section">
+        <div class="content-section-title"><i class="fas fa-sitemap"></i>Classifications</div>
+        ${structure.classifications.map((c) => `
+          <div class="block">
+            <div class="block-head"><i class="fas fa-tag"></i>${escapeHtml(c.category || 'Catégorie')}</div>
+            <ul class="simple-list">${(c.items || []).map((item, i) => `<li><span class="num">${i + 1}.</span><span>${safeText(item)}</span></li>`).join('')}</ul>
+          </div>
+        `).join('')}
+      </div>`;
+    }
+  }
+
+  // ═══ PHILOSOPHIE : Thèses + Vocabulaire + Plans ═══
+  if (profile === 'philosophy') {
+    if (Array.isArray(structure.theses) && structure.theses.length > 0) {
+      html += `<div class="content-section">
+        <div class="content-section-title"><i class="fas fa-scale-balanced"></i>Thèses & Arguments</div>
+        ${structure.theses.map((t) => `
+          <div class="block">
+            <div class="block-head"><i class="fas fa-quote-left"></i>${safeText(t.thesis)}</div>
+            ${Array.isArray(t.arguments) && t.arguments.length > 0 ? `<ul class="simple-list">${t.arguments.map((arg, i) => `<li><span class="num">${i + 1}.</span><span>${safeText(arg)}</span></li>`).join('')}</ul>` : ''}
+          </div>
+        `).join('')}
+      </div>`;
+    }
+
+    if (Array.isArray(structure.vocabulary) && structure.vocabulary.length > 0) {
+      html += `<div class="content-section">
+        <div class="content-section-title"><i class="fas fa-spell-check"></i>Vocabulaire</div>
+        <div class="block">
+          <ul class="simple-list">
+            ${structure.vocabulary.map((v, i) => `<li><span class="num">${i + 1}.</span><span><strong>${safeText(v.term)}</strong> — ${safeText(v.meaning)}</span></li>`).join('')}
+          </ul>
+        </div>
+      </div>`;
+    }
+
+    if (Array.isArray(structure.plans) && structure.plans.length > 0) {
+      html += `<div class="content-section">
+        <div class="content-section-title"><i class="fas fa-list-ol"></i>Plans possibles</div>
+        ${structure.plans.map((p) => `
+          <div class="block">
+            <div class="block-head"><i class="fas fa-project-diagram"></i>${escapeHtml(p.title || 'Plan')}</div>
+            <ol class="method-list">${(p.parties || []).map((x) => `<li>${safeText(x)}</li>`).join('')}</ol>
+          </div>
+        `).join('')}
+      </div>`;
+    }
+  }
+
+  // ═══ HISTOIRE-GÉO : Timeline + Causes/Conséquences + Personnages + Vocabulaire ═══
+  if (profile === 'history') {
+    if (Array.isArray(structure.timeline) && structure.timeline.length > 0) {
+      html += `<div class="content-section">
+        <div class="content-section-title"><i class="fas fa-calendar"></i>Repères chronologiques</div>
+        <div class="block">
+          <ul class="simple-list">
+            ${structure.timeline.map((t, i) => `<li><span class="num">${i + 1}.</span><span><strong>${safeText(t.date)}</strong> — ${safeText(t.event)}</span></li>`).join('')}
+          </ul>
+        </div>
+      </div>`;
+    }
+
+    if (Array.isArray(structure.causesConsequences) && structure.causesConsequences.length > 0) {
+      html += `<div class="content-section">
+        <div class="content-section-title"><i class="fas fa-arrow-right-arrow-left"></i>Causes & Conséquences</div>
+        ${structure.causesConsequences.map((cc) => `
+          <div class="block">
+            <div class="block-head"><i class="fas fa-diagram-project"></i>Relation</div>
+            <div style="font-size:14px;line-height:1.7;">
+              <div style="color:#ff9a84;"><strong>Cause :</strong> ${safeText(cc.cause)}</div>
+              <div style="color:#7ce0aa;margin-top:6px;"><strong>Conséquence :</strong> ${safeText(cc.consequence)}</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>`;
+    }
+
+    if (Array.isArray(structure.keyFigures) && structure.keyFigures.length > 0) {
+      html += `<div class="content-section">
+        <div class="content-section-title"><i class="fas fa-user-tie"></i>Personnages clés</div>
+        <div class="block">
+          <ul class="simple-list">
+            ${structure.keyFigures.map((f, i) => `<li><span class="num">${i + 1}.</span><span><strong>${safeText(f.name)}</strong> — ${safeText(f.role)}</span></li>`).join('')}
+          </ul>
+        </div>
+      </div>`;
+    }
+
+    if (Array.isArray(structure.vocabulary) && structure.vocabulary.length > 0) {
+      html += `<div class="content-section">
+        <div class="content-section-title"><i class="fas fa-spell-check"></i>Vocabulaire</div>
+        <div class="block">
+          <ul class="simple-list">
+            ${structure.vocabulary.map((v, i) => `<li><span class="num">${i + 1}.</span><span><strong>${safeText(v.term)}</strong> — ${safeText(v.meaning)}</span></li>`).join('')}
+          </ul>
+        </div>
+      </div>`;
+    }
+  }
+
+  // ═══ FRANÇAIS : Procédés + Vocabulaire + Textes ═══
+  if (profile === 'french') {
+    if (Array.isArray(structure.literaryDevices) && structure.literaryDevices.length > 0) {
+      html += `<div class="content-section">
+        <div class="content-section-title"><i class="fas fa-feather"></i>Procédés littéraires</div>
+        ${structure.literaryDevices.map((d) => `
+          <div class="block">
+            <div class="block-head"><i class="fas fa-quote-right"></i>${escapeHtml(d.name)}</div>
+            <div class="block-body">${safeText(d.definition)}</div>
+            ${d.example ? `<div class="example-enonce" style="margin-top:8px;">${safeText(d.example)}</div>` : ''}
+          </div>
+        `).join('')}
+      </div>`;
+    }
+
+    if (Array.isArray(structure.vocabulary) && structure.vocabulary.length > 0) {
+      html += `<div class="content-section">
+        <div class="content-section-title"><i class="fas fa-spell-check"></i>Vocabulaire</div>
+        <div class="block">
+          <ul class="simple-list">
+            ${structure.vocabulary.map((v, i) => `<li><span class="num">${i + 1}.</span><span><strong>${safeText(v.term)}</strong> — ${safeText(v.meaning)}</span></li>`).join('')}
+          </ul>
+        </div>
+      </div>`;
+    }
+
+    if (Array.isArray(structure.texts) && structure.texts.length > 0) {
+      html += `<div class="content-section">
+        <div class="content-section-title"><i class="fas fa-book"></i>Textes</div>
+        ${structure.texts.map((t) => `
+          <div class="block">
+            <div class="block-head"><i class="fas fa-bookmark"></i>${escapeHtml(t.title)}${t.author ? ' — ' + escapeHtml(t.author) : ''}</div>
+            ${t.analysis ? `<div class="block-body">${safeText(t.analysis)}</div>` : ''}
+          </div>
+        `).join('')}
+      </div>`;
+    }
+  }
+
+  // ═══ LANGUE : Vocabulaire + Grammaire + Phrases ═══
+  if (profile === 'language') {
+    if (Array.isArray(structure.vocabulary) && structure.vocabulary.length > 0) {
+      html += `<div class="content-section">
+        <div class="content-section-title"><i class="fas fa-language"></i>Vocabulaire anglais <span class="count">${structure.vocabulary.length}</span></div>
+        <div class="block">
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            ${structure.vocabulary.map((v) => `
+              <div style="display:flex;flex-direction:column;gap:2px;">
+                <div style="font-size:14.5px;font-weight:600;color:var(--text-light);">
+                  ${safeText(v.english)}
+                  ${v.phonetic ? `<span style="font-size:12px;color:var(--text-muted);font-weight:400;margin-left:6px;">${safeText(v.phonetic)}</span>` : ''}
+                </div>
+                <div style="font-size:13.5px;color:var(--accent-bright);">→ ${safeText(v.french)}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>`;
+    }
+
+    if (Array.isArray(structure.grammar) && structure.grammar.length > 0) {
+      html += `<div class="content-section">
+        <div class="content-section-title"><i class="fas fa-book-open"></i>Grammaire</div>
+        ${structure.grammar.map((g) => `
+          <div class="block">
+            <div class="block-head"><i class="fas fa-check"></i>${escapeHtml(g.rule || 'Règle')}</div>
+            <div class="block-body">${safeText(g.explanation_fr || g.explanation || '')}</div>
+            ${Array.isArray(g.examples) && g.examples.length > 0 ? `
+              <div style="margin-top:10px;display:flex;flex-direction:column;gap:6px;">
+                ${g.examples.map((ex) => `
+                  <div>
+                    <div style="font-size:14px;color:var(--text-light);">${safeText(ex.english)}</div>
+                    <div style="font-size:13px;color:var(--text-dim);font-style:italic;">→ ${safeText(ex.french)}</div>
+                  </div>
+                `).join('')}
+              </div>
+            ` : ''}
+          </div>
+        `).join('')}
+      </div>`;
+    }
+
+    if (Array.isArray(structure.phrases) && structure.phrases.length > 0) {
+      html += `<div class="content-section">
+        <div class="content-section-title"><i class="fas fa-comments"></i>Phrases types</div>
+        <div class="block">
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            ${structure.phrases.map((p) => `
+              <div>
+                <div style="font-size:14px;color:var(--text-light);">${safeText(p.english)}</div>
+                <div style="font-size:13px;color:var(--text-dim);font-style:italic;">→ ${safeText(p.french)}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>`;
+    }
+  }
+
+  return html;
+}
+
+function renderQuestion(q, idx) {
+  const level = Number(q.level) || 1;
+  const importance = Number(q.importance) || 1;
+  const iconClass = importance >= 3 ? 'very-important' : importance === 2 ? 'important' : '';
+
+  return `
+    <div class="qa-item" data-qa="${idx}">
+      <div class="qa-question">
+        <div class="qa-q-icon ${iconClass}">Q${idx + 1}</div>
+        <div class="qa-q-text">${safeText(q.question)}</div>
+        <span class="qa-level l${level}">Niv ${level}</span>
+        <div class="qa-toggle"><i class="fas fa-chevron-down"></i></div>
+      </div>
+      <div class="qa-answer">
+        <div class="qa-answer-inner">
+          <div class="qa-answer-label"><i class="fas fa-check"></i>Réponse</div>
+          <div class="qa-answer-text">${safeText(q.answer)}</div>
+          ${Array.isArray(q.mustHave) && q.mustHave.length > 0 ? `
+            <div class="qa-musthave">
+              <div class="qa-musthave-title">Éléments indispensables</div>
+              <ul class="qa-musthave-list">
+                ${q.mustHave.map((m) => `<li>${safeText(m)}</li>`).join('')}
+              </ul>
+            </div>
+          ` : ''}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderQcm(q, idx) {
+  return `
+    <div class="qcm-item" data-correct="${escapeHtml(q.correct || 'A')}">
+      <div class="qcm-question">${idx + 1}. ${safeText(q.question)}</div>
+      <div class="qcm-options">
+        ${(q.options || []).map((opt) => `
+          <button class="qcm-option" data-letter="${escapeHtml(opt.id)}">
+            <span class="qcm-option-letter">${escapeHtml(opt.id)}</span>
+            <span>${safeText(opt.text)}</span>
+          </button>
+        `).join('')}
+      </div>
+      ${q.explanation ? `<div class="qcm-explanation"><strong>💡</strong> ${safeText(q.explanation)}</div>` : ''}
+    </div>
+  `;
+}
+
+function renderTrueFalse(tf, idx) {
+  return `
+    <div class="tf-item" data-answer="${tf.answer ? 'true' : 'false'}">
+      <div class="tf-statement">${idx + 1}. ${safeText(tf.statement)}</div>
+      <div class="tf-buttons">
+        <button class="tf-btn" data-value="true"><i class="fas fa-check"></i> Vrai</button>
+        <button class="tf-btn" data-value="false"><i class="fas fa-times"></i> Faux</button>
+      </div>
+      ${tf.justification ? `<div class="tf-justification"><strong>💡</strong> ${safeText(tf.justification)}</div>` : ''}
+    </div>
+  `;
+}
+
+function renderImagesSection(images) {
+  if (!Array.isArray(images) || images.length === 0) return '';
+  return `
+    <div class="content-section">
+      <div class="content-section-title"><i class="fas fa-image"></i>Images du cours <span class="count">${images.length}</span></div>
+      <div class="images-grid">
+        ${images.map((img, i) => `
+          <div class="image-tile">
+            <img src="${img.dataUrl}" alt="Image ${i + 1}" loading="lazy">
+            ${img.caption ? `<div class="image-tile-caption">${escapeHtml(img.caption)}</div>` : ''}
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// VUE 5 — LEÇON COMPLÈTE
 // ═══════════════════════════════════════════════════════════════
 async function renderLessonView(params) {
   const el = $('view-lesson');
@@ -1646,28 +2852,32 @@ async function renderLessonView(params) {
       const a = s.analysis || {};
       let content = '';
 
-      if (a.summary) content += `<div class="block"><div class="block-head"><i class="fas fa-align-left"></i>Résumé</div><div class="block-body">${safeText(a.summary)}</div></div>`;
-      if (Array.isArray(a.keyIdeas) && a.keyIdeas.length > 0) {
-        content += `<div class="block"><div class="block-head"><i class="fas fa-lightbulb"></i>Idées clés</div><ul class="simple-list">${a.keyIdeas.map((x, j) => `<li><span class="num">${j + 1}.</span><span>${safeText(x)}</span></li>`).join('')}</ul></div>`;
+      if (a.explanation?.understanding) {
+        content += `<div class="block">
+          <div class="block-head"><i class="fas fa-lightbulb"></i>À comprendre</div>
+          <div class="block-body">${safeText(a.explanation.understanding)}</div>
+        </div>`;
       }
-      if (Array.isArray(a.formulas) && a.formulas.length > 0) {
-        content += `<div class="block"><div class="block-head"><i class="fas fa-square-root-variable"></i>Formules</div>${a.formulas.map((f) => {
-          const latex = String(f.latex || '');
-          const wrapped = latex.includes('$') ? latex : `$$${latex}$$`;
-          return `<div class="formula-block"><div>${safeText(wrapped)}</div></div>`;
-        }).join('')}</div>`;
+
+      if (a.explanation?.parts) {
+        content += a.explanation.parts.map((p) => renderPart(p, s.profile || 'scientific')).join('');
       }
-      if (Array.isArray(a.definitions) && a.definitions.length > 0) {
-        content += `<div class="block"><div class="block-head"><i class="fas fa-book"></i>Définitions</div><ul class="simple-list">${a.definitions.map((d, j) => `<li><span class="num">${j + 1}.</span><span><strong>${safeText(d.term)}</strong> — ${safeText(d.definition)}</span></li>`).join('')}</ul></div>`;
+
+      if (a.structure) {
+        content += renderStructure(a.structure, s.profile || 'scientific');
       }
+
       if (s.userNotes && s.userNotes.trim()) {
-        content += `<div class="block"><div class="block-head"><i class="fas fa-pen"></i>Mes notes</div><div class="block-body" style="white-space:pre-wrap;">${safeText(s.userNotes)}</div></div>`;
+        content += `<div class="block">
+          <div class="block-head"><i class="fas fa-pen"></i>Mes notes</div>
+          <div class="block-body" style="white-space:pre-wrap;">${safeText(s.userNotes)}</div>
+        </div>`;
       }
 
       return `
-        <div style="margin-bottom:28px;">
-          <div style="font-size:11px; font-weight:700; color:var(--accent-bright); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px;">Section ${i + 1}</div>
-          <div style="font-family:'Playfair Display',serif; font-size:20px; font-weight:700; color:var(--text-light); margin-bottom:14px;">${escapeHtml(s.title)}</div>
+        <div style="margin-bottom:32px;">
+          <div style="font-size:11px;font-weight:700;color:var(--accent-bright);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;">Section ${i + 1}</div>
+          <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--text-light);margin-bottom:14px;">${escapeHtml(s.title)}</div>
           ${content}
         </div>
       `;
@@ -1675,10 +2885,10 @@ async function renderLessonView(params) {
 
     el.innerHTML = `
       <div class="page-hero" style="text-align:center;">
-        <div style="font-size:32px; margin-bottom:8px;">${info.emoji}</div>
-        <div style="font-size:11px; font-weight:700; color:var(--accent-bright); text-transform:uppercase; letter-spacing:0.15em; margin-bottom:6px;">${escapeHtml(info.label)}</div>
-        <h1 style="font-family:'Playfair Display',serif; font-size:24px; font-weight:700; color:var(--text-light); margin-bottom:6px;">${escapeHtml(data.chapter.title)}</h1>
-        <div style="font-size:13px; color:var(--text-dim);">${sections.length} section${sections.length > 1 ? 's' : ''}</div>
+        <div style="font-size:32px;margin-bottom:8px;">${info.emoji}</div>
+        <div style="font-size:11px;font-weight:700;color:var(--accent-bright);text-transform:uppercase;letter-spacing:0.15em;margin-bottom:6px;">${escapeHtml(info.label)}</div>
+        <h1 style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--text-light);margin-bottom:6px;">${escapeHtml(data.chapter.title)}</h1>
+        <div style="font-size:13px;color:var(--text-dim);">${sections.length} section${sections.length > 1 ? 's' : ''}</div>
       </div>
       ${sectionsHtml}
     `;
@@ -1700,6 +2910,7 @@ function closeModal() {
   $('modalBackdrop').classList.remove('center');
   $('modalBackdrop').innerHTML = '';
   document.body.style.overflow = '';
+  state.uploadImages = [];
 }
 
 function openModal(html, { center = false } = {}) {
@@ -1744,6 +2955,36 @@ function confirmDelete({ title, message, onConfirm }) {
   });
 }
 
+function showPremiumModal(used, limit) {
+  const message = (used && limit)
+    ? `Tu as utilisé tes <strong>${limit} sections gratuites</strong> ce mois-ci.`
+    : `Cette fonctionnalité est réservée aux membres <strong>Premium</strong>.`;
+
+  openModal(`
+    <div class="premium-modal">
+      <div class="premium-icon">👑</div>
+      <h2>Passe à <span>Premium</span></h2>
+      <p>${message}</p>
+
+      <ul class="premium-features">
+        <li><i class="fas fa-check-circle"></i> Sections illimitées (au lieu de 5/mois)</li>
+        <li><i class="fas fa-check-circle"></i> Jusqu'à 10 images par section (au lieu de 3)</li>
+        <li><i class="fas fa-check-circle"></i> Analyses IA sans limite</li>
+        <li><i class="fas fa-check-circle"></i> Accès illimité à tous les outils</li>
+      </ul>
+
+      <a href="abonnement.html" class="btn-premium-subscribe">
+        <i class="fas fa-crown"></i>
+        <span>S'abonner maintenant</span>
+      </a>
+      <button class="btn-premium-later" id="premiumLaterBtn">Plus tard</button>
+    </div>
+  `, { center: true });
+
+  $('premiumLaterBtn')?.addEventListener('click', closeModal);
+}
+
+// Modale nouveau chapitre
 function openNewChapterModal(subject) {
   const info = SUBJECTS[subject];
 
@@ -1756,7 +2997,7 @@ function openNewChapterModal(subject) {
       </div>
 
       <div class="form-field">
-        <label class="form-label"><i class="fas fa-heading" style="color:var(--accent-bright); margin-right:6px;"></i>Titre du chapitre</label>
+        <label class="form-label">Titre du chapitre</label>
         <input type="text" class="form-input" id="newChapterTitle" placeholder="Ex : Nombres complexes" maxlength="100">
       </div>
 
@@ -1794,8 +3035,11 @@ function openNewChapterModal(subject) {
   setTimeout(() => input.focus(), 200);
 }
 
+// Modale ajouter une section
 function openAddSectionModal(subject, chapterId) {
   const info = SUBJECTS[subject];
+  const isPremium = state.isPremium;
+  const maxImages = isPremium ? 10 : 3;
 
   const tabsHtml = SYMBOL_GROUPS.map((g, i) =>
     `<button type="button" class="symbols-tab ${i === 0 ? 'active' : ''}" data-tab="${i}">${escapeHtml(g.name)}</button>`
@@ -1833,13 +3077,26 @@ function openAddSectionModal(subject, chapterId) {
           </div>
         </div>
 
-        <textarea class="form-textarea" id="sectionBody" placeholder="Colle ici la partie du cours que tu viens d'étudier. Tape normalement, sans te soucier des formules." maxlength="${MAX_CONTENT_LENGTH}"></textarea>
+        <textarea class="form-textarea" id="sectionBody" placeholder="Colle ici la partie du cours que tu viens d'étudier." maxlength="${MAX_CONTENT_LENGTH}"></textarea>
         <div class="char-counter" id="sectionCounter">0 / ${MAX_CONTENT_LENGTH}</div>
       </div>
 
-      <p style="font-size:12px; color:var(--text-muted); line-height:1.55; margin-bottom:16px;">
-        💡 L'IA convertira automatiquement <code style="color:var(--text-dim)">i²</code> en <code style="color:var(--text-dim)">$i^2$</code>, <code style="color:var(--text-dim)">racine de a²+b²</code> en <code style="color:var(--text-dim)">$\\sqrt{a^2+b^2}$</code>, etc.
-      </p>
+      <div class="form-field">
+        <label class="form-label">
+          <i class="fas fa-image" style="color:var(--accent-bright);margin-right:6px;"></i>Images (optionnel)
+        </label>
+
+        <button type="button" class="image-upload-zone" id="imageUploadZone">
+          <i class="fas fa-cloud-arrow-up"></i>
+          <div class="zone-title">Ajouter des images</div>
+          <div class="zone-hint">Schémas, photos de ton cahier, expériences...</div>
+          <div class="zone-limit">${isPremium ? `Jusqu'à ${maxImages} images` : `Jusqu'à ${maxImages} images (Premium : ${10})`}</div>
+        </button>
+
+        <input type="file" id="imageInput" accept="image/*" multiple style="display:none;">
+
+        <div class="image-uploads-grid" id="imageUploadsGrid"></div>
+      </div>
 
       <button class="btn-full primary" id="sectionSubmitBtn" disabled>
         <span class="btn-icon"><i class="fas fa-wand-magic-sparkles"></i></span>
@@ -1854,11 +3111,35 @@ function openAddSectionModal(subject, chapterId) {
   const submitBtn = $('sectionSubmitBtn');
   const toggle = $('symbolsToggle');
   const panel = $('symbolsPanel');
+  const imageZone = $('imageUploadZone');
+  const imageInput = $('imageInput');
+  const imageGrid = $('imageUploadsGrid');
+
+  state.uploadImages = [];
 
   function updateReady() {
     const len = body.value.trim().length;
     submitBtn.disabled = len < MIN_CONTENT_LENGTH;
     counter.textContent = `${body.value.length} / ${MAX_CONTENT_LENGTH}`;
+  }
+
+  function renderImageUploads() {
+    imageGrid.innerHTML = state.uploadImages.map((img, i) => `
+      <div class="image-upload-tile">
+        <img src="${img.dataUrl}" alt="Image ${i + 1}">
+        <button class="image-upload-tile-remove" data-remove="${i}" title="Supprimer">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    `).join('');
+
+    imageGrid.querySelectorAll('[data-remove]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.dataset.remove);
+        state.uploadImages.splice(idx, 1);
+        renderImageUploads();
+      });
+    });
   }
 
   body.addEventListener('input', updateReady);
@@ -1894,25 +3175,73 @@ function openAddSectionModal(subject, chapterId) {
     });
   });
 
+  // Upload images
+  imageZone.addEventListener('click', () => imageInput.click());
+
+  imageInput.addEventListener('change', async (e) => {
+    const files = Array.from(e.target.files || []);
+    imageInput.value = '';
+
+    for (const file of files) {
+      if (state.uploadImages.length >= maxImages) {
+        showToast(`Maximum ${maxImages} images${isPremium ? '' : '. Passe à Premium pour 10.'}`, 'error');
+        break;
+      }
+      if (!file.type.startsWith('image/')) continue;
+
+      try {
+        const compressed = await compressImage(file);
+        state.uploadImages.push({
+          dataUrl: compressed.dataUrl,
+          caption: ''
+        });
+        renderImageUploads();
+      } catch (err) {
+        console.error('[IMAGE] Compression failed:', err);
+        showToast('Impossible de traiter l\'image', 'error');
+      }
+    }
+  });
+
   submitBtn.addEventListener('click', async () => {
     const rawInput = body.value.trim();
     if (rawInput.length < MIN_CONTENT_LENGTH) {
       showToast(`Contenu trop court (min ${MIN_CONTENT_LENGTH} caractères)`, 'error');
       return;
     }
+
     submitBtn.disabled = true;
     submitBtn.classList.add('loading');
+
+    // Afficher l'état de génération
+    const container = $('view-section');
+    const info = SUBJECTS[subject];
+    document.querySelectorAll('.view').forEach((v) => v.classList.remove('active'));
+    container.classList.add('active');
+    const cleanupProgress = showGeneratingState(container, info?.profile || 'scientific');
+
     try {
-      const result = await callApi('createSection', { subject, chapterId, rawInput });
+      closeModal();
+      const result = await callApi('createSection', {
+        subject,
+        chapterId,
+        rawInput,
+        images: state.uploadImages
+      });
+
+      cleanupProgress();
       showToast('Section analysée', 'success');
       delete state.cache.chapter[`${subject}/${chapterId}`];
-      closeModal();
       applyRoute({ view: 'section', params: { subject, chapterId, sectionId: result.sectionId } });
     } catch (e) {
-      if (e.code === 'FREE_SECTION_LIMIT') showToast('Limite gratuite atteinte.', 'error', 5000);
-      else showToast('Erreur : ' + e.message, 'error', 5000);
-      submitBtn.disabled = false;
-      submitBtn.classList.remove('loading');
+      cleanupProgress();
+      if (e.code === 'FREE_SECTION_LIMIT') {
+        showPremiumModal();
+        applyRoute({ view: 'chapter', params: { subject, chapterId } });
+      } else {
+        showToast('Erreur : ' + e.message, 'error', 5000);
+        applyRoute({ view: 'chapter', params: { subject, chapterId } });
+      }
     }
   });
 
@@ -1920,7 +3249,48 @@ function openAddSectionModal(subject, chapterId) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// EVENTS GLOBAUX
+// COMPRESSION IMAGE (canvas)
+// ═══════════════════════════════════════════════════════════════
+function compressImage(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        let { width, height } = img;
+        const ratio = Math.min(1, MAX_IMAGE_DIMENSION / Math.max(width, height));
+        const newWidth = Math.round(width * ratio);
+        const newHeight = Math.round(height * ratio);
+
+        const canvas = document.createElement('canvas');
+        canvas.width = newWidth;
+        canvas.height = newHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, newWidth, newHeight);
+
+        let quality = IMAGE_QUALITY;
+        let dataUrl = canvas.toDataURL('image/jpeg', quality);
+
+        // Réduire la qualité si trop lourd
+        let attempts = 0;
+        while (dataUrl.length > MAX_IMAGE_SIZE_BYTES * 1.33 && quality > 0.4 && attempts < 5) {
+          quality -= 0.1;
+          dataUrl = canvas.toDataURL('image/jpeg', quality);
+          attempts++;
+        }
+
+        resolve({ dataUrl });
+      };
+      img.onerror = () => reject(new Error('Image invalide'));
+      img.src = e.target.result;
+    };
+    reader.onerror = () => reject(new Error('Lecture fichier échouée'));
+    reader.readAsDataURL(file);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ÉVÉNEMENTS GLOBAUX
 // ═══════════════════════════════════════════════════════════════
 $('backBtn').addEventListener('click', () => window.history.back());
 
@@ -1930,17 +3300,38 @@ $('refreshBtn').addEventListener('click', () => {
   showToast('Actualisé', 'success', 1200);
 });
 
+// ═══════════════════════════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════════════════════════
 function isUserPremium(data) {
   if (!data) return false;
-  const active = data.premium === true || data.isUnlocked === true || data.hasDeposited === true;
-  if (!active) return false;
+  const status = data.subscriptionStatus || 'none';
+  if (status === 'pending') return false;
+
+  const hasPremium = data.premium === true ||
+                     data.isUnlocked === true ||
+                     data.hasDeposited === true;
+
   const end = data.subscriptionEndDate?.toDate?.() ||
     (data.subscriptionEndDate?.seconds ? new Date(data.subscriptionEndDate.seconds * 1000) : null);
-  return !end || end.getTime() > Date.now();
+
+  if (hasPremium && end) return end.getTime() > Date.now();
+  if (status === 'expired') return false;
+  if (hasPremium && !end) return true;
+  return false;
+}
+
+function updatePremiumBadge() {
+  const badge = $('premiumBadge');
+  if (state.isPremium) badge.classList.add('show');
+  else badge.classList.remove('show');
 }
 
 onAuthStateChanged(auth, async (user) => {
-  if (!user) { window.location.replace('login.html'); return; }
+  if (!user) {
+    window.location.replace('login.html');
+    return;
+  }
   state.user = user;
 
   try {
@@ -1951,6 +3342,7 @@ onAuthStateChanged(auth, async (user) => {
     }
   } catch (_) {}
 
+  updatePremiumBadge();
   applyRoute(routeFromHash());
 
   if (!window.location.hash) {
@@ -1958,7 +3350,7 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
-console.log('ARVEXA — Mon cahier v6.0');
+console.log('ARVEXA — Mon cahier v7.0 — Multi-profils + Images + Premium');
 </script>
 </body>
 </html>

@@ -167,7 +167,6 @@
       line-height: 1.7;
     }
 
-    /* Bandeau "mode cahier" */
     .notebook-banner {
       display: none;
       align-items: center;
@@ -1487,7 +1486,6 @@
           <strong style="color:var(--accent-bright)">Approfondissement</strong> (moyen à difficile).
         </p>
 
-        <!-- Bandeau contexte cahier -->
         <div class="notebook-banner" id="notebookBanner">
           <i class="fas fa-book-open"></i>
           <div>
@@ -1573,8 +1571,8 @@
 
           <div class="field">
             <label for="exerciseCount">Nombre d'exercices</label>
-            <input id="exerciseCount" type="number" min="5" max="5" value="5" readonly required>
-            <small style="color:var(--text-muted);font-size:12px;">Chaque sujet contient 5 exercices × 10 questions.</small>
+            <input id="exerciseCount" type="number" min="3" max="3" value="3" readonly required>
+            <small style="color:var(--text-muted);font-size:12px;">Chaque sujet contient 3 exercices × 5 questions.</small>
           </div>
 
           <div class="field full">
@@ -1601,7 +1599,7 @@
           <div class="steps-list">
             <div class="loading-step" id="genStep1"><span class="step-icon">🔍</span><div class="step-content"><span class="step-label">Analyse de la configuration</span><span class="step-desc">Matière, chapitre, difficulté et durée</span></div></div>
             <div class="loading-step" id="genStep2"><span class="step-icon">🎲</span><div class="step-content"><span class="step-label">Génération des sujets</span><span class="step-desc">2 sujets de niveaux progressifs</span></div></div>
-            <div class="loading-step" id="genStep3"><span class="step-icon">📝</span><div class="step-content"><span class="step-label">Rédaction des exercices</span><span class="step-desc">5 exercices × 10 questions par sujet</span></div></div>
+            <div class="loading-step" id="genStep3"><span class="step-icon">📝</span><div class="step-content"><span class="step-label">Rédaction des exercices</span><span class="step-desc">3 exercices × 5 questions par sujet</span></div></div>
             <div class="loading-step" id="genStep4"><span class="step-icon">🧮</span><div class="step-content"><span class="step-label">Vérification</span><span class="step-desc">Contrôle cohérence et réponses</span></div></div>
             <div class="loading-step" id="genStep5"><span class="step-icon">✨</span><div class="step-content"><span class="step-label">Finalisation</span><span class="step-desc">Préparation de l'affichage</span></div></div>
           </div>
@@ -1766,7 +1764,7 @@
 
   <script type="module">
   // ═══════════════════════════════════════════════════════════════
-  // EXAM — Mode examen BAC (avec contexte cahier)
+  // EXAM — Mode examen BAC (3 exercices × 5 questions)
   // ═══════════════════════════════════════════════════════════════
 
   import { initializeApp } from 'firebase/app';
@@ -1791,8 +1789,8 @@
   const db = getFirestore(app);
 
   const EXAM_CONSTANTS = {
-    REQUIRED_EXERCISES: 5,
-    QUESTIONS_PER_EXERCISE: 10,
+    REQUIRED_EXERCISES: 3,
+    QUESTIONS_PER_EXERCISE: 5,
     DEFAULT_DURATION_MIN: 60,
     TIMER_WARNING_SEC: 300,
     SESSION_TTL_HOURS: 24
@@ -1862,9 +1860,6 @@
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  // ═══════════════════════════════════════════════════════════════
-  // CUSTOM SELECT
-  // ═══════════════════════════════════════════════════════════════
   class CustomSelect {
     constructor(element) {
       this.element = element;
@@ -2028,9 +2023,6 @@
     };
   }
 
-  // ═══════════════════════════════════════════════════════════════
-  // PRÉ-REMPLISSAGE DEPUIS URL (venant du cahier)
-  // ═══════════════════════════════════════════════════════════════
   function prefillFromUrl() {
     try {
       const urlParams = new URLSearchParams(window.location.search);
@@ -2039,7 +2031,6 @@
       const preChapterId = urlParams.get('chapterId');
       const useNotebook = urlParams.get('useNotebook') === 'true';
 
-      // Activer le mode cahier si demandé
       if (useNotebook && (preChapterId || preChapter)) {
         state.notebookContext = {
           chapterId: preChapterId || null,
@@ -2054,7 +2045,6 @@
         console.log('[EXAM] Contexte cahier activé :', state.notebookContext);
       }
 
-      // Pré-remplir la matière
       if (preSubject) {
         const optionExists = Array.from(document.querySelectorAll('#subjectSelect .custom-select-option'))
           .some((o) => o.dataset.value === preSubject);
@@ -2064,7 +2054,6 @@
         }
       }
 
-      // Pré-remplir le chapitre (détection floue)
       if (preChapter) {
         setTimeout(() => {
           const chapterOptions = Array.from(
@@ -2100,9 +2089,6 @@
     }
   }
 
-  // ═══════════════════════════════════════════════════════════════
-  // ÉTAPES DE CHARGEMENT
-  // ═══════════════════════════════════════════════════════════════
   function resetSteps(steps) {
     steps.forEach((id) => {
       const el = $(id);
@@ -2140,9 +2126,6 @@
     }
   }
 
-  // ═══════════════════════════════════════════════════════════════
-  // SESSION FIRESTORE
-  // ═══════════════════════════════════════════════════════════════
   async function saveActiveSession() {
     if (!state.user || !state.selectedSubject) return;
     try {
@@ -2196,9 +2179,6 @@
     saveSessionTimer = setTimeout(saveActiveSession, 2000);
   }
 
-  // ═══════════════════════════════════════════════════════════════
-  // VALIDATION
-  // ═══════════════════════════════════════════════════════════════
   function normalizeExam(payload) {
     const exam = payload?.exam;
     if (!exam || !Array.isArray(exam.subjects) || exam.subjects.length < 2) {
@@ -2221,9 +2201,6 @@
     return exam;
   }
 
-  // ═══════════════════════════════════════════════════════════════
-  // GÉNÉRATION
-  // ═══════════════════════════════════════════════════════════════
   $('configForm').addEventListener('submit', generateExam);
 
   async function generateExam(event) {
@@ -2262,7 +2239,6 @@
 
       activateStep('genStep2', statusEl, 'Génération des deux sujets...');
 
-      // ⚡ Injection du contexte cahier
       const notebookContextPayload = state.notebookContext
         ? { subject: config.subject, chapterId: state.notebookContext.chapterId, chapterTitle: state.notebookContext.chapterTitle }
         : null;
@@ -2324,15 +2300,13 @@
     }
   }
 
-  // ═══════════════════════════════════════════════════════════════
-  // AFFICHAGE DES SUJETS
-  // ═══════════════════════════════════════════════════════════════
   function displaySubjects() {
     const list = $('subjectsList');
     list.replaceChildren();
 
     state.exam.subjects.forEach((subject, index) => {
       const exerciseCount = subject.exercises.length;
+      const totalQuestions = subject.exercises.reduce((sum, ex) => sum + (ex.questions?.length || 0), 0);
       const points = subject.exercises.reduce((sum, ex) => sum + (Number(ex.points) || 0), 0);
       const level = subject.level || (index === 0 ? 'consolidation' : 'approfondissement');
       const levelLabel = level === 'consolidation' ? 'Consolidation' : 'Approfondissement';
@@ -2349,8 +2323,8 @@
         <p>${escapeHtml(subject.instructions || 'Sujet complet à traiter dans le temps imparti.')}</p>
         <div class="subject-meta">
           <span>${exerciseCount} exercices</span>
-          <span>50 questions</span>
-          <span>${points || state.exam.totalPoints}/20 points</span>
+          <span>${totalQuestions} questions</span>
+          <span>${Math.round(points * 100) / 100 || state.exam.totalPoints}/20 points</span>
         </div>
       `;
 
@@ -2365,9 +2339,6 @@
     });
   }
 
-  // ═══════════════════════════════════════════════════════════════
-  // DÉMARRAGE
-  // ═══════════════════════════════════════════════════════════════
   async function startExam(subject) {
     state.selectedSubject = subject;
     state.exerciseIndex = 0;
@@ -2383,9 +2354,6 @@
     startTimer();
   }
 
-  // ═══════════════════════════════════════════════════════════════
-  // RENDU EXERCICE
-  // ═══════════════════════════════════════════════════════════════
   function answerKey(exerciseIndex, questionIndex) {
     return `${state.selectedSubject.id}:${exerciseIndex}:${questionIndex}`;
   }
@@ -2402,7 +2370,7 @@
     $('exerciseTitle').textContent =
       `Exercice ${exercise.number || state.exerciseIndex + 1}${exercise.title ? ` — ${exercise.title}` : ''}`;
     $('exerciseCounter').textContent = `${state.exerciseIndex + 1} / ${EXAM_CONSTANTS.REQUIRED_EXERCISES}`;
-    $('exercisePoints').textContent = `${Number(exercise.points) || 0} points · 10 questions`;
+    $('exercisePoints').textContent = `${Math.round((Number(exercise.points) || 0) * 100) / 100} points · ${EXAM_CONSTANTS.QUESTIONS_PER_EXERCISE} questions`;
     $('exerciseStatement').textContent = exercise.statement || '';
 
     const list = $('questionsList');
@@ -2417,7 +2385,7 @@
       title.className = 'question-title';
       title.innerHTML = `
         <span>${escapeHtml(question.number || `${state.exerciseIndex + 1}.${qIdx + 1}`)}. ${escapeHtml(question.text || '')}</span>
-        <span class="points">${Number(question.points) || 0} pt</span>
+        <span class="points">${Math.round((Number(question.points) || 0) * 100) / 100} pt</span>
       `;
       wrapper.appendChild(title);
 
@@ -2483,9 +2451,6 @@
     }
   }
 
-  // ═══════════════════════════════════════════════════════════════
-  // TIMER
-  // ═══════════════════════════════════════════════════════════════
   function startTimer() {
     clearInterval(state.timerId);
     state.timerId = setInterval(() => {
@@ -2512,9 +2477,6 @@
     timer.classList.toggle('urgent', s <= EXAM_CONSTANTS.TIMER_WARNING_SEC);
   }
 
-  // ═══════════════════════════════════════════════════════════════
-  // CONFIRMATION
-  // ═══════════════════════════════════════════════════════════════
   function askFinish() {
     $('confirmModal').classList.add('show');
     $('confirmFinishButton').focus();
@@ -2524,9 +2486,6 @@
     $('confirmModal').classList.remove('show');
   }
 
-  // ═══════════════════════════════════════════════════════════════
-  // SOUMISSION
-  // ═══════════════════════════════════════════════════════════════
   async function submitExam(auto = false) {
     if (state.submitting || !state.selectedSubject) return;
 
@@ -2592,9 +2551,6 @@
     }
   }
 
-  // ═══════════════════════════════════════════════════════════════
-  // RÉSULTATS
-  // ═══════════════════════════════════════════════════════════════
   function getGrade(percentage) {
     if (percentage >= 90) return 'Excellent';
     if (percentage >= 80) return 'Très bien';
@@ -2661,7 +2617,7 @@
           <div class="exercise-card-icon">${icon}</div>
           <div class="exercise-card-body">
             <div class="exercise-card-title">Exercice ${exercise.number || idx + 1}${exercise.title ? ` — ${escapeHtml(exercise.title)}` : ''}</div>
-            <div class="exercise-card-meta">${Number(exercise.score || 0).toFixed(2)} / ${Number(exercise.maxScore || 4).toFixed(2)} pts · ${exercise.correctAnswers || 0}/${exercise.totalQuestions || 10} correctes</div>
+            <div class="exercise-card-meta">${Number(exercise.score || 0).toFixed(2)} / ${Number(exercise.maxScore || 6.67).toFixed(2)} pts · ${exercise.correctAnswers || 0}/${exercise.totalQuestions || 5} correctes</div>
             <div class="exercise-card-progress">
               <div class="exercise-card-fill" style="width:${percent}%;background:${getProgressColor(percent)}"></div>
             </div>
@@ -2709,8 +2665,8 @@
         <div>
           <h3>Exercice ${exercise.number || exerciseIndex + 1}${exercise.title ? ` — ${escapeHtml(exercise.title)}` : ''}</h3>
           <div class="exercise-detail-meta">
-            ${Number(exercise.score || 0).toFixed(2)} / ${Number(exercise.maxScore || 4).toFixed(2)} pts ·
-            ${exercise.correctAnswers || 0}/${exercise.totalQuestions || 10} correctes
+            ${Number(exercise.score || 0).toFixed(2)} / ${Number(exercise.maxScore || 6.67).toFixed(2)} pts ·
+            ${exercise.correctAnswers || 0}/${exercise.totalQuestions || 5} correctes
           </div>
         </div>
       </div>
@@ -2736,7 +2692,7 @@
             <div class="question-number">
               <span class="q-icon">${qIcon}</span> Question ${escapeHtml(q.number || idx + 1)}
             </div>
-            <div class="question-points">${Number(q.points || 0).toFixed(2)} / ${Number(q.maxPoints || 0.4).toFixed(2)} pt</div>
+            <div class="question-points">${Number(q.points || 0).toFixed(2)} / ${Number(q.maxPoints || 1.33).toFixed(2)} pt</div>
           </div>
         `;
 
@@ -2805,9 +2761,6 @@
     });
   }
 
-  // ═══════════════════════════════════════════════════════════════
-  // PREMIUM
-  // ═══════════════════════════════════════════════════════════════
   function showPremiumPopup() {
     $('premiumPopup').classList.add('show');
     $('popupCloseBtn').focus();
@@ -2816,9 +2769,6 @@
     $('premiumPopup').classList.remove('show');
   }
 
-  // ═══════════════════════════════════════════════════════════════
-  // REPRISE
-  // ═══════════════════════════════════════════════════════════════
   async function checkActiveSession() {
     const session = await loadActiveSession();
     if (!session || !session.exam) return;
@@ -2862,9 +2812,6 @@
     };
   }
 
-  // ═══════════════════════════════════════════════════════════════
-  // ÉVÉNEMENTS
-  // ═══════════════════════════════════════════════════════════════
   $('backConfigButton').addEventListener('click', () => showView('configView'));
   $('previousButton').addEventListener('click', goPrevious);
   $('nextButton').addEventListener('click', goNext);
@@ -2904,9 +2851,6 @@
     }
   });
 
-  // ═══════════════════════════════════════════════════════════════
-  // AUTH
-  // ═══════════════════════════════════════════════════════════════
   onAuthStateChanged(auth, async (user) => {
     if (!user) {
       window.location.replace('auth-choice.html');
@@ -2917,17 +2861,12 @@
     $('connectionState').textContent = 'Compte connecté';
     $('connectionState').classList.add('online');
 
-    // Pré-remplir avant de vérifier la session
     prefillFromUrl();
-
     await checkActiveSession();
   });
 
-  // ═══════════════════════════════════════════════════════════════
-  // INIT
-  // ═══════════════════════════════════════════════════════════════
   initSelects();
-  console.log('🚀 ARVEXA — Mode examen v2.0 (avec contexte cahier)');
+  console.log('🚀 ARVEXA — Mode examen v2.2 (3 exercices × 5 questions)');
   </script>
 </body>
 </html>

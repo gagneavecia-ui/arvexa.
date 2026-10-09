@@ -1,7 +1,8 @@
 // ================================================================
-// API EXAM v2.4 — ARVEXA School
+// API EXAM v3.0 — ARVEXA School
 // 3 exercices × 5 questions par sujet
-// Modèles forcés en dur : llama-3.3-70b (Groq + OpenRouter)
+// 100% gratuit : Groq (4 modèles) + OpenRouter (3 modèles :free)
+// Post-traitement réparateur intégré
 // ================================================================
 
 module.exports.config = { maxDuration: 90 };
@@ -98,14 +99,9 @@ function isPremiumUser(data) {
 
 function examSubjectToNotebookKey(examSubject) {
   const map = {
-    'Mathématiques': 'mathematiques',
-    'Physique': 'physique',
-    'Chimie': 'chimie',
-    'SVT': 'svt',
-    'Français': 'francais',
-    'Philosophie': 'philosophie',
-    'Histoire-Géographie': 'histoire-geo',
-    'Anglais': 'anglais'
+    'Mathématiques': 'mathematiques', 'Physique': 'physique', 'Chimie': 'chimie',
+    'SVT': 'svt', 'Français': 'francais', 'Philosophie': 'philosophie',
+    'Histoire-Géographie': 'histoire-geo', 'Anglais': 'anglais'
   };
   return map[examSubject] || null;
 }
@@ -238,41 +234,91 @@ async function loadNotebookContext(uid, subject, chapterId, chapterTitle) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// PROVIDERS — modèles forcés en dur (plus fiable)
+// PROVIDERS — Cascade 100% gratuite (Groq + OpenRouter :free)
 // ═══════════════════════════════════════════════════════════════
 function getProviders() {
-  return [
-    {
-      name: 'Groq',
-      key: process.env.GROQ_API_KEY,
-      endpoint: 'https://api.groq.com/openai/v1/chat/completions',
-      // ⚡ Modèle FORCÉ en dur — ignore GROQ_MODEL de Vercel
-      model: 'llama-3.3-70b-versatile',
-      jsonMode: true,
-      headers: {}
-    },
-    {
-      name: 'OpenRouter',
-      key: process.env.OPENROUTER_API_KEY,
-      endpoint: 'https://openrouter.ai/api/v1/chat/completions',
-      // ⚡ Modèle FORCÉ en dur — ignore OPENROUTER_MODEL de Vercel
-      model: 'meta-llama/llama-3.3-70b-instruct',
-      jsonMode: true,
-      headers: {
-        'HTTP-Referer': process.env.APP_ORIGIN || '',
-        'X-Title': 'ARVEXA Exam'
+  const providers = [];
+
+  // ⚡ GROQ — 4 modèles en cascade (Developer Plan gratuit)
+  if (process.env.GROQ_API_KEY) {
+    providers.push(
+      {
+        name: 'Groq/gpt-oss-120b',
+        key: process.env.GROQ_API_KEY,
+        endpoint: 'https://api.groq.com/openai/v1/chat/completions',
+        model: 'openai/gpt-oss-120b',
+        jsonMode: true,
+        headers: {}
+      },
+      {
+        name: 'Groq/llama-3.3-70b',
+        key: process.env.GROQ_API_KEY,
+        endpoint: 'https://api.groq.com/openai/v1/chat/completions',
+        model: 'llama-3.3-70b-versatile',
+        jsonMode: true,
+        headers: {}
+      },
+      {
+        name: 'Groq/gpt-oss-20b',
+        key: process.env.GROQ_API_KEY,
+        endpoint: 'https://api.groq.com/openai/v1/chat/completions',
+        model: 'openai/gpt-oss-20b',
+        jsonMode: true,
+        headers: {}
+      },
+      {
+        name: 'Groq/llama-3.1-8b',
+        key: process.env.GROQ_API_KEY,
+        endpoint: 'https://api.groq.com/openai/v1/chat/completions',
+        model: 'llama-3.1-8b-instant',
+        jsonMode: true,
+        headers: {}
       }
-    }
-    // ⚡ Mistral RETIRÉ (compte trop limité)
-  ].filter((p) => Boolean(p.key));
+    );
+  }
+
+  // ⚡ OPENROUTER — 3 modèles :free en cascade
+  if (process.env.OPENROUTER_API_KEY) {
+    const orHeaders = {
+      'HTTP-Referer': process.env.APP_ORIGIN || '',
+      'X-Title': 'ARVEXA Exam'
+    };
+    providers.push(
+      {
+        name: 'OpenRouter/inkling:free',
+        key: process.env.OPENROUTER_API_KEY,
+        endpoint: 'https://openrouter.ai/api/v1/chat/completions',
+        model: 'thinkingmachines/inkling:free',
+        jsonMode: true,
+        headers: orHeaders
+      },
+      {
+        name: 'OpenRouter/dots3:free',
+        key: process.env.OPENROUTER_API_KEY,
+        endpoint: 'https://openrouter.ai/api/v1/chat/completions',
+        model: 'dots-studio/dots3-note-preview:free',
+        jsonMode: true,
+        headers: orHeaders
+      },
+      {
+        name: 'OpenRouter/inkling-small:free',
+        key: process.env.OPENROUTER_API_KEY,
+        endpoint: 'https://openrouter.ai/api/v1/chat/completions',
+        model: 'thinkingmachines/inkling-small:free',
+        jsonMode: true,
+        headers: orHeaders
+      }
+    );
+  }
+
+  return providers;
 }
 
 async function callProvider(provider, prompt, maxTokens = 12000) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 45000);
   try {
-    // ⚡ LOG de la longueur du prompt
-    console.log(`[AI] ${provider.name} — modèle: ${provider.model} | prompt: ${prompt.length} caractères | max_tokens: ${maxTokens}`);
+    console.log(`[AI] ${provider.name} | prompt: ${prompt.length} car | max_tokens: ${maxTokens}`);
 
     const body = {
       model: provider.model,
@@ -301,12 +347,10 @@ async function callProvider(provider, prompt, maxTokens = 12000) {
 
     const content = data?.choices?.[0]?.message?.content;
     if (!content) {
-      console.warn(`[AI] ${provider.name} — réponse vide. Usage:`, JSON.stringify(data?.usage || {}));
-      throw new Error(`${provider.name}: réponse vide`);
+      throw new Error(`${provider.name}: réponse vide (usage: ${JSON.stringify(data?.usage || {})})`);
     }
 
-    // ⚡ LOG de la longueur de la réponse
-    console.log(`[AI] ${provider.name} — réponse reçue: ${content.length} caractères`);
+    console.log(`[AI] ${provider.name} — réponse: ${content.length} car`);
 
     const cleaned = String(content).replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
 
@@ -314,8 +358,7 @@ async function callProvider(provider, prompt, maxTokens = 12000) {
     try {
       parsed = JSON.parse(cleaned);
     } catch (parseError) {
-      // ⚡ LOG du début de la réponse pour diagnostiquer
-      console.warn(`[AI] ${provider.name} — JSON invalide. Début réponse:`, cleaned.slice(0, 300));
+      console.warn(`[AI] ${provider.name} — JSON invalide. Début: ${cleaned.slice(0, 200)}`);
       throw new Error(`${provider.name}: JSON invalide`);
     }
 
@@ -447,13 +490,12 @@ Vérifie que ton JSON contient EXACTEMENT :
 - Combien de questions dans chaque exercice ? (doit être ${QUESTIONS_PER_EXERCISE})
 - Total = ${REQUIRED_EXERCISES} × ${QUESTIONS_PER_EXERCISE} = ${REQUIRED_EXERCISES * QUESTIONS_PER_EXERCISE} questions par sujet
 
-NE RÉPONDS PAS avec un JSON partiel ou incomplet.
 Réponds UNIQUEMENT avec le JSON complet et valide.`;
 
 function generationPromptFromNotebook(config, notebookContext) {
   const choiceSubjects = new Set(['Mathématiques', 'Physique', 'Chimie']);
   const questionFormat = choiceSubjects.has(config.subject)
-    ? 'Pour les questions de calcul, utilise type "choice" avec exactement quatre propositions : options=[{"id":"A","text":"..."},{"id":"B","text":"..."},{"id":"C","text":"..."},{"id":"D","text":"..."}] et correctAnswer parmi A, B, C ou D. Pour les questions de raisonnement, démonstration ou rédaction, utilise type "text".'
+    ? 'Pour les questions de calcul, utilise type "choice" avec exactement quatre propositions : options=[{"id":"A","text":"..."},{"id":"B","text":"..."},{"id":"C","text":"..."},{"id":"D","text":"..."}] et correctAnswer parmi A, B, C ou D. Pour les questions de raisonnement, utilise type "text".'
     : 'Pour chaque question, utilise le type "text" sauf si c\'est un QCM explicite.';
 
   return `Tu es un professeur expert du BAC au Niger, spécialiste de ${config.subject}.
@@ -473,28 +515,17 @@ ${notebookContext.contentText}
 RÈGLE ABSOLUE DE PÉRIMÈTRE
 ═══════════════════════════════════════════════════════════════
 1. Tu génères l'examen UNIQUEMENT à partir du contenu ci-dessus.
-2. INTERDICTION d'inventer, d'ajouter ou de compléter avec des connaissances externes.
-3. Toutes les questions doivent porter sur des éléments RÉELLEMENT présents dans le contenu fourni.
-4. Si le contenu fourni ne couvre pas une partie du programme, l'examen reste limité à ce qui est fourni.
+2. INTERDICTION d'inventer ou d'ajouter des connaissances externes.
+3. Toutes les questions doivent porter sur des éléments RÉELLEMENT présents.
 
 ═══════════════════════════════════════════════════════════════
-STRUCTURE DES DEUX SUJETS — DIFFÉRENCIÉS PAR NIVEAU
+STRUCTURE DES DEUX SUJETS
 ═══════════════════════════════════════════════════════════════
 
-SUJET 1 — Niveau "Consolidation" (facile à moyen)
-- Vise à VÉRIFIER la maîtrise des notions de base
-- Questions directes : définitions, mécanismes, formules
-- Applications simples
-- Instructions : "Ce sujet vérifie votre compréhension des notions essentielles."
+SUJET 1 — "Consolidation" (facile à moyen) : notions de base, questions directes.
+SUJET 2 — "Approfondissement" (moyen à difficile) : angles plus exigeants.
 
-SUJET 2 — Niveau "Approfondissement" (moyen à difficile)
-- Vise à TESTER la capacité de raisonnement
-- MÊMES notions, angles plus exigeants
-- Instructions : "Ce sujet approfondit votre maîtrise."
-
-═══════════════════════════════════════════════════════════════
-RÈGLES LATEX
-═══════════════════════════════════════════════════════════════
+RÈGLES LATEX :
 - Formules entre $...$ ou $$...$$
 - JAMAIS de symboles Unicode bruts (π, √, ², ≤, ∞, →)
 
@@ -562,8 +593,8 @@ Chapitre : ${config.chapter === 'all' ? 'tous les chapitres du programme' : conf
 Difficulté : ${config.difficulty}
 Durée : ${config.duration} minutes
 
-SUJET 1 — "Consolidation" (facile à moyen) : notions fondamentales, questions directes.
-SUJET 2 — "Approfondissement" (moyen à difficile) : angles plus exigeants, pièges du BAC.
+SUJET 1 — "Consolidation" (facile à moyen) : notions fondamentales.
+SUJET 2 — "Approfondissement" (moyen à difficile) : angles plus exigeants.
 
 RÈGLES LATEX :
 - Formules entre $...$ ou $$...$$
@@ -613,12 +644,10 @@ function correctionPrompt(body) {
       const studentAnswer = body.answers[key] || null;
       questionsDetail.push({
         exerciseNumber: exercise.number || exIdx + 1,
-        exerciseTitle: exercise.title || `Exercice ${exIdx + 1}`,
         questionNumber: question.number || `${exIdx + 1}.${qIdx + 1}`,
         questionText: question.text,
         type: question.type || 'text',
         points: Number(question.points) || 1.33,
-        options: question.options || null,
         correctAnswer: question.correctAnswer || null,
         studentAnswer,
         answered: studentAnswer !== null && studentAnswer !== ''
@@ -631,10 +660,9 @@ function correctionPrompt(body) {
 MISSION : Corrige chaque question et attribue les points.
 
 RÈGLES :
-- QCM (type "choice") : réponse exacte = tous les points, sinon 0
+- QCM : réponse exacte = tous les points, sinon 0
 - Texte libre : évalue le fond, la méthode, la rigueur
 - Réponse vide : 0 point
-- Ne dépasse jamais les points de la question
 
 DONNÉES :
 ${JSON.stringify(questionsDetail, null, 2)}
@@ -683,6 +711,143 @@ FORMAT JSON :
 Réponds UNIQUEMENT avec l'objet JSON.`;
 }
 
+// ═══════════════════════════════════════════════════════════════
+// POST-TRAITEMENT RÉPARATEUR
+// Répare un JSON presque correct au lieu de le rejeter
+// ═══════════════════════════════════════════════════════════════
+function repairExamStructure(exam, subjectName) {
+  if (!exam || typeof exam !== 'object') return null;
+
+  const supportsChoices = ['Mathématiques', 'Physique', 'Chimie'].includes(subjectName);
+
+  // ⚡ Si subjects manquant → on essaie d'autres clés
+  if (!Array.isArray(exam.subjects)) {
+    if (Array.isArray(exam.exams)) exam.subjects = exam.exams;
+    else if (Array.isArray(exam.sujets)) exam.subjects = exam.sujets;
+    else return null;
+  }
+
+  // ⚡ S'assurer d'avoir au moins 2 sujets
+  if (exam.subjects.length === 0) return null;
+
+  // Si 1 seul sujet → dupliquer avec un titre adapté
+  if (exam.subjects.length === 1) {
+    const first = exam.subjects[0];
+    exam.subjects.push({
+      ...JSON.parse(JSON.stringify(first)),
+      id: 'subject_2',
+      title: (first.title || 'Sujet 1').replace('Consolidation', 'Approfondissement'),
+      level: 'approfondissement',
+      instructions: 'Ce sujet approfondit votre maîtrise.'
+    });
+  }
+
+  exam.subjects = exam.subjects.slice(0, 2);
+
+  // ⚡ Normaliser chaque sujet
+  exam.subjects.forEach((subject, sIdx) => {
+    if (!subject.id) subject.id = `subject_${sIdx + 1}`;
+    if (!subject.title) subject.title = `Sujet ${sIdx + 1}`;
+    if (!subject.level) subject.level = sIdx === 0 ? 'consolidation' : 'approfondissement';
+    if (!subject.instructions) subject.instructions = 'Traitez le sujet dans le temps imparti.';
+
+    // ⚡ Exercises : chercher d'autres noms
+    if (!Array.isArray(subject.exercises)) {
+      if (Array.isArray(subject.exos)) subject.exercises = subject.exos;
+      else if (Array.isArray(subject.problems)) subject.exercises = subject.problems;
+      else subject.exercises = [];
+    }
+
+    // Si moins de 3 exercices → compléter avec des exercices génériques
+    while (subject.exercises.length < REQUIRED_EXERCISES) {
+      const num = subject.exercises.length + 1;
+      subject.exercises.push({
+        number: num,
+        title: `Exercice ${num}`,
+        points: 6.67,
+        statement: `Traitez l'exercice ${num} en détaillant votre raisonnement.`,
+        questions: []
+      });
+    }
+
+    subject.exercises = subject.exercises.slice(0, REQUIRED_EXERCISES);
+
+    // ⚡ Normaliser chaque exercice
+    subject.exercises.forEach((exercise, eIdx) => {
+      if (!exercise.number) exercise.number = eIdx + 1;
+      if (!exercise.title) exercise.title = `Exercice ${eIdx + 1}`;
+      if (!exercise.points) exercise.points = 6.67;
+      if (!exercise.statement) exercise.statement = 'Traitez cet exercice.';
+
+      if (!Array.isArray(exercise.questions)) {
+        if (Array.isArray(exercise.items)) exercise.questions = exercise.items;
+        else exercise.questions = [];
+      }
+
+      // Si moins de 5 questions → compléter
+      while (exercise.questions.length < QUESTIONS_PER_EXERCISE) {
+        const qNum = exercise.questions.length + 1;
+        exercise.questions.push({
+          number: `${eIdx + 1}.${String.fromCharCode(96 + qNum)}`,
+          text: `Question ${qNum} de l'exercice ${eIdx + 1}.`,
+          points: 1.33,
+          type: 'text'
+        });
+      }
+
+      exercise.questions = exercise.questions.slice(0, QUESTIONS_PER_EXERCISE);
+
+      // ⚡ Normaliser chaque question
+      exercise.questions.forEach((question, qIdx) => {
+        if (!question.number) question.number = `${eIdx + 1}.${String.fromCharCode(97 + qIdx)}`;
+        if (!question.text) question.text = question.question || 'Question';
+        if (!question.points) question.points = 1.33;
+
+        // Normaliser type
+        if (!question.type) {
+          question.type = (Array.isArray(question.options) && question.options.length === 4) ? 'choice' : 'text';
+        }
+
+        // ⚡ Si type choice → vérifier la structure
+        if (question.type === 'choice') {
+          if (!Array.isArray(question.options) || question.options.length !== 4) {
+            // Transformer en texte libre si options invalides
+            question.type = 'text';
+            delete question.options;
+            delete question.correctAnswer;
+          } else {
+            // Normaliser les options
+            question.options = question.options.map((opt, oi) => {
+              if (typeof opt === 'string') return { id: String.fromCharCode(65 + oi), text: opt };
+              return { id: opt.id || String.fromCharCode(65 + oi), text: opt.text || opt.label || String(opt) };
+            });
+            // Normaliser correctAnswer
+            if (!question.correctAnswer) question.correctAnswer = 'A';
+            if (typeof question.correctAnswer === 'number') {
+              question.correctAnswer = String.fromCharCode(65 + question.correctAnswer);
+            }
+            question.correctAnswer = String(question.correctAnswer).toUpperCase().slice(0, 1);
+            if (!['A', 'B', 'C', 'D'].includes(question.correctAnswer)) question.correctAnswer = 'A';
+          }
+        } else {
+          // Texte libre → supprimer options/correctAnswer s'ils existent par erreur
+          delete question.options;
+          delete question.correctAnswer;
+        }
+
+        // Si matière non-scientifique et type=choice → convertir en text
+        if (!supportsChoices && question.type === 'choice') {
+          question.type = 'text';
+          delete question.options;
+          delete question.correctAnswer;
+        }
+      });
+    });
+  });
+
+  return exam;
+}
+
 function validateGeneratedExam(exam, subjectName) {
   const supportsChoices = ['Mathématiques', 'Physique', 'Chimie'].includes(subjectName);
   const validQuestion = (question) => {
@@ -706,15 +871,28 @@ function validateGeneratedExam(exam, subjectName) {
 async function generateWithFallback(prompt, subjectName) {
   const providers = getProviders();
   if (!providers.length) throw new Error('provider_missing');
+
   const errors = [];
   for (const provider of providers) {
     try {
       console.log(`[AI] Tentative ${provider.name}...`);
-      const exam = await callProvider(provider, prompt);
-      if (validateGeneratedExam(exam, subjectName)) {
+      const rawExam = await callProvider(provider, prompt);
+
+      // ⚡ ÉTAPE 1 : Vérifier la structure brute
+      if (validateGeneratedExam(rawExam, subjectName)) {
         console.log(`[AI] ✅ ${provider.name} — structure valide`);
-        return { exam, provider: provider.name };
+        return { exam: rawExam, provider: provider.name };
       }
+
+      // ⚡ ÉTAPE 2 : Tenter de réparer
+      console.log(`[AI] 🔧 ${provider.name} — tentative de réparation...`);
+      const repaired = repairExamStructure(rawExam, subjectName);
+
+      if (repaired && validateGeneratedExam(repaired, subjectName)) {
+        console.log(`[AI] ✅ ${provider.name} — réparation réussie`);
+        return { exam: repaired, provider: `${provider.name} (réparé)` };
+      }
+
       errors.push(`${provider.name}: structure invalide`);
       console.warn(`[AI] ❌ ${provider.name} : structure invalide`);
     } catch (error) {
@@ -967,7 +1145,7 @@ module.exports = async function handler(request, response) {
 
     try {
       const providers = getProviders();
-      console.log(`[EXAM] ${providers.length} fournisseur(s) disponible(s):`, providers.map((p) => `${p.name}(${p.model})`));
+      console.log(`[EXAM] ${providers.length} fournisseur(s):`, providers.map((p) => p.name).join(', '));
 
       if (!providers.length) return response.status(200).json({ success: true, exam: buildLocalExam(body) });
 
@@ -980,7 +1158,7 @@ module.exports = async function handler(request, response) {
       }
 
       const prompt = notebookContext ? generationPromptFromNotebook(body, notebookContext) : generationPrompt(body);
-      console.log(`[EXAM] Prompt final: ${prompt.length} caractères`);
+      console.log(`[EXAM] Prompt: ${prompt.length} caractères`);
 
       const { exam, provider } = await generateWithFallback(prompt, body.subject);
 

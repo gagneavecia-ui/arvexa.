@@ -1,7 +1,7 @@
 // ================================================================
-// API EXAM v2.3 — ARVEXA School
+// API EXAM v2.4 — ARVEXA School
 // 3 exercices × 5 questions par sujet
-// Corrections : prompt strict + temperature 0.15 + Mistral compatible
+// Modèles forcés en dur : llama-3.3-70b (Groq + OpenRouter)
 // ================================================================
 
 module.exports.config = { maxDuration: 90 };
@@ -184,12 +184,10 @@ async function loadNotebookContext(uid, subject, chapterId, chapterTitle) {
     return { id: d.id, title: s.title || 'Section', rawInput: s.rawInput || '', analysis: s.analysis || {} };
   });
 
-  // ⚡ CORRECTION : limiter à 5 sections maximum
   const sections = allSections.slice(0, 5);
 
   const contentText = sections.map((s, i) => {
     let text = `━━━ SECTION ${i + 1} : ${s.title} ━━━\n`;
-    // ⚡ CORRECTION : réduire à 1500 caractères au lieu de 3000
     text += `Contenu source :\n${s.rawInput.slice(0, 1500)}\n\n`;
     const a = s.analysis || {};
     if (a.explanation?.understanding) text += `À comprendre : ${a.explanation.understanding}\n`;
@@ -239,13 +237,17 @@ async function loadNotebookContext(uid, subject, chapterId, chapterTitle) {
   };
 }
 
+// ═══════════════════════════════════════════════════════════════
+// PROVIDERS — modèles forcés en dur (plus fiable)
+// ═══════════════════════════════════════════════════════════════
 function getProviders() {
   return [
     {
       name: 'Groq',
       key: process.env.GROQ_API_KEY,
       endpoint: 'https://api.groq.com/openai/v1/chat/completions',
-      model: process.env.GROQ_MODEL || 'openai/gpt-oss-120b',
+      // ⚡ Modèle FORCÉ en dur — ignore GROQ_MODEL de Vercel
+      model: 'llama-3.3-70b-versatile',
       jsonMode: true,
       headers: {}
     },
@@ -253,32 +255,27 @@ function getProviders() {
       name: 'OpenRouter',
       key: process.env.OPENROUTER_API_KEY,
       endpoint: 'https://openrouter.ai/api/v1/chat/completions',
-      model: process.env.OPENROUTER_MODEL || 'openai/gpt-oss-120b',
+      // ⚡ Modèle FORCÉ en dur — ignore OPENROUTER_MODEL de Vercel
+      model: 'meta-llama/llama-3.3-70b-instruct',
       jsonMode: true,
       headers: {
         'HTTP-Referer': process.env.APP_ORIGIN || '',
         'X-Title': 'ARVEXA Exam'
       }
-    },
-    // ⚡ CORRECTION : Mistral avec modèle gratuit
-    {
-      name: 'Mistral',
-      key: process.env.MISTRAL_API_KEY,
-      endpoint: 'https://api.mistral.ai/v1/chat/completions',
-      model: process.env.MISTRAL_MODEL || 'open-mistral-nemo',
-      jsonMode: false,
-      headers: {}
     }
+    // ⚡ Mistral RETIRÉ (compte trop limité)
   ].filter((p) => Boolean(p.key));
 }
 
 async function callProvider(provider, prompt, maxTokens = 12000) {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 40000);
+  const timeout = setTimeout(() => controller.abort(), 45000);
   try {
+    // ⚡ LOG de la longueur du prompt
+    console.log(`[AI] ${provider.name} — modèle: ${provider.model} | prompt: ${prompt.length} caractères | max_tokens: ${maxTokens}`);
+
     const body = {
       model: provider.model,
-      // ⚡ CORRECTION : temperature 0.15 pour mieux respecter le schéma JSON
       temperature: 0.15,
       max_tokens: maxTokens,
       messages: [
@@ -287,21 +284,42 @@ async function callProvider(provider, prompt, maxTokens = 12000) {
       ]
     };
     if (provider.jsonMode) body.response_format = { type: 'json_object' };
+
     const result = await fetch(provider.endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${provider.key}`, ...provider.headers },
       body: JSON.stringify(body),
       signal: controller.signal
     });
+
     const data = await result.json().catch(() => null);
+
     if (!result.ok) {
       const msg = data?.error?.message || data?.message || `HTTP ${result.status}`;
       throw new Error(`${provider.name}: ${msg}`);
     }
+
     const content = data?.choices?.[0]?.message?.content;
-    if (!content) throw new Error(`${provider.name}: réponse vide`);
+    if (!content) {
+      console.warn(`[AI] ${provider.name} — réponse vide. Usage:`, JSON.stringify(data?.usage || {}));
+      throw new Error(`${provider.name}: réponse vide`);
+    }
+
+    // ⚡ LOG de la longueur de la réponse
+    console.log(`[AI] ${provider.name} — réponse reçue: ${content.length} caractères`);
+
     const cleaned = String(content).replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
-    return JSON.parse(cleaned);
+
+    let parsed;
+    try {
+      parsed = JSON.parse(cleaned);
+    } catch (parseError) {
+      // ⚡ LOG du début de la réponse pour diagnostiquer
+      console.warn(`[AI] ${provider.name} — JSON invalide. Début réponse:`, cleaned.slice(0, 300));
+      throw new Error(`${provider.name}: JSON invalide`);
+    }
+
+    return parsed;
   } finally {
     clearTimeout(timeout);
   }
@@ -395,9 +413,6 @@ function validateCorrection(body) {
   return null;
 }
 
-// ═══════════════════════════════════════════════════════════════
-// CONTRÔLE STRUCTUREL — bloc commun à ajouter en fin de prompt
-// ═══════════════════════════════════════════════════════════════
 const STRUCTURE_CONTROL = `
 ═══════════════════════════════════════════════════════════════
 CONTRÔLE STRUCTUREL OBLIGATOIRE — AVANT DE RÉPONDRE
@@ -461,7 +476,6 @@ RÈGLE ABSOLUE DE PÉRIMÈTRE
 2. INTERDICTION d'inventer, d'ajouter ou de compléter avec des connaissances externes.
 3. Toutes les questions doivent porter sur des éléments RÉELLEMENT présents dans le contenu fourni.
 4. Si le contenu fourni ne couvre pas une partie du programme, l'examen reste limité à ce qui est fourni.
-5. Chaque question doit être "traçable" à un passage du contenu.
 
 ═══════════════════════════════════════════════════════════════
 STRUCTURE DES DEUX SUJETS — DIFFÉRENCIÉS PAR NIVEAU
@@ -470,28 +484,23 @@ STRUCTURE DES DEUX SUJETS — DIFFÉRENCIÉS PAR NIVEAU
 SUJET 1 — Niveau "Consolidation" (facile à moyen)
 - Vise à VÉRIFIER la maîtrise des notions de base
 - Questions directes : définitions, mécanismes, formules
-- Applications simples et classiques
-- Répartition : environ 40% QCM + 60% texte
+- Applications simples
 - Instructions : "Ce sujet vérifie votre compréhension des notions essentielles."
 
 SUJET 2 — Niveau "Approfondissement" (moyen à difficile)
-- Vise à TESTER la capacité de raisonnement et d'analyse
-- MÊMES notions que le Sujet 1, MAIS sous des angles plus exigeants
-- Applications composées, pièges classiques du BAC
-- Instructions : "Ce sujet approfondit votre maîtrise et vous prépare aux questions complexes du BAC."
+- Vise à TESTER la capacité de raisonnement
+- MÊMES notions, angles plus exigeants
+- Instructions : "Ce sujet approfondit votre maîtrise."
 
 ═══════════════════════════════════════════════════════════════
 RÈGLES LATEX
 ═══════════════════════════════════════════════════════════════
-- Formules entre $...$ (inline) ou $$...$$ (display)
+- Formules entre $...$ ou $$...$$
 - JAMAIS de symboles Unicode bruts (π, √, ², ≤, ∞, →)
-- Utilise $\\pi$, $\\sqrt{}$, $^{2}$, $\\leq$, $\\infty$, $\\to$
 
 ${questionFormat}
 
-═══════════════════════════════════════════════════════════════
-FORMAT JSON ATTENDU
-═══════════════════════════════════════════════════════════════
+FORMAT JSON ATTENDU :
 {
   "subject": "${config.subject}",
   "level": "${config.level}",
@@ -503,18 +512,18 @@ FORMAT JSON ATTENDU
     {
       "id": "subject_1",
       "title": "Sujet 1 — Consolidation",
-      "instructions": "Ce sujet vérifie votre compréhension des notions essentielles.",
+      "instructions": "...",
       "level": "consolidation",
       "exercises": [
         {
           "number": 1,
-          "title": "Titre de l'exercice",
+          "title": "...",
           "points": 6.67,
-          "statement": "Énoncé complet.",
+          "statement": "...",
           "questions": [
             {
               "number": "1.a",
-              "text": "Question ?",
+              "text": "...",
               "points": 1.33,
               "type": "choice",
               "options": [{"id":"A","text":"..."},{"id":"B","text":"..."},{"id":"C","text":"..."},{"id":"D","text":"..."}],
@@ -527,7 +536,7 @@ FORMAT JSON ATTENDU
     {
       "id": "subject_2",
       "title": "Sujet 2 — Approfondissement",
-      "instructions": "Ce sujet approfondit votre maîtrise.",
+      "instructions": "...",
       "level": "approfondissement",
       "exercises": []
     }
@@ -540,44 +549,29 @@ ${STRUCTURE_CONTROL}`;
 function generationPrompt(config) {
   const choiceSubjects = new Set(['Mathématiques', 'Physique', 'Chimie']);
   const questionFormat = choiceSubjects.has(config.subject)
-    ? 'Pour les questions de calcul, utilise type "choice" avec exactement quatre propositions et correctAnswer parmi A, B, C ou D. Pour les questions de raisonnement, démonstration ou rédaction, utilise type "text".'
+    ? 'Pour les questions de calcul, utilise type "choice" avec exactement quatre propositions et correctAnswer parmi A, B, C ou D. Pour les questions de raisonnement, utilise type "text".'
     : 'Pour chaque question, utilise le type "text" sauf si c\'est un QCM explicite.';
 
   return `Tu es un professeur expert du BAC au Niger, spécialiste de ${config.subject}.
 
-MISSION : Génère DEUX sujets d'examen de niveau Terminale D, de difficulté comparable mais avec des angles pédagogiques différents.
+MISSION : Génère DEUX sujets d'examen de niveau Terminale D.
 
 Matière : ${config.subject}
 Niveau : ${config.level}
 Chapitre : ${config.chapter === 'all' ? 'tous les chapitres du programme' : config.chapter}
-Difficulté demandée : ${config.difficulty}
+Difficulté : ${config.difficulty}
 Durée : ${config.duration} minutes
 
-═══════════════════════════════════════════════════════════════
-STRUCTURE DES DEUX SUJETS
-═══════════════════════════════════════════════════════════════
+SUJET 1 — "Consolidation" (facile à moyen) : notions fondamentales, questions directes.
+SUJET 2 — "Approfondissement" (moyen à difficile) : angles plus exigeants, pièges du BAC.
 
-SUJET 1 — Niveau "Consolidation" (facile à moyen)
-- Vise à vérifier les notions fondamentales
-- Questions directes, applications simples
-- 40% QCM + 60% texte
-
-SUJET 2 — Niveau "Approfondissement" (moyen à difficile)
-- MÊMES notions, angles plus exigeants
-- Applications composées, pièges classiques du BAC
-- 30% QCM + 70% texte
-
-═══════════════════════════════════════════════════════════════
-RÈGLES LATEX
-═══════════════════════════════════════════════════════════════
+RÈGLES LATEX :
 - Formules entre $...$ ou $$...$$
-- JAMAIS de symboles Unicode bruts (π, √, ², ≤, ∞, →)
+- JAMAIS de symboles Unicode bruts
 
 ${questionFormat}
 
-═══════════════════════════════════════════════════════════════
-FORMAT JSON ATTENDU
-═══════════════════════════════════════════════════════════════
+FORMAT JSON ATTENDU :
 {
   "subject": "${config.subject}",
   "level": "${config.level}",
@@ -632,27 +626,20 @@ function correctionPrompt(body) {
     });
   });
 
-  return `Tu es un professeur correcteur expert du BAC au Niger (Terminale D).
-Tu corriges un examen de ${body.exam.subject} sur le chapitre "${subject.title || 'Général'}".
+  return `Tu es un professeur correcteur expert du BAC au Niger.
 
-MISSION : Pour CHAQUE question :
-1. Compare la réponse de l'élève à la bonne réponse
-2. Attribue les points (0 = faux, total = juste, partiel si justifié)
-3. Explique PRÉCISÉMENT où est l'erreur (si erreur)
-4. Félicite si c'est juste (avec une astuce bonus)
-5. Propose une meilleure méthode si elle existe
-6. Suggère un point à revoir (notion précise)
+MISSION : Corrige chaque question et attribue les points.
 
-RÈGLES DE NOTATION :
+RÈGLES :
 - QCM (type "choice") : réponse exacte = tous les points, sinon 0
-- Texte libre : évalue sur le fond, la méthode, la rigueur
-- Réponse vide : 0 point + conseil de ne jamais laisser vide
+- Texte libre : évalue le fond, la méthode, la rigueur
+- Réponse vide : 0 point
 - Ne dépasse jamais les points de la question
 
-DONNÉES DE L'EXAMEN :
+DONNÉES :
 ${JSON.stringify(questionsDetail, null, 2)}
 
-FORMAT DE RÉPONSE (JSON UNIQUEMENT) :
+FORMAT JSON :
 {
   "score": 0,
   "totalScore": 20,
@@ -693,8 +680,6 @@ FORMAT DE RÉPONSE (JSON UNIQUEMENT) :
   }
 }
 
-Émojis : 🎉, ❌, ⏭️, 💡, 📖
-Chaque feedback : 2-4 phrases max, pédagogique.
 Réponds UNIQUEMENT avec l'objet JSON.`;
 }
 
@@ -727,14 +712,14 @@ async function generateWithFallback(prompt, subjectName) {
       console.log(`[AI] Tentative ${provider.name}...`);
       const exam = await callProvider(provider, prompt);
       if (validateGeneratedExam(exam, subjectName)) {
-        console.log(`[AI] ${provider.name} — structure valide`);
+        console.log(`[AI] ✅ ${provider.name} — structure valide`);
         return { exam, provider: provider.name };
       }
       errors.push(`${provider.name}: structure invalide`);
-      console.warn(`[AI] ${provider.name} : structure invalide`);
+      console.warn(`[AI] ❌ ${provider.name} : structure invalide`);
     } catch (error) {
       errors.push(`${provider.name}: ${error.message}`);
-      console.warn(`[AI] ${provider.name} échec: ${error.message}`);
+      console.warn(`[AI] ❌ ${provider.name} échec: ${error.message}`);
     }
   }
   throw new Error('all_providers_failed: ' + errors.join(' | '));
@@ -749,13 +734,13 @@ async function correctWithFallback(prompt) {
       console.log(`[AI] Correction avec ${provider.name}...`);
       const result = await callProvider(provider, prompt, 14000);
       if (result && typeof result === 'object' && Array.isArray(result.exercises)) {
-        console.log(`[AI] ${provider.name} — correction valide`);
+        console.log(`[AI] ✅ ${provider.name} — correction valide`);
         return { result, provider: provider.name };
       }
       errors.push(`${provider.name}: structure invalide`);
     } catch (error) {
       errors.push(`${provider.name}: ${error.message}`);
-      console.warn(`[AI] ${provider.name} correction échouée: ${error.message}`);
+      console.warn(`[AI] ❌ ${provider.name} correction échouée: ${error.message}`);
     }
   }
   throw new Error('all_providers_failed: ' + errors.join(' | '));
@@ -982,6 +967,8 @@ module.exports = async function handler(request, response) {
 
     try {
       const providers = getProviders();
+      console.log(`[EXAM] ${providers.length} fournisseur(s) disponible(s):`, providers.map((p) => `${p.name}(${p.model})`));
+
       if (!providers.length) return response.status(200).json({ success: true, exam: buildLocalExam(body) });
 
       let notebookContext = null;
@@ -993,6 +980,8 @@ module.exports = async function handler(request, response) {
       }
 
       const prompt = notebookContext ? generationPromptFromNotebook(body, notebookContext) : generationPrompt(body);
+      console.log(`[EXAM] Prompt final: ${prompt.length} caractères`);
+
       const { exam, provider } = await generateWithFallback(prompt, body.subject);
 
       const examWithMeta = {

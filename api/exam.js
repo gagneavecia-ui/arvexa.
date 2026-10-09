@@ -1,6 +1,7 @@
 // ================================================================
-// API EXAM v2.1 — ARVEXA School
+// API EXAM v2.3 — ARVEXA School
 // 3 exercices × 5 questions par sujet
+// Corrections : prompt strict + temperature 0.15 + Mistral compatible
 // ================================================================
 
 module.exports.config = { maxDuration: 90 };
@@ -178,18 +179,22 @@ async function loadNotebookContext(uid, subject, chapterId, chapterTitle) {
 
   if (sectionsSnap.docs.length === 0) return null;
 
-  const sections = sectionsSnap.docs.map((d) => {
+  const allSections = sectionsSnap.docs.map((d) => {
     const s = d.data();
     return { id: d.id, title: s.title || 'Section', rawInput: s.rawInput || '', analysis: s.analysis || {} };
   });
 
+  // ⚡ CORRECTION : limiter à 5 sections maximum
+  const sections = allSections.slice(0, 5);
+
   const contentText = sections.map((s, i) => {
     let text = `━━━ SECTION ${i + 1} : ${s.title} ━━━\n`;
-    text += `Contenu source :\n${s.rawInput.slice(0, 3000)}\n\n`;
+    // ⚡ CORRECTION : réduire à 1500 caractères au lieu de 3000
+    text += `Contenu source :\n${s.rawInput.slice(0, 1500)}\n\n`;
     const a = s.analysis || {};
     if (a.explanation?.understanding) text += `À comprendre : ${a.explanation.understanding}\n`;
     if (Array.isArray(a.explanation?.parts)) {
-      a.explanation.parts.forEach((p) => {
+      a.explanation.parts.slice(0, 5).forEach((p) => {
         text += `\n• ${p.partTitle || 'Partie'} :\n`;
         if (p.mainIdea) text += `  Idée : ${p.mainIdea}\n`;
         if (p.simpleExplanation) text += `  Explication : ${p.simpleExplanation}\n`;
@@ -198,28 +203,28 @@ async function loadNotebookContext(uid, subject, chapterId, chapterTitle) {
     }
     if (Array.isArray(a.questions)) {
       text += `\nQuestions déjà posées :\n`;
-      a.questions.forEach((q, j) => { text += `  Q${j + 1} : ${q.question}\n`; });
+      a.questions.slice(0, 8).forEach((q, j) => { text += `  Q${j + 1} : ${q.question}\n`; });
     }
     if (a.structure) {
       const st = a.structure;
       if (Array.isArray(st.formulas) && st.formulas.length > 0) {
         text += `\nFormules clés :\n`;
-        st.formulas.forEach((f) => { text += `  - ${f.latex || ''}\n`; });
+        st.formulas.slice(0, 8).forEach((f) => { text += `  - ${f.latex || ''}\n`; });
       }
       if (Array.isArray(st.definitions) && st.definitions.length > 0) {
         text += `\nDéfinitions :\n`;
-        st.definitions.forEach((d) => { text += `  - ${d.term} : ${d.definition}\n`; });
+        st.definitions.slice(0, 10).forEach((d) => { text += `  - ${d.term} : ${d.definition}\n`; });
       }
       if (Array.isArray(st.mechanisms) && st.mechanisms.length > 0) {
         text += `\nMécanismes :\n`;
-        st.mechanisms.forEach((m) => {
+        st.mechanisms.slice(0, 5).forEach((m) => {
           text += `  - ${m.name || ''}\n`;
-          if (Array.isArray(m.steps)) m.steps.forEach((step, si) => { text += `    ${si + 1}. ${step}\n`; });
+          if (Array.isArray(m.steps)) m.steps.slice(0, 6).forEach((step, si) => { text += `    ${si + 1}. ${step}\n`; });
         });
       }
       if (Array.isArray(st.timeline) && st.timeline.length > 0) {
         text += `\nChronologie :\n`;
-        st.timeline.forEach((t) => { text += `  - ${t.date} : ${t.event}\n`; });
+        st.timeline.slice(0, 10).forEach((t) => { text += `  - ${t.date} : ${t.event}\n`; });
       }
     }
     return text;
@@ -236,9 +241,34 @@ async function loadNotebookContext(uid, subject, chapterId, chapterTitle) {
 
 function getProviders() {
   return [
-    { name: 'Groq', key: process.env.GROQ_API_KEY, endpoint: 'https://api.groq.com/openai/v1/chat/completions', model: process.env.GROQ_MODEL || 'openai/gpt-oss-120b', jsonMode: true, headers: {} },
-    { name: 'OpenRouter', key: process.env.OPENROUTER_API_KEY, endpoint: 'https://openrouter.ai/api/v1/chat/completions', model: process.env.OPENROUTER_MODEL || 'openai/gpt-oss-120b', jsonMode: true, headers: { 'HTTP-Referer': process.env.APP_ORIGIN || '', 'X-Title': 'ARVEXA Exam' } },
-    { name: 'Mistral', key: process.env.MISTRAL_API_KEY, endpoint: 'https://api.mistral.ai/v1/chat/completions', model: process.env.MISTRAL_MODEL || 'mistral-large-latest', jsonMode: false, headers: {} }
+    {
+      name: 'Groq',
+      key: process.env.GROQ_API_KEY,
+      endpoint: 'https://api.groq.com/openai/v1/chat/completions',
+      model: process.env.GROQ_MODEL || 'openai/gpt-oss-120b',
+      jsonMode: true,
+      headers: {}
+    },
+    {
+      name: 'OpenRouter',
+      key: process.env.OPENROUTER_API_KEY,
+      endpoint: 'https://openrouter.ai/api/v1/chat/completions',
+      model: process.env.OPENROUTER_MODEL || 'openai/gpt-oss-120b',
+      jsonMode: true,
+      headers: {
+        'HTTP-Referer': process.env.APP_ORIGIN || '',
+        'X-Title': 'ARVEXA Exam'
+      }
+    },
+    // ⚡ CORRECTION : Mistral avec modèle gratuit
+    {
+      name: 'Mistral',
+      key: process.env.MISTRAL_API_KEY,
+      endpoint: 'https://api.mistral.ai/v1/chat/completions',
+      model: process.env.MISTRAL_MODEL || 'open-mistral-nemo',
+      jsonMode: false,
+      headers: {}
+    }
   ].filter((p) => Boolean(p.key));
 }
 
@@ -248,10 +278,11 @@ async function callProvider(provider, prompt, maxTokens = 12000) {
   try {
     const body = {
       model: provider.model,
-      temperature: 0.25,
+      // ⚡ CORRECTION : temperature 0.15 pour mieux respecter le schéma JSON
+      temperature: 0.15,
       max_tokens: maxTokens,
       messages: [
-        { role: 'system', content: 'Tu produis exclusivement du JSON valide.' },
+        { role: 'system', content: 'Tu produis exclusivement du JSON valide. Tu respectes scrupuleusement le schéma demandé.' },
         { role: 'user', content: prompt }
       ]
     };
@@ -364,11 +395,51 @@ function validateCorrection(body) {
   return null;
 }
 
+// ═══════════════════════════════════════════════════════════════
+// CONTRÔLE STRUCTUREL — bloc commun à ajouter en fin de prompt
+// ═══════════════════════════════════════════════════════════════
+const STRUCTURE_CONTROL = `
+═══════════════════════════════════════════════════════════════
+CONTRÔLE STRUCTUREL OBLIGATOIRE — AVANT DE RÉPONDRE
+═══════════════════════════════════════════════════════════════
+Vérifie que ton JSON contient EXACTEMENT :
+
+1. "subjects" : un tableau de 2 objets
+2. Chaque objet "subject" contient :
+   - "id" : "subject_1" ou "subject_2"
+   - "title" : "Sujet 1 — Consolidation" ou "Sujet 2 — Approfondissement"
+   - "level" : "consolidation" ou "approfondissement"
+   - "instructions" : "..."
+   - "exercises" : un tableau de EXACTEMENT ${REQUIRED_EXERCISES} objets
+
+3. Chaque "exercise" contient :
+   - "number" : 1, 2 ou 3
+   - "title" : "..."
+   - "points" : 6.67
+   - "statement" : "..."
+   - "questions" : un tableau de EXACTEMENT ${QUESTIONS_PER_EXERCISE} objets
+
+4. Chaque "question" contient :
+   - "number" : "1.a", "1.b", etc.
+   - "text" : "..."
+   - "points" : 1.33
+   - "type" : "choice" OU "text"
+   - SI "type"="choice" : "options" (4 objets avec "id" et "text") + "correctAnswer" (A, B, C ou D)
+   - SI "type"="text" : PAS de "options" et PAS de "correctAnswer"
+
+⚠️ COMPTE MENTALEMENT AVANT DE RÉPONDRE :
+- Combien d'exercices par sujet ? (doit être ${REQUIRED_EXERCISES})
+- Combien de questions dans chaque exercice ? (doit être ${QUESTIONS_PER_EXERCISE})
+- Total = ${REQUIRED_EXERCISES} × ${QUESTIONS_PER_EXERCISE} = ${REQUIRED_EXERCISES * QUESTIONS_PER_EXERCISE} questions par sujet
+
+NE RÉPONDS PAS avec un JSON partiel ou incomplet.
+Réponds UNIQUEMENT avec le JSON complet et valide.`;
+
 function generationPromptFromNotebook(config, notebookContext) {
   const choiceSubjects = new Set(['Mathématiques', 'Physique', 'Chimie']);
   const questionFormat = choiceSubjects.has(config.subject)
     ? 'Pour les questions de calcul, utilise type "choice" avec exactement quatre propositions : options=[{"id":"A","text":"..."},{"id":"B","text":"..."},{"id":"C","text":"..."},{"id":"D","text":"..."}] et correctAnswer parmi A, B, C ou D. Pour les questions de raisonnement, démonstration ou rédaction, utilise type "text".'
-    : 'Pour chaque question, utilise le type "text" sauf si c\'est un QCM.';
+    : 'Pour chaque question, utilise le type "text" sauf si c\'est un QCM explicite.';
 
   return `Tu es un professeur expert du BAC au Niger, spécialiste de ${config.subject}.
 
@@ -401,18 +472,13 @@ SUJET 1 — Niveau "Consolidation" (facile à moyen)
 - Questions directes : définitions, mécanismes, formules
 - Applications simples et classiques
 - Répartition : environ 40% QCM + 60% texte
-- Difficulté progressive : commence facile, termine moyen
 - Instructions : "Ce sujet vérifie votre compréhension des notions essentielles."
 
 SUJET 2 — Niveau "Approfondissement" (moyen à difficile)
 - Vise à TESTER la capacité de raisonnement et d'analyse
 - MÊMES notions que le Sujet 1, MAIS sous des angles plus exigeants
 - Applications composées, pièges classiques du BAC
-- Répartition : environ 30% QCM + 70% texte
-- Difficulté progressive : commence moyen, termine difficile
 - Instructions : "Ce sujet approfondit votre maîtrise et vous prépare aux questions complexes du BAC."
-
-Les 2 sujets couvrent TOUT le contenu, mais sous des angles différents.
 
 ═══════════════════════════════════════════════════════════════
 RÈGLES LATEX
@@ -444,7 +510,7 @@ FORMAT JSON ATTENDU
           "number": 1,
           "title": "Titre de l'exercice",
           "points": 6.67,
-          "statement": "Énoncé complet de l'exercice.",
+          "statement": "Énoncé complet.",
           "questions": [
             {
               "number": "1.a",
@@ -461,28 +527,21 @@ FORMAT JSON ATTENDU
     {
       "id": "subject_2",
       "title": "Sujet 2 — Approfondissement",
-      "instructions": "Ce sujet approfondit votre maîtrise et vous prépare aux questions complexes du BAC.",
+      "instructions": "Ce sujet approfondit votre maîtrise.",
       "level": "approfondissement",
       "exercises": []
     }
   ]
 }
 
-CONTRAINTES FINALES :
-- Chaque sujet : EXACTEMENT ${REQUIRED_EXERCISES} exercices
-- Chaque exercice : EXACTEMENT ${QUESTIONS_PER_EXERCISE} questions
-- Chaque sujet : total de 20 points
-- Score des exercices : environ 6.67 pts chacun (20 / ${REQUIRED_EXERCISES})
-- Score des questions : environ 1.33 pts chacune
-- Toutes les questions basées sur le contenu fourni
-- Réponds UNIQUEMENT avec le JSON valide`;
+${STRUCTURE_CONTROL}`;
 }
 
 function generationPrompt(config) {
   const choiceSubjects = new Set(['Mathématiques', 'Physique', 'Chimie']);
   const questionFormat = choiceSubjects.has(config.subject)
     ? 'Pour les questions de calcul, utilise type "choice" avec exactement quatre propositions et correctAnswer parmi A, B, C ou D. Pour les questions de raisonnement, démonstration ou rédaction, utilise type "text".'
-    : 'Pour chaque question, utilise le type "text" sauf si c\'est un QCM.';
+    : 'Pour chaque question, utilise le type "text" sauf si c\'est un QCM explicite.';
 
   return `Tu es un professeur expert du BAC au Niger, spécialiste de ${config.subject}.
 
@@ -502,13 +561,11 @@ SUJET 1 — Niveau "Consolidation" (facile à moyen)
 - Vise à vérifier les notions fondamentales
 - Questions directes, applications simples
 - 40% QCM + 60% texte
-- Difficulté progressive : facile → moyen
 
 SUJET 2 — Niveau "Approfondissement" (moyen à difficile)
 - MÊMES notions, angles plus exigeants
 - Applications composées, pièges classiques du BAC
 - 30% QCM + 70% texte
-- Difficulté progressive : moyen → difficile
 
 ═══════════════════════════════════════════════════════════════
 RÈGLES LATEX
@@ -532,7 +589,7 @@ FORMAT JSON ATTENDU
     {
       "id": "subject_1",
       "title": "Sujet 1 — Consolidation",
-      "instructions": "Ce sujet vérifie votre compréhension des notions essentielles.",
+      "instructions": "...",
       "level": "consolidation",
       "exercises": [
         { "number": 1, "title": "...", "points": 6.67, "statement": "...", "questions": [ { "number": "1.a", "text": "...", "points": 1.33, "type": "text" } ] }
@@ -541,17 +598,14 @@ FORMAT JSON ATTENDU
     {
       "id": "subject_2",
       "title": "Sujet 2 — Approfondissement",
-      "instructions": "Ce sujet approfondit votre maîtrise et vous prépare aux questions complexes du BAC.",
+      "instructions": "...",
       "level": "approfondissement",
       "exercises": []
     }
   ]
 }
 
-CONTRAINTES :
-- Chaque sujet : ${REQUIRED_EXERCISES} exercices × ${QUESTIONS_PER_EXERCISE} questions
-- Total : 20 points par sujet
-- Réponds UNIQUEMENT avec le JSON`;
+${STRUCTURE_CONTROL}`;
 }
 
 function correctionPrompt(body) {
@@ -581,10 +635,7 @@ function correctionPrompt(body) {
   return `Tu es un professeur correcteur expert du BAC au Niger (Terminale D).
 Tu corriges un examen de ${body.exam.subject} sur le chapitre "${subject.title || 'Général'}".
 
-═══════════════════════════════════════════════════════════════
-MISSION
-═══════════════════════════════════════════════════════════════
-Pour CHAQUE question :
+MISSION : Pour CHAQUE question :
 1. Compare la réponse de l'élève à la bonne réponse
 2. Attribue les points (0 = faux, total = juste, partiel si justifié)
 3. Explique PRÉCISÉMENT où est l'erreur (si erreur)
@@ -592,22 +643,16 @@ Pour CHAQUE question :
 5. Propose une meilleure méthode si elle existe
 6. Suggère un point à revoir (notion précise)
 
-═══════════════════════════════════════════════════════════════
-RÈGLES DE NOTATION
-═══════════════════════════════════════════════════════════════
+RÈGLES DE NOTATION :
 - QCM (type "choice") : réponse exacte = tous les points, sinon 0
 - Texte libre : évalue sur le fond, la méthode, la rigueur
 - Réponse vide : 0 point + conseil de ne jamais laisser vide
 - Ne dépasse jamais les points de la question
 
-═══════════════════════════════════════════════════════════════
-DONNÉES DE L'EXAMEN
-═══════════════════════════════════════════════════════════════
+DONNÉES DE L'EXAMEN :
 ${JSON.stringify(questionsDetail, null, 2)}
 
-═══════════════════════════════════════════════════════════════
-FORMAT DE RÉPONSE (JSON UNIQUEMENT)
-═══════════════════════════════════════════════════════════════
+FORMAT DE RÉPONSE (JSON UNIQUEMENT) :
 {
   "score": 0,
   "totalScore": 20,
@@ -648,14 +693,9 @@ FORMAT DE RÉPONSE (JSON UNIQUEMENT)
   }
 }
 
-═══════════════════════════════════════════════════════════════
-IMPORTANT
-═══════════════════════════════════════════════════════════════
-- Émojis dans feedback : 🎉, ❌, ⏭️, 💡, 📖
-- Chaque feedback : 2-4 phrases max, pédagogique
-- "betterMethod" : astuce ou meilleure méthode
-- "toReview" : notion précise à revoir (null si tout bon)
-- Réponds UNIQUEMENT avec l'objet JSON`;
+Émojis : 🎉, ❌, ⏭️, 💡, 📖
+Chaque feedback : 2-4 phrases max, pédagogique.
+Réponds UNIQUEMENT avec l'objet JSON.`;
 }
 
 function validateGeneratedExam(exam, subjectName) {

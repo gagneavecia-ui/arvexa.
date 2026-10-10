@@ -1623,8 +1623,6 @@
   // ────────────────────────────────────────────────────────────
   // UTILITAIRES TEXTE — anti "[object Object]"
   // ────────────────────────────────────────────────────────────
-
-  // Convertit n'importe quelle valeur en chaîne propre et sûre.
   function toPlainText(value) {
     if (value === null || value === undefined) return '';
     if (typeof value === 'string') return value;
@@ -1633,12 +1631,10 @@
       return value.map((v) => toPlainText(v)).filter(Boolean).join('\n');
     }
     if (typeof value === 'object') {
-      // Essaie les clés classiques d'abord
       const keys = ['text', 'latex', 'formule', 'expression', 'content', 'value', 'label', 'titre', 'title', 'description'];
       for (const k of keys) {
         if (typeof value[k] === 'string' && value[k].trim()) return value[k];
       }
-      // Sinon : concatène les valeurs string
       return Object.values(value)
         .map((v) => (typeof v === 'string' ? v : (typeof v === 'number' ? String(v) : '')))
         .filter(Boolean)
@@ -1647,22 +1643,18 @@
     return '';
   }
 
-  // Convertit en texte + échappe HTML pour innerHTML sécurisé.
   function safeText(value) {
     const txt = toPlainText(value);
     return txt.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
 
-  // Pour préserver les $ LaTeX, on n'échappe que < > &
   function safeLatex(value) {
     const txt = toPlainText(value);
     return txt.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
 
-  // Nettoie une chaîne LaTeX : enlève les $ déjà présents (on les rajoute nous-mêmes)
   function cleanLatex(value) {
     let txt = toPlainText(value).trim();
-    // retire $$...$$, $...$, \[...\], \(...\)
     txt = txt.replace(/^\$\$([\s\S]*)\$\$$/, '$1');
     txt = txt.replace(/^\$([\s\S]*)\$$/, '$1');
     txt = txt.replace(/^\\\[([\s\S]*)\\\]$/, '$1');
@@ -1688,6 +1680,7 @@
     } else {
       $('stepBar').classList.remove('show');
     }
+    // ⚡ Scroll en haut à chaque changement de vue
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -1856,7 +1849,6 @@
     if (active) state.mode = active.dataset.mode;
   }
 
-  // ── API ──
   async function callApi(payload) {
     const token = await getIdToken(state.user);
     const res = await fetch('/api/reviseur', {
@@ -1868,7 +1860,6 @@
     return { res, data };
   }
 
-  // ── FICHE ──
   $('configForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     if (state.isGenerating) return;
@@ -2077,14 +2068,12 @@
     const title = toPlainText(section.notionTitle || section.title || `Notion ${index + 1}`);
     const id = toPlainText(section.notionId || '');
 
-    // COMPRENDRE
     let comprendreHTML = '';
     const comprendreTxt = toPlainText(section.comprendre);
     if (comprendreTxt.trim()) {
       comprendreHTML = `<div class="block"><div class="block-label"><i class="fas fa-lightbulb"></i> Comprendre</div><div class="block-text">${safeText(comprendreTxt)}</div></div>`;
     }
 
-    // FORMULES
     let formulesHTML = '';
     if (Array.isArray(section.formules) && section.formules.length > 0) {
       const valid = section.formules.map(normalizeFormula).filter(Boolean);
@@ -2109,7 +2098,6 @@
       }
     }
 
-    // MÉTHODE
     let methodeHTML = '';
     let steps = [];
     let methTitle = 'Méthode pas-à-pas';
@@ -2125,7 +2113,6 @@
       methodeHTML = `<div class="block"><div class="block-label"><i class="fas fa-list-ol"></i> ${safeText(methTitle)}</div><ol class="method-steps">${steps.map((st) => `<li>${safeText(st)}</li>`).join('')}</ol></div>`;
     }
 
-    // EXEMPLE RÉSOLU
     let exempleHTML = '';
     if (section.exempleResolu && typeof section.exempleResolu === 'object') {
       const ex = section.exempleResolu;
@@ -2144,7 +2131,6 @@
       }
     }
 
-    // PIÈGE
     let piegeHTML = '';
     if (section.piegeBAC && typeof section.piegeBAC === 'object') {
       const trap = toPlainText(section.piegeBAC.trap);
@@ -2154,7 +2140,6 @@
       }
     }
 
-    // ASTUCE
     let astuceHTML = '';
     const astuceTxt = toPlainText(section.astuce);
     if (astuceTxt.trim()) {
@@ -2411,7 +2396,7 @@
 
   initCustomSelects();
   initChips();
-  console.log('🎓 ARVEXA — Réviseur v6.1');
+  console.log('🎓 ARVEXA — Réviseur v6.2 (version corrigée)');
   </script>
 </body>
 </html>

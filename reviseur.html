@@ -1221,12 +1221,15 @@
                 <span class="custom-select-value"></span>
                 <i class="fas fa-chevron-down custom-select-arrow"></i>
               </button>
-              <div class="custom-select-options">
-                <div class="custom-select-option" data-value="mathematiques"><span class="option-prefix">📐</span> Mathématiques</div>
-                <div class="custom-select-option" data-value="physique"><span class="option-prefix">⚡</span> Physique</div>
-                <div class="custom-select-option" data-value="chimie"><span class="option-prefix">🧪</span> Chimie</div>
-                <div class="custom-select-option" data-value="svt"><span class="option-prefix">🧬</span> SVT</div>
-              </div>
+             <div class="custom-select-options">
+  <div class="custom-select-option" data-value="mathematiques"><span class="option-prefix">📐</span> Mathématiques</div>
+  <div class="custom-select-option" data-value="physique"><span class="option-prefix">⚡</span> Physique</div>
+  <div class="custom-select-option" data-value="chimie"><span class="option-prefix">🧪</span> Chimie</div>
+  <div class="custom-select-option" data-value="svt"><span class="option-prefix">🧬</span> SVT</div>
+  <div class="custom-select-option" data-value="philosophie"><span class="option-prefix">🧠</span> Philosophie</div>
+  <div class="custom-select-option" data-value="histoire"><span class="option-prefix">🌍</span> Histoire</div>
+  <div class="custom-select-option" data-value="geographie"><span class="option-prefix">🗺️</span> Géographie</div>
+</div>
             </div>
           </div>
 
@@ -1505,16 +1508,98 @@
   const auth = getAuth(app);
   const db = getFirestore(app);
 
-  const CHAPTERS = {
-    mathematiques: ['Nombres complexes','Similitudes planes directes','Calcul de probabilités','Variable aléatoire','Fonctions numériques','Fonction logarithme','Fonction exponentielle','Calcul intégral','Équations différentielles','Suites numériques','Statistiques'],
-    physique: ['Cinématique','Mouvement du centre d\'inertie','Champ de pesanteur','Particules chargées','Oscillateurs mécaniques','Vibrations','Propagation des ondes','Superposition','Interférences lumineuses','Champ magnétique','Force de Lorentz','Force de Laplace','Induction électromagnétique','Auto-Induction','Circuit LC','Régime sinusoïdal','Radioactivité'],
-    chimie: ['Solutions aqueuses','Acide chlorhydrique / Soude','Couples acide/base','Réaction acide-base','Solution tampon','Alcools','Acides carboxyliques','Amines','Acides α-aminés'],
-    svt: ['Génétique','Immunologie','Écologie','Évolution']
-  };
+ const CHAPTERS = {
+  mathematiques: [
+    'Nombres complexes',
+    'Similitudes planes directes',
+    'Calcul de probabilités',
+    'Variable aléatoire',
+    'Fonction numérique',
+    'Fonction logarithme',
+    'Fonction exponentielle',
+    'Calcul intégral',
+    'Équations différentielles',
+    'Suites numériques',
+    'Statistiques'
+  ],
+  physique: [
+    'Cinématique',
+    'Mouvement rectiligne',
+    'Mouvement dans le champ de pesanteur',
+    'Mouvement des particules chargées',
+    'Oscillateurs mécaniques',
+    'Généralités sur les ondes',
+    'Mouvement vibratoire',
+    'Superposition des ondes',
+    'Interférence lumineuse',
+    'Champ magnétique',
+    'Force de Laplace',
+    'Force de Lorentz',
+    'Induction magnétique',
+    'Auto-induction',
+    'Circuit LC',
+    'Circuit RLC',
+    'Radioactivité'
+  ],
+  chimie: [
+    'Solutions aqueuses',
+    'Acide chlorhydrique / Soude',
+    'Couples acide/base',
+    'Réaction acide-base',
+    'Solution tampon',
+    'Alcools',
+    'Acides carboxyliques',
+    'Amines',
+    'Acides α-aminés'
+  ],
+  svt: [
+    'Notion de l\'IG',
+    'Nature chimique et structure de l\'IG : la molécule d\'ADN',
+    'La reproduction conforme',
+    'Notion de cycle cellulaire et évolution de la quantité d\'ADN au cours du cycle',
+    'Protéines',
+    'Mécanismes d\'expression des gènes : la synthèse des protéines',
+    'Reproduction sexuée',
+    'Brassage des gènes',
+    'Transmission des caractères héréditaires chez l\'Homme',
+    'Anomalies chromosomiques',
+    'Tissus nerveux et notions de réflexes',
+    'Messages nerveux',
+    'La glycémie',
+    'Les appareils génitaux et leur fonctionnement',
+    'Régulation du fonctionnement des organes génitaux',
+    'De la fécondation à la nidation',
+    'La régulation des naissances',
+    'Le soi et le non soi',
+    'Les réponses immunitaires',
+    'Dysfonctionnement du système immunitaire : cas du VIH/SIDA'
+  ],
+  philosophie: [
+    'Conscience - Inconscient',
+    'Les passions',
+    'Autrui',
+    'Travail',
+    'Histoire',
+    'Religion',
+    'Science et technique',
+    'Le langage',
+    'La vérité',
+    'Espace - temps',
+    'État',
+    'La justice',
+    'La liberté'
+  ]
+};
 
-  const SUBJECT_LABELS = {
-    mathematiques: 'Mathématiques', physique: 'Physique', chimie: 'Chimie', svt: 'SVT'
-  };
+    const SUBJECT_LABELS = {
+  mathematiques: 'Mathématiques',
+  physique: 'Physique',
+  chimie: 'Chimie',
+  svt: 'SVT',
+  philosophie: 'Philosophie',
+  histoire: 'Histoire',
+  geographie: 'Geographie'
+};
 
   const DIFFICULTY_LABELS = { 1: 'Facile', 2: 'Moyen', 3: 'Difficile', 4: 'Niveau BAC' };
   const TYPE_LABELS = { definition: 'Définition', formule: 'Formule', methode: 'Méthode', piege: 'Piège' };

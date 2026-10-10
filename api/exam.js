@@ -1,8 +1,9 @@
 // ================================================================
-// API EXAM v3.0 — ARVEXA School
+// API EXAM v3.1 — ARVEXA School
 // 3 exercices × 5 questions par sujet
 // 100% gratuit : Groq (4 modèles) + OpenRouter (3 modèles :free)
 // Post-traitement réparateur intégré
+// ⚡ v3.1 — Harmonisation minuscules (mathematiques, philosophie, etc.)
 // ================================================================
 
 module.exports.config = { maxDuration: 90 };
@@ -11,12 +12,38 @@ const WINDOW_MS = 60 * 1000;
 const MAX_REQUESTS_PER_WINDOW = 3;
 const requestLog = new Map();
 
-const ALLOWED_SUBJECTS = new Set(['Mathématiques', 'Physique', 'Chimie', 'SVT', 'Français']);
+// ⚡ ALLOWED_SUBJECTS — clés minuscules harmonisées
+const ALLOWED_SUBJECTS = new Set([
+  'mathematiques',
+  'physique',
+  'chimie',
+  'svt',
+  'francais',
+  'philosophie',
+  'histoire',
+  'geographie'
+]);
+
 const ALLOWED_DIFFICULTIES = new Set(['easy', 'medium', 'hard', 'bac']);
 const ALLOWED_DURATIONS = new Set([30, 60, 90, 120, 180]);
 const REQUIRED_EXERCISES = 3;
 const QUESTIONS_PER_EXERCISE = 5;
 const FREE_EXAM_LIMIT = 2;
+
+// ⚡ Labels d'affichage (pour les prompts IA)
+const SUBJECT_LABELS = {
+  'mathematiques': 'Mathématiques',
+  'physique': 'Physique',
+  'chimie': 'Chimie',
+  'svt': 'SVT',
+  'francais': 'Français',
+  'philosophie': 'Philosophie',
+  'histoire': 'Histoire',
+  'geographie': 'Géographie'
+};
+
+// ⚡ Matières supportant les QCM (choix multiples)
+const CHOICE_SUBJECTS = new Set(['mathematiques', 'physique', 'chimie']);
 
 let adminServices = null;
 
@@ -97,15 +124,24 @@ function isPremiumUser(data) {
   return false;
 }
 
+// ⚡ Mapping subject → notebook key (clés minuscules partout)
 function examSubjectToNotebookKey(examSubject) {
   const map = {
-    'Mathématiques': 'mathematiques', 'Physique': 'physique', 'Chimie': 'chimie',
-    'SVT': 'svt', 'Français': 'francais', 'Philosophie': 'philosophie',
-    'Histoire-Géographie': 'histoire-geo', 'Anglais': 'anglais'
+    'mathematiques': 'mathematiques',
+    'physique': 'physique',
+    'chimie': 'chimie',
+    'svt': 'svt',
+    'francais': 'francais',
+    'philosophie': 'philosophie',
+    'histoire': 'histoire',
+    'geographie': 'geographie',
+    'histoire-geo': 'histoire-geo',
+    'anglais': 'anglais'
   };
   return map[examSubject] || null;
 }
 
+// ⚡ Normalisation des clés de matière
 function normalizeSubjectKey(raw) {
   if (!raw) return null;
   const s = String(raw).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
@@ -115,6 +151,8 @@ function normalizeSubjectKey(raw) {
     physique: 'physique', physiques: 'physique',
     chimie: 'chimie', svt: 'svt', francais: 'francais', anglais: 'anglais',
     philosophie: 'philosophie', philo: 'philosophie',
+    histoire: 'histoire',
+    geographie: 'geographie', geo: 'geographie',
     histoire_geo: 'histoire_geo', histoiregeo: 'histoire_geo'
   };
   return map[s] || s;
@@ -239,7 +277,6 @@ async function loadNotebookContext(uid, subject, chapterId, chapterTitle) {
 function getProviders() {
   const providers = [];
 
-  // ⚡ GROQ — 4 modèles en cascade (Developer Plan gratuit)
   if (process.env.GROQ_API_KEY) {
     providers.push(
       {
@@ -277,7 +314,6 @@ function getProviders() {
     );
   }
 
-  // ⚡ OPENROUTER — 3 modèles :free en cascade
   if (process.env.OPENROUTER_API_KEY) {
     const orHeaders = {
       'HTTP-Referer': process.env.APP_ORIGIN || '',
@@ -412,7 +448,7 @@ async function saveExamResult(uid, body, result) {
   })) : [];
 
   await db.collection('users').doc(uid).collection('examResults').add({
-    subject: body.exam.subject,
+    subject: SUBJECT_LABELS[body.exam.subject] || body.exam.subject,
     subjectKey: normalizeSubjectKey(body.exam.subject),
     subjectId: body.subjectId,
     chapter: body.exam.chapter || 'all',
@@ -493,12 +529,13 @@ Vérifie que ton JSON contient EXACTEMENT :
 Réponds UNIQUEMENT avec le JSON complet et valide.`;
 
 function generationPromptFromNotebook(config, notebookContext) {
-  const choiceSubjects = new Set(['Mathématiques', 'Physique', 'Chimie']);
-  const questionFormat = choiceSubjects.has(config.subject)
+  const subjectLabel = SUBJECT_LABELS[config.subject] || config.subject;
+  const usesChoices = CHOICE_SUBJECTS.has(config.subject);
+  const questionFormat = usesChoices
     ? 'Pour les questions de calcul, utilise type "choice" avec exactement quatre propositions : options=[{"id":"A","text":"..."},{"id":"B","text":"..."},{"id":"C","text":"..."},{"id":"D","text":"..."}] et correctAnswer parmi A, B, C ou D. Pour les questions de raisonnement, utilise type "text".'
     : 'Pour chaque question, utilise le type "text" sauf si c\'est un QCM explicite.';
 
-  return `Tu es un professeur expert du BAC au Niger, spécialiste de ${config.subject}.
+  return `Tu es un professeur expert du BAC au Niger, spécialiste de ${subjectLabel}.
 
 L'élève a étudié un chapitre précis dans son cahier. Tu dois générer DEUX sujets d'examen basés STRICTEMENT sur ce contenu.
 
@@ -506,7 +543,7 @@ L'élève a étudié un chapitre précis dans son cahier. Tu dois générer DEUX
 CONTENU DU CHAPITRE ÉTUDIÉ PAR L'ÉLÈVE
 ═══════════════════════════════════════════════════════════════
 Chapitre : ${notebookContext.chapterTitle}
-Matière : ${config.subject}
+Matière : ${subjectLabel}
 Nombre de sections étudiées : ${notebookContext.sectionsCount}
 
 ${notebookContext.contentText}
@@ -578,16 +615,17 @@ ${STRUCTURE_CONTROL}`;
 }
 
 function generationPrompt(config) {
-  const choiceSubjects = new Set(['Mathématiques', 'Physique', 'Chimie']);
-  const questionFormat = choiceSubjects.has(config.subject)
+  const subjectLabel = SUBJECT_LABELS[config.subject] || config.subject;
+  const usesChoices = CHOICE_SUBJECTS.has(config.subject);
+  const questionFormat = usesChoices
     ? 'Pour les questions de calcul, utilise type "choice" avec exactement quatre propositions et correctAnswer parmi A, B, C ou D. Pour les questions de raisonnement, utilise type "text".'
     : 'Pour chaque question, utilise le type "text" sauf si c\'est un QCM explicite.';
 
-  return `Tu es un professeur expert du BAC au Niger, spécialiste de ${config.subject}.
+  return `Tu es un professeur expert du BAC au Niger, spécialiste de ${subjectLabel}.
 
 MISSION : Génère DEUX sujets d'examen de niveau Terminale D.
 
-Matière : ${config.subject}
+Matière : ${subjectLabel}
 Niveau : ${config.level}
 Chapitre : ${config.chapter === 'all' ? 'tous les chapitres du programme' : config.chapter}
 Difficulté : ${config.difficulty}
@@ -708,9 +746,6 @@ FORMAT JSON :
   }
 }
 
-Réponds UNIQUEMENT avec l'objet JSON.`;
-}
-
 // ═══════════════════════════════════════════════════════════════
 // POST-TRAITEMENT RÉPARATEUR
 // Répare un JSON presque correct au lieu de le rejeter
@@ -718,7 +753,7 @@ Réponds UNIQUEMENT avec l'objet JSON.`;
 function repairExamStructure(exam, subjectName) {
   if (!exam || typeof exam !== 'object') return null;
 
-  const supportsChoices = ['Mathématiques', 'Physique', 'Chimie'].includes(subjectName);
+  const supportsChoices = CHOICE_SUBJECTS.has(subjectName);
 
   // ⚡ Si subjects manquant → on essaie d'autres clés
   if (!Array.isArray(exam.subjects)) {
@@ -727,10 +762,8 @@ function repairExamStructure(exam, subjectName) {
     else return null;
   }
 
-  // ⚡ S'assurer d'avoir au moins 2 sujets
   if (exam.subjects.length === 0) return null;
 
-  // Si 1 seul sujet → dupliquer avec un titre adapté
   if (exam.subjects.length === 1) {
     const first = exam.subjects[0];
     exam.subjects.push({
@@ -744,21 +777,18 @@ function repairExamStructure(exam, subjectName) {
 
   exam.subjects = exam.subjects.slice(0, 2);
 
-  // ⚡ Normaliser chaque sujet
   exam.subjects.forEach((subject, sIdx) => {
     if (!subject.id) subject.id = `subject_${sIdx + 1}`;
     if (!subject.title) subject.title = `Sujet ${sIdx + 1}`;
     if (!subject.level) subject.level = sIdx === 0 ? 'consolidation' : 'approfondissement';
     if (!subject.instructions) subject.instructions = 'Traitez le sujet dans le temps imparti.';
 
-    // ⚡ Exercises : chercher d'autres noms
     if (!Array.isArray(subject.exercises)) {
       if (Array.isArray(subject.exos)) subject.exercises = subject.exos;
       else if (Array.isArray(subject.problems)) subject.exercises = subject.problems;
       else subject.exercises = [];
     }
 
-    // Si moins de 3 exercices → compléter avec des exercices génériques
     while (subject.exercises.length < REQUIRED_EXERCISES) {
       const num = subject.exercises.length + 1;
       subject.exercises.push({
@@ -772,7 +802,6 @@ function repairExamStructure(exam, subjectName) {
 
     subject.exercises = subject.exercises.slice(0, REQUIRED_EXERCISES);
 
-    // ⚡ Normaliser chaque exercice
     subject.exercises.forEach((exercise, eIdx) => {
       if (!exercise.number) exercise.number = eIdx + 1;
       if (!exercise.title) exercise.title = `Exercice ${eIdx + 1}`;
@@ -784,7 +813,6 @@ function repairExamStructure(exam, subjectName) {
         else exercise.questions = [];
       }
 
-      // Si moins de 5 questions → compléter
       while (exercise.questions.length < QUESTIONS_PER_EXERCISE) {
         const qNum = exercise.questions.length + 1;
         exercise.questions.push({
@@ -797,31 +825,25 @@ function repairExamStructure(exam, subjectName) {
 
       exercise.questions = exercise.questions.slice(0, QUESTIONS_PER_EXERCISE);
 
-      // ⚡ Normaliser chaque question
       exercise.questions.forEach((question, qIdx) => {
         if (!question.number) question.number = `${eIdx + 1}.${String.fromCharCode(97 + qIdx)}`;
         if (!question.text) question.text = question.question || 'Question';
         if (!question.points) question.points = 1.33;
 
-        // Normaliser type
         if (!question.type) {
           question.type = (Array.isArray(question.options) && question.options.length === 4) ? 'choice' : 'text';
         }
 
-        // ⚡ Si type choice → vérifier la structure
         if (question.type === 'choice') {
           if (!Array.isArray(question.options) || question.options.length !== 4) {
-            // Transformer en texte libre si options invalides
             question.type = 'text';
             delete question.options;
             delete question.correctAnswer;
           } else {
-            // Normaliser les options
             question.options = question.options.map((opt, oi) => {
               if (typeof opt === 'string') return { id: String.fromCharCode(65 + oi), text: opt };
               return { id: opt.id || String.fromCharCode(65 + oi), text: opt.text || opt.label || String(opt) };
             });
-            // Normaliser correctAnswer
             if (!question.correctAnswer) question.correctAnswer = 'A';
             if (typeof question.correctAnswer === 'number') {
               question.correctAnswer = String.fromCharCode(65 + question.correctAnswer);
@@ -830,12 +852,11 @@ function repairExamStructure(exam, subjectName) {
             if (!['A', 'B', 'C', 'D'].includes(question.correctAnswer)) question.correctAnswer = 'A';
           }
         } else {
-          // Texte libre → supprimer options/correctAnswer s'ils existent par erreur
           delete question.options;
           delete question.correctAnswer;
         }
 
-        // Si matière non-scientifique et type=choice → convertir en text
+        // ⚡ Matières non-scientifiques → conversion en text
         if (!supportsChoices && question.type === 'choice') {
           question.type = 'text';
           delete question.options;
@@ -849,7 +870,7 @@ function repairExamStructure(exam, subjectName) {
 }
 
 function validateGeneratedExam(exam, subjectName) {
-  const supportsChoices = ['Mathématiques', 'Physique', 'Chimie'].includes(subjectName);
+  const supportsChoices = CHOICE_SUBJECTS.has(subjectName);
   const validQuestion = (question) => {
     if (!supportsChoices || question.type !== 'choice') {
       return ['text', 'number', 'formula', 'choice'].includes(question.type);
@@ -878,13 +899,11 @@ async function generateWithFallback(prompt, subjectName) {
       console.log(`[AI] Tentative ${provider.name}...`);
       const rawExam = await callProvider(provider, prompt);
 
-      // ⚡ ÉTAPE 1 : Vérifier la structure brute
       if (validateGeneratedExam(rawExam, subjectName)) {
         console.log(`[AI] ✅ ${provider.name} — structure valide`);
         return { exam: rawExam, provider: provider.name };
       }
 
-      // ⚡ ÉTAPE 2 : Tenter de réparer
       console.log(`[AI] 🔧 ${provider.name} — tentative de réparation...`);
       const repaired = repairExamStructure(rawExam, subjectName);
 
@@ -925,7 +944,7 @@ async function correctWithFallback(prompt) {
 }
 
 function buildLocalExam(config) {
-  const useChoices = ['Mathématiques', 'Physique', 'Chimie'].includes(config.subject);
+  const useChoices = CHOICE_SUBJECTS.has(config.subject);
   const options = useChoices ? [
     { id: 'A', text: 'Réponse A' }, { id: 'B', text: 'Réponse B' },
     { id: 'C', text: 'Réponse C' }, { id: 'D', text: 'Réponse D' }
@@ -1208,3 +1227,5 @@ module.exports = async function handler(request, response) {
 
   return jsonError(response, 400, 'Action invalide.');
 };
+Réponds UNIQUEMENT avec l'objet JSON.`;
+}

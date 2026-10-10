@@ -233,22 +233,22 @@
     .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
 
     .btn {
-  min-height: 50px;
-  border: 1px solid transparent;
-  border-radius: 30px;
-  padding: 14px 24px;
-  color: var(--text-light);
-  background: rgba(255, 255, 255, 0.04);
-  font-weight: 700;
-  font-size: 14px;
-  transition: var(--transition);
-  font-family: var(--font-body);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  letter-spacing: 0.01em;
-}
+      min-height: 50px;
+      border: 1px solid transparent;
+      border-radius: 30px;
+      padding: 14px 24px;
+      color: var(--text-light);
+      background: rgba(255, 255, 255, 0.04);
+      font-weight: 700;
+      font-size: 14px;
+      transition: var(--transition);
+      font-family: var(--font-body);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      letter-spacing: 0.01em;
+    }
 
     .btn:hover:not(:disabled) {
       transform: translateY(-1px);
@@ -1503,15 +1503,16 @@
                 <span class="custom-select-value"></span>
                 <i class="fas fa-chevron-down custom-select-arrow"></i>
               </button>
-          <div class="custom-select-options">
-  <div class="custom-select-option" data-value="mathematiques"><span class="option-prefix">📐</span> Mathématiques</div>
-  <div class="custom-select-option" data-value="physique"><span class="option-prefix">⚡</span> Physique</div>
-  <div class="custom-select-option" data-value="chimie"><span class="option-prefix">🧪</span> Chimie</div>
-  <div class="custom-select-option" data-value="svt"><span class="option-prefix">🧬</span> SVT</div>
-  <div class="custom-select-option" data-value="philosophie"><span class="option-prefix">🧠</span> Philosophie</div>
-  <div class="custom-select-option" data-value="histoire"><span class="option-prefix">🌍</span> Histoire</div>
-  <div class="custom-select-option" data-value="geographie"><span class="option-prefix">🗺️</span> Géographie</div>
-</div>
+              <div class="custom-select-options">
+                <div class="custom-select-option" data-value="mathematiques"><span class="option-prefix">📐</span> Mathématiques</div>
+                <div class="custom-select-option" data-value="physique"><span class="option-prefix">⚡</span> Physique</div>
+                <div class="custom-select-option" data-value="chimie"><span class="option-prefix">🧪</span> Chimie</div>
+                <div class="custom-select-option" data-value="svt"><span class="option-prefix">🧬</span> SVT</div>
+                <div class="custom-select-option" data-value="philosophie"><span class="option-prefix">🧠</span> Philosophie</div>
+                <div class="custom-select-option" data-value="histoire"><span class="option-prefix">🌍</span> Histoire</div>
+                <div class="custom-select-option" data-value="geographie"><span class="option-prefix">🗺️</span> Géographie</div>
+              </div>
+            </div>
           </div>
 
           <div class="field">
@@ -1561,7 +1562,7 @@
                 <span class="custom-select-value"></span>
                 <i class="fas fa-chevron-down custom-select-arrow"></i>
               </button>
-            <div class="custom-select-options" role="listbox">
+              <div class="custom-select-options" role="listbox">
                 <div class="custom-select-option" data-value="30" role="option"><span class="option-prefix">⏱️</span> 30 min</div>
                 <div class="custom-select-option" data-value="60" role="option"><span class="option-prefix">⏱️</span> 1 heure</div>
                 <div class="custom-select-option" data-value="90" role="option"><span class="option-prefix">⏱️</span> 1 h 30</div>
@@ -1767,6 +1768,7 @@
   <script type="module">
   // ═══════════════════════════════════════════════════════════════
   // EXAM — Mode examen BAC (3 exercices × 5 questions)
+  // ⚡ v3.2 — Clés minuscules harmonisées avec l'API
   // ═══════════════════════════════════════════════════════════════
 
   import { initializeApp } from 'firebase/app';
@@ -1798,120 +1800,122 @@
     SESSION_TTL_HOURS: 24
   };
 
-const CHAPTERS = {
-  'mathematiques': [
-    'Nombres complexes',
-    'Similitudes planes directes',
-    'Calcul de probabilités',
-    'Variable aléatoire',
-    'Fonction numérique',
-    'Fonction logarithme',
-    'Fonction exponentielle',
-    'Calcul intégral',
-    'Équations différentielles',
-    'Suites numériques',
-    'Statistiques'
-  ],
-  'physique': [
-    'Cinématique',
-    'Mouvement rectiligne',
-    'Mouvement dans le champ de pesanteur',
-    'Mouvement des particules chargées',
-    'Oscillateurs mécaniques',
-    'Généralités sur les ondes',
-    'Mouvement vibratoire',
-    'Superposition des ondes',
-    'Interférence lumineuse',
-    'Champ magnétique',
-    'Force de Laplace',
-    'Force de Lorentz',
-    'Induction magnétique',
-    'Auto-induction',
-    'Circuit LC',
-    'Circuit RLC',
-    'Radioactivité'
-  ],
-  'chimie': [
-    'Solutions aqueuses et leur pH',
-    'Acide fort, base forte',
-    'Acide faible, base faible',
-    'Couples acide/base et classification',
-    'Réaction acido-basique et solution tampon',
-    'Alcools',
-    'Acides carboxyliques et ses dérivés',
-    'Amines et amides',
-    'Acides α-aminés et protéines'
-  ],
-  'svt': [
-    'Notion de l\'IG',
-    'Nature chimique et structure de l\'IG : la molécule d\'ADN',
-    'La reproduction conforme',
-    'Notion de cycle cellulaire et évolution de la quantité d\'ADN au cours du cycle',
-    'Protéines',
-    'Mécanismes d\'expression des gènes : la synthèse des protéines',
-    'Reproduction sexuée',
-    'Brassage des gènes',
-    'Transmission des caractères héréditaires chez l\'Homme',
-    'Anomalies chromosomiques',
-    'Tissus nerveux et notions de réflexes',
-    'Messages nerveux',
-    'La glycémie',
-    'Les appareils génitaux et leur fonctionnement',
-    'Régulation du fonctionnement des organes génitaux',
-    'De la fécondation à la nidation',
-    'La régulation des naissances',
-    'Le soi et le non soi',
-    'Les réponses immunitaires',
-    'Dysfonctionnement du système immunitaire : cas du VIH/SIDA'
-  ],
-  'philosophie': [
-    'Conscience - Inconscient',
-    'Les passions',
-    'Autrui',
-    'Travail',
-    'Histoire',
-    'Religion',
-    'Science et technique',
-    'Le langage',
-    'La vérité',
-    'Espace - temps',
-    'État',
-    'La justice',
-    'La liberté'
-  ],
-  'histoire': [
-    'Les causes de la Seconde Guerre mondiale',
-    'Le déroulement de la Seconde Guerre mondiale',
-    'L\'Afrique dans la guerre',
-    'Le bilan de la Seconde Guerre mondiale',
-    'Les conditions de la lutte de libération',
-    'La libération de l\'Algérie',
-    'La décolonisation en Afrique occidentale française (AOF)',
-    'Les problèmes des pays décolonisés'
-  ],
-  'geographie': [
-    'Les aspects physiques',
-    'Étude humaine',
-    'L\'agriculture',
-    'L\'élevage',
-    'La pêche',
-    'L\'industrie et l\'artisanat',
-    'La communication et le transport',
-    'Le commerce',
-    'Le tourisme'
-  ]
-};
+  // ⚡ CHAPTERS — clés minuscules harmonisées
+  const CHAPTERS = {
+    'mathematiques': [
+      'Nombres complexes',
+      'Similitudes planes directes',
+      'Calcul de probabilités',
+      'Variable aléatoire',
+      'Fonction numérique',
+      'Fonction logarithme',
+      'Fonction exponentielle',
+      'Calcul intégral',
+      'Équations différentielles',
+      'Suites numériques',
+      'Statistiques'
+    ],
+    'physique': [
+      'Cinématique',
+      'Mouvement rectiligne',
+      'Mouvement dans le champ de pesanteur',
+      'Mouvement des particules chargées',
+      'Oscillateurs mécaniques',
+      'Généralités sur les ondes',
+      'Mouvement vibratoire',
+      'Superposition des ondes',
+      'Interférence lumineuse',
+      'Champ magnétique',
+      'Force de Laplace',
+      'Force de Lorentz',
+      'Induction magnétique',
+      'Auto-induction',
+      'Circuit LC',
+      'Circuit RLC',
+      'Radioactivité'
+    ],
+    'chimie': [
+      'Solutions aqueuses et leur pH',
+      'Acide fort, base forte',
+      'Acide faible, base faible',
+      'Couples acide/base et classification',
+      'Réaction acido-basique et solution tampon',
+      'Alcools',
+      'Acides carboxyliques et ses dérivés',
+      'Amines et amides',
+      'Acides α-aminés et protéines'
+    ],
+    'svt': [
+      'Notion de l\'IG',
+      'Nature chimique et structure de l\'IG : la molécule d\'ADN',
+      'La reproduction conforme',
+      'Notion de cycle cellulaire et évolution de la quantité d\'ADN au cours du cycle',
+      'Protéines',
+      'Mécanismes d\'expression des gènes : la synthèse des protéines',
+      'Reproduction sexuée',
+      'Brassage des gènes',
+      'Transmission des caractères héréditaires chez l\'Homme',
+      'Anomalies chromosomiques',
+      'Tissus nerveux et notions de réflexes',
+      'Messages nerveux',
+      'La glycémie',
+      'Les appareils génitaux et leur fonctionnement',
+      'Régulation du fonctionnement des organes génitaux',
+      'De la fécondation à la nidation',
+      'La régulation des naissances',
+      'Le soi et le non soi',
+      'Les réponses immunitaires',
+      'Dysfonctionnement du système immunitaire : cas du VIH/SIDA'
+    ],
+    'philosophie': [
+      'Conscience - Inconscient',
+      'Les passions',
+      'Autrui',
+      'Travail',
+      'Histoire',
+      'Religion',
+      'Science et technique',
+      'Le langage',
+      'La vérité',
+      'Espace - temps',
+      'État',
+      'La justice',
+      'La liberté'
+    ],
+    'histoire': [
+      'Les causes de la Seconde Guerre mondiale',
+      'Le déroulement de la Seconde Guerre mondiale',
+      'L\'Afrique dans la guerre',
+      'Le bilan de la Seconde Guerre mondiale',
+      'Les conditions de la lutte de libération',
+      'La libération de l\'Algérie',
+      'La décolonisation en Afrique occidentale française (AOF)',
+      'Les problèmes des pays décolonisés'
+    ],
+    'geographie': [
+      'Les aspects physiques',
+      'Étude humaine',
+      'L\'agriculture',
+      'L\'élevage',
+      'La pêche',
+      'L\'industrie et l\'artisanat',
+      'La communication et le transport',
+      'Le commerce',
+      'Le tourisme'
+    ]
+  };
 
-    const SUBJECT_LABELS = {
-  'mathematiques': 'Mathématiques',
-  'physique': 'Physique',
-  'chimie': 'Chimie',
-  'svt': 'SVT',
-  'philosophie': 'Philosophie',
-  'histoire': 'Histoire',
-  'geographie': 'Géographie'
-};
-    
+  // ⚡ SUBJECT_LABELS — pour l'affichage et l'API
+  const SUBJECT_LABELS = {
+    'mathematiques': 'Mathématiques',
+    'physique': 'Physique',
+    'chimie': 'Chimie',
+    'svt': 'SVT',
+    'philosophie': 'Philosophie',
+    'histoire': 'Histoire',
+    'geographie': 'Géographie'
+  };
+
   const GENERATION_STEPS = ['genStep1', 'genStep2', 'genStep3', 'genStep4', 'genStep5'];
   const CORRECTION_STEPS = ['corrStep1', 'corrStep2', 'corrStep3', 'corrStep4', 'corrStep5'];
 
@@ -2102,6 +2106,7 @@ const CHAPTERS = {
     selects.difficulty = new CustomSelect($('difficultySelect'));
     selects.duration = new CustomSelect($('durationSelect'));
 
+    // ⚡ Sélection initiale avec la clé minuscule
     selects.subject.select('mathematiques', true);
     selects.level.select('Terminale D', true);
     selects.difficulty.select('medium', true);
@@ -2120,16 +2125,17 @@ const CHAPTERS = {
     ]);
   }
 
-function readConfig() {
-  return {
-    subject: selects.subject.getValue(),  // ⚡ déjà en minuscules (mathematiques, philosophie, etc.)
-    level: selects.level.getValue(),
-    chapter: selects.chapter.getValue(),
-    difficulty: selects.difficulty.getValue(),
-    duration: Number(selects.duration.getValue()),
-    exerciseCount: EXAM_CONSTANTS.REQUIRED_EXERCISES
-  };
-}
+  // ⚡ readConfig — envoie les clés minuscules à l'API
+  function readConfig() {
+    return {
+      subject: selects.subject.getValue(),            // 'mathematiques', 'philosophie'...
+      level: selects.level.getValue(),
+      chapter: selects.chapter.getValue(),
+      difficulty: selects.difficulty.getValue(),
+      duration: Number(selects.duration.getValue()),
+      exerciseCount: EXAM_CONSTANTS.REQUIRED_EXERCISES
+    };
+  }
 
   function prefillFromUrl() {
     try {
@@ -2150,7 +2156,6 @@ function readConfig() {
           $('notebookBannerTitle').textContent = `📖 Basé sur ton cahier : ${preChapter}`;
           $('notebookBannerSub').textContent = 'L\'examen sera généré à partir des sections que tu as étudiées.';
         }
-        console.log('[EXAM] Contexte cahier activé :', state.notebookContext);
       }
 
       if (preSubject) {
@@ -2186,9 +2191,6 @@ function readConfig() {
 
           if (match && match.dataset.value !== 'all') {
             selects.chapter.select(match.dataset.value, true);
-            console.log('[EXAM] Chapitre pré-sélectionné :', match.dataset.value);
-          } else {
-            console.log('[EXAM] Pas de correspondance exacte, laissé sur "Tous les chapitres"');
           }
         }, 150);
       }
@@ -2541,29 +2543,24 @@ function readConfig() {
     $('progressBar').style.width = `${((state.exerciseIndex + 1) / EXAM_CONSTANTS.REQUIRED_EXERCISES) * 100}%`;
 
     renderMath($('examView'));
-    // ⚡ Scroll en haut pour voir le nouvel exercice
-window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
- function goNext() {
-  if (state.exerciseIndex < EXAM_CONSTANTS.REQUIRED_EXERCISES - 1) {
-    state.exerciseIndex += 1;
-    saveActiveSession();
-    renderExercise();
-    // ⚡ Remonter en haut pour voir le nouvel exercice
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
-}
 
-function goPrevious() {
-  if (state.exerciseIndex > 0) {
-    state.exerciseIndex -= 1;
-    saveActiveSession();
-    renderExercise();
-    // ⚡ Remonter en haut
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  function goNext() {
+    if (state.exerciseIndex < EXAM_CONSTANTS.REQUIRED_EXERCISES - 1) {
+      state.exerciseIndex += 1;
+      saveActiveSession();
+      renderExercise();
+    }
   }
-}
+
+  function goPrevious() {
+    if (state.exerciseIndex > 0) {
+      state.exerciseIndex -= 1;
+      saveActiveSession();
+      renderExercise();
+    }
+  }
 
   function startTimer() {
     clearInterval(state.timerId);
@@ -2980,7 +2977,7 @@ function goPrevious() {
   });
 
   initSelects();
-  console.log('🚀 ARVEXA — Mode examen v2.2 (3 exercices × 5 questions)');
+  console.log('🚀 ARVEXA — Mode examen v3.2 (clés minuscules harmonisées)');
   </script>
 </body>
 </html>

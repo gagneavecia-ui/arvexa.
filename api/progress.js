@@ -15,22 +15,20 @@ const requestLog = new Map();
 // ────────────────────────────────────────────────────────────────
 // CONFIG
 // ────────────────────────────────────────────────────────────────
-const ALLOWED_SUBJECTS = new Set([
+var ALLOWED_SUBJECTS = new Set([
   'mathematiques', 'physique', 'chimie', 'svt',
-  'philosophie', 'histoire-geo', 'francais', 'anglais'
+  'philosophie', 'histoire', 'geographie'
 ]);
 
-const SUBJECT_INFO = {
+var SUBJECT_INFO = {
   mathematiques: { label: 'Mathématiques',  profile: 'scientific' },
   physique:      { label: 'Physique',       profile: 'scientific' },
   chimie:        { label: 'Chimie',         profile: 'scientific' },
   svt:           { label: 'SVT',            profile: 'svt' },
   philosophie:   { label: 'Philosophie',    profile: 'philosophy' },
-  'histoire-geo':{ label: 'Histoire-Géo',   profile: 'history' },
-  francais:      { label: 'Français',       profile: 'french' },
-  anglais:       { label: 'Anglais',        profile: 'language' }
+  histoire:      { label: 'Histoire',       profile: 'history' },
+  geographie:    { label: 'Géographie',     profile: 'history' }
 };
-
 const MIN_CONTENT_LENGTH = 40;
 const MAX_CONTENT_LENGTH = 15000;
 

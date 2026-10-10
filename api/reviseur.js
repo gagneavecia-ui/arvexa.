@@ -18,7 +18,7 @@ const requestLog = new Map();
 
 const FREE_REVISEUR_LIMIT = 2;
 
-const ALLOWED_SUBJECTS = new Set(['mathematiques', 'physique', 'chimie', 'svt']);
+const ALLOWED_SUBJECTS = new Set(['mathematiques', 'physique', 'chimie', 'svt', 'philosophie', 'histoire', 'geographie']);
 const ALLOWED_MODES = new Set(['fiche', 'flashcard']);
 const ALLOWED_ACTIONS = new Set(['generate', 'quiz', 'exercises', 'approveCache', 'listPendingCaches']);
 
@@ -1088,9 +1088,17 @@ module.exports = async function handler(request, response) {
   const mandatoryNotions = chapterData ? getMandatoryNotions(chapterData) : [];
   const hasKnowledge = mandatoryNotions.length > 0;
 
-  const subjectLabel = knowledgeBase?.matiereLabel ||
-    { mathematiques: 'Mathématiques', physique: 'Physique', chimie: 'Chimie', svt: 'SVT' }[body.subject] ||
-    body.subject;
+ const subjectLabel = knowledgeBase?.matiereLabel ||
+  {
+    mathematiques: 'Mathématiques',
+    physique: 'Physique',
+    chimie: 'Chimie',
+    svt: 'SVT',
+    philosophie: 'Philosophie',
+    histoire: 'Histoire',
+    geographie: 'Géographie'
+  }[body.subject] ||
+  body.subject;
   const chapterTitle = chapterData?.titre || body.chapter;
 
   console.log(`[REVISEUR v4] ${action} | ${body.subject} > ${body.chapter} | ${mandatoryNotions.length} notions`);

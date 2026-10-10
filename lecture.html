@@ -1717,42 +1717,50 @@
       border-radius: 10px;
     }
 
-    /* ============================================================
-   FIX — Supprime le vide sous la fin de partie
+  /* ============================================================
+   FIX FINAL — Supprime tout vide sous la fin de lecture
    ============================================================ */
 
-/* Fin de partie : réduit au minimum */
+/* 1) Neutralise l'ancienne règle 448px */
 .lecture-end {
-  margin: 40px 0 0 !important;
-  padding: 32px 16px 8px !important;
-  border-top: 1px solid var(--border-gold);
+  text-align: center !important;
+  margin: 48px 0 0 !important;
+  padding: 32px 16px 16px !important;
+  border-top: 1px solid var(--border-gold) !important;
 }
 
-.lecture-end-divider {
+/* 2) Réduit le margin-bottom de la dernière section du contenu */
+#contentBody .lecture-section:last-child,
+#contentBody .lecture-section:last-of-type {
   margin-bottom: 0 !important;
 }
 
-/* Dernier enfant du conteneur : pas de marge basse résiduelle */
-.lecture-container > *:last-child {
-  margin-bottom: 0 !important;
-  padding-bottom: 0 !important;
-}
-
-/* Réduit la marge du récap (si présent avant la fin) */
-.lecture-recap {
+#contentBody .lecture-recap:last-child {
   margin-bottom: 0 !important;
 }
 
-/* Nav-bar collée à la fin du contenu */
+/* 3) Réduit le padding-bottom du wrapper à un minimum */
+.content-wrapper {
+  padding-bottom: 16px !important;
+}
+
+/* 4) Supprime le padding-top de la nav-bar (elle est déjà suivie du wrapper) */
 .nav-bar {
-  margin-top: 24px !important;
+  margin-top: 16px !important;
   padding-top: 0 !important;
   border-top: none !important;
 }
 
-/* Wrapper : padding bas minimal pour aérer juste un peu */
-.content-wrapper {
-  padding-bottom: 24px !important;
+/* 5) Force le dernier enfant du contentBody à ne pas pousser vers le bas */
+#contentBody > *:last-child {
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* 6) Cas particulier : si le dernier élément est .lecture-container, neutraliser son padding */
+#contentBody .lecture-container:last-child {
+  padding-bottom: 0 !important;
+  margin-bottom: 0 !important;
 }
   </style>
 </head>

@@ -64,6 +64,7 @@
       font: 15px/1.6 'Inter', system-ui, sans-serif;
       padding-top: var(--safe-top);
       -webkit-font-smoothing: antialiased;
+      justify-content: flex-start;
     }
 
     button { cursor: pointer; font-family: inherit; }
@@ -108,13 +109,12 @@
     }
     .connection.online::before { background: var(--success-light); }
 
-    /* SHELL */
-    .shell {
-      width: min(100% - 28px, 900px);
-      margin: 0 auto;
-      padding: 20px 0 30px;
-      flex: 1 1 auto;
-    }
+  .shell {
+  width: min(100% - 28px, 900px);
+  margin: 0 auto;
+  padding: 20px 0 30px;
+  flex: 0 1 auto;   /* ⚡ ne s'étire plus */
+}
 
     /* STEP BAR */
     .step-bar {
@@ -1185,6 +1185,30 @@
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
     }
+
+    /* ============================================================
+   FIX — Supprime le vide sous le contenu
+   ============================================================ */
+.shell {
+  flex: 0 1 auto !important;
+  padding-bottom: 30px !important;
+  height: auto !important;
+}
+
+.view.active {
+  /* Le panel ne doit pas s'étirer non plus */
+  height: auto !important;
+}
+
+.panel {
+  /* Le panel interne garde sa taille naturelle */
+  height: auto !important;
+}
+
+/* Neutralise les divs vides en fin de contenu */
+.shell > div:empty {
+  display: none !important;
+}
   </style>
 </head>
 <body>

@@ -2446,25 +2446,29 @@
       wrapper.appendChild(title);
 
       if (Array.isArray(question.options) && question.options.length === 4) {
-        var options = document.createElement('div');
-        options.className = 'answer-options';
-        question.options.forEach(function (opt) {
-          var label = document.createElement('label');
-          label.className = 'answer-option';
-          var input = document.createElement('input');
-          input.type = 'radio';
-          input.name = key;
-          input.value = opt.id;
-          input.checked = state.answers[key] === opt.id;
-          input.addEventListener('change', function () { saveAnswer(key, input.value); });
-          var text = document.createElement('span');
-          text.textContent = opt.id + '. ' + (opt.text || '');
-          label.appendChild(input);
-          label.appendChild(text);
-          options.appendChild(label);
-        });
-        wrapper.appendChild(options);
-      } else {
+  var options = document.createElement('div');
+  options.className = 'answer-options';
+  var letters = ['A', 'B', 'C', 'D'];
+  question.options.forEach(function (opt, oIdx) {
+    var letter = (opt && opt.id) ? String(opt.id).toUpperCase().slice(0, 1) : letters[oIdx];
+    var optText = (opt && (opt.text || opt.label)) ? (opt.text || opt.label) : String(opt || '');
+    var label = document.createElement('label');
+    label.className = 'answer-option';
+    var input = document.createElement('input');
+    input.type = 'radio';
+    input.name = key;
+    input.value = letter;
+    input.checked = state.answers[key] === letter;
+    input.addEventListener('change', function () { saveAnswer(key, letter); });
+    var text = document.createElement('span');
+    text.textContent = letter + '. ' + optText;
+    label.appendChild(input);
+    label.appendChild(text);
+    options.appendChild(label);
+  });
+  wrapper.appendChild(options);
+}
+      else {
         var isNumber = question.type === 'number';
         var input = document.createElement(isNumber ? 'input' : 'textarea');
         input.className = 'answer';

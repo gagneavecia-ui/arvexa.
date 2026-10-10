@@ -779,7 +779,7 @@ function repairExamStructure(exam, subjectName) {
 
   exam.subjects.forEach((subject, sIdx) => {
     if (!subject.id) subject.id = `subject_${sIdx + 1}`;
-    if (!subject.title) subject.title = `Sujet ${sIdx + 1}`;
+    if (!subject.title) subject.title = `Sujet_${sIdx + 1}`;
     if (!subject.level) subject.level = sIdx === 0 ? 'consolidation' : 'approfondissement';
     if (!subject.instructions) subject.instructions = 'Traitez le sujet dans le temps imparti.';
 

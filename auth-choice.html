@@ -2,48 +2,515 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0A0A0A">
   <meta name="robots" content="noindex">
+  <meta name="description" content="ARVEXA School — Choisis ton parcours">
+  <link rel="icon" href="icon.png" type="image/png">
+  <link rel="apple-touch-icon" href="icon.png">
+  <link rel="manifest" href="manifest.json">
   <title>ARVEXA | Accès</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+
   <style>
-    :root { color-scheme: dark; --bg:#0a0d0b; --panel:#151a15; --line:rgba(255,255,255,.1); --text:#f5f5f1; --muted:#a9ad9d; --gold:#e0b84a; }
-    * { box-sizing:border-box; }
-    body { margin:0; min-height:100vh; display:grid; place-items:center; padding:20px; background:radial-gradient(circle at top right,rgba(28,70,52,.38),transparent 32rem),linear-gradient(180deg,#0a0d0b,#101511); color:var(--text); font:15px/1.6 Inter,system-ui,sans-serif; }
-    main { width:min(100%,480px); padding:28px; border:1px solid var(--line); border-radius:18px; background:rgba(21,26,21,.94); box-shadow:0 20px 60px rgba(0,0,0,.3); text-align:center; }
-    h1 { margin:0; font:700 clamp(28px,7vw,42px)/1.1 Georgia,serif; }
-    p { color:var(--muted); }
-    .actions { display:grid; gap:10px; margin-top:22px; }
-    a { display:block; padding:12px 16px; border-radius:10px; text-decoration:none; font-weight:800; }
-    .primary { background:linear-gradient(135deg,#f3d778,var(--gold)); color:#0a0d0b; }
-    .secondary { border:1px solid var(--line); color:var(--text); }
-    #loading { color:var(--muted); }
-    [hidden] { display:none; }
+    /* ============================================================
+       ROOT — Palette ARVEXA
+       ============================================================ */
+    :root {
+      color-scheme: dark;
+      --accent: #B8860B;
+      --accent-bright: #E0B84A;
+      --accent-dim: rgba(184, 134, 11, 0.08);
+      --success: #2D7D5A;
+      --success-light: #3AB67E;
+      --bg-dark: #0A0A0A;
+      --bg-surface: #141414;
+      --bg-card: rgba(20, 20, 20, 0.7);
+      --text-light: #F5F0E8;
+      --text-dim: #8A8A7A;
+      --text-muted: #5A5A4A;
+      --border-soft: rgba(255, 255, 255, 0.05);
+      --border-gold: rgba(184, 134, 11, 0.15);
+      --transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+      --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+      --font-serif: 'Playfair Display', Georgia, serif;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    /* ============================================================
+       RESET
+       ============================================================ */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      width: 100%;
+      overflow-x: hidden;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg-dark);
+      color: var(--text-light);
+      font-size: 15px;
+      line-height: 1.6;
+      min-height: 100vh;
+      min-height: 100dvh;
+      width: 100%;
+      overflow-x: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: calc(var(--safe-top) + 24px) 24px calc(var(--safe-bottom) + 24px);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ============================================================
+       BACKGROUND
+       ============================================================ */
+    .bg-layer {
+      position: fixed;
+      inset: 0;
+      z-index: -3;
+      background:
+        radial-gradient(ellipse 40% 30% at 30% 20%, rgba(26, 58, 42, 0.18) 0%, transparent 70%),
+        radial-gradient(ellipse 30% 20% at 70% 80%, rgba(184, 134, 11, 0.05) 0%, transparent 60%),
+        linear-gradient(180deg, #0A0A0A 0%, #060606 100%);
+    }
+
+    .glow {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(90px);
+      pointer-events: none;
+      z-index: -2;
+      opacity: 0.15;
+      animation: glowFloat 12s ease-in-out infinite alternate;
+    }
+    .glow-1 {
+      width: 380px; height: 380px;
+      background: rgba(26, 58, 42, 0.25);
+      top: -100px; right: -100px;
+    }
+    .glow-2 {
+      width: 250px; height: 250px;
+      background: rgba(184, 134, 11, 0.08);
+      bottom: -60px; left: -60px;
+      animation-delay: -6s;
+    }
+
+    @keyframes glowFloat {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(40px, -30px) scale(1.15); }
+    }
+
+    /* ============================================================
+       CARD
+       ============================================================ */
+    .card {
+      position: relative;
+      width: min(100%, 480px);
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border-soft);
+      border-radius: 20px;
+      padding: 32px 28px 28px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+      animation: cardEnter 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    @keyframes cardEnter {
+      from { opacity: 0; transform: translateY(24px) scale(0.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-bright), var(--success), var(--accent));
+      background-size: 300% 100%;
+      animation: shimmerBorder 5s linear infinite;
+    }
+
+    @keyframes shimmerBorder {
+      0% { background-position: 0% 0%; }
+      100% { background-position: 300% 0%; }
+    }
+
+    /* ============================================================
+       HERO
+       ============================================================ */
+    .hero {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .hero-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 72px;
+      height: 72px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, rgba(184, 134, 11, 0.15), rgba(26, 58, 42, 0.1));
+      border: 1px solid rgba(184, 134, 11, 0.2);
+      font-size: 34px;
+      margin-bottom: 16px;
+      animation: iconFloat 3s ease-in-out infinite;
+      position: relative;
+    }
+
+    .hero-icon::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 24px;
+      background: linear-gradient(135deg, rgba(184, 134, 11, 0.3), transparent, rgba(45, 125, 90, 0.2));
+      z-index: -1;
+      filter: blur(8px);
+      opacity: 0.6;
+    }
+
+    @keyframes iconFloat {
+      0%, 100% { transform: translateY(0) rotate(-2deg); }
+      50% { transform: translateY(-8px) rotate(2deg); }
+    }
+
+    .hero-title {
+      font-family: var(--font-serif);
+      font-size: clamp(24px, 5vw, 32px);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      color: var(--text-light);
+      margin-bottom: 10px;
+    }
+
+    .hero-title em {
+      color: var(--accent-bright);
+      font-style: italic;
+    }
+
+    .hero-subtitle {
+      font-size: clamp(13px, 1.6vw, 14.5px);
+      color: var(--text-dim);
+      line-height: 1.65;
+      max-width: 380px;
+      margin: 0 auto;
+    }
+
+    /* ============================================================
+       ACTIONS
+       ============================================================ */
+    .actions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 15px 24px;
+      border-radius: 30px;
+      border: none;
+      font-family: var(--font-body);
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      cursor: pointer;
+      transition: var(--transition);
+      text-decoration: none;
+      min-height: 54px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+      transition: left 0.6s ease;
+    }
+
+    .btn:hover::before {
+      left: 100%;
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, var(--accent-bright), var(--accent));
+      color: #0A0A0A;
+      box-shadow: 0 4px 20px rgba(184, 134, 11, 0.25);
+    }
+
+    .btn.primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(184, 134, 11, 0.4);
+    }
+
+    .btn.primary:active {
+      transform: translateY(0) scale(0.98);
+    }
+
+    .btn.secondary {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-dim);
+      border: 1px solid var(--border-soft);
+    }
+
+    .btn.secondary:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-light);
+      border-color: rgba(184, 134, 11, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .btn.secondary:active {
+      transform: scale(0.98);
+    }
+
+    .btn i {
+      font-size: 14px;
+    }
+
+    /* ============================================================
+       ÉTAT DE CHARGEMENT
+       ============================================================ */
+    #loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 20px 0;
+      color: var(--text-dim);
+      font-size: 13.5px;
+    }
+
+    .spinner {
+      width: 36px;
+      height: 36px;
+      border: 3px solid rgba(184, 134, 11, 0.15);
+      border-top-color: var(--accent-bright);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ============================================================
+       FOOTER
+       ============================================================ */
+    .footer {
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border-soft);
+      text-align: center;
+      font-size: 11.5px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .footer .brand {
+      font-family: var(--font-serif);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-light);
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .footer .brand span {
+      background: linear-gradient(90deg, var(--accent), var(--accent-bright), var(--accent));
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-style: italic;
+      animation: shimmer 4s linear infinite;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 0% center; }
+      100% { background-position: 200% center; }
+    }
+
+    /* ============================================================
+       RESPONSIVE
+       ============================================================ */
+    @media (max-width: 480px) {
+      .card {
+        padding: 26px 20px 22px;
+        border-radius: 18px;
+      }
+      .hero-icon {
+        width: 62px;
+        height: 62px;
+        font-size: 28px;
+        margin-bottom: 14px;
+      }
+      .btn {
+        padding: 13px 20px;
+        min-height: 50px;
+        font-size: 14px;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .card {
+        padding: 22px 16px 18px;
+      }
+      .hero-icon {
+        width: 56px;
+        height: 56px;
+        font-size: 26px;
+      }
+      .hero-title {
+        font-size: 22px;
+      }
+      .btn {
+        font-size: 13.5px;
+        padding: 12px 18px;
+      }
+    }
+
+    /* ============================================================
+       ACCESSIBILITÉ
+       ============================================================ */
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    a:focus-visible,
+    button:focus-visible {
+      outline: 2px solid var(--accent-bright);
+      outline-offset: 2px;
+      border-radius: 6px;
+    }
+
+    [hidden] { display: none !important; }
   </style>
 </head>
 <body>
-  <main>
-    <div id="loading">Vérification de ta session...</div>
+
+  <!-- ===== BACKGROUND ===== -->
+  <div class="bg-layer"></div>
+  <div class="glow glow-1"></div>
+  <div class="glow glow-2"></div>
+
+  <!-- ===== CARD ===== -->
+  <main class="card">
+
+    <!-- CHARGEMENT -->
+    <div id="loading">
+      <div class="spinner"></div>
+      <span>Vérification de ta session...</span>
+    </div>
+
+    <!-- CHOIX -->
     <div id="choice" hidden>
-      <h1>Bienvenue sur ARVEXA</h1>
-      <p>Choisis ton parcours. Un visiteur non connecté n’est pas automatiquement considéré comme déjà inscrit.</p>
+      <div class="hero">
+        <div class="hero-icon">🎓</div>
+        <h1 class="hero-title">
+          Bienvenue sur <em>ARVEXA</em>
+        </h1>
+        <p class="hero-subtitle">
+          Choisis ton parcours. Que tu sois nouveau ou déjà inscrit, on t'accompagne vers la réussite au BAC.
+        </p>
+      </div>
+
       <div class="actions">
-        <a class="primary" id="registerLink" href="register.html">Créer un compte</a>
-        <a class="secondary" id="loginLink" href="login.html">J’ai déjà un compte</a>
+        <a class="btn primary" id="registerLink" href="register.html">
+          <i class="fas fa-user-plus"></i>
+          Créer un compte
+        </a>
+        <a class="btn secondary" id="loginLink" href="login.html">
+          <i class="fas fa-sign-in-alt"></i>
+          J'ai déjà un compte
+        </a>
+      </div>
+
+      <div class="footer">
+        <div class="brand">ARVEX<span>A School</span></div>
+        &copy; 2026 — Tous droits réservés
       </div>
     </div>
+
   </main>
+
+  <!-- ============================================================
+       SCRIPTS
+       ============================================================ -->
   <script type="module">
+    // ================================================================
+    // AUTH-CHOICE — Redirection intelligente
+    // ================================================================
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js';
-    import { getAuth, onAuthStateChanged, setPersistence, browserLocalPersistence } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js';
-    const app = initializeApp({ apiKey:'AIzaSyDHscOXw3rLuhV6z1Cny-bdYCumqpnG7QE', authDomain:'arvexa-fbf10.firebaseapp.com', projectId:'arvexa-fbf10', storageBucket:'arvexa-fbf10.firebasestorage.app', messagingSenderId:'920108330053', appId:'1:920108330053:web:f532d71cbc2c824bc7472c' });
+    import {
+      getAuth,
+      onAuthStateChanged,
+      setPersistence,
+      browserLocalPersistence
+    } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js';
+
+    const app = initializeApp({
+      apiKey: 'AIzaSyDHscOXw3rLuhV6z1Cny-bdYCumqpnG7QE',
+      authDomain: 'arvexa-fbf10.firebaseapp.com',
+      projectId: 'arvexa-fbf10',
+      storageBucket: 'arvexa-fbf10.firebasestorage.app',
+      messagingSenderId: '920108330053',
+      appId: '1:920108330053:web:f532d71cbc2c824bc7472c'
+    });
+
     const auth = getAuth(app);
+
+    try {
+      await setPersistence(auth, browserLocalPersistence);
+    } catch (e) {}
+
+    // Redirection demandée
     const redirect = sessionStorage.getItem('redirectAfterAuth') || 'index.html';
     const target = encodeURIComponent(redirect);
+
     document.getElementById('registerLink').href = `register.html?redirect=${target}`;
     document.getElementById('loginLink').href = `login.html?redirect=${target}`;
-    try { await setPersistence(auth, browserLocalPersistence); } catch (_) {}
+
+    // Vérifier la session
     onAuthStateChanged(auth, (user) => {
-      if (user) { sessionStorage.removeItem('redirectAfterAuth'); window.location.replace(redirect); return; }
+      if (user) {
+        // Déjà connecté → redirection directe
+        sessionStorage.removeItem('redirectAfterAuth');
+        window.location.replace(redirect);
+        return;
+      }
+
+      // Sinon, afficher le choix
       document.getElementById('loading').hidden = true;
       document.getElementById('choice').hidden = false;
     });

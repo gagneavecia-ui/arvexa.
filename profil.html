@@ -650,7 +650,6 @@
       box-shadow: 0 4px 20px rgba(184, 92, 58, 0.2);
     }
 
-    
     /* ============================================================
        SKELETON
        ============================================================ */
@@ -1160,20 +1159,20 @@
             </div>
           </div>
 
-         <!-- ACTIONS -->
-<div class="profile-actions">
-  <a href="abonnement.html" class="btn-profile primary" id="premiumBtn">
-    <i class="fas fa-crown"></i> Voir les offres Premium
-  </a>
+          <!-- ACTIONS -->
+          <div class="profile-actions">
+            <a href="abonnement.html" class="btn-profile primary" id="premiumBtn">
+              <i class="fas fa-crown"></i> Voir les offres Premium
+            </a>
 
-  <a href="index.html" class="btn-profile secondary">
-    <i class="fas fa-home"></i> Retour à l'accueil
-  </a>
+            <a href="index.html" class="btn-profile secondary">
+              <i class="fas fa-home"></i> Retour à l'accueil
+            </a>
 
-  <button class="btn-profile danger" id="logoutProfileBtn">
-    <i class="fas fa-sign-out-alt"></i> Se déconnecter
-  </button>
-</div>
+            <button class="btn-profile danger" id="logoutProfileBtn">
+              <i class="fas fa-sign-out-alt"></i> Se déconnecter
+            </button>
+          </div>
 
         </div>
       </div>
@@ -1937,87 +1936,10 @@
     window.location.href = 'notifications.html';
   });
 
-    // ================================================================
-// BOUTON CONTENU HORS LIGNE
-// ================================================================
-const offlineManagerBtn = document.getElementById('offlineManagerBtn');
-const offlineBadge = document.getElementById('offlineBadge');
+  // ⚡ SUPPRESSION du code mort (offlineManagerBtn / offlineBadge / refreshOfflineBadge)
+  // Ces éléments n'existent pas dans le HTML de profil.html.
 
-if (offlineManagerBtn) {
-  offlineManagerBtn.addEventListener('click', () => {
-    if (window.arvexaOffline && window.arvexaOffline.openManager) {
-      window.arvexaOffline.openManager();
-    } else {
-      if (window.arvexaOffline?.toast) {
-        window.arvexaOffline.toast('⚠️ Module hors ligne en cours de chargement...', 'info');
-      }
-      // Retenter après 1 seconde
-      setTimeout(() => {
-        window.arvexaOffline?.openManager?.();
-      }, 1000);
-    }
-  });
-}
-
-// ================================================================
-// BADGE : nombre de fichiers en cache
-// ================================================================
-async function refreshOfflineBadge() {
-  if (!offlineBadge) return;
-  if (!window.arvexaOffline?.getStats) return;
-
-  try {
-    const stats = await window.arvexaOffline.getStats();
-    const total = (stats.cours || 0) + (stats.manifests || 0);
-
-    if (total === 0) {
-      offlineBadge.style.display = 'none';
-    } else {
-      offlineBadge.style.display = 'inline-flex';
-      offlineBadge.textContent = total;
-
-      // Vérifier si tout est téléchargé
-      try {
-        const res = await fetch('cache-manifest.json');
-        if (res.ok) {
-          const manifest = await res.json();
-          const totalFiles = manifest.totalFiles || 0;
-          if (totalFiles > 0 && total >= totalFiles) {
-            offlineBadge.classList.add('full');
-            offlineBadge.title = 'Tout est disponible hors ligne';
-          } else {
-            offlineBadge.classList.remove('full');
-            offlineBadge.title = `${total} / ${totalFiles} fichiers en cache`;
-          }
-        }
-      } catch (e) {}
-    }
-  } catch (e) {
-    offlineBadge.style.display = 'none';
-  }
-}
-
-// Rafraîchir le badge au chargement + après un download
-if (offlineManagerBtn) {
-  setTimeout(refreshOfflineBadge, 1500);
-
-  // Re-vérifier quand la modale se ferme (polling léger)
-  let pollInterval = setInterval(refreshOfflineBadge, 5000);
-
-  // Nettoyer si on quitte
-  window.addEventListener('beforeunload', () => clearInterval(pollInterval));
-}
-
-// Écouter les événements de téléchargement terminé
-if (navigator.serviceWorker) {
-  navigator.serviceWorker.addEventListener('message', (event) => {
-    if (event.data?.type === 'DOWNLOAD_COMPLETE') {
-      setTimeout(refreshOfflineBadge, 500);
-    }
-  });
-}
-    
-  console.log('🚀 ARVEXA — Profil (avec session robuste)');
+  console.log('🚀 ARVEXA — Profil (version nettoyée)');
   </script>
 </body>
 </html>

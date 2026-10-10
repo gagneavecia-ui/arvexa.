@@ -1767,8 +1767,9 @@
 
   <script type="module">
   // ═══════════════════════════════════════════════════════════════
-  // EXAM — Mode examen BAC (3 exercices × 5 questions)
-  // ⚡ v3.2 — Clés minuscules harmonisées avec l'API
+  // EXAM — Mode examen BAC
+  // ⚡ 7 matières : maths, physique, chimie, svt, philo, histoire, geo
+  // ⚡ v3.3 — Sans backticks, clés harmonisées avec api/exam.js
   // ═══════════════════════════════════════════════════════════════
 
   import { initializeApp } from 'firebase/app';
@@ -1779,7 +1780,7 @@
     serverTimestamp
   } from 'firebase/firestore';
 
-  const firebaseConfig = {
+  var firebaseConfig = {
     apiKey: 'AIzaSyDHscOXw3rLuhV6z1Cny-bdYCumqpnG7QE',
     authDomain: 'arvexa-fbf10.firebaseapp.com',
     projectId: 'arvexa-fbf10',
@@ -1788,11 +1789,11 @@
     appId: '1:920108330053:web:f532d71cbc2c824bc7472c'
   };
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
+  var app = initializeApp(firebaseConfig);
+  var auth = getAuth(app);
+  var db = getFirestore(app);
 
-  const EXAM_CONSTANTS = {
+  var EXAM_CONSTANTS = {
     REQUIRED_EXERCISES: 3,
     QUESTIONS_PER_EXERCISE: 5,
     DEFAULT_DURATION_MIN: 60,
@@ -1800,8 +1801,8 @@
     SESSION_TTL_HOURS: 24
   };
 
-  // ⚡ CHAPTERS — clés minuscules harmonisées
-  const CHAPTERS = {
+  // ⚡ CHAPTERS — 7 matières, clés minuscules
+  var CHAPTERS = {
     'mathematiques': [
       'Nombres complexes',
       'Similitudes planes directes',
@@ -1847,25 +1848,25 @@
     ],
     'svt': [
       'Notion de l\'IG',
-      'Nature chimique et structure de l\'IG : la molécule d\'ADN',
+      'Nature chimique et structure de l\'IG',
       'La reproduction conforme',
-      'Notion de cycle cellulaire et évolution de la quantité d\'ADN au cours du cycle',
+      'Cycle cellulaire',
       'Protéines',
-      'Mécanismes d\'expression des gènes : la synthèse des protéines',
+      'Synthèse des protéines',
       'Reproduction sexuée',
       'Brassage des gènes',
-      'Transmission des caractères héréditaires chez l\'Homme',
+      'Transmission des caractères',
       'Anomalies chromosomiques',
-      'Tissus nerveux et notions de réflexes',
+      'Tissus nerveux',
       'Messages nerveux',
       'La glycémie',
-      'Les appareils génitaux et leur fonctionnement',
-      'Régulation du fonctionnement des organes génitaux',
-      'De la fécondation à la nidation',
-      'La régulation des naissances',
+      'Appareils génitaux',
+      'Régulation des organes génitaux',
+      'Fécondation à la nidation',
+      'Régulation des naissances',
       'Le soi et le non soi',
-      'Les réponses immunitaires',
-      'Dysfonctionnement du système immunitaire : cas du VIH/SIDA'
+      'Réponses immunitaires',
+      'VIH/SIDA'
     ],
     'philosophie': [
       'Conscience - Inconscient',
@@ -1889,7 +1890,7 @@
       'Le bilan de la Seconde Guerre mondiale',
       'Les conditions de la lutte de libération',
       'La libération de l\'Algérie',
-      'La décolonisation en Afrique occidentale française (AOF)',
+      'La décolonisation en AOF',
       'Les problèmes des pays décolonisés'
     ],
     'geographie': [
@@ -1905,8 +1906,7 @@
     ]
   };
 
-  // ⚡ SUBJECT_LABELS — pour l'affichage et l'API
-  const SUBJECT_LABELS = {
+  var SUBJECT_LABELS = {
     'mathematiques': 'Mathématiques',
     'physique': 'Physique',
     'chimie': 'Chimie',
@@ -1916,10 +1916,10 @@
     'geographie': 'Géographie'
   };
 
-  const GENERATION_STEPS = ['genStep1', 'genStep2', 'genStep3', 'genStep4', 'genStep5'];
-  const CORRECTION_STEPS = ['corrStep1', 'corrStep2', 'corrStep3', 'corrStep4', 'corrStep5'];
+  var GENERATION_STEPS = ['genStep1', 'genStep2', 'genStep3', 'genStep4', 'genStep5'];
+  var CORRECTION_STEPS = ['corrStep1', 'corrStep2', 'corrStep3', 'corrStep4', 'corrStep5'];
 
-  const state = {
+  var state = {
     user: null,
     exam: null,
     selectedSubject: null,
@@ -1933,24 +1933,24 @@
     notebookContext: null
   };
 
-  const $ = (id) => document.getElementById(id);
-  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  var $ = function (id) { return document.getElementById(id); };
+  var sleep = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
 
   function escapeHtml(value) {
-    const div = document.createElement('div');
-    div.textContent = String(value ?? '');
+    var div = document.createElement('div');
+    div.textContent = String(value === null || value === undefined ? '' : value);
     return div.innerHTML;
   }
 
-  function setStatus(id, message, type = '') {
-    const el = $(id);
+  function setStatus(id, message, type) {
+    var el = $(id);
     if (!el) return;
     el.textContent = message;
-    el.className = `status ${type}`;
+    el.className = 'status ' + (type || '');
   }
 
   function renderMath(root) {
-    if (window.KaTeXUtils?.renderMath) {
+    if (window.KaTeXUtils && window.KaTeXUtils.renderMath) {
       window.KaTeXUtils.renderMath(root);
       return;
     }
@@ -1968,136 +1968,110 @@
 
   function showView(id) {
     ['configView', 'loadingView', 'subjectsView', 'examView', 'loadingCorrectionView', 'resultsView']
-      .forEach((v) => $(v).classList.toggle('active', v === id));
+      .forEach(function (v) { $(v).classList.toggle('active', v === id); });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  class CustomSelect {
-    constructor(element) {
-      this.element = element;
-      this.name = element.dataset.name;
-      this.trigger = element.querySelector('.custom-select-trigger');
-      this.valueEl = element.querySelector('.custom-select-value');
-      this.optionsContainer = element.querySelector('.custom-select-options');
-      this.options = [];
-      this.value = null;
-      this.focusedIndex = -1;
-      this.isOpen = false;
-      this.init();
-    }
-
-    init() {
-      this.trigger.addEventListener('click', (e) => { e.stopPropagation(); this.toggle(); });
-      this.trigger.addEventListener('keydown', (e) => this.handleKeydown(e));
-      document.addEventListener('click', (e) => {
-        if (!this.element.contains(e.target)) this.close();
-      });
-      this.refreshOptions();
-    }
-
-    refreshOptions() {
-      this.options = Array.from(this.optionsContainer.querySelectorAll('.custom-select-option'));
-      this.options.forEach((opt) => {
-        opt.addEventListener('click', (e) => {
-          e.stopPropagation();
-          this.select(opt.dataset.value);
-        });
-        opt.addEventListener('mouseenter', () => {
-          this.focusedIndex = this.options.indexOf(opt);
-          this.updateFocus();
-        });
-      });
-      if (!this.value && this.options.length > 0) {
-        this.select(this.options[0].dataset.value, true);
-      }
-    }
-
-    setOptions(options) {
-      this.optionsContainer.innerHTML = '';
-      options.forEach((opt) => {
-        const div = document.createElement('div');
-        div.className = 'custom-select-option';
-        div.dataset.value = opt.value;
-        div.setAttribute('role', 'option');
-        if (opt.prefix) {
-          div.innerHTML = `<span class="option-prefix">${escapeHtml(opt.prefix)}</span> ${escapeHtml(opt.label)}`;
-        } else {
-          div.textContent = opt.label;
-        }
-        this.optionsContainer.appendChild(div);
-      });
-      this.value = null;
-      this.refreshOptions();
-    }
-
-    select(value, silent = false) {
-      this.value = value;
-      const selected = this.options.find((o) => o.dataset.value === String(value));
-      if (!selected) return;
-
-      const prefix = selected.querySelector('.option-prefix');
-      const prefixHTML = prefix ? prefix.outerHTML : '';
-      const label = selected.textContent.replace(prefix?.textContent || '', '').trim();
-      this.valueEl.innerHTML = `${prefixHTML} <span>${escapeHtml(label)}</span>`;
-
-      this.options.forEach((o) => o.classList.toggle('selected', o.dataset.value === String(value)));
-      this.close();
-
-      if (!silent) {
-        this.element.dispatchEvent(new CustomEvent('change', {
-          detail: { name: this.name, value: this.value }
-        }));
-      }
-    }
-
-    toggle() { this.isOpen ? this.close() : this.open(); }
-
-    open() {
-      document.querySelectorAll('.custom-select.open').forEach((el) => {
-        if (el !== this.element) el.classList.remove('open');
-      });
-      this.element.classList.add('open');
-      this.trigger.setAttribute('aria-expanded', 'true');
-      this.isOpen = true;
-      this.focusedIndex = this.options.findIndex((o) => o.classList.contains('selected'));
-      this.updateFocus();
-    }
-
-    close() {
-      this.element.classList.remove('open');
-      this.trigger.setAttribute('aria-expanded', 'false');
-      this.isOpen = false;
-    }
-
-    handleKeydown(e) {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault(); this.toggle();
-      } else if (e.key === 'Escape') {
-        this.close();
-      } else if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        if (!this.isOpen) this.open();
-        else {
-          this.focusedIndex = Math.min(this.focusedIndex + 1, this.options.length - 1);
-          this.updateFocus();
-        }
-      } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        if (this.isOpen) {
-          this.focusedIndex = Math.max(this.focusedIndex - 1, 0);
-          this.updateFocus();
-        }
-      }
-    }
-
-    updateFocus() {
-      this.options.forEach((opt, idx) => opt.classList.toggle('focused', idx === this.focusedIndex));
-    }
-
-    getValue() { return this.value; }
+  function CustomSelect(element) {
+    this.element = element;
+    this.name = element.dataset.name;
+    this.trigger = element.querySelector('.custom-select-trigger');
+    this.valueEl = element.querySelector('.custom-select-value');
+    this.optionsContainer = element.querySelector('.custom-select-options');
+    this.options = [];
+    this.value = null;
+    this.focusedIndex = -1;
+    this.isOpen = false;
+    this.init();
   }
 
-  const selects = { subject: null, level: null, chapter: null, difficulty: null, duration: null };
+  CustomSelect.prototype.init = function () {
+    var self = this;
+    this.trigger.addEventListener('click', function (e) { e.stopPropagation(); self.toggle(); });
+    document.addEventListener('click', function (e) {
+      if (!self.element.contains(e.target)) self.close();
+    });
+    this.refreshOptions();
+  };
+
+  CustomSelect.prototype.refreshOptions = function () {
+    var self = this;
+    this.options = Array.prototype.slice.call(this.optionsContainer.querySelectorAll('.custom-select-option'));
+    this.options.forEach(function (opt) {
+      opt.addEventListener('click', function (e) {
+        e.stopPropagation();
+        self.select(opt.dataset.value);
+      });
+    });
+    if (!this.value && this.options.length > 0) {
+      this.select(this.options[0].dataset.value, true);
+    }
+  };
+
+  CustomSelect.prototype.setOptions = function (options) {
+    this.optionsContainer.innerHTML = '';
+    var self = this;
+    options.forEach(function (opt) {
+      var div = document.createElement('div');
+      div.className = 'custom-select-option';
+      div.dataset.value = opt.value;
+      div.setAttribute('role', 'option');
+      if (opt.prefix) {
+        div.innerHTML = '<span class="option-prefix">' + escapeHtml(opt.prefix) + '</span> ' + escapeHtml(opt.label);
+      } else {
+        div.textContent = opt.label;
+      }
+      self.optionsContainer.appendChild(div);
+    });
+    this.value = null;
+    this.refreshOptions();
+  };
+
+  CustomSelect.prototype.select = function (value, silent) {
+    this.value = value;
+    var selected = null;
+    for (var i = 0; i < this.options.length; i++) {
+      if (this.options[i].dataset.value === String(value)) { selected = this.options[i]; break; }
+    }
+    if (!selected) return;
+
+    var prefix = selected.querySelector('.option-prefix');
+    var prefixHTML = prefix ? prefix.outerHTML : '';
+    var label = selected.textContent.replace(prefix ? prefix.textContent : '', '').trim();
+    this.valueEl.innerHTML = prefixHTML + ' <span>' + escapeHtml(label) + '</span>';
+
+    this.options.forEach(function (o) {
+      o.classList.toggle('selected', o.dataset.value === String(value));
+    });
+    this.close();
+
+    if (!silent) {
+      this.element.dispatchEvent(new CustomEvent('change', {
+        detail: { name: this.name, value: this.value }
+      }));
+    }
+  };
+
+  CustomSelect.prototype.toggle = function () { this.isOpen ? this.close() : this.open(); };
+
+  CustomSelect.prototype.open = function () {
+    document.querySelectorAll('.custom-select.open').forEach(function (el) {
+      if (el !== this.element) el.classList.remove('open');
+    }, this);
+    this.element.classList.add('open');
+    this.trigger.setAttribute('aria-expanded', 'true');
+    this.isOpen = true;
+  };
+
+  CustomSelect.prototype.close = function () {
+    this.element.classList.remove('open');
+    this.trigger.setAttribute('aria-expanded', 'false');
+    this.isOpen = false;
+  };
+
+  CustomSelect.prototype.getValue = function () { return this.value; };
+
+  var selects = { subject: null, level: null, chapter: null, difficulty: null, duration: null };
 
   function initSelects() {
     selects.subject = new CustomSelect($('subjectSelect'));
@@ -2106,7 +2080,6 @@
     selects.difficulty = new CustomSelect($('difficultySelect'));
     selects.duration = new CustomSelect($('durationSelect'));
 
-    // ⚡ Sélection initiale avec la clé minuscule
     selects.subject.select('mathematiques', true);
     selects.level.select('Terminale D', true);
     selects.difficulty.select('medium', true);
@@ -2117,18 +2090,16 @@
   }
 
   function updateChapters() {
-    const subject = selects.subject.getValue();
-    const chapters = CHAPTERS[subject] || [];
-    selects.chapter.setOptions([
-      { value: 'all', label: 'Tous les chapitres', prefix: '📚' },
-      ...chapters.map((ch) => ({ value: ch, label: ch, prefix: '📖' }))
-    ]);
+    var subject = selects.subject.getValue();
+    var chapters = CHAPTERS[subject] || [];
+    var opts = [{ value: 'all', label: 'Tous les chapitres', prefix: '📚' }];
+    chapters.forEach(function (ch) { opts.push({ value: ch, label: ch, prefix: '📖' }); });
+    selects.chapter.setOptions(opts);
   }
 
-  // ⚡ readConfig — envoie les clés minuscules à l'API
   function readConfig() {
     return {
-      subject: selects.subject.getValue(),            // 'mathematiques', 'philosophie'...
+      subject: selects.subject.getValue(),
       level: selects.level.getValue(),
       chapter: selects.chapter.getValue(),
       difficulty: selects.difficulty.getValue(),
@@ -2139,11 +2110,11 @@
 
   function prefillFromUrl() {
     try {
-      const urlParams = new URLSearchParams(window.location.search);
-      const preSubject = urlParams.get('subject');
-      const preChapter = urlParams.get('chapter');
-      const preChapterId = urlParams.get('chapterId');
-      const useNotebook = urlParams.get('useNotebook') === 'true';
+      var urlParams = new URLSearchParams(window.location.search);
+      var preSubject = urlParams.get('subject');
+      var preChapter = urlParams.get('chapter');
+      var preChapterId = urlParams.get('chapterId');
+      var useNotebook = urlParams.get('useNotebook') === 'true';
 
       if (useNotebook && (preChapterId || preChapter)) {
         state.notebookContext = {
@@ -2153,42 +2124,45 @@
         };
         $('notebookBanner').classList.add('show');
         if (preChapter) {
-          $('notebookBannerTitle').textContent = `📖 Basé sur ton cahier : ${preChapter}`;
+          $('notebookBannerTitle').textContent = '📖 Basé sur ton cahier : ' + preChapter;
           $('notebookBannerSub').textContent = 'L\'examen sera généré à partir des sections que tu as étudiées.';
         }
       }
 
       if (preSubject) {
-        const optionExists = Array.from(document.querySelectorAll('#subjectSelect .custom-select-option'))
-          .some((o) => o.dataset.value === preSubject);
-        if (optionExists) {
+        var exists = Array.prototype.slice.call(
+          document.querySelectorAll('#subjectSelect .custom-select-option')
+        ).some(function (o) { return o.dataset.value === preSubject; });
+        if (exists) {
           selects.subject.select(preSubject, true);
           updateChapters();
         }
       }
 
       if (preChapter) {
-        setTimeout(() => {
-          const chapterOptions = Array.from(
+        setTimeout(function () {
+          var chapterOptions = Array.prototype.slice.call(
             document.querySelectorAll('#chapterOptions .custom-select-option')
           );
 
-          const normalize = (s) => String(s || '')
-            .toLowerCase()
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .replace(/[^a-z0-9]/g, '');
+          var normalize = function (s) {
+            return String(s || '').toLowerCase().normalize('NFD')
+              .replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, '');
+          };
 
-          const target = normalize(preChapter);
-          let match = chapterOptions.find((o) => normalize(o.dataset.value) === target);
-
-          if (!match && target.length > 3) {
-            match = chapterOptions.find((o) => {
-              const v = normalize(o.dataset.value);
-              return v && v.length > 3 && (v.includes(target) || target.includes(v));
-            });
+          var target = normalize(preChapter);
+          var match = null;
+          for (var i = 0; i < chapterOptions.length; i++) {
+            if (normalize(chapterOptions[i].dataset.value) === target) { match = chapterOptions[i]; break; }
           }
-
+          if (!match && target.length > 3) {
+            for (var j = 0; j < chapterOptions.length; j++) {
+              var v = normalize(chapterOptions[j].dataset.value);
+              if (v.length > 3 && (v.indexOf(target) !== -1 || target.indexOf(v) !== -1)) {
+                match = chapterOptions[j]; break;
+              }
+            }
+          }
           if (match && match.dataset.value !== 'all') {
             selects.chapter.select(match.dataset.value, true);
           }
@@ -2200,14 +2174,14 @@
   }
 
   function resetSteps(steps) {
-    steps.forEach((id) => {
-      const el = $(id);
+    steps.forEach(function (id) {
+      var el = $(id);
       if (el) el.classList.remove('active', 'done');
     });
   }
 
   function activateStep(stepId, statusEl, label) {
-    document.querySelectorAll('.loading-step').forEach((s) => {
+    document.querySelectorAll('.loading-step').forEach(function (s) {
       if (s.id === stepId) {
         s.classList.add('active');
         s.classList.remove('done');
@@ -2222,16 +2196,16 @@
     }
   }
 
-  function finishAllSteps(steps, statusEl, finalLabel = 'Terminé !') {
-    steps.forEach((id) => {
-      const el = $(id);
+  function finishAllSteps(steps, statusEl, finalLabel) {
+    steps.forEach(function (id) {
+      var el = $(id);
       if (el) {
         el.classList.remove('active');
         el.classList.add('done');
       }
     });
     if (statusEl) {
-      statusEl.textContent = finalLabel;
+      statusEl.textContent = finalLabel || 'Terminé !';
       statusEl.classList.remove('active');
     }
   }
@@ -2239,7 +2213,7 @@
   async function saveActiveSession() {
     if (!state.user || !state.selectedSubject) return;
     try {
-      const ref = doc(db, 'users', state.user.uid, 'activeExam', 'current');
+      var ref = doc(db, 'users', state.user.uid, 'activeExam', 'current');
       await setDoc(ref, {
         exam: state.exam,
         selectedSubjectId: state.selectedSubject.id,
@@ -2249,65 +2223,54 @@
         remainingSeconds: state.remainingSeconds,
         updatedAt: serverTimestamp()
       }, { merge: true });
-    } catch (e) {
-      console.warn('Save session error:', e.message);
-    }
+    } catch (e) { console.warn('Save session error:', e.message); }
   }
 
   async function clearActiveSession() {
     if (!state.user) return;
     try {
       await deleteDoc(doc(db, 'users', state.user.uid, 'activeExam', 'current'));
-    } catch (e) {
-      console.warn('Clear session error:', e.message);
-    }
+    } catch (e) { console.warn('Clear session error:', e.message); }
   }
 
   async function loadActiveSession() {
     if (!state.user) return null;
     try {
-      const snap = await getDoc(doc(db, 'users', state.user.uid, 'activeExam', 'current'));
+      var snap = await getDoc(doc(db, 'users', state.user.uid, 'activeExam', 'current'));
       if (!snap.exists()) return null;
-      const data = snap.data();
-
-      const updated = data.updatedAt?.toDate?.() || new Date(data.updatedAt);
-      const ageHours = (Date.now() - updated.getTime()) / (1000 * 60 * 60);
+      var data = snap.data();
+      var updated = (data.updatedAt && data.updatedAt.toDate) ? data.updatedAt.toDate() : new Date(data.updatedAt);
+      var ageHours = (Date.now() - updated.getTime()) / (1000 * 60 * 60);
       if (ageHours > EXAM_CONSTANTS.SESSION_TTL_HOURS) {
         await clearActiveSession();
         return null;
       }
       return data;
-    } catch (e) {
-      console.warn('Load session error:', e.message);
-      return null;
-    }
+    } catch (e) { console.warn('Load session error:', e.message); return null; }
   }
 
-  let saveSessionTimer = null;
+  var saveSessionTimer = null;
   function debouncedSaveSession() {
     if (saveSessionTimer) clearTimeout(saveSessionTimer);
     saveSessionTimer = setTimeout(saveActiveSession, 2000);
   }
 
   function normalizeExam(payload) {
-    const exam = payload?.exam;
+    var exam = payload && payload.exam;
     if (!exam || !Array.isArray(exam.subjects) || exam.subjects.length < 2) {
       throw new Error('Réponse du serveur invalide.');
     }
-
     exam.duration = Number(exam.duration) || EXAM_CONSTANTS.DEFAULT_DURATION_MIN;
     exam.totalPoints = Number(exam.totalPoints) || 20;
     exam.subjects = exam.subjects.slice(0, 2);
-
-    exam.subjects.forEach((subject, idx) => {
-      const ok = Array.isArray(subject.exercises)
+    exam.subjects.forEach(function (subject, idx) {
+      var ok = Array.isArray(subject.exercises)
         && subject.exercises.length === EXAM_CONSTANTS.REQUIRED_EXERCISES
-        && subject.exercises.every((ex) =>
-          Array.isArray(ex.questions) && ex.questions.length === EXAM_CONSTANTS.QUESTIONS_PER_EXERCISE
-        );
-      if (!ok) throw new Error(`Sujet ${idx + 1} invalide.`);
+        && subject.exercises.every(function (ex) {
+          return Array.isArray(ex.questions) && ex.questions.length === EXAM_CONSTANTS.QUESTIONS_PER_EXERCISE;
+        });
+      if (!ok) throw new Error('Sujet ' + (idx + 1) + ' invalide.');
     });
-
     return exam;
   }
 
@@ -2315,66 +2278,60 @@
 
   async function generateExam(event) {
     event.preventDefault();
-
     if (!navigator.onLine) {
       setStatus('configStatus', 'Votre connexion semble interrompue.', 'error');
       return;
     }
-
     if (!state.user) {
       setStatus('configStatus', 'Connecte-toi pour générer un examen.', 'error');
       return;
     }
 
-    const btn = $('generateButton');
+    var btn = $('generateButton');
     btn.disabled = true;
     btn.classList.add('loading');
     setStatus('configStatus', '');
 
     showView('loadingView');
     resetSteps(GENERATION_STEPS);
-    const statusEl = $('genLoadingStatus');
+    var statusEl = $('genLoadingStatus');
 
     try {
-      const config = readConfig();
-
+      var config = readConfig();
       activateStep('genStep1', statusEl, 'Analyse de la configuration...');
       await sleep(600);
 
-      const token = await getIdToken(state.user);
-      const headers = {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
-      };
+      var token = await getIdToken(state.user);
+      var headers = { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token };
 
       activateStep('genStep2', statusEl, 'Génération des deux sujets...');
 
-      const notebookContextPayload = state.notebookContext
+      var notebookContextPayload = state.notebookContext
         ? { subject: config.subject, chapterId: state.notebookContext.chapterId, chapterTitle: state.notebookContext.chapterTitle }
         : null;
 
-      const responsePromise = fetch('/api/exam', {
+      var responsePromise = fetch('/api/exam', {
         method: 'POST',
-        headers,
-        body: JSON.stringify({
-          ...config,
-          notebookContext: notebookContextPayload
-        })
+        headers: headers,
+        body: JSON.stringify(Object.assign({}, config, { notebookContext: notebookContextPayload }))
       });
       await sleep(1500);
 
       activateStep('genStep3', statusEl, 'Rédaction des exercices...');
-      const response = await responsePromise;
-      const payload = await response.json().catch(() => null);
+      var response = await responsePromise;
+      var payload = await response.json().catch(function () { return null; });
 
       if (response.status === 401) throw new Error('AUTH_REQUIRED');
-      if (response.status === 429 && payload?.code === 'FREE_EXAM_LIMIT') {
+      if (response.status === 429 && payload && payload.code === 'FREE_EXAM_LIMIT') {
         showView('configView');
         showPremiumPopup();
         return;
       }
       if (response.status === 429) throw new Error('RATE_LIMIT');
-      if (!response.ok) throw new Error(payload?.error || 'SERVICE');
+      if (!response.ok) {
+        console.error('[EXAM] Erreur serveur:', response.status, payload);
+        throw new Error((payload && (payload.error || payload.message)) || ('Erreur serveur ' + response.status));
+      }
 
       activateStep('genStep4', statusEl, 'Vérification des questions...');
       await sleep(800);
@@ -2386,22 +2343,18 @@
 
       activateStep('genStep5', statusEl, 'Finalisation...');
       await sleep(600);
-
       finishAllSteps(GENERATION_STEPS, statusEl, '✅ Tes deux sujets sont prêts !');
       await sleep(400);
-
       displaySubjects();
       showView('subjectsView');
-
     } catch (error) {
       console.error('Génération échouée:', error);
-
       if (error.message === 'AUTH_REQUIRED') {
         setStatus('configStatus', 'Connecte-toi pour générer un examen.', 'error');
       } else if (error.message === 'RATE_LIMIT') {
-        setStatus('configStatus', 'Trop de tentatives. Attends une minute puis réessaie.', 'error');
+        setStatus('configStatus', 'Trop de tentatives. Attends une minute.', 'error');
       } else {
-        setStatus('configStatus', error.message || 'Impossible de générer l\'examen. Réessaie.', 'error');
+        setStatus('configStatus', error.message || 'Impossible de générer l\'examen.', 'error');
       }
       showView('configView');
     } finally {
@@ -2411,39 +2364,36 @@
   }
 
   function displaySubjects() {
-    const list = $('subjectsList');
+    var list = $('subjectsList');
     list.replaceChildren();
+    state.exam.subjects.forEach(function (subject, index) {
+      var exerciseCount = subject.exercises.length;
+      var totalQuestions = subject.exercises.reduce(function (sum, ex) { return sum + ((ex.questions && ex.questions.length) || 0); }, 0);
+      var points = subject.exercises.reduce(function (sum, ex) { return sum + (Number(ex.points) || 0); }, 0);
+      var level = subject.level || (index === 0 ? 'consolidation' : 'approfondissement');
+      var levelLabel = level === 'consolidation' ? 'Consolidation' : 'Approfondissement';
+      var levelClass = level === 'consolidation' ? 'consolidation' : 'approfondissement';
 
-    state.exam.subjects.forEach((subject, index) => {
-      const exerciseCount = subject.exercises.length;
-      const totalQuestions = subject.exercises.reduce((sum, ex) => sum + (ex.questions?.length || 0), 0);
-      const points = subject.exercises.reduce((sum, ex) => sum + (Number(ex.points) || 0), 0);
-      const level = subject.level || (index === 0 ? 'consolidation' : 'approfondissement');
-      const levelLabel = level === 'consolidation' ? 'Consolidation' : 'Approfondissement';
-      const levelClass = level === 'consolidation' ? 'consolidation' : 'approfondissement';
-
-      const card = document.createElement('article');
+      var card = document.createElement('article');
       card.className = 'subject-card';
-      card.innerHTML = `
-        <div class="subject-kicker">Version ${index + 1}</div>
-        <h3>${escapeHtml(subject.title || `Sujet ${index + 1}`)}</h3>
-        <div style="margin-bottom:6px;">
-          <span class="subject-level-badge ${levelClass}">${levelLabel}</span>
-        </div>
-        <p>${escapeHtml(subject.instructions || 'Sujet complet à traiter dans le temps imparti.')}</p>
-        <div class="subject-meta">
-          <span>${exerciseCount} exercices</span>
-          <span>${totalQuestions} questions</span>
-          <span>${Math.round(points * 100) / 100 || state.exam.totalPoints}/20 points</span>
-        </div>
-      `;
+      card.innerHTML =
+        '<div class="subject-kicker">Version ' + (index + 1) + '</div>' +
+        '<h3>' + escapeHtml(subject.title || ('Sujet ' + (index + 1))) + '</h3>' +
+        '<div style="margin-bottom:6px;">' +
+        '<span class="subject-level-badge ' + levelClass + '">' + levelLabel + '</span>' +
+        '</div>' +
+        '<p>' + escapeHtml(subject.instructions || 'Sujet complet à traiter dans le temps imparti.') + '</p>' +
+        '<div class="subject-meta">' +
+        '<span>' + exerciseCount + ' exercices</span>' +
+        '<span>' + totalQuestions + ' questions</span>' +
+        '<span>' + (Math.round(points * 100) / 100 || state.exam.totalPoints) + '/20 points</span>' +
+        '</div>';
 
-      const btn = document.createElement('button');
+      var btn = document.createElement('button');
       btn.className = 'btn primary';
       btn.type = 'button';
       btn.textContent = 'Commencer';
-      btn.addEventListener('click', () => startExam(subject));
-
+      btn.addEventListener('click', function () { startExam(subject); });
       card.appendChild(btn);
       list.appendChild(card);
     });
@@ -2455,9 +2405,7 @@
     state.answers = {};
     state.startedAt = Date.now();
     state.remainingSeconds = Math.max(60, Number(state.exam.duration) * 60);
-
     await saveActiveSession();
-
     $('examTitle').textContent = subject.title || 'Sujet';
     showView('examView');
     renderExercise();
@@ -2465,7 +2413,7 @@
   }
 
   function answerKey(exerciseIndex, questionIndex) {
-    return `${state.selectedSubject.id}:${exerciseIndex}:${questionIndex}`;
+    return state.selectedSubject.id + ':' + exerciseIndex + ':' + questionIndex;
   }
 
   function saveAnswer(key, value) {
@@ -2474,54 +2422,51 @@
   }
 
   function renderExercise() {
-    const exercise = state.selectedSubject.exercises[state.exerciseIndex];
+    var exercise = state.selectedSubject.exercises[state.exerciseIndex];
     if (!exercise) return;
 
-    $('exerciseTitle').textContent =
-      `Exercice ${exercise.number || state.exerciseIndex + 1}${exercise.title ? ` — ${exercise.title}` : ''}`;
-    $('exerciseCounter').textContent = `${state.exerciseIndex + 1} / ${EXAM_CONSTANTS.REQUIRED_EXERCISES}`;
-    $('exercisePoints').textContent = `${Math.round((Number(exercise.points) || 0) * 100) / 100} points · ${EXAM_CONSTANTS.QUESTIONS_PER_EXERCISE} questions`;
+    $('exerciseTitle').textContent = 'Exercice ' + (exercise.number || (state.exerciseIndex + 1)) + (exercise.title ? ' — ' + exercise.title : '');
+    $('exerciseCounter').textContent = (state.exerciseIndex + 1) + ' / ' + EXAM_CONSTANTS.REQUIRED_EXERCISES;
+    $('exercisePoints').textContent = (Math.round((Number(exercise.points) || 0) * 100) / 100) + ' points · ' + EXAM_CONSTANTS.QUESTIONS_PER_EXERCISE + ' questions';
     $('exerciseStatement').textContent = exercise.statement || '';
 
-    const list = $('questionsList');
+    var list = $('questionsList');
     list.replaceChildren();
 
-    exercise.questions.slice(0, EXAM_CONSTANTS.QUESTIONS_PER_EXERCISE).forEach((question, qIdx) => {
-      const key = answerKey(state.exerciseIndex, qIdx);
-      const wrapper = document.createElement('div');
+    exercise.questions.slice(0, EXAM_CONSTANTS.QUESTIONS_PER_EXERCISE).forEach(function (question, qIdx) {
+      var key = answerKey(state.exerciseIndex, qIdx);
+      var wrapper = document.createElement('div');
       wrapper.className = 'question';
 
-      const title = document.createElement('div');
+      var title = document.createElement('div');
       title.className = 'question-title';
-      title.innerHTML = `
-        <span>${escapeHtml(question.number || `${state.exerciseIndex + 1}.${qIdx + 1}`)}. ${escapeHtml(question.text || '')}</span>
-        <span class="points">${Math.round((Number(question.points) || 0) * 100) / 100} pt</span>
-      `;
+      title.innerHTML =
+        '<span>' + escapeHtml(question.number || ((state.exerciseIndex + 1) + '.' + (qIdx + 1))) + '. ' + escapeHtml(question.text || '') + '</span>' +
+        '<span class="points">' + (Math.round((Number(question.points) || 0) * 100) / 100) + ' pt</span>';
       wrapper.appendChild(title);
 
       if (Array.isArray(question.options) && question.options.length === 4) {
-        const options = document.createElement('div');
+        var options = document.createElement('div');
         options.className = 'answer-options';
-        question.options.forEach((opt) => {
-          const label = document.createElement('label');
+        question.options.forEach(function (opt) {
+          var label = document.createElement('label');
           label.className = 'answer-option';
-          const input = document.createElement('input');
+          var input = document.createElement('input');
           input.type = 'radio';
           input.name = key;
           input.value = opt.id;
           input.checked = state.answers[key] === opt.id;
-          input.addEventListener('change', () => saveAnswer(key, input.value));
-
-          const text = document.createElement('span');
-          text.textContent = `${opt.id}. ${opt.text || ''}`;
-
-          label.append(input, text);
+          input.addEventListener('change', function () { saveAnswer(key, input.value); });
+          var text = document.createElement('span');
+          text.textContent = opt.id + '. ' + (opt.text || '');
+          label.appendChild(input);
+          label.appendChild(text);
           options.appendChild(label);
         });
         wrapper.appendChild(options);
       } else {
-        const isNumber = question.type === 'number';
-        const input = document.createElement(isNumber ? 'input' : 'textarea');
+        var isNumber = question.type === 'number';
+        var input = document.createElement(isNumber ? 'input' : 'textarea');
         input.className = 'answer';
         if (isNumber) {
           input.type = 'number';
@@ -2531,17 +2476,15 @@
           input.placeholder = 'Rédige ta réponse ici...';
         }
         input.value = state.answers[key] || '';
-        input.addEventListener('input', () => saveAnswer(key, input.value));
+        input.addEventListener('input', function () { saveAnswer(key, input.value); });
         wrapper.appendChild(input);
       }
-
       list.appendChild(wrapper);
     });
 
     $('previousButton').disabled = state.exerciseIndex === 0;
     $('nextButton').disabled = state.exerciseIndex >= EXAM_CONSTANTS.REQUIRED_EXERCISES - 1;
-    $('progressBar').style.width = `${((state.exerciseIndex + 1) / EXAM_CONSTANTS.REQUIRED_EXERCISES) * 100}%`;
-
+    $('progressBar').style.width = (((state.exerciseIndex + 1) / EXAM_CONSTANTS.REQUIRED_EXERCISES) * 100) + '%';
     renderMath($('examView'));
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -2564,10 +2507,9 @@
 
   function startTimer() {
     clearInterval(state.timerId);
-    state.timerId = setInterval(() => {
+    state.timerId = setInterval(function () {
       state.remainingSeconds -= 1;
       updateTimerDisplay();
-
       if (state.remainingSeconds <= 0) {
         clearInterval(state.timerId);
         submitExam(true);
@@ -2579,12 +2521,12 @@
   }
 
   function updateTimerDisplay() {
-    const s = Math.max(0, state.remainingSeconds);
-    const h = String(Math.floor(s / 3600)).padStart(2, '0');
-    const m = String(Math.floor((s % 3600) / 60)).padStart(2, '0');
-    const sec = String(s % 60).padStart(2, '0');
-    const timer = $('timer');
-    timer.textContent = `${h}:${m}:${sec}`;
+    var s = Math.max(0, state.remainingSeconds);
+    var h = String(Math.floor(s / 3600)).padStart(2, '0');
+    var m = String(Math.floor((s % 3600) / 60)).padStart(2, '0');
+    var sec = String(s % 60).padStart(2, '0');
+    var timer = $('timer');
+    timer.textContent = h + ':' + m + ':' + sec;
     timer.classList.toggle('urgent', s <= EXAM_CONSTANTS.TIMER_WARNING_SEC);
   }
 
@@ -2597,59 +2539,48 @@
     $('confirmModal').classList.remove('show');
   }
 
-  async function submitExam(auto = false) {
+  async function submitExam(auto) {
     if (state.submitting || !state.selectedSubject) return;
-
     closeConfirmModal();
     state.submitting = true;
     clearInterval(state.timerId);
     $('finishButton').disabled = true;
-
     showView('loadingCorrectionView');
     resetSteps(CORRECTION_STEPS);
-    const statusEl = $('corrLoadingStatus');
+    var statusEl = $('corrLoadingStatus');
 
     try {
       activateStep('corrStep1', statusEl, 'Envoi de ta copie au correcteur...');
       await sleep(600);
-
-      const token = await getIdToken(state.user);
-      const headers = {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
-      };
+      var token = await getIdToken(state.user);
+      var headers = { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token };
 
       activateStep('corrStep2', statusEl, 'Analyse des exercices...');
-      const responsePromise = fetch('/api/exam', {
+      var responsePromise = fetch('/api/exam', {
         method: 'POST',
-        headers,
-        body: JSON.stringify({
-          action: 'correct',
-          exam: state.exam,
-          subjectId: state.selectedSubject.id,
-          answers: state.answers
-        })
+        headers: headers,
+        body: JSON.stringify({ action: 'correct', exam: state.exam, subjectId: state.selectedSubject.id, answers: state.answers })
       });
       await sleep(1500);
 
       activateStep('corrStep3', statusEl, 'Évaluation pédagogique...');
-      const response = await responsePromise;
-      const payload = await response.json().catch(() => null);
+      var response = await responsePromise;
+      var payload = await response.json().catch(function () { return null; });
 
-      if (!response.ok) throw new Error(payload?.error || 'SERVICE');
+      if (!response.ok) {
+        console.error('[EXAM] Erreur correction:', response.status, payload);
+        throw new Error((payload && (payload.error || payload.message)) || ('Erreur correction ' + response.status));
+      }
 
       activateStep('corrStep4', statusEl, 'Calcul du score...');
       await sleep(900);
-
       activateStep('corrStep5', statusEl, 'Finalisation...');
       await sleep(600);
-
       finishAllSteps(CORRECTION_STEPS, statusEl, '✅ Ta copie est corrigée !');
       await sleep(500);
 
       showResults(payload.result);
       await clearActiveSession();
-
     } catch (error) {
       console.error('Correction échouée:', error);
       finishAllSteps(CORRECTION_STEPS, statusEl, '⚠️ Correction indisponible.');
@@ -2689,68 +2620,58 @@
 
   function showResults(result) {
     state.lastResult = result;
+    var score = Math.max(0, Math.min(20, Number((result && result.score) || 0)));
+    var percentage = Number((result && result.percentage) || Math.round((score / 20) * 100));
+    var grade = (result && result.grade) || getGrade(percentage);
 
-    const score = Math.max(0, Math.min(20, Number(result?.score ?? 0)));
-    const percentage = Number(result?.percentage ?? Math.round((score / 20) * 100));
-    const grade = result?.grade || getGrade(percentage);
+    $('resultScore').textContent = score.toFixed(2) + ' / 20';
+    $('resultPercent').textContent = percentage + ' %';
 
-    $('resultScore').textContent = `${score.toFixed(2)} / 20`;
-    $('resultPercent').textContent = `${percentage} %`;
-
-    const details = $('resultsDetails');
+    var details = $('resultsDetails');
     details.replaceChildren();
 
-    const banner = document.createElement('div');
-    banner.className = `grade-banner grade-${getGradeClass(percentage)}`;
-    banner.innerHTML = `
-      <div class="grade-emoji">${getGradeEmoji(percentage)}</div>
-      <div class="grade-info">
-        <div class="grade-title">${escapeHtml(grade)}</div>
-        <div class="grade-sub">${escapeHtml(result?.globalFeedback?.encouragement || 'Continue tes efforts !')}</div>
-      </div>
-    `;
+    var banner = document.createElement('div');
+    banner.className = 'grade-banner grade-' + getGradeClass(percentage);
+    banner.innerHTML =
+      '<div class="grade-emoji">' + getGradeEmoji(percentage) + '</div>' +
+      '<div class="grade-info">' +
+      '<div class="grade-title">' + escapeHtml(grade) + '</div>' +
+      '<div class="grade-sub">' + escapeHtml((result && result.globalFeedback && result.globalFeedback.encouragement) || 'Continue tes efforts !') + '</div>' +
+      '</div>';
     details.appendChild(banner);
 
-    const exercises = Array.isArray(result?.exercises) ? result.exercises : [];
+    var exercises = (result && Array.isArray(result.exercises)) ? result.exercises : [];
     if (exercises.length > 0) {
-      const recap = document.createElement('div');
+      var recap = document.createElement('div');
       recap.className = 'recap-section';
       recap.innerHTML = '<h3 class="recap-title">📚 Récapitulatif des exercices</h3>';
-
-      exercises.forEach((exercise, idx) => {
-        const percent = exercise.maxScore > 0 ? (exercise.score / exercise.maxScore) * 100 : 0;
-        const icon = percent >= 75 ? '✅' : percent >= 50 ? '⚠️' : '❌';
-
-        const card = document.createElement('button');
+      exercises.forEach(function (exercise, idx) {
+        var percent = exercise.maxScore > 0 ? (exercise.score / exercise.maxScore) * 100 : 0;
+        var icon = percent >= 75 ? '✅' : percent >= 50 ? '⚠️' : '❌';
+        var card = document.createElement('button');
         card.className = 'exercise-card';
         card.type = 'button';
-        card.innerHTML = `
-          <div class="exercise-card-icon">${icon}</div>
-          <div class="exercise-card-body">
-            <div class="exercise-card-title">Exercice ${exercise.number || idx + 1}${exercise.title ? ` — ${escapeHtml(exercise.title)}` : ''}</div>
-            <div class="exercise-card-meta">${Number(exercise.score || 0).toFixed(2)} / ${Number(exercise.maxScore || 6.67).toFixed(2)} pts · ${exercise.correctAnswers || 0}/${exercise.totalQuestions || 5} correctes</div>
-            <div class="exercise-card-progress">
-              <div class="exercise-card-fill" style="width:${percent}%;background:${getProgressColor(percent)}"></div>
-            </div>
-          </div>
-          <div class="exercise-card-arrow">→</div>
-        `;
-        card.addEventListener('click', () => showExerciseDetail(exercise, idx));
+        card.innerHTML =
+          '<div class="exercise-card-icon">' + icon + '</div>' +
+          '<div class="exercise-card-body">' +
+          '<div class="exercise-card-title">Exercice ' + (exercise.number || (idx + 1)) + (exercise.title ? ' — ' + escapeHtml(exercise.title) : '') + '</div>' +
+          '<div class="exercise-card-meta">' + Number(exercise.score || 0).toFixed(2) + ' / ' + Number(exercise.maxScore || 6.67).toFixed(2) + ' pts · ' + (exercise.correctAnswers || 0) + '/' + (exercise.totalQuestions || 5) + ' correctes</div>' +
+          '<div class="exercise-card-progress"><div class="exercise-card-fill" style="width:' + percent + '%;background:' + getProgressColor(percent) + '"></div></div>' +
+          '</div>' +
+          '<div class="exercise-card-arrow">→</div>';
+        card.addEventListener('click', function () { showExerciseDetail(exercise, idx); });
         recap.appendChild(card);
       });
-
       details.appendChild(recap);
     }
 
-    if (Array.isArray(result?.revisionTopics) && result.revisionTopics.length > 0) {
-      const topics = document.createElement('div');
+    if (result && Array.isArray(result.revisionTopics) && result.revisionTopics.length > 0) {
+      var topics = document.createElement('div');
       topics.className = 'topics-section';
-      topics.innerHTML = `
-        <h3 class="topics-title">📖 Points à revoir en priorité</h3>
-        <ul class="topics-list">
-          ${result.revisionTopics.map((t) => `<li>${escapeHtml(t)}</li>`).join('')}
-        </ul>
-      `;
+      var topicsHtml = '<h3 class="topics-title">📖 Points à revoir en priorité</h3><ul class="topics-list">';
+      result.revisionTopics.forEach(function (t) { topicsHtml += '<li>' + escapeHtml(t) + '</li>'; });
+      topicsHtml += '</ul>';
+      topics.innerHTML = topicsHtml;
       details.appendChild(topics);
     }
 
@@ -2759,115 +2680,93 @@
   }
 
   function showExerciseDetail(exercise, exerciseIndex) {
-    const details = $('resultsDetails');
+    var details = $('resultsDetails');
     details.replaceChildren();
+    var percent = exercise.maxScore > 0 ? (exercise.score / exercise.maxScore) * 100 : 0;
+    var icon = percent >= 75 ? '✅' : percent >= 50 ? '⚠️' : '❌';
 
-    const percent = exercise.maxScore > 0 ? (exercise.score / exercise.maxScore) * 100 : 0;
-    const icon = percent >= 75 ? '✅' : percent >= 50 ? '⚠️' : '❌';
-
-    const header = document.createElement('div');
+    var header = document.createElement('div');
     header.className = 'exercise-detail-header';
-    header.innerHTML = `
-      <button class="back-btn-detail" id="backToRecapBtn">
-        <i class="fas fa-arrow-left"></i> Retour
-      </button>
-      <div class="exercise-detail-title">
-        <div class="exercise-detail-icon">${icon}</div>
-        <div>
-          <h3>Exercice ${exercise.number || exerciseIndex + 1}${exercise.title ? ` — ${escapeHtml(exercise.title)}` : ''}</h3>
-          <div class="exercise-detail-meta">
-            ${Number(exercise.score || 0).toFixed(2)} / ${Number(exercise.maxScore || 6.67).toFixed(2)} pts ·
-            ${exercise.correctAnswers || 0}/${exercise.totalQuestions || 5} correctes
-          </div>
-        </div>
-      </div>
-    `;
+    header.innerHTML =
+      '<button class="back-btn-detail" id="backToRecapBtn"><i class="fas fa-arrow-left"></i> Retour</button>' +
+      '<div class="exercise-detail-title">' +
+      '<div class="exercise-detail-icon">' + icon + '</div>' +
+      '<div><h3>Exercice ' + (exercise.number || (exerciseIndex + 1)) + (exercise.title ? ' — ' + escapeHtml(exercise.title) : '') + '</h3>' +
+      '<div class="exercise-detail-meta">' + Number(exercise.score || 0).toFixed(2) + ' / ' + Number(exercise.maxScore || 6.67).toFixed(2) + ' pts · ' + (exercise.correctAnswers || 0) + '/' + (exercise.totalQuestions || 5) + ' correctes</div>' +
+      '</div></div>';
     details.appendChild(header);
 
-    const questions = Array.isArray(exercise.questions) ? exercise.questions : [];
-
+    var questions = Array.isArray(exercise.questions) ? exercise.questions : [];
     if (questions.length === 0) {
-      const empty = document.createElement('p');
+      var empty = document.createElement('p');
       empty.className = 'lead';
-      empty.textContent = 'Aucun détail disponible pour cet exercice.';
+      empty.textContent = 'Aucun détail disponible.';
       details.appendChild(empty);
     } else {
-      questions.forEach((q, idx) => {
-        const qEl = document.createElement('div');
-        qEl.className = `question-detail q-${q.status || 'pending'}`;
-
-        const qIcon = q.status === 'correct' ? '✅' : q.status === 'wrong' ? '❌' : '⏭️';
-
-        qEl.innerHTML = `
-          <div class="question-header">
-            <div class="question-number">
-              <span class="q-icon">${qIcon}</span> Question ${escapeHtml(q.number || idx + 1)}
-            </div>
-            <div class="question-points">${Number(q.points || 0).toFixed(2)} / ${Number(q.maxPoints || 1.33).toFixed(2)} pt</div>
-          </div>
-        `;
-
+      questions.forEach(function (q, idx) {
+        var qEl = document.createElement('div');
+        qEl.className = 'question-detail q-' + (q.status || 'pending');
+        var qIcon = q.status === 'correct' ? '✅' : q.status === 'wrong' ? '❌' : '⏭️';
+        qEl.innerHTML =
+          '<div class="question-header">' +
+          '<div class="question-number"><span class="q-icon">' + qIcon + '</span> Question ' + escapeHtml(q.number || (idx + 1)) + '</div>' +
+          '<div class="question-points">' + Number(q.points || 0).toFixed(2) + ' / ' + Number(q.maxPoints || 1.33).toFixed(2) + ' pt</div>' +
+          '</div>';
         if (q.questionText) {
-          const qText = document.createElement('div');
+          var qText = document.createElement('div');
           qText.className = 'question-text';
-          qText.innerHTML = `<strong>❓ Énoncé :</strong> ${escapeHtml(q.questionText)}`;
+          qText.innerHTML = '<strong>❓ Énoncé :</strong> ' + escapeHtml(q.questionText);
           qEl.appendChild(qText);
         }
-
-        const answersRow = document.createElement('div');
+        var answersRow = document.createElement('div');
         answersRow.className = 'answers-row';
-
-        const studentBlock = document.createElement('div');
+        var studentBlock = document.createElement('div');
         studentBlock.className = 'answer-block student-answer';
         if (q.status === 'unanswered' || !q.studentAnswer) {
-          studentBlock.innerHTML = `<div class="answer-label">✍️ Ta réponse :</div><div class="answer-value unanswered">Aucune réponse</div>`;
+          studentBlock.innerHTML = '<div class="answer-label">✍️ Ta réponse :</div><div class="answer-value unanswered">Aucune réponse</div>';
         } else {
-          studentBlock.innerHTML = `<div class="answer-label">✍️ Ta réponse :</div><div class="answer-value">${escapeHtml(String(q.studentAnswer))}</div>`;
+          studentBlock.innerHTML = '<div class="answer-label">✍️ Ta réponse :</div><div class="answer-value">' + escapeHtml(String(q.studentAnswer)) + '</div>';
         }
         answersRow.appendChild(studentBlock);
-
         if (q.correctAnswer && q.status !== 'correct') {
-          const correctBlock = document.createElement('div');
+          var correctBlock = document.createElement('div');
           correctBlock.className = 'answer-block correct-answer';
-          correctBlock.innerHTML = `<div class="answer-label">✅ Bonne réponse :</div><div class="answer-value">${escapeHtml(String(q.correctAnswer))}</div>`;
+          correctBlock.innerHTML = '<div class="answer-label">✅ Bonne réponse :</div><div class="answer-value">' + escapeHtml(String(q.correctAnswer)) + '</div>';
           answersRow.appendChild(correctBlock);
         }
         qEl.appendChild(answersRow);
 
         if (q.feedback) {
-          const fb = document.createElement('div');
+          var fb = document.createElement('div');
           fb.className = 'feedback-block';
-          fb.innerHTML = `<div class="feedback-text">${escapeHtml(q.feedback)}</div>`;
+          fb.innerHTML = '<div class="feedback-text">' + escapeHtml(q.feedback) + '</div>';
           qEl.appendChild(fb);
         }
-
         if (q.betterMethod) {
-          const bm = document.createElement('div');
+          var bm = document.createElement('div');
           bm.className = 'method-block';
-          bm.innerHTML = `<div class="method-label">💡 ${q.status === 'correct' ? 'Astuce bonus' : 'Meilleure méthode'}</div><div class="method-text">${escapeHtml(q.betterMethod)}</div>`;
+          bm.innerHTML = '<div class="method-label">💡 ' + (q.status === 'correct' ? 'Astuce bonus' : 'Meilleure méthode') + '</div><div class="method-text">' + escapeHtml(q.betterMethod) + '</div>';
           qEl.appendChild(bm);
         }
-
         if (q.toReview) {
-          const tr = document.createElement('div');
+          var tr = document.createElement('div');
           tr.className = 'review-block';
-          tr.innerHTML = `<div class="review-label">📖 À revoir</div><div class="review-text">${escapeHtml(q.toReview)}</div>`;
+          tr.innerHTML = '<div class="review-label">📖 À revoir</div><div class="review-text">' + escapeHtml(q.toReview) + '</div>';
           qEl.appendChild(tr);
         }
-
         details.appendChild(qEl);
       });
     }
 
     if (exercise.explanation) {
-      const expl = document.createElement('div');
+      var expl = document.createElement('div');
       expl.className = 'exercise-explanation';
-      expl.innerHTML = `<div class="explanation-label">📝 Bilan de l'exercice</div><div class="explanation-text">${escapeHtml(exercise.explanation)}</div>`;
+      expl.innerHTML = '<div class="explanation-label">📝 Bilan de l\'exercice</div><div class="explanation-text">' + escapeHtml(exercise.explanation) + '</div>';
       details.appendChild(expl);
     }
 
     renderMath(details);
-    document.getElementById('backToRecapBtn').addEventListener('click', () => {
+    document.getElementById('backToRecapBtn').addEventListener('click', function () {
       showResults(state.lastResult);
     });
   }
@@ -2876,37 +2775,29 @@
     $('premiumPopup').classList.add('show');
     $('popupCloseBtn').focus();
   }
-  function hidePremiumPopup() {
-    $('premiumPopup').classList.remove('show');
-  }
+  function hidePremiumPopup() { $('premiumPopup').classList.remove('show'); }
 
   async function checkActiveSession() {
-    const session = await loadActiveSession();
+    var session = await loadActiveSession();
     if (!session || !session.exam) return;
+    var subject = session.exam.subjects && session.exam.subjects.find(function (s) { return s.id === session.selectedSubjectId; });
+    if (!subject) { await clearActiveSession(); return; }
 
-    const subject = session.exam.subjects?.find((s) => s.id === session.selectedSubjectId);
-    if (!subject) {
-      await clearActiveSession();
-      return;
-    }
-
-    $('resumeMeta').innerHTML = `
-      <div><span class="label">Matière</span><span class="value">${escapeHtml(session.exam.subject || '—')}</span></div>
-      <div><span class="label">Sujet</span><span class="value">${escapeHtml(subject.title || 'Sujet')}</span></div>
-      <div><span class="label">Exercice</span><span class="value">${(Number(session.exerciseIndex) || 0) + 1} / ${EXAM_CONSTANTS.REQUIRED_EXERCISES}</span></div>
-      <div><span class="label">Réponses données</span><span class="value">${Object.keys(session.answers || {}).length}</span></div>
-    `;
+    $('resumeMeta').innerHTML =
+      '<div><span class="label">Matière</span><span class="value">' + escapeHtml(session.exam.subject || '—') + '</span></div>' +
+      '<div><span class="label">Sujet</span><span class="value">' + escapeHtml(subject.title || 'Sujet') + '</span></div>' +
+      '<div><span class="label">Exercice</span><span class="value">' + ((Number(session.exerciseIndex) || 0) + 1) + ' / ' + EXAM_CONSTANTS.REQUIRED_EXERCISES + '</span></div>' +
+      '<div><span class="label">Réponses données</span><span class="value">' + Object.keys(session.answers || {}).length + '</span></div>';
 
     $('resumeModal').classList.add('show');
 
-    $('resumeContinueBtn').onclick = () => {
+    $('resumeContinueBtn').onclick = function () {
       state.exam = session.exam;
       state.selectedSubject = subject;
       state.exerciseIndex = Number(session.exerciseIndex) || 0;
       state.answers = session.answers || {};
       state.startedAt = Number(session.startedAt) || Date.now();
-      state.remainingSeconds = Number(session.remainingSeconds) || state.exam.duration * 60;
-
+      state.remainingSeconds = Number(session.remainingSeconds) || (state.exam.duration * 60);
       $('resumeModal').classList.remove('show');
       $('examTitle').textContent = subject.title || 'Sujet';
       showView('examView');
@@ -2914,7 +2805,7 @@
       startTimer();
     };
 
-    $('resumeNewBtn').onclick = async () => {
+    $('resumeNewBtn').onclick = async function () {
       await clearActiveSession();
       $('resumeModal').classList.remove('show');
       state.exam = null;
@@ -2923,20 +2814,20 @@
     };
   }
 
-  $('backConfigButton').addEventListener('click', () => showView('configView'));
+  $('backConfigButton').addEventListener('click', function () { showView('configView'); });
   $('previousButton').addEventListener('click', goPrevious);
   $('nextButton').addEventListener('click', goNext);
   $('finishButton').addEventListener('click', askFinish);
   $('cancelFinishButton').addEventListener('click', closeConfirmModal);
-  $('confirmFinishButton').addEventListener('click', () => submitExam(false));
+  $('confirmFinishButton').addEventListener('click', function () { submitExam(false); });
 
   $('popupCloseBtn').addEventListener('click', hidePremiumPopup);
   $('popupLaterBtn').addEventListener('click', hidePremiumPopup);
-  $('premiumPopup').addEventListener('click', (e) => {
+  $('premiumPopup').addEventListener('click', function (e) {
     if (e.target === $('premiumPopup')) hidePremiumPopup();
   });
 
-  $('newExamButton').addEventListener('click', async () => {
+  $('newExamButton').addEventListener('click', async function () {
     await clearActiveSession();
     state.exam = null;
     state.selectedSubject = null;
@@ -2946,38 +2837,36 @@
     showView('configView');
   });
 
-  window.addEventListener('online', () => {
+  window.addEventListener('online', function () {
     $('connectionState').textContent = 'Connexion disponible';
     $('connectionState').classList.add('online');
   });
-  window.addEventListener('offline', () => {
+  window.addEventListener('offline', function () {
     $('connectionState').textContent = 'Hors ligne';
     $('connectionState').classList.remove('online');
   });
 
-  document.addEventListener('keydown', (e) => {
+  document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') {
       if ($('premiumPopup').classList.contains('show')) hidePremiumPopup();
       if ($('confirmModal').classList.contains('show')) closeConfirmModal();
     }
   });
 
-  onAuthStateChanged(auth, async (user) => {
+  onAuthStateChanged(auth, async function (user) {
     if (!user) {
       window.location.replace('auth-choice.html');
       return;
     }
-
     state.user = user;
     $('connectionState').textContent = 'Compte connecté';
     $('connectionState').classList.add('online');
-
     prefillFromUrl();
     await checkActiveSession();
   });
 
   initSelects();
-  console.log('🚀 ARVEXA — Mode examen v3.2 (clés minuscules harmonisées)');
+  console.log('ARVEXA — Mode examen v3.3 (7 matières, sans backticks)');
   </script>
 </body>
 </html>

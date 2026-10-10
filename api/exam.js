@@ -1,1230 +1,2983 @@
-// ================================================================
-// API EXAM v3.1 — ARVEXA School
-// 3 exercices × 5 questions par sujet
-// 100% gratuit : Groq (4 modèles) + OpenRouter (3 modèles :free)
-// Post-traitement réparateur intégré
-// ⚡ v3.1 — Harmonisation minuscules (mathematiques, philosophie, etc.)
-// ================================================================
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0A0A0A">
+  <meta name="description" content="ARVEXA School — Mode examen BAC">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.png" type="image/png">
+  <link rel="apple-touch-icon" href="icon.png">
 
-module.exports.config = { maxDuration: 90 };
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <script src="katex-utils.js" defer></script>
+  <script src="register-sw.js" defer></script>
 
-const WINDOW_MS = 60 * 1000;
-const MAX_REQUESTS_PER_WINDOW = 3;
-const requestLog = new Map();
+  <style>
+    :root {
+      --accent: #B8860B;
+      --accent-bright: #E0B84A;
+      --accent-dim: rgba(184, 134, 11, 0.08);
+      --success: #2D7D5A;
+      --success-light: #3AB67E;
+      --danger: #B85C3A;
+      --danger-light: #E07A5F;
+      --warning: #D4A017;
+      --info: #4AAFE0;
+      --bg-dark: #0A0A0A;
+      --bg-surface: #141414;
+      --bg-card: rgba(20, 20, 20, 0.7);
+      --text-light: #F5F0E8;
+      --text-dim: #8A8A7A;
+      --text-muted: #5A5A4A;
+      --text-body: #cfd0cc;
+      --border-soft: rgba(255, 255, 255, 0.05);
+      --border-strong: rgba(255, 255, 255, 0.08);
+      --border-gold: rgba(184, 134, 11, 0.15);
+      --transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+      --transition-fast: all 0.15s ease;
+      --radius-sm: 10px;
+      --radius: 16px;
+      --radius-lg: 20px;
+      --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.5);
+      --font-body: 'Inter', system-ui, sans-serif;
+      --font-serif: 'Playfair Display', Georgia, serif;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
 
-// ⚡ ALLOWED_SUBJECTS — clés minuscules harmonisées
-const ALLOWED_SUBJECTS = new Set([
-  'mathematiques',
-  'physique',
-  'chimie',
-  'svt',
-  'francais',
-  'philosophie',
-  'histoire',
-  'geographie'
-]);
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html { background: var(--bg-dark); color-scheme: dark; min-width: 320px; width: 100%; }
 
-const ALLOWED_DIFFICULTIES = new Set(['easy', 'medium', 'hard', 'bac']);
-const ALLOWED_DURATIONS = new Set([30, 60, 90, 120, 180]);
-const REQUIRED_EXERCISES = 3;
-const QUESTIONS_PER_EXERCISE = 5;
-const FREE_EXAM_LIMIT = 2;
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(ellipse 40% 30% at 30% 15%, rgba(26, 58, 42, 0.16) 0%, transparent 70%),
+        radial-gradient(ellipse 35% 25% at 75% 85%, rgba(184, 134, 11, 0.05) 0%, transparent 60%),
+        linear-gradient(180deg, #0A0A0A 0%, #060606 100%);
+      color: var(--text-light);
+      font: 15px/1.6 var(--font-body);
+      padding-top: var(--safe-top);
+      padding-bottom: var(--safe-bottom);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
 
-// ⚡ Labels d'affichage (pour les prompts IA)
-const SUBJECT_LABELS = {
-  'mathematiques': 'Mathématiques',
-  'physique': 'Physique',
-  'chimie': 'Chimie',
-  'svt': 'SVT',
-  'francais': 'Français',
-  'philosophie': 'Philosophie',
-  'histoire': 'Histoire',
-  'geographie': 'Géographie'
-};
+    button, input, select, textarea { font: inherit; font-family: inherit; }
+    button { cursor: pointer; }
+    button:disabled { cursor: not-allowed; opacity: 0.55; }
 
-// ⚡ Matières supportant les QCM (choix multiples)
-const CHOICE_SUBJECTS = new Set(['mathematiques', 'physique', 'chimie']);
+    .shell { width: min(100% - 28px, 980px); margin: auto; padding: 18px 0 46px; }
 
-let adminServices = null;
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
 
-function getAdminServices() {
-  if (adminServices) return adminServices;
-  const credentials = process.env.FIREBASE_ADMIN_CREDENTIALS;
-  if (!credentials) throw new Error('firebase_admin_not_configured');
-  const admin = require('firebase-admin');
-  const serviceAccount = JSON.parse(credentials);
-  if (!admin.apps.length) {
-    admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
+    .brand {
+      color: var(--text-light);
+      text-decoration: none;
+      font: 700 22px var(--font-serif);
+      letter-spacing: 0.05em;
+    }
+    .brand span { color: var(--accent-bright); font-style: italic; }
+
+    .connection {
+      color: var(--text-muted);
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-weight: 500;
+    }
+    .connection::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      transition: background 0.3s ease;
+    }
+    .connection.online::before {
+      background: var(--success-light);
+      box-shadow: 0 0 8px var(--success-light);
+    }
+
+    .panel {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow);
+      position: relative;
+    }
+    .panel::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      border-radius: var(--radius) var(--radius) 0 0;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      opacity: 0.6;
+    }
+
+    .view { display: none; animation: appear 0.28s ease both; }
+    .view.active { display: block; }
+    @keyframes appear {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: none; }
+    }
+
+    h1, h2, h3 {
+      margin: 0;
+      line-height: 1.2;
+      font-family: var(--font-serif);
+      color: var(--text-light);
+    }
+    h1 { font-size: clamp(28px, 6vw, 46px); max-width: 680px; letter-spacing: -0.01em; }
+    h2 { font-size: clamp(23px, 4vw, 32px); letter-spacing: -0.01em; }
+    h3 { font-size: 19px; }
+
+    .eyebrow {
+      color: var(--accent-bright);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .lead {
+      color: var(--text-dim);
+      max-width: 650px;
+      margin: 12px 0 0;
+      line-height: 1.7;
+    }
+
+    .notebook-banner {
+      display: none;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, rgba(224, 184, 74, 0.1), rgba(184, 134, 11, 0.05));
+      border: 1px solid rgba(224, 184, 74, 0.25);
+      margin-top: 18px;
+      color: var(--text-light);
+      font-size: 13.5px;
+      line-height: 1.5;
+    }
+    .notebook-banner.show { display: flex; }
+    .notebook-banner i {
+      color: var(--accent-bright);
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .notebook-banner strong {
+      color: var(--accent-bright);
+      font-weight: 700;
+      display: block;
+      margin-bottom: 2px;
+      font-size: 14px;
+    }
+    .notebook-banner span { color: var(--text-dim); }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    .field { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+    .field.full { grid-column: 1 / -1; }
+
+    label {
+      color: var(--text-light);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+    }
+
+    input, select {
+      width: 100%;
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-sm);
+      background: rgba(0, 0, 0, 0.3);
+      color: var(--text-light);
+      padding: 12px 13px;
+      outline: none;
+      transition: var(--transition-fast);
+      font-size: 14px;
+    }
+    input:focus, select:focus {
+      border-color: var(--accent-bright);
+      box-shadow: 0 0 0 3px rgba(224, 184, 74, 0.1);
+      background: rgba(184, 134, 11, 0.02);
+    }
+    input::placeholder { color: var(--text-muted); }
+
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+
+    .btn {
+      min-height: 50px;
+      border: 1px solid transparent;
+      border-radius: 30px;
+      padding: 14px 24px;
+      color: var(--text-light);
+      background: rgba(255, 255, 255, 0.04);
+      font-weight: 700;
+      font-size: 14px;
+      transition: var(--transition);
+      font-family: var(--font-body);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      letter-spacing: 0.01em;
+    }
+
+    .btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      border-color: rgba(224, 184, 74, 0.3);
+      background: rgba(255, 255, 255, 0.06);
+    }
+    .btn.primary {
+      background: linear-gradient(135deg, var(--accent-bright), var(--accent));
+      color: #0A0A0A;
+      border-color: transparent;
+      box-shadow: 0 4px 16px rgba(184, 134, 11, 0.2);
+    }
+    .btn.primary:hover:not(:disabled) {
+      box-shadow: 0 8px 28px rgba(184, 134, 11, 0.35);
+      border-color: transparent;
+    }
+    .btn.secondary {
+      background: transparent;
+      border-color: var(--border-strong);
+      color: var(--text-dim);
+    }
+    .btn.secondary:hover:not(:disabled) {
+      border-color: var(--border-gold);
+      color: var(--text-light);
+    }
+    .btn.danger {
+      background: rgba(184, 92, 58, 0.1);
+      border-color: rgba(184, 92, 58, 0.3);
+      color: var(--danger-light);
+    }
+    .btn.danger:hover:not(:disabled) {
+      background: rgba(184, 92, 58, 0.2);
+      border-color: rgba(184, 92, 58, 0.5);
+    }
+    .btn.full { width: 100%; }
+
+    .loader {
+      display: none;
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(10, 10, 10, 0.25);
+      border-top-color: currentColor;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    .btn.secondary .loader {
+      border-color: rgba(255, 255, 255, 0.2);
+      border-top-color: var(--text-light);
+    }
+    .btn.loading .loader { display: inline-block; }
+    .btn.loading .btn-text { display: none; }
+    .btn.loading .btn-icon { display: none; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .status {
+      min-height: 22px;
+      margin-top: 14px;
+      color: var(--text-dim);
+      font-size: 13px;
+    }
+    .status.error { color: #ff9a84; }
+    .status.success { color: #7ce0aa; }
+
+    .custom-select { position: relative; width: 100%; user-select: none; }
+    .custom-select-trigger {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      width: 100%;
+      min-height: 46px;
+      padding: 12px 14px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-sm);
+      color: var(--text-light);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition-fast);
+      text-align: left;
+      font-family: var(--font-body);
+    }
+    .custom-select-trigger:hover:not(.disabled) {
+      border-color: rgba(224, 184, 74, 0.3);
+      background: rgba(255, 255, 255, 0.04);
+    }
+    .custom-select.open .custom-select-trigger {
+      border-color: var(--accent-bright);
+      box-shadow: 0 0 0 3px rgba(224, 184, 74, 0.1);
+      background: rgba(184, 134, 11, 0.02);
+    }
+    .custom-select-value {
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .custom-select-value .icon-prefix {
+      color: var(--accent-bright);
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+    .custom-select-arrow {
+      color: var(--text-muted);
+      font-size: 12px;
+      flex-shrink: 0;
+      transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+    .custom-select.open .custom-select-arrow {
+      transform: rotate(180deg);
+      color: var(--accent-bright);
+    }
+    .custom-select-options {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0; right: 0;
+      z-index: 50;
+      max-height: 280px;
+      overflow-y: auto;
+      background: linear-gradient(145deg, #171717, #101010);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(224, 184, 74, 0.05);
+      padding: 6px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-8px) scale(0.98);
+      transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+      transform-origin: top center;
+    }
+    .custom-select.open .custom-select-options {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0) scale(1);
+    }
+    .custom-select-options::-webkit-scrollbar { width: 4px; }
+    .custom-select-options::-webkit-scrollbar-thumb {
+      background: rgba(224, 184, 74, 0.2);
+      border-radius: 10px;
+    }
+    .custom-select-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 14px;
+      border-radius: 8px;
+      color: var(--text-body);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition-fast);
+      position: relative;
+    }
+    .custom-select-option:hover,
+    .custom-select-option.focused {
+      background: rgba(224, 184, 74, 0.08);
+      color: var(--text-light);
+    }
+    .custom-select-option.selected {
+      background: rgba(224, 184, 74, 0.12);
+      color: var(--accent-bright);
+      font-weight: 700;
+    }
+    .custom-select-option.selected::after {
+      content: '✓';
+      margin-left: auto;
+      color: var(--accent-bright);
+      font-size: 12px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+    .custom-select-option .option-prefix {
+      color: var(--accent-bright);
+      font-size: 13px;
+      flex-shrink: 0;
+      width: 18px;
+      text-align: center;
+    }
+
+    .loading-steps {
+      margin-top: 28px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
+    .loader-spinner {
+      width: 56px;
+      height: 56px;
+      border: 3px solid rgba(224, 184, 74, 0.15);
+      border-top-color: var(--accent-bright);
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+      flex-shrink: 0;
+    }
+    .steps-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+      max-width: 480px;
+    }
+    .loading-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      background: rgba(20, 20, 20, 0.6);
+      border: 1px solid var(--border-soft);
+      border-left: 3px solid transparent;
+      transition: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+      opacity: 0.5;
+    }
+    .loading-step.active {
+      opacity: 1;
+      background: rgba(224, 184, 74, 0.06);
+      border-left-color: var(--accent-bright);
+      border-color: rgba(224, 184, 74, 0.2);
+      transform: translateX(4px);
+      box-shadow: 0 4px 20px rgba(224, 184, 74, 0.08);
+    }
+    .loading-step.done {
+      opacity: 0.85;
+      background: rgba(69, 180, 125, 0.04);
+      border-left-color: var(--success);
+      border-color: rgba(69, 180, 125, 0.15);
+    }
+    .loading-step.done::after {
+      content: '✓';
+      margin-left: auto;
+      color: var(--success);
+      font-weight: 800;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .step-icon {
+      font-size: 22px;
+      line-height: 1;
+      flex-shrink: 0;
+      width: 28px;
+      text-align: center;
+      filter: grayscale(0.6);
+      transition: filter 0.3s ease;
+    }
+    .loading-step.active .step-icon {
+      filter: none;
+      animation: pulseStep 1.5s ease-in-out infinite;
+    }
+    @keyframes pulseStep {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+    }
+    .step-content {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+      flex: 1;
+    }
+    .step-label {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-light);
+      line-height: 1.3;
+    }
+    .loading-step.active .step-label { color: var(--accent-bright); }
+    .loading-step.done .step-label { color: var(--success); }
+    .step-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+    .loading-status {
+      font-size: 13px;
+      color: var(--text-muted);
+      text-align: center;
+      font-style: italic;
+      min-height: 20px;
+      transition: color 0.3s ease;
+    }
+    .loading-status.active {
+      color: var(--accent-bright);
+      font-style: normal;
+      font-weight: 600;
+    }
+
+    .subject-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 22px;
+    }
+    .subject-card {
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius);
+      padding: 20px 18px;
+      background: var(--bg-card);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: relative;
+      overflow: hidden;
+      transition: var(--transition);
+    }
+    .subject-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      opacity: 0.5;
+    }
+    .subject-card:hover {
+      border-color: rgba(184, 134, 11, 0.25);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+    }
+    .subject-card h3 {
+      font-size: 19px;
+      color: var(--text-light);
+      letter-spacing: -0.01em;
+    }
+    .subject-card .subject-kicker {
+      color: var(--accent-bright);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .subject-card p {
+      color: var(--text-dim);
+      margin: 0;
+      font-size: 13.5px;
+      line-height: 1.6;
+    }
+    .subject-meta {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      color: var(--accent-bright);
+      font-size: 12.5px;
+      font-weight: 600;
+    }
+    .subject-meta span {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 12px;
+      background: rgba(184, 134, 11, 0.08);
+      border: 1px solid rgba(184, 134, 11, 0.12);
+    }
+    .subject-level-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 10px;
+      font-size: 10.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .subject-level-badge.consolidation {
+      background: rgba(58, 182, 126, 0.1);
+      color: var(--success-light);
+      border: 1px solid rgba(58, 182, 126, 0.25);
+    }
+    .subject-level-badge.approfondissement {
+      background: rgba(224, 122, 95, 0.1);
+      color: var(--danger-light);
+      border: 1px solid rgba(224, 122, 95, 0.25);
+    }
+
+    .exam-top {
+      position: sticky;
+      top: 0;
+      z-index: 4;
+      background: rgba(10, 10, 10, 0.94);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 12px 0;
+      margin-bottom: 18px;
+      border-bottom: 1px solid var(--border-soft);
+    }
+    .exam-topline {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .timer {
+      color: var(--accent-bright);
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+      font-family: var(--font-serif);
+      font-size: 22px;
+      letter-spacing: 0.02em;
+      padding: 4px 14px;
+      border-radius: 12px;
+      background: rgba(184, 134, 11, 0.08);
+      border: 1px solid rgba(184, 134, 11, 0.15);
+    }
+    .timer.urgent {
+      color: var(--danger-light);
+      background: rgba(184, 92, 58, 0.1);
+      border-color: rgba(184, 92, 58, 0.25);
+      animation: pulseTimer 1.5s ease-in-out infinite;
+    }
+    @keyframes pulseTimer {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+    .progress {
+      height: 4px;
+      border-radius: 10px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.06);
+      margin-top: 12px;
+    }
+    .progress span {
+      display: block;
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-bright));
+      transition: width 0.3s ease;
+    }
+
+    .exercise-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 14px;
+    }
+    .exercise-head h3 {
+      font-size: 19px;
+      color: var(--text-light);
+      margin-bottom: 2px;
+      letter-spacing: -0.01em;
+    }
+    .exercise-head small {
+      color: var(--text-muted);
+      font-size: 12px;
+      display: block;
+      margin-top: 2px;
+    }
+    .points {
+      color: var(--accent-bright);
+      font-weight: 800;
+      white-space: nowrap;
+      font-size: 13px;
+      padding: 4px 12px;
+      border-radius: 12px;
+      background: rgba(184, 134, 11, 0.08);
+      border: 1px solid rgba(184, 134, 11, 0.15);
+    }
+
+    .statement {
+      color: var(--text-body);
+      white-space: pre-wrap;
+      margin: 0 0 22px;
+      font-size: 14.5px;
+      line-height: 1.75;
+      padding: 16px 18px;
+      border-radius: var(--radius-sm);
+      background: rgba(0, 0, 0, 0.25);
+      border-left: 3px solid var(--accent);
+      overflow-wrap: break-word;
+    }
+
+    .question {
+      border-top: 1px solid var(--border-soft);
+      padding: 18px 0 0;
+      margin-top: 18px;
+    }
+    .question-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-weight: 700;
+      color: var(--text-light);
+      font-size: 14.5px;
+      line-height: 1.6;
+      align-items: flex-start;
+    }
+    .question-title .points {
+      padding: 2px 10px;
+      font-size: 11.5px;
+      border-radius: 10px;
+      flex-shrink: 0;
+    }
+
+    .answer {
+      margin-top: 12px;
+      min-height: 92px;
+      width: 100%;
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-sm);
+      background: rgba(0, 0, 0, 0.3);
+      color: var(--text-light);
+      padding: 12px 14px;
+      font-size: 14px;
+      line-height: 1.6;
+      font-family: var(--font-body);
+      resize: vertical;
+      outline: none;
+      transition: var(--transition-fast);
+    }
+    .answer:focus {
+      border-color: var(--accent-bright);
+      box-shadow: 0 0 0 3px rgba(224, 184, 74, 0.1);
+      background: rgba(184, 134, 11, 0.02);
+    }
+    .answer::placeholder { color: var(--text-muted); }
+
+    .answer-options {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .answer-option {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 14px;
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-sm);
+      background: rgba(0, 0, 0, 0.25);
+      cursor: pointer;
+      transition: var(--transition-fast);
+      font-size: 14px;
+      color: var(--text-body);
+      line-height: 1.5;
+    }
+    .answer-option:hover {
+      border-color: rgba(224, 184, 74, 0.3);
+      background: rgba(224, 184, 74, 0.04);
+    }
+    .answer-option:has(input:checked) {
+      border-color: var(--accent-bright);
+      background: rgba(224, 184, 74, 0.1);
+      color: var(--text-light);
+    }
+    .answer-option input {
+      width: auto;
+      margin-top: 4px;
+      accent-color: var(--accent-bright);
+      flex-shrink: 0;
+    }
+
+    .result-summary {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin: 20px 0;
+    }
+    .metric {
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius);
+      padding: 18px;
+      background: var(--bg-card);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      text-align: center;
+      transition: var(--transition);
+    }
+    .metric:hover {
+      border-color: rgba(184, 134, 11, 0.2);
+      transform: translateY(-2px);
+    }
+    .metric small {
+      display: block;
+      color: var(--text-muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .metric strong {
+      display: block;
+      color: var(--accent-bright);
+      font-size: 28px;
+      font-family: var(--font-serif);
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+
+    .grade-banner {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 20px 22px;
+      border-radius: var(--radius);
+      margin-bottom: 20px;
+      border: 1px solid var(--border-soft);
+    }
+    .grade-banner.grade-success {
+      background: linear-gradient(135deg, rgba(58, 138, 95, 0.12), rgba(58, 138, 95, 0.04));
+      border-color: rgba(58, 138, 95, 0.3);
+    }
+    .grade-banner.grade-warning {
+      background: linear-gradient(135deg, rgba(224, 184, 74, 0.12), rgba(224, 184, 74, 0.04));
+      border-color: rgba(224, 184, 74, 0.3);
+    }
+    .grade-banner.grade-danger {
+      background: linear-gradient(135deg, rgba(215, 101, 74, 0.12), rgba(215, 101, 74, 0.04));
+      border-color: rgba(215, 101, 74, 0.3);
+    }
+    .grade-banner .grade-emoji {
+      font-size: 44px;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    .grade-banner .grade-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .grade-banner .grade-title {
+      font-family: var(--font-serif);
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-light);
+      margin-bottom: 4px;
+      letter-spacing: -0.01em;
+    }
+    .grade-banner .grade-sub {
+      font-size: 13.5px;
+      color: var(--text-dim);
+      line-height: 1.55;
+    }
+
+    .recap-section { margin-bottom: 24px; }
+    .recap-title {
+      font-family: var(--font-serif);
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-light);
+      margin-bottom: 14px;
+      letter-spacing: -0.01em;
+    }
+
+    .exercise-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      width: 100%;
+      padding: 16px 18px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border-soft);
+      background: var(--bg-card);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: var(--transition);
+      text-align: left;
+      font-family: inherit;
+      color: inherit;
+    }
+    .exercise-card:hover {
+      border-color: rgba(224, 184, 74, 0.3);
+      background: rgba(224, 184, 74, 0.04);
+      transform: translateX(3px);
+    }
+    .exercise-card-icon {
+      font-size: 24px;
+      line-height: 1;
+      flex-shrink: 0;
+      width: 32px;
+      text-align: center;
+    }
+    .exercise-card-body { flex: 1; min-width: 0; }
+    .exercise-card-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-light);
+      margin-bottom: 4px;
+    }
+    .exercise-card-meta {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+    .exercise-card-progress {
+      height: 4px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.06);
+      overflow: hidden;
+    }
+    .exercise-card-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.3s ease;
+    }
+    .exercise-card-arrow {
+      color: var(--text-muted);
+      font-size: 16px;
+      flex-shrink: 0;
+      transition: var(--transition);
+    }
+    .exercise-card:hover .exercise-card-arrow {
+      color: var(--accent-bright);
+      transform: translateX(4px);
+    }
+
+    .topics-section {
+      margin-top: 24px;
+      padding: 20px;
+      border-radius: var(--radius);
+      background: rgba(74, 175, 224, 0.06);
+      border: 1px solid rgba(74, 175, 224, 0.2);
+    }
+    .topics-title {
+      font-family: var(--font-serif);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--info);
+      margin-bottom: 12px;
+    }
+    .topics-list {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin: 0;
+    }
+    .topics-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 13.5px;
+      color: var(--text-body);
+      line-height: 1.55;
+    }
+    .topics-list li::before {
+      content: '→';
+      color: var(--info);
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .exercise-detail-header { margin-bottom: 20px; }
+    .back-btn-detail {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-soft);
+      background: transparent;
+      color: var(--text-dim);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: inherit;
+      margin-bottom: 16px;
+    }
+    .back-btn-detail:hover {
+      color: var(--text-light);
+      border-color: var(--accent-bright);
+      background: rgba(184, 134, 11, 0.06);
+    }
+    .exercise-detail-title {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .exercise-detail-icon {
+      font-size: 32px;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    .exercise-detail-title h3 {
+      font-family: var(--font-serif);
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-light);
+      margin: 0 0 4px;
+      letter-spacing: -0.01em;
+    }
+    .exercise-detail-meta {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .question-detail {
+      padding: 18px 20px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border-soft);
+      background: var(--bg-card);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      margin-bottom: 12px;
+      transition: var(--transition);
+    }
+    .question-detail:hover { border-color: rgba(224, 184, 74, 0.2); }
+    .question-detail.q-correct { border-color: rgba(69, 180, 125, 0.25); }
+    .question-detail.q-wrong { border-color: rgba(215, 101, 74, 0.25); }
+    .question-detail.q-unanswered { border-color: var(--border-soft); opacity: 0.9; }
+
+    .question-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .question-number {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-light);
+    }
+    .question-number .q-icon { font-size: 16px; }
+    .question-points {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent-bright);
+      padding: 3px 10px;
+      border-radius: 12px;
+      background: rgba(224, 184, 74, 0.1);
+      border: 1px solid rgba(224, 184, 74, 0.2);
+      white-space: nowrap;
+    }
+    .q-wrong .question-points {
+      color: #ff9a84;
+      background: rgba(215, 101, 74, 0.1);
+      border-color: rgba(215, 101, 74, 0.2);
+    }
+    .q-correct .question-points {
+      color: #7ce0aa;
+      background: rgba(69, 180, 125, 0.1);
+      border-color: rgba(69, 180, 125, 0.2);
+    }
+
+    .question-text {
+      font-size: 14px;
+      line-height: 1.65;
+      color: var(--text-body);
+      margin-bottom: 14px;
+    }
+    .question-text strong { color: var(--accent-bright); font-weight: 700; }
+
+    .answers-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .answer-block {
+      padding: 12px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-soft);
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .answer-block .answer-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 6px;
+      color: var(--text-muted);
+    }
+    .answer-block.student-answer .answer-label { color: var(--accent-bright); }
+    .answer-block.correct-answer .answer-label { color: #7ce0aa; }
+    .answer-block .answer-value {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-light);
+      word-break: break-word;
+    }
+    .answer-block .answer-value.unanswered {
+      color: var(--text-muted);
+      font-style: italic;
+      font-weight: 400;
+    }
+
+    .feedback-block,
+    .method-block,
+    .review-block {
+      padding: 12px 14px;
+      border-radius: var(--radius-sm);
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-soft);
+      margin-bottom: 10px;
+    }
+    .feedback-block:last-child,
+    .method-block:last-child,
+    .review-block:last-child { margin-bottom: 0; }
+
+    .feedback-text {
+      font-size: 13.5px;
+      line-height: 1.65;
+      color: var(--text-body);
+    }
+    .method-label,
+    .review-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 6px;
+    }
+    .method-label { color: var(--accent-bright); }
+    .method-text {
+      font-size: 13.5px;
+      line-height: 1.65;
+      color: var(--text-body);
+    }
+    .review-label { color: var(--info); }
+    .review-text {
+      font-size: 13.5px;
+      line-height: 1.65;
+      color: var(--text-body);
+    }
+
+    .exercise-explanation {
+      margin-top: 20px;
+      padding: 18px 20px;
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-soft);
+    }
+    .explanation-label {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-bright);
+      margin-bottom: 8px;
+    }
+    .explanation-text {
+      font-size: 14px;
+      line-height: 1.65;
+      color: var(--text-body);
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: none;
+      place-items: center;
+      padding: 18px;
+      background: rgba(0, 0, 0, 0.78);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .modal-backdrop.show { display: grid; animation: fadeIn 0.25s ease; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .modal {
+      max-width: 440px;
+      width: 100%;
+      background: linear-gradient(145deg, #161616, #0f0f0f);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius);
+      padding: 24px 22px;
+      position: relative;
+      animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    @keyframes modalPop {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .modal::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      border-radius: var(--radius) var(--radius) 0 0;
+      background: linear-gradient(90deg, var(--accent), var(--accent-bright), var(--accent));
+    }
+    .modal h3 {
+      font-family: var(--font-serif);
+      font-size: 20px;
+      margin-bottom: 12px;
+      color: var(--text-light);
+    }
+    .modal p {
+      color: var(--text-dim);
+      font-size: 14px;
+      line-height: 1.7;
+      margin: 0 0 16px;
+    }
+
+    .resume-modal-content {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .resume-modal-content h3 { font-family: var(--font-serif); font-size: 20px; }
+    .resume-modal-content p {
+      color: var(--text-dim);
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .resume-modal-content .resume-meta {
+      padding: 12px 14px;
+      border-radius: var(--radius-sm);
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-soft);
+      font-size: 13px;
+    }
+    .resume-modal-content .resume-meta div {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 0;
+    }
+    .resume-modal-content .resume-meta .label { color: var(--text-muted); }
+    .resume-modal-content .resume-meta .value {
+      color: var(--text-light);
+      font-weight: 600;
+    }
+
+    .premium-popup-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: grid;
+      place-items: center;
+      padding: 16px;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.25s ease, visibility 0.25s ease;
+    }
+    .premium-popup-overlay.show { opacity: 1; visibility: visible; }
+
+    .premium-popup {
+      position: relative;
+      width: min(100%, 400px);
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 28px 22px 20px;
+      border: 1px solid var(--accent);
+      border-radius: var(--radius);
+      background: linear-gradient(145deg, #161616, #0a0a0a);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+      transform: scale(0.94) translateY(16px);
+      transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+    .premium-popup-overlay.show .premium-popup {
+      transform: scale(1) translateY(0);
+    }
+    .premium-popup::before {
+      content: '';
+      position: absolute;
+      inset: 0 0 auto;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-bright), var(--accent));
+    }
+    .popup-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 30px;
+      height: 30px;
+      border: 1px solid rgba(184, 134, 11, 0.2);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .popup-close:hover {
+      color: var(--text-light);
+      border-color: rgba(184, 134, 11, 0.3);
+    }
+    .popup-icon {
+      display: block;
+      text-align: center;
+      font-size: 44px;
+      margin-bottom: 6px;
+      line-height: 1;
+    }
+    .premium-popup h2 {
+      text-align: center;
+      font-size: 22px;
+      margin-bottom: 6px;
+      font-family: var(--font-serif);
+      letter-spacing: -0.01em;
+    }
+    .premium-popup h2 span {
+      color: var(--accent-bright);
+      font-style: italic;
+    }
+    .popup-subtitle {
+      color: var(--text-dim);
+      text-align: center;
+      font-size: 13.5px;
+      line-height: 1.6;
+      margin: 0 0 18px;
+    }
+    .popup-subtitle strong { color: var(--accent-bright); }
+    .popup-features {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+    .popup-features .feature {
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-soft);
+      font-size: 11.5px;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .popup-features .feature i {
+      color: var(--accent-bright);
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+    .popup-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .btn-subscribe {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 13px;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, var(--accent-bright), var(--accent));
+      color: #0A0A0A;
+      font-weight: 700;
+      text-decoration: none;
+      font-size: 14px;
+      min-height: 44px;
+      transition: var(--transition);
+    }
+    .btn-subscribe:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 22px rgba(184, 134, 11, 0.3);
+    }
+    .btn-later {
+      padding: 9px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 13px;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: inherit;
+    }
+    .btn-later:hover { color: var(--text-light); }
+
+    .katex { color: inherit; font-size: 1.05em; }
+    .katex-display {
+      max-width: 100%;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 6px 0;
+    }
+
+    @media (max-width: 620px) {
+      .shell { width: min(100% - 20px, 980px); padding-top: 12px; }
+      .panel { padding: 17px; }
+      .form-grid, .subject-grid { grid-template-columns: 1fr; }
+      .field.full { grid-column: auto; }
+      .actions .btn { flex: 1 1 100%; }
+      .exam-topline { align-items: flex-start; flex-direction: column; }
+      .result-summary { grid-template-columns: 1fr 1fr; }
+      .loading-steps { margin-top: 22px; gap: 18px; }
+      .loader-spinner { width: 48px; height: 48px; }
+      .loading-step { padding: 11px 13px; gap: 12px; }
+      .step-icon { font-size: 20px; width: 24px; }
+      .step-label { font-size: 13px; }
+      .step-desc { font-size: 11px; }
+      .custom-select-trigger { padding: 11px 12px; min-height: 44px; font-size: 13.5px; }
+      .answers-row { grid-template-columns: 1fr; }
+      .exercise-detail-title h3 { font-size: 17px; }
+      .question-detail { padding: 14px 16px; }
+      .timer { font-size: 18px; padding: 3px 10px; }
+    }
+
+    @media (max-width: 380px) {
+      .panel { padding: 14px; }
+      .btn { font-size: 13px; padding: 10px 14px; }
+      h1 { font-size: 26px; }
+      h2 { font-size: 21px; }
+      .metric strong { font-size: 24px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <a class="brand" href="index.html">ARVEX<span>A School</span></a>
+      <div class="connection" id="connectionState">Vérification...</div>
+    </header>
+
+    <!-- VUE 1 : CONFIGURATION -->
+    <section class="view active" id="configView" aria-labelledby="configTitle">
+      <div class="panel">
+        <div class="eyebrow">Mode examen</div>
+        <h1 id="configTitle">Prépare ton examen dans les conditions du BAC.</h1>
+        <p class="lead">
+          Choisis tes paramètres. Le serveur générera deux sujets de niveaux progressifs :
+          <strong style="color:var(--accent-bright)">Consolidation</strong> (facile à moyen) puis
+          <strong style="color:var(--accent-bright)">Approfondissement</strong> (moyen à difficile).
+        </p>
+
+        <div class="notebook-banner" id="notebookBanner">
+          <i class="fas fa-book-open"></i>
+          <div>
+            <strong id="notebookBannerTitle">📖 Basé sur ton cahier</strong>
+            <span id="notebookBannerSub">L'examen sera généré à partir de ce que tu as étudié.</span>
+          </div>
+        </div>
+
+        <form id="configForm" class="form-grid">
+          <div class="field">
+            <label>Matière</label>
+            <div class="custom-select" id="subjectSelect" data-name="subject">
+              <button type="button" class="custom-select-trigger" aria-haspopup="listbox" aria-expanded="false">
+                <span class="custom-select-value"></span>
+                <i class="fas fa-chevron-down custom-select-arrow"></i>
+              </button>
+              <div class="custom-select-options">
+                <div class="custom-select-option" data-value="mathematiques"><span class="option-prefix">📐</span> Mathématiques</div>
+                <div class="custom-select-option" data-value="physique"><span class="option-prefix">⚡</span> Physique</div>
+                <div class="custom-select-option" data-value="chimie"><span class="option-prefix">🧪</span> Chimie</div>
+                <div class="custom-select-option" data-value="svt"><span class="option-prefix">🧬</span> SVT</div>
+                <div class="custom-select-option" data-value="philosophie"><span class="option-prefix">🧠</span> Philosophie</div>
+                <div class="custom-select-option" data-value="histoire"><span class="option-prefix">🌍</span> Histoire</div>
+                <div class="custom-select-option" data-value="geographie"><span class="option-prefix">🗺️</span> Géographie</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Niveau</label>
+            <div class="custom-select" id="levelSelect" data-name="level">
+              <button type="button" class="custom-select-trigger" aria-haspopup="listbox" aria-expanded="false">
+                <span class="custom-select-value"></span>
+                <i class="fas fa-chevron-down custom-select-arrow"></i>
+              </button>
+              <div class="custom-select-options" role="listbox">
+                <div class="custom-select-option" data-value="Terminale D" role="option"><span class="option-prefix">🎓</span> Terminale D</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Chapitre</label>
+            <div class="custom-select" id="chapterSelect" data-name="chapter">
+              <button type="button" class="custom-select-trigger" aria-haspopup="listbox" aria-expanded="false">
+                <span class="custom-select-value"></span>
+                <i class="fas fa-chevron-down custom-select-arrow"></i>
+              </button>
+              <div class="custom-select-options" role="listbox" id="chapterOptions"></div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Difficulté</label>
+            <div class="custom-select" id="difficultySelect" data-name="difficulty">
+              <button type="button" class="custom-select-trigger" aria-haspopup="listbox" aria-expanded="false">
+                <span class="custom-select-value"></span>
+                <i class="fas fa-chevron-down custom-select-arrow"></i>
+              </button>
+              <div class="custom-select-options" role="listbox">
+                <div class="custom-select-option" data-value="easy" role="option"><span class="option-prefix">🟢</span> Facile</div>
+                <div class="custom-select-option" data-value="medium" role="option"><span class="option-prefix">🟡</span> Moyen</div>
+                <div class="custom-select-option" data-value="hard" role="option"><span class="option-prefix">🟠</span> Difficile</div>
+                <div class="custom-select-option" data-value="bac" role="option"><span class="option-prefix">🔴</span> Niveau BAC</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Durée</label>
+            <div class="custom-select" id="durationSelect" data-name="duration">
+              <button type="button" class="custom-select-trigger" aria-haspopup="listbox" aria-expanded="false">
+                <span class="custom-select-value"></span>
+                <i class="fas fa-chevron-down custom-select-arrow"></i>
+              </button>
+              <div class="custom-select-options" role="listbox">
+                <div class="custom-select-option" data-value="30" role="option"><span class="option-prefix">⏱️</span> 30 min</div>
+                <div class="custom-select-option" data-value="60" role="option"><span class="option-prefix">⏱️</span> 1 heure</div>
+                <div class="custom-select-option" data-value="90" role="option"><span class="option-prefix">⏱️</span> 1 h 30</div>
+                <div class="custom-select-option" data-value="120" role="option"><span class="option-prefix">⏱️</span> 2 heures</div>
+                <div class="custom-select-option" data-value="180" role="option"><span class="option-prefix">⏱️</span> 3 heures</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="exerciseCount">Nombre d'exercices</label>
+            <input id="exerciseCount" type="number" min="3" max="3" value="3" readonly required>
+            <small style="color:var(--text-muted);font-size:12px;">Chaque sujet contient 3 exercices × 5 questions.</small>
+          </div>
+
+          <div class="field full">
+            <button class="btn primary" id="generateButton" type="submit">
+              <span class="btn-text">Générer mon examen</span>
+              <span class="loader"></span>
+            </button>
+          </div>
+        </form>
+
+        <div class="status" id="configStatus" role="status" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <!-- VUE 2 : CHARGEMENT -->
+    <section class="view" id="loadingView" aria-labelledby="loadingTitle">
+      <div class="panel">
+        <div class="eyebrow">Génération en cours</div>
+        <h2 id="loadingTitle">L'IA prépare tes deux sujets...</h2>
+        <p class="lead">30 à 60 secondes. Chaque étape indique la progression exacte.</p>
+
+        <div class="loading-steps">
+          <div class="loader-spinner"></div>
+          <div class="steps-list">
+            <div class="loading-step" id="genStep1"><span class="step-icon">🔍</span><div class="step-content"><span class="step-label">Analyse de la configuration</span><span class="step-desc">Matière, chapitre, difficulté et durée</span></div></div>
+            <div class="loading-step" id="genStep2"><span class="step-icon">🎲</span><div class="step-content"><span class="step-label">Génération des sujets</span><span class="step-desc">2 sujets de niveaux progressifs</span></div></div>
+            <div class="loading-step" id="genStep3"><span class="step-icon">📝</span><div class="step-content"><span class="step-label">Rédaction des exercices</span><span class="step-desc">3 exercices × 5 questions par sujet</span></div></div>
+            <div class="loading-step" id="genStep4"><span class="step-icon">🧮</span><div class="step-content"><span class="step-label">Vérification</span><span class="step-desc">Contrôle cohérence et réponses</span></div></div>
+            <div class="loading-step" id="genStep5"><span class="step-icon">✨</span><div class="step-content"><span class="step-label">Finalisation</span><span class="step-desc">Préparation de l'affichage</span></div></div>
+          </div>
+          <div class="loading-status" id="genLoadingStatus">Préparation...</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VUE 3 : CHOIX DU SUJET -->
+    <section class="view" id="subjectsView" aria-labelledby="subjectsTitle">
+      <div class="panel">
+        <div class="eyebrow">Génération terminée</div>
+        <h2 id="subjectsTitle">Ton examen est prêt</h2>
+        <p class="lead">Choisis un seul sujet. L'autre reste disponible si tu veux recommencer.</p>
+        <div class="subject-grid" id="subjectsList"></div>
+        <div class="actions">
+          <button class="btn secondary" id="backConfigButton" type="button">Modifier la configuration</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- VUE 4 : EXAMEN -->
+    <section class="view" id="examView" aria-labelledby="examTitle">
+      <div class="exam-top">
+        <div class="exam-topline">
+          <div>
+            <div class="eyebrow">Examen en cours</div>
+            <h2 id="examTitle">Sujet</h2>
+          </div>
+          <div class="timer" id="timer" aria-live="polite">00:00:00</div>
+        </div>
+        <div class="progress" aria-label="Progression">
+          <span id="progressBar" style="width:0%"></span>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="exercise-head">
+          <div>
+            <h3 id="exerciseTitle">Exercice</h3>
+            <small id="exerciseCounter"></small>
+          </div>
+          <div class="points" id="exercisePoints"></div>
+        </div>
+
+        <p class="statement" id="exerciseStatement"></p>
+        <div id="questionsList"></div>
+
+        <div class="actions">
+          <button class="btn secondary" id="previousButton" type="button">Précédent</button>
+          <button class="btn primary" id="nextButton" type="button">Suivant</button>
+          <button class="btn danger" id="finishButton" type="button">Terminer</button>
+        </div>
+
+        <div class="status" id="examStatus" role="status" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <!-- VUE 5 : CHARGEMENT CORRECTION -->
+    <section class="view" id="loadingCorrectionView" aria-labelledby="loadingCorrTitle">
+      <div class="panel">
+        <div class="eyebrow">Correction en cours</div>
+        <h2 id="loadingCorrTitle">L'IA corrige ta copie...</h2>
+        <p class="lead">30 à 45 secondes par exercice. Les étapes s'affichent en temps réel.</p>
+
+        <div class="loading-steps">
+          <div class="loader-spinner"></div>
+          <div class="steps-list">
+            <div class="loading-step" id="corrStep1"><span class="step-icon">📥</span><div class="step-content"><span class="step-label">Réception des réponses</span><span class="step-desc">Envoi de ta copie au correcteur</span></div></div>
+            <div class="loading-step" id="corrStep2"><span class="step-icon">🔍</span><div class="step-content"><span class="step-label">Analyse des exercices</span><span class="step-desc">Vérification de chaque réponse</span></div></div>
+            <div class="loading-step" id="corrStep3"><span class="step-icon">🧠</span><div class="step-content"><span class="step-label">Évaluation pédagogique</span><span class="step-desc">Identification des erreurs et points forts</span></div></div>
+            <div class="loading-step" id="corrStep4"><span class="step-icon">📊</span><div class="step-content"><span class="step-label">Calcul du score</span><span class="step-desc">Attribution des points</span></div></div>
+            <div class="loading-step" id="corrStep5"><span class="step-icon">✅</span><div class="step-content"><span class="step-label">Finalisation</span><span class="step-desc">Préparation du bilan détaillé</span></div></div>
+          </div>
+          <div class="loading-status" id="corrLoadingStatus">Préparation...</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VUE 6 : RÉSULTATS -->
+    <section class="view" id="resultsView" aria-labelledby="resultsTitle">
+      <div class="panel">
+        <div class="eyebrow">Correction</div>
+        <h2 id="resultsTitle">Résultats de l'examen</h2>
+
+        <div class="result-summary">
+          <div class="metric">
+            <small>Note</small>
+            <strong id="resultScore">-- / 20</strong>
+          </div>
+          <div class="metric">
+            <small>Pourcentage</small>
+            <strong id="resultPercent">-- %</strong>
+          </div>
+        </div>
+
+        <div id="resultsDetails"></div>
+
+        <div class="actions">
+          <button class="btn primary" id="newExamButton" type="button">Nouvel examen</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODALES -->
+  <div class="modal-backdrop" id="confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+    <div class="modal">
+      <h3 id="confirmTitle">Terminer l'examen ?</h3>
+      <p>Voulez-vous vraiment terminer votre examen ? Vos réponses seront envoyées pour correction.</p>
+      <div class="actions">
+        <button class="btn secondary" id="cancelFinishButton" type="button">Continuer</button>
+        <button class="btn danger" id="confirmFinishButton" type="button">Terminer</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="resumeModal" role="dialog" aria-modal="true" aria-labelledby="resumeTitle">
+    <div class="modal">
+      <div class="resume-modal-content">
+        <h3 id="resumeTitle">📝 Examen en cours détecté</h3>
+        <p>Tu as un examen commencé mais non terminé. Veux-tu le reprendre là où tu en étais ?</p>
+        <div class="resume-meta" id="resumeMeta"></div>
+        <div class="actions">
+          <button class="btn secondary" id="resumeNewBtn" type="button">Nouvel examen</button>
+          <button class="btn primary" id="resumeContinueBtn" type="button">Reprendre</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="premium-popup-overlay" id="premiumPopup" role="dialog" aria-modal="true" aria-labelledby="premiumTitle">
+    <div class="premium-popup">
+      <button class="popup-close" id="popupCloseBtn" type="button" aria-label="Fermer"><i class="fas fa-times"></i></button>
+      <span class="popup-icon">👑</span>
+      <h2 id="premiumTitle">Accès <span>Premium</span></h2>
+      <p class="popup-subtitle">
+        Tu as utilisé tes <strong>2 générations gratuites</strong>. Débloque les examens complets et génère sans limite.
+      </p>
+      <div class="popup-features">
+        <div class="feature"><i class="fas fa-file-circle-check"></i> Examens complets</div>
+        <div class="feature"><i class="fas fa-check-double"></i> Corrections détaillées</div>
+        <div class="feature"><i class="fas fa-infinity"></i> Générations illimitées</div>
+        <div class="feature"><i class="fas fa-gear"></i> Outils avancés</div>
+      </div>
+      <div class="popup-buttons">
+        <a href="abonnement.html" class="btn-subscribe"><i class="fas fa-crown"></i> S'abonner maintenant</a>
+        <button class="btn-later" id="popupLaterBtn" type="button">Fermer</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "firebase/app": "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
+      "firebase/auth": "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js",
+      "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js"
+    }
   }
-  adminServices = {
-    auth: admin.auth(),
-    db: admin.firestore(),
-    FieldValue: admin.firestore.FieldValue
+  </script>
+
+  <script type="module">
+  // ═══════════════════════════════════════════════════════════════
+  // EXAM — Mode examen BAC (3 exercices × 5 questions)
+  // ⚡ v3.2 — Clés minuscules harmonisées avec l'API
+  // ═══════════════════════════════════════════════════════════════
+
+  import { initializeApp } from 'firebase/app';
+  import { getAuth, onAuthStateChanged, getIdToken } from 'firebase/auth';
+  import {
+    getFirestore,
+    doc, getDoc, setDoc, deleteDoc,
+    serverTimestamp
+  } from 'firebase/firestore';
+
+  const firebaseConfig = {
+    apiKey: 'AIzaSyDHscOXw3rLuhV6z1Cny-bdYCumqpnG7QE',
+    authDomain: 'arvexa-fbf10.firebaseapp.com',
+    projectId: 'arvexa-fbf10',
+    storageBucket: 'arvexa-fbf10.firebasestorage.app',
+    messagingSenderId: '920108330053',
+    appId: '1:920108330053:web:f532d71cbc2c824bc7472c'
   };
-  return adminServices;
-}
 
-function clientIp(request) {
-  return String(request.headers['x-forwarded-for'] || request.socket?.remoteAddress || 'unknown')
-    .split(',')[0].trim();
-}
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
 
-function rateLimited(ip) {
-  const now = Date.now();
-  const recent = (requestLog.get(ip) || []).filter((t) => now - t < WINDOW_MS);
-  recent.push(now);
-  requestLog.set(ip, recent);
-  return recent.length > MAX_REQUESTS_PER_WINDOW;
-}
-
-function jsonError(response, status, error, code) {
-  return response.status(status).json({ success: false, error, ...(code ? { code } : {}) });
-}
-
-function applyCors(request, response) {
-  const ALLOWED_ORIGINS = [
-    'https://arvexaschool.vercel.app',
-    'https://admin-89.vercel.app',
-    'http://localhost:3000',
-    'http://localhost:5000'
-  ];
-  const origin = request.headers.origin || '';
-  if (ALLOWED_ORIGINS.includes(origin)) {
-    response.setHeader('Access-Control-Allow-Origin', origin);
-  }
-  response.setHeader('Vary', 'Origin');
-  response.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  response.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  response.setHeader('Access-Control-Max-Age', '86400');
-}
-
-async function verifyFirebaseToken(request) {
-  const authorization = request.headers.authorization || '';
-  const match = authorization.match(/^Bearer\s+(.+)$/i);
-  if (!match) return null;
-  try {
-    const { auth } = getAdminServices();
-    return await auth.verifyIdToken(match[1]);
-  } catch (error) {
-    console.error('[EXAM AUTH] failed:', error.message);
-    return null;
-  }
-}
-
-function isPremiumUser(data) {
-  if (!data) return false;
-  const status = data.subscriptionStatus || 'none';
-  if (status === 'pending') return false;
-  const hasPremium = data.premium === true || data.isUnlocked === true || data.hasDeposited === true;
-  const end = data.subscriptionEndDate?.toDate?.() ||
-    (data.subscriptionEndDate?.seconds ? new Date(data.subscriptionEndDate.seconds * 1000) : null);
-  if (hasPremium && end) return end.getTime() > Date.now();
-  if (status === 'expired') return false;
-  if (hasPremium && !end) return true;
-  return false;
-}
-
-// ⚡ Mapping subject → notebook key (clés minuscules partout)
-function examSubjectToNotebookKey(examSubject) {
-  const map = {
-    'mathematiques': 'mathematiques',
-    'physique': 'physique',
-    'chimie': 'chimie',
-    'svt': 'svt',
-    'francais': 'francais',
-    'philosophie': 'philosophie',
-    'histoire': 'histoire',
-    'geographie': 'geographie',
-    'histoire-geo': 'histoire-geo',
-    'anglais': 'anglais'
+  const EXAM_CONSTANTS = {
+    REQUIRED_EXERCISES: 3,
+    QUESTIONS_PER_EXERCISE: 5,
+    DEFAULT_DURATION_MIN: 60,
+    TIMER_WARNING_SEC: 300,
+    SESSION_TTL_HOURS: 24
   };
-  return map[examSubject] || null;
-}
 
-// ⚡ Normalisation des clés de matière
-function normalizeSubjectKey(raw) {
-  if (!raw) return null;
-  const s = String(raw).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-    .replace(/\s+/g, '_').replace(/[^a-z_]/g, '');
-  const map = {
-    mathematiques: 'mathematiques', maths: 'mathematiques', math: 'mathematiques',
-    physique: 'physique', physiques: 'physique',
-    chimie: 'chimie', svt: 'svt', francais: 'francais', anglais: 'anglais',
-    philosophie: 'philosophie', philo: 'philosophie',
-    histoire: 'histoire',
-    geographie: 'geographie', geo: 'geographie',
-    histoire_geo: 'histoire_geo', histoiregeo: 'histoire_geo'
-  };
-  return map[s] || s;
-}
-
-function normalizeText(str) {
-  return String(str || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9]/g, '');
-}
-
-function findChapterFuzzy(chapters, targetTitle) {
-  if (!Array.isArray(chapters) || !targetTitle) return null;
-  const target = normalizeText(targetTitle);
-  if (!target) return null;
-  for (const c of chapters) {
-    if (normalizeText(c.title) === target) return c;
-  }
-  if (target.length > 3) {
-    for (const c of chapters) {
-      const t = normalizeText(c.title);
-      if (t.length > 3 && (t.includes(target) || target.includes(t))) return c;
-    }
-  }
-  return null;
-}
-
-async function loadNotebookContext(uid, subject, chapterId, chapterTitle) {
-  const { db } = getAdminServices();
-  const notebookKey = examSubjectToNotebookKey(subject);
-  if (!notebookKey) return null;
-
-  let actualChapterId = chapterId;
-  let chapterData = null;
-
-  if (chapterId) {
-    const chapterRef = db.collection('users').doc(uid)
-      .collection('notebooks').doc(notebookKey)
-      .collection('chapters').doc(chapterId);
-    const snap = await chapterRef.get();
-    if (snap.exists) chapterData = { id: chapterId, ...snap.data() };
-  }
-
-  if (!chapterData && chapterTitle) {
-    const chaptersSnap = await db.collection('users').doc(uid)
-      .collection('notebooks').doc(notebookKey)
-      .collection('chapters').get().catch(() => ({ docs: [] }));
-    const allChapters = chaptersSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
-    const found = findChapterFuzzy(allChapters, chapterTitle);
-    if (found) { chapterData = found; actualChapterId = found.id; }
-  }
-
-  if (!chapterData) return null;
-
-  const sectionsSnap = await db.collection('users').doc(uid)
-    .collection('notebooks').doc(notebookKey)
-    .collection('chapters').doc(actualChapterId)
-    .collection('sections').orderBy('createdAt', 'asc').get();
-
-  if (sectionsSnap.docs.length === 0) return null;
-
-  const allSections = sectionsSnap.docs.map((d) => {
-    const s = d.data();
-    return { id: d.id, title: s.title || 'Section', rawInput: s.rawInput || '', analysis: s.analysis || {} };
-  });
-
-  const sections = allSections.slice(0, 5);
-
-  const contentText = sections.map((s, i) => {
-    let text = `━━━ SECTION ${i + 1} : ${s.title} ━━━\n`;
-    text += `Contenu source :\n${s.rawInput.slice(0, 1500)}\n\n`;
-    const a = s.analysis || {};
-    if (a.explanation?.understanding) text += `À comprendre : ${a.explanation.understanding}\n`;
-    if (Array.isArray(a.explanation?.parts)) {
-      a.explanation.parts.slice(0, 5).forEach((p) => {
-        text += `\n• ${p.partTitle || 'Partie'} :\n`;
-        if (p.mainIdea) text += `  Idée : ${p.mainIdea}\n`;
-        if (p.simpleExplanation) text += `  Explication : ${p.simpleExplanation}\n`;
-        if (p.toRemember) text += `  À retenir : ${p.toRemember}\n`;
-      });
-    }
-    if (Array.isArray(a.questions)) {
-      text += `\nQuestions déjà posées :\n`;
-      a.questions.slice(0, 8).forEach((q, j) => { text += `  Q${j + 1} : ${q.question}\n`; });
-    }
-    if (a.structure) {
-      const st = a.structure;
-      if (Array.isArray(st.formulas) && st.formulas.length > 0) {
-        text += `\nFormules clés :\n`;
-        st.formulas.slice(0, 8).forEach((f) => { text += `  - ${f.latex || ''}\n`; });
-      }
-      if (Array.isArray(st.definitions) && st.definitions.length > 0) {
-        text += `\nDéfinitions :\n`;
-        st.definitions.slice(0, 10).forEach((d) => { text += `  - ${d.term} : ${d.definition}\n`; });
-      }
-      if (Array.isArray(st.mechanisms) && st.mechanisms.length > 0) {
-        text += `\nMécanismes :\n`;
-        st.mechanisms.slice(0, 5).forEach((m) => {
-          text += `  - ${m.name || ''}\n`;
-          if (Array.isArray(m.steps)) m.steps.slice(0, 6).forEach((step, si) => { text += `    ${si + 1}. ${step}\n`; });
-        });
-      }
-      if (Array.isArray(st.timeline) && st.timeline.length > 0) {
-        text += `\nChronologie :\n`;
-        st.timeline.slice(0, 10).forEach((t) => { text += `  - ${t.date} : ${t.event}\n`; });
-      }
-    }
-    return text;
-  }).join('\n\n');
-
-  return {
-    notebookKey,
-    chapterId: actualChapterId,
-    chapterTitle: chapterData.title || chapterTitle || 'Chapitre',
-    sectionsCount: sections.length,
-    contentText
-  };
-}
-
-// ═══════════════════════════════════════════════════════════════
-// PROVIDERS — Cascade 100% gratuite (Groq + OpenRouter :free)
-// ═══════════════════════════════════════════════════════════════
-function getProviders() {
-  const providers = [];
-
-  if (process.env.GROQ_API_KEY) {
-    providers.push(
-      {
-        name: 'Groq/gpt-oss-120b',
-        key: process.env.GROQ_API_KEY,
-        endpoint: 'https://api.groq.com/openai/v1/chat/completions',
-        model: 'openai/gpt-oss-120b',
-        jsonMode: true,
-        headers: {}
-      },
-      {
-        name: 'Groq/llama-3.3-70b',
-        key: process.env.GROQ_API_KEY,
-        endpoint: 'https://api.groq.com/openai/v1/chat/completions',
-        model: 'llama-3.3-70b-versatile',
-        jsonMode: true,
-        headers: {}
-      },
-      {
-        name: 'Groq/gpt-oss-20b',
-        key: process.env.GROQ_API_KEY,
-        endpoint: 'https://api.groq.com/openai/v1/chat/completions',
-        model: 'openai/gpt-oss-20b',
-        jsonMode: true,
-        headers: {}
-      },
-      {
-        name: 'Groq/llama-3.1-8b',
-        key: process.env.GROQ_API_KEY,
-        endpoint: 'https://api.groq.com/openai/v1/chat/completions',
-        model: 'llama-3.1-8b-instant',
-        jsonMode: true,
-        headers: {}
-      }
-    );
-  }
-
-  if (process.env.OPENROUTER_API_KEY) {
-    const orHeaders = {
-      'HTTP-Referer': process.env.APP_ORIGIN || '',
-      'X-Title': 'ARVEXA Exam'
-    };
-    providers.push(
-      {
-        name: 'OpenRouter/inkling:free',
-        key: process.env.OPENROUTER_API_KEY,
-        endpoint: 'https://openrouter.ai/api/v1/chat/completions',
-        model: 'thinkingmachines/inkling:free',
-        jsonMode: true,
-        headers: orHeaders
-      },
-      {
-        name: 'OpenRouter/dots3:free',
-        key: process.env.OPENROUTER_API_KEY,
-        endpoint: 'https://openrouter.ai/api/v1/chat/completions',
-        model: 'dots-studio/dots3-note-preview:free',
-        jsonMode: true,
-        headers: orHeaders
-      },
-      {
-        name: 'OpenRouter/inkling-small:free',
-        key: process.env.OPENROUTER_API_KEY,
-        endpoint: 'https://openrouter.ai/api/v1/chat/completions',
-        model: 'thinkingmachines/inkling-small:free',
-        jsonMode: true,
-        headers: orHeaders
-      }
-    );
-  }
-
-  return providers;
-}
-
-async function callProvider(provider, prompt, maxTokens = 12000) {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 45000);
-  try {
-    console.log(`[AI] ${provider.name} | prompt: ${prompt.length} car | max_tokens: ${maxTokens}`);
-
-    const body = {
-      model: provider.model,
-      temperature: 0.15,
-      max_tokens: maxTokens,
-      messages: [
-        { role: 'system', content: 'Tu produis exclusivement du JSON valide. Tu respectes scrupuleusement le schéma demandé.' },
-        { role: 'user', content: prompt }
-      ]
-    };
-    if (provider.jsonMode) body.response_format = { type: 'json_object' };
-
-    const result = await fetch(provider.endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${provider.key}`, ...provider.headers },
-      body: JSON.stringify(body),
-      signal: controller.signal
-    });
-
-    const data = await result.json().catch(() => null);
-
-    if (!result.ok) {
-      const msg = data?.error?.message || data?.message || `HTTP ${result.status}`;
-      throw new Error(`${provider.name}: ${msg}`);
-    }
-
-    const content = data?.choices?.[0]?.message?.content;
-    if (!content) {
-      throw new Error(`${provider.name}: réponse vide (usage: ${JSON.stringify(data?.usage || {})})`);
-    }
-
-    console.log(`[AI] ${provider.name} — réponse: ${content.length} car`);
-
-    const cleaned = String(content).replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
-
-    let parsed;
-    try {
-      parsed = JSON.parse(cleaned);
-    } catch (parseError) {
-      console.warn(`[AI] ${provider.name} — JSON invalide. Début: ${cleaned.slice(0, 200)}`);
-      throw new Error(`${provider.name}: JSON invalide`);
-    }
-
-    return parsed;
-  } finally {
-    clearTimeout(timeout);
-  }
-}
-
-function getUsageDate() { return new Date().toISOString().slice(0, 10); }
-
-async function reserveFreeGeneration(uid) {
-  const { db, FieldValue } = getAdminServices();
-  const userRef = db.collection('users').doc(uid);
-  const usageDate = getUsageDate();
-  const usageRef = userRef.collection('examUsage').doc(usageDate);
-
-  return db.runTransaction(async (transaction) => {
-    const userSnapshot = await transaction.get(userRef);
-    const usageSnapshot = await transaction.get(usageRef);
-    if (!userSnapshot.exists) throw new Error('profile_missing');
-    if (isPremiumUser(userSnapshot.data())) return { premium: true, reserved: false };
-    const used = Number(usageSnapshot.data()?.count || 0);
-    if (used >= FREE_EXAM_LIMIT) return { premium: false, reserved: false, limitReached: true, used };
-    transaction.set(usageRef, { count: used + 1, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
-    return { premium: false, reserved: true, usageDate, used: used + 1 };
-  });
-}
-
-async function releaseFreeGeneration(uid, usageDate) {
-  if (!usageDate) return;
-  const { db, FieldValue } = getAdminServices();
-  const usageRef = db.collection('users').doc(uid).collection('examUsage').doc(usageDate);
-  try {
-    await db.runTransaction(async (transaction) => {
-      const snapshot = await transaction.get(usageRef);
-      const used = Math.max(0, Number(snapshot.data()?.count || 0) - 1);
-      transaction.set(usageRef, { count: used, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
-    });
-  } catch (_) {}
-}
-
-async function saveExamResult(uid, body, result) {
-  const { db, FieldValue } = getAdminServices();
-  const selected = body.exam.subjects.find((s) => s.id === body.subjectId) || body.exam.subjects[0];
-  const difficulties = Array.isArray(result?.exercises) ? result.exercises.map((ex) => ({
-    number: ex.number,
-    score: Number(ex.score || 0),
-    maxScore: Number(ex.maxScore || 6.67),
-    advice: String(ex.advice || '').slice(0, 500)
-  })) : [];
-
-  await db.collection('users').doc(uid).collection('examResults').add({
-    subject: SUBJECT_LABELS[body.exam.subject] || body.exam.subject,
-    subjectKey: normalizeSubjectKey(body.exam.subject),
-    subjectId: body.subjectId,
-    chapter: body.exam.chapter || 'all',
-    chapterTitle: selected?.title || 'Examen',
-    score: Number(result?.score ?? result?.totalScore ?? 0),
-    totalScore: 20,
-    percentage: Number(result?.percentage ?? Math.round((Number(result?.score ?? 0) / 20) * 100)),
-    grade: result?.grade || null,
-    result: { ...result, exercises: difficulties },
-    difficulties,
-    answerCount: Object.values(body.answers || {}).filter(Boolean).length,
-    examTitle: selected?.title || 'Examen',
-    fromNotebook: Boolean(body.notebookContext),
-    notebookChapterId: body.notebookContext?.chapterId || null,
-    createdAt: FieldValue.serverTimestamp(),
-    date: FieldValue.serverTimestamp()
-  });
-}
-
-function validateConfig(body) {
-  const config = {
-    subject: String(body.subject || ''),
-    level: String(body.level || ''),
-    chapter: String(body.chapter || 'all'),
-    difficulty: String(body.difficulty || ''),
-    duration: Number(body.duration),
-    exerciseCount: Number(body.exerciseCount)
-  };
-  if (!ALLOWED_SUBJECTS.has(config.subject)) return 'Matière invalide.';
-  if (config.level !== 'Terminale D') return 'Niveau invalide.';
-  if (!ALLOWED_DIFFICULTIES.has(config.difficulty)) return 'Difficulté invalide.';
-  if (!ALLOWED_DURATIONS.has(config.duration)) return 'Durée invalide.';
-  if (config.exerciseCount !== REQUIRED_EXERCISES) return `Chaque sujet doit contenir ${REQUIRED_EXERCISES} exercices.`;
-  if (config.chapter.length > 100) return 'Chapitre invalide.';
-  return null;
-}
-
-function validateCorrection(body) {
-  if (!body.exam || !Array.isArray(body.exam.subjects) || !body.subjectId || !body.answers || typeof body.answers !== 'object') return 'Données de correction invalides.';
-  if (JSON.stringify(body).length > 250000) return 'Examen trop volumineux.';
-  return null;
-}
-
-const STRUCTURE_CONTROL = `
-═══════════════════════════════════════════════════════════════
-CONTRÔLE STRUCTUREL OBLIGATOIRE — AVANT DE RÉPONDRE
-═══════════════════════════════════════════════════════════════
-Vérifie que ton JSON contient EXACTEMENT :
-
-1. "subjects" : un tableau de 2 objets
-2. Chaque objet "subject" contient :
-   - "id" : "subject_1" ou "subject_2"
-   - "title" : "Sujet 1 — Consolidation" ou "Sujet 2 — Approfondissement"
-   - "level" : "consolidation" ou "approfondissement"
-   - "instructions" : "..."
-   - "exercises" : un tableau de EXACTEMENT ${REQUIRED_EXERCISES} objets
-
-3. Chaque "exercise" contient :
-   - "number" : 1, 2 ou 3
-   - "title" : "..."
-   - "points" : 6.67
-   - "statement" : "..."
-   - "questions" : un tableau de EXACTEMENT ${QUESTIONS_PER_EXERCISE} objets
-
-4. Chaque "question" contient :
-   - "number" : "1.a", "1.b", etc.
-   - "text" : "..."
-   - "points" : 1.33
-   - "type" : "choice" OU "text"
-   - SI "type"="choice" : "options" (4 objets avec "id" et "text") + "correctAnswer" (A, B, C ou D)
-   - SI "type"="text" : PAS de "options" et PAS de "correctAnswer"
-
-⚠️ COMPTE MENTALEMENT AVANT DE RÉPONDRE :
-- Combien d'exercices par sujet ? (doit être ${REQUIRED_EXERCISES})
-- Combien de questions dans chaque exercice ? (doit être ${QUESTIONS_PER_EXERCISE})
-- Total = ${REQUIRED_EXERCISES} × ${QUESTIONS_PER_EXERCISE} = ${REQUIRED_EXERCISES * QUESTIONS_PER_EXERCISE} questions par sujet
-
-Réponds UNIQUEMENT avec le JSON complet et valide.`;
-
-function generationPromptFromNotebook(config, notebookContext) {
-  const subjectLabel = SUBJECT_LABELS[config.subject] || config.subject;
-  const usesChoices = CHOICE_SUBJECTS.has(config.subject);
-  const questionFormat = usesChoices
-    ? 'Pour les questions de calcul, utilise type "choice" avec exactement quatre propositions : options=[{"id":"A","text":"..."},{"id":"B","text":"..."},{"id":"C","text":"..."},{"id":"D","text":"..."}] et correctAnswer parmi A, B, C ou D. Pour les questions de raisonnement, utilise type "text".'
-    : 'Pour chaque question, utilise le type "text" sauf si c\'est un QCM explicite.';
-
-  return `Tu es un professeur expert du BAC au Niger, spécialiste de ${subjectLabel}.
-
-L'élève a étudié un chapitre précis dans son cahier. Tu dois générer DEUX sujets d'examen basés STRICTEMENT sur ce contenu.
-
-═══════════════════════════════════════════════════════════════
-CONTENU DU CHAPITRE ÉTUDIÉ PAR L'ÉLÈVE
-═══════════════════════════════════════════════════════════════
-Chapitre : ${notebookContext.chapterTitle}
-Matière : ${subjectLabel}
-Nombre de sections étudiées : ${notebookContext.sectionsCount}
-
-${notebookContext.contentText}
-
-═══════════════════════════════════════════════════════════════
-RÈGLE ABSOLUE DE PÉRIMÈTRE
-═══════════════════════════════════════════════════════════════
-1. Tu génères l'examen UNIQUEMENT à partir du contenu ci-dessus.
-2. INTERDICTION d'inventer ou d'ajouter des connaissances externes.
-3. Toutes les questions doivent porter sur des éléments RÉELLEMENT présents.
-
-═══════════════════════════════════════════════════════════════
-STRUCTURE DES DEUX SUJETS
-═══════════════════════════════════════════════════════════════
-
-SUJET 1 — "Consolidation" (facile à moyen) : notions de base, questions directes.
-SUJET 2 — "Approfondissement" (moyen à difficile) : angles plus exigeants.
-
-RÈGLES LATEX :
-- Formules entre $...$ ou $$...$$
-- JAMAIS de symboles Unicode bruts (π, √, ², ≤, ∞, →)
-
-${questionFormat}
-
-FORMAT JSON ATTENDU :
-{
-  "subject": "${config.subject}",
-  "level": "${config.level}",
-  "duration": ${config.duration},
-  "totalPoints": 20,
-  "chapter": "${config.chapter}",
-  "fromNotebook": true,
-  "subjects": [
-    {
-      "id": "subject_1",
-      "title": "Sujet 1 — Consolidation",
-      "instructions": "...",
-      "level": "consolidation",
-      "exercises": [
-        {
-          "number": 1,
-          "title": "...",
-          "points": 6.67,
-          "statement": "...",
-          "questions": [
-            {
-              "number": "1.a",
-              "text": "...",
-              "points": 1.33,
-              "type": "choice",
-              "options": [{"id":"A","text":"..."},{"id":"B","text":"..."},{"id":"C","text":"..."},{"id":"D","text":"..."}],
-              "correctAnswer": "A"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "subject_2",
-      "title": "Sujet 2 — Approfondissement",
-      "instructions": "...",
-      "level": "approfondissement",
-      "exercises": []
-    }
-  ]
-}
-
-${STRUCTURE_CONTROL}`;
-}
-
-function generationPrompt(config) {
-  const subjectLabel = SUBJECT_LABELS[config.subject] || config.subject;
-  const usesChoices = CHOICE_SUBJECTS.has(config.subject);
-  const questionFormat = usesChoices
-    ? 'Pour les questions de calcul, utilise type "choice" avec exactement quatre propositions et correctAnswer parmi A, B, C ou D. Pour les questions de raisonnement, utilise type "text".'
-    : 'Pour chaque question, utilise le type "text" sauf si c\'est un QCM explicite.';
-
-  return `Tu es un professeur expert du BAC au Niger, spécialiste de ${subjectLabel}.
-
-MISSION : Génère DEUX sujets d'examen de niveau Terminale D.
-
-Matière : ${subjectLabel}
-Niveau : ${config.level}
-Chapitre : ${config.chapter === 'all' ? 'tous les chapitres du programme' : config.chapter}
-Difficulté : ${config.difficulty}
-Durée : ${config.duration} minutes
-
-SUJET 1 — "Consolidation" (facile à moyen) : notions fondamentales.
-SUJET 2 — "Approfondissement" (moyen à difficile) : angles plus exigeants.
-
-RÈGLES LATEX :
-- Formules entre $...$ ou $$...$$
-- JAMAIS de symboles Unicode bruts
-
-${questionFormat}
-
-FORMAT JSON ATTENDU :
-{
-  "subject": "${config.subject}",
-  "level": "${config.level}",
-  "duration": ${config.duration},
-  "totalPoints": 20,
-  "chapter": "${config.chapter}",
-  "fromNotebook": false,
-  "subjects": [
-    {
-      "id": "subject_1",
-      "title": "Sujet 1 — Consolidation",
-      "instructions": "...",
-      "level": "consolidation",
-      "exercises": [
-        { "number": 1, "title": "...", "points": 6.67, "statement": "...", "questions": [ { "number": "1.a", "text": "...", "points": 1.33, "type": "text" } ] }
-      ]
-    },
-    {
-      "id": "subject_2",
-      "title": "Sujet 2 — Approfondissement",
-      "instructions": "...",
-      "level": "approfondissement",
-      "exercises": []
-    }
-  ]
-}
-
-${STRUCTURE_CONTROL}`;
-}
-
-function correctionPrompt(body) {
-  const subject = body.exam.subjects.find((s) => s.id === body.subjectId);
-  if (!subject) throw new Error('subject_not_found');
-
-  const questionsDetail = [];
-  subject.exercises.forEach((exercise, exIdx) => {
-    exercise.questions.forEach((question, qIdx) => {
-      const key = `${body.subjectId}:${exIdx}:${qIdx}`;
-      const studentAnswer = body.answers[key] || null;
-      questionsDetail.push({
-        exerciseNumber: exercise.number || exIdx + 1,
-        questionNumber: question.number || `${exIdx + 1}.${qIdx + 1}`,
-        questionText: question.text,
-        type: question.type || 'text',
-        points: Number(question.points) || 1.33,
-        correctAnswer: question.correctAnswer || null,
-        studentAnswer,
-        answered: studentAnswer !== null && studentAnswer !== ''
-      });
-    });
-  });
-
-  return `Tu es un professeur correcteur expert du BAC au Niger.
-
-MISSION : Corrige chaque question et attribue les points.
-
-RÈGLES :
-- QCM : réponse exacte = tous les points, sinon 0
-- Texte libre : évalue le fond, la méthode, la rigueur
-- Réponse vide : 0 point
-
-DONNÉES :
-${JSON.stringify(questionsDetail, null, 2)}
-
-FORMAT JSON :
-{
-  "score": 0,
-  "totalScore": 20,
-  "percentage": 0,
-  "grade": "Insuffisant",
-  "exercises": [
-    {
-      "number": 1,
-      "title": "...",
-      "score": 5.0,
-      "maxScore": 6.67,
-      "correctAnswers": 3,
-      "totalQuestions": 5,
-      "questions": [
-        {
-          "number": "1.1",
-          "questionText": "...",
-          "type": "choice",
-          "studentAnswer": "B",
-          "correctAnswer": "A",
-          "points": 1.33,
-          "maxPoints": 1.33,
-          "status": "correct",
-          "feedback": "🎉 Bravo !",
-          "betterMethod": "...",
-          "toReview": null
-        }
-      ],
-      "explanation": "...",
-      "advice": "..."
-    }
-  ],
-  "revisionTopics": ["..."],
-  "globalFeedback": {
-    "strengths": ["..."],
-    "weaknesses": ["..."],
-    "encouragement": "..."
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════
-// POST-TRAITEMENT RÉPARATEUR
-// Répare un JSON presque correct au lieu de le rejeter
-// ═══════════════════════════════════════════════════════════════
-function repairExamStructure(exam, subjectName) {
-  if (!exam || typeof exam !== 'object') return null;
-
-  const supportsChoices = CHOICE_SUBJECTS.has(subjectName);
-
-  // ⚡ Si subjects manquant → on essaie d'autres clés
-  if (!Array.isArray(exam.subjects)) {
-    if (Array.isArray(exam.exams)) exam.subjects = exam.exams;
-    else if (Array.isArray(exam.sujets)) exam.subjects = exam.sujets;
-    else return null;
-  }
-
-  if (exam.subjects.length === 0) return null;
-
-  if (exam.subjects.length === 1) {
-    const first = exam.subjects[0];
-    exam.subjects.push({
-      ...JSON.parse(JSON.stringify(first)),
-      id: 'subject_2',
-      title: (first.title || 'Sujet 1').replace('Consolidation', 'Approfondissement'),
-      level: 'approfondissement',
-      instructions: 'Ce sujet approfondit votre maîtrise.'
-    });
-  }
-
-  exam.subjects = exam.subjects.slice(0, 2);
-
-  exam.subjects.forEach((subject, sIdx) => {
-    if (!subject.id) subject.id = `subject_${sIdx + 1}`;
-    if (!subject.title) subject.title = `Sujet ${sIdx + 1}`;
-    if (!subject.level) subject.level = sIdx === 0 ? 'consolidation' : 'approfondissement';
-    if (!subject.instructions) subject.instructions = 'Traitez le sujet dans le temps imparti.';
-
-    if (!Array.isArray(subject.exercises)) {
-      if (Array.isArray(subject.exos)) subject.exercises = subject.exos;
-      else if (Array.isArray(subject.problems)) subject.exercises = subject.problems;
-      else subject.exercises = [];
-    }
-
-    while (subject.exercises.length < REQUIRED_EXERCISES) {
-      const num = subject.exercises.length + 1;
-      subject.exercises.push({
-        number: num,
-        title: `Exercice ${num}`,
-        points: 6.67,
-        statement: `Traitez l'exercice ${num} en détaillant votre raisonnement.`,
-        questions: []
-      });
-    }
-
-    subject.exercises = subject.exercises.slice(0, REQUIRED_EXERCISES);
-
-    subject.exercises.forEach((exercise, eIdx) => {
-      if (!exercise.number) exercise.number = eIdx + 1;
-      if (!exercise.title) exercise.title = `Exercice ${eIdx + 1}`;
-      if (!exercise.points) exercise.points = 6.67;
-      if (!exercise.statement) exercise.statement = 'Traitez cet exercice.';
-
-      if (!Array.isArray(exercise.questions)) {
-        if (Array.isArray(exercise.items)) exercise.questions = exercise.items;
-        else exercise.questions = [];
-      }
-
-      while (exercise.questions.length < QUESTIONS_PER_EXERCISE) {
-        const qNum = exercise.questions.length + 1;
-        exercise.questions.push({
-          number: `${eIdx + 1}.${String.fromCharCode(96 + qNum)}`,
-          text: `Question ${qNum} de l'exercice ${eIdx + 1}.`,
-          points: 1.33,
-          type: 'text'
-        });
-      }
-
-      exercise.questions = exercise.questions.slice(0, QUESTIONS_PER_EXERCISE);
-
-      exercise.questions.forEach((question, qIdx) => {
-        if (!question.number) question.number = `${eIdx + 1}.${String.fromCharCode(97 + qIdx)}`;
-        if (!question.text) question.text = question.question || 'Question';
-        if (!question.points) question.points = 1.33;
-
-        if (!question.type) {
-          question.type = (Array.isArray(question.options) && question.options.length === 4) ? 'choice' : 'text';
-        }
-
-        if (question.type === 'choice') {
-          if (!Array.isArray(question.options) || question.options.length !== 4) {
-            question.type = 'text';
-            delete question.options;
-            delete question.correctAnswer;
-          } else {
-            question.options = question.options.map((opt, oi) => {
-              if (typeof opt === 'string') return { id: String.fromCharCode(65 + oi), text: opt };
-              return { id: opt.id || String.fromCharCode(65 + oi), text: opt.text || opt.label || String(opt) };
-            });
-            if (!question.correctAnswer) question.correctAnswer = 'A';
-            if (typeof question.correctAnswer === 'number') {
-              question.correctAnswer = String.fromCharCode(65 + question.correctAnswer);
-            }
-            question.correctAnswer = String(question.correctAnswer).toUpperCase().slice(0, 1);
-            if (!['A', 'B', 'C', 'D'].includes(question.correctAnswer)) question.correctAnswer = 'A';
-          }
-        } else {
-          delete question.options;
-          delete question.correctAnswer;
-        }
-
-        // ⚡ Matières non-scientifiques → conversion en text
-        if (!supportsChoices && question.type === 'choice') {
-          question.type = 'text';
-          delete question.options;
-          delete question.correctAnswer;
-        }
-      });
-    });
-  });
-
-  return exam;
-}
-
-function validateGeneratedExam(exam, subjectName) {
-  const supportsChoices = CHOICE_SUBJECTS.has(subjectName);
-  const validQuestion = (question) => {
-    if (!supportsChoices || question.type !== 'choice') {
-      return ['text', 'number', 'formula', 'choice'].includes(question.type);
-    }
-    return Array.isArray(question.options) && question.options.length === 4
-      && question.options.every((option) => option?.id && option?.text)
-      && ['A', 'B', 'C', 'D'].includes(question.correctAnswer);
-  };
-  return exam && typeof exam === 'object' && Array.isArray(exam.subjects) && exam.subjects.length === 2
-    && exam.subjects.every((subject) =>
-      Array.isArray(subject.exercises) && subject.exercises.length === REQUIRED_EXERCISES
-      && subject.exercises.every((exercise) =>
-        Array.isArray(exercise.questions) && exercise.questions.length === QUESTIONS_PER_EXERCISE
-        && exercise.questions.every(validQuestion)
-      )
-    );
-}
-
-async function generateWithFallback(prompt, subjectName) {
-  const providers = getProviders();
-  if (!providers.length) throw new Error('provider_missing');
-
-  const errors = [];
-  for (const provider of providers) {
-    try {
-      console.log(`[AI] Tentative ${provider.name}...`);
-      const rawExam = await callProvider(provider, prompt);
-
-      if (validateGeneratedExam(rawExam, subjectName)) {
-        console.log(`[AI] ✅ ${provider.name} — structure valide`);
-        return { exam: rawExam, provider: provider.name };
-      }
-
-      console.log(`[AI] 🔧 ${provider.name} — tentative de réparation...`);
-      const repaired = repairExamStructure(rawExam, subjectName);
-
-      if (repaired && validateGeneratedExam(repaired, subjectName)) {
-        console.log(`[AI] ✅ ${provider.name} — réparation réussie`);
-        return { exam: repaired, provider: `${provider.name} (réparé)` };
-      }
-
-      errors.push(`${provider.name}: structure invalide`);
-      console.warn(`[AI] ❌ ${provider.name} : structure invalide`);
-    } catch (error) {
-      errors.push(`${provider.name}: ${error.message}`);
-      console.warn(`[AI] ❌ ${provider.name} échec: ${error.message}`);
-    }
-  }
-  throw new Error('all_providers_failed: ' + errors.join(' | '));
-}
-
-async function correctWithFallback(prompt) {
-  const providers = getProviders();
-  if (!providers.length) throw new Error('provider_missing');
-  const errors = [];
-  for (const provider of providers) {
-    try {
-      console.log(`[AI] Correction avec ${provider.name}...`);
-      const result = await callProvider(provider, prompt, 14000);
-      if (result && typeof result === 'object' && Array.isArray(result.exercises)) {
-        console.log(`[AI] ✅ ${provider.name} — correction valide`);
-        return { result, provider: provider.name };
-      }
-      errors.push(`${provider.name}: structure invalide`);
-    } catch (error) {
-      errors.push(`${provider.name}: ${error.message}`);
-      console.warn(`[AI] ❌ ${provider.name} correction échouée: ${error.message}`);
-    }
-  }
-  throw new Error('all_providers_failed: ' + errors.join(' | '));
-}
-
-function buildLocalExam(config) {
-  const useChoices = CHOICE_SUBJECTS.has(config.subject);
-  const options = useChoices ? [
-    { id: 'A', text: 'Réponse A' }, { id: 'B', text: 'Réponse B' },
-    { id: 'C', text: 'Réponse C' }, { id: 'D', text: 'Réponse D' }
-  ] : null;
-  const pointsPerExercise = Math.round((20 / REQUIRED_EXERCISES) * 100) / 100;
-  const pointsPerQuestion = Math.round((pointsPerExercise / QUESTIONS_PER_EXERCISE) * 100) / 100;
-
-  const buildSubjects = (id, title, level, instructions) => ({
-    id, title, level, instructions,
-    exercises: Array.from({ length: REQUIRED_EXERCISES }, (_, exIdx) => ({
-      number: exIdx + 1,
-      title: `Exercice ${exIdx + 1}`,
-      points: pointsPerExercise,
-      statement: `Énoncé de l'exercice ${exIdx + 1}. Montrez votre méthode et concluez.`,
-      questions: Array.from({ length: QUESTIONS_PER_EXERCISE }, (_, qIdx) => ({
-        number: `${exIdx + 1}.${qIdx + 1}`,
-        text: `Question ${qIdx + 1} sur le thème ${config.chapter === 'all' ? 'principal' : config.chapter}.`,
-        points: pointsPerQuestion,
-        type: useChoices ? 'choice' : 'text',
-        ...(options ? { options, correctAnswer: 'A' } : {})
-      }))
-    }))
-  });
-
-  return {
-    subject: config.subject,
-    level: config.level,
-    duration: config.duration,
-    totalPoints: 20,
-    chapter: config.chapter,
-    fromNotebook: false,
-    subjects: [
-      buildSubjects('subject_1', 'Sujet 1 — Consolidation', 'consolidation',
-        'Ce sujet vérifie votre compréhension des notions essentielles.'),
-      buildSubjects('subject_2', 'Sujet 2 — Approfondissement', 'approfondissement',
-        'Ce sujet approfondit votre maîtrise et vous prépare aux questions complexes du BAC.')
+  // ⚡ CHAPTERS — clés minuscules harmonisées
+  const CHAPTERS = {
+    'mathematiques': [
+      'Nombres complexes',
+      'Similitudes planes directes',
+      'Calcul de probabilités',
+      'Variable aléatoire',
+      'Fonction numérique',
+      'Fonction logarithme',
+      'Fonction exponentielle',
+      'Calcul intégral',
+      'Équations différentielles',
+      'Suites numériques',
+      'Statistiques'
+    ],
+    'physique': [
+      'Cinématique',
+      'Mouvement rectiligne',
+      'Mouvement dans le champ de pesanteur',
+      'Mouvement des particules chargées',
+      'Oscillateurs mécaniques',
+      'Généralités sur les ondes',
+      'Mouvement vibratoire',
+      'Superposition des ondes',
+      'Interférence lumineuse',
+      'Champ magnétique',
+      'Force de Laplace',
+      'Force de Lorentz',
+      'Induction magnétique',
+      'Auto-induction',
+      'Circuit LC',
+      'Circuit RLC',
+      'Radioactivité'
+    ],
+    'chimie': [
+      'Solutions aqueuses et leur pH',
+      'Acide fort, base forte',
+      'Acide faible, base faible',
+      'Couples acide/base et classification',
+      'Réaction acido-basique et solution tampon',
+      'Alcools',
+      'Acides carboxyliques et ses dérivés',
+      'Amines et amides',
+      'Acides α-aminés et protéines'
+    ],
+    'svt': [
+      'Notion de l\'IG',
+      'Nature chimique et structure de l\'IG : la molécule d\'ADN',
+      'La reproduction conforme',
+      'Notion de cycle cellulaire et évolution de la quantité d\'ADN au cours du cycle',
+      'Protéines',
+      'Mécanismes d\'expression des gènes : la synthèse des protéines',
+      'Reproduction sexuée',
+      'Brassage des gènes',
+      'Transmission des caractères héréditaires chez l\'Homme',
+      'Anomalies chromosomiques',
+      'Tissus nerveux et notions de réflexes',
+      'Messages nerveux',
+      'La glycémie',
+      'Les appareils génitaux et leur fonctionnement',
+      'Régulation du fonctionnement des organes génitaux',
+      'De la fécondation à la nidation',
+      'La régulation des naissances',
+      'Le soi et le non soi',
+      'Les réponses immunitaires',
+      'Dysfonctionnement du système immunitaire : cas du VIH/SIDA'
+    ],
+    'philosophie': [
+      'Conscience - Inconscient',
+      'Les passions',
+      'Autrui',
+      'Travail',
+      'Histoire',
+      'Religion',
+      'Science et technique',
+      'Le langage',
+      'La vérité',
+      'Espace - temps',
+      'État',
+      'La justice',
+      'La liberté'
+    ],
+    'histoire': [
+      'Les causes de la Seconde Guerre mondiale',
+      'Le déroulement de la Seconde Guerre mondiale',
+      'L\'Afrique dans la guerre',
+      'Le bilan de la Seconde Guerre mondiale',
+      'Les conditions de la lutte de libération',
+      'La libération de l\'Algérie',
+      'La décolonisation en Afrique occidentale française (AOF)',
+      'Les problèmes des pays décolonisés'
+    ],
+    'geographie': [
+      'Les aspects physiques',
+      'Étude humaine',
+      'L\'agriculture',
+      'L\'élevage',
+      'La pêche',
+      'L\'industrie et l\'artisanat',
+      'La communication et le transport',
+      'Le commerce',
+      'Le tourisme'
     ]
   };
-}
 
-function correctQCMDeterministic(subject, subjectId, answers) {
-  const exercises = [];
-  subject.exercises.forEach((exercise, exIdx) => {
-    const exerciseResult = {
-      number: exercise.number || exIdx + 1,
-      title: exercise.title || `Exercice ${exIdx + 1}`,
-      score: 0, maxScore: 0, correctAnswers: 0,
-      totalQuestions: exercise.questions.length,
-      questions: [], wrongAnswers: [], explanation: '', advice: ''
-    };
-    const textQuestions = [];
-
-    exercise.questions.forEach((question, qIdx) => {
-      const key = `${subjectId}:${exIdx}:${qIdx}`;
-      const studentAnswer = answers[key];
-      const points = Number(question.points) || 1.33;
-      exerciseResult.maxScore += points;
-
-      const questionResult = {
-        number: question.number || `${exIdx + 1}.${qIdx + 1}`,
-        questionText: question.text,
-        type: question.type || 'text',
-        studentAnswer: studentAnswer || null,
-        correctAnswer: question.correctAnswer || null,
-        points: 0, maxPoints: points, status: 'pending',
-        feedback: '', betterMethod: null, toReview: null
-      };
-
-      if (question.type === 'choice' && question.correctAnswer) {
-        if (studentAnswer === question.correctAnswer) {
-          questionResult.status = 'correct';
-          questionResult.points = points;
-          exerciseResult.score += points;
-          exerciseResult.correctAnswers++;
-        } else if (!studentAnswer) {
-          questionResult.status = 'unanswered';
-        } else {
-          questionResult.status = 'wrong';
-          exerciseResult.wrongAnswers.push({
-            number: questionResult.number,
-            studentAnswer, correctAnswer: question.correctAnswer, question: question.text
-          });
-        }
-      } else {
-        textQuestions.push({ exerciseIndex: exIdx, questionIndex: qIdx, questionResult });
-      }
-      exerciseResult.questions.push(questionResult);
-    });
-    exercises.push({ exerciseResult, textQuestions });
-  });
-  return exercises;
-}
-
-async function correctExamHybrid(exam, subjectId, answers, uid) {
-  const subject = exam.subjects.find((s) => s.id === subjectId);
-  if (!subject) throw new Error('subject_not_found');
-
-  const deterministicResults = correctQCMDeterministic(subject, subjectId, answers);
-  const hasTextQuestions = deterministicResults.some((r) => r.textQuestions.length > 0);
-
-  if (hasTextQuestions) {
-    try {
-      const prompt = correctionPrompt({ exam: { ...exam, subjects: [subject] }, subjectId, answers });
-      const { result: aiResult } = await correctWithFallback(prompt);
-
-      if (Array.isArray(aiResult?.exercises)) {
-        aiResult.exercises.forEach((aiEx, exIdx) => {
-          const target = deterministicResults[exIdx];
-          if (!target) return;
-          const aiQuestions = Array.isArray(aiEx.questions) ? aiEx.questions : [];
-          aiQuestions.forEach((aiQ) => {
-            const match = target.exerciseResult.questions.find((q) => String(q.number) === String(aiQ.number));
-            if (!match) return;
-            if (match.status === 'pending') {
-              match.points = Number(aiQ.points) || 0;
-              match.status = aiQ.status || (match.points > 0 ? 'correct' : 'wrong');
-              if (match.status === 'correct') {
-                target.exerciseResult.score += match.points;
-                target.exerciseResult.correctAnswers++;
-              }
-            }
-            match.feedback = aiQ.feedback || match.feedback;
-            match.betterMethod = aiQ.betterMethod || match.betterMethod;
-            match.toReview = aiQ.toReview || match.toReview;
-            if (aiQ.correctAnswer) match.correctAnswer = aiQ.correctAnswer;
-          });
-          if (aiEx.explanation) target.exerciseResult.explanation = aiEx.explanation;
-          if (aiEx.advice) target.exerciseResult.advice = aiEx.advice;
-        });
-      }
-      if (Array.isArray(aiResult?.revisionTopics)) deterministicResults.revisionTopics = aiResult.revisionTopics;
-      if (aiResult?.globalFeedback) deterministicResults.globalFeedback = aiResult.globalFeedback;
-    } catch (error) {
-      console.warn('AI correction failed, deterministic only:', error.message);
-      deterministicResults.forEach(({ textQuestions, exerciseResult }) => {
-        textQuestions.forEach(({ questionResult }) => {
-          questionResult.status = 'unanswered';
-          questionResult.feedback = 'Correction IA temporairement indisponible. Réessaie plus tard.';
-        });
-        if (!exerciseResult.explanation) {
-          exerciseResult.explanation = 'Correction partielle : QCM corrigés automatiquement.';
-        }
-      });
-    }
-  }
-
-  const finalExercises = deterministicResults.map((r) => r.exerciseResult);
-  const rawScore = finalExercises.reduce((sum, ex) => sum + ex.score, 0);
-  const score = Math.min(20, Math.round(rawScore * 100) / 100);
-  const percentage = Math.round((score / 20) * 100);
-
-  let grade = 'Insuffisant';
-  if (percentage >= 90) grade = 'Excellent';
-  else if (percentage >= 80) grade = 'Très bien';
-  else if (percentage >= 70) grade = 'Bien';
-  else if (percentage >= 60) grade = 'Assez bien';
-  else if (percentage >= 50) grade = 'Passable';
-
-  let revisionTopics = deterministicResults.revisionTopics || [];
-  if (!revisionTopics.length) {
-    finalExercises.forEach((ex) => {
-      if (ex.score < ex.maxScore * 0.5) revisionTopics.push(`Revoir ${ex.title || `Exercice ${ex.number}`}`);
-    });
-  }
-
-  const globalFeedback = deterministicResults.globalFeedback || {
-    strengths: [], weaknesses: [],
-    encouragement: percentage >= 70 ? 'Bon travail global !' : 'Continue tes efforts.'
+  // ⚡ SUBJECT_LABELS — pour l'affichage et l'API
+  const SUBJECT_LABELS = {
+    'mathematiques': 'Mathématiques',
+    'physique': 'Physique',
+    'chimie': 'Chimie',
+    'svt': 'SVT',
+    'philosophie': 'Philosophie',
+    'histoire': 'Histoire',
+    'geographie': 'Géographie'
   };
 
-  return { score, totalScore: 20, percentage, grade, exercises: finalExercises, revisionTopics, globalFeedback };
-}
+  const GENERATION_STEPS = ['genStep1', 'genStep2', 'genStep3', 'genStep4', 'genStep5'];
+  const CORRECTION_STEPS = ['corrStep1', 'corrStep2', 'corrStep3', 'corrStep4', 'corrStep5'];
 
-module.exports = async function handler(request, response) {
-  applyCors(request, response);
-  if (request.method === 'OPTIONS') return response.status(204).end();
-  if (request.method !== 'POST') {
-    response.setHeader('Allow', 'POST');
-    return jsonError(response, 405, 'Méthode non autorisée.');
+  const state = {
+    user: null,
+    exam: null,
+    selectedSubject: null,
+    exerciseIndex: 0,
+    answers: {},
+    startedAt: 0,
+    remainingSeconds: 0,
+    timerId: null,
+    submitting: false,
+    lastResult: null,
+    notebookContext: null
+  };
+
+  const $ = (id) => document.getElementById(id);
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+  function escapeHtml(value) {
+    const div = document.createElement('div');
+    div.textContent = String(value ?? '');
+    return div.innerHTML;
   }
-  if (rateLimited(clientIp(request))) {
-    return jsonError(response, 429, 'Vous avez atteint votre limite de génération.');
+
+  function setStatus(id, message, type = '') {
+    const el = $(id);
+    if (!el) return;
+    el.textContent = message;
+    el.className = `status ${type}`;
   }
 
-  const firebaseConfigured = Boolean(process.env.FIREBASE_ADMIN_CREDENTIALS);
-  let verifiedUser = null;
-  try { verifiedUser = await verifyFirebaseToken(request); }
-  catch (error) { console.error('Firebase token verification failed:', error.message); }
-
-  if (!verifiedUser && !firebaseConfigured) verifiedUser = { uid: 'local-fallback-user' };
-  else if (!verifiedUser) return jsonError(response, 401, 'Connexion requise.');
-
-  const body = request.body && typeof request.body === 'object' ? request.body : {};
-  const action = body.action || 'generate';
-
-  if (action === 'generate') {
-    const validationError = validateConfig(body);
-    if (validationError) return jsonError(response, 400, validationError);
-
-    if (!firebaseConfigured || verifiedUser.uid === 'local-fallback-user') {
-      return response.status(200).json({ success: true, exam: buildLocalExam(body) });
+  function renderMath(root) {
+    if (window.KaTeXUtils?.renderMath) {
+      window.KaTeXUtils.renderMath(root);
+      return;
     }
-
-    let reservation;
-    try { reservation = await reserveFreeGeneration(verifiedUser.uid); }
-    catch (error) {
-      console.error('Exam usage check failed:', error.message);
-      return jsonError(response, 503, 'La vérification du quota est temporairement indisponible.');
-    }
-
-    if (reservation.limitReached) {
-      return response.status(429).json({
-        success: false, error: 'Limite gratuite atteinte.',
-        code: 'FREE_EXAM_LIMIT', used: reservation.used, limit: FREE_EXAM_LIMIT
+    if (typeof renderMathInElement === 'function') {
+      renderMathInElement(root, {
+        delimiters: [
+          { left: '$$', right: '$$', display: true },
+          { left: '\\(', right: '\\)', display: false },
+          { left: '$', right: '$', display: false }
+        ],
+        throwOnError: false
       });
     }
+  }
 
+  function showView(id) {
+    ['configView', 'loadingView', 'subjectsView', 'examView', 'loadingCorrectionView', 'resultsView']
+      .forEach((v) => $(v).classList.toggle('active', v === id));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  class CustomSelect {
+    constructor(element) {
+      this.element = element;
+      this.name = element.dataset.name;
+      this.trigger = element.querySelector('.custom-select-trigger');
+      this.valueEl = element.querySelector('.custom-select-value');
+      this.optionsContainer = element.querySelector('.custom-select-options');
+      this.options = [];
+      this.value = null;
+      this.focusedIndex = -1;
+      this.isOpen = false;
+      this.init();
+    }
+
+    init() {
+      this.trigger.addEventListener('click', (e) => { e.stopPropagation(); this.toggle(); });
+      this.trigger.addEventListener('keydown', (e) => this.handleKeydown(e));
+      document.addEventListener('click', (e) => {
+        if (!this.element.contains(e.target)) this.close();
+      });
+      this.refreshOptions();
+    }
+
+    refreshOptions() {
+      this.options = Array.from(this.optionsContainer.querySelectorAll('.custom-select-option'));
+      this.options.forEach((opt) => {
+        opt.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.select(opt.dataset.value);
+        });
+        opt.addEventListener('mouseenter', () => {
+          this.focusedIndex = this.options.indexOf(opt);
+          this.updateFocus();
+        });
+      });
+      if (!this.value && this.options.length > 0) {
+        this.select(this.options[0].dataset.value, true);
+      }
+    }
+
+    setOptions(options) {
+      this.optionsContainer.innerHTML = '';
+      options.forEach((opt) => {
+        const div = document.createElement('div');
+        div.className = 'custom-select-option';
+        div.dataset.value = opt.value;
+        div.setAttribute('role', 'option');
+        if (opt.prefix) {
+          div.innerHTML = `<span class="option-prefix">${escapeHtml(opt.prefix)}</span> ${escapeHtml(opt.label)}`;
+        } else {
+          div.textContent = opt.label;
+        }
+        this.optionsContainer.appendChild(div);
+      });
+      this.value = null;
+      this.refreshOptions();
+    }
+
+    select(value, silent = false) {
+      this.value = value;
+      const selected = this.options.find((o) => o.dataset.value === String(value));
+      if (!selected) return;
+
+      const prefix = selected.querySelector('.option-prefix');
+      const prefixHTML = prefix ? prefix.outerHTML : '';
+      const label = selected.textContent.replace(prefix?.textContent || '', '').trim();
+      this.valueEl.innerHTML = `${prefixHTML} <span>${escapeHtml(label)}</span>`;
+
+      this.options.forEach((o) => o.classList.toggle('selected', o.dataset.value === String(value)));
+      this.close();
+
+      if (!silent) {
+        this.element.dispatchEvent(new CustomEvent('change', {
+          detail: { name: this.name, value: this.value }
+        }));
+      }
+    }
+
+    toggle() { this.isOpen ? this.close() : this.open(); }
+
+    open() {
+      document.querySelectorAll('.custom-select.open').forEach((el) => {
+        if (el !== this.element) el.classList.remove('open');
+      });
+      this.element.classList.add('open');
+      this.trigger.setAttribute('aria-expanded', 'true');
+      this.isOpen = true;
+      this.focusedIndex = this.options.findIndex((o) => o.classList.contains('selected'));
+      this.updateFocus();
+    }
+
+    close() {
+      this.element.classList.remove('open');
+      this.trigger.setAttribute('aria-expanded', 'false');
+      this.isOpen = false;
+    }
+
+    handleKeydown(e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault(); this.toggle();
+      } else if (e.key === 'Escape') {
+        this.close();
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (!this.isOpen) this.open();
+        else {
+          this.focusedIndex = Math.min(this.focusedIndex + 1, this.options.length - 1);
+          this.updateFocus();
+        }
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (this.isOpen) {
+          this.focusedIndex = Math.max(this.focusedIndex - 1, 0);
+          this.updateFocus();
+        }
+      }
+    }
+
+    updateFocus() {
+      this.options.forEach((opt, idx) => opt.classList.toggle('focused', idx === this.focusedIndex));
+    }
+
+    getValue() { return this.value; }
+  }
+
+  const selects = { subject: null, level: null, chapter: null, difficulty: null, duration: null };
+
+  function initSelects() {
+    selects.subject = new CustomSelect($('subjectSelect'));
+    selects.level = new CustomSelect($('levelSelect'));
+    selects.chapter = new CustomSelect($('chapterSelect'));
+    selects.difficulty = new CustomSelect($('difficultySelect'));
+    selects.duration = new CustomSelect($('durationSelect'));
+
+    // ⚡ Sélection initiale avec la clé minuscule
+    selects.subject.select('mathematiques', true);
+    selects.level.select('Terminale D', true);
+    selects.difficulty.select('medium', true);
+    selects.duration.select('60', true);
+
+    updateChapters();
+    selects.subject.element.addEventListener('change', updateChapters);
+  }
+
+  function updateChapters() {
+    const subject = selects.subject.getValue();
+    const chapters = CHAPTERS[subject] || [];
+    selects.chapter.setOptions([
+      { value: 'all', label: 'Tous les chapitres', prefix: '📚' },
+      ...chapters.map((ch) => ({ value: ch, label: ch, prefix: '📖' }))
+    ]);
+  }
+
+  // ⚡ readConfig — envoie les clés minuscules à l'API
+  function readConfig() {
+    return {
+      subject: selects.subject.getValue(),            // 'mathematiques', 'philosophie'...
+      level: selects.level.getValue(),
+      chapter: selects.chapter.getValue(),
+      difficulty: selects.difficulty.getValue(),
+      duration: Number(selects.duration.getValue()),
+      exerciseCount: EXAM_CONSTANTS.REQUIRED_EXERCISES
+    };
+  }
+
+  function prefillFromUrl() {
     try {
-      const providers = getProviders();
-      console.log(`[EXAM] ${providers.length} fournisseur(s):`, providers.map((p) => p.name).join(', '));
+      const urlParams = new URLSearchParams(window.location.search);
+      const preSubject = urlParams.get('subject');
+      const preChapter = urlParams.get('chapter');
+      const preChapterId = urlParams.get('chapterId');
+      const useNotebook = urlParams.get('useNotebook') === 'true';
 
-      if (!providers.length) return response.status(200).json({ success: true, exam: buildLocalExam(body) });
-
-      let notebookContext = null;
-      if (body.notebookContext?.chapterId || body.notebookContext?.chapterTitle) {
-        try {
-          notebookContext = await loadNotebookContext(verifiedUser.uid, body.subject, body.notebookContext.chapterId, body.notebookContext.chapterTitle);
-          if (notebookContext) console.log(`[EXAM] Contexte cahier : ${notebookContext.sectionsCount} sections`);
-        } catch (e) { console.warn('[EXAM] Erreur cahier:', e.message); }
+      if (useNotebook && (preChapterId || preChapter)) {
+        state.notebookContext = {
+          chapterId: preChapterId || null,
+          chapterTitle: preChapter || '',
+          useNotebook: true
+        };
+        $('notebookBanner').classList.add('show');
+        if (preChapter) {
+          $('notebookBannerTitle').textContent = `📖 Basé sur ton cahier : ${preChapter}`;
+          $('notebookBannerSub').textContent = 'L\'examen sera généré à partir des sections que tu as étudiées.';
+        }
       }
 
-      const prompt = notebookContext ? generationPromptFromNotebook(body, notebookContext) : generationPrompt(body);
-      console.log(`[EXAM] Prompt: ${prompt.length} caractères`);
+      if (preSubject) {
+        const optionExists = Array.from(document.querySelectorAll('#subjectSelect .custom-select-option'))
+          .some((o) => o.dataset.value === preSubject);
+        if (optionExists) {
+          selects.subject.select(preSubject, true);
+          updateChapters();
+        }
+      }
 
-      const { exam, provider } = await generateWithFallback(prompt, body.subject);
+      if (preChapter) {
+        setTimeout(() => {
+          const chapterOptions = Array.from(
+            document.querySelectorAll('#chapterOptions .custom-select-option')
+          );
 
-      const examWithMeta = {
-        ...exam,
-        chapter: body.chapter,
-        fromNotebook: Boolean(notebookContext),
-        notebookSectionsCount: notebookContext?.sectionsCount || 0
+          const normalize = (s) => String(s || '')
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-z0-9]/g, '');
+
+          const target = normalize(preChapter);
+          let match = chapterOptions.find((o) => normalize(o.dataset.value) === target);
+
+          if (!match && target.length > 3) {
+            match = chapterOptions.find((o) => {
+              const v = normalize(o.dataset.value);
+              return v && v.length > 3 && (v.includes(target) || target.includes(v));
+            });
+          }
+
+          if (match && match.dataset.value !== 'all') {
+            selects.chapter.select(match.dataset.value, true);
+          }
+        }, 150);
+      }
+    } catch (e) {
+      console.warn('[EXAM] Prefill error:', e.message);
+    }
+  }
+
+  function resetSteps(steps) {
+    steps.forEach((id) => {
+      const el = $(id);
+      if (el) el.classList.remove('active', 'done');
+    });
+  }
+
+  function activateStep(stepId, statusEl, label) {
+    document.querySelectorAll('.loading-step').forEach((s) => {
+      if (s.id === stepId) {
+        s.classList.add('active');
+        s.classList.remove('done');
+      } else if (s.classList.contains('active')) {
+        s.classList.remove('active');
+        s.classList.add('done');
+      }
+    });
+    if (statusEl) {
+      statusEl.textContent = label;
+      statusEl.classList.add('active');
+    }
+  }
+
+  function finishAllSteps(steps, statusEl, finalLabel = 'Terminé !') {
+    steps.forEach((id) => {
+      const el = $(id);
+      if (el) {
+        el.classList.remove('active');
+        el.classList.add('done');
+      }
+    });
+    if (statusEl) {
+      statusEl.textContent = finalLabel;
+      statusEl.classList.remove('active');
+    }
+  }
+
+  async function saveActiveSession() {
+    if (!state.user || !state.selectedSubject) return;
+    try {
+      const ref = doc(db, 'users', state.user.uid, 'activeExam', 'current');
+      await setDoc(ref, {
+        exam: state.exam,
+        selectedSubjectId: state.selectedSubject.id,
+        exerciseIndex: state.exerciseIndex,
+        answers: state.answers,
+        startedAt: state.startedAt,
+        remainingSeconds: state.remainingSeconds,
+        updatedAt: serverTimestamp()
+      }, { merge: true });
+    } catch (e) {
+      console.warn('Save session error:', e.message);
+    }
+  }
+
+  async function clearActiveSession() {
+    if (!state.user) return;
+    try {
+      await deleteDoc(doc(db, 'users', state.user.uid, 'activeExam', 'current'));
+    } catch (e) {
+      console.warn('Clear session error:', e.message);
+    }
+  }
+
+  async function loadActiveSession() {
+    if (!state.user) return null;
+    try {
+      const snap = await getDoc(doc(db, 'users', state.user.uid, 'activeExam', 'current'));
+      if (!snap.exists()) return null;
+      const data = snap.data();
+
+      const updated = data.updatedAt?.toDate?.() || new Date(data.updatedAt);
+      const ageHours = (Date.now() - updated.getTime()) / (1000 * 60 * 60);
+      if (ageHours > EXAM_CONSTANTS.SESSION_TTL_HOURS) {
+        await clearActiveSession();
+        return null;
+      }
+      return data;
+    } catch (e) {
+      console.warn('Load session error:', e.message);
+      return null;
+    }
+  }
+
+  let saveSessionTimer = null;
+  function debouncedSaveSession() {
+    if (saveSessionTimer) clearTimeout(saveSessionTimer);
+    saveSessionTimer = setTimeout(saveActiveSession, 2000);
+  }
+
+  function normalizeExam(payload) {
+    const exam = payload?.exam;
+    if (!exam || !Array.isArray(exam.subjects) || exam.subjects.length < 2) {
+      throw new Error('Réponse du serveur invalide.');
+    }
+
+    exam.duration = Number(exam.duration) || EXAM_CONSTANTS.DEFAULT_DURATION_MIN;
+    exam.totalPoints = Number(exam.totalPoints) || 20;
+    exam.subjects = exam.subjects.slice(0, 2);
+
+    exam.subjects.forEach((subject, idx) => {
+      const ok = Array.isArray(subject.exercises)
+        && subject.exercises.length === EXAM_CONSTANTS.REQUIRED_EXERCISES
+        && subject.exercises.every((ex) =>
+          Array.isArray(ex.questions) && ex.questions.length === EXAM_CONSTANTS.QUESTIONS_PER_EXERCISE
+        );
+      if (!ok) throw new Error(`Sujet ${idx + 1} invalide.`);
+    });
+
+    return exam;
+  }
+
+  $('configForm').addEventListener('submit', generateExam);
+
+  async function generateExam(event) {
+    event.preventDefault();
+
+    if (!navigator.onLine) {
+      setStatus('configStatus', 'Votre connexion semble interrompue.', 'error');
+      return;
+    }
+
+    if (!state.user) {
+      setStatus('configStatus', 'Connecte-toi pour générer un examen.', 'error');
+      return;
+    }
+
+    const btn = $('generateButton');
+    btn.disabled = true;
+    btn.classList.add('loading');
+    setStatus('configStatus', '');
+
+    showView('loadingView');
+    resetSteps(GENERATION_STEPS);
+    const statusEl = $('genLoadingStatus');
+
+    try {
+      const config = readConfig();
+
+      activateStep('genStep1', statusEl, 'Analyse de la configuration...');
+      await sleep(600);
+
+      const token = await getIdToken(state.user);
+      const headers = {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
       };
 
-      return response.status(200).json({
-        success: true, exam: examWithMeta,
-        meta: { provider, fromNotebook: Boolean(notebookContext), sectionsUsed: notebookContext?.sectionsCount || 0 }
+      activateStep('genStep2', statusEl, 'Génération des deux sujets...');
+
+      const notebookContextPayload = state.notebookContext
+        ? { subject: config.subject, chapterId: state.notebookContext.chapterId, chapterTitle: state.notebookContext.chapterTitle }
+        : null;
+
+      const responsePromise = fetch('/api/exam', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          ...config,
+          notebookContext: notebookContextPayload
+        })
       });
-    } catch (error) {
-      console.error('Exam generation failed:', error.message);
-      if (reservation?.reserved) {
-        try { await releaseFreeGeneration(verifiedUser.uid, reservation.usageDate); } catch (_) {}
+      await sleep(1500);
+
+      activateStep('genStep3', statusEl, 'Rédaction des exercices...');
+      const response = await responsePromise;
+      const payload = await response.json().catch(() => null);
+
+      if (response.status === 401) throw new Error('AUTH_REQUIRED');
+      if (response.status === 429 && payload?.code === 'FREE_EXAM_LIMIT') {
+        showView('configView');
+        showPremiumPopup();
+        return;
       }
-      return response.status(200).json({ success: true, exam: buildLocalExam(body) });
+      if (response.status === 429) throw new Error('RATE_LIMIT');
+      if (!response.ok) throw new Error(payload?.error || 'SERVICE');
+
+      activateStep('genStep4', statusEl, 'Vérification des questions...');
+      await sleep(800);
+
+      state.exam = normalizeExam(payload);
+      state.answers = {};
+      state.exerciseIndex = 0;
+      await clearActiveSession();
+
+      activateStep('genStep5', statusEl, 'Finalisation...');
+      await sleep(600);
+
+      finishAllSteps(GENERATION_STEPS, statusEl, '✅ Tes deux sujets sont prêts !');
+      await sleep(400);
+
+      displaySubjects();
+      showView('subjectsView');
+
+    } catch (error) {
+      console.error('Génération échouée:', error);
+
+      if (error.message === 'AUTH_REQUIRED') {
+        setStatus('configStatus', 'Connecte-toi pour générer un examen.', 'error');
+      } else if (error.message === 'RATE_LIMIT') {
+        setStatus('configStatus', 'Trop de tentatives. Attends une minute puis réessaie.', 'error');
+      } else {
+        setStatus('configStatus', error.message || 'Impossible de générer l\'examen. Réessaie.', 'error');
+      }
+      showView('configView');
+    } finally {
+      btn.disabled = false;
+      btn.classList.remove('loading');
     }
   }
 
-  if (action === 'correct') {
-    const validationError = validateCorrection(body);
-    if (validationError) return jsonError(response, 400, validationError);
+  function displaySubjects() {
+    const list = $('subjectsList');
+    list.replaceChildren();
+
+    state.exam.subjects.forEach((subject, index) => {
+      const exerciseCount = subject.exercises.length;
+      const totalQuestions = subject.exercises.reduce((sum, ex) => sum + (ex.questions?.length || 0), 0);
+      const points = subject.exercises.reduce((sum, ex) => sum + (Number(ex.points) || 0), 0);
+      const level = subject.level || (index === 0 ? 'consolidation' : 'approfondissement');
+      const levelLabel = level === 'consolidation' ? 'Consolidation' : 'Approfondissement';
+      const levelClass = level === 'consolidation' ? 'consolidation' : 'approfondissement';
+
+      const card = document.createElement('article');
+      card.className = 'subject-card';
+      card.innerHTML = `
+        <div class="subject-kicker">Version ${index + 1}</div>
+        <h3>${escapeHtml(subject.title || `Sujet ${index + 1}`)}</h3>
+        <div style="margin-bottom:6px;">
+          <span class="subject-level-badge ${levelClass}">${levelLabel}</span>
+        </div>
+        <p>${escapeHtml(subject.instructions || 'Sujet complet à traiter dans le temps imparti.')}</p>
+        <div class="subject-meta">
+          <span>${exerciseCount} exercices</span>
+          <span>${totalQuestions} questions</span>
+          <span>${Math.round(points * 100) / 100 || state.exam.totalPoints}/20 points</span>
+        </div>
+      `;
+
+      const btn = document.createElement('button');
+      btn.className = 'btn primary';
+      btn.type = 'button';
+      btn.textContent = 'Commencer';
+      btn.addEventListener('click', () => startExam(subject));
+
+      card.appendChild(btn);
+      list.appendChild(card);
+    });
+  }
+
+  async function startExam(subject) {
+    state.selectedSubject = subject;
+    state.exerciseIndex = 0;
+    state.answers = {};
+    state.startedAt = Date.now();
+    state.remainingSeconds = Math.max(60, Number(state.exam.duration) * 60);
+
+    await saveActiveSession();
+
+    $('examTitle').textContent = subject.title || 'Sujet';
+    showView('examView');
+    renderExercise();
+    startTimer();
+  }
+
+  function answerKey(exerciseIndex, questionIndex) {
+    return `${state.selectedSubject.id}:${exerciseIndex}:${questionIndex}`;
+  }
+
+  function saveAnswer(key, value) {
+    state.answers[key] = value;
+    debouncedSaveSession();
+  }
+
+  function renderExercise() {
+    const exercise = state.selectedSubject.exercises[state.exerciseIndex];
+    if (!exercise) return;
+
+    $('exerciseTitle').textContent =
+      `Exercice ${exercise.number || state.exerciseIndex + 1}${exercise.title ? ` — ${exercise.title}` : ''}`;
+    $('exerciseCounter').textContent = `${state.exerciseIndex + 1} / ${EXAM_CONSTANTS.REQUIRED_EXERCISES}`;
+    $('exercisePoints').textContent = `${Math.round((Number(exercise.points) || 0) * 100) / 100} points · ${EXAM_CONSTANTS.QUESTIONS_PER_EXERCISE} questions`;
+    $('exerciseStatement').textContent = exercise.statement || '';
+
+    const list = $('questionsList');
+    list.replaceChildren();
+
+    exercise.questions.slice(0, EXAM_CONSTANTS.QUESTIONS_PER_EXERCISE).forEach((question, qIdx) => {
+      const key = answerKey(state.exerciseIndex, qIdx);
+      const wrapper = document.createElement('div');
+      wrapper.className = 'question';
+
+      const title = document.createElement('div');
+      title.className = 'question-title';
+      title.innerHTML = `
+        <span>${escapeHtml(question.number || `${state.exerciseIndex + 1}.${qIdx + 1}`)}. ${escapeHtml(question.text || '')}</span>
+        <span class="points">${Math.round((Number(question.points) || 0) * 100) / 100} pt</span>
+      `;
+      wrapper.appendChild(title);
+
+      if (Array.isArray(question.options) && question.options.length === 4) {
+        const options = document.createElement('div');
+        options.className = 'answer-options';
+        question.options.forEach((opt) => {
+          const label = document.createElement('label');
+          label.className = 'answer-option';
+          const input = document.createElement('input');
+          input.type = 'radio';
+          input.name = key;
+          input.value = opt.id;
+          input.checked = state.answers[key] === opt.id;
+          input.addEventListener('change', () => saveAnswer(key, input.value));
+
+          const text = document.createElement('span');
+          text.textContent = `${opt.id}. ${opt.text || ''}`;
+
+          label.append(input, text);
+          options.appendChild(label);
+        });
+        wrapper.appendChild(options);
+      } else {
+        const isNumber = question.type === 'number';
+        const input = document.createElement(isNumber ? 'input' : 'textarea');
+        input.className = 'answer';
+        if (isNumber) {
+          input.type = 'number';
+          input.step = 'any';
+          input.placeholder = 'Ta réponse numérique';
+        } else {
+          input.placeholder = 'Rédige ta réponse ici...';
+        }
+        input.value = state.answers[key] || '';
+        input.addEventListener('input', () => saveAnswer(key, input.value));
+        wrapper.appendChild(input);
+      }
+
+      list.appendChild(wrapper);
+    });
+
+    $('previousButton').disabled = state.exerciseIndex === 0;
+    $('nextButton').disabled = state.exerciseIndex >= EXAM_CONSTANTS.REQUIRED_EXERCISES - 1;
+    $('progressBar').style.width = `${((state.exerciseIndex + 1) / EXAM_CONSTANTS.REQUIRED_EXERCISES) * 100}%`;
+
+    renderMath($('examView'));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function goNext() {
+    if (state.exerciseIndex < EXAM_CONSTANTS.REQUIRED_EXERCISES - 1) {
+      state.exerciseIndex += 1;
+      saveActiveSession();
+      renderExercise();
+    }
+  }
+
+  function goPrevious() {
+    if (state.exerciseIndex > 0) {
+      state.exerciseIndex -= 1;
+      saveActiveSession();
+      renderExercise();
+    }
+  }
+
+  function startTimer() {
+    clearInterval(state.timerId);
+    state.timerId = setInterval(() => {
+      state.remainingSeconds -= 1;
+      updateTimerDisplay();
+
+      if (state.remainingSeconds <= 0) {
+        clearInterval(state.timerId);
+        submitExam(true);
+      } else if (state.remainingSeconds % 30 === 0) {
+        saveActiveSession();
+      }
+    }, 1000);
+    updateTimerDisplay();
+  }
+
+  function updateTimerDisplay() {
+    const s = Math.max(0, state.remainingSeconds);
+    const h = String(Math.floor(s / 3600)).padStart(2, '0');
+    const m = String(Math.floor((s % 3600) / 60)).padStart(2, '0');
+    const sec = String(s % 60).padStart(2, '0');
+    const timer = $('timer');
+    timer.textContent = `${h}:${m}:${sec}`;
+    timer.classList.toggle('urgent', s <= EXAM_CONSTANTS.TIMER_WARNING_SEC);
+  }
+
+  function askFinish() {
+    $('confirmModal').classList.add('show');
+    $('confirmFinishButton').focus();
+  }
+
+  function closeConfirmModal() {
+    $('confirmModal').classList.remove('show');
+  }
+
+  async function submitExam(auto = false) {
+    if (state.submitting || !state.selectedSubject) return;
+
+    closeConfirmModal();
+    state.submitting = true;
+    clearInterval(state.timerId);
+    $('finishButton').disabled = true;
+
+    showView('loadingCorrectionView');
+    resetSteps(CORRECTION_STEPS);
+    const statusEl = $('corrLoadingStatus');
 
     try {
-      const result = await correctExamHybrid(body.exam, body.subjectId, body.answers, verifiedUser.uid);
-      if (firebaseConfigured && verifiedUser.uid !== 'local-fallback-user') {
-        try { await saveExamResult(verifiedUser.uid, body, result); }
-        catch (e) { console.error('Exam result save failed:', e.message); }
-      }
-      return response.status(200).json({ success: true, result });
-    } catch (error) {
-      console.error('Exam correction failed:', error.message);
-      return response.status(200).json({
-        success: true,
-        result: {
-          score: 0, totalScore: 20, percentage: 0, grade: 'Indéterminé',
-          exercises: [], revisionTopics: [],
-          globalFeedback: { strengths: [], weaknesses: [], encouragement: 'Correction indisponible. Réessaie.' }
-        }
+      activateStep('corrStep1', statusEl, 'Envoi de ta copie au correcteur...');
+      await sleep(600);
+
+      const token = await getIdToken(state.user);
+      const headers = {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      };
+
+      activateStep('corrStep2', statusEl, 'Analyse des exercices...');
+      const responsePromise = fetch('/api/exam', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          action: 'correct',
+          exam: state.exam,
+          subjectId: state.selectedSubject.id,
+          answers: state.answers
+        })
       });
+      await sleep(1500);
+
+      activateStep('corrStep3', statusEl, 'Évaluation pédagogique...');
+      const response = await responsePromise;
+      const payload = await response.json().catch(() => null);
+
+      if (!response.ok) throw new Error(payload?.error || 'SERVICE');
+
+      activateStep('corrStep4', statusEl, 'Calcul du score...');
+      await sleep(900);
+
+      activateStep('corrStep5', statusEl, 'Finalisation...');
+      await sleep(600);
+
+      finishAllSteps(CORRECTION_STEPS, statusEl, '✅ Ta copie est corrigée !');
+      await sleep(500);
+
+      showResults(payload.result);
+      await clearActiveSession();
+
+    } catch (error) {
+      console.error('Correction échouée:', error);
+      finishAllSteps(CORRECTION_STEPS, statusEl, '⚠️ Correction indisponible.');
+      await sleep(1200);
+      showView('examView');
+      setStatus('examStatus', 'Correction temporairement indisponible. Réessaie dans quelques minutes.', 'error');
+    } finally {
+      state.submitting = false;
+      $('finishButton').disabled = false;
     }
   }
 
-  return jsonError(response, 400, 'Action invalide.');
-};
-}
+  function getGrade(percentage) {
+    if (percentage >= 90) return 'Excellent';
+    if (percentage >= 80) return 'Très bien';
+    if (percentage >= 70) return 'Bien';
+    if (percentage >= 60) return 'Assez bien';
+    if (percentage >= 50) return 'Passable';
+    return 'Insuffisant';
+  }
+  function getGradeEmoji(percentage) {
+    if (percentage >= 90) return '🏆';
+    if (percentage >= 70) return '🎉';
+    if (percentage >= 50) return '📚';
+    return '💪';
+  }
+  function getGradeClass(percentage) {
+    if (percentage >= 70) return 'success';
+    if (percentage >= 50) return 'warning';
+    return 'danger';
+  }
+  function getProgressColor(percent) {
+    if (percent >= 75) return 'linear-gradient(90deg, #45b47d, #6fd99a)';
+    if (percent >= 50) return 'linear-gradient(90deg, #E0B84A, #F0CC65)';
+    return 'linear-gradient(90deg, #d7654a, #e88a72)';
+  }
+
+  function showResults(result) {
+    state.lastResult = result;
+
+    const score = Math.max(0, Math.min(20, Number(result?.score ?? 0)));
+    const percentage = Number(result?.percentage ?? Math.round((score / 20) * 100));
+    const grade = result?.grade || getGrade(percentage);
+
+    $('resultScore').textContent = `${score.toFixed(2)} / 20`;
+    $('resultPercent').textContent = `${percentage} %`;
+
+    const details = $('resultsDetails');
+    details.replaceChildren();
+
+    const banner = document.createElement('div');
+    banner.className = `grade-banner grade-${getGradeClass(percentage)}`;
+    banner.innerHTML = `
+      <div class="grade-emoji">${getGradeEmoji(percentage)}</div>
+      <div class="grade-info">
+        <div class="grade-title">${escapeHtml(grade)}</div>
+        <div class="grade-sub">${escapeHtml(result?.globalFeedback?.encouragement || 'Continue tes efforts !')}</div>
+      </div>
+    `;
+    details.appendChild(banner);
+
+    const exercises = Array.isArray(result?.exercises) ? result.exercises : [];
+    if (exercises.length > 0) {
+      const recap = document.createElement('div');
+      recap.className = 'recap-section';
+      recap.innerHTML = '<h3 class="recap-title">📚 Récapitulatif des exercices</h3>';
+
+      exercises.forEach((exercise, idx) => {
+        const percent = exercise.maxScore > 0 ? (exercise.score / exercise.maxScore) * 100 : 0;
+        const icon = percent >= 75 ? '✅' : percent >= 50 ? '⚠️' : '❌';
+
+        const card = document.createElement('button');
+        card.className = 'exercise-card';
+        card.type = 'button';
+        card.innerHTML = `
+          <div class="exercise-card-icon">${icon}</div>
+          <div class="exercise-card-body">
+            <div class="exercise-card-title">Exercice ${exercise.number || idx + 1}${exercise.title ? ` — ${escapeHtml(exercise.title)}` : ''}</div>
+            <div class="exercise-card-meta">${Number(exercise.score || 0).toFixed(2)} / ${Number(exercise.maxScore || 6.67).toFixed(2)} pts · ${exercise.correctAnswers || 0}/${exercise.totalQuestions || 5} correctes</div>
+            <div class="exercise-card-progress">
+              <div class="exercise-card-fill" style="width:${percent}%;background:${getProgressColor(percent)}"></div>
+            </div>
+          </div>
+          <div class="exercise-card-arrow">→</div>
+        `;
+        card.addEventListener('click', () => showExerciseDetail(exercise, idx));
+        recap.appendChild(card);
+      });
+
+      details.appendChild(recap);
+    }
+
+    if (Array.isArray(result?.revisionTopics) && result.revisionTopics.length > 0) {
+      const topics = document.createElement('div');
+      topics.className = 'topics-section';
+      topics.innerHTML = `
+        <h3 class="topics-title">📖 Points à revoir en priorité</h3>
+        <ul class="topics-list">
+          ${result.revisionTopics.map((t) => `<li>${escapeHtml(t)}</li>`).join('')}
+        </ul>
+      `;
+      details.appendChild(topics);
+    }
+
+    showView('resultsView');
+    renderMath($('resultsView'));
+  }
+
+  function showExerciseDetail(exercise, exerciseIndex) {
+    const details = $('resultsDetails');
+    details.replaceChildren();
+
+    const percent = exercise.maxScore > 0 ? (exercise.score / exercise.maxScore) * 100 : 0;
+    const icon = percent >= 75 ? '✅' : percent >= 50 ? '⚠️' : '❌';
+
+    const header = document.createElement('div');
+    header.className = 'exercise-detail-header';
+    header.innerHTML = `
+      <button class="back-btn-detail" id="backToRecapBtn">
+        <i class="fas fa-arrow-left"></i> Retour
+      </button>
+      <div class="exercise-detail-title">
+        <div class="exercise-detail-icon">${icon}</div>
+        <div>
+          <h3>Exercice ${exercise.number || exerciseIndex + 1}${exercise.title ? ` — ${escapeHtml(exercise.title)}` : ''}</h3>
+          <div class="exercise-detail-meta">
+            ${Number(exercise.score || 0).toFixed(2)} / ${Number(exercise.maxScore || 6.67).toFixed(2)} pts ·
+            ${exercise.correctAnswers || 0}/${exercise.totalQuestions || 5} correctes
+          </div>
+        </div>
+      </div>
+    `;
+    details.appendChild(header);
+
+    const questions = Array.isArray(exercise.questions) ? exercise.questions : [];
+
+    if (questions.length === 0) {
+      const empty = document.createElement('p');
+      empty.className = 'lead';
+      empty.textContent = 'Aucun détail disponible pour cet exercice.';
+      details.appendChild(empty);
+    } else {
+      questions.forEach((q, idx) => {
+        const qEl = document.createElement('div');
+        qEl.className = `question-detail q-${q.status || 'pending'}`;
+
+        const qIcon = q.status === 'correct' ? '✅' : q.status === 'wrong' ? '❌' : '⏭️';
+
+        qEl.innerHTML = `
+          <div class="question-header">
+            <div class="question-number">
+              <span class="q-icon">${qIcon}</span> Question ${escapeHtml(q.number || idx + 1)}
+            </div>
+            <div class="question-points">${Number(q.points || 0).toFixed(2)} / ${Number(q.maxPoints || 1.33).toFixed(2)} pt</div>
+          </div>
+        `;
+
+        if (q.questionText) {
+          const qText = document.createElement('div');
+          qText.className = 'question-text';
+          qText.innerHTML = `<strong>❓ Énoncé :</strong> ${escapeHtml(q.questionText)}`;
+          qEl.appendChild(qText);
+        }
+
+        const answersRow = document.createElement('div');
+        answersRow.className = 'answers-row';
+
+        const studentBlock = document.createElement('div');
+        studentBlock.className = 'answer-block student-answer';
+        if (q.status === 'unanswered' || !q.studentAnswer) {
+          studentBlock.innerHTML = `<div class="answer-label">✍️ Ta réponse :</div><div class="answer-value unanswered">Aucune réponse</div>`;
+        } else {
+          studentBlock.innerHTML = `<div class="answer-label">✍️ Ta réponse :</div><div class="answer-value">${escapeHtml(String(q.studentAnswer))}</div>`;
+        }
+        answersRow.appendChild(studentBlock);
+
+        if (q.correctAnswer && q.status !== 'correct') {
+          const correctBlock = document.createElement('div');
+          correctBlock.className = 'answer-block correct-answer';
+          correctBlock.innerHTML = `<div class="answer-label">✅ Bonne réponse :</div><div class="answer-value">${escapeHtml(String(q.correctAnswer))}</div>`;
+          answersRow.appendChild(correctBlock);
+        }
+        qEl.appendChild(answersRow);
+
+        if (q.feedback) {
+          const fb = document.createElement('div');
+          fb.className = 'feedback-block';
+          fb.innerHTML = `<div class="feedback-text">${escapeHtml(q.feedback)}</div>`;
+          qEl.appendChild(fb);
+        }
+
+        if (q.betterMethod) {
+          const bm = document.createElement('div');
+          bm.className = 'method-block';
+          bm.innerHTML = `<div class="method-label">💡 ${q.status === 'correct' ? 'Astuce bonus' : 'Meilleure méthode'}</div><div class="method-text">${escapeHtml(q.betterMethod)}</div>`;
+          qEl.appendChild(bm);
+        }
+
+        if (q.toReview) {
+          const tr = document.createElement('div');
+          tr.className = 'review-block';
+          tr.innerHTML = `<div class="review-label">📖 À revoir</div><div class="review-text">${escapeHtml(q.toReview)}</div>`;
+          qEl.appendChild(tr);
+        }
+
+        details.appendChild(qEl);
+      });
+    }
+
+    if (exercise.explanation) {
+      const expl = document.createElement('div');
+      expl.className = 'exercise-explanation';
+      expl.innerHTML = `<div class="explanation-label">📝 Bilan de l'exercice</div><div class="explanation-text">${escapeHtml(exercise.explanation)}</div>`;
+      details.appendChild(expl);
+    }
+
+    renderMath(details);
+    document.getElementById('backToRecapBtn').addEventListener('click', () => {
+      showResults(state.lastResult);
+    });
+  }
+
+  function showPremiumPopup() {
+    $('premiumPopup').classList.add('show');
+    $('popupCloseBtn').focus();
+  }
+  function hidePremiumPopup() {
+    $('premiumPopup').classList.remove('show');
+  }
+
+  async function checkActiveSession() {
+    const session = await loadActiveSession();
+    if (!session || !session.exam) return;
+
+    const subject = session.exam.subjects?.find((s) => s.id === session.selectedSubjectId);
+    if (!subject) {
+      await clearActiveSession();
+      return;
+    }
+
+    $('resumeMeta').innerHTML = `
+      <div><span class="label">Matière</span><span class="value">${escapeHtml(session.exam.subject || '—')}</span></div>
+      <div><span class="label">Sujet</span><span class="value">${escapeHtml(subject.title || 'Sujet')}</span></div>
+      <div><span class="label">Exercice</span><span class="value">${(Number(session.exerciseIndex) || 0) + 1} / ${EXAM_CONSTANTS.REQUIRED_EXERCISES}</span></div>
+      <div><span class="label">Réponses données</span><span class="value">${Object.keys(session.answers || {}).length}</span></div>
+    `;
+
+    $('resumeModal').classList.add('show');
+
+    $('resumeContinueBtn').onclick = () => {
+      state.exam = session.exam;
+      state.selectedSubject = subject;
+      state.exerciseIndex = Number(session.exerciseIndex) || 0;
+      state.answers = session.answers || {};
+      state.startedAt = Number(session.startedAt) || Date.now();
+      state.remainingSeconds = Number(session.remainingSeconds) || state.exam.duration * 60;
+
+      $('resumeModal').classList.remove('show');
+      $('examTitle').textContent = subject.title || 'Sujet';
+      showView('examView');
+      renderExercise();
+      startTimer();
+    };
+
+    $('resumeNewBtn').onclick = async () => {
+      await clearActiveSession();
+      $('resumeModal').classList.remove('show');
+      state.exam = null;
+      state.selectedSubject = null;
+      showView('configView');
+    };
+  }
+
+  $('backConfigButton').addEventListener('click', () => showView('configView'));
+  $('previousButton').addEventListener('click', goPrevious);
+  $('nextButton').addEventListener('click', goNext);
+  $('finishButton').addEventListener('click', askFinish);
+  $('cancelFinishButton').addEventListener('click', closeConfirmModal);
+  $('confirmFinishButton').addEventListener('click', () => submitExam(false));
+
+  $('popupCloseBtn').addEventListener('click', hidePremiumPopup);
+  $('popupLaterBtn').addEventListener('click', hidePremiumPopup);
+  $('premiumPopup').addEventListener('click', (e) => {
+    if (e.target === $('premiumPopup')) hidePremiumPopup();
+  });
+
+  $('newExamButton').addEventListener('click', async () => {
+    await clearActiveSession();
+    state.exam = null;
+    state.selectedSubject = null;
+    state.submitting = false;
+    state.lastResult = null;
+    state.notebookContext = null;
+    showView('configView');
+  });
+
+  window.addEventListener('online', () => {
+    $('connectionState').textContent = 'Connexion disponible';
+    $('connectionState').classList.add('online');
+  });
+  window.addEventListener('offline', () => {
+    $('connectionState').textContent = 'Hors ligne';
+    $('connectionState').classList.remove('online');
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if ($('premiumPopup').classList.contains('show')) hidePremiumPopup();
+      if ($('confirmModal').classList.contains('show')) closeConfirmModal();
+    }
+  });
+
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      window.location.replace('auth-choice.html');
+      return;
+    }
+
+    state.user = user;
+    $('connectionState').textContent = 'connecté';
+    $('connectionState').classList.add('online');
+
+    prefillFromUrl();
+    await checkActiveSession();
+  });
+
+  initSelects();
+  console.log('🚀 ARVEXA — Mode examen v3.2 (clés minuscules harmonisées)');
+  </script>
+</body>
+</html>

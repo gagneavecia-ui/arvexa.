@@ -1328,27 +1328,25 @@ const db = getFirestore(app);
 const MIN_CONTENT_LENGTH = 40;
 const MAX_CONTENT_LENGTH = 15000;
 
-const SUBJECTS = {
+var SUBJECTS = {
   mathematiques: { label: 'Mathématiques', emoji: '📐' },
   physique:      { label: 'Physique',      emoji: '⚡' },
   chimie:        { label: 'Chimie',        emoji: '🧪' },
   svt:           { label: 'SVT',           emoji: '🧬' },
   philosophie:   { label: 'Philosophie',   emoji: '🧠' },
-  'histoire-geo':{ label: 'Histoire-Géo',  emoji: '🌍' },
-  francais:      { label: 'Français',      emoji: '📖' },
-  anglais:       { label: 'Anglais',       emoji: '🌐' }
+  histoire:      { label: 'Histoire',      emoji: '🌍' },
+  geographie:    { label: 'Géographie',    emoji: '🗺️' }
 };
 const ALL_SUBJECT_KEYS = Object.keys(SUBJECTS);
 
-const EXAM_SUBJECT_MAP = {
-  mathematiques: 'Mathématiques',
-  physique: 'Physique',
-  chimie: 'Chimie',
-  svt: 'SVT',
-  francais: 'Français',
-  philosophie: 'Philosophie',
-  'histoire-geo': 'Histoire-Géographie',
-  anglais: 'Anglais'
+var EXAM_SUBJECT_MAP = {
+  mathematiques: 'mathematiques',
+  physique: 'physique',
+  chimie: 'chimie',
+  svt: 'svt',
+  philosophie: 'philosophie',
+  histoire: 'histoire',
+  geographie: 'geographie'
 };
 
 const SYMBOL_GROUPS = [
@@ -2018,17 +2016,21 @@ async function renderSectionView(params) {
     });
 
     // ⚡ Lien vers mode examen (avec contexte cahier)
-    $('goToExamBtn')?.addEventListener('click', () => {
-      const subj = $('goToExamBtn').dataset.subject;
-      const chap = $('goToExamBtn').dataset.chapter;
-      const examSubject = EXAM_SUBJECT_MAP[subj] || '';
-      const params = new URLSearchParams();
-      if (examSubject) params.set('subject', examSubject);
-      if (chap) params.set('chapter', chap);
-      if (chapterId) params.set('chapterId', chapterId);
-      params.set('useNotebook', 'true');
-      window.location.href = `exam.html?${params.toString()}`;
-    });
+   $('goToExamBtn')?.addEventListener('click', function () {
+  var subj = $('goToExamBtn').dataset.subject;
+  var chap = $('goToExamBtn').dataset.chapter;
+  var examSubject = EXAM_SUBJECT_MAP[subj] || '';
+  if (!examSubject) {
+    showToast('Cette matière n\'est pas encore disponible en mode examen.', 'info', 3000);
+    return;
+  }
+  var params = new URLSearchParams();
+  params.set('subject', examSubject);
+  if (chap) params.set('chapter', chap);
+  if (chapterId) params.set('chapterId', chapterId);
+  params.set('useNotebook', 'true');
+  window.location.href = 'exam.html?' + params.toString();
+});
 
   } catch (err) {
     if (err.status === 404) showEmptyState(el, 'fa-file', 'Section introuvable', 'Cette section n\'existe plus.');
@@ -2616,17 +2618,21 @@ async function renderLessonView(params) {
     });
 
     // ⚡ Lien vers mode examen (avec contexte cahier)
-    $('goToExamLessonBtn')?.addEventListener('click', () => {
-      const subj = $('goToExamLessonBtn').dataset.subject;
-      const chap = $('goToExamLessonBtn').dataset.chapter;
-      const examSubject = EXAM_SUBJECT_MAP[subj] || '';
-      const params = new URLSearchParams();
-      if (examSubject) params.set('subject', examSubject);
-      if (chap) params.set('chapter', chap);
-      if (chapterId) params.set('chapterId', chapterId);
-      params.set('useNotebook', 'true');
-      window.location.href = `exam.html?${params.toString()}`;
-    });
+  $('goToExamLessonBtn')?.addEventListener('click', function () {
+  var subj = $('goToExamLessonBtn').dataset.subject;
+  var chap = $('goToExamLessonBtn').dataset.chapter;
+  var examSubject = EXAM_SUBJECT_MAP[subj] || '';
+  if (!examSubject) {
+    showToast('Cette matière n\'est pas encore disponible en mode examen.', 'info', 3000);
+    return;
+  }
+  var params = new URLSearchParams();
+  params.set('subject', examSubject);
+  if (chap) params.set('chapter', chap);
+  if (chapterId) params.set('chapterId', chapterId);
+  params.set('useNotebook', 'true');
+  window.location.href = 'exam.html?' + params.toString();
+});
 
   } catch (err) {
     showEmptyState(el, 'fa-exclamation-triangle', 'Erreur', err.message || 'Erreur réseau.');

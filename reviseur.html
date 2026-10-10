@@ -555,6 +555,11 @@
       border-top: 1px solid var(--border-soft);
     }
 
+    .notion-card.open .notion-body {
+  max-height: 60vh !important;   /* ⚡ max 60% de l'écran */
+  overflow-y: auto !important;   /* ⚡ scroll interne */
+}
+
     /* ═══════════════════════════════════════════════════════════
        BLOC INTERNE
        ═══════════════════════════════════════════════════════════ */
@@ -2057,10 +2062,6 @@
     sections.forEach((sec, i) => container.appendChild(buildNotionCard(sec, i)));
 
     renderKaTeX(container);
-
-    const first = container.querySelector('.notion-card');
-    if (first) setTimeout(() => toggleNotion(first), 200);
-  }
 
   function buildNotionCard(section, index) {
     const card = document.createElement('div');

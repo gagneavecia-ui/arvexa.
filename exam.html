@@ -2434,23 +2434,29 @@
     $('progressBar').style.width = `${((state.exerciseIndex + 1) / EXAM_CONSTANTS.REQUIRED_EXERCISES) * 100}%`;
 
     renderMath($('examView'));
+    // ⚡ Scroll en haut pour voir le nouvel exercice
+window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  function goNext() {
-    if (state.exerciseIndex < EXAM_CONSTANTS.REQUIRED_EXERCISES - 1) {
-      state.exerciseIndex += 1;
-      saveActiveSession();
-      renderExercise();
-    }
+ function goNext() {
+  if (state.exerciseIndex < EXAM_CONSTANTS.REQUIRED_EXERCISES - 1) {
+    state.exerciseIndex += 1;
+    saveActiveSession();
+    renderExercise();
+    // ⚡ Remonter en haut pour voir le nouvel exercice
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
+}
 
-  function goPrevious() {
-    if (state.exerciseIndex > 0) {
-      state.exerciseIndex -= 1;
-      saveActiveSession();
-      renderExercise();
-    }
+function goPrevious() {
+  if (state.exerciseIndex > 0) {
+    state.exerciseIndex -= 1;
+    saveActiveSession();
+    renderExercise();
+    // ⚡ Remonter en haut
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
+}
 
   function startTimer() {
     clearInterval(state.timerId);

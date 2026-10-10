@@ -4,136 +4,122 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0A0A0A">
-  <title>ARVEXA — Réviseur</title>
+  <meta name="description" content="ARVEXA School - Réviseur intelligent">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icon.png" type="image/png">
-  <link rel="apple-touch-icon" href="icon.png">
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
   <script src="katex-utils.js" defer></script>
   <script src="register-sw.js" defer></script>
-
   <style>
-    /* ═══════════════════════════════════════════════════════════
-       ROOT — Design tokens ARVEXA
-       ═══════════════════════════════════════════════════════════ */
     :root {
-      --accent: #B8860B;
-      --accent-bright: #E0B84A;
-      --accent-dim: rgba(184, 134, 11, 0.08);
-      --success: #2D7D5A;
-      --success-light: #3AB67E;
-      --danger: #B85C3A;
-      --danger-light: #E07A5F;
-      --warning: #D4A017;
-      --warning-light: #E8C158;
-      --info: #4AAFE0;
-      --purple: #9B59B6;
-
-      --bg-dark: #0A0A0A;
-      --bg-surface: #141414;
-      --bg-card: rgba(20, 20, 20, 0.7);
-
-      --text-light: #F5F0E8;
-      --text-dim: #8A8A7A;
-      --text-muted: #5A5A4A;
-      --text-body: #cfd0cc;
-
-      --border-soft: rgba(255, 255, 255, 0.05);
-      --border-strong: rgba(255, 255, 255, 0.08);
-      --border-gold: rgba(184, 134, 11, 0.15);
-
-      --transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-      --transition-fast: all 0.15s ease;
-
-      --radius-sm: 10px;
-      --radius: 16px;
-      --radius-lg: 20px;
-
-      --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-      --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.5);
-
-      --font-body: 'Inter', system-ui, sans-serif;
-      --font-serif: 'Playfair Display', Georgia, serif;
-
-      --safe-top: env(safe-area-inset-top, 0px);
-      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --black: #0A0A0A;
+      --green: #1A3A2A;
+      --gold: #B8860B;
+      --gold-light: #E0B84A;
+      --white: #FFF;
+      --muted: #9b9c91;
+      --danger: #d7654a;
+      --success: #45b47d;
+      --surface: #151715;
+      --line: rgba(255, 255, 255, .09);
+      --radius: 14px;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    * { box-sizing: border-box; }
 
-    /* ═══════════════════════════════════════════════════════════
-       HTML & BODY — Structure corrigée
-       ═══════════════════════════════════════════════════════════ */
+    /* ⚡ FOND DÉGRADÉ SUR HTML — le body ne s'étire plus */
     html {
       min-width: 320px;
-      width: 100%;
-      /* ⚡ Le fond dégradé est porté par html, pas body */
       background:
-        radial-gradient(ellipse 40% 30% at 30% 15%, rgba(26, 58, 42, 0.16) 0%, transparent 70%),
-        radial-gradient(ellipse 35% 25% at 75% 85%, rgba(184, 134, 11, 0.05) 0%, transparent 60%),
-        linear-gradient(180deg, #0A0A0A 0%, #060606 100%);
+        radial-gradient(circle at 85% 0, rgba(26, 58, 42, .32), transparent 32rem),
+        linear-gradient(180deg, #0a0a0a, #10130f);
       background-attachment: fixed;
-      background-color: #0A0A0A;
+      background-color: #0a0a0a;
       color-scheme: dark;
+      min-height: 100%;
     }
 
-   body {
-  margin: 0;
-  min-height: auto;
-  overflow-x: hidden;
-  background: transparent;
-  color: var(--white);
-  font: 15px/1.6 Inter, system-ui, sans-serif;
-}
+    body {
+      margin: 0;
+      /* ⚡ min-height: auto → le body ne s'étire plus */
+      min-height: auto;
+      overflow-x: hidden;
+      background: transparent;
+      color: var(--white);
+      font: 15px/1.6 Inter, system-ui, sans-serif;
+    }
 
-/* ⚡ Fond dégradé sur html pour couvrir tout l'écran */
-html {
-  min-width: 320px;
-  background:
-    radial-gradient(circle at 85% 0, rgba(26, 58, 42, .32), transparent 32rem),
-    linear-gradient(180deg, #0a0a0a, #10130f);
-  background-attachment: fixed;
-  background-color: #0a0a0a;
-  color-scheme: dark;
-  min-height: 100%;
-}
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+    button:disabled { cursor: not-allowed; opacity: .55; }
 
-    button { cursor: pointer; font-family: inherit; }
-    button:disabled { cursor: not-allowed; opacity: 0.55; }
+    /* SHELL */
+    .shell {
+      width: min(100% - 28px, 980px);
+      margin: 0 auto;
+      padding: 18px 0 30px;
+    }
 
-    /* ═══════════════════════════════════════════════════════════
-       HEADER
-       ═══════════════════════════════════════════════════════════ */
+    /* HEADER */
     header {
-      position: sticky;
-      top: 0;
-      z-index: 50;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: calc(12px + var(--safe-top)) 16px 12px;
-      background: rgba(10, 10, 10, 0.94);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border-bottom: 1px solid var(--border-soft);
-      gap: 12px;
+      gap: 14px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
     }
+
     .brand {
-      color: var(--text-light);
+      color: var(--white);
       text-decoration: none;
-      font: 700 20px var(--font-serif);
-      letter-spacing: 0.04em;
+      font: 700 22px 'Playfair Display', serif;
+      letter-spacing: .05em;
     }
-    .brand span { color: var(--accent-bright); font-style: italic; }
+    .brand span { color: var(--gold-light); font-style: italic; }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .quota-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      background: rgba(224, 184, 74, .08);
+      border: 1px solid rgba(224, 184, 74, .2);
+      color: var(--gold-light);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .05em;
+      white-space: nowrap;
+      transition: all .25s ease;
+    }
+    .quota-badge i { font-size: 11px; }
+    .quota-badge.warning {
+      background: rgba(215, 101, 74, .1);
+      border-color: rgba(215, 101, 74, .3);
+      color: #ff9a84;
+    }
+    .quota-badge.premium {
+      background: rgba(69, 180, 125, .1);
+      border-color: rgba(69, 180, 125, .3);
+      color: #7ce0aa;
+    }
+
     .connection {
-      color: var(--text-muted);
+      color: var(--muted);
       font-size: 12px;
       display: flex;
       align-items: center;
@@ -144,204 +130,157 @@ html {
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background: var(--accent);
+      background: var(--gold);
     }
-    .connection.online::before { background: var(--success-light); }
+    .connection.online::before { background: var(--success); }
 
-    /* ═══════════════════════════════════════════════════════════
-       SHELL
-       ═══════════════════════════════════════════════════════════ */
-   .shell {
-  width: min(100% - 28px, 980px);
-  margin: 0 auto;
-  padding: 18px 0 30px;
-  /* ⚡ pas de flex, pas de height : le shell prend juste la hauteur du contenu */
-}
-
-    /* ═══════════════════════════════════════════════════════════
-       STEP BAR
-       ═══════════════════════════════════════════════════════════ */
-    .step-bar {
-      display: none;
-      align-items: center;
-      gap: 8px;
-      padding: 12px 16px;
-      margin-bottom: 20px;
-      background: var(--bg-card);
-      border: 1px solid var(--border-soft);
-      border-radius: 12px;
-      overflow-x: auto;
-    }
-    .step-bar.show { display: flex; }
-    .step-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-      white-space: nowrap;
-      color: var(--text-muted);
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid transparent;
-      flex-shrink: 0;
-    }
-    .step-item .num {
-      width: 20px; height: 20px;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 10px; font-weight: 800;
-      background: rgba(255, 255, 255, 0.05);
-      color: var(--text-muted);
-    }
-    .step-item.active {
-      background: rgba(224, 184, 74, 0.1);
-      border-color: rgba(224, 184, 74, 0.25);
-      color: var(--accent-bright);
-    }
-    .step-item.active .num { background: var(--accent-bright); color: #0A0A0A; }
-    .step-item.done { color: var(--success-light); background: rgba(69, 180, 125, 0.06); }
-    .step-item.done .num { background: var(--success-light); color: #0A0A0A; }
-    .step-item.done .num::before { content: '✓'; }
-    .step-item.done .num span { display: none; }
-    .step-sep { color: var(--text-muted); font-size: 10px; opacity: 0.5; }
-
-    /* ═══════════════════════════════════════════════════════════
-       PANEL
-       ═══════════════════════════════════════════════════════════ */
+    /* PANEL */
     .panel {
-      background: var(--bg-card);
-      border: 1px solid var(--border-soft);
-      border-radius: 14px;
+      background: rgba(21, 23, 21, .88);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
       padding: 22px;
-      /* ⚡ height: auto → le panel ne s'étire plus */
-      height: auto;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, .2);
     }
 
-    .view { display: none; }
-    .view.active {
-      display: block;
-      height: auto;
-      animation: appear 0.3s ease;
-    }
+    /* VIEWS */
+    .view { display: none; animation: appear .24s ease both; }
+    .view.active { display: block; }
     @keyframes appear {
       from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: none; }
     }
 
-    h1, h2 {
+    /* TYPOGRAPHIE */
+    h1, h2, h3 {
       margin: 0;
       line-height: 1.2;
-      font-family: var(--font-serif);
-      color: var(--text-light);
+      font-family: 'Playfair Display', serif;
     }
-    h1 { font-size: clamp(24px, 4.5vw, 36px); }
-    h2 { font-size: clamp(19px, 3.5vw, 24px); }
+    h1 { font-size: clamp(28px, 6vw, 46px); max-width: 680px; }
+    h2 { font-size: clamp(23px, 4vw, 32px); }
 
     .eyebrow {
-      color: var(--accent-bright);
+      color: var(--gold-light);
       font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.14em;
+      font-weight: 800;
+      letter-spacing: .14em;
       text-transform: uppercase;
       margin-bottom: 10px;
     }
+
     .lead {
-      color: var(--text-dim);
-      max-width: 620px;
+      color: var(--muted);
+      max-width: 650px;
       margin: 12px 0 0;
-      line-height: 1.7;
-      font-size: 14.5px;
     }
 
-    /* ═══════════════════════════════════════════════════════════
-       FORM
-       ═══════════════════════════════════════════════════════════ */
+    /* FORMULAIRE */
     .form-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 16px;
-      margin-top: 22px;
+      margin-top: 24px;
     }
-    .field { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
     .field.full { grid-column: 1 / -1; }
-    label { color: var(--text-light); font-size: 13px; font-weight: 600; }
-
-    /* ═══════════════════════════════════════════════════════════
-       CHIPS
-       ═══════════════════════════════════════════════════════════ */
-    .chips-row { display: flex; gap: 8px; flex-wrap: wrap; }
-    .chip {
-      padding: 8px 16px;
-      border-radius: 20px;
-      border: 1px solid var(--border-soft);
-      background: transparent;
-      color: var(--text-dim);
-      font-size: 12.5px;
-      font-weight: 600;
-      transition: var(--transition);
+    label {
+      color: #e5e5dc;
+      font-size: 13px;
+      font-weight: 700;
     }
-    .chip.active {
-      background: rgba(224, 184, 74, 0.12);
-      border-color: rgba(224, 184, 74, 0.3);
-      color: var(--accent-bright);
+    input, select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #0e100e;
+      color: var(--white);
+      padding: 12px 13px;
+      outline: none;
+      transition: border-color .16s;
+    }
+    input:focus, select:focus {
+      border-color: var(--gold-light);
+      box-shadow: 0 0 0 3px rgba(224, 184, 74, .12);
     }
 
-    /* ═══════════════════════════════════════════════════════════
-       BUTTONS
-       ═══════════════════════════════════════════════════════════ */
-    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    /* BOUTONS */
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 24px;
+    }
     .btn {
-      min-height: 50px;
+      min-height: 44px;
       border: 1px solid transparent;
-      border-radius: 30px;
-      padding: 14px 24px;
-      color: var(--text-light);
-      background: rgba(255, 255, 255, 0.04);
-      font-weight: 600;
-      font-size: 14px;
-      transition: var(--transition);
+      border-radius: 10px;
+      padding: 10px 18px;
+      color: var(--white);
+      background: #222722;
+      font-weight: 800;
+      transition: transform .16s, background .16s, border-color .16s;
+      text-decoration: none;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
+      font-family: inherit;
+    }
+    .btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      border-color: rgba(224, 184, 74, .55);
     }
     .btn.primary {
-      background: linear-gradient(135deg, var(--accent-bright), var(--accent));
-      color: #0A0A0A;
-      font-weight: 700;
+      background: linear-gradient(135deg, var(--gold-light), var(--gold));
+      color: var(--black);
     }
     .btn.secondary {
       background: transparent;
-      border-color: var(--border-strong);
-      color: var(--text-dim);
+      border-color: var(--line);
     }
     .btn.full { width: 100%; }
 
-    /* ═══════════════════════════════════════════════════════════
-       LOADER
-       ═══════════════════════════════════════════════════════════ */
+    /* LOADER */
     .loader {
       display: none;
-      width: 18px; height: 18px;
-      border: 2px solid rgba(10, 10, 10, 0.25);
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(10, 10, 10, .25);
       border-top-color: currentColor;
       border-radius: 50%;
-      animation: spin 0.7s linear infinite;
+      animation: spin .7s linear infinite;
+    }
+    .btn.secondary .loader {
+      border-color: rgba(255, 255, 255, .2);
+      border-top-color: var(--white);
     }
     .btn.loading .loader { display: inline-block; }
     .btn.loading .btn-text { display: none; }
+    .btn.loading .btn-icon { display: none; }
+
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    .status { min-height: 20px; margin-top: 12px; color: var(--text-dim); font-size: 13px; }
+    /* STATUS */
+    .status {
+      min-height: 22px;
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 13px;
+    }
     .status.error { color: #ff9a84; }
-    .status.info { color: var(--accent-bright); }
+    .status.success { color: #7ce0aa; }
 
-    /* ═══════════════════════════════════════════════════════════
-       CUSTOM SELECT
-       ═══════════════════════════════════════════════════════════ */
-    .custom-select { position: relative; width: 100%; user-select: none; }
+    /* CUSTOM SELECT */
+    .custom-select {
+      position: relative;
+      width: 100%;
+      user-select: none;
+    }
     .custom-select-trigger {
       display: flex;
       align-items: center;
@@ -350,45 +289,79 @@ html {
       width: 100%;
       min-height: 46px;
       padding: 12px 14px;
-      background: rgba(0, 0, 0, 0.3);
-      border: 1px solid var(--border-soft);
+      background: #0e100e;
+      border: 1px solid var(--line);
       border-radius: 10px;
-      color: var(--text-light);
+      color: var(--white);
       font-size: 14px;
-      text-align: left;
+      font-weight: 500;
       cursor: pointer;
+      transition: all .16s ease;
+      text-align: left;
+      font-family: inherit;
     }
-    .custom-select.open .custom-select-trigger { border-color: var(--accent-bright); }
+    .custom-select-trigger:hover:not(.disabled) {
+      border-color: rgba(224, 184, 74, .3);
+      background: #121612;
+    }
+    .custom-select.open .custom-select-trigger {
+      border-color: var(--gold-light);
+      box-shadow: 0 0 0 3px rgba(224, 184, 74, .12);
+      background: #121612;
+    }
     .custom-select-value {
-      flex: 1; min-width: 0;
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-      display: flex; align-items: center; gap: 8px;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-    .custom-select-value .icon-prefix { color: var(--accent-bright); font-size: 13px; }
+    .custom-select-value .icon-prefix {
+      color: var(--gold-light);
+      font-size: 13px;
+      flex-shrink: 0;
+    }
     .custom-select-arrow {
-      color: var(--text-muted); font-size: 12px;
-      transition: transform 0.25s ease;
+      color: var(--muted);
+      font-size: 12px;
+      flex-shrink: 0;
+      transition: transform .25s cubic-bezier(.25, 1, .5, 1);
     }
-    .custom-select.open .custom-select-arrow { transform: rotate(180deg); color: var(--accent-bright); }
+    .custom-select.open .custom-select-arrow {
+      transform: rotate(180deg);
+      color: var(--gold-light);
+    }
     .custom-select-options {
       position: absolute;
       top: calc(100% + 6px);
-      left: 0; right: 0;
+      left: 0;
+      right: 0;
       z-index: 50;
       max-height: 280px;
       overflow-y: auto;
-      background: #171717;
-      border: 1px solid var(--border-strong);
-      border-radius: 10px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+      background: linear-gradient(145deg, #171a17, #101310);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, .5), 0 0 0 1px rgba(224, 184, 74, .05);
       padding: 6px;
       opacity: 0;
       visibility: hidden;
-      transform: translateY(-8px);
-      transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
+      transform: translateY(-8px) scale(.98);
+      transition: opacity .2s ease, visibility .2s ease, transform .2s cubic-bezier(.25, 1, .5, 1);
+      transform-origin: top center;
     }
     .custom-select.open .custom-select-options {
-      opacity: 1; visibility: visible; transform: translateY(0);
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0) scale(1);
+    }
+    .custom-select-options::-webkit-scrollbar { width: 4px; }
+    .custom-select-options::-webkit-scrollbar-thumb {
+      background: rgba(224, 184, 74, .2);
+      border-radius: 10px;
     }
     .custom-select-option {
       display: flex;
@@ -396,87 +369,204 @@ html {
       gap: 10px;
       padding: 11px 14px;
       border-radius: 8px;
-      color: var(--text-body);
+      color: #e2e3dc;
       font-size: 14px;
       font-weight: 500;
       cursor: pointer;
+      transition: all .15s ease;
+      position: relative;
     }
-    .custom-select-option:hover { background: rgba(224, 184, 74, 0.08); color: var(--text-light); }
-    .custom-select-option.selected { background: rgba(224, 184, 74, 0.12); color: var(--accent-bright); font-weight: 600; }
-    .custom-select-option .option-prefix { color: var(--accent-bright); font-size: 13px; width: 18px; text-align: center; }
+    .custom-select-option:hover,
+    .custom-select-option.focused {
+      background: rgba(224, 184, 74, .08);
+      color: var(--white);
+    }
+    .custom-select-option.selected {
+      background: rgba(224, 184, 74, .12);
+      color: var(--gold-light);
+      font-weight: 700;
+    }
+    .custom-select-option.selected::after {
+      content: '✓';
+      margin-left: auto;
+      color: var(--gold-light);
+      font-size: 12px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+    .custom-select-option .option-prefix {
+      color: var(--gold-light);
+      font-size: 13px;
+      flex-shrink: 0;
+      width: 18px;
+      text-align: center;
+    }
 
-    /* ═══════════════════════════════════════════════════════════
-       LOADING STEPS
-       ═══════════════════════════════════════════════════════════ */
+    /* MODES */
+    .modes {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .mode-card {
+      padding: 16px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: #0e100e;
+      cursor: pointer;
+      transition: all .16s ease;
+      text-align: left;
+    }
+    .mode-card:hover { border-color: rgba(224, 184, 74, .3); }
+    .mode-card.active {
+      border-color: var(--gold-light);
+      background: rgba(224, 184, 74, .08);
+    }
+    .mode-card .mode-emoji {
+      font-size: 22px;
+      display: block;
+      margin-bottom: 6px;
+      line-height: 1;
+    }
+    .mode-card .mode-name {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--white);
+      display: block;
+      margin-bottom: 2px;
+    }
+    .mode-card .mode-desc {
+      font-size: 12px;
+      color: var(--muted);
+      display: block;
+      line-height: 1.4;
+    }
+
+    /* LOADING STEPS */
     .loading-steps {
-      margin-top: 26px;
+      margin-top: 28px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 22px;
+      gap: 24px;
     }
     .loader-spinner {
-      width: 52px; height: 52px;
-      border: 3px solid rgba(224, 184, 74, 0.15);
-      border-top-color: var(--accent-bright);
+      width: 56px;
+      height: 56px;
+      border: 3px solid rgba(224, 184, 74, .15);
+      border-top-color: var(--gold-light);
       border-radius: 50%;
       animation: spin 0.9s linear infinite;
+      flex-shrink: 0;
     }
     .steps-list {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
       width: 100%;
-      max-width: 460px;
+      max-width: 480px;
     }
     .loading-step {
       display: flex;
       align-items: flex-start;
-      gap: 12px;
-      padding: 12px 14px;
-      border-radius: 10px;
-      background: rgba(20, 20, 20, 0.5);
-      border: 1px solid var(--border-soft);
+      gap: 14px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      background: #101410;
+      border: 1px solid var(--line);
+      border-left: 3px solid transparent;
+      transition: all .35s cubic-bezier(.25, 1, .5, 1);
       opacity: 0.5;
-      transition: all 0.3s ease;
     }
-    .loading-step.active { opacity: 1; background: rgba(224, 184, 74, 0.06); border-color: rgba(224, 184, 74, 0.2); }
-    .loading-step.done { opacity: 0.85; background: rgba(69, 180, 125, 0.04); border-color: rgba(69, 180, 125, 0.15); }
+    .loading-step.active {
+      opacity: 1;
+      background: rgba(224, 184, 74, .06);
+      border-left-color: var(--gold-light);
+      border-color: rgba(224, 184, 74, .2);
+      transform: translateX(4px);
+      box-shadow: 0 4px 20px rgba(224, 184, 74, .08);
+    }
+    .loading-step.done {
+      opacity: 0.85;
+      background: rgba(69, 180, 125, .04);
+      border-left-color: var(--success);
+      border-color: rgba(69, 180, 125, .15);
+    }
     .loading-step.done::after {
       content: '✓';
       margin-left: auto;
-      color: var(--success-light);
+      color: var(--success);
       font-weight: 800;
-      font-size: 15px;
+      font-size: 16px;
+      flex-shrink: 0;
     }
-    .step-icon { font-size: 20px; line-height: 1; width: 26px; text-align: center; opacity: 0.7; }
-    .loading-step.active .step-icon { opacity: 1; }
-    .step-content { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
-    .step-label { font-size: 13.5px; font-weight: 600; color: var(--text-light); }
-    .loading-step.active .step-label { color: var(--accent-bright); }
-    .loading-step.done .step-label { color: var(--success-light); }
-    .step-desc { font-size: 11.5px; color: var(--text-muted); }
-    .loading-status { font-size: 13px; color: var(--text-muted); text-align: center; min-height: 20px; }
-    .loading-status.active { color: var(--accent-bright); font-weight: 600; }
+    .step-icon {
+      font-size: 22px;
+      line-height: 1;
+      flex-shrink: 0;
+      width: 28px;
+      text-align: center;
+      filter: grayscale(0.6);
+      transition: filter .3s ease;
+    }
+    .loading-step.active .step-icon {
+      filter: none;
+      animation: pulseStep 1.5s ease-in-out infinite;
+    }
+    @keyframes pulseStep {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+    }
+    .step-content {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+      flex: 1;
+    }
+    .step-label {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1.3;
+    }
+    .loading-step.active .step-label { color: var(--gold-light); }
+    .loading-step.done .step-label { color: var(--success); }
+    .step-desc {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+    .loading-status {
+      font-size: 13px;
+      color: var(--muted);
+      text-align: center;
+      font-style: italic;
+      min-height: 20px;
+      transition: color .3s ease;
+    }
+    .loading-status.active {
+      color: var(--gold-light);
+      font-style: normal;
+      font-weight: 600;
+    }
 
-    /* ═══════════════════════════════════════════════════════════
-       SESSION HEAD
-       ═══════════════════════════════════════════════════════════ */
+    /* SESSION HEAD */
     .session-head {
       display: flex;
       justify-content: space-between;
-      align-items: flex-end;
+      align-items: end;
       gap: 12px;
       margin-bottom: 18px;
       flex-wrap: wrap;
     }
-    .session-head h2 { font-size: clamp(18px, 3vw, 22px); }
+    .session-head h2 { font-size: clamp(22px, 4vw, 28px); }
     .session-meta {
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
       font-size: 12px;
-      color: var(--text-muted);
+      color: var(--muted);
       margin-top: 8px;
     }
     .session-meta span {
@@ -485,473 +575,155 @@ html {
       gap: 5px;
       padding: 4px 10px;
       border-radius: 20px;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--border-soft);
+      background: rgba(255, 255, 255, .03);
+      border: 1px solid var(--line);
     }
-    .session-meta i { color: var(--accent-bright); font-size: 11px; }
+    .session-meta i { color: var(--gold-light); font-size: 11px; }
 
-    /* ═══════════════════════════════════════════════════════════
-       NOTION CARD
-       ═══════════════════════════════════════════════════════════ */
-    .notion-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-soft);
+    /* PROGRESS BAR */
+    .progress {
+      height: 6px;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #262b26;
+      margin: 14px 0 22px;
+    }
+    .progress span {
+      display: block;
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold), var(--gold-light));
+      transition: width .3s ease;
+      width: 0%;
+    }
+
+    /* CARTES SIMPLES */
+    .card {
+      background: #101410;
+      border: 1px solid var(--line);
       border-radius: 12px;
+      padding: 18px 20px;
       margin-bottom: 10px;
-      overflow: hidden;
-      transition: var(--transition);
+      transition: border-color .16s ease;
     }
-    .notion-card.open { border-color: rgba(224, 184, 74, 0.25); }
-
-    .notion-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 14px 16px;
-      cursor: pointer;
-      user-select: none;
-    }
-    .notion-header:hover { background: rgba(255, 255, 255, 0.02); }
-
-    .notion-num {
-      width: 30px; height: 30px;
-      border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      font: 700 13px var(--font-serif);
-      background: rgba(224, 184, 74, 0.1);
-      color: var(--accent-bright);
-      border: 1px solid rgba(224, 184, 74, 0.15);
-      flex-shrink: 0;
-    }
-    .notion-title-wrap { flex: 1; min-width: 0; }
-    .notion-title {
-      font: 600 14.5px var(--font-body);
-      color: var(--text-light);
-      line-height: 1.35;
-    }
-    .notion-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
-    .notion-toggle {
-      width: 26px; height: 26px;
-      display: flex; align-items: center; justify-content: center;
-      color: var(--text-muted);
-      font-size: 11px;
-      flex-shrink: 0;
-      transition: transform 0.3s ease, color 0.2s ease;
-    }
-    .notion-card.open .notion-toggle { transform: rotate(180deg); color: var(--accent-bright); }
-
-    .notion-body {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-      will-change: max-height;
-    }
-    .notion-card.open .notion-body {
-      max-height: 5000px;
-      overflow: visible;
-    }
-
-    .notion-content {
-      padding: 14px 16px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      border-top: 1px solid var(--border-soft);
-    }
-
-    .notion-card.open .notion-body {
-  max-height: 60vh !important;   /* ⚡ max 60% de l'écran */
-  overflow-y: auto !important;   /* ⚡ scroll interne */
-}
-
-    /* ═══════════════════════════════════════════════════════════
-       BLOC INTERNE
-       ═══════════════════════════════════════════════════════════ */
-    .block {
-      background: rgba(0, 0, 0, 0.25);
-      border-radius: 10px;
-      padding: 12px 14px;
-      overflow-wrap: break-word;
-    }
-    .block-label {
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--accent-bright);
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .block-label i { font-size: 11px; }
-    .block-text {
+    .card:hover { border-color: rgba(224, 184, 74, .2); }
+    .card-title {
       font-size: 14px;
-      color: var(--text-body);
-      line-height: 1.7;
-    }
-
-    /* ═══════════════════════════════════════════════════════════
-       FORMULES
-       ═══════════════════════════════════════════════════════════ */
-    .formula-list { display: flex; flex-direction: column; gap: 10px; }
-    .formula-item { padding: 10px 0; text-align: center; }
-    .formula-latex {
-      font-size: 15px;
-      color: var(--text-light);
-      padding: 4px 0;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-    }
-    .formula-meta {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 6px;
-      margin-top: 8px;
-      font-size: 11px;
-    }
-    .formula-meta .tag {
-      padding: 2px 8px;
-      border-radius: 6px;
-      background: rgba(255, 255, 255, 0.04);
-      color: var(--text-dim);
-    }
-
-    /* ═══════════════════════════════════════════════════════════
-       MÉTHODE
-       ═══════════════════════════════════════════════════════════ */
-    .method-steps { list-style: none; padding: 0; counter-reset: step; }
-    .method-steps li {
-      position: relative;
-      padding-left: 28px;
-      counter-increment: step;
-      font-size: 13.5px;
-      color: var(--text-body);
-      line-height: 1.7;
-      margin-bottom: 8px;
-    }
-    .method-steps li:last-child { margin-bottom: 0; }
-    .method-steps li::before {
-      content: counter(step);
-      position: absolute;
-      left: 0; top: 2px;
-      width: 20px; height: 20px;
-      border-radius: 50%;
-      background: rgba(224, 184, 74, 0.12);
-      color: var(--accent-bright);
-      font-size: 10px;
       font-weight: 800;
-      display: flex; align-items: center; justify-content: center;
-    }
-
-    /* ═══════════════════════════════════════════════════════════
-       EXEMPLE
-       ═══════════════════════════════════════════════════════════ */
-    .example-enonce {
-      padding: 10px 12px;
-      border-radius: 8px;
-      background: rgba(0, 0, 0, 0.3);
-      font-size: 13.5px;
-      color: var(--text-light);
-      line-height: 1.6;
-      margin-bottom: 10px;
-    }
-    .example-steps {
-      list-style: none;
-      padding: 0;
-      counter-reset: estep;
-      margin-bottom: 10px;
-    }
-    .example-steps li {
-      position: relative;
-      padding-left: 26px;
-      counter-increment: estep;
-      font-size: 13.5px;
-      color: var(--text-body);
-      line-height: 1.7;
-      margin-bottom: 6px;
-    }
-    .example-steps li::before {
-      content: counter(estep) '.';
-      position: absolute;
-      left: 0; top: 0;
-      color: var(--accent-bright);
-      font-weight: 700;
-    }
-    .example-conclusion {
-      padding: 8px 12px;
-      border-radius: 8px;
-      background: rgba(69, 180, 125, 0.08);
-      font-size: 13.5px;
-      color: #7ce0aa;
-      font-weight: 600;
-    }
-
-    /* ═══════════════════════════════════════════════════════════
-       PIÈGE
-       ═══════════════════════════════════════════════════════════ */
-    .piege-trap {
-      font-size: 13.5px;
-      color: var(--text-light);
-      line-height: 1.65;
-      margin-bottom: 8px;
-    }
-    .piege-solution {
-      position: relative;
-      padding-left: 18px;
-      font-size: 13px;
-      color: #7ce0aa;
-      line-height: 1.65;
-    }
-    .piege-solution::before {
-      content: '→';
-      position: absolute;
-      left: 0; top: 0;
-      font-weight: 700;
-    }
-
-    /* ═══════════════════════════════════════════════════════════
-       GLOBAL BLOCK
-       ═══════════════════════════════════════════════════════════ */
-    .global-block {
-      padding: 14px 16px;
-      border-radius: 10px;
+      color: var(--gold-light);
       margin-bottom: 12px;
-      background: rgba(255, 255, 255, 0.015);
-      border: 1px solid var(--border-soft);
-    }
-    .global-title {
-      font-size: 11.5px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--accent-bright);
-      margin-bottom: 10px;
       display: flex;
       align-items: center;
       gap: 8px;
     }
-    .global-list { list-style: none; padding: 0; }
-    .global-list li {
-      position: relative;
-      padding-left: 18px;
-      font-size: 14px;
-      color: var(--text-body);
-      line-height: 1.7;
-      margin-bottom: 6px;
+    .card-title i { font-size: 13px; }
+    .card-body {
+      font-size: 15px;
+      line-height: 1.75;
+      color: #e2e3dc;
     }
-    .global-list li::before {
-      content: '•';
-      position: absolute;
-      left: 4px; top: 0;
-      color: var(--accent);
-      font-weight: 700;
-    }
-
-    .sections-label {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font: 700 16px var(--font-serif);
-      color: var(--text-light);
-      margin: 20px 0 12px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid var(--border-soft);
-    }
-    .sections-label i { color: var(--accent-bright); font-size: 14px; }
-    .sections-label .count {
-      margin-left: auto;
-      font-family: var(--font-body);
-      font-size: 11px;
-      color: var(--text-muted);
-      font-weight: 600;
-      text-transform: uppercase;
+    .card-body strong { color: var(--gold-light); font-weight: 700; }
+    .card-body ul { padding-left: 20px; margin: 8px 0; }
+    .card-body li { margin-bottom: 6px; }
+    .card-body code {
+      background: rgba(224, 184, 74, .1);
+      color: var(--gold-light);
+      padding: 2px 7px;
+      border-radius: 5px;
+      font-family: 'Consolas', monospace;
+      font-size: 13px;
     }
 
-    /* ═══════════════════════════════════════════════════════════
-       FLASHCARD
-       ═══════════════════════════════════════════════════════════ */
-    .flashcard-progress {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 16px;
-      font-size: 12px;
-      color: var(--text-muted);
-      flex-wrap: wrap;
-    }
-    .flashcard-progress .counter { font-weight: 700; color: var(--accent-bright); }
-    .flashcard-track {
-      flex: 1; min-width: 100px; height: 4px;
-      border-radius: 4px;
-      background: rgba(255, 255, 255, 0.06);
-      overflow: hidden;
-    }
-    .flashcard-track-fill {
-      height: 100%; border-radius: 4px;
-      background: linear-gradient(90deg, var(--accent), var(--accent-bright));
-      transition: width 0.4s ease;
-    }
+    /* FLASHCARDS */
     .flashcard {
-      perspective: 1400px;
-      margin-bottom: 16px;
+      perspective: 1200px;
+      margin-bottom: 18px;
+      min-height: 220px;
     }
     .flashcard-inner {
       position: relative;
       width: 100%;
-      height: 280px;
-      transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+      height: 220px;
+      transition: transform .6s cubic-bezier(.25, 1, .5, 1);
       transform-style: preserve-3d;
       cursor: pointer;
     }
     .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+
     .flashcard-face {
-      position: absolute; inset: 0;
+      position: absolute;
+      inset: 0;
       backface-visibility: hidden;
-      -webkit-backface-visibility: hidden;
-      border-radius: 12px;
+      border-radius: 14px;
       padding: 24px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
-      border: 1px solid var(--border-soft);
-      background: var(--bg-card);
+      border: 1px solid var(--line);
+      background: #101410;
       overflow-y: auto;
     }
     .flashcard-back {
       transform: rotateY(180deg);
-      border-color: rgba(224, 184, 74, 0.25);
-    }
-    .flashcard-type-badge {
-      display: inline-flex;
-      align-items: center;
-      padding: 3px 10px;
-      border-radius: 12px;
-      font-size: 9.5px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 12px;
-      background: rgba(224, 184, 74, 0.1);
-      color: var(--accent-bright);
+      border-color: rgba(224, 184, 74, .3);
+      background: rgba(224, 184, 74, .04);
     }
     .flashcard-label {
       font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.12em;
+      font-weight: 800;
+      letter-spacing: .14em;
       text-transform: uppercase;
-      color: var(--text-muted);
-      margin-bottom: 12px;
+      color: var(--gold-light);
+      margin-bottom: 14px;
     }
     .flashcard-text {
-      font-size: 16px;
+      font-size: 17px;
       line-height: 1.6;
-      color: var(--text-light);
+      color: var(--white);
       font-weight: 500;
-      word-break: break-word;
       width: 100%;
     }
     .flashcard-hint {
       font-size: 12px;
-      color: var(--text-muted);
-      margin-top: 14px;
-      font-style: italic;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .flashcard-hint i { color: var(--accent-bright); font-size: 11px; }
-    .flashcard-flip-hint {
-      text-align: center;
-      font-size: 11.5px;
-      color: var(--text-muted);
-      margin-bottom: 14px;
+      color: var(--muted);
+      margin-top: 16px;
       font-style: italic;
     }
-    .flashcard-feedback {
-      display: none;
-      gap: 8px;
-      margin-bottom: 14px;
-    }
-    .flashcard-feedback.show {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-    }
-    .feedback-btn {
-      padding: 12px 8px;
-      border-radius: 10px;
-      border: 1px solid var(--border-soft);
-      background: rgba(255, 255, 255, 0.02);
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      color: var(--text-dim);
-      transition: all 0.15s ease;
-    }
-    .feedback-btn i { font-size: 16px; }
-    .feedback-btn.hard:hover { background: rgba(215, 101, 74, 0.1); border-color: rgba(215, 101, 74, 0.3); color: #ff9a84; }
-    .feedback-btn.medium:hover { background: rgba(212, 160, 23, 0.1); border-color: rgba(212, 160, 23, 0.3); color: #fbbf24; }
-    .feedback-btn.easy:hover { background: rgba(69, 180, 125, 0.1); border-color: rgba(69, 180, 125, 0.3); color: #7ce0aa; }
 
-    /* ═══════════════════════════════════════════════════════════
-       QUIZ
-       ═══════════════════════════════════════════════════════════ */
-    .progress {
-      height: 4px;
-      border-radius: 10px;
-      overflow: hidden;
-      background: rgba(255, 255, 255, 0.06);
-      margin: 12px 0 20px;
-    }
-    .progress span {
-      display: block;
-      height: 100%;
-      background: linear-gradient(90deg, var(--accent), var(--accent-bright));
-      transition: width 0.3s ease;
-      width: 0%;
-    }
-    .quiz-question {
-      background: var(--bg-card);
-      border: 1px solid var(--border-soft);
-      border-radius: 12px;
-      padding: 16px 18px;
-      margin-bottom: 12px;
-    }
-    .quiz-q-header {
+    .flashcard-nav {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 8px;
-      margin-bottom: 10px;
-      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .flashcard-counter {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    /* QUIZ */
+    .quiz-question {
+      background: #101410;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 18px 20px;
+      margin-bottom: 12px;
     }
     .quiz-q-number {
       font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.1em;
+      font-weight: 800;
+      letter-spacing: .14em;
       text-transform: uppercase;
-      color: var(--accent-bright);
-    }
-    .quiz-q-level {
-      font-size: 10px;
-      font-weight: 700;
-      padding: 3px 10px;
-      border-radius: 10px;
-      text-transform: uppercase;
-      background: rgba(255, 255, 255, 0.04);
-      color: var(--text-dim);
+      color: var(--gold-light);
+      margin-bottom: 8px;
     }
     .quiz-q-text {
       font-size: 15px;
-      line-height: 1.65;
-      color: var(--text-light);
+      line-height: 1.6;
+      color: var(--white);
       font-weight: 500;
       margin-bottom: 14px;
     }
@@ -960,243 +732,235 @@ html {
       display: flex;
       align-items: flex-start;
       gap: 12px;
-      padding: 12px 14px;
+      padding: 11px 13px;
       border-radius: 10px;
-      border: 1px solid var(--border-soft);
-      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--line);
+      background: #0e100e;
       cursor: pointer;
+      transition: all .16s ease;
       font-size: 14px;
-      color: var(--text-body);
-      line-height: 1.5;
-      transition: all 0.15s ease;
+      color: #e2e3dc;
     }
     .quiz-option:hover:not(.disabled) {
-      border-color: rgba(224, 184, 74, 0.4);
-      background: rgba(224, 184, 74, 0.04);
+      border-color: rgba(224, 184, 74, .4);
+      background: rgba(224, 184, 74, .04);
     }
-    .quiz-option.selected { border-color: var(--accent-bright); background: rgba(224, 184, 74, 0.1); color: var(--text-light); }
-    .quiz-option.correct { border-color: var(--success-light); background: rgba(69, 180, 125, 0.12); color: #7ce0aa; }
-    .quiz-option.wrong { border-color: var(--danger); background: rgba(215, 101, 74, 0.12); color: #ff9a84; }
+    .quiz-option.selected {
+      border-color: var(--gold-light);
+      background: rgba(224, 184, 74, .1);
+      color: var(--white);
+    }
+    .quiz-option.correct {
+      border-color: var(--success);
+      background: rgba(69, 180, 125, .12);
+      color: #7ce0aa;
+    }
+    .quiz-option.wrong {
+      border-color: var(--danger);
+      background: rgba(215, 101, 74, .12);
+      color: #ff9a84;
+    }
     .quiz-option.disabled { cursor: not-allowed; }
     .quiz-option-letter {
-      width: 24px; height: 24px;
+      width: 26px;
+      height: 26px;
       border-radius: 6px;
-      background: rgba(255, 255, 255, 0.04);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--text-muted);
+      background: rgba(255, 255, 255, .04);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 800;
       flex-shrink: 0;
+      color: var(--muted);
     }
-    .quiz-option.selected .quiz-option-letter { background: var(--accent-bright); color: #0A0A0A; }
-    .quiz-option.correct .quiz-option-letter { background: var(--success-light); color: #fff; }
-    .quiz-option.wrong .quiz-option-letter { background: var(--danger); color: #fff; }
+    .quiz-option.selected .quiz-option-letter {
+      background: var(--gold-light);
+      color: var(--black);
+    }
+    .quiz-option.correct .quiz-option-letter {
+      background: var(--success);
+      color: var(--white);
+    }
+    .quiz-option.wrong .quiz-option-letter {
+      background: var(--danger);
+      color: var(--white);
+    }
 
     .quiz-explanation {
       margin-top: 12px;
-      padding: 10px 12px;
-      background: rgba(74, 175, 224, 0.06);
-      border-radius: 8px;
+      padding: 12px 14px;
+      background: rgba(74, 175, 224, .08);
+      border-left: 3px solid #4AAFE0;
+      border-radius: 0 8px 8px 0;
       font-size: 13px;
-      line-height: 1.65;
-      color: var(--text-body);
+      line-height: 1.6;
+      color: #cfd0cc;
       display: none;
     }
     .quiz-explanation.show { display: block; }
     .quiz-explanation strong { color: #4AAFE0; }
 
-    /* ═══════════════════════════════════════════════════════════
-       RESULT
-       ═══════════════════════════════════════════════════════════ */
+    /* RÉSULTATS */
     .result-hero {
       text-align: center;
-      padding: 28px 22px;
-      background: var(--bg-card);
-      border: 1px solid var(--border-soft);
-      border-radius: 12px;
-      margin-bottom: 18px;
+      padding: 30px 20px;
+      background: rgba(21, 23, 21, .88);
+      border: 1px solid rgba(224, 184, 74, .15);
+      border-radius: 14px;
+      margin-bottom: 16px;
     }
-    .result-hero .emoji { font-size: 52px; display: block; margin-bottom: 12px; }
-    .result-hero h2 { font-size: clamp(20px, 4vw, 26px); margin-bottom: 6px; }
-    .result-hero p { color: var(--text-dim); font-size: 14px; }
+    .result-hero .emoji { font-size: 56px; display: block; margin-bottom: 12px; line-height: 1; }
+    .result-hero h2 { font-size: 26px; margin-bottom: 8px; }
+    .result-hero p { color: var(--muted); margin: 0; font-size: 14px; }
 
     .result-summary {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-bottom: 18px;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
     }
     .metric {
-      border: 1px solid var(--border-soft);
-      border-radius: 10px;
-      padding: 14px 10px;
-      background: var(--bg-card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 18px 14px;
+      background: #101310;
       text-align: center;
     }
     .metric strong {
       display: block;
-      color: var(--accent-bright);
-      font-size: 22px;
-      font-family: var(--font-serif);
-      line-height: 1.1;
-      margin-bottom: 4px;
+      color: var(--gold-light);
+      font-size: 26px;
+      font-family: 'Playfair Display', serif;
+      line-height: 1.2;
     }
     .metric small {
       display: block;
-      color: var(--text-muted);
-      font-size: 10px;
+      color: var(--muted);
+      font-size: 11px;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: .05em;
+      margin-top: 4px;
       font-weight: 700;
     }
 
-    .mastery-block {
-      padding: 16px 18px;
-      border-radius: 10px;
-      border: 1px solid var(--border-soft);
-      margin-bottom: 14px;
-      background: var(--bg-card);
-    }
-    .mastery-head {
+    /* HISTORIQUE */
+    .history-item {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      margin-bottom: 10px;
-      gap: 12px;
-      flex-wrap: wrap;
+      gap: 14px;
+      padding: 14px 16px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: #101410;
+      margin-bottom: 8px;
+      transition: all .16s ease;
     }
-    .mastery-head .label {
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--text-dim);
-    }
-    .mastery-head .value {
-      font-family: var(--font-serif);
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--accent-bright);
-    }
-    .mastery-track {
-      height: 6px;
-      border-radius: 6px;
-      background: rgba(255, 255, 255, 0.06);
-      overflow: hidden;
-      margin-bottom: 10px;
-    }
-    .mastery-track-fill {
-      height: 100%; border-radius: 6px;
-      transition: width 1s ease;
-    }
-    .mastery-label-text { font-size: 13px; color: var(--text-dim); line-height: 1.55; }
-
-    .recommendations {
-      padding: 16px 18px;
+    .history-item:hover { border-color: rgba(224, 184, 74, .3); }
+    .history-icon {
+      width: 42px;
+      height: 42px;
       border-radius: 10px;
-      border: 1px solid var(--border-soft);
-      background: rgba(74, 175, 224, 0.04);
-      margin-bottom: 14px;
+      background: rgba(224, 184, 74, .12);
+      color: var(--gold-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
     }
-    .recommendations .rec-title {
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #4AAFE0;
-      margin-bottom: 10px;
-    }
-    .recommendations .rec-list { list-style: none; padding: 0; }
-    .recommendations .rec-list li {
-      position: relative;
-      padding-left: 18px;
-      font-size: 13.5px;
-      color: var(--text-body);
-      line-height: 1.65;
-      margin-bottom: 6px;
-    }
-    .recommendations .rec-list li::before {
-      content: '•';
-      position: absolute;
-      left: 4px; top: 0;
-      color: #4AAFE0;
-      font-weight: 700;
-    }
-
-    /* ═══════════════════════════════════════════════════════════
-       SCROLL TOP
-       ═══════════════════════════════════════════════════════════ */
-    .scroll-top {
-      position: fixed;
-      bottom: calc(20px + var(--safe-bottom));
-      right: 20px;
-      width: 40px; height: 40px;
-      border-radius: 50%;
-      border: 1px solid var(--border-soft);
-      background: rgba(20, 20, 20, 0.95);
-      color: var(--accent-bright);
+    .history-info { flex: 1; min-width: 0; }
+    .history-title {
       font-size: 14px;
-      display: flex; align-items: center; justify-content: center;
-      opacity: 0; visibility: hidden;
-      transform: translateY(10px);
-      transition: all 0.3s ease;
-      z-index: 40;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 2px;
     }
-    .scroll-top.show { opacity: 1; visibility: visible; transform: translateY(0); }
+    .history-sub { font-size: 12px; color: var(--muted); }
+    .history-score {
+      font-size: 20px;
+      font-weight: 800;
+      font-family: 'Playfair Display', serif;
+      color: var(--gold-light);
+    }
 
-    /* ═══════════════════════════════════════════════════════════
-       PREMIUM
-       ═══════════════════════════════════════════════════════════ */
+    /* MODAL PREMIUM */
     .premium-popup-overlay {
-      position: fixed; inset: 0;
-      z-index: 100;
-      display: grid; place-items: center;
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: grid;
+      place-items: center;
       padding: 16px;
-      background: rgba(0, 0, 0, 0.85);
+      background: rgba(0, 0, 0, .85);
       backdrop-filter: blur(16px);
-      opacity: 0; visibility: hidden;
-      transition: opacity 0.25s ease, visibility 0.25s ease;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .25s ease, visibility .25s ease;
     }
     .premium-popup-overlay.show { opacity: 1; visibility: visible; }
+
     .premium-popup {
       position: relative;
       width: min(100%, 400px);
-      padding: 26px 22px 20px;
-      border: 1px solid var(--accent);
-      border-radius: 12px;
-      background: #161616;
-      transform: scale(0.94);
-      transition: transform 0.3s ease;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 28px 22px 20px;
+      border: 1px solid var(--gold);
+      border-radius: var(--radius);
+      background: linear-gradient(145deg, #141414, #0a0a0a);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, .6);
+      transform: scale(.94) translateY(16px);
+      transition: transform .25s ease;
     }
-    .premium-popup-overlay.show .premium-popup { transform: scale(1); }
+    .premium-popup-overlay.show .premium-popup {
+      transform: scale(1) translateY(0);
+    }
+    .premium-popup::before {
+      content: '';
+      position: absolute;
+      inset: 0 0 auto;
+      height: 3px;
+      background: linear-gradient(90deg, var(--gold), var(--gold-light), var(--gold));
+    }
     .popup-close {
       position: absolute;
-      top: 10px; right: 10px;
-      width: 30px; height: 30px;
-      border: 1px solid var(--border-soft);
+      top: 8px;
+      right: 8px;
+      width: 28px;
+      height: 28px;
+      border: 1px solid rgba(184, 134, 11, .2);
       border-radius: 8px;
-      background: transparent;
-      color: var(--text-muted);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 13px;
+      background: rgba(255, 255, 255, .03);
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      cursor: pointer;
     }
-    .popup-icon { display: block; text-align: center; font-size: 40px; margin-bottom: 6px; }
+    .popup-close:hover { color: var(--white); }
+    .popup-icon {
+      display: block;
+      text-align: center;
+      font-size: 44px;
+      margin-bottom: 6px;
+      line-height: 1;
+    }
     .premium-popup h2 {
       text-align: center;
-      font-size: 20px;
+      font-size: 22px;
       margin-bottom: 6px;
-      font-family: var(--font-serif);
     }
-    .premium-popup h2 span { color: var(--accent-bright); font-style: italic; }
+    .premium-popup h2 span { color: var(--gold-light); font-style: italic; }
     .popup-subtitle {
-      color: var(--text-dim);
+      color: var(--muted);
       text-align: center;
       font-size: 13px;
       line-height: 1.6;
-      margin: 0 0 16px;
+      margin: 0 0 18px;
     }
-    .popup-subtitle strong { color: var(--accent-bright); }
+    .popup-subtitle strong { color: var(--gold-light); }
     .popup-buttons { display: flex; flex-direction: column; gap: 8px; }
     .btn-subscribe {
       display: flex;
@@ -1205,115 +969,153 @@ html {
       gap: 6px;
       padding: 12px;
       border-radius: 10px;
-      background: linear-gradient(135deg, var(--accent-bright), var(--accent));
-      color: #0A0A0A;
-      font-weight: 700;
+      background: linear-gradient(135deg, var(--gold-light), var(--gold));
+      color: var(--black);
+      font-weight: 800;
       text-decoration: none;
       font-size: 14px;
-    }
-    .btn-later {
-      padding: 9px;
-      border: none;
-      background: transparent;
-      color: var(--text-muted);
-      font-size: 13px;
+      min-height: 44px;
     }
 
-    /* ═══════════════════════════════════════════════════════════
-       TOAST
-       ═══════════════════════════════════════════════════════════ */
-    .toast {
+    /* EMPTY */
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--muted);
+    }
+    .empty-state .empty-icon {
+      font-size: 44px;
+      margin-bottom: 12px;
+      display: block;
+      opacity: .5;
+      line-height: 1;
+    }
+    .empty-state h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .empty-state p { font-size: 13px; }
+
+    /* MODAL */
+    .modal-backdrop {
       position: fixed;
-      top: calc(var(--safe-top) + 20px);
-      left: 50%;
-      transform: translateX(-50%) translateY(-100px);
-      padding: 12px 20px;
-      border-radius: 10px;
-      background: rgba(20, 22, 20, 0.96);
-      border: 1px solid rgba(224, 184, 74, 0.3);
-      color: var(--text-light);
-      font-size: 13px;
-      z-index: 300;
-      opacity: 0;
-      transition: all 0.3s ease;
-      display: flex; align-items: center; gap: 10px;
-      pointer-events: none;
-      max-width: 90vw;
+      inset: 0;
+      z-index: 20;
+      display: none;
+      place-items: center;
+      padding: 18px;
+      background: rgba(0, 0, 0, .78);
     }
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-    .toast.error { border-color: rgba(215, 101, 74, 0.4); }
-    .toast.success { border-color: rgba(69, 180, 125, 0.4); }
+    .modal-backdrop.show { display: grid; }
+    .modal {
+      max-width: 440px;
+      width: 100%;
+      background: #171a17;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 22px;
+    }
+    .modal h3 { font-family: 'Playfair Display', serif; font-size: 20px; margin-bottom: 12px; }
+    .modal p { color: var(--muted); margin: 0 0 16px; }
+    .resume-modal-content { display: flex; flex-direction: column; gap: 14px; }
+    .resume-modal-content .resume-meta {
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, .02);
+      border: 1px solid var(--line);
+      font-size: 13px;
+    }
+    .resume-modal-content .resume-meta div {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 0;
+    }
+    .resume-modal-content .resume-meta .label { color: var(--muted); }
+    .resume-modal-content .resume-meta .value { color: var(--white); font-weight: 600; }
 
-    .katex { font-size: 1.05em; }
-    .katex-display { margin: 8px 0; overflow-x: auto; padding: 4px 0; }
+    /* KATEX */
+    .katex { color: inherit; font-size: 1.05em; }
+    .katex-display {
+      max-width: 100%;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 6px 0;
+    }
 
-    /* ═══════════════════════════════════════════════════════════
-       RESPONSIVE
-       ═══════════════════════════════════════════════════════════ */
+    /* RESPONSIVE */
     @media (max-width: 620px) {
-      .shell { width: min(100% - 20px, 900px); padding: 14px 0 20px; }
-      .panel { padding: 16px; }
+      .shell { width: min(100% - 20px, 980px); padding-top: 12px; }
+      .panel { padding: 17px; }
       .form-grid { grid-template-columns: 1fr; }
       .field.full { grid-column: auto; }
       .actions .btn { flex: 1 1 100%; }
-      .notion-content { padding: 12px 14px 14px; }
-      .flashcard-inner { height: 260px; }
+      .modes { grid-template-columns: 1fr; }
+      .flashcard-nav { flex-wrap: wrap; }
+      .flashcard-nav .btn { flex: 1 1 auto; }
+      .flashcard-counter { width: 100%; text-align: center; order: 3; }
+      .flashcard, .flashcard-inner { height: 200px; min-height: 200px; }
+      .flashcard-text { font-size: 15px; }
+      .session-head { flex-direction: column; align-items: flex-start; }
+      .loading-steps { margin-top: 22px; gap: 18px; }
+      .loader-spinner { width: 48px; height: 48px; }
+      .loading-step { padding: 11px 13px; gap: 12px; }
+      .step-icon { font-size: 20px; width: 24px; }
+      .step-label { font-size: 13px; }
+      .step-desc { font-size: 11px; }
+      .loading-status { font-size: 12px; }
+      .custom-select-trigger { padding: 11px 12px; min-height: 44px; font-size: 13.5px; }
+      .custom-select-option { padding: 12px 12px; font-size: 14px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+      }
     }
-
-    a:focus-visible, button:focus-visible {
-      outline: 2px solid var(--accent);
-      outline-offset: 2px;
-      border-radius: 6px;
-    }
-
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: rgba(184, 134, 11, 0.2); border-radius: 10px; }
   </style>
 </head>
 <body>
-
-  <header>
-    <a class="brand" href="index.html">ARVEX<span>A School</span></a>
-    <div class="connection" id="connectionState">Vérification...</div>
-  </header>
-
   <main class="shell">
 
-    <div class="step-bar" id="stepBar">
-      <div class="step-item active" data-step="fiche"><div class="num"><span>1</span></div><span>Fiche</span></div>
-      <span class="step-sep">›</span>
-      <div class="step-item" data-step="flashcard"><div class="num"><span>2</span></div><span>Flashcards</span></div>
-      <span class="step-sep">›</span>
-      <div class="step-item" data-step="quiz"><div class="num"><span>3</span></div><span>Quiz</span></div>
-      <span class="step-sep">›</span>
-      <div class="step-item" data-step="results"><div class="num"><span>4</span></div><span>Résultats</span></div>
-    </div>
+    <!-- HEADER -->
+    <header>
+      <a class="brand" href="index.html">ARVEX<span>A School</span></a>
+      <div class="header-right">
+        <div class="quota-badge" id="quotaBadge" style="display:none;">
+          <i class="fas fa-gift"></i>
+          <span id="quotaText">2 essais gratuits</span>
+        </div>
+        <div class="connection" id="connectionState">Vérification...</div>
+      </div>
+    </header>
 
-    <!-- CONFIG -->
+    <!-- VUE 1 : CONFIGURATION -->
     <section class="view active" id="configView">
       <div class="panel">
-        <div class="eyebrow">Réviseur</div>
-        <h1>Révise <em style="color:var(--accent-bright);font-style:italic;">efficacement</em>.</h1>
-        <p class="lead">Fiche détaillée, flashcards actives, quiz varié. Un seul objectif : ta réussite.</p>
+        <div class="eyebrow">Réviseur intelligent</div>
+        <h1>Génère des fiches, flashcards et quiz sur mesure.</h1>
+        <p class="lead">
+          Choisis une matière, un chapitre et un mode. L'IA construit un contenu de révision
+          adapté à ton programme. <strong style="color: var(--gold-light);">2 essais gratuits par jour</strong>,
+          illimité en Premium.
+        </p>
 
         <form id="configForm" class="form-grid">
           <div class="field">
             <label>Matière</label>
             <div class="custom-select" id="subjectSelect" data-name="subject">
-              <button type="button" class="custom-select-trigger">
+              <button type="button" class="custom-select-trigger" aria-haspopup="listbox" aria-expanded="false">
                 <span class="custom-select-value"></span>
                 <i class="fas fa-chevron-down custom-select-arrow"></i>
               </button>
-              <div class="custom-select-options">
-                <div class="custom-select-option" data-value="mathematiques"><span class="option-prefix">📐</span> Mathématiques</div>
-                <div class="custom-select-option" data-value="physique"><span class="option-prefix">⚡</span> Physique</div>
-                <div class="custom-select-option" data-value="chimie"><span class="option-prefix">🧪</span> Chimie</div>
-                <div class="custom-select-option" data-value="svt"><span class="option-prefix">🧬</span> SVT</div>
+              <div class="custom-select-options" role="listbox">
+                <div class="custom-select-option" data-value="mathematiques" role="option"><span class="option-prefix">📐</span> Mathématiques</div>
+                <div class="custom-select-option" data-value="physique" role="option"><span class="option-prefix">⚡</span> Physique</div>
+                <div class="custom-select-option" data-value="chimie" role="option"><span class="option-prefix">🧪</span> Chimie</div>
+                <div class="custom-select-option" data-value="svt" role="option"><span class="option-prefix">🧬</span> SVT</div>
               </div>
             </div>
           </div>
@@ -1321,162 +1123,102 @@ html {
           <div class="field">
             <label>Chapitre</label>
             <div class="custom-select" id="chapterSelect" data-name="chapter">
-              <button type="button" class="custom-select-trigger">
+              <button type="button" class="custom-select-trigger" aria-haspopup="listbox" aria-expanded="false">
                 <span class="custom-select-value"></span>
                 <i class="fas fa-chevron-down custom-select-arrow"></i>
               </button>
-              <div class="custom-select-options" id="chapterOptions"></div>
+              <div class="custom-select-options" role="listbox" id="chapterOptions"></div>
             </div>
           </div>
 
           <div class="field full">
-            <label>Mode de départ</label>
-            <div class="chips-row" id="modeChips">
-              <button type="button" class="chip active" data-mode="fiche">Fiche</button>
-              <button type="button" class="chip" data-mode="flashcard">Flashcards</button>
-            </div>
-          </div>
-
-          <div class="field">
-            <label>Difficulté quiz</label>
-            <div class="chips-row" id="difficultyChips">
-              <button type="button" class="chip" data-diff="1">Facile</button>
-              <button type="button" class="chip active" data-diff="2">Moyen</button>
-              <button type="button" class="chip" data-diff="3">Difficile</button>
-              <button type="button" class="chip" data-diff="4">BAC</button>
-            </div>
-          </div>
-
-          <div class="field">
-            <label>Nombre de questions</label>
-            <div class="chips-row" id="quizCountChips">
-              <button type="button" class="chip" data-qcount="5">5</button>
-              <button type="button" class="chip active" data-qcount="10">10</button>
-              <button type="button" class="chip" data-qcount="15">15</button>
+            <label>Mode de révision</label>
+            <div class="modes">
+              <div class="mode-card active" data-mode="fiche">
+                <span class="mode-emoji">📝</span>
+                <span class="mode-name">Fiche</span>
+                <span class="mode-desc">Résumé structuré</span>
+              </div>
+              <div class="mode-card" data-mode="flashcard">
+                <span class="mode-emoji">⚡</span>
+                <span class="mode-name">Flashcards</span>
+                <span class="mode-desc">Question / Réponse</span>
+              </div>
             </div>
           </div>
 
           <div class="field full">
-            <button class="btn primary full" id="generateBtn" type="submit">
-              <span class="btn-text">Générer</span>
+            <button class="btn primary" id="generateBtn" type="submit">
+              <span class="btn-text">Générer ma révision</span>
               <span class="loader"></span>
             </button>
           </div>
         </form>
-
-        <div class="status" id="configStatus"></div>
+        <div class="status" id="configStatus" role="status" aria-live="polite"></div>
       </div>
     </section>
 
-    <!-- LOADING FICHE -->
+    <!-- VUE 2 : CHARGEMENT -->
     <section class="view" id="loadingView">
       <div class="panel">
-        <div class="eyebrow">Génération</div>
-        <h2>Préparation de la fiche...</h2>
+        <div class="eyebrow">Génération en cours</div>
+        <h2>Préparation de ta révision...</h2>
+        <p class="lead">Cela prend généralement 20 à 40 secondes. Chaque étape indique la progression exacte.</p>
+
         <div class="loading-steps">
           <div class="loader-spinner"></div>
           <div class="steps-list">
-            <div class="loading-step" id="genStep1"><span class="step-icon">🔍</span><div class="step-content"><span class="step-label">Analyse du chapitre</span></div></div>
-            <div class="loading-step" id="genStep2"><span class="step-icon">🧠</span><div class="step-content"><span class="step-label">Extraction des notions</span></div></div>
-            <div class="loading-step" id="genStep3"><span class="step-icon">✍️</span><div class="step-content"><span class="step-label">Rédaction enrichie</span></div></div>
-            <div class="loading-step" id="genStep4"><span class="step-icon">✅</span><div class="step-content"><span class="step-label">Vérification</span></div></div>
-            <div class="loading-step" id="genStep5"><span class="step-icon">✨</span><div class="step-content"><span class="step-label">Finalisation</span></div></div>
+            <div class="loading-step" id="genStep1"><span class="step-icon">🔍</span><div class="step-content"><span class="step-label">Analyse du chapitre</span><span class="step-desc">Matière, chapitre et mode sélectionnés</span></div></div>
+            <div class="loading-step" id="genStep2"><span class="step-icon">🧠</span><div class="step-content"><span class="step-label">Extraction des notions clés</span><span class="step-desc">L'IA identifie les points essentiels</span></div></div>
+            <div class="loading-step" id="genStep3"><span class="step-icon">✍️</span><div class="step-content"><span class="step-label">Rédaction du contenu</span><span class="step-desc">Sections, formules et explications</span></div></div>
+            <div class="loading-step" id="genStep4"><span class="step-icon">🧮</span><div class="step-content"><span class="step-label">Vérification</span><span class="step-desc">Contrôle de la cohérence et du LaTeX</span></div></div>
+            <div class="loading-step" id="genStep5"><span class="step-icon">✨</span><div class="step-content"><span class="step-label">Finalisation</span><span class="step-desc">Préparation de l'affichage</span></div></div>
           </div>
           <div class="loading-status" id="genLoadingStatus">Préparation...</div>
         </div>
       </div>
     </section>
 
-    <!-- LOADING FLASHCARDS -->
-    <section class="view" id="loadingFlashView">
-      <div class="panel">
-        <div class="eyebrow">Génération</div>
-        <h2>Préparation des flashcards...</h2>
-        <div class="loading-steps">
-          <div class="loader-spinner"></div>
-          <div class="steps-list">
-            <div class="loading-step" id="flStep1"><span class="step-icon">🔍</span><div class="step-content"><span class="step-label">Analyse du chapitre</span></div></div>
-            <div class="loading-step" id="flStep2"><span class="step-icon">🧠</span><div class="step-content"><span class="step-label">Extraction des notions</span></div></div>
-            <div class="loading-step" id="flStep3"><span class="step-icon">⚡</span><div class="step-content"><span class="step-label">Génération des cartes</span></div></div>
-            <div class="loading-step" id="flStep4"><span class="step-icon">✅</span><div class="step-content"><span class="step-label">Vérification</span></div></div>
-            <div class="loading-step" id="flStep5"><span class="step-icon">✨</span><div class="step-content"><span class="step-label">Finalisation</span></div></div>
-          </div>
-          <div class="loading-status" id="flLoadingStatus">Préparation...</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- LOADING QUIZ -->
-    <section class="view" id="loadingQuizView">
-      <div class="panel">
-        <div class="eyebrow">Génération</div>
-        <h2>Préparation du quiz...</h2>
-        <div class="loading-steps">
-          <div class="loader-spinner"></div>
-          <div class="steps-list">
-            <div class="loading-step" id="qzStep1"><span class="step-icon">🔍</span><div class="step-content"><span class="step-label">Analyse du chapitre</span></div></div>
-            <div class="loading-step" id="qzStep2"><span class="step-icon">🧠</span><div class="step-content"><span class="step-label">Extraction des notions</span></div></div>
-            <div class="loading-step" id="qzStep3"><span class="step-icon">❓</span><div class="step-content"><span class="step-label">Génération des questions</span></div></div>
-            <div class="loading-step" id="qzStep4"><span class="step-icon">✅</span><div class="step-content"><span class="step-label">Vérification</span></div></div>
-            <div class="loading-step" id="qzStep5"><span class="step-icon">✨</span><div class="step-content"><span class="step-label">Finalisation</span></div></div>
-          </div>
-          <div class="loading-status" id="qzLoadingStatus">Préparation...</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- FICHE -->
+    <!-- VUE 3 : FICHE -->
     <section class="view" id="ficheView">
       <div class="panel">
         <div class="session-head">
           <div>
-            <div class="eyebrow">Fiche</div>
-            <h2 id="ficheTitle">Fiche</h2>
+            <div class="eyebrow">Fiche de révision</div>
+            <h2 id="ficheTitle">📝 Fiche</h2>
             <div class="session-meta" id="ficheMeta"></div>
           </div>
           <button class="btn secondary" id="newFicheBtn"><i class="fas fa-plus"></i> Nouvelle</button>
         </div>
         <div id="ficheContent"></div>
         <div class="actions">
-          <button class="btn primary full" id="startFlashcardsBtn">
-            <span class="btn-icon"><i class="fas fa-clone"></i></span>
-            <span class="btn-text">Continuer avec les flashcards</span>
+          <button class="btn primary full" id="startQuizBtn">
+            <span class="btn-icon"><i class="fas fa-question-circle"></i></span>
+            <span class="btn-text">Tester mes connaissances (Quiz)</span>
             <span class="loader"></span>
-          </button>
-          <button class="btn secondary full" id="skipToQuizBtn">
-            <i class="fas fa-forward"></i> Passer au quiz
           </button>
         </div>
       </div>
     </section>
 
-    <!-- FLASHCARDS -->
+    <!-- VUE 4 : FLASHCARDS -->
     <section class="view" id="flashcardView">
       <div class="panel">
         <div class="session-head">
           <div>
             <div class="eyebrow">Flashcards</div>
-            <h2>Cartes de mémorisation</h2>
+            <h2>⚡ Cartes de mémorisation</h2>
             <div class="session-meta" id="flashMeta"></div>
           </div>
           <button class="btn secondary" id="newFlashBtn"><i class="fas fa-plus"></i> Nouvelle</button>
         </div>
 
-        <div class="flashcard-progress">
-          <span>Progression</span>
-          <div class="flashcard-track"><div class="flashcard-track-fill" id="flashcardTrackFill"></div></div>
-          <span class="counter" id="flashCounter">0 / 10</span>
-        </div>
-
         <div class="flashcard" id="flashcardEl">
           <div class="flashcard-inner">
             <div class="flashcard-face flashcard-front">
-              <div class="flashcard-type-badge" id="flashTypeBadge" style="display:none;"></div>
               <div class="flashcard-label">Question</div>
               <div class="flashcard-text" id="flashFront"></div>
-              <div class="flashcard-hint" id="flashHint" style="display:none;">
-                <i class="fas fa-lightbulb"></i><span id="flashHintText"></span>
-              </div>
+              <div class="flashcard-hint">👆 Clique pour voir la réponse</div>
             </div>
             <div class="flashcard-face flashcard-back">
               <div class="flashcard-label">Réponse</div>
@@ -1485,42 +1227,43 @@ html {
           </div>
         </div>
 
-        <div class="flashcard-flip-hint"><i class="fas fa-hand-pointer"></i> Clique pour voir la réponse</div>
-
-        <div class="flashcard-feedback" id="flashFeedback">
-          <button class="feedback-btn hard" data-rating="hard"><i class="fas fa-times-circle"></i><span>Oublié</span></button>
-          <button class="feedback-btn medium" data-rating="medium"><i class="fas fa-circle-half-stroke"></i><span>Hésité</span></button>
-          <button class="feedback-btn easy" data-rating="easy"><i class="fas fa-check-circle"></i><span>Je savais</span></button>
+        <div class="flashcard-nav">
+          <button class="btn secondary" id="flashPrev"><i class="fas fa-chevron-left"></i> Précédente</button>
+          <span class="flashcard-counter" id="flashCounter">1 / 10</span>
+          <button class="btn secondary" id="flashNext">Suivante <i class="fas fa-chevron-right"></i></button>
         </div>
 
         <div class="actions">
-          <button class="btn primary full" id="finishFlashBtn"><i class="fas fa-arrow-right"></i> Passer au quiz</button>
+          <button class="btn primary full" id="finishFlashBtn"><i class="fas fa-check"></i> Terminer la révision</button>
         </div>
       </div>
     </section>
 
-    <!-- QUIZ -->
+    <!-- VUE 5 : QUIZ -->
     <section class="view" id="quizView">
       <div class="panel">
         <div class="session-head">
           <div>
-            <div class="eyebrow">Quiz</div>
-            <h2>Teste tes connaissances</h2>
+            <div class="eyebrow">Quiz de vérification</div>
+            <h2>❓ Teste tes connaissances</h2>
             <div class="session-meta" id="quizMeta"></div>
           </div>
         </div>
+
         <div class="progress"><span id="quizProgress"></span></div>
+
         <div id="quizContent"></div>
+
         <div class="actions">
           <button class="btn primary full" id="validateQuizBtn" disabled>
             <i class="fas fa-check-circle"></i>
-            <span class="btn-text">Valider</span>
+            <span class="btn-text">Valider mes réponses</span>
           </button>
         </div>
       </div>
     </section>
 
-    <!-- RESULTS -->
+    <!-- VUE 6 : RÉSULTATS -->
     <section class="view" id="resultsView">
       <div class="panel">
         <div class="result-hero">
@@ -1528,59 +1271,91 @@ html {
           <h2 id="resultsTitle">Bravo !</h2>
           <p id="resultsSub">Continue comme ça !</p>
         </div>
+
         <div class="result-summary">
-          <div class="metric"><strong id="metricCorrect">0/5</strong><small>Correctes</small></div>
-          <div class="metric"><strong id="metricScore">0/20</strong><small>Score</small></div>
-          <div class="metric"><strong id="metricPercent">0%</strong><small>Pourcentage</small></div>
-        </div>
-        <div class="mastery-block">
-          <div class="mastery-head">
-            <span class="label">Score de maîtrise</span>
-            <span class="value" id="masteryValue">0%</span>
+          <div class="metric">
+            <strong id="metricCorrect">0/5</strong>
+            <small>Bonnes réponses</small>
           </div>
-          <div class="mastery-track"><div class="mastery-track-fill" id="masteryFill"></div></div>
-          <div class="mastery-label-text" id="masteryText"></div>
+          <div class="metric">
+            <strong id="metricScore">0/20</strong>
+            <small>Score</small>
+          </div>
         </div>
-        <div class="recommendations">
-          <div class="rec-title">Recommandations</div>
-          <ul class="rec-list" id="recommendationsList"></ul>
-        </div>
+
+        <div class="eyebrow" style="margin-top:20px;">Conseils de révision</div>
+        <div id="resultsAdvice" style="margin-top:10px;"></div>
+
         <div class="actions">
           <button class="btn primary full" id="restartBtn"><i class="fas fa-redo"></i> Nouvelle révision</button>
+          <a href="index.html" class="btn secondary full"><i class="fas fa-home"></i> Retour à l'accueil</a>
         </div>
       </div>
     </section>
+
+    <!-- VUE 7 : HISTORIQUE -->
+    <section class="view" id="historyView">
+      <div class="panel">
+        <div class="session-head">
+          <div>
+            <div class="eyebrow">Historique</div>
+            <h2>📜 Mes révisions</h2>
+          </div>
+          <button class="btn secondary" id="backToConfigBtn"><i class="fas fa-arrow-left"></i> Retour</button>
+        </div>
+        <div id="historyList"></div>
+      </div>
+    </section>
+
   </main>
 
-  <button class="scroll-top" id="scrollTop"><i class="fas fa-arrow-up"></i></button>
-
-  <div class="premium-popup-overlay" id="premiumOverlay">
+  <!-- MODAL PREMIUM -->
+  <div class="premium-popup-overlay" id="premiumOverlay" role="dialog" aria-modal="true">
     <div class="premium-popup">
-      <button class="popup-close" id="premiumClose"><i class="fas fa-times"></i></button>
+      <button class="popup-close" id="premiumClose" aria-label="Fermer"><i class="fas fa-times"></i></button>
       <span class="popup-icon">👑</span>
-      <h2>Premium</h2>
-      <p class="popup-subtitle" id="premiumSubtitle">Débloque l'accès illimité.</p>
+      <h2>Réviseur <span>Premium</span></h2>
+      <p class="popup-subtitle" id="premiumSubtitle">
+        Débloque les fiches IA, les flashcards et les quiz <strong>sans limite</strong>.
+      </p>
       <div class="popup-buttons">
-        <a href="abonnement.html" class="btn-subscribe">S'abonner</a>
-        <button class="btn-later" id="popupLaterBtn">Plus tard</button>
+        <a href="abonnement.html" class="btn-subscribe"><i class="fas fa-crown"></i> S'abonner maintenant</a>
       </div>
     </div>
   </div>
 
-  <div class="toast" id="toast"><i class="fas fa-info-circle"></i><span id="toastText"></span></div>
+  <!-- MODAL REPRISE -->
+  <div class="modal-backdrop" id="resumeModal" role="dialog" aria-modal="true" aria-labelledby="resumeTitle">
+    <div class="modal">
+      <div class="resume-modal-content">
+        <h3 id="resumeTitle">📚 Révision en cours détectée</h3>
+        <p>Tu as une révision commencée mais non terminée. Veux-tu la reprendre ?</p>
+        <div class="resume-meta" id="resumeMeta"></div>
+        <div class="actions">
+          <button class="btn secondary" id="resumeNewBtn" type="button">Nouvelle révision</button>
+          <button class="btn primary" id="resumeContinueBtn" type="button">Reprendre</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script type="importmap">
-  { "imports": {
-    "firebase/app": "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
-    "firebase/auth": "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js",
-    "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js"
-  } }
+  {
+    "imports": {
+      "firebase/app": "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
+      "firebase/auth": "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js",
+      "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js"
+    }
+  }
   </script>
 
   <script type="module">
   import { initializeApp } from "firebase/app";
   import { getAuth, onAuthStateChanged, getIdToken } from "firebase/auth";
-  import { getFirestore, doc, getDoc } from "firebase/firestore";
+  import {
+    getFirestore, doc, getDoc, setDoc, deleteDoc,
+    collection, addDoc, query, orderBy, limit, getDocs, serverTimestamp
+  } from "firebase/firestore";
 
   const app = initializeApp({
     apiKey: "AIzaSyDHscOXw3rLuhV6z1Cny-bdYCumqpnG7QE",
@@ -1593,103 +1368,75 @@ html {
   const auth = getAuth(app);
   const db = getFirestore(app);
 
+  // ═══════════════════════════════════════════════════════════════
+  // CONFIG
+  // ═══════════════════════════════════════════════════════════════
+  const FREE_LIMIT = 2;
+
   const CHAPTERS = {
-    mathematiques: ['Nombres complexes','Similitudes planes directes','Calcul de probabilités','Variable aléatoire','Fonctions numériques','Fonction logarithme','Fonction exponentielle','Calcul intégral','Équations différentielles','Suites numériques','Statistiques'],
-    physique: ['Cinématique','Mouvement du centre d\'inertie','Champ de pesanteur','Particules chargées','Oscillateurs mécaniques','Vibrations','Propagation des ondes','Superposition','Interférences lumineuses','Champ magnétique','Force de Lorentz','Force de Laplace','Induction électromagnétique','Auto-Induction','Circuit LC','Régime sinusoïdal','Radioactivité'],
-    chimie: ['Solutions aqueuses','Acide chlorhydrique / Soude','Couples acide/base','Réaction acide-base','Solution tampon','Alcools','Acides carboxyliques','Amines','Acides α-aminés'],
-    svt: ['Génétique','Immunologie','Écologie','Évolution']
+    mathematiques: [
+      'Nombres complexes', 'Probabilités - Variable aléatoire',
+      'Fonction logarithme', 'Fonction exponentielle',
+      'Étude des fonctions numériques', 'Calcul intégral',
+      'Suites numériques', 'Équations différentielles'
+    ],
+    physique: [
+      'Cinématique', 'Mouvement du centre d\'inertie',
+      'Champ de pesanteur', 'Particules chargées',
+      'Oscillateurs mécaniques', 'Vibrations',
+      'Propagation des ondes', 'Superposition',
+      'Interférences lumineuses', 'Champ magnétique',
+      'Force de Lorentz', 'Force de Laplace',
+      'Induction électromagnétique', 'Auto-Induction',
+      'Circuit LC', 'Régime sinusoïdal', 'Radioactivité'
+    ],
+    chimie: [
+      'Solutions aqueuses', 'Acide chlorhydrique / Soude',
+      'Couples acide/base', 'Réaction acide-base',
+      'Solution tampon', 'Alcools', 'Acides carboxyliques',
+      'Amines', 'Acides α-aminés'
+    ],
+    svt: ['Génétique', 'Immunologie', 'Écologie', 'Évolution']
   };
 
   const SUBJECT_LABELS = {
-    mathematiques: 'Mathématiques', physique: 'Physique', chimie: 'Chimie', svt: 'SVT'
+    mathematiques: 'Mathématiques',
+    physique: 'Physique',
+    chimie: 'Chimie',
+    svt: 'SVT'
   };
 
-  const DIFFICULTY_LABELS = { 1: 'Facile', 2: 'Moyen', 3: 'Difficile', 4: 'Niveau BAC' };
-  const TYPE_LABELS = { definition: 'Définition', formule: 'Formule', methode: 'Méthode', piege: 'Piège' };
-
+  // ═══════════════════════════════════════════════════════════════
+  // ÉTAT
+  // ═══════════════════════════════════════════════════════════════
   const state = {
     subject: 'mathematiques',
     chapter: 'all',
     mode: 'fiche',
-    difficulty: 2,
-    quizCount: 10,
     user: null,
     isPremium: false,
     currentSession: null,
     flashcards: [],
     currentFlashIndex: 0,
-    flashRatings: {},
     quiz: [],
     quizAnswers: {},
     isGenerating: false
   };
 
+  // ═══════════════════════════════════════════════════════════════
+  // DOM HELPERS
+  // ═══════════════════════════════════════════════════════════════
   const $ = (id) => document.getElementById(id);
-  const views = ['configView','loadingView','loadingFlashView','loadingQuizView','ficheView','flashcardView','quizView','resultsView'];
+  const views = ['configView', 'loadingView', 'ficheView', 'flashcardView', 'quizView', 'resultsView', 'historyView'];
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-  let katexAttempts = 0;
-
-  // ────────────────────────────────────────────────────────────
-  // UTILITAIRES TEXTE — anti "[object Object]"
-  // ────────────────────────────────────────────────────────────
-  function toPlainText(value) {
-    if (value === null || value === undefined) return '';
-    if (typeof value === 'string') return value;
-    if (typeof value === 'number' || typeof value === 'boolean') return String(value);
-    if (Array.isArray(value)) {
-      return value.map((v) => toPlainText(v)).filter(Boolean).join('\n');
-    }
-    if (typeof value === 'object') {
-      const keys = ['text', 'latex', 'formule', 'expression', 'content', 'value', 'label', 'titre', 'title', 'description'];
-      for (const k of keys) {
-        if (typeof value[k] === 'string' && value[k].trim()) return value[k];
-      }
-      return Object.values(value)
-        .map((v) => (typeof v === 'string' ? v : (typeof v === 'number' ? String(v) : '')))
-        .filter(Boolean)
-        .join(' — ');
-    }
-    return '';
-  }
-
-  function safeText(value) {
-    const txt = toPlainText(value);
-    return txt.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  }
-
-  function safeLatex(value) {
-    const txt = toPlainText(value);
-    return txt.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  }
-
-  function cleanLatex(value) {
-    let txt = toPlainText(value).trim();
-    txt = txt.replace(/^\$\$([\s\S]*)\$\$$/, '$1');
-    txt = txt.replace(/^\$([\s\S]*)\$$/, '$1');
-    txt = txt.replace(/^\\\[([\s\S]*)\\\]$/, '$1');
-    txt = txt.replace(/^\\\(([\s\S]*)\\\)$/, '$1');
-    return txt.trim();
-  }
-
-  // ────────────────────────────────────────────────────────────
+  const GENERATION_STEPS = [
+    { id: 'genStep1' }, { id: 'genStep2' }, { id: 'genStep3' },
+    { id: 'genStep4' }, { id: 'genStep5' }
+  ];
 
   function showView(id) {
     views.forEach((v) => $(v).classList.toggle('active', v === id));
-    const stepMap = { ficheView: 'fiche', flashcardView: 'flashcard', quizView: 'quiz', resultsView: 'results' };
-    const current = stepMap[id];
-    if (current) {
-      const order = ['fiche','flashcard','quiz','results'];
-      const idx = order.indexOf(current);
-      document.querySelectorAll('.step-item').forEach((el) => {
-        const i = order.indexOf(el.dataset.step);
-        el.classList.toggle('active', i === idx);
-        el.classList.toggle('done', i < idx);
-      });
-      $('stepBar').classList.add('show');
-    } else {
-      $('stepBar').classList.remove('show');
-    }
-    // ⚡ Scroll en haut à chaque changement de vue
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -1700,68 +1447,11 @@ html {
     el.className = `status ${type}`;
   }
 
-  function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = toPlainText(text);
-    return div.innerHTML;
-  }
-
-  function renderKaTeX(root) {
-    if (!root) return;
-    if (window.KaTeXUtils?.renderMath) { window.KaTeXUtils.renderMath(root); return; }
-    if (typeof renderMathInElement !== 'function') {
-      if (katexAttempts++ < 10) setTimeout(() => renderKaTeX(root), 200);
-      return;
-    }
-    katexAttempts = 0;
-    try {
-      renderMathInElement(root, {
-        delimiters: [
-          { left: '$$', right: '$$', display: true },
-          { left: '\\[', right: '\\]', display: true },
-          { left: '$', right: '$', display: false },
-          { left: '\\(', right: '\\)', display: false }
-        ],
-        throwOnError: false, errorColor: '#ff9a84', strict: false, trust: true
-      });
-    } catch (e) {}
-  }
-
-  function showToast(message, type = 'info') {
-    const toast = $('toast');
-    $('toastText').textContent = toPlainText(message);
-    toast.className = `toast show ${type}`;
-    clearTimeout(window.__toastTimer);
-    window.__toastTimer = setTimeout(() => toast.classList.remove('show'), 3200);
-  }
-
-  function normalizeFormula(f) {
-    if (!f) return null;
-    if (typeof f === 'string') {
-      const t = f.trim();
-      return t ? { latex: t, condition: '', usage: '' } : null;
-    }
-    if (typeof f === 'object') {
-      const latex = f.latex || f.formule || f.expression || f.text || '';
-      if (!latex || typeof latex !== 'string') return null;
-      return {
-        latex: latex.trim(),
-        condition: toPlainText(f.condition || ''),
-        usage: toPlainText(f.usage || '')
-      };
-    }
-    return null;
-  }
-
-  function buildFallbackContent() {
-    return {
-      comprendre: `Cette notion fait partie du programme du BAC. Relis-la et fais des exercices d'application.`,
-      tips: ['Note l\'essentiel dans ton carnet','Revois dans 24h puis 3 jours','Refais 2 exercices types','Explique-la à un camarade']
-    };
-  }
-
-  function resetSteps(prefix) {
-    ['1','2','3','4','5'].forEach((n) => $(`${prefix}Step${n}`)?.classList.remove('active','done'));
+  // ═══════════════════════════════════════════════════════════════
+  // ÉTAPES
+  // ═══════════════════════════════════════════════════════════════
+  function resetSteps(steps) {
+    steps.forEach((step) => { const el = $(step.id); if (el) el.classList.remove('active', 'done'); });
   }
   function activateStep(stepId, statusEl, label) {
     document.querySelectorAll('.loading-step').forEach((s) => {
@@ -1770,12 +1460,14 @@ html {
     });
     if (statusEl) { statusEl.textContent = label; statusEl.classList.add('active'); }
   }
-  function finishAllSteps(prefix, statusEl, finalLabel) {
-    ['1','2','3','4','5'].forEach((n) => $(`${prefix}Step${n}`)?.classList.remove('active'));
-    ['1','2','3','4','5'].forEach((n) => $(`${prefix}Step${n}`)?.classList.add('done'));
+  function finishAllSteps(steps, statusEl, finalLabel = 'Terminé !') {
+    steps.forEach((step) => { const el = $(step.id); if (el) { el.classList.remove('active'); el.classList.add('done'); } });
     if (statusEl) { statusEl.textContent = finalLabel; statusEl.classList.remove('active'); }
   }
 
+  // ═══════════════════════════════════════════════════════════════
+  // CUSTOM SELECT
+  // ═══════════════════════════════════════════════════════════════
   class CustomSelect {
     constructor(element) {
       this.element = element;
@@ -1783,17 +1475,27 @@ html {
       this.trigger = element.querySelector('.custom-select-trigger');
       this.valueEl = element.querySelector('.custom-select-value');
       this.optionsContainer = element.querySelector('.custom-select-options');
-      this.options = []; this.value = null; this.isOpen = false;
+      this.options = [];
+      this.value = null;
+      this.focusedIndex = -1;
+      this.isOpen = false;
       this.init();
     }
     init() {
       this.trigger.addEventListener('click', (e) => { e.stopPropagation(); this.toggle(); });
+      this.trigger.addEventListener('keydown', (e) => this.handleKeydown(e));
       document.addEventListener('click', (e) => { if (!this.element.contains(e.target)) this.close(); });
       this.refreshOptions();
     }
     refreshOptions() {
       this.options = Array.from(this.optionsContainer.querySelectorAll('.custom-select-option'));
-      this.options.forEach((opt) => opt.addEventListener('click', (e) => { e.stopPropagation(); this.select(opt.dataset.value); }));
+      this.options.forEach((opt) => {
+        opt.addEventListener('click', (e) => { e.stopPropagation(); this.select(opt.dataset.value); });
+        opt.addEventListener('mouseenter', () => {
+          this.focusedIndex = this.options.indexOf(opt);
+          this.updateFocus();
+        });
+      });
       if (!this.value && this.options.length > 0) this.select(this.options[0].dataset.value, true);
     }
     setOptions(options) {
@@ -1802,606 +1504,898 @@ html {
         const div = document.createElement('div');
         div.className = 'custom-select-option';
         div.dataset.value = opt.value;
-        div.innerHTML = opt.prefix ? `<span class="option-prefix">${escapeHtml(opt.prefix)}</span> ${escapeHtml(opt.label)}` : escapeHtml(opt.label);
+        div.setAttribute('role', 'option');
+        if (opt.prefix) div.innerHTML = `<span class="option-prefix">${opt.prefix}</span> ${opt.label}`;
+        else div.textContent = opt.label;
         this.optionsContainer.appendChild(div);
       });
       this.value = null;
       this.refreshOptions();
     }
-    select(value, silent) {
+    select(value, silent = false) {
       this.value = value;
-      const selected = this.options.find((o) => o.dataset.value === String(value));
-      if (!selected) return;
-      const prefix = selected.querySelector('.option-prefix');
+      const selectedOption = this.options.find((o) => o.dataset.value === String(value));
+      if (!selectedOption) return;
+      const prefix = selectedOption.querySelector('.option-prefix');
       const prefixHTML = prefix ? prefix.outerHTML : '';
-      const label = selected.textContent.replace(prefix?.textContent || '', '').trim();
-      this.valueEl.innerHTML = `${prefixHTML} <span>${escapeHtml(label)}</span>`;
-      this.options.forEach((o) => o.classList.toggle('selected', o.dataset.value === String(value)));
+      const label = selectedOption.textContent.replace(prefix?.textContent || '', '').trim();
+      this.valueEl.innerHTML = `${prefixHTML} <span>${label}</span>`;
+      this.options.forEach((o) => { o.classList.toggle('selected', o.dataset.value === String(value)); });
       this.close();
-      if (!silent) this.element.dispatchEvent(new CustomEvent('change'));
+      if (!silent) {
+        const event = new CustomEvent('change', { detail: { name: this.name, value: this.value } });
+        this.element.dispatchEvent(event);
+      }
     }
-    toggle() { this.isOpen ? this.close() : this.open(); }
-    open() { this.element.classList.add('open'); this.isOpen = true; }
-    close() { this.element.classList.remove('open'); this.isOpen = false; }
+    toggle() { if (this.isOpen) this.close(); else this.open(); }
+    open() {
+      document.querySelectorAll('.custom-select.open').forEach((el) => { if (el !== this.element) el.classList.remove('open'); });
+      this.element.classList.add('open');
+      this.trigger.setAttribute('aria-expanded', 'true');
+      this.isOpen = true;
+      this.focusedIndex = this.options.findIndex((o) => o.classList.contains('selected'));
+    }
+    close() {
+      this.element.classList.remove('open');
+      this.trigger.setAttribute('aria-expanded', 'false');
+      this.isOpen = false;
+      this.updateFocus();
+    }
+    handleKeydown(e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.toggle(); }
+      else if (e.key === 'Escape') this.close();
+      else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (!this.isOpen) this.open();
+        else { this.focusedIndex = Math.min(this.focusedIndex + 1, this.options.length - 1); this.updateFocus(); }
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (this.isOpen) { this.focusedIndex = Math.max(this.focusedIndex - 1, 0); this.updateFocus(); }
+      }
+    }
+    updateFocus() { this.options.forEach((opt, idx) => { opt.classList.toggle('focused', idx === this.focusedIndex); }); }
     getValue() { return this.value; }
   }
 
-  const cs = { subject: null, chapter: null };
+  const customSelects = { subject: null, chapter: null };
   function initCustomSelects() {
-    cs.subject = new CustomSelect($('subjectSelect'));
-    cs.chapter = new CustomSelect($('chapterSelect'));
-    cs.subject.element.addEventListener('change', updateChapters);
-    cs.subject.select('mathematiques', true);
-    updateChapters();
-  }
-  function updateChapters() {
-    const s = cs.subject.getValue();
-    cs.chapter.setOptions([
-      { value: 'all', label: 'Tous les chapitres', prefix: '📚' },
-      ...(CHAPTERS[s] || []).map((ch) => ({ value: ch, label: ch, prefix: '📖' }))
-    ]);
-  }
-  function initChips() {
-    ['modeChips','difficultyChips','quizCountChips'].forEach((id) => {
-      const chips = document.querySelectorAll(`#${id} .chip`);
-      chips.forEach((c) => c.addEventListener('click', () => {
-        chips.forEach((x) => x.classList.remove('active'));
-        c.classList.add('active');
-        if (id === 'modeChips') state.mode = c.dataset.mode;
-        if (id === 'difficultyChips') state.difficulty = Number(c.dataset.diff);
-        if (id === 'quizCountChips') state.quizCount = Number(c.dataset.qcount);
-      }));
-    });
-  }
-  function syncModeFromChips() {
-    const active = document.querySelector('#modeChips .chip.active');
-    if (active) state.mode = active.dataset.mode;
+    customSelects.subject = new CustomSelect($('subjectSelect'));
+    customSelects.chapter = new CustomSelect($('chapterSelect'));
   }
 
-  async function callApi(payload) {
-    const token = await getIdToken(state.user);
-    const res = await fetch('/api/reviseur', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-      body: JSON.stringify(payload)
-    });
-    const data = await res.json().catch(() => null);
-    return { res, data };
-  }
-
-  $('configForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    if (state.isGenerating) return;
-    if (!state.user) return;
-    state.isGenerating = true;
-    state.subject = cs.subject.getValue();
-    state.chapter = cs.chapter.getValue();
-
-    if (state.mode === 'flashcard') return generateFlashcards();
-
-    $('generateBtn').disabled = true;
-    $('generateBtn').classList.add('loading');
-    setStatus('configStatus', '');
-
-    showView('loadingView');
-    resetSteps('gen');
-
+  // ═══════════════════════════════════════════════════════════════
+  // FIRESTORE SESSION — Active Revision
+  // ═══════════════════════════════════════════════════════════════
+  async function saveActiveRevisionSession() {
+    if (!state.user || !state.currentSession) return;
     try {
-      activateStep('genStep1', $('genLoadingStatus'), 'Analyse...');
-      await new Promise((r) => setTimeout(r, 400));
-      activateStep('genStep2', $('genLoadingStatus'), 'Extraction...');
-
-      const resPromise = callApi({ action: 'generate', subject: state.subject, chapter: state.chapter, mode: 'fiche' });
-
-      await new Promise((r) => setTimeout(r, 1200));
-      activateStep('genStep3', $('genLoadingStatus'), 'Rédaction...');
-
-      const { res, data: payload } = await resPromise;
-
-      if (res.status === 429) { showView('configView'); showPremiumPopup(payload?.used, payload?.limit); return; }
-      if (res.status === 400 && (payload?.code === 'SUBJECT_NOT_READY' || payload?.code === 'CHAPTER_NOT_FOUND')) {
-        showView('configView');
-        setStatus('configStatus', payload.error || 'Erreur.', 'error');
-        return;
-      }
-      if (!res.ok || !payload?.success) throw new Error(payload?.error || 'Erreur de génération.');
-
-      activateStep('genStep4', $('genLoadingStatus'), 'Vérification...');
-      await new Promise((r) => setTimeout(r, 600));
-      state.currentSession = payload.session;
-      activateStep('genStep5', $('genLoadingStatus'), 'Finalisation...');
-      await new Promise((r) => setTimeout(r, 400));
-      finishAllSteps('gen', $('genLoadingStatus'), '✅ Prête !');
-      await new Promise((r) => setTimeout(r, 300));
-
-      renderFiche();
-      showView('ficheView');
-    } catch (err) {
-      console.error('[REVISEUR] Fiche erreur:', err);
-      showView('configView');
-      setStatus('configStatus', err.message || 'Erreur réseau. Réessaie.', 'error');
-    } finally {
-      state.isGenerating = false;
-      $('generateBtn').disabled = false;
-      $('generateBtn').classList.remove('loading');
-    }
-  });
-
-  async function generateFlashcards() {
-    $('generateBtn').disabled = true;
-    $('generateBtn').classList.add('loading');
-    setStatus('configStatus', '');
-    showView('loadingFlashView');
-    resetSteps('fl');
-
-    try {
-      activateStep('flStep1', $('flLoadingStatus'), 'Analyse...');
-      await new Promise((r) => setTimeout(r, 400));
-      activateStep('flStep2', $('flLoadingStatus'), 'Extraction...');
-
-      const resPromise = callApi({ action: 'generate', subject: state.subject, chapter: state.chapter, mode: 'flashcard' });
-
-      await new Promise((r) => setTimeout(r, 1200));
-      activateStep('flStep3', $('flLoadingStatus'), 'Génération...');
-
-      const { res, data: payload } = await resPromise;
-      if (res.status === 429) { showView('configView'); showPremiumPopup(payload?.used, payload?.limit); return; }
-      if (res.status === 400 && (payload?.code === 'SUBJECT_NOT_READY' || payload?.code === 'CHAPTER_NOT_FOUND')) {
-        showView('configView');
-        setStatus('configStatus', payload.error, 'error');
-        return;
-      }
-      if (!res.ok || !payload?.success) throw new Error(payload?.error || 'Erreur de génération.');
-
-      activateStep('flStep4', $('flLoadingStatus'), 'Vérification...');
-      await new Promise((r) => setTimeout(r, 500));
-      state.flashcards = Array.isArray(payload.session?.flashcards) ? payload.session.flashcards : [];
-      state.currentFlashIndex = 0;
-      state.flashRatings = {};
-
-      if (state.flashcards.length === 0) {
-        showView('configView');
-        setStatus('configStatus', 'Aucune flashcard générée. Réessaie.', 'error');
-        return;
-      }
-
-      activateStep('flStep5', $('flLoadingStatus'), 'Finalisation...');
-      await new Promise((r) => setTimeout(r, 400));
-      finishAllSteps('fl', $('flLoadingStatus'), '✅ Prêtes !');
-      await new Promise((r) => setTimeout(r, 300));
-      renderFlashcard();
-      showView('flashcardView');
-    } catch (err) {
-      console.error('[REVISEUR] Flashcards erreur:', err);
-      showView('configView');
-      setStatus('configStatus', err.message || 'Erreur réseau. Réessaie.', 'error');
-    } finally {
-      state.isGenerating = false;
-      $('generateBtn').disabled = false;
-      $('generateBtn').classList.remove('loading');
-    }
-  }
-
-  async function generateQuiz() {
-    showView('loadingQuizView');
-    resetSteps('qz');
-
-    try {
-      activateStep('qzStep1', $('qzLoadingStatus'), 'Analyse...');
-      await new Promise((r) => setTimeout(r, 400));
-      activateStep('qzStep2', $('qzLoadingStatus'), 'Extraction...');
-
-      const resPromise = callApi({
-        action: 'quiz',
+      const sessionRef = doc(db, 'users', state.user.uid, 'activeRevision', 'current');
+      await setDoc(sessionRef, {
         subject: state.subject,
         chapter: state.chapter,
-        difficulty: state.difficulty,
-        count: state.quizCount
-      });
-
-      await new Promise((r) => setTimeout(r, 1200));
-      activateStep('qzStep3', $('qzLoadingStatus'), 'Génération...');
-
-      const { res, data: payload } = await resPromise;
-      if (res.status === 400 && (payload?.code === 'SUBJECT_NOT_READY' || payload?.code === 'CHAPTER_NOT_FOUND')) {
-        showView('configView');
-        setStatus('configStatus', payload.error, 'error');
-        return;
-      }
-      if (!res.ok || !payload?.success) throw new Error(payload?.error || 'Erreur.');
-
-      activateStep('qzStep4', $('qzLoadingStatus'), 'Vérification...');
-      await new Promise((r) => setTimeout(r, 500));
-      state.quiz = Array.isArray(payload.quiz) ? payload.quiz : [];
-      state.quizAnswers = {};
-
-      if (state.quiz.length === 0) {
-        showView('configView');
-        setStatus('configStatus', 'Quiz vide. Réessaie.', 'error');
-        return;
-      }
-
-      activateStep('qzStep5', $('qzLoadingStatus'), 'Finalisation...');
-      await new Promise((r) => setTimeout(r, 400));
-      finishAllSteps('qz', $('qzLoadingStatus'), '✅ Prêt !');
-      await new Promise((r) => setTimeout(r, 300));
-      renderQuiz();
-      showView('quizView');
-    } catch (err) {
-      console.error('[REVISEUR] Quiz erreur:', err);
-      showView('configView');
-      setStatus('configStatus', err.message || 'Erreur réseau. Réessaie.', 'error');
+        mode: state.mode,
+        currentSession: state.currentSession,
+        flashcards: state.flashcards,
+        currentFlashIndex: state.currentFlashIndex,
+        quiz: state.quiz,
+        quizAnswers: state.quizAnswers,
+        updatedAt: serverTimestamp()
+      }, { merge: true });
+    } catch (error) {
+      console.warn('Save revision session error:', error.message);
     }
   }
 
-  function renderFiche() {
-    const s = state.currentSession;
-    if (!s) return;
-    const sections = Array.isArray(s.sections) ? s.sections : [];
-    $('ficheTitle').textContent = toPlainText(s.chapterTitle) || 'Fiche';
-    $('ficheMeta').innerHTML = `
-      <span><i class="fas fa-book"></i> ${escapeHtml(SUBJECT_LABELS[state.subject] || state.subject)}</span>
-      <span><i class="fas fa-list"></i> ${sections.length} sections</span>
-    `;
-    const container = $('ficheContent');
-    container.innerHTML = '';
+  async function clearActiveRevisionSession() {
+    if (!state.user) return;
+    try {
+      const sessionRef = doc(db, 'users', state.user.uid, 'activeRevision', 'current');
+      await deleteDoc(sessionRef);
+    } catch (error) {
+      console.warn('Clear revision session error:', error.message);
+    }
+  }
 
-    if (sections.length === 0) {
-      container.innerHTML = `<div class="global-block"><div class="global-title"><i class="fas fa-exclamation-triangle"></i> Aucun contenu</div><div class="block-text">Aucune section générée pour ce chapitre. Réessaie.</div></div>`;
+  async function loadActiveRevisionSession() {
+    if (!state.user) return null;
+    try {
+      const sessionRef = doc(db, 'users', state.user.uid, 'activeRevision', 'current');
+      const snap = await getDoc(sessionRef);
+      if (!snap.exists()) return null;
+      const data = snap.data();
+
+      const updatedAt = data.updatedAt?.toDate?.() || new Date(data.updatedAt);
+      const ageHours = (Date.now() - updatedAt.getTime()) / (1000 * 60 * 60);
+      if (ageHours > 24) {
+        await clearActiveRevisionSession();
+        return null;
+      }
+      return data;
+    } catch (error) {
+      console.warn('Load revision session error:', error.message);
+      return null;
+    }
+  }
+
+  let saveRevisionTimer = null;
+  function debouncedSaveRevision() {
+    if (saveRevisionTimer) clearTimeout(saveRevisionTimer);
+    saveRevisionTimer = setTimeout(() => { saveActiveRevisionSession(); }, 1500);
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // KATEX
+  // ═══════════════════════════════════════════════════════════════
+  function renderKaTeX(root) {
+    if (!root) return;
+    if (window.KaTeXUtils) { window.KaTeXUtils.renderMath(root); return; }
+    if (typeof renderMathInElement !== 'function') {
+      setTimeout(() => renderKaTeX(root), 200);
+      return;
+    }
+    try {
+      renderMathInElement(root, {
+        delimiters: [
+          { left: '$$', right: '$$', display: true },
+          { left: '\\[', right: '\\]', display: true },
+          { left: '$', right: '$', display: false },
+          { left: '\\(', right: '\\)', display: false }
+        ],
+        throwOnError: false,
+        errorColor: '#ff9a84',
+        strict: false
+      });
+    } catch (e) { console.warn('KaTeX render error:', e); }
+  }
+
+  function normalizeMath(text) {
+    if (!text) return '';
+    if (window.KaTeXUtils) return window.KaTeXUtils.cleanAIResponse(text);
+    return String(text);
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // CHAPITRES
+  // ═══════════════════════════════════════════════════════════════
+  function updateChapters() {
+    const subject = customSelects.subject.getValue();
+    const chapters = CHAPTERS[subject] || [];
+    const options = [
+      { value: 'all', label: 'Tous les chapitres', prefix: '📚' },
+      ...chapters.map((ch) => ({ value: ch, label: ch, prefix: '📖' }))
+    ];
+    customSelects.chapter.setOptions(options);
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // MODES
+  // ═══════════════════════════════════════════════════════════════
+  document.querySelectorAll('.mode-card').forEach((card) => {
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.mode-card').forEach((c) => c.classList.remove('active'));
+      card.classList.add('active');
+      state.mode = card.dataset.mode;
+    });
+  });
+
+  // ═══════════════════════════════════════════════════════════════
+  // GÉNÉRATION
+  // ═══════════════════════════════════════════════════════════════
+  $('configForm').addEventListener('submit', generateRevision);
+
+  async function generateRevision(event) {
+    event.preventDefault();
+
+    if (state.isGenerating) return;
+    if (!state.user) {
+      setStatus('configStatus', 'Connecte-toi pour utiliser le Réviseur.', 'error');
       return;
     }
 
-    if (Array.isArray(s.keyPoints) && s.keyPoints.length > 0) {
-      const b = document.createElement('div');
-      b.className = 'global-block';
-      b.innerHTML = `<div class="global-title"><i class="fas fa-star"></i> Points clés</div><ul class="global-list">${s.keyPoints.map((p) => `<li>${safeText(p)}</li>`).join('')}</ul>`;
-      container.appendChild(b);
-    }
+    state.isGenerating = true;
+    const btn = $('generateBtn');
+    btn.disabled = true;
+    btn.classList.add('loading');
+    setStatus('configStatus', '');
 
-    const label = document.createElement('div');
-    label.className = 'sections-label';
-    label.innerHTML = `<i class="fas fa-layer-group"></i> Détail par notion <span class="count">${sections.length} notions</span>`;
-    container.appendChild(label);
+    state.subject = customSelects.subject.getValue();
+    state.chapter = customSelects.chapter.getValue();
 
-    sections.forEach((sec, i) => container.appendChild(buildNotionCard(sec, i)));
+    showView('loadingView');
+    resetSteps(GENERATION_STEPS);
+    const statusEl = $('genLoadingStatus');
 
-    renderKaTeX(container);
+    try {
+      activateStep('genStep1', statusEl, 'Analyse du chapitre...');
+      await sleep(600);
 
-  function buildNotionCard(section, index) {
-    const card = document.createElement('div');
-    card.className = 'notion-card';
-    const title = toPlainText(section.notionTitle || section.title || `Notion ${index + 1}`);
-    const id = toPlainText(section.notionId || '');
+      activateStep('genStep2', statusEl, 'Extraction des notions clés...');
 
-    let comprendreHTML = '';
-    const comprendreTxt = toPlainText(section.comprendre);
-    if (comprendreTxt.trim()) {
-      comprendreHTML = `<div class="block"><div class="block-label"><i class="fas fa-lightbulb"></i> Comprendre</div><div class="block-text">${safeText(comprendreTxt)}</div></div>`;
-    }
+      const token = await getIdToken(state.user);
+      const responsePromise = fetch('/api/reviseur', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          subject: state.subject,
+          chapter: state.chapter,
+          mode: state.mode
+        })
+      });
 
-    let formulesHTML = '';
-    if (Array.isArray(section.formules) && section.formules.length > 0) {
-      const valid = section.formules.map(normalizeFormula).filter(Boolean);
-      if (valid.length > 0) {
-        formulesHTML = `
-          <div class="block">
-            <div class="block-label"><i class="fas fa-square-root-variable"></i> Formules clés</div>
-            <div class="formula-list">
-              ${valid.map((f) => {
-                const latexClean = cleanLatex(f.latex);
-                if (!latexClean) return '';
-                return `
-                  <div class="formula-item">
-                    <div class="formula-latex">$$${safeLatex(latexClean)}$$</div>
-                    ${(f.condition || f.usage) ? `<div class="formula-meta">${f.condition ? `<span class="tag">${safeText(f.condition)}</span>` : ''}${f.usage ? `<span class="tag">${safeText(f.usage)}</span>` : ''}</div>` : ''}
-                  </div>
-                `;
-              }).join('')}
-            </div>
-          </div>
-        `;
+      await sleep(1500);
+
+      activateStep('genStep3', statusEl, 'Rédaction du contenu...');
+
+      const response = await responsePromise;
+      const payload = await response.json().catch(() => null);
+
+      if (response.status === 429 && payload?.code === 'FREE_REVISEUR_LIMIT') {
+        showView('configView');
+        showPremiumPopup(payload.used, payload.limit);
+        return;
       }
-    }
 
-    let methodeHTML = '';
-    let steps = [];
-    let methTitle = 'Méthode pas-à-pas';
-    if (section.methode && typeof section.methode === 'object' && !Array.isArray(section.methode)) {
-      methTitle = toPlainText(section.methode.title) || methTitle;
-      steps = Array.isArray(section.methode.steps) ? section.methode.steps : [];
-    } else if (Array.isArray(section.methode)) {
-      steps = section.methode;
-    } else if (typeof section.methode === 'string') {
-      steps = [section.methode];
-    }
-    if (steps.length > 0) {
-      methodeHTML = `<div class="block"><div class="block-label"><i class="fas fa-list-ol"></i> ${safeText(methTitle)}</div><ol class="method-steps">${steps.map((st) => `<li>${safeText(st)}</li>`).join('')}</ol></div>`;
-    }
-
-    let exempleHTML = '';
-    if (section.exempleResolu && typeof section.exempleResolu === 'object') {
-      const ex = section.exempleResolu;
-      const enonce = toPlainText(ex.enonce);
-      const et = Array.isArray(ex.etapes) ? ex.etapes : [];
-      const conclusion = toPlainText(ex.conclusion);
-      if (enonce || et.length > 0 || conclusion) {
-        exempleHTML = `
-          <div class="block">
-            <div class="block-label"><i class="fas fa-check-circle"></i> Exemple résolu</div>
-            ${enonce ? `<div class="example-enonce">${safeText(enonce)}</div>` : ''}
-            ${et.length > 0 ? `<ol class="example-steps">${et.map((e) => `<li>${safeText(e)}</li>`).join('')}</ol>` : ''}
-            ${conclusion ? `<div class="example-conclusion">${safeText(conclusion)}</div>` : ''}
-          </div>
-        `;
+      if (!response.ok || !payload?.success) {
+        throw new Error(payload?.error || 'Service temporairement indisponible.');
       }
-    }
 
-    let piegeHTML = '';
-    if (section.piegeBAC && typeof section.piegeBAC === 'object') {
-      const trap = toPlainText(section.piegeBAC.trap);
-      const solution = toPlainText(section.piegeBAC.solution);
-      if (trap || solution) {
-        piegeHTML = `<div class="block"><div class="block-label"><i class="fas fa-triangle-exclamation"></i> Piège du BAC</div>${trap ? `<div class="piege-trap">${safeText(trap)}</div>` : ''}${solution ? `<div class="piege-solution">${safeText(solution)}</div>` : ''}</div>`;
+      activateStep('genStep4', statusEl, 'Vérification...');
+      await sleep(800);
+
+      state.currentSession = payload.session;
+
+      state.flashcards = [];
+      state.currentFlashIndex = 0;
+      state.quiz = [];
+      state.quizAnswers = {};
+
+      await saveSession(payload.session);
+
+      if (payload.quota && payload.quota.type === 'free') {
+        updateQuotaBadge(FREE_LIMIT - payload.quota.used);
       }
-    }
 
-    let astuceHTML = '';
-    const astuceTxt = toPlainText(section.astuce);
-    if (astuceTxt.trim()) {
-      astuceHTML = `<div class="block"><div class="block-label"><i class="fas fa-star"></i> Astuce</div><div class="block-text">${safeText(astuceTxt)}</div></div>`;
-    }
+      activateStep('genStep5', statusEl, 'Finalisation...');
+      await sleep(600);
 
-    const hasContent = comprendreHTML || formulesHTML || methodeHTML || exempleHTML || piegeHTML || astuceHTML;
-    let fallbackHTML = '';
-    if (!hasContent) {
-      const fb = buildFallbackContent();
-      fallbackHTML = `
-        <div class="block"><div class="block-label"><i class="fas fa-lightbulb"></i> À retenir</div><div class="block-text">${safeText(fb.comprendre)}</div></div>
-        <div class="block"><div class="block-label"><i class="fas fa-check-circle"></i> Conseils</div><ol class="method-steps">${fb.tips.map((t) => `<li>${safeText(t)}</li>`).join('')}</ol></div>
-      `;
-    }
+      finishAllSteps(GENERATION_STEPS, statusEl, '✅ Ta révision est prête !');
+      await sleep(400);
 
-    card.innerHTML = `
-      <div class="notion-header">
-        <div class="notion-num">${index + 1}</div>
-        <div class="notion-title-wrap">
-          <div class="notion-title">${safeText(title)}</div>
-          <div class="notion-sub">${id ? escapeHtml(id) : 'Notion'}</div>
-        </div>
-        <div class="notion-toggle"><i class="fas fa-chevron-down"></i></div>
-      </div>
-      <div class="notion-body">
-        <div class="notion-content">
-          ${comprendreHTML}${formulesHTML}${methodeHTML}${exempleHTML}${piegeHTML}${astuceHTML}${fallbackHTML}
-        </div>
-      </div>
+      if (state.mode === 'flashcard' && Array.isArray(payload.session.flashcards)) {
+        state.flashcards = payload.session.flashcards;
+        state.currentFlashIndex = 0;
+        await saveActiveRevisionSession();
+        renderFlashcard();
+        showView('flashcardView');
+      } else {
+        await saveActiveRevisionSession();
+        renderFiche();
+        showView('ficheView');
+      }
+
+    } catch (error) {
+      console.error('Erreur révision:', error);
+
+      if (error instanceof TypeError || error?.code === 'CONFIGURATION') {
+        activateStep('genStep2', statusEl, 'Génération locale de secours...');
+        await sleep(500);
+
+        const fallback = state.mode === 'flashcard'
+          ? buildLocalFlashcards()
+          : buildLocalFiche();
+
+        state.currentSession = { ...fallback, subject: state.subject, chapter: state.chapter, mode: state.mode };
+
+        activateStep('genStep3', statusEl, 'Finalisation locale...');
+        await sleep(500);
+        activateStep('genStep4', statusEl, 'Vérification...');
+        await sleep(500);
+
+        finishAllSteps(GENERATION_STEPS, statusEl, '✅ Contenu généré localement.');
+        await sleep(400);
+
+        if (state.mode === 'flashcard' && Array.isArray(state.currentSession.flashcards)) {
+          state.flashcards = state.currentSession.flashcards;
+          state.currentFlashIndex = 0;
+          await saveActiveRevisionSession();
+          renderFlashcard();
+          showView('flashcardView');
+        } else {
+          await saveActiveRevisionSession();
+          renderFiche();
+          showView('ficheView');
+        }
+        return;
+      }
+
+      showView('configView');
+      setStatus('configStatus', error.message || 'Erreur inconnue.', 'error');
+    } finally {
+      state.isGenerating = false;
+      btn.disabled = false;
+      btn.classList.remove('loading');
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // FALLBACKS
+  // ═══════════════════════════════════════════════════════════════
+  function buildLocalFiche() {
+    const subjectLabel = SUBJECT_LABELS[state.subject] || 'Matière';
+    return {
+      chapterTitle: state.chapter === 'all' ? 'Révision générale' : state.chapter,
+      sections: [
+        { title: 'Introduction', content: `Cette fiche couvre les notions essentielles du chapitre **${state.chapter === 'all' ? 'complet' : state.chapter}** en **${subjectLabel}**.` },
+        { title: 'Définitions clés', content: '- **Définition 1** : à compléter avec ton cours.\n- **Définition 2** : à compléter avec ton cours.\n- **Définition 3** : à compléter avec ton cours.' },
+        { title: 'Formules importantes', content: 'Les formules principales à retenir :\n\n$F = ma$\n\n$E = mc^2$\n\nComplète avec les formules de ton cours.' },
+        { title: 'Méthodes de résolution', content: '1. Lire attentivement l\'énoncé\n2. Identifier les données\n3. Choisir la bonne formule\n4. Calculer\n5. Vérifier le résultat' },
+        { title: 'Erreurs fréquentes', content: '- Oublier les unités\n- Confondre les formules\n- Ne pas vérifier le résultat\n- Aller trop vite' }
+      ]
+    };
+  }
+
+  function buildLocalFlashcards() {
+    return {
+      chapterTitle: state.chapter === 'all' ? 'Révision générale' : state.chapter,
+      flashcards: Array.from({ length: 10 }, (_, i) => ({
+        question: `Question ${i + 1} sur ${state.chapter === 'all' ? 'le programme' : state.chapter}`,
+        answer: 'Réponse à compléter avec ton cours. Cette carte est un placeholder généré en mode hors-ligne.'
+      }))
+    };
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // RENDU FICHE
+  // ═══════════════════════════════════════════════════════════════
+  function renderFiche() {
+    const session = state.currentSession;
+    if (!session) return;
+
+    $('ficheMeta').innerHTML = `
+      <span><i class="fas fa-book"></i> ${SUBJECT_LABELS[state.subject]}</span>
+      <span><i class="fas fa-list"></i> ${session.chapterTitle || state.chapter}</span>
+      <span><i class="fas fa-clock"></i> ${session.sections?.length || 0} sections</span>
     `;
 
-    card.querySelector('.notion-header').addEventListener('click', () => toggleNotion(card));
-    return card;
-  }
+    const container = $('ficheContent');
+    container.innerHTML = '';
 
-  function toggleNotion(card) {
-    const open = card.classList.contains('open');
-    document.querySelectorAll('.notion-card.open').forEach((o) => { if (o !== card) o.classList.remove('open'); });
-    card.classList.toggle('open', !open);
-    if (!open) {
-      const body = card.querySelector('.notion-content');
-      if (body) setTimeout(() => renderKaTeX(body), 150);
+    if (!Array.isArray(session.sections) || session.sections.length === 0) {
+      container.innerHTML = '<div class="empty-state"><span class="empty-icon">📭</span><h3>Aucune section</h3></div>';
+      return;
     }
+
+    session.sections.forEach((section) => {
+      const div = document.createElement('div');
+      div.className = 'card';
+
+      let content = normalizeMath(section.content || '');
+      content = content
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/`(.+?)`/g, '<code>$1</code>')
+        .replace(/\n/g, '<br>');
+
+      div.innerHTML = `
+        <div class="card-title"><i class="fas fa-bookmark"></i> ${escapeHtml(section.title || 'Section')}</div>
+        <div class="card-body">${content}</div>
+      `;
+      container.appendChild(div);
+    });
+
+    renderKaTeX(container);
   }
 
+  // ═══════════════════════════════════════════════════════════════
+  // RENDU FLASHCARDS
+  // ═══════════════════════════════════════════════════════════════
   function renderFlashcard() {
-    if (!state.flashcards || state.flashcards.length === 0) { showView('configView'); return; }
-    $('flashMeta').innerHTML = `<span><i class="fas fa-layer-group"></i> ${state.flashcards.length} cartes</span>`;
+    if (!state.flashcards || state.flashcards.length === 0) {
+      showView('configView');
+      return;
+    }
+
+    $('flashMeta').innerHTML = `
+      <span><i class="fas fa-book"></i> ${SUBJECT_LABELS[state.subject]}</span>
+      <span><i class="fas fa-layer-group"></i> ${state.flashcards.length} cartes</span>
+    `;
+
     updateFlashcardContent();
   }
 
   function updateFlashcardContent() {
-    const c = state.flashcards[state.currentFlashIndex];
-    if (!c) return;
-    const question = toPlainText(c.question || c.front || '');
-    const answer = toPlainText(c.answer || c.back || c.reponse || '');
-    $('flashFront').innerHTML = safeText(question);
-    $('flashBack').innerHTML = safeText(answer);
-    const badge = $('flashTypeBadge');
-    const typeKey = toPlainText(c.type || '');
-    if (typeKey && TYPE_LABELS[typeKey]) {
-      badge.textContent = TYPE_LABELS[typeKey];
-      badge.style.display = 'inline-flex';
-    } else badge.style.display = 'none';
-    const hint = toPlainText(c.hint);
-    if (hint) { $('flashHint').style.display = 'flex'; $('flashHintText').textContent = hint; }
-    else $('flashHint').style.display = 'none';
+    const card = state.flashcards[state.currentFlashIndex];
+    if (!card) return;
+
+    const question = normalizeMath(card.question || '');
+    const answer = normalizeMath(card.answer || '');
+
+    $('flashFront').innerHTML = escapeHtml(question);
+    $('flashBack').innerHTML = escapeHtml(answer);
     $('flashCounter').textContent = `${state.currentFlashIndex + 1} / ${state.flashcards.length}`;
-    $('flashcardTrackFill').style.width = `${((state.currentFlashIndex) / state.flashcards.length) * 100}%`;
+
     $('flashcardEl').classList.remove('flipped');
-    $('flashFeedback').classList.remove('show');
+
     renderKaTeX($('flashFront'));
     renderKaTeX($('flashBack'));
+
+    $('flashPrev').disabled = state.currentFlashIndex === 0;
+    $('flashNext').disabled = state.currentFlashIndex >= state.flashcards.length - 1;
   }
 
-  let flipTimer = null;
   $('flashcardEl').addEventListener('click', () => {
-    clearTimeout(flipTimer);
-    const el = $('flashcardEl');
-    el.classList.toggle('flipped');
-    if (el.classList.contains('flipped')) {
-      flipTimer = setTimeout(() => $('flashFeedback').classList.add('show'), 300);
-    } else {
-      $('flashFeedback').classList.remove('show');
+    $('flashcardEl').classList.toggle('flipped');
+  });
+
+  $('flashPrev').addEventListener('click', () => {
+    if (state.currentFlashIndex > 0) {
+      state.currentFlashIndex--;
+      updateFlashcardContent();
+      debouncedSaveRevision();
     }
   });
 
-  document.querySelectorAll('.feedback-btn').forEach((btn) => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      state.flashRatings[state.currentFlashIndex] = btn.dataset.rating;
-      const card = $('flashcardEl');
-      card.style.opacity = '0';
-      setTimeout(() => {
-        if (state.currentFlashIndex < state.flashcards.length - 1) {
-          state.currentFlashIndex++;
-          updateFlashcardContent();
-          card.style.opacity = '1';
-        } else {
-          card.style.opacity = '1';
-          $('flashFeedback').classList.remove('show');
-          $('flashcardTrackFill').style.width = '100%';
-        }
-      }, 200);
-    });
+  $('flashNext').addEventListener('click', () => {
+    if (state.currentFlashIndex < state.flashcards.length - 1) {
+      state.currentFlashIndex++;
+      updateFlashcardContent();
+      debouncedSaveRevision();
+    }
   });
 
-  $('finishFlashBtn').addEventListener('click', generateQuiz);
+  $('finishFlashBtn').addEventListener('click', startQuiz);
+
+  // ═══════════════════════════════════════════════════════════════
+  // QUIZ
+  // ═══════════════════════════════════════════════════════════════
+  async function startQuiz() {
+    if (!state.currentSession) return;
+
+    if (Array.isArray(state.currentSession.quiz) && state.currentSession.quiz.length > 0) {
+      state.quiz = state.currentSession.quiz;
+      state.quizAnswers = {};
+      renderQuiz();
+      showView('quizView');
+      return;
+    }
+
+    const btn = $('startQuizBtn');
+    btn.disabled = true;
+    btn.classList.add('loading');
+
+    try {
+      const token = await getIdToken(state.user);
+      const response = await fetch('/api/reviseur', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          action: 'quiz',
+          subject: state.subject,
+          chapter: state.chapter,
+          session: state.currentSession
+        })
+      });
+
+      const payload = await response.json().catch(() => null);
+      if (!response.ok || !payload?.success) {
+        throw new Error(payload?.error || 'Impossible de générer le quiz.');
+      }
+
+      state.quiz = payload.quiz;
+      state.quizAnswers = {};
+      await saveActiveRevisionSession();
+      renderQuiz();
+      showView('quizView');
+    } catch (error) {
+      alert(error.message || 'Erreur');
+    } finally {
+      btn.disabled = false;
+      btn.classList.remove('loading');
+    }
+  }
+
+  $('startQuizBtn').addEventListener('click', startQuiz);
 
   function renderQuiz() {
     const container = $('quizContent');
     container.innerHTML = '';
 
-    state.quiz = (state.quiz || []).filter((q) => q && Array.isArray(q.options) && q.options.length === 4);
-    if (state.quiz.length === 0) {
-      showView('configView');
-      setStatus('configStatus', 'Aucune question valide générée. Réessaie.', 'error');
-      return;
-    }
-
     $('quizMeta').innerHTML = `
       <span><i class="fas fa-question-circle"></i> ${state.quiz.length} questions</span>
-      <span><i class="fas fa-signal"></i> ${DIFFICULTY_LABELS[state.difficulty]}</span>
+      <span><i class="fas fa-book"></i> ${SUBJECT_LABELS[state.subject]}</span>
     `;
 
-    state.quiz.forEach((q, i) => {
+    state.quiz.forEach((q, index) => {
       const div = document.createElement('div');
       div.className = 'quiz-question';
-      div.dataset.index = i;
-      const questionTxt = toPlainText(q.question || q.text || '');
-      const opts = (q.options || []).map((opt, optIdx) => {
-        const text = toPlainText(typeof opt === 'string' ? opt : (opt.text || opt.label || ''));
-        const id = typeof opt === 'string' ? String.fromCharCode(65 + optIdx) : toPlainText(opt.id || String.fromCharCode(65 + optIdx));
-        return `<div class="quiz-option" data-option="${escapeHtml(id)}" data-qindex="${i}"><span class="quiz-option-letter">${escapeHtml(id)}</span><span>${safeText(text)}</span></div>`;
+      div.dataset.index = index;
+
+      const cleanQuestion = normalizeMath(q.question || '');
+
+      const optionsHtml = (q.options || []).map((opt) => {
+        const cleanText = normalizeMath(opt.text || '');
+        return `
+          <div class="quiz-option" data-option="${opt.id}" data-qindex="${index}">
+            <span class="quiz-option-letter">${opt.id}</span>
+            <span>${escapeHtml(cleanText)}</span>
+          </div>
+        `;
       }).join('');
+
       div.innerHTML = `
-        <div class="quiz-q-header">
-          <div class="quiz-q-number">Question ${i + 1}</div>
-          <div class="quiz-q-level">Niveau ${q.level || 1}</div>
-        </div>
-        <div class="quiz-q-text">${safeText(questionTxt)}</div>
-        <div class="quiz-options">${opts}</div>
-        <div class="quiz-explanation" id="exp-${i}"></div>
+        <div class="quiz-q-number">Question ${index + 1}</div>
+        <div class="quiz-q-text">${escapeHtml(cleanQuestion)}</div>
+        <div class="quiz-options">${optionsHtml}</div>
+        <div class="quiz-explanation" id="explanation-${index}"></div>
       `;
+
       container.appendChild(div);
     });
 
     container.querySelectorAll('.quiz-option').forEach((opt) => {
       opt.addEventListener('click', () => {
-        const i = parseInt(opt.dataset.qindex);
-        if (state.quizAnswers[i]) return;
-        const q = state.quiz[i];
-        state.quizAnswers[i] = opt.dataset.option;
-        const question = container.querySelector(`[data-index="${i}"]`);
+        const qIndex = parseInt(opt.dataset.qindex);
+        if (state.quizAnswers[qIndex]) return;
+
+        const q = state.quiz[qIndex];
+        const selected = opt.dataset.option;
+        state.quizAnswers[qIndex] = selected;
+
+        const question = container.querySelector(`[data-index="${qIndex}"]`);
         question.querySelectorAll('.quiz-option').forEach((o) => {
           o.classList.add('disabled');
           if (o.dataset.option === q.correctAnswer) o.classList.add('correct');
-          else if (o.dataset.option === opt.dataset.option) o.classList.add('wrong');
+          else if (o.dataset.option === selected) o.classList.add('wrong');
         });
-        const exp = $(`exp-${i}`);
-        const explTxt = toPlainText(q.explanation);
-        if (explTxt) {
-          exp.innerHTML = `<strong>💡</strong> ${safeText(explTxt)}`;
+
+        const exp = $(`explanation-${qIndex}`);
+        if (q.explanation) {
+          const cleanExp = normalizeMath(q.explanation);
+          exp.innerHTML = `<strong>💡 Explication :</strong> ${escapeHtml(cleanExp)}`;
           exp.classList.add('show');
           renderKaTeX(exp);
         }
-        const answered = Object.keys(state.quizAnswers).length;
-        $('validateQuizBtn').disabled = answered < state.quiz.length;
-        $('quizProgress').style.width = `${(answered / state.quiz.length) * 100}%`;
+
+        if (Object.keys(state.quizAnswers).length === state.quiz.length) {
+          $('validateQuizBtn').disabled = false;
+        }
+
+        const percent = (Object.keys(state.quizAnswers).length / state.quiz.length) * 100;
+        $('quizProgress').style.width = percent + '%';
+
+        debouncedSaveRevision();
       });
     });
+
     renderKaTeX(container);
   }
 
-  $('validateQuizBtn').addEventListener('click', () => {
+  $('validateQuizBtn').addEventListener('click', showQuizResults);
+
+  // ═══════════════════════════════════════════════════════════════
+  // RÉSULTATS
+  // ═══════════════════════════════════════════════════════════════
+  async function showQuizResults() {
     let correct = 0;
-    state.quiz.forEach((q, i) => { if (state.quizAnswers[i] === q.correctAnswer) correct++; });
+    state.quiz.forEach((q, i) => {
+      if (state.quizAnswers[i] === q.correctAnswer) correct++;
+    });
+
     const total = state.quiz.length;
-    if (total === 0) return;
     const score = Math.round((correct / total) * 20);
     const percent = Math.round((correct / total) * 100);
+
     $('metricCorrect').textContent = `${correct}/${total}`;
     $('metricScore').textContent = `${score}/20`;
-    $('metricPercent').textContent = `${percent}%`;
-    let emoji = percent >= 90 ? '🏆' : percent >= 70 ? '🎉' : percent >= 50 ? '📚' : '💪';
-    let title = percent >= 90 ? 'Excellent !' : percent >= 70 ? 'Bravo !' : percent >= 50 ? 'Pas mal' : 'Courage';
-    let sub = percent >= 90 ? 'Chapitre maîtrisé !' : percent >= 70 ? 'Bonne voie.' : percent >= 50 ? 'Continue.' : 'Retravaille.';
+
+    let emoji, title, sub;
+    if (percent >= 90) { emoji = '🏆'; title = 'Excellent !'; sub = 'Tu maîtrises ce chapitre !'; }
+    else if (percent >= 70) { emoji = '🎉'; title = 'Bravo !'; sub = 'Tu es sur la bonne voie.'; }
+    else if (percent >= 50) { emoji = '📚'; title = 'Pas mal'; sub = 'Continue à réviser.'; }
+    else { emoji = '💪'; title = 'Courage'; sub = 'Retravaille ce chapitre.'; }
+
     $('resultsEmoji').textContent = emoji;
-    $('resultsTitle').textContent = title;
+    $('resultsTitle').innerHTML = title;
     $('resultsSub').textContent = sub;
 
-    $('masteryValue').textContent = `${percent}%`;
-    const fill = $('masteryFill');
-    fill.style.background = percent >= 75 ? 'linear-gradient(90deg, #45b47d, #6fd99a)' : percent >= 50 ? 'linear-gradient(90deg, #E0B84A, #F0CC65)' : 'linear-gradient(90deg, #d7654a, #e88a72)';
-    fill.style.width = '0%';
-    setTimeout(() => { fill.style.width = `${percent}%`; }, 100);
-    $('masteryText').textContent = percent >= 75 ? 'Chapitre solide.' : percent >= 50 ? 'À consolider.' : 'À retravailler.';
+    const wrongQuestions = state.quiz.filter((q, i) => state.quizAnswers[i] !== q.correctAnswer);
+    if (wrongQuestions.length === 0) {
+      $('resultsAdvice').innerHTML = '<p style="color:var(--success);">✅ Tu as tout juste ! Passe au chapitre suivant.</p>';
+    } else {
+      $('resultsAdvice').innerHTML = wrongQuestions.slice(0, 3).map((q) => {
+        const cleanQ = normalizeMath(q.question || '');
+        const cleanExp = normalizeMath(q.explanation || 'Revois cette notion dans la fiche.');
+        return `<p style="margin-bottom:10px;"><strong style="color:#ff9a84;">❌ ${escapeHtml(cleanQ)}</strong><br><span style="color:var(--muted);font-size:13px;">${escapeHtml(cleanExp)}</span></p>`;
+      }).join('');
+      renderKaTeX($('resultsAdvice'));
+    }
 
-    const recs = [
-      percent === 100 ? 'Continue, teste un autre chapitre.' : percent >= 70 ? 'Revois les questions manquées.' : 'Refais une session dans 2-3 jours.'
-    ];
-    $('recommendationsList').innerHTML = recs.map((r) => `<li>${r}</li>`).join('');
+    await saveQuizResult(correct, total);
+    await clearActiveRevisionSession();
+
     showView('resultsView');
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // SAUVEGARDE FIRESTORE
+  // ═══════════════════════════════════════════════════════════════
+  async function saveSession(session) {
+    if (!state.user) return;
+    try {
+      await addDoc(collection(db, 'users', state.user.uid, 'revisionSessions'), {
+        subject: state.subject,
+        chapter: state.chapter,
+        chapterTitle: session.chapterTitle || state.chapter,
+        mode: state.mode,
+        session,
+        createdAt: serverTimestamp()
+      });
+    } catch (e) { console.warn('Save session error:', e); }
+  }
+
+  async function saveQuizResult(correct, total) {
+    if (!state.user) return;
+    try {
+      await addDoc(collection(db, 'users', state.user.uid, 'revisionSessions'), {
+        subject: state.subject,
+        chapter: state.chapter,
+        type: 'quiz_result',
+        score: Math.round((correct / total) * 20),
+        correct,
+        total,
+        createdAt: serverTimestamp()
+      });
+    } catch (e) { console.warn('Save quiz error:', e); }
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // HISTORIQUE
+  // ═══════════════════════════════════════════════════════════════
+  async function loadHistory() {
+    if (!state.user) return;
+    try {
+      const q = query(
+        collection(db, 'users', state.user.uid, 'revisionSessions'),
+        orderBy('createdAt', 'desc'),
+        limit(20)
+      );
+      const snap = await getDocs(q);
+
+      const list = $('historyList');
+      if (snap.empty) {
+        list.innerHTML = '<div class="empty-state"><span class="empty-icon">📭</span><h3>Aucune révision</h3><p>Commence une première révision pour la voir ici.</p></div>';
+      } else {
+        list.innerHTML = snap.docs.map((d) => {
+          const data = d.data();
+          const date = data.createdAt?.toDate?.() || new Date();
+          const isQuiz = data.type === 'quiz_result';
+          const score = isQuiz ? data.score : null;
+
+          return `
+            <div class="history-item">
+              <div class="history-icon">${isQuiz ? '✅' : '📝'}</div>
+              <div class="history-info">
+                <div class="history-title">${escapeHtml(SUBJECT_LABELS[data.subject] || data.subject)} — ${escapeHtml(data.chapterTitle || data.chapter || 'Tous')}</div>
+                <div class="history-sub">${isQuiz ? 'Quiz' : 'Fiche'} · ${date.toLocaleDateString('fr-FR')}</div>
+              </div>
+              ${score !== null ? `<div class="history-score">${score}/20</div>` : ''}
+            </div>
+          `;
+        }).join('');
+      }
+
+      showView('historyView');
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  $('newFicheBtn').addEventListener('click', async () => {
+    await clearActiveRevisionSession();
+    showView('configView');
   });
-
-  $('newFicheBtn').addEventListener('click', () => { syncModeFromChips(); showView('configView'); });
-  $('newFlashBtn').addEventListener('click', () => { syncModeFromChips(); showView('configView'); });
-  $('restartBtn').addEventListener('click', () => { syncModeFromChips(); showView('configView'); });
-  $('startFlashcardsBtn').addEventListener('click', async () => {
-    state.flashcards = [];
-    state.currentFlashIndex = 0;
-    state.flashRatings = {};
-    state.mode = 'flashcard';
-    await generateFlashcards();
+  $('newFlashBtn').addEventListener('click', async () => {
+    await clearActiveRevisionSession();
+    showView('configView');
   });
-  $('skipToQuizBtn').addEventListener('click', generateQuiz);
+  $('restartBtn').addEventListener('click', async () => {
+    await clearActiveRevisionSession();
+    showView('configView');
+  });
+  $('backToConfigBtn').addEventListener('click', () => showView('configView'));
 
-  window.addEventListener('scroll', () => {
-    $('scrollTop').classList.toggle('show', window.scrollY > 300);
-  }, { passive: true });
-  $('scrollTop').addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-
-  function showPremiumPopup(used, limit) {
-    if (used && limit) $('premiumSubtitle').innerHTML = `Tu as utilisé tes <strong>${limit} essais gratuits</strong>. Passe à Premium.`;
+  // ═══════════════════════════════════════════════════════════════
+  // MODAL PREMIUM
+  // ═══════════════════════════════════════════════════════════════
+  function showPremiumPopup(used = 0, limit = FREE_LIMIT) {
+    const subtitle = $('premiumSubtitle');
+    if (used && limit) {
+      subtitle.innerHTML = `
+        Tu as utilisé tes <strong>${limit} essais gratuits</strong> du jour.
+        Passe à <strong>Premium</strong> pour générer des fiches, flashcards et quiz sans limite.
+      `;
+    }
     $('premiumOverlay').classList.add('show');
   }
-  $('premiumClose').addEventListener('click', () => $('premiumOverlay').classList.remove('show'));
-  $('popupLaterBtn').addEventListener('click', () => $('premiumOverlay').classList.remove('show'));
-  $('premiumOverlay').addEventListener('click', (e) => { if (e.target === $('premiumOverlay')) $('premiumOverlay').classList.remove('show'); });
 
+  $('premiumClose').addEventListener('click', () => $('premiumOverlay').classList.remove('show'));
+  $('premiumOverlay').addEventListener('click', (e) => {
+    if (e.target === $('premiumOverlay')) $('premiumOverlay').classList.remove('show');
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') $('premiumOverlay').classList.remove('show');
+  });
+
+  // ═══════════════════════════════════════════════════════════════
+  // BADGE QUOTA
+  // ═══════════════════════════════════════════════════════════════
+  function updateQuotaBadge(remaining) {
+    const badge = $('quotaBadge');
+    const text = $('quotaText');
+    if (!badge || !text) return;
+
+    badge.style.display = 'inline-flex';
+    badge.classList.remove('warning', 'premium');
+
+    if (remaining <= 0) {
+      badge.classList.add('warning');
+      text.textContent = '0 essai gratuit';
+    } else {
+      text.textContent = `${remaining} essai${remaining > 1 ? 's' : ''} gratuit${remaining > 1 ? 's' : ''}`;
+    }
+  }
+
+  function showPremiumBadge() {
+    const badge = $('quotaBadge');
+    const text = $('quotaText');
+    if (!badge || !text) return;
+
+    badge.style.display = 'inline-flex';
+    badge.classList.remove('warning');
+    badge.classList.add('premium');
+    text.textContent = 'Premium illimité';
+  }
+
+  async function loadQuota() {
+    if (!state.user) return;
+
+    if (state.isPremium) {
+      showPremiumBadge();
+      return;
+    }
+
+    try {
+      const today = new Date().toISOString().slice(0, 10);
+      const usageDoc = await getDoc(doc(db, 'users', state.user.uid, 'reviseurUsage', today));
+      const used = usageDoc.exists() ? (usageDoc.data().count || 0) : 0;
+      const remaining = Math.max(0, FREE_LIMIT - used);
+      updateQuotaBadge(remaining);
+    } catch (e) { console.warn('Load quota error:', e); }
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // HELPERS
+  // ═══════════════════════════════════════════════════════════════
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = String(text || '');
+    return div.innerHTML;
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // REPRISE DE SESSION
+  // ═══════════════════════════════════════════════════════════════
+  async function checkActiveRevisionSession() {
+    const session = await loadActiveRevisionSession();
+    if (!session || !session.currentSession) return;
+
+    $('resumeMeta').innerHTML = `
+      <div><span class="label">Matière</span><span class="value">${escapeHtml(SUBJECT_LABELS[session.subject] || session.subject)}</span></div>
+      <div><span class="label">Chapitre</span><span class="value">${escapeHtml(session.chapter === 'all' ? 'Tous' : session.chapter)}</span></div>
+      <div><span class="label">Mode</span><span class="value">${session.mode === 'flashcard' ? 'Flashcards' : 'Fiche'}</span></div>
+    `;
+
+    $('resumeModal').classList.add('show');
+
+    $('resumeContinueBtn').onclick = () => {
+      state.subject = session.subject;
+      state.chapter = session.chapter;
+      state.mode = session.mode;
+      state.currentSession = session.currentSession;
+      state.flashcards = session.flashcards || [];
+      state.currentFlashIndex = session.currentFlashIndex || 0;
+      state.quiz = session.quiz || [];
+      state.quizAnswers = session.quizAnswers || {};
+
+      customSelects.subject.select(session.subject, true);
+      updateChapters();
+      customSelects.chapter.select(session.chapter, true);
+      document.querySelectorAll('.mode-card').forEach((c) => {
+        c.classList.toggle('active', c.dataset.mode === session.mode);
+      });
+
+      $('resumeModal').classList.remove('show');
+
+      if (state.mode === 'flashcard' && state.flashcards.length > 0) {
+        renderFlashcard();
+        showView('flashcardView');
+      } else if (state.quiz.length > 0 && Object.keys(state.quizAnswers).length > 0) {
+        renderQuiz();
+        showView('quizView');
+      } else {
+        renderFiche();
+        showView('ficheView');
+      }
+    };
+
+    $('resumeNewBtn').onclick = async () => {
+      await clearActiveRevisionSession();
+      $('resumeModal').classList.remove('show');
+      state.currentSession = null;
+      state.flashcards = [];
+      state.quiz = [];
+      state.quizAnswers = {};
+      showView('configView');
+    };
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // AUTH
+  // ═══════════════════════════════════════════════════════════════
   function isUserPremium(data) {
     if (!data) return false;
     const active = data.premium === true || data.isUnlocked === true || data.hasDeposited === true;
     if (!active) return false;
-    const end = data.subscriptionEndDate?.toDate?.() || (data.subscriptionEndDate?.seconds ? new Date(data.subscriptionEndDate.seconds * 1000) : null);
+    const end = data.subscriptionEndDate?.toDate?.() ||
+      (data.subscriptionEndDate?.seconds ? new Date(data.subscriptionEndDate.seconds * 1000) : null);
     return !end || end.getTime() > Date.now();
   }
+
   onAuthStateChanged(auth, async (user) => {
     const conn = $('connectionState');
-    if (!user) { window.location.replace('login.html'); return; }
+
+    if (!user) {
+      window.location.replace('auth-choice.html');
+      return;
+    }
+
     state.user = user;
     conn.textContent = 'Connecté';
     conn.classList.add('online');
+
     try {
-      const snap = await getDoc(doc(db, 'users', user.uid));
-      if (snap.exists()) {
-        const d = snap.data();
-        state.isPremium = isUserPremium(d);
-        conn.textContent = state.isPremium ? 'Premium' : 'Gratuit';
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      if (userDoc.exists()) {
+        const data = userDoc.data();
+        state.isPremium = isUserPremium(data);
+        conn.textContent = state.isPremium ? 'Premium actif' : 'Compte gratuit';
+        conn.classList.toggle('online', state.isPremium);
+        await loadQuota();
       }
-    } catch (e) {}
+    } catch (e) {
+      console.warn('Load user error:', e);
+    }
+
+    await checkActiveRevisionSession();
   });
 
-  initCustomSelects();
-  initChips();
-  console.log('🎓 ARVEXA — Réviseur v6.2 (version corrigée)');
+  // ═══════════════════════════════════════════════════════════════
+  // INIT
+  // ═══════════════════════════════════════════════════════════════
+  function init() {
+    initCustomSelects();
+    customSelects.subject.select('mathematiques', true);
+    updateChapters();
+    customSelects.subject.element.addEventListener('change', updateChapters);
+    console.log('🎓 ARVEXA — Réviseur (Firestore + quota 2/jour)');
+  }
+
+  init();
   </script>
 </body>
 </html>

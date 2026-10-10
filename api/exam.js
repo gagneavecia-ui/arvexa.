@@ -1227,5 +1227,4 @@ module.exports = async function handler(request, response) {
 
   return jsonError(response, 400, 'Action invalide.');
 };
-Réponds UNIQUEMENT avec l'objet JSON.`;
 }

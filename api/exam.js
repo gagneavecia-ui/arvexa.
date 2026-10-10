@@ -1,8 +1,9 @@
 // ================================================================
-// API EXAM v3.2 — ARVEXA School
+// API EXAM v3.3 — ARVEXA School
+// 7 matières : maths, physique, chimie, svt, philo, histoire, geographie
 // 3 exercices × 5 questions par sujet
-// 100% gratuit : Groq + OpenRouter :free
-// ⚡ Version sans backticks (compatible copier-coller)
+// 100% gratuit : Groq (4 modèles) + OpenRouter (3 modèles :free)
+// Version SANS backticks (compatible copier-coller partout)
 // ================================================================
 
 module.exports.config = { maxDuration: 90 };
@@ -12,8 +13,8 @@ var MAX_REQUESTS_PER_WINDOW = 3;
 var requestLog = new Map();
 
 var ALLOWED_SUBJECTS = new Set([
-  'mathematiques', 'physique', 'chimie', 'svt', 'francais',
-  'philosophie', 'histoire-geo'
+  'mathematiques', 'physique', 'chimie', 'svt',
+  'philosophie', 'histoire', 'geographie'
 ]);
 
 var ALLOWED_DIFFICULTIES = new Set(['easy', 'medium', 'hard', 'bac']);
@@ -27,9 +28,9 @@ var SUBJECT_LABELS = {
   'physique': 'Physique',
   'chimie': 'Chimie',
   'svt': 'SVT',
-  'francais': 'Français',
   'philosophie': 'Philosophie',
-  'histoire-geo': 'Histoire-Géographie'
+  'histoire': 'Histoire',
+  'geographie': 'Géographie'
 };
 
 var CHOICE_SUBJECTS = new Set(['mathematiques', 'physique', 'chimie']);
@@ -121,10 +122,9 @@ function examSubjectToNotebookKey(examSubject) {
     'physique': 'physique',
     'chimie': 'chimie',
     'svt': 'svt',
-    'francais': 'francais',
     'philosophie': 'philosophie',
-    'histoire-geo': 'histoire-geo',
-    'anglais': 'anglais'
+    'histoire': 'histoire',
+    'geographie': 'geographie'
   };
   return map[examSubject] || null;
 }
@@ -136,10 +136,10 @@ function normalizeSubjectKey(raw) {
   var map = {
     mathematiques: 'mathematiques', maths: 'mathematiques', math: 'mathematiques',
     physique: 'physique', physiques: 'physique',
-    chimie: 'chimie', svt: 'svt', francais: 'francais', anglais: 'anglais',
+    chimie: 'chimie', svt: 'svt',
     philosophie: 'philosophie', philo: 'philosophie',
-    histoire_geo: 'histoire-geo', histoiregeo: 'histoire-geo',
-    histoire: 'histoire-geo', geographie: 'histoire-geo', geo: 'histoire-geo'
+    histoire: 'histoire',
+    geographie: 'geographie', geo: 'geographie'
   };
   return map[s] || s;
 }
@@ -822,23 +822,23 @@ async function generateWithFallback(prompt, subjectName) {
       var rawExam = await callProvider(provider, prompt);
 
       if (validateGeneratedExam(rawExam, subjectName)) {
-        console.log('[AI] ✅ ' + provider.name + ' — structure valide');
+        console.log('[AI] OK ' + provider.name + ' — structure valide');
         return { exam: rawExam, provider: provider.name };
       }
 
-      console.log('[AI] 🔧 ' + provider.name + ' — tentative de réparation...');
+      console.log('[AI] FIX ' + provider.name + ' — tentative de réparation...');
       var repaired = repairExamStructure(rawExam, subjectName);
 
       if (repaired && validateGeneratedExam(repaired, subjectName)) {
-        console.log('[AI] ✅ ' + provider.name + ' — réparation réussie');
+        console.log('[AI] OK ' + provider.name + ' — réparation réussie');
         return { exam: repaired, provider: provider.name + ' (réparé)' };
       }
 
       errors.push(provider.name + ': structure invalide');
-      console.warn('[AI] ❌ ' + provider.name + ' : structure invalide');
+      console.warn('[AI] FAIL ' + provider.name + ' : structure invalide');
     } catch (error) {
       errors.push(provider.name + ': ' + error.message);
-      console.warn('[AI] ❌ ' + provider.name + ' échec: ' + error.message);
+      console.warn('[AI] FAIL ' + provider.name + ' échec: ' + error.message);
     }
   }
   throw new Error('all_providers_failed: ' + errors.join(' | '));
@@ -854,13 +854,13 @@ async function correctWithFallback(prompt) {
       console.log('[AI] Correction avec ' + provider.name + '...');
       var result = await callProvider(provider, prompt, 14000);
       if (result && typeof result === 'object' && Array.isArray(result.exercises)) {
-        console.log('[AI] ✅ ' + provider.name + ' — correction valide');
+        console.log('[AI] OK ' + provider.name + ' — correction valide');
         return { result: result, provider: provider.name };
       }
       errors.push(provider.name + ': structure invalide');
     } catch (error) {
       errors.push(provider.name + ': ' + error.message);
-      console.warn('[AI] ❌ ' + provider.name + ' correction échouée: ' + error.message);
+      console.warn('[AI] FAIL ' + provider.name + ' correction échouée: ' + error.message);
     }
   }
   throw new Error('all_providers_failed: ' + errors.join(' | '));

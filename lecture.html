@@ -247,16 +247,20 @@
        CONTENT WRAPPER
        ============================================================ */
     .content-wrapper {
-      flex: 1;
-      overflow-y: auto;
-      overflow-x: hidden;
-      padding: 16px 16px 80px;
-      max-width: var(--content-max);
-      margin: 0 auto;
-      width: 100%;
-      min-width: 0;
-      transition: background-color 0.3s ease;
-    }
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 16px 16px 24px;   /* ⚡ 80px → 24px */
+  max-width: var(--content-max);
+  margin: 0 auto;
+  width: 100%;
+  min-width: 0;
+  transition: background-color 0.3s ease;
+  /* ⚡ Empêche l'étirement vertical */
+  align-self: flex-start;
+  height: auto;
+  max-height: 100%;
+}
     .content-wrapper::-webkit-scrollbar { width: 4px; }
     .content-wrapper::-webkit-scrollbar-track { background: transparent; }
     .content-wrapper::-webkit-scrollbar-thumb {
@@ -1717,8 +1721,8 @@
       border-radius: 10px;
     }
 
-  /* ============================================================
-   FIX FINAL — Supprime tout vide sous la fin de lecture
+ /* ============================================================
+   FIX FINAL V3 — Supprime le vide en fin de lecture
    ============================================================ */
 
 /* 1) Neutralise l'ancienne règle 448px */
@@ -1729,38 +1733,39 @@
   border-top: 1px solid var(--border-gold) !important;
 }
 
-/* 2) Réduit le margin-bottom de la dernière section du contenu */
-#contentBody .lecture-section:last-child,
-#contentBody .lecture-section:last-of-type {
-  margin-bottom: 0 !important;
-}
-
-#contentBody .lecture-recap:last-child {
-  margin-bottom: 0 !important;
-}
-
-/* 3) Réduit le padding-bottom du wrapper à un minimum */
+/* 2) Réduit le padding-bottom du wrapper */
 .content-wrapper {
-  padding-bottom: 16px !important;
+  padding-bottom: 24px !important;
+  flex: 0 1 auto !important;   /* ⚡ ne s'étire plus */
 }
 
-/* 4) Supprime le padding-top de la nav-bar (elle est déjà suivie du wrapper) */
+/* 3) Réduit le margin-bottom de la dernière section */
+#contentBody .lecture-section:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* 4) Nettoie le body / main-content */
+body {
+  height: auto !important;
+}
+
+/* 5) Supprime le padding-top de la nav-bar */
 .nav-bar {
   margin-top: 16px !important;
   padding-top: 0 !important;
   border-top: none !important;
 }
 
-/* 5) Force le dernier enfant du contentBody à ne pas pousser vers le bas */
-#contentBody > *:last-child {
-  margin-bottom: 0 !important;
-  padding-bottom: 0 !important;
+/* 6) Neutralise les divs vides en fin de contenu */
+#contentBody > div:empty,
+#contentBody > p:empty,
+#contentBody > br:last-child {
+  display: none !important;
 }
 
-/* 6) Cas particulier : si le dernier élément est .lecture-container, neutraliser son padding */
-#contentBody .lecture-container:last-child {
-  padding-bottom: 0 !important;
-  margin-bottom: 0 !important;
+/* 7) Force la hauteur min du body à 0 */
+#contentBody {
+  min-height: 0 !important;
 }
   </style>
 </head>

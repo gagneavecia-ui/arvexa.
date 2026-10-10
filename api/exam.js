@@ -755,25 +755,45 @@ function repairExamStructure(exam, subjectName) {
         if (!question.type) {
           question.type = (Array.isArray(question.options) && question.options.length === 4) ? 'choice' : 'text';
         }
+if (question.type === 'choice') {
+  // ⚡ Si options absentes ou mauvais format → convertir en texte libre
+  if (!Array.isArray(question.options) || question.options.length !== 4) {
+    question.type = 'text';
+    delete question.options;
+    delete question.correctAnswer;
+  } else {
+    // ⚡ Normaliser les options (forcé A/B/C/D)
+    var letters = ['A', 'B', 'C', 'D'];
+    question.options = question.options.map(function (opt, oi) {
+      var text = '';
+      if (typeof opt === 'string') text = opt;
+      else if (opt && typeof opt === 'object') text = opt.text || opt.label || opt.value || String(opt);
+      else text = String(opt || '');
+      return { id: letters[oi], text: String(text || '').trim() || ('Réponse ' + letters[oi]) };
+    });
 
-        if (question.type === 'choice') {
-          if (!Array.isArray(question.options) || question.options.length !== 4) {
-            question.type = 'text';
-            delete question.options;
-            delete question.correctAnswer;
-          } else {
-            question.options = question.options.map(function (opt, oi) {
-              if (typeof opt === 'string') return { id: String.fromCharCode(65 + oi), text: opt };
-              return { id: opt.id || String.fromCharCode(65 + oi), text: opt.text || opt.label || String(opt) };
-            });
-            if (!question.correctAnswer) question.correctAnswer = 'A';
-            if (typeof question.correctAnswer === 'number') {
-              question.correctAnswer = String.fromCharCode(65 + question.correctAnswer);
-            }
-            question.correctAnswer = String(question.correctAnswer).toUpperCase().slice(0, 1);
-            if (['A', 'B', 'C', 'D'].indexOf(question.correctAnswer) === -1) question.correctAnswer = 'A';
-          }
-        } else {
+    // ⚡ Normaliser la bonne réponse
+    var correct = question.correctAnswer;
+    if (correct === null || correct === undefined) {
+      correct = 'A';
+    } else if (typeof correct === 'number') {
+      correct = letters[correct] || 'A';
+    } else {
+      correct = String(correct).toUpperCase().trim();
+      // Si c'est un texte au lieu d'une lettre → chercher la bonne lettre
+      if (['A', 'B', 'C', 'D'].indexOf(correct) === -1) {
+        // Chercher l'option dont le texte correspond
+        var matchIdx = -1;
+        for (var m = 0; m < question.options.length; m++) {
+          if (question.options[m].text === String(question.correctAnswer)) { matchIdx = m; break; }
+        }
+        correct = matchIdx !== -1 ? letters[matchIdx] : 'A';
+      }
+    }
+    question.correctAnswer = correct;
+  }
+}
+        else {
           delete question.options;
           delete question.correctAnswer;
         }
@@ -820,6 +840,9 @@ async function generateWithFallback(prompt, subjectName) {
     try {
       console.log('[AI] Tentative ' + provider.name + '...');
       var rawExam = await callProvider(provider, prompt);
+
+      // ⚡ Force la normalisation des options (A/B/C/D) MEME si structure valide
+      rawExam = repairExamStructure(rawExam, subjectName);
 
       if (validateGeneratedExam(rawExam, subjectName)) {
         console.log('[AI] OK ' + provider.name + ' — structure valide');

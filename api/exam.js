@@ -2969,7 +2969,7 @@
     }
 
     state.user = user;
-    $('connectionState').textContent = 'connecté';
+    $('connectionState').textContent = 'Compte connecté';
     $('connectionState').classList.add('online');
 
     prefillFromUrl();

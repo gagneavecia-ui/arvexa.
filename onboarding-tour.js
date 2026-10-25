@@ -129,7 +129,7 @@
 
       // 5. ARV-PROGRESS — le cœur du suivi
       {
-        element: '.tools-grid a[href*="arv-progress"]',
+        element: '.progress-link',
         popover: {
           title: '📊 ARV-PROGRESS',
           description: 'Ton carnet intelligent. Ajoute tes cours, l\'IA les analyse et te dit exactement quoi réviser. Ton meilleur allié pour progresser.',

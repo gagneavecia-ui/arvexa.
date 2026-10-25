@@ -3,7 +3,7 @@
 // Version : OFFLINE v2.2 — Navigation instantanée
 // ================================================================
 
-const SW_VERSION = 'arvexa-offline-v2.8'; // v2.8 : accueil fixe (zéro animation de chargement), retrait Test de niveau + Groupe
+const SW_VERSION = 'arvexa-offline-v2.9'; // v2.9 : accueil épuré (6 outils), retrait Actions rapides + Conseils, MathMind aligné or/noir (pages fixes)
 const CACHE_STATIC = `${SW_VERSION}-static`;
 const CACHE_HTML = `${SW_VERSION}-html`;
 

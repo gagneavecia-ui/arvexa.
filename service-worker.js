@@ -3,7 +3,7 @@
 // Version : OFFLINE v2.2 — Navigation instantanée
 // ================================================================
 
-const SW_VERSION = 'arvexa-offline-v3.2'; // v3.2 : accueil — retour du compte à rebours BAC en ouverture (design épuré d'origine), rituel retiré (progression visible dans ARV Progress)
+const SW_VERSION = 'arvexa-offline-v3.3'; // v3.3 : accueil — réparation du commentaire CSS MATIÈRES (grille et espacement des cartes matières restaurés)
 const CACHE_STATIC = `${SW_VERSION}-static`;
 const CACHE_HTML = `${SW_VERSION}-html`;
 

@@ -3,7 +3,7 @@
 // Version : OFFLINE v2.2 — Navigation instantanée
 // ================================================================
 
-const SW_VERSION = 'arvexa-offline-v2.9'; // v2.9 : accueil épuré (6 outils), retrait Actions rapides + Conseils, MathMind aligné or/noir (pages fixes)
+const SW_VERSION = 'arvexa-offline-v3.0'; // v3.0 : accueil — compte à rebours en héros (hero retiré), outils = Calculatrice/Formulaires/Tableau périodique/Mode Examen/ARV Progress + Plus d'outils
 const CACHE_STATIC = `${SW_VERSION}-static`;
 const CACHE_HTML = `${SW_VERSION}-html`;
 

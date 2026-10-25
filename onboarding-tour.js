@@ -129,20 +129,20 @@
 
       // 5. ARV-PROGRESS — le cœur du suivi
       {
-        element: '.progress-link',
+        element: '.tools-grid a[href*="arv-progress"]',
         popover: {
           title: '📊 ARV-PROGRESS',
           description: 'Ton carnet intelligent. Ajoute tes cours, l\'IA les analyse et te dit exactement quoi réviser. Ton meilleur allié pour progresser.',
-          side: 'bottom', align: 'start'
+          side: 'top', align: 'start'
         }
       },
 
-      // 6. ARV-Assistant — l'IA tuteur
+      // 6. Tous les outils
       {
-        element: '.tools-grid a[href*="arv.html"]',
+        element: '.tools-grid a[href*="outils.html"]',
         popover: {
-          title: '🤖 ARV-Assistant',
-          description: 'Ton tuteur personnel IA. Pose-lui n\'importe quelle question sur ton programme. Il connaît tes examens et tes faiblesses.',
+          title: '🧰 Tous tes outils',
+          description: 'ARV-Assistant, Réviseur, MathMind, Planificateur… Tout ton arsenal t\'attend dans la page Outils. ARV est ton tuteur IA, il te connaît déjà.',
           side: 'top', align: 'start'
         }
       },

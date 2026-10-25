@@ -3,7 +3,7 @@
 // Version : OFFLINE v2.2 — Navigation instantanée
 // ================================================================
 
-const SW_VERSION = 'arvexa-offline-v3.1'; // v3.1 : accueil — rituel du jour en ouverture ; compte à rebours et carte « Ma progression » retirés (progression regroupée dans ARV Progress)
+const SW_VERSION = 'arvexa-offline-v3.2'; // v3.2 : accueil — retour du compte à rebours BAC en ouverture (design épuré d'origine), rituel retiré (progression visible dans ARV Progress)
 const CACHE_STATIC = `${SW_VERSION}-static`;
 const CACHE_HTML = `${SW_VERSION}-html`;
 

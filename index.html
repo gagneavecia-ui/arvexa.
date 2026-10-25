@@ -911,73 +911,117 @@
       .arvexa-confirm-btn { padding: 10px 10px; font-size: 12.5px; gap: 6px; }
     }
 
-       RITUEL DU JOUR — série, objectif, activité
+    /* ============================================================
+       COMPTE À REBOURS BAC — carte héros (tout en haut de l'accueil)
        ============================================================ */
-    .rituel-card {
-      margin-top: 14px; padding: 16px;
-      background: var(--bg-card); border: 1px solid var(--card-border);
-      border-radius: var(--radius);
+    .countdown-card {
       position: relative; overflow: hidden;
+      padding: 26px 20px 24px;
+      border-radius: 20px;
+      background: linear-gradient(145deg, rgba(184,134,11,0.10) 0%, rgba(10,10,10,0.85) 55%, rgba(20,20,20,0.9) 100%);
+      border: 1px solid rgba(224, 184, 74, 0.14);
     }
-    .rituel-card::before {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(224,184,74,0.35), transparent);
+    .countdown-card::before {
+      content: ''; position: absolute; top: -70px; right: -60px;
+      width: 220px; height: 220px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(224,184,74,0.16) 0%, transparent 70%);
+      pointer-events: none;
     }
-    .rituel-head {
+    .countdown-card::after {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(224,184,74,0.7), transparent);
+    }
+    .hero-date {
+      display: flex; align-items: center; gap: 7px;
+      font-size: 11px; font-weight: 600; letter-spacing: 1.6px; text-transform: uppercase;
+      color: var(--text-muted); margin-bottom: 10px;
+    }
+    .hero-date i { color: var(--accent-bright); font-size: 10px; }
+    .cd-hero-head {
       display: flex; align-items: center; justify-content: space-between;
-      gap: 8px; margin-bottom: 12px;
+      gap: 10px; flex-wrap: wrap;
     }
-    .rituel-title {
-      font-size: 13px; font-weight: 700; color: var(--text-light);
-      display: flex; align-items: center; gap: 8px;
-    }
-    .rituel-title i { color: var(--accent-bright); font-size: 12px; }
-    .rituel-sub {
-      font-size: 10.5px; color: var(--text-dim);
-      text-align: right; line-height: 1.4; min-width: 0;
-    }
-    .rituel-cols {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
-    }
-    .rituel-cell {
-      background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04);
-      border-radius: 12px; padding: 12px 6px; text-align: center;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      gap: 6px; min-height: 96px;
-    }
-    .streak-flame { font-size: 20px; line-height: 1; }
-    .streak-flame.lit { display: inline-block; }
-    .streak-num {
+    .cd-hero-title {
       font-family: 'Playfair Display', Georgia, serif;
-      font-size: 22px; font-weight: 700; color: var(--text-light); line-height: 1;
+      font-size: clamp(26px, 7vw, 34px); font-weight: 700; line-height: 1.15;
+      background: linear-gradient(120deg, #F5F0E8 10%, #E0B84A 55%, #B8860B 95%);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent; color: transparent;
     }
-    .rituel-lbl {
-      font-size: 9px; text-transform: uppercase; letter-spacing: 0.6px;
-      color: var(--text-muted); font-weight: 700; line-height: 1.3;
+    .countdown-date {
+      font-size: 12px; color: var(--text-muted); font-weight: 500; margin-top: 4px;
     }
-    .goal-ring { position: relative; width: 54px; height: 54px; }
-    .goal-ring svg { transform: rotate(-90deg); display: block; }
-    .goal-ring .track { stroke: rgba(255,255,255,0.07); }
-    .goal-ring .val {
-      stroke: url(#goalGrad); stroke-linecap: round;
-      transition: stroke-dashoffset 0.9s cubic-bezier(0.25, 1, 0.5, 1);
+    .cd-hero-greeting {
+      margin: 14px 0 0; font-size: clamp(14px, 2vw, 15.5px);
+      color: var(--text-light); font-weight: 500;
     }
-    .goal-ring .goal-pct {
-      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-      font-size: 11.5px; font-weight: 700; color: var(--text-light);
+    .cd-hero-greeting .shimmer { color: var(--accent-bright); font-style: italic; }
+    .cd-hero-note { color: var(--text-muted); font-weight: 400; }
+    .countdown-status {
+      font-size: 11px; font-weight: 600;
+      padding: 4px 12px; border-radius: 999px;
+      background: rgba(224, 184, 74, 0.08); color: var(--accent-bright);
+      border: 1px solid rgba(224, 184, 74, 0.15);
+      white-space: nowrap; flex-shrink: 0;
     }
-    .goal-ring .goal-pct.done { color: var(--accent-bright); font-size: 16px; }
-    .week-bars {
-      display: flex; align-items: flex-end; justify-content: center;
-      gap: 4px; height: 40px; width: 100%;
+    .countdown-status.early { background: rgba(46, 204, 113, 0.1); color: #2ECC71; border-color: rgba(46, 204, 113, 0.2); }
+    .countdown-status.mid { background: rgba(241, 196, 15, 0.1); color: #F1C40F; border-color: rgba(241, 196, 15, 0.2); }
+    .countdown-status.late { background: rgba(230, 126, 34, 0.1); color: #E67E22; border-color: rgba(230, 126, 34, 0.2); }
+    .countdown-status.critical { background: rgba(231, 76, 60, 0.1); color: #E74C3C; border-color: rgba(231, 76, 60, 0.2); }
+
+    .progress-track {
+      width: 100%; height: 4px; background: rgba(255,255,255,0.06);
+      border-radius: 8px; margin: 14px 0; overflow: hidden;
     }
-    .week-bar {
-      width: 9px; border-radius: 3px 3px 1px 1px;
-      background: rgba(255,255,255,0.08); min-height: 3px;
-      transition: height 0.6s ease;
+    .progress-fill {
+      height: 100%; border-radius: 8px; transition: width 1s ease;
+      background: linear-gradient(90deg, var(--accent), var(--accent-bright));
+      width: 0%;
     }
-    .week-bar.active { background: linear-gradient(180deg, var(--accent-bright), var(--accent)); }
-    .week-bar.today { outline: 1px solid rgba(224,184,74,0.45); outline-offset: 1.5px; }
+    .progress-fill.early { background: linear-gradient(90deg, #2ECC71, #27AE60); }
+    .progress-fill.mid { background: linear-gradient(90deg, #F1C40F, #F39C12); }
+    .progress-fill.late { background: linear-gradient(90deg, #E67E22, #D35400); }
+    .progress-fill.critical { background: linear-gradient(90deg, #E74C3C, #C0392B); }
+
+    .countdown-display {
+      display: flex; align-items: center; justify-content: center;
+      gap: 10px;
+    }
+    .cd-block {
+      display: flex; flex-direction: column; align-items: center;
+      background: rgba(224,184,74,0.05); border: 1px solid rgba(224,184,74,0.12);
+      border-radius: 12px; padding: 10px 14px; min-width: 68px;
+    }
+    .cd-block.primary {
+      border-color: rgba(224,184,74,0.30); background: rgba(224,184,74,0.09);
+    }
+    .cd-block.primary .cd-number { color: var(--accent-bright); }
+    .cd-number {
+      font-size: clamp(26px, 3.4vw, 32px); font-weight: 800;
+      font-family: 'Playfair Display', Georgia, serif; color: var(--text-light);
+      line-height: 1.1;
+    }
+    .cd-label {
+      font-size: 10px; color: var(--text-muted); margin-top: 2px;
+      text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;
+    }
+    .cd-separator {
+      font-size: 22px; font-weight: 700;
+      color: var(--text-muted); padding-bottom: 10px;
+    }
+    .hero-quote {
+      position: relative; margin-top: 16px; padding: 2px 0 0 16px;
+      border-left: 2px solid rgba(224,184,74,0.35);
+      font-family: 'Playfair Display', Georgia, serif;
+      font-style: italic; font-size: clamp(13.5px, 1.6vw, 15px);
+      color: var(--text-dim); line-height: 1.65;
+    }
+    .hero-quote .quote-author {
+      display: block; margin-top: 6px;
+      font-family: 'Inter', sans-serif; font-style: normal;
+      font-size: 10.5px; font-weight: 700; letter-spacing: 0.8px;
+      color: var(--accent-bright); text-transform: uppercase;
+    }
 
     
     /* ============================================================
@@ -1080,21 +1124,27 @@
        RESPONSIVE NOUVEAUX BLOCS
        ============================================================ */
     @media (max-width: 640px) {
-      .rituel-cols { gap: 6px; }
+      .countdown-card { padding: 20px 16px 18px; }
+      .cd-hero-head { flex-direction: column; align-items: flex-start; }
+      .countdown-status { font-size: 10.5px; padding: 3px 10px; }
+      .countdown-display { gap: 6px; }
+      .cd-block { padding: 6px 10px; min-width: 54px; }
+      .cd-number { font-size: 22px; }
+      .cd-separator { font-size: 16px; padding-bottom: 8px; }
     }
     @media (max-width: 480px) {
-      .rituel-cell { min-height: 88px; padding: 10px 4px; }
-      .goal-ring { width: 48px; height: 48px; }
-      .week-bars { gap: 3px; }
-      .week-bar { width: 8px; }
+      .countdown-display { gap: 4px; }
+      .cd-block { padding: 5px 8px; min-width: 46px; }
+      .cd-number { font-size: 18px; }
+      .cd-separator { font-size: 14px; padding-bottom: 6px; }
+      .cd-label { font-size: 8px; }
       .badge-item { width: 80px; }
       .badge-coin { width: 54px; height: 54px; font-size: 22px; }
       .install-inner { flex-wrap: wrap; }
       .install-btn { width: 100%; padding: 10px 14px; }
     }
     @media (max-width: 360px) {
-      .goal-ring { width: 42px; height: 42px; }
-      .goal-ring .goal-pct { font-size: 10px; }
+
       .badge-item { width: 74px; }
       .badge-coin { width: 50px; height: 50px; font-size: 20px; }
     }
@@ -1264,42 +1314,41 @@
     <div class="container" id="dashboardContent">
 
       <div id="dynamicContent">
-
-        <!-- ============================================================
-             BLOC 0 — RITUEL DU JOUR (ouverture)
+        <!-- ============================================================
+             BLOC 0 — COMPTE À REBOURS BAC (héros)
              ============================================================ -->
-        <section class="rituel-card" aria-label="Rituel du jour">
-          <div class="rituel-head">
-            <div class="rituel-title"><i class="fas fa-bolt"></i> Rituel du jour</div>
-            <div class="rituel-sub" id="rituelSub">Lis une section pour démarrer</div>
+        <section class="countdown-card" aria-labelledby="countdownTitle">
+          <div class="hero-date"><i class="fas fa-calendar-day"></i><span id="heroDateText">—</span></div>
+          <div class="cd-hero-head">
+            <h1 class="cd-hero-title" id="countdownTitle">BAC 2026</h1>
+            <span class="countdown-status early" id="countdownStatus">🌱 Tu as le temps</span>
           </div>
-          <div class="rituel-cols">
-            <div class="rituel-cell">
-              <span class="streak-flame" id="streakFlame">🔥</span>
-              <span class="streak-num" id="streakNum">0</span>
-              <span class="rituel-lbl">jours de série</span>
+          <div class="countdown-date" id="countdownDate">Date indicative</div>
+          <p class="cd-hero-greeting">
+            <span id="heroGreeting">Bonsoir</span>, <span class="shimmer" id="heroName">Élève</span><span class="cd-hero-note"> — chaque jour compte vers ton BAC.</span>
+          </p>
+          <div class="progress-track">
+            <div class="progress-fill early" id="progressFill" style="width: 0%"></div>
+          </div>
+          <div class="countdown-display">
+            <div class="cd-block primary">
+              <span class="cd-number" id="cdDays">--</span>
+              <span class="cd-label">Jours</span>
             </div>
-            <div class="rituel-cell">
-              <div class="goal-ring">
-                <svg viewBox="0 0 60 60" width="100%" height="100%">
-                  <defs>
-                    <linearGradient id="goalGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stop-color="#B8860B"/>
-                      <stop offset="100%" stop-color="#E0B84A"/>
-                    </linearGradient>
-                  </defs>
-                  <circle class="track" cx="30" cy="30" r="26" fill="none" stroke-width="5"/>
-                  <circle class="val" id="goalRingVal" cx="30" cy="30" r="26" fill="none" stroke-width="5"
-                          stroke-dasharray="163.36" stroke-dashoffset="163.36"/>
-                </svg>
-                <span class="goal-pct" id="goalPct">0/3</span>
-              </div>
-              <span class="rituel-lbl">objectif du jour</span>
+            <span class="cd-separator">:</span>
+            <div class="cd-block">
+              <span class="cd-number" id="cdHours">--</span>
+              <span class="cd-label">Heures</span>
             </div>
-            <div class="rituel-cell">
-              <div class="week-bars" id="weekBars"></div>
-              <span class="rituel-lbl">7 derniers jours</span>
+            <span class="cd-separator">:</span>
+            <div class="cd-block">
+              <span class="cd-number" id="cdMinutes">--</span>
+              <span class="cd-label">Minutes</span>
             </div>
+          </div>
+          <div class="hero-quote">
+            <span id="heroQuoteText">« Chaque jour compte vers ton BAC. »</span>
+            <span class="quote-author" id="heroQuoteAuthor">— ARVEXA School</span>
           </div>
         </section>
 
@@ -1729,6 +1778,13 @@
     userFirstName.classList.remove('loading');
     userFirstName.textContent = firstName || 'Élève';
     greetingEmoji.textContent = emoji;
+    const heroGreeting = document.getElementById('heroGreeting');
+    const heroName = document.getElementById('heroName');
+    if (heroGreeting) heroGreeting.textContent = text;
+    if (heroName) {
+      heroName.classList.remove('loading');
+      heroName.textContent = firstName || 'Élève';
+    }
   }
 
   // CHARGEUR DE PROFIL — squelette doré discret le temps que les données
@@ -1738,7 +1794,9 @@
     const { text, emoji } = getGreeting();
     greetingText.textContent = text;
     greetingEmoji.textContent = emoji;
-    [userFirstName].forEach((el) => {
+    const heroGreeting = document.getElementById('heroGreeting');
+    if (heroGreeting) heroGreeting.textContent = text;
+    [userFirstName, document.getElementById('heroName')].forEach((el) => {
       if (!el) return;
       el.classList.add('loading');
       el.textContent = '';
@@ -1750,6 +1808,134 @@
   }
 
   showProfileLoading();
+
+  // ================================================================
+  // COMPTE À REBOURS BAC
+  // ================================================================
+  const cdDays = document.getElementById('cdDays');
+  const cdHours = document.getElementById('cdHours');
+  const cdMinutes = document.getElementById('cdMinutes');
+  const progressFill = document.getElementById('progressFill');
+  const countdownStatus = document.getElementById('countdownStatus');
+  const countdownTitle = document.getElementById('countdownTitle');
+  const countdownDate = document.getElementById('countdownDate');
+
+  function getExamDate() {
+    if (typeof window.ARVEXA_getExamDate === 'function') {
+      return window.ARVEXA_getExamDate();
+    }
+    const now = new Date();
+    const year = now.getFullYear();
+    const juneThisYear = new Date(year, 5, 1);
+    if (now < juneThisYear) return juneThisYear;
+    return new Date(year + 1, 5, 1);
+  }
+
+  function getSchoolYearStart(examDate) {
+    const examYear = examDate.getFullYear();
+    const examMonth = examDate.getMonth();
+    const startYear = examMonth < 8 ? examYear - 1 : examYear;
+    return new Date(startYear, 8, 1);
+  }
+
+  function getCountdownMessages(days) {
+    if (days <= 0) return { emoji: '🎉', message: 'C\'est le jour J ! Bonne chance !', class: 'critical' };
+    if (days < 7) return { emoji: '🏆', message: 'C\'est maintenant ! Dernière ligne droite', class: 'critical' };
+    if (days < 15) return { emoji: '🚀', message: 'Sprint final, donne tout', class: 'critical' };
+    if (days < 30) return { emoji: '🔥', message: 'Concentre-toi, chaque jour compte', class: 'late' };
+    if (days < 60) return { emoji: '⚡', message: 'Accélère, c\'est le moment clé', class: 'mid' };
+    if (days < 90) return { emoji: '📚', message: 'Bon rythme, continue comme ça', class: 'mid' };
+    return { emoji: '🌱', message: 'Tu as le temps, commence tranquillement', class: 'early' };
+  }
+
+  function updateCountdown() {
+    const now = new Date();
+    const exam = getExamDate();
+    const diffMs = exam - now;
+
+    countdownTitle.textContent = 'BAC ' + exam.getFullYear();
+    try {
+      countdownDate.textContent = 'Échéance : ' + exam.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+    } catch (e) {
+      countdownDate.textContent = 'Date indicative';
+    }
+
+    if (diffMs <= 0) {
+      cdDays.textContent = '0';
+      cdHours.textContent = '00';
+      cdMinutes.textContent = '00';
+      progressFill.style.width = '100%';
+      progressFill.className = 'progress-fill critical';
+      countdownStatus.textContent = '🎉 C\'est le jour J !';
+      countdownStatus.className = 'countdown-status critical';
+      return;
+    }
+
+    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+
+    cdDays.textContent = days;
+    cdHours.textContent = String(hours).padStart(2, '0');
+    cdMinutes.textContent = String(minutes).padStart(2, '0');
+
+    const start = getSchoolYearStart(exam);
+    const total = exam - start;
+    const elapsed = now - start;
+    const progress = total > 0 ? Math.min(100, Math.max(0, (elapsed / total) * 100)) : 0;
+    progressFill.style.width = progress + '%';
+
+    let progressClass = 'early';
+    if (progress > 85) progressClass = 'critical';
+    else if (progress > 70) progressClass = 'late';
+    else if (progress > 50) progressClass = 'mid';
+    progressFill.className = 'progress-fill ' + progressClass;
+
+    const msg = getCountdownMessages(days);
+    countdownStatus.textContent = `${msg.emoji} ${msg.message}`;
+    countdownStatus.className = 'countdown-status ' + msg.class;
+  }
+
+  updateCountdown();
+  const countdownInterval = setInterval(updateCountdown, 60000);
+  window.addEventListener('beforeunload', () => clearInterval(countdownInterval));
+
+  // ================================================================
+  // HERO — date + citation du jour
+  // ================================================================
+  const QUOTES = [
+    { t: "L'éducation est l'arme la plus puissante pour changer le monde.", a: "Nelson Mandela" },
+    { t: "La discipline est le pont entre les objectifs et les accomplissements.", a: "Jim Rohn" },
+    { t: "Petit à petit, l'oiseau fait son nid.", a: "Proverbe" },
+    { t: "Seul on va plus vite, ensemble on va plus loin.", a: "Proverbe africain" },
+    { t: "Le succès, c'est d'aller d'échec en échec sans perdre son enthousiasme.", a: "Winston Churchill" },
+    { t: "La connaissance est un trésor, mais la pratique en est la clé.", a: "Proverbe" },
+    { t: "Le génie est fait de 1 % d'inspiration et de 99 % de transpiration.", a: "Thomas Edison" },
+    { t: "Patience et longueur de temps font plus que force ni que rage.", a: "Jean de La Fontaine" },
+    { t: "Ce n'est pas parce que les choses sont difficiles que nous n'osons pas.", a: "Sénèque" },
+    { t: "Chaque chapitre maîtrisé aujourd'hui est une question gagnée demain.", a: "ARVEXA School" }
+  ];
+
+  const heroDateText = document.getElementById('heroDateText');
+  const heroQuoteText = document.getElementById('heroQuoteText');
+  const heroQuoteAuthor = document.getElementById('heroQuoteAuthor');
+
+  function renderHero() {
+    const d = new Date();
+    try {
+      const ds = d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+      heroDateText.textContent = ds.charAt(0).toUpperCase() + ds.slice(1);
+    } catch (e) {
+      heroDateText.textContent = d.getDate() + '/' + (d.getMonth() + 1) + '/' + d.getFullYear();
+    }
+    const start = new Date(d.getFullYear(), 0, 0);
+    const dayOfYear = Math.floor((d - start) / (1000 * 60 * 60 * 24));
+    const q = QUOTES[dayOfYear % QUOTES.length] || QUOTES[0];
+    heroQuoteText.textContent = '« ' + q.t + ' »';
+    heroQuoteAuthor.textContent = '— ' + q.a;
+  }
+
+  renderHero();
 
   // ================================================================
   // PROGRESSION SCOLAIRE (prioritaire)
@@ -1809,8 +1995,7 @@
       }
     });
 
-    // Rituel + badges (gamification)
-    renderRituel();
+    // Badges (gamification)
     renderBadges();
   }
 
@@ -1871,51 +2056,6 @@
       cursor.setDate(cursor.getDate() - 1);
     }
     return streak;
-  }
-
-  // ================================================================
-  // RITUEL DU JOUR — série, objectif, 7 derniers jours
-  // ================================================================
-  const streakNum = document.getElementById('streakNum');
-  const streakFlame = document.getElementById('streakFlame');
-  const goalRingVal = document.getElementById('goalRingVal');
-  const goalPct = document.getElementById('goalPct');
-  const weekBars = document.getElementById('weekBars');
-  const rituelSub = document.getElementById('rituelSub');
-  const GOAL_CIRC = 163.36;
-
-  function renderRituel() {
-    if (!streakNum || !goalRingVal || !weekBars) return;
-    const activity = computeActivity();
-    const streak = computeStreak(activity);
-    streakNum.textContent = String(streak);
-    streakFlame.classList.toggle('lit', streak > 0);
-
-    const todayKey = dayStr(new Date());
-    const doneToday = Number(activity[todayKey]) || 0;
-    const goalDone = Math.min(doneToday, DAILY_GOAL);
-    goalRingVal.style.strokeDashoffset = String(GOAL_CIRC * (1 - goalDone / DAILY_GOAL));
-    goalPct.textContent = goalDone >= DAILY_GOAL ? '✓' : String(Math.min(doneToday, 9)) + '/' + DAILY_GOAL;
-    goalPct.classList.toggle('done', goalDone >= DAILY_GOAL);
-
-    const maxVal = Math.max.apply(null, [DAILY_GOAL, 1].concat(Object.keys(activity).slice(-7).map((k) => Number(activity[k]) || 0)));
-    weekBars.textContent = '';
-    for (let i = 6; i >= 0; i--) {
-      const dt = new Date();
-      dt.setDate(dt.getDate() - i);
-      const v = Number(activity[dayStr(dt)]) || 0;
-      const bar = document.createElement('div');
-      bar.className = 'week-bar' + (v > 0 ? ' active' : '') + (i === 0 ? ' today' : '');
-      bar.style.height = Math.max(9, Math.round((v / maxVal) * 100)) + '%';
-      try {
-        bar.title = v + ' section' + (v > 1 ? 's' : '') + ' — ' + dt.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'short' });
-      } catch (e) {}
-      weekBars.appendChild(bar);
-    }
-
-    if (doneToday >= DAILY_GOAL) rituelSub.textContent = 'Objectif du jour atteint, bravo !';
-    else if (streak > 0) rituelSub.textContent = 'Ne casse pas ta série 🔥';
-    else rituelSub.textContent = 'Lis une section pour démarrer';
   }
 
   // ================================================================
@@ -2867,7 +3007,7 @@
     if (authGraceTimer) { clearTimeout(authGraceTimer); authGraceTimer = null; }
   });
 
-  console.log('🚀 ARVEXA School — Index refondu (progression prioritaire, action intelligente)');
+  console.log('🚀 ARVEXA School — Accueil : compte à rebours BAC en ouverture');
   </script>
 </body>
 </html>

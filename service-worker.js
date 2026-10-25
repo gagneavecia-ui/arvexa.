@@ -3,7 +3,7 @@
 // Version : OFFLINE v2.2 — Navigation instantanée
 // ================================================================
 
-const SW_VERSION = 'arvexa-offline-v2.7'; // v2.7 : accueil refondu (hero, rituel, actions rapides, badges)
+const SW_VERSION = 'arvexa-offline-v2.8'; // v2.8 : accueil fixe (zéro animation de chargement), retrait Test de niveau + Groupe
 const CACHE_STATIC = `${SW_VERSION}-static`;
 const CACHE_HTML = `${SW_VERSION}-html`;
 
@@ -25,7 +25,6 @@ const PRECACHE = [
   './planificateur.html',
   './tableau-periodique.html',
   './arv-progress.html',
-  './groupe.html',
   './offline.html',
   './manifest.json',
   './perf.css',

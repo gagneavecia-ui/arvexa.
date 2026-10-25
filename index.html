@@ -1148,7 +1148,7 @@
       position: relative; overflow: hidden;
       padding: 26px 20px 24px;
       border-radius: 20px;
-      background: linear-gradient(145deg, rgba(26,58,42,0.50) 0%, rgba(10,10,10,0.85) 55%, rgba(20,20,20,0.9) 100%);
+      background: linear-gradient(145deg, rgba(184,134,11,0.10) 0%, rgba(10,10,10,0.85) 55%, rgba(20,20,20,0.9) 100%);
       border: 1px solid rgba(224, 184, 74, 0.14);
     }
     .hero::before {
@@ -1173,14 +1173,9 @@
       color: var(--text-light); margin-bottom: 14px;
     }
     .hero-title .shimmer {
-      background: linear-gradient(90deg, var(--accent-bright) 0%, #FFF3D6 25%, var(--accent-bright) 50%, #FFF3D6 75%, var(--accent-bright) 100%);
-      background-size: 200% auto;
-      -webkit-background-clip: text; background-clip: text;
-      -webkit-text-fill-color: transparent;
-      animation: heroShimmer 5s linear infinite;
+      color: var(--accent-bright);
       font-style: italic;
     }
-    @keyframes heroShimmer { to { background-position: 200% center; } }
     .hero-quote {
       position: relative; padding: 10px 0 2px 16px;
       border-left: 2px solid rgba(224,184,74,0.35);
@@ -1231,11 +1226,7 @@
       gap: 6px; min-height: 96px;
     }
     .streak-flame { font-size: 20px; line-height: 1; }
-    .streak-flame.lit { display: inline-block; animation: flamePulse 1.6s ease-in-out infinite; }
-    @keyframes flamePulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.18); }
-    }
+    .streak-flame.lit { display: inline-block; }
     .streak-num {
       font-family: 'Playfair Display', Georgia, serif;
       font-size: 22px; font-weight: 700; color: var(--text-light); line-height: 1;
@@ -1274,7 +1265,7 @@
     .qa-grid { display: flex; flex-direction: column; gap: 10px; }
     .qa-flagship {
       display: flex; align-items: center; gap: 14px; padding: 16px 18px;
-      background: linear-gradient(135deg, rgba(224,184,74,0.14), rgba(184,134,11,0.05) 55%, rgba(26,58,42,0.30));
+      background: linear-gradient(135deg, rgba(224,184,74,0.14), rgba(184,134,11,0.05) 55%, rgba(20,20,20,0.80));
       border: 1px solid rgba(224,184,74,0.32); border-radius: var(--radius);
       text-decoration: none; color: var(--text-light);
       position: relative; overflow: hidden;
@@ -1284,12 +1275,7 @@
       content: ''; position: absolute; top: -40px; right: -40px;
       width: 140px; height: 140px; border-radius: 50%;
       background: radial-gradient(circle, rgba(224,184,74,0.18), transparent 70%);
-      animation: qaFloat 6s ease-in-out infinite alternate;
       pointer-events: none;
-    }
-    @keyframes qaFloat {
-      from { transform: translateY(0); }
-      to { transform: translateY(14px); }
     }
     .qa-flagship:hover {
       transform: translateY(-2px);
@@ -1395,8 +1381,8 @@
     .install-inner {
       display: flex; align-items: center; gap: 12px; padding: 14px 16px;
       margin-top: 14px;
-      background: linear-gradient(135deg, rgba(26,58,42,0.35), rgba(20,20,20,0.8));
-      border: 1px solid rgba(45,125,90,0.35); border-radius: var(--radius);
+      background: linear-gradient(135deg, rgba(184,134,11,0.12), rgba(20,20,20,0.8));
+      border: 1px solid rgba(224,184,74,0.30); border-radius: var(--radius);
       position: relative;
     }
     .install-icon { font-size: 24px; flex-shrink: 0; }
@@ -1421,18 +1407,20 @@
     .install-close:hover { color: var(--text-light); }
 
     /* ============================================================
-       ANIMATIONS D'APPARITION (reveal)
+       CHARGEUR DE PROFIL — squelette doré discret
+       (le SEUL état de chargement : les données arrivent progressivement,
+        la page elle-même reste fixe)
        ============================================================ */
-    .rv-js .reveal {
-      opacity: 0; transform: translateY(14px);
-      transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.25, 1, 0.5, 1);
+    .profile-skeleton {
+      display: inline-block; width: 72px; height: 0.9em;
+      border-radius: 999px; background: rgba(224,184,74,0.18);
+      animation: profilePulse 1.2s ease-in-out infinite;
+      vertical-align: middle;
     }
-    .rv-js .reveal.in { opacity: 1; transform: none; }
+    .header .profile-skeleton { width: 54px; height: 0.8em; }
+    @keyframes profilePulse { 0%, 100% { opacity: 0.45; } 50% { opacity: 1; } }
     @media (prefers-reduced-motion: reduce) {
-      .rv-js .reveal { opacity: 1; transform: none; transition: none; }
-      .hero-title .shimmer { animation: none; }
-      .streak-flame.lit { animation: none; }
-      .qa-flagship::after { animation: none; }
+      .profile-skeleton { animation: none; opacity: 0.6; }
     }
 
     /* ============================================================
@@ -1660,7 +1648,7 @@
         <!-- ============================================================
              BLOC 0 — HERO PERSONNALISÉ
              ============================================================ -->
-        <section class="hero reveal" aria-label="Accueil personnalisé">
+        <section class="hero" aria-label="Accueil personnalisé">
           <div class="hero-date"><i class="fas fa-calendar-day"></i><span id="heroDateText">—</span></div>
           <h1 class="hero-title">
             <span id="heroGreeting">Bonsoir</span>, <span class="shimmer" id="heroName">Élève</span>
@@ -1728,7 +1716,7 @@
         <!-- ============================================================
              BLOC 1bis — RITUEL DU JOUR (gamification)
              ============================================================ -->
-        <section class="rituel-card reveal" aria-label="Rituel du jour">
+        <section class="rituel-card" aria-label="Rituel du jour">
           <div class="rituel-head">
             <div class="rituel-title"><i class="fas fa-bolt"></i> Rituel du jour</div>
             <div class="rituel-sub" id="rituelSub">Lis une section pour démarrer</div>
@@ -1804,7 +1792,7 @@
              BLOC 2bis — ACTIONS RAPIDES
              ============================================================ -->
         <div class="section-title"><h3>⚡ Actions rapides</h3></div>
-        <div class="qa-grid reveal">
+        <div class="qa-grid">
           <a href="arv.html" class="qa-flagship">
             <span class="qa-flag-icon"><i class="fas fa-robot"></i></span>
             <span class="qa-flag-body">
@@ -1897,19 +1885,11 @@
             <div class="icon-badge"><i class="fas fa-robot"></i></div>
             <div class="name">Arv IA</div>
           </a>
-          <a href="groupe.html" class="tool-card">
-            <div class="icon-badge"><i class="fas fa-users"></i></div>
-            <div class="name">Groupe d'étude</div>
-          </a>
-          <a href="planificateur.html" class="tool-card">
+                    <a href="planificateur.html" class="tool-card">
             <div class="icon-badge"><i class="fas fa-calendar-check"></i></div>
             <div class="name">Planificateur</div>
           </a>
-          <a href="diagnostic.html" class="tool-card">
-            <div class="icon-badge"><i class="fas fa-list-check"></i></div>
-            <div class="name">Test de niveau</div>
-          </a>
-          <a href="outils.html" class="tool-card">
+                    <a href="outils.html" class="tool-card">
             <div class="icon-badge"><i class="fas fa-wand-sparkles"></i></div>
             <div class="name">Plus d'outils</div>
           </a>
@@ -1956,7 +1936,7 @@
              BLOC 5bis — RÉALISATIONS
              ============================================================ -->
         <div class="section-title"><h3>🏆 Tes réalisations</h3></div>
-        <div class="badges-scroll reveal" id="badgesScroll" aria-label="Badges débloqués"></div>
+        <div class="badges-scroll" id="badgesScroll" aria-label="Badges débloqués"></div>
 
         <!-- ============================================================
              BLOC 6 — AVIS
@@ -2010,16 +1990,6 @@
 
   </div>
 
-  <!-- Bootstrap animations reveal (filet de sécurité si le module échoue) -->
-  <script>
-    document.documentElement.className += ' rv-js';
-    window.__arvexaReveal = { ready: false };
-    setTimeout(function () {
-      if (window.__arvexaReveal && !window.__arvexaReveal.ready) {
-        document.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('in'); });
-      }
-    }, 3000);
-  </script>
 
   <!-- ============================================================
        MODALE AVIS
@@ -2344,7 +2314,6 @@
     { title: '🥗 Nutrition', text: "Mange équilibré. Un cerveau bien nourri est un cerveau performant." },
     { title: '🚶 Bouge', text: "Fais 15 minutes d'exercice par jour. Le sport améliore la mémoire et la concentration." },
     { title: '🎯 Révisions ciblées', text: "Ne révise pas tout au hasard. Cible les chapitres où tu as le plus de difficultés." },
-    { title: '👥 Groupe d\'étude', text: "Réviser à plusieurs peut être motivant. Explique une notion à un ami pour mieux la comprendre." },
     { title: '📅 Planning', text: "Fais un planning réaliste. Mieux vaut 2 heures régulières que 8 heures d'un coup." },
     { title: '🎓 Vieille épreuve', text: "Entraîne-toi sur les sujets des années passées. C'est le meilleur moyen de te préparer." },
     { title: '🚫 Sans téléphone', text: "Range ton téléphone pendant les révisions. Les notifications cassent la concentration." },
@@ -2448,15 +2417,39 @@
   function updateGreeting(firstName) {
     const { text, emoji } = getGreeting();
     greetingText.textContent = text;
+    userFirstName.classList.remove('loading');
     userFirstName.textContent = firstName || 'Élève';
     greetingEmoji.textContent = emoji;
     const heroGreeting = document.getElementById('heroGreeting');
     const heroName = document.getElementById('heroName');
     if (heroGreeting) heroGreeting.textContent = text;
-    if (heroName) heroName.textContent = firstName || 'Élève';
+    if (heroName) {
+      heroName.classList.remove('loading');
+      heroName.textContent = firstName || 'Élève';
+    }
   }
 
-  updateGreeting('Élève');
+  // CHARGEUR DE PROFIL — squelette doré discret le temps que les données
+  // arrivent (cache localStorage puis Firestore). La page reste fixe :
+  // c'est le seul état de chargement de tout l'accueil.
+  function showProfileLoading() {
+    const { text, emoji } = getGreeting();
+    greetingText.textContent = text;
+    greetingEmoji.textContent = emoji;
+    const heroGreeting = document.getElementById('heroGreeting');
+    if (heroGreeting) heroGreeting.textContent = text;
+    [userFirstName, document.getElementById('heroName')].forEach((el) => {
+      if (!el) return;
+      el.classList.add('loading');
+      el.textContent = '';
+      const sk = document.createElement('span');
+      sk.className = 'profile-skeleton';
+      sk.setAttribute('aria-label', 'Chargement du profil');
+      el.appendChild(sk);
+    });
+  }
+
+  showProfileLoading();
 
   // ================================================================
   // PROGRESSION SCOLAIRE (prioritaire)
@@ -2819,55 +2812,14 @@
   }
 
   // ================================================================
-  // COUNT-UP — métriques de progression animées
+  // MÉTRIQUES — affichage direct (page fixe, sans effet de comptage)
   // ================================================================
-  function prefersReducedMotion() {
-    return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  }
-
   function countUpMetric(el, value, total, suffix) {
     if (!el) return;
     const fmt = (v) => (total != null ? v + '/' + total : String(v) + (suffix || ''));
     const target = Math.max(0, Math.round(Number(value) || 0));
-    if (el.dataset.v === String(target)) { el.textContent = fmt(target); return; }
-    const from = el.dataset.v !== undefined ? (parseInt(el.dataset.v, 10) || 0) : 0;
     el.dataset.v = String(target);
-    if (prefersReducedMotion() || target === from) { el.textContent = fmt(target); return; }
-    const dur = 700;
-    const t0 = performance.now();
-    const step = (t) => {
-      const p = Math.min(1, (t - t0) / dur);
-      const eased = 1 - Math.pow(1 - p, 3);
-      el.textContent = fmt(Math.round(from + (target - from) * eased));
-      if (p < 1) requestAnimationFrame(step);
-    };
-    requestAnimationFrame(step);
-  }
-
-  // ================================================================
-  // ANIMATIONS D'APPARITION (reveal au scroll)
-  // ================================================================
-  function initReveal() {
-    const els = document.querySelectorAll('.reveal');
-    if (!els.length) return;
-    if (!('IntersectionObserver' in window) || prefersReducedMotion()) {
-      els.forEach((el) => el.classList.add('in'));
-      if (window.__arvexaReveal) window.__arvexaReveal.ready = true;
-      return;
-    }
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach((en) => {
-        if (en.isIntersecting) {
-          en.target.classList.add('in');
-          io.unobserve(en.target);
-        }
-      });
-    }, { threshold: 0.08, rootMargin: '0px 0px -24px 0px' });
-    els.forEach((el, i) => {
-      el.style.transitionDelay = i < 4 ? (i * 70) + 'ms' : '0ms';
-      io.observe(el);
-    });
-    if (window.__arvexaReveal) window.__arvexaReveal.ready = true;
+    el.textContent = fmt(target);
   }
 
   // ================================================================
@@ -2954,7 +2906,6 @@
 
   renderHero();
   renderProgress();
-  initReveal();
 
 
   // ================================================================

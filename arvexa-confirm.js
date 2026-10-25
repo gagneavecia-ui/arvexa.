@@ -19,8 +19,8 @@
   if (window.__arvexaConfirmLoaded) return;
   window.__arvexaConfirmLoaded = true;
 
-  // ── CSS extrait d'index.html — valeurs verrouillées sur le :root
-  //    de l'index pour un rendu IDENTIQUE quelle que soit la page.
+  // ── CSS ALIGNÉ SUR profil.html (référence officielle votée utilisateur)
+  //    + anti-retour-à-la-ligne : le texte des boutons reste sur UNE ligne.
   const CSS = `
     .arvexa-confirm-overlay {
       --axc-accent: #B8860B;
@@ -41,7 +41,7 @@
       padding: 20px;
       opacity: 0;
       visibility: hidden;
-      transition: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+      transition: opacity 0.25s ease, visibility 0.25s ease;
     }
     .arvexa-confirm-overlay.show {
       opacity: 1;
@@ -56,9 +56,9 @@
       width: 100%;
       position: relative;
       overflow: hidden;
-      transform: scale(0.9) translateY(20px);
-      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+      transform: scale(0.96) translateY(10px);
+      transition: transform 0.3s ease;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(184, 134, 11, 0.08);
     }
     .arvexa-confirm-overlay.show .arvexa-confirm-modal {
       transform: scale(1) translateY(0);
@@ -67,13 +67,24 @@
       content: '';
       position: absolute;
       top: 0; left: 0; right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, var(--axc-accent), var(--axc-accent-bright), var(--axc-accent));
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--axc-accent-bright), transparent);
+      opacity: 0.9;
+    }
+    .arvexa-confirm-modal::after {
+      content: '';
+      position: absolute;
+      top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: radial-gradient(circle at center, rgba(184, 134, 11, 0.04), transparent 60%);
+      pointer-events: none;
     }
     .arvexa-confirm-icon-wrap {
       display: flex;
       justify-content: center;
       margin-bottom: 18px;
+      position: relative;
+      z-index: 1;
     }
     .arvexa-confirm-icon-box {
       width: 64px;
@@ -85,6 +96,7 @@
       align-items: center;
       justify-content: center;
       font-size: 28px;
+      position: relative;
     }
     .arvexa-confirm-icon-box.danger {
       background: linear-gradient(135deg, rgba(184, 92, 58, 0.15), rgba(184, 92, 58, 0.05));
@@ -98,12 +110,16 @@
       text-align: center;
       margin-bottom: 8px;
       line-height: 1.25;
+      position: relative;
+      z-index: 1;
     }
     .arvexa-confirm-divider {
       width: 40px;
       height: 2px;
       margin: 0 auto 16px;
       background: linear-gradient(90deg, transparent, var(--axc-accent), transparent);
+      position: relative;
+      z-index: 1;
     }
     .arvexa-confirm-message {
       font-size: 14.5px;
@@ -111,6 +127,8 @@
       color: var(--axc-text-dim);
       text-align: center;
       margin-bottom: 24px;
+      position: relative;
+      z-index: 1;
     }
     .arvexa-confirm-message strong {
       color: var(--axc-text-light);
@@ -119,21 +137,26 @@
     .arvexa-confirm-actions {
       display: flex;
       gap: 10px;
+      position: relative;
+      z-index: 1;
     }
     .arvexa-confirm-btn {
       flex: 1;
       padding: 13px 16px;
-      border-radius: 30px;
+      border-radius: 999px;
       border: none;
       font-size: 14px;
       font-weight: 700;
       cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+      transition: var(--transition-fast, all 0.15s ease);
       font-family: 'Inter', sans-serif;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
+      letter-spacing: 0.2px;
+      white-space: nowrap;
+      min-width: 0;
     }
     .arvexa-confirm-btn.cancel {
       background: rgba(255, 255, 255, 0.05);
@@ -143,17 +166,30 @@
     .arvexa-confirm-btn.cancel:hover {
       background: rgba(255, 255, 255, 0.09);
       color: var(--axc-text-light);
+      border-color: rgba(255, 255, 255, 0.12);
     }
+    .arvexa-confirm-btn.cancel:active { transform: scale(0.97); }
     .arvexa-confirm-btn.danger {
       background: linear-gradient(135deg, #D97A3A, #B85C3A);
       color: #fff;
       box-shadow: 0 4px 16px rgba(184, 92, 58, 0.25);
     }
+    .arvexa-confirm-btn.danger:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 22px rgba(184, 92, 58, 0.4);
+    }
+    .arvexa-confirm-btn.danger:active { transform: scale(0.97); }
     .arvexa-confirm-btn.primary {
       background: linear-gradient(135deg, var(--axc-accent-bright), var(--axc-accent));
       color: #0A0A0A;
       box-shadow: 0 4px 16px rgba(184, 134, 11, 0.25);
     }
+    .arvexa-confirm-btn.primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 22px rgba(184, 134, 11, 0.4);
+    }
+    .arvexa-confirm-btn.primary:active { transform: scale(0.97); }
+    .arvexa-confirm-btn i { font-size: 13px; }
     .arvexa-confirm-close {
       position: absolute;
       top: 12px;
@@ -175,6 +211,25 @@
     .arvexa-confirm-close:hover {
       background: rgba(255, 255, 255, 0.08);
       color: var(--axc-text-light);
+    }
+    /* ── Responsive : identique aux 3 points de rupture de profil.html ── */
+    @media (max-width: 640px) {
+      .arvexa-confirm-modal { padding: 26px 22px 20px; max-width: 360px; }
+      .arvexa-confirm-icon-box { width: 56px; height: 56px; font-size: 24px; }
+      .arvexa-confirm-title { font-size: 19px; }
+      .arvexa-confirm-message { font-size: 13.5px; }
+      .arvexa-confirm-btn { padding: 11px 14px; font-size: 13px; }
+    }
+    @media (max-width: 480px) {
+      .arvexa-confirm-modal { padding: 22px 18px 18px; }
+      .arvexa-confirm-title { font-size: 17px; }
+      .arvexa-confirm-message { font-size: 13px; margin-bottom: 20px; }
+    }
+    @media (max-width: 360px) {
+      .arvexa-confirm-modal { padding: 20px 16px 16px; }
+      .arvexa-confirm-title { font-size: 16px; }
+      .arvexa-confirm-message { font-size: 12.5px; }
+      .arvexa-confirm-btn { padding: 10px 10px; font-size: 12.5px; gap: 6px; }
     }
   `;
 

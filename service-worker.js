@@ -3,7 +3,7 @@
 // Version : OFFLINE v2.2 — Navigation instantanée
 // ================================================================
 
-const SW_VERSION = 'arvexa-offline-v2.5'; // v2.5 : design system unifié arvexa-ui.css
+const SW_VERSION = 'arvexa-offline-v2.6'; // v2.6 : modale uniforme design profil + anti-wrap
 const CACHE_STATIC = `${SW_VERSION}-static`;
 const CACHE_HTML = `${SW_VERSION}-html`;
 

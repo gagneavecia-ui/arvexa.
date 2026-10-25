@@ -3,7 +3,7 @@
 // Version : OFFLINE v2.2 — Navigation instantanée
 // ================================================================
 
-const SW_VERSION = 'arvexa-offline-v3.0'; // v3.0 : accueil — compte à rebours en héros (hero retiré), outils = Calculatrice/Formulaires/Tableau périodique/Mode Examen/ARV Progress + Plus d'outils
+const SW_VERSION = 'arvexa-offline-v3.1'; // v3.1 : accueil — rituel du jour en ouverture ; compte à rebours et carte « Ma progression » retirés (progression regroupée dans ARV Progress)
 const CACHE_STATIC = `${SW_VERSION}-static`;
 const CACHE_HTML = `${SW_VERSION}-html`;
 

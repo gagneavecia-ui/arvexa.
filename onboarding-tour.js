@@ -107,12 +107,12 @@
         }
       },
 
-      // 3. Compte à rebours
+      // 3. Rituel du jour (nouvelle carte d'ouverture de l'accueil)
       {
-        element: '#countdownTitle',
+        element: '.rituel-card',
         popover: {
-          title: '📅 Compte à rebours BAC',
-          description: 'Le temps restant avant l\'examen officiel. Chaque jour compte, garde-le en vue !',
+          title: '🔥 Rituel du jour',
+          description: 'Ta série, ton objectif du jour et tes 7 derniers jours. Reviens chaque jour pour ne pas casser ta série !',
           side: 'bottom', align: 'start'
         }
       },

@@ -936,6 +936,153 @@ main {
 @media (max-width: 480px) {
   .progress-row { grid-template-columns: 1fr; }
 }
+/* ── MA PROGRESSION (révisions officielles) ── */
+.official-progress {
+  margin-bottom: 20px;
+  padding: 18px;
+  border-radius: var(--radius, 16px);
+  background: linear-gradient(140deg, rgba(184, 134, 11, 0.14) 0%, rgba(10, 10, 10, 0.7) 100%);
+  border: 1px solid rgba(224, 184, 74, 0.18);
+  position: relative;
+  overflow: hidden;
+}
+.official-progress::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent, #B8860B), var(--accent-bright, #E0B84A), var(--accent, #B8860B));
+}
+.op-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.op-eyebrow {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--accent-bright, #E0B84A);
+}
+.op-scope {
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--text-dim, #8A8A7A);
+}
+.op-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 12px 0 14px;
+}
+.op-metric {
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
+  padding: 12px 8px;
+  text-align: center;
+}
+.op-num {
+  display: block;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(20px, 3vw, 26px);
+  font-weight: 700;
+  color: var(--text-light, #F5F0E8);
+  line-height: 1.1;
+}
+.op-lbl {
+  display: block;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-dim, #8A8A7A);
+  margin-top: 4px;
+  font-weight: 600;
+}
+.op-track {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+.op-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent, #B8860B), var(--accent-bright, #E0B84A));
+  border-radius: 999px;
+  transition: width 0.6s ease;
+}
+.op-cta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, rgba(224, 184, 74, 0.14), rgba(184, 134, 11, 0.06));
+  border: 1px solid rgba(224, 184, 74, 0.32);
+  border-radius: var(--radius, 16px);
+  text-decoration: none;
+  color: var(--text-light, #F5F0E8);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.op-cta:hover {
+  transform: translateY(-2px);
+  border-color: rgba(224, 184, 74, 0.55);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+.op-cta:active { transform: scale(0.99); }
+.op-cta-icon {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--accent-bright, #E0B84A), var(--accent, #B8860B));
+  color: #0A0A0A;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+}
+.op-cta-body { flex: 1; min-width: 0; }
+.op-cta-eyebrow {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--accent-bright, #E0B84A);
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+.op-cta-title {
+  display: block;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--text-light, #F5F0E8);
+  line-height: 1.3;
+}
+.op-cta-desc {
+  display: block;
+  font-size: 12px;
+  color: var(--text-dim, #8A8A7A);
+  margin-top: 2px;
+}
+.op-cta-arrow {
+  color: var(--accent-bright, #E0B84A);
+  font-size: 16px;
+  flex-shrink: 0;
+}
+@media (max-width: 480px) {
+  .op-metrics { gap: 6px; }
+  .op-metric { padding: 10px 4px; }
+  .op-cta { padding: 12px 14px; gap: 12px; }
+}
+
 .progress-card {
   padding: 16px 18px;
   border-radius: 16px;
@@ -2214,6 +2361,76 @@ function renderRecommendationsBlock() {
   `;
 }
 
+// ── MA PROGRESSION (révisions officielles) — carte héritée de l'accueil ──
+const OFFICIAL_READ_KEY = 'arvexa_read_parts';
+const OFFICIAL_SUBJECTS = [
+  { key: 'mathematiques', name: 'Mathématiques', chapters: 11 },
+  { key: 'physique', name: 'Physique', chapters: 17 },
+  { key: 'chimie', name: 'Chimie', chapters: 9 },
+  { key: 'svt', name: 'SVT', chapters: 20 }
+];
+
+function renderOfficialProgress() {
+  let readParts = [];
+  try { readParts = JSON.parse(localStorage.getItem(OFFICIAL_READ_KEY) || '[]'); } catch (e) { readParts = []; }
+  const perSubject = {};
+  OFFICIAL_SUBJECTS.forEach((s) => { perSubject[s.key] = new Set(); });
+  readParts.forEach((k) => {
+    const parts = String(k).split('_');
+    if (parts.length >= 2 && perSubject[parts[0]]) perSubject[parts[0]].add(parts[1]);
+  });
+  let totalRead = 0, touched = 0;
+  OFFICIAL_SUBJECTS.forEach((s) => {
+    const c = perSubject[s.key].size;
+    if (c > 0) { touched++; totalRead += c; }
+  });
+  const totalAll = OFFICIAL_SUBJECTS.reduce((a, s) => a + s.chapters, 0);
+  const pct = totalRead > 0 ? Math.round((totalRead / totalAll) * 100) : 0;
+
+  // Action intelligente : la matière la plus avancée mais incomplète
+  let best = null, bestRead = 0;
+  OFFICIAL_SUBJECTS.forEach((s) => {
+    const c = perSubject[s.key].size;
+    if (c > 0 && c < s.chapters && c > bestRead) { bestRead = c; best = s; }
+  });
+  let cta;
+  if (best) {
+    cta = { href: 'matiere.html?subject=' + best.key, eyebrow: 'Continuer', icon: 'fa-play',
+            title: 'Reprendre ' + best.name,
+            desc: bestRead + ' chapitre' + (bestRead > 1 ? 's' : '') + ' déjà lu' + (bestRead > 1 ? 's' : '') + '.' };
+  } else if (totalRead === 0) {
+    cta = { href: 'matiere.html?subject=mathematiques', eyebrow: 'Commencer', icon: 'fa-book-open',
+            title: 'Commencer une révision', desc: 'Choisis une matière pour démarrer.' };
+  } else {
+    cta = { href: 'lecture.html', eyebrow: 'Progresser', icon: 'fa-chart-line',
+            title: 'Toutes tes matières sont avancées', desc: 'Continue tes révisions, chaque chapitre compte.' };
+  }
+
+  return `
+    <div class="official-progress" aria-label="Ma progression — révisions officielles">
+      <div class="op-head">
+        <span class="op-eyebrow">Ma progression</span>
+        <span class="op-scope">Révisions officielles</span>
+      </div>
+      <div class="op-metrics">
+        <div class="op-metric"><span class="op-num">${totalRead}</span><span class="op-lbl">Chapitres lus</span></div>
+        <div class="op-metric"><span class="op-num">${touched}/4</span><span class="op-lbl">Matières travaillées</span></div>
+        <div class="op-metric"><span class="op-num">${totalRead > 0 ? pct + '%' : '—'}</span><span class="op-lbl">Avancement</span></div>
+      </div>
+      <div class="op-track"><div class="op-fill" style="width:${pct}%"></div></div>
+      <a class="op-cta" href="${cta.href}">
+        <span class="op-cta-icon"><i class="fas ${cta.icon}"></i></span>
+        <span class="op-cta-body">
+          <span class="op-cta-eyebrow">${cta.eyebrow}</span>
+          <span class="op-cta-title">${cta.title}</span>
+          <span class="op-cta-desc">${cta.desc}</span>
+        </span>
+        <i class="fas fa-arrow-right op-cta-arrow"></i>
+      </a>
+    </div>
+  `;
+}
+
 function renderQuotaBadge() {
   const q = localCache.quota;
   if (!q || q.premium) return '';
@@ -2355,6 +2572,7 @@ async function renderNotebooksView() {
         <p>${totalSections > 0 ? 'Continue là où tu t\'es arrêté.' : 'Commence ton premier cahier.'}</p>
       </div>
 
+      ${renderOfficialProgress()}
       ${renderQuotaBadge()}
       ${renderProgressionBlocks()}
 

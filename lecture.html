@@ -2135,7 +2135,23 @@ function markPartAsRead() {
   if (!readParts.includes(key)) {
     readParts.push(key);
     try { localStorage.setItem(READ_KEY, JSON.stringify(readParts)); } catch (e) {}
+    bumpDailyActivity();
   }
+}
+
+// Gamification accueil : compte les sections lues aujourd'hui
+// (l'accueil fusionne ce compteur temps réel avec ses snapshots)
+function bumpDailyActivity() {
+  try {
+    const K = 'arvexa_daily_activity';
+    const a = JSON.parse(localStorage.getItem(K) || '{}');
+    const d = new Date();
+    const day = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    a[day] = (a[day] || 0) + 1;
+    const keys = Object.keys(a).sort();
+    while (keys.length > 35) { delete a[keys.shift()]; }
+    localStorage.setItem(K, JSON.stringify(a));
+  } catch (e) {}
 }
 
 function getNotesKey() {

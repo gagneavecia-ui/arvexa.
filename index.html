@@ -1142,6 +1142,329 @@
     }
 
     /* ============================================================
+       HERO — Accueil personnalisé
+       ============================================================ */
+    .hero {
+      position: relative; overflow: hidden;
+      padding: 26px 20px 24px;
+      border-radius: 20px;
+      background: linear-gradient(145deg, rgba(26,58,42,0.50) 0%, rgba(10,10,10,0.85) 55%, rgba(20,20,20,0.9) 100%);
+      border: 1px solid rgba(224, 184, 74, 0.14);
+    }
+    .hero::before {
+      content: ''; position: absolute; top: -70px; right: -60px;
+      width: 220px; height: 220px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(224,184,74,0.16) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero::after {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(224,184,74,0.7), transparent);
+    }
+    .hero-date {
+      display: flex; align-items: center; gap: 7px;
+      font-size: 11px; font-weight: 600; letter-spacing: 1.6px; text-transform: uppercase;
+      color: var(--text-muted); margin-bottom: 8px;
+    }
+    .hero-date i { color: var(--accent-bright); font-size: 10px; }
+    .hero-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(24px, 6vw, 30px); font-weight: 700; line-height: 1.2;
+      color: var(--text-light); margin-bottom: 14px;
+    }
+    .hero-title .shimmer {
+      background: linear-gradient(90deg, var(--accent-bright) 0%, #FFF3D6 25%, var(--accent-bright) 50%, #FFF3D6 75%, var(--accent-bright) 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: heroShimmer 5s linear infinite;
+      font-style: italic;
+    }
+    @keyframes heroShimmer { to { background-position: 200% center; } }
+    .hero-quote {
+      position: relative; padding: 10px 0 2px 16px;
+      border-left: 2px solid rgba(224,184,74,0.35);
+      font-family: 'Playfair Display', Georgia, serif;
+      font-style: italic; font-size: clamp(13.5px, 1.6vw, 15px);
+      color: var(--text-dim); line-height: 1.65;
+    }
+    .hero-quote .quote-author {
+      display: block; margin-top: 6px;
+      font-family: 'Inter', sans-serif; font-style: normal;
+      font-size: 10.5px; font-weight: 700; letter-spacing: 0.8px;
+      color: var(--accent-bright); text-transform: uppercase;
+    }
+
+    /* ============================================================
+       RITUEL DU JOUR — série, objectif, activité
+       ============================================================ */
+    .rituel-card {
+      margin-top: 14px; padding: 16px;
+      background: var(--bg-card); border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      position: relative; overflow: hidden;
+    }
+    .rituel-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(224,184,74,0.35), transparent);
+    }
+    .rituel-head {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 8px; margin-bottom: 12px;
+    }
+    .rituel-title {
+      font-size: 13px; font-weight: 700; color: var(--text-light);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .rituel-title i { color: var(--accent-bright); font-size: 12px; }
+    .rituel-sub {
+      font-size: 10.5px; color: var(--text-dim);
+      text-align: right; line-height: 1.4; min-width: 0;
+    }
+    .rituel-cols {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+    }
+    .rituel-cell {
+      background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04);
+      border-radius: 12px; padding: 12px 6px; text-align: center;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 6px; min-height: 96px;
+    }
+    .streak-flame { font-size: 20px; line-height: 1; }
+    .streak-flame.lit { display: inline-block; animation: flamePulse 1.6s ease-in-out infinite; }
+    @keyframes flamePulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.18); }
+    }
+    .streak-num {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 22px; font-weight: 700; color: var(--text-light); line-height: 1;
+    }
+    .rituel-lbl {
+      font-size: 9px; text-transform: uppercase; letter-spacing: 0.6px;
+      color: var(--text-muted); font-weight: 700; line-height: 1.3;
+    }
+    .goal-ring { position: relative; width: 54px; height: 54px; }
+    .goal-ring svg { transform: rotate(-90deg); display: block; }
+    .goal-ring .track { stroke: rgba(255,255,255,0.07); }
+    .goal-ring .val {
+      stroke: url(#goalGrad); stroke-linecap: round;
+      transition: stroke-dashoffset 0.9s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+    .goal-ring .goal-pct {
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      font-size: 11.5px; font-weight: 700; color: var(--text-light);
+    }
+    .goal-ring .goal-pct.done { color: var(--accent-bright); font-size: 16px; }
+    .week-bars {
+      display: flex; align-items: flex-end; justify-content: center;
+      gap: 4px; height: 40px; width: 100%;
+    }
+    .week-bar {
+      width: 9px; border-radius: 3px 3px 1px 1px;
+      background: rgba(255,255,255,0.08); min-height: 3px;
+      transition: height 0.6s ease;
+    }
+    .week-bar.active { background: linear-gradient(180deg, var(--accent-bright), var(--accent)); }
+    .week-bar.today { outline: 1px solid rgba(224,184,74,0.45); outline-offset: 1.5px; }
+
+    /* ============================================================
+       ACTIONS RAPIDES
+       ============================================================ */
+    .qa-grid { display: flex; flex-direction: column; gap: 10px; }
+    .qa-flagship {
+      display: flex; align-items: center; gap: 14px; padding: 16px 18px;
+      background: linear-gradient(135deg, rgba(224,184,74,0.14), rgba(184,134,11,0.05) 55%, rgba(26,58,42,0.30));
+      border: 1px solid rgba(224,184,74,0.32); border-radius: var(--radius);
+      text-decoration: none; color: var(--text-light);
+      position: relative; overflow: hidden;
+      transition: var(--transition);
+    }
+    .qa-flagship::after {
+      content: ''; position: absolute; top: -40px; right: -40px;
+      width: 140px; height: 140px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(224,184,74,0.18), transparent 70%);
+      animation: qaFloat 6s ease-in-out infinite alternate;
+      pointer-events: none;
+    }
+    @keyframes qaFloat {
+      from { transform: translateY(0); }
+      to { transform: translateY(14px); }
+    }
+    .qa-flagship:hover {
+      transform: translateY(-2px);
+      border-color: rgba(224,184,74,0.55);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
+    .qa-flagship:active { transform: scale(0.99); }
+    .qa-flag-icon {
+      width: 48px; height: 48px; border-radius: 14px; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--accent-bright), var(--accent));
+      color: #0A0A0A; display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 4px 16px rgba(184,134,11,0.3);
+      position: relative; z-index: 1;
+    }
+    .qa-flag-body { flex: 1; min-width: 0; position: relative; z-index: 1; }
+    .qa-flag-eyebrow {
+      display: flex; align-items: center; gap: 7px;
+      font-size: 10px; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--accent-bright); margin-bottom: 2px;
+    }
+    .ia-chip {
+      background: rgba(224,184,74,0.15); border: 1px solid rgba(224,184,74,0.4);
+      padding: 1px 8px; border-radius: 999px;
+      font-size: 9px; letter-spacing: 1.2px;
+    }
+    .qa-flag-title { display: block; font-size: clamp(15px, 1.6vw, 17px); font-weight: 700; }
+    .qa-flag-desc { display: block; font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+    .qa-arrow { color: var(--accent-bright); flex-shrink: 0; position: relative; z-index: 1; }
+    .qa-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .qa-tile {
+      background: var(--bg-card); border: 1px solid var(--card-border);
+      border-radius: var(--radius); padding: 14px 8px;
+      text-align: center; text-decoration: none; color: var(--text-light);
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+      transition: var(--transition);
+    }
+    .qa-tile:hover {
+      border-color: rgba(224,184,74,0.22); transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+    }
+    .qa-tile:active { transform: scale(0.97); }
+    .qa-icon {
+      width: 40px; height: 40px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(184,134,11,0.08); color: var(--accent-bright);
+      font-size: 16px; margin-bottom: 3px;
+    }
+    .qa-name { font-size: 12px; font-weight: 700; }
+    .qa-desc { font-size: 10px; color: var(--text-muted); }
+
+    /* ============================================================
+       MATIÈRES — mini barre de progression
+       ============================================================ */
+    .subject-chip .subject-body { flex: 1; min-width: 0; }
+    .subject-mini {
+      height: 3px; background: rgba(255,255,255,0.06);
+      border-radius: 999px; margin-top: 7px; overflow: hidden;
+    }
+    .subject-mini span {
+      display: block; height: 100%; width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-bright));
+      border-radius: 999px;
+      transition: width 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    /* ============================================================
+       BADGES — réalisations
+       ============================================================ */
+    .badges-scroll {
+      display: flex; gap: 10px; overflow-x: auto;
+      padding: 2px 2px 8px; -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .badges-scroll::-webkit-scrollbar { display: none; }
+    .badge-item {
+      flex: 0 0 auto; width: 86px; text-align: center;
+      display: flex; flex-direction: column; align-items: center; gap: 7px;
+    }
+    .badge-coin {
+      width: 58px; height: 58px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; position: relative;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.06);
+      filter: grayscale(1); opacity: 0.4;
+      transition: var(--transition);
+    }
+    .badge-item.unlocked .badge-coin {
+      filter: none; opacity: 1;
+      background: linear-gradient(135deg, rgba(224,184,74,0.18), rgba(184,134,11,0.06));
+      border: 1px solid rgba(224,184,74,0.4);
+      box-shadow: 0 0 18px rgba(184,134,11,0.18);
+    }
+    .badge-item .badge-name {
+      font-size: 10px; font-weight: 600; color: var(--text-muted); line-height: 1.3;
+    }
+    .badge-item.unlocked .badge-name { color: var(--text-light); }
+
+    /* ============================================================
+       INSTALLATION PWA
+       ============================================================ */
+    .install-inner {
+      display: flex; align-items: center; gap: 12px; padding: 14px 16px;
+      margin-top: 14px;
+      background: linear-gradient(135deg, rgba(26,58,42,0.35), rgba(20,20,20,0.8));
+      border: 1px solid rgba(45,125,90,0.35); border-radius: var(--radius);
+      position: relative;
+    }
+    .install-icon { font-size: 24px; flex-shrink: 0; }
+    .install-text { flex: 1; min-width: 0; }
+    .install-title { font-size: 13.5px; font-weight: 700; color: var(--text-light); }
+    .install-desc { font-size: 11.5px; color: var(--text-dim); margin-top: 1px; }
+    .install-btn {
+      padding: 8px 14px; border-radius: 999px; border: none; cursor: pointer;
+      background: linear-gradient(135deg, var(--accent-bright), var(--accent));
+      color: #0A0A0A; font-size: 12px; font-weight: 700;
+      font-family: 'Inter', sans-serif; white-space: nowrap; flex-shrink: 0;
+      transition: var(--transition);
+    }
+    .install-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(184,134,11,0.3); }
+    .install-close {
+      position: absolute; top: -8px; right: -8px;
+      width: 24px; height: 24px; border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.1); background: #141414;
+      color: var(--text-muted); font-size: 10px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .install-close:hover { color: var(--text-light); }
+
+    /* ============================================================
+       ANIMATIONS D'APPARITION (reveal)
+       ============================================================ */
+    .rv-js .reveal {
+      opacity: 0; transform: translateY(14px);
+      transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+    .rv-js .reveal.in { opacity: 1; transform: none; }
+    @media (prefers-reduced-motion: reduce) {
+      .rv-js .reveal { opacity: 1; transform: none; transition: none; }
+      .hero-title .shimmer { animation: none; }
+      .streak-flame.lit { animation: none; }
+      .qa-flagship::after { animation: none; }
+    }
+
+    /* ============================================================
+       RESPONSIVE NOUVEAUX BLOCS
+       ============================================================ */
+    @media (max-width: 640px) {
+      .hero { padding: 22px 16px 20px; }
+      .rituel-cols { gap: 6px; }
+      .qa-row { gap: 8px; }
+      .qa-tile { padding: 12px 6px; }
+      .qa-flag-desc { font-size: 11px; }
+    }
+    @media (max-width: 480px) {
+      .rituel-cell { min-height: 88px; padding: 10px 4px; }
+      .goal-ring { width: 48px; height: 48px; }
+      .week-bars { gap: 3px; }
+      .week-bar { width: 8px; }
+      .badge-item { width: 80px; }
+      .badge-coin { width: 54px; height: 54px; font-size: 22px; }
+      .install-inner { flex-wrap: wrap; }
+      .install-btn { width: 100%; padding: 10px 14px; }
+    }
+    @media (max-width: 360px) {
+      .goal-ring { width: 42px; height: 42px; }
+      .goal-ring .goal-pct { font-size: 10px; }
+      .badge-item { width: 74px; }
+      .badge-coin { width: 50px; height: 50px; font-size: 20px; }
+      .qa-row { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+      .qa-name { font-size: 11px; }
+    }
+
+    /* ============================================================
        RESPONSIVE
        ============================================================ */
     @media (min-width: 768px) {
@@ -1335,6 +1658,20 @@
       <div id="dynamicContent">
 
         <!-- ============================================================
+             BLOC 0 — HERO PERSONNALISÉ
+             ============================================================ -->
+        <section class="hero reveal" aria-label="Accueil personnalisé">
+          <div class="hero-date"><i class="fas fa-calendar-day"></i><span id="heroDateText">—</span></div>
+          <h1 class="hero-title">
+            <span id="heroGreeting">Bonsoir</span>, <span class="shimmer" id="heroName">Élève</span>
+          </h1>
+          <div class="hero-quote">
+            <span id="heroQuoteText">Chargement de ta citation…</span>
+            <span class="quote-author" id="heroQuoteAuthor">ARVEXA School</span>
+          </div>
+        </section>
+
+        <!-- ============================================================
              BLOC 1 — PROGRESSION SCOLAIRE (prioritaire)
              ============================================================ -->
         <section class="progress-card" aria-labelledby="progressTitle">
@@ -1389,6 +1726,44 @@
         </section>
 
         <!-- ============================================================
+             BLOC 1bis — RITUEL DU JOUR (gamification)
+             ============================================================ -->
+        <section class="rituel-card reveal" aria-label="Rituel du jour">
+          <div class="rituel-head">
+            <div class="rituel-title"><i class="fas fa-bolt"></i> Rituel du jour</div>
+            <div class="rituel-sub" id="rituelSub">Lis une section pour démarrer</div>
+          </div>
+          <div class="rituel-cols">
+            <div class="rituel-cell">
+              <span class="streak-flame" id="streakFlame">🔥</span>
+              <span class="streak-num" id="streakNum">0</span>
+              <span class="rituel-lbl">jours de série</span>
+            </div>
+            <div class="rituel-cell">
+              <div class="goal-ring">
+                <svg viewBox="0 0 60 60" width="100%" height="100%">
+                  <defs>
+                    <linearGradient id="goalGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#B8860B"/>
+                      <stop offset="100%" stop-color="#E0B84A"/>
+                    </linearGradient>
+                  </defs>
+                  <circle class="track" cx="30" cy="30" r="26" fill="none" stroke-width="5"/>
+                  <circle class="val" id="goalRingVal" cx="30" cy="30" r="26" fill="none" stroke-width="5"
+                          stroke-dasharray="163.36" stroke-dashoffset="163.36"/>
+                </svg>
+                <span class="goal-pct" id="goalPct">0/3</span>
+              </div>
+              <span class="rituel-lbl">objectif du jour</span>
+            </div>
+            <div class="rituel-cell">
+              <div class="week-bars" id="weekBars"></div>
+              <span class="rituel-lbl">7 derniers jours</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================================
              BLOC 2 — COMPTE À REBOURS BAC
              ============================================================ -->
         <section class="countdown-card" aria-labelledby="countdownTitle">
@@ -1426,36 +1801,73 @@
         </section>
 
         <!-- ============================================================
+             BLOC 2bis — ACTIONS RAPIDES
+             ============================================================ -->
+        <div class="section-title"><h3>⚡ Actions rapides</h3></div>
+        <div class="qa-grid reveal">
+          <a href="arv.html" class="qa-flagship">
+            <span class="qa-flag-icon"><i class="fas fa-robot"></i></span>
+            <span class="qa-flag-body">
+              <span class="qa-flag-eyebrow"><span class="ia-chip">IA</span> Disponible 24h/24</span>
+              <span class="qa-flag-title">Demande à Arv</span>
+              <span class="qa-flag-desc">Ton prof IA : explications, exercices guidés, corrections pas à pas.</span>
+            </span>
+            <i class="fas fa-arrow-right qa-arrow"></i>
+          </a>
+          <div class="qa-row">
+            <a href="exam.html" class="qa-tile">
+              <span class="qa-icon"><i class="fas fa-stopwatch"></i></span>
+              <span class="qa-name">Mode Examen</span>
+              <span class="qa-desc">Chrono réel</span>
+            </a>
+            <a href="reviseur.html" class="qa-tile">
+              <span class="qa-icon"><i class="fas fa-wand-sparkles"></i></span>
+              <span class="qa-name">Réviseur IA</span>
+              <span class="qa-desc">Fiches express</span>
+            </a>
+            <a href="mathmind.html" class="qa-tile">
+              <span class="qa-icon"><i class="fas fa-brain"></i></span>
+              <span class="qa-name">MathMind</span>
+              <span class="qa-desc">Défi mental</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- ============================================================
              BLOC 3 — MATIÈRES
              ============================================================ -->
         <div class="section-title"><h3>📐 Mes matières</h3></div>
         <div class="subjects-grid" id="subjectsGrid">
           <a href="matiere.html?subject=mathematiques" class="subject-chip">
             <div class="icon-badge"><i class="fas fa-square-root-variable"></i></div>
-            <div>
+            <div class="subject-body">
               <div class="subject-name">Mathématiques</div>
               <div class="subject-chapters" data-subject="mathematiques">11 chapitres</div>
+                          <div class="subject-mini"><span data-mini="mathematiques"></span></div>
             </div>
           </a>
           <a href="matiere.html?subject=physique" class="subject-chip">
             <div class="icon-badge"><i class="fas fa-bolt"></i></div>
-            <div>
+            <div class="subject-body">
               <div class="subject-name">Physique</div>
               <div class="subject-chapters" data-subject="physique">17 chapitres</div>
+                          <div class="subject-mini"><span data-mini="physique"></span></div>
             </div>
           </a>
           <a href="matiere.html?subject=chimie" class="subject-chip">
             <div class="icon-badge"><i class="fas fa-flask"></i></div>
-            <div>
+            <div class="subject-body">
               <div class="subject-name">Chimie</div>
               <div class="subject-chapters" data-subject="chimie">9 chapitres</div>
+                          <div class="subject-mini"><span data-mini="chimie"></span></div>
             </div>
           </a>
           <a href="matiere.html?subject=svt" class="subject-chip">
             <div class="icon-badge"><i class="fas fa-dna"></i></div>
-            <div>
+            <div class="subject-body">
               <div class="subject-name">SVT</div>
               <div class="subject-chapters" data-subject="svt">20 chapitres</div>
+                          <div class="subject-mini"><span data-mini="svt"></span></div>
             </div>
           </a>
         </div>
@@ -1464,26 +1876,38 @@
              BLOC 4 — OUTILS
              ============================================================ -->
         <div class="section-title"><h3>🛠️ Outils & Ressources</h3></div>
-        <div class="tools-grid" id="toolsGrid">
+                <div class="tools-grid" id="toolsGrid">
           <a href="calculatrice.html" class="tool-card">
             <div class="icon-badge"><i class="fas fa-calculator"></i></div>
             <div class="name">Calculatrice</div>
           </a>
           <a href="formulaires.html" class="tool-card">
-            <div class="icon-badge"><i class="fas fa-flask"></i></div>
+            <div class="icon-badge"><i class="fas fa-book-bookmark"></i></div>
             <div class="name">Formulaires</div>
           </a>
           <a href="arv-progress.html" class="tool-card">
             <div class="icon-badge"><i class="fas fa-graduation-cap"></i></div>
             <div class="name">Arv-progress</div>
           </a>
-          <a href="exam.html" class="tool-card">
-            <div class="icon-badge"><i class="fas fa-clock"></i></div>
-            <div class="name">Mode Examen</div>
-          </a>
           <a href="tableau-periodique.html" class="tool-card">
             <div class="icon-badge"><i class="fas fa-table-cells"></i></div>
             <div class="name">Table périodique</div>
+          </a>
+          <a href="arv.html" class="tool-card">
+            <div class="icon-badge"><i class="fas fa-robot"></i></div>
+            <div class="name">Arv IA</div>
+          </a>
+          <a href="groupe.html" class="tool-card">
+            <div class="icon-badge"><i class="fas fa-users"></i></div>
+            <div class="name">Groupe d'étude</div>
+          </a>
+          <a href="planificateur.html" class="tool-card">
+            <div class="icon-badge"><i class="fas fa-calendar-check"></i></div>
+            <div class="name">Planificateur</div>
+          </a>
+          <a href="diagnostic.html" class="tool-card">
+            <div class="icon-badge"><i class="fas fa-list-check"></i></div>
+            <div class="name">Test de niveau</div>
           </a>
           <a href="outils.html" class="tool-card">
             <div class="icon-badge"><i class="fas fa-wand-sparkles"></i></div>
@@ -1527,6 +1951,12 @@
             </div>
           </div>
         </div>
+
+        <!-- ============================================================
+             BLOC 5bis — RÉALISATIONS
+             ============================================================ -->
+        <div class="section-title"><h3>🏆 Tes réalisations</h3></div>
+        <div class="badges-scroll reveal" id="badgesScroll" aria-label="Badges débloqués"></div>
 
         <!-- ============================================================
              BLOC 6 — AVIS
@@ -1579,6 +2009,17 @@
     </footer>
 
   </div>
+
+  <!-- Bootstrap animations reveal (filet de sécurité si le module échoue) -->
+  <script>
+    document.documentElement.className += ' rv-js';
+    window.__arvexaReveal = { ready: false };
+    setTimeout(function () {
+      if (window.__arvexaReveal && !window.__arvexaReveal.ready) {
+        document.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('in'); });
+      }
+    }, 3000);
+  </script>
 
   <!-- ============================================================
        MODALE AVIS
@@ -2009,6 +2450,10 @@
     greetingText.textContent = text;
     userFirstName.textContent = firstName || 'Élève';
     greetingEmoji.textContent = emoji;
+    const heroGreeting = document.getElementById('heroGreeting');
+    const heroName = document.getElementById('heroName');
+    if (heroGreeting) heroGreeting.textContent = text;
+    if (heroName) heroName.textContent = firstName || 'Élève';
   }
 
   updateGreeting('Élève');
@@ -2056,12 +2501,12 @@
   function renderProgress() {
     const data = readProgressData();
 
-    metricChapters.textContent = data.totalChaptersRead;
-    metricSubjects.textContent = `${data.subjectsTouched}/${data.subjectsTotal}`;
+    countUpMetric(metricChapters, data.totalChaptersRead, null, '');
+    countUpMetric(metricSubjects, data.subjectsTouched, data.subjectsTotal, '');
 
     if (data.totalChaptersRead > 0 && data.totalChaptersAll > 0) {
       const pct = Math.round((data.totalChaptersRead / data.totalChaptersAll) * 100);
-      metricPercent.textContent = pct + '%';
+      countUpMetric(metricPercent, pct, null, '%');
       progressBar.style.width = pct + '%';
       progressFootText.innerHTML = '';
       const strong = document.createElement('strong');
@@ -2070,6 +2515,7 @@
       progressFootText.appendChild(document.createTextNode(' lus sur ' + data.totalChaptersAll + ' au total.'));
     } else {
       metricPercent.textContent = '—';
+      delete metricPercent.dataset.v;
       progressBar.style.width = '0%';
       progressFootText.textContent = 'Commence une révision pour suivre ta progression.';
     }
@@ -2094,6 +2540,10 @@
 
     // Conseil personnalisé
     renderPersonalizedTip(data);
+
+    // Rituel + badges (gamification)
+    renderRituel();
+    renderBadges();
   }
 
   function renderPrimaryAction(data) {
@@ -2186,6 +2636,326 @@
 
   renderDailyTip();
   renderMotivation();
+  // ================================================================
+  // HERO — date + citation du jour
+  // ================================================================
+  const QUOTES = [
+    { t: "L'éducation est l'arme la plus puissante pour changer le monde.", a: "Nelson Mandela" },
+    { t: "La discipline est le pont entre les objectifs et les accomplissements.", a: "Jim Rohn" },
+    { t: "Petit à petit, l'oiseau fait son nid.", a: "Proverbe" },
+    { t: "Seul on va plus vite, ensemble on va plus loin.", a: "Proverbe africain" },
+    { t: "Le succès, c'est d'aller d'échec en échec sans perdre son enthousiasme.", a: "Winston Churchill" },
+    { t: "La connaissance est un trésor, mais la pratique en est la clé.", a: "Proverbe" },
+    { t: "Le génie est fait de 1 % d'inspiration et de 99 % de transpiration.", a: "Thomas Edison" },
+    { t: "Patience et longueur de temps font plus que force ni que rage.", a: "Jean de La Fontaine" },
+    { t: "Ce n'est pas parce que les choses sont difficiles que nous n'osons pas.", a: "Sénèque" },
+    { t: "Chaque chapitre maîtrisé aujourd'hui est une question gagnée demain.", a: "ARVEXA School" }
+  ];
+
+  const heroDateText = document.getElementById('heroDateText');
+  const heroQuoteText = document.getElementById('heroQuoteText');
+  const heroQuoteAuthor = document.getElementById('heroQuoteAuthor');
+
+  function renderHero() {
+    const d = new Date();
+    try {
+      const ds = d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+      heroDateText.textContent = ds.charAt(0).toUpperCase() + ds.slice(1);
+    } catch (e) {
+      heroDateText.textContent = d.getDate() + '/' + (d.getMonth() + 1) + '/' + d.getFullYear();
+    }
+    const start = new Date(d.getFullYear(), 0, 0);
+    const dayOfYear = Math.floor((d - start) / (1000 * 60 * 60 * 24));
+    const q = QUOTES[dayOfYear % QUOTES.length] || QUOTES[0];
+    heroQuoteText.textContent = '« ' + q.t + ' »';
+    heroQuoteAuthor.textContent = '— ' + q.a;
+  }
+
+  // ================================================================
+  // ACTIVITÉ QUOTIDIENNE (série / objectif / semaine)
+  // Écrit aussi par lecture.html (hook temps réel) + merge snapshot ici.
+  // ================================================================
+  const ACTIVITY_KEY = 'arvexa_daily_activity';
+  const SNAP_KEY = 'arvexa_daily_snap';
+  const DAILY_GOAL = 3;
+
+  function dayStr(d) {
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+
+  function getTotalParts() {
+    try { return JSON.parse(localStorage.getItem(READ_KEY) || '[]').length; }
+    catch (e) { return 0; }
+  }
+
+  function computeActivity() {
+    let hook = {}, snap = {};
+    try { hook = JSON.parse(localStorage.getItem(ACTIVITY_KEY) || '{}') || {}; } catch (e) { hook = {}; }
+    try { snap = JSON.parse(localStorage.getItem(SNAP_KEY) || '{}') || {}; } catch (e) { snap = {}; }
+    const total = getTotalParts();
+    const today = dayStr(new Date());
+    const prevDays = Object.keys(snap).filter((d) => d < today).sort();
+    const prevTotal = prevDays.length ? (Number(snap[prevDays[prevDays.length - 1]]) || 0) : total;
+    const deltaToday = Math.max(0, total - prevTotal);
+
+    const activity = {};
+    Object.keys(snap).forEach((d) => { if (d !== today) activity[d] = Number(hook[d]) || 0; });
+    Object.keys(hook).forEach((d) => { if (d !== today) activity[d] = Math.max(activity[d] || 0, Number(hook[d]) || 0); });
+    activity[today] = Math.max(Number(hook[today]) || 0, deltaToday);
+
+    // Prune 35 jours + sauvegarde
+    const snapNext = {};
+    Object.keys(snap).forEach((d) => { snapNext[d] = Number(snap[d]) || 0; });
+    snapNext[today] = Math.max(Number(snap[today]) || 0, total);
+    const snapKeys = Object.keys(snapNext).sort().slice(-35);
+    const snapOut = {};
+    snapKeys.forEach((d) => { snapOut[d] = snapNext[d]; });
+    const actKeys = Object.keys(activity).sort().slice(-35);
+    const actOut = {};
+    actKeys.forEach((d) => { actOut[d] = activity[d]; });
+    try { localStorage.setItem(SNAP_KEY, JSON.stringify(snapOut)); } catch (e) {}
+    try { localStorage.setItem(ACTIVITY_KEY, JSON.stringify(actOut)); } catch (e) {}
+    return actOut;
+  }
+
+  function computeStreak(activity) {
+    let streak = 0;
+    const cursor = new Date();
+    const active = (dt) => (Number(activity[dayStr(dt)]) || 0) > 0;
+    if (!active(cursor)) cursor.setDate(cursor.getDate() - 1);
+    while (active(cursor) && streak < 365) {
+      streak++;
+      cursor.setDate(cursor.getDate() - 1);
+    }
+    return streak;
+  }
+
+  // ================================================================
+  // RITUEL DU JOUR — série, objectif, 7 derniers jours
+  // ================================================================
+  const streakNum = document.getElementById('streakNum');
+  const streakFlame = document.getElementById('streakFlame');
+  const goalRingVal = document.getElementById('goalRingVal');
+  const goalPct = document.getElementById('goalPct');
+  const weekBars = document.getElementById('weekBars');
+  const rituelSub = document.getElementById('rituelSub');
+  const GOAL_CIRC = 163.36;
+
+  function renderRituel() {
+    if (!streakNum || !goalRingVal || !weekBars) return;
+    const activity = computeActivity();
+    const streak = computeStreak(activity);
+    streakNum.textContent = String(streak);
+    streakFlame.classList.toggle('lit', streak > 0);
+
+    const todayKey = dayStr(new Date());
+    const doneToday = Number(activity[todayKey]) || 0;
+    const goalDone = Math.min(doneToday, DAILY_GOAL);
+    goalRingVal.style.strokeDashoffset = String(GOAL_CIRC * (1 - goalDone / DAILY_GOAL));
+    goalPct.textContent = goalDone >= DAILY_GOAL ? '✓' : String(Math.min(doneToday, 9)) + '/' + DAILY_GOAL;
+    goalPct.classList.toggle('done', goalDone >= DAILY_GOAL);
+
+    const maxVal = Math.max.apply(null, [DAILY_GOAL, 1].concat(Object.keys(activity).slice(-7).map((k) => Number(activity[k]) || 0)));
+    weekBars.textContent = '';
+    for (let i = 6; i >= 0; i--) {
+      const dt = new Date();
+      dt.setDate(dt.getDate() - i);
+      const v = Number(activity[dayStr(dt)]) || 0;
+      const bar = document.createElement('div');
+      bar.className = 'week-bar' + (v > 0 ? ' active' : '') + (i === 0 ? ' today' : '');
+      bar.style.height = Math.max(9, Math.round((v / maxVal) * 100)) + '%';
+      try {
+        bar.title = v + ' section' + (v > 1 ? 's' : '') + ' — ' + dt.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'short' });
+      } catch (e) {}
+      weekBars.appendChild(bar);
+    }
+
+    if (doneToday >= DAILY_GOAL) rituelSub.textContent = 'Objectif du jour atteint, bravo !';
+    else if (streak > 0) rituelSub.textContent = 'Ne casse pas ta série 🔥';
+    else rituelSub.textContent = 'Lis une section pour démarrer';
+  }
+
+  // ================================================================
+  // BADGES — réalisations
+  // ================================================================
+  const badgesScroll = document.getElementById('badgesScroll');
+  const BADGES = [
+    { icon: '📖', name: 'Première section', check: (st) => st.totalParts >= 1 },
+    { icon: '📚', name: '5 sections', check: (st) => st.totalParts >= 5 },
+    { icon: '🎓', name: '15 sections', check: (st) => st.totalParts >= 15 },
+    { icon: '🏅', name: '30 sections', check: (st) => st.totalParts >= 30 },
+    { icon: '🌍', name: 'Toutes matières', check: (st) => st.subjectsTouched >= 4 },
+    { icon: '🔥', name: 'Série de 3 jours', check: (st) => st.streak >= 3 },
+    { icon: '🚀', name: 'Série de 7 jours', check: (st) => st.streak >= 7 },
+    { icon: '💎', name: 'Programme complet', check: (st) => st.chaptersRead >= st.chaptersTotal }
+  ];
+
+  function renderBadges() {
+    if (!badgesScroll) return;
+    const activity = computeActivity();
+    const streak = computeStreak(activity);
+    const prog = readProgressData();
+    const st = {
+      totalParts: getTotalParts(),
+      subjectsTouched: prog.subjectsTouched,
+      chaptersRead: prog.totalChaptersRead,
+      chaptersTotal: prog.totalChaptersAll,
+      streak: streak
+    };
+    badgesScroll.textContent = '';
+    BADGES.forEach((b) => {
+      const item = document.createElement('div');
+      item.className = 'badge-item' + (b.check(st) ? ' unlocked' : '');
+      const coin = document.createElement('div');
+      coin.className = 'badge-coin';
+      coin.textContent = b.icon;
+      const nm = document.createElement('div');
+      nm.className = 'badge-name';
+      nm.textContent = b.name;
+      item.appendChild(coin);
+      item.appendChild(nm);
+      badgesScroll.appendChild(item);
+    });
+  }
+
+  // ================================================================
+  // COUNT-UP — métriques de progression animées
+  // ================================================================
+  function prefersReducedMotion() {
+    return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+
+  function countUpMetric(el, value, total, suffix) {
+    if (!el) return;
+    const fmt = (v) => (total != null ? v + '/' + total : String(v) + (suffix || ''));
+    const target = Math.max(0, Math.round(Number(value) || 0));
+    if (el.dataset.v === String(target)) { el.textContent = fmt(target); return; }
+    const from = el.dataset.v !== undefined ? (parseInt(el.dataset.v, 10) || 0) : 0;
+    el.dataset.v = String(target);
+    if (prefersReducedMotion() || target === from) { el.textContent = fmt(target); return; }
+    const dur = 700;
+    const t0 = performance.now();
+    const step = (t) => {
+      const p = Math.min(1, (t - t0) / dur);
+      const eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = fmt(Math.round(from + (target - from) * eased));
+      if (p < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+
+  // ================================================================
+  // ANIMATIONS D'APPARITION (reveal au scroll)
+  // ================================================================
+  function initReveal() {
+    const els = document.querySelectorAll('.reveal');
+    if (!els.length) return;
+    if (!('IntersectionObserver' in window) || prefersReducedMotion()) {
+      els.forEach((el) => el.classList.add('in'));
+      if (window.__arvexaReveal) window.__arvexaReveal.ready = true;
+      return;
+    }
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((en) => {
+        if (en.isIntersecting) {
+          en.target.classList.add('in');
+          io.unobserve(en.target);
+        }
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -24px 0px' });
+    els.forEach((el, i) => {
+      el.style.transitionDelay = i < 4 ? (i * 70) + 'ms' : '0ms';
+      io.observe(el);
+    });
+    if (window.__arvexaReveal) window.__arvexaReveal.ready = true;
+  }
+
+  // ================================================================
+  // INSTALLATION PWA — bannière élégante (beforeinstallprompt)
+  // ================================================================
+  let deferredPrompt = null;
+  const PWA_DISMISS_KEY = 'arvexa_pwa_dismissed';
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    setTimeout(maybeShowInstallBanner, 1500);
+  });
+
+  window.addEventListener('appinstalled', () => {
+    const b = document.getElementById('installBanner');
+    if (b) b.remove();
+    deferredPrompt = null;
+  });
+
+  function maybeShowInstallBanner() {
+    if (!deferredPrompt) return;
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    if (isStandalone) return;
+    try {
+      const dismissed = window.localStorage.getItem(PWA_DISMISS_KEY);
+      if (dismissed) {
+        if (Date.now() - parseInt(dismissed, 10) < 7 * 24 * 60 * 60 * 1000) return;
+        window.localStorage.removeItem(PWA_DISMISS_KEY);
+      }
+    } catch (e) {}
+    const container = document.getElementById('dynamicContent');
+    if (!container || document.getElementById('installBanner')) return;
+
+    const banner = document.createElement('div');
+    banner.id = 'installBanner';
+    const inner = document.createElement('div');
+    inner.className = 'install-inner';
+    const icon = document.createElement('div');
+    icon.className = 'install-icon';
+    icon.textContent = '📲';
+    const txt = document.createElement('div');
+    txt.className = 'install-text';
+    const tt = document.createElement('div');
+    tt.className = 'install-title';
+    tt.textContent = 'Installe ARVEXA';
+    const td = document.createElement('div');
+    td.className = 'install-desc';
+    td.textContent = "Accès hors ligne + icône sur ton écran d'accueil, comme une vraie app.";
+    txt.appendChild(tt);
+    txt.appendChild(td);
+    const btn = document.createElement('button');
+    btn.className = 'install-btn';
+    btn.id = 'installBtn';
+    btn.type = 'button';
+    btn.textContent = 'Installer';
+    const close = document.createElement('button');
+    close.className = 'install-close';
+    close.type = 'button';
+    close.setAttribute('aria-label', 'Fermer');
+    const ci = document.createElement('i');
+    ci.className = 'fas fa-times';
+    close.appendChild(ci);
+    inner.appendChild(icon);
+    inner.appendChild(txt);
+    inner.appendChild(btn);
+    inner.appendChild(close);
+    banner.appendChild(inner);
+    container.appendChild(banner);
+
+    btn.addEventListener('click', async () => {
+      if (!deferredPrompt) return;
+      btn.disabled = true;
+      deferredPrompt.prompt();
+      try { await deferredPrompt.userChoice; } catch (err) {}
+      deferredPrompt = null;
+      banner.remove();
+    });
+    close.addEventListener('click', () => {
+      try { window.localStorage.setItem(PWA_DISMISS_KEY, String(Date.now())); } catch (err) {}
+      banner.remove();
+    });
+  }
+
+  renderHero();
+  renderProgress();
+  initReveal();
+
 
   // ================================================================
   // NOTIFICATIONS NON LUES

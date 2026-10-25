@@ -20,6 +20,7 @@
   <script src="katex-utils.js" defer></script>
   <script src="register-sw.js" defer></script>
 
+  <link rel="stylesheet" href="arvexa-ui.css">
   <style>
        :root {
       /* Palette complète — alignée sur index.html */
@@ -268,7 +269,7 @@
     .selector-icon {
       width: 32px;
       height: 32px;
-      border-radius: 8px;
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -333,7 +334,7 @@
       align-items: center;
       gap: 10px;
       padding: 11px 14px;
-      border-radius: 8px;
+      border-radius: 10px;
       color: var(--text-body);
       font-size: 14px;
       font-weight: 500;
@@ -409,13 +410,13 @@
     .hero-progress-bar {
       flex: 1;
       height: 6px;
-      border-radius: 6px;
+      border-radius: 8px;
       background: rgba(255, 255, 255, 0.06);
       overflow: hidden;
     }
     .hero-progress-fill {
       height: 100%;
-      border-radius: 6px;
+      border-radius: 8px;
       background: linear-gradient(90deg, var(--accent), var(--accent-bright));
       transition: width 0.6s cubic-bezier(0.25, 1, 0.5, 1);
     }
@@ -461,7 +462,7 @@
     .action-card-icon {
       width: 52px;
       height: 52px;
-      border-radius: 14px;
+      border-radius: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -486,7 +487,7 @@
       align-items: center;
       gap: 4px;
       padding: 2px 8px;
-      border-radius: 8px;
+      border-radius: 10px;
       background: rgba(58, 182, 126, 0.15);
       color: #7ce0aa;
       font-size: 10px;
@@ -587,7 +588,7 @@
       align-items: center;
       gap: 4px;
       padding: 2px 8px;
-      border-radius: 8px;
+      border-radius: 10px;
       background: rgba(255, 255, 255, 0.03);
       color: var(--text-muted);
       font-size: 11px;
@@ -868,7 +869,7 @@
     }
     .mechanism-consequences {
       padding: 10px 12px;
-      border-radius: 8px;
+      border-radius: 10px;
       background: rgba(69, 180, 125, 0.06);
       border-left: 3px solid var(--success-light);
     }
@@ -1033,7 +1034,7 @@
     .quiz-letter {
       width: 26px;
       height: 26px;
-      border-radius: 7px;
+      border-radius: 8px;
       background: rgba(255, 255, 255, 0.05);
       display: flex;
       align-items: center;
@@ -1073,7 +1074,7 @@
     .btn {
       min-height: 48px;
       border: 1px solid transparent;
-      border-radius: 30px;
+      border-radius: 999px;
       padding: 13px 24px;
       color: var(--text-light);
       background: rgba(255, 255, 255, 0.04);
@@ -1241,7 +1242,7 @@
       .action-card-title { font-size: 14px; }
       .action-card-desc { font-size: 12px; }
       .notion-row { padding: 12px 14px; gap: 10px; }
-      .notion-row-num { width: 30px; height: 30px; font-size: 13px; border-radius: 8px; }
+      .notion-row-num { width: 30px; height: 30px; font-size: 13px; border-radius: 10px; }
       .notion-row-title { font-size: 13.5px; }
       .block { padding: 14px 16px; }
       .block-text { font-size: 14px; }
@@ -1282,7 +1283,7 @@
     textarea:focus-visible {
       outline: 2px solid var(--accent);
       outline-offset: 2px;
-      border-radius: 6px;
+      border-radius: 8px;
     }
 
     ::-webkit-scrollbar { width: 4px; height: 4px; }
@@ -1318,7 +1319,7 @@
       margin: auto;
       padding: 30px 26px 22px;
       border: 1px solid rgba(224, 184, 74, 0.20);
-      border-radius: 22px;
+      border-radius: 20px;
       background:
         radial-gradient(ellipse 120% 70% at 50% -10%, rgba(224, 184, 74, 0.10) 0%, transparent 65%),
         radial-gradient(ellipse 100% 50% at 50% 110%, rgba(184, 134, 11, 0.05) 0%, transparent 60%),
@@ -2164,9 +2165,10 @@ document.addEventListener('click', () => closeAllSelectors());
 // ═══════════════════════════════════════════════════════════════
 // API CALL
 // ═══════════════════════════════════════════════════════════════
-async function callApi(payload) {
+async function callApi(payload, _attempt = 1) {
   if (!state.user) throw new Error('Non authentifié.');
-  const token = await getIdToken(state.user);
+  // _attempt > 1 -> forceRefresh : le token est régénéré côté Firebase
+  const token = await getIdToken(state.user, _attempt > 1);
   const res = await fetch('/api/reviseur', {
     method: 'POST',
     headers: {
@@ -2178,6 +2180,9 @@ async function callApi(payload) {
   const data = await res.json().catch(() => null);
 
   if (res.status === 401 && data?.code === 'AUTH_REQUIRED') {
+    // Anti-boucle : rafraîchissement forcé du token + UNE retente avant
+    // de renvoyer vers la connexion (401 passagers tolérés).
+    if (_attempt === 1) return callApi(payload, 2);
     try {
       sessionStorage.setItem('redirectAfterLogin',
         window.location.pathname + window.location.search);

@@ -1,0 +1,195 @@
+/* ═══════════════════════════════════════════════════════════════════
+   ARVEXA SCHOOL — ARVEXA-UI.CSS
+   Design system unifié — chargé par TOUTES les pages.
+   Rôle :
+     1. Garantir les mêmes tokens (couleurs, rayons, ombres, polices)
+        sur chaque page, même si la page ne les définit pas.
+     2. Donner une base commune (focus, sélection, scrollbars, tap,
+        autofill) pour un rendu "app native" identique partout.
+   Garantie de non-casse :
+     - Ce fichier est chargé AVANT le <style> interne de chaque page.
+     - Les composants utilisent :where() (spécificité zéro) : le style
+       propre de chaque page gagne TOUJOURS.
+     - Les tokens :root ne font que compléter les pages qui n'ont pas
+       la variable ; les pages qui la définissent gardent leur valeur.
+   Palette de référence (identique à index.html / login.html) :
+     fond #0A0A0A · surface #141414 · or #B8860B / #E0B84A
+     texte #F5F0E8 · dim #8A8A7A · muted #5A5A4A
+     succès #2D7D5A / #3AB67E · danger #B85C3A · warning #D4A017 · info #4AAFE0
+   ═══════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── Couleurs de marque (uniques et officielles) ── */
+  --bg-dark: #0A0A0A;
+  --bg-surface: #141414;
+  --bg-card: rgba(20, 20, 20, 0.7);
+  --accent: #B8860B;
+  --accent-bright: #E0B84A;
+  --accent-dim: rgba(184, 134, 11, 0.08);
+  --primary: #1A3A2A;
+  --primary-dark: #0A1A12;
+  --primary-light: #2A5A3A;
+  --success: #2D7D5A;
+  --success-light: #3AB67E;
+  --danger: #B85C3A;
+  --danger-light: #FF9A84;
+  --warning: #D4A017;
+  --info: #4AAFE0;
+  --text-light: #F5F0E8;
+  --text-dim: #8A8A7A;
+  --text-muted: #5A5A4A;
+
+  /* ── Échelle de rayons UNIQUE ──
+     10px = petits éléments (chips, tags, mini-boutons)
+     12px = inputs, boutons moyens
+     16px = cartes, panneaux          (var(--radius))
+     20px = modales, grands blocs     (var(--radius-lg))
+     999px = pilules, badges ronds ; 50% = cercles */
+  --radius-xs: 8px;
+  --radius-sm: 10px;
+  --radius: 16px;
+  --radius-lg: 20px;
+  --radius-pill: 999px;
+
+  /* ── Polices officielles ── */
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-body: 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  --font-math: 'Cambria Math', 'STIX Two Math', Georgia, serif;
+
+  /* ── Ombres et transitions officielles ── */
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.5);
+  --transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  --transition-fast: all 0.15s ease;
+
+  /* ── Contrôles natifs assortis au thème sombre ── */
+  color-scheme: dark;
+  accent-color: #B8860B;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   BASE GLOBALE — sensation "app native" identique sur tout le site
+   (spécificité minimale : chaque page garde la main)
+   ═══════════════════════════════════════════════════════════════════ */
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Aucun flash de surbrillance au tap sur iOS/Android */
+button, a, input, select, textarea, label, [role="button"] {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Les boutons héritent toujours de la police de la page */
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+button {
+  touch-action: manipulation; /* pas de zoom accidentel au double-tap */
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+/* ── Focus clavier uniforme (anneau or ARVEXA) ── */
+:focus-visible {
+  outline: 2px solid #E0B84A;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* ── Sélection de texte aux couleurs de la marque ── */
+::selection {
+  background: rgba(184, 134, 11, 0.35);
+  color: #F5F0E8;
+}
+
+/* ── Autofill sombre : plus de flash blanc sur les champs connectés ── */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-text-fill-color: #F5F0E8;
+  caret-color: #E0B84A;
+  transition: background-color 600000s ease-out, color 600000s ease-out;
+}
+
+/* ── Barres de défilement discrètes et identiques partout ── */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #2A2A2A #0A0A0A;
+}
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0A0A0A;
+}
+::-webkit-scrollbar-thumb {
+  background: #2A2A2A;
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #B8860B;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   COMPOSANTS — valeurs par défaut à spécificité ZÉRO (:where)
+   → elles ne s'appliquent que si la page ne définit rien elle-même.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Transition tactile uniforme sur tous les boutons du site */
+:where(button, .btn, [class*="btn"], [class*="button"], [role="button"]) {
+  transition:
+    transform 0.15s ease,
+    opacity 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease,
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+/* Retour tactile : léger enfoncement au pressage (feel natif) */
+:where(button:not(:disabled):active, [role="button"]:not([aria-disabled="true"]):active) {
+  transform: scale(0.97);
+}
+
+/* Champs de formulaire : transition douce par défaut */
+:where(input, select, textarea) {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+/* Liens : pas de saut de couleur brutal */
+:where(a) {
+  transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   ACCESSIBILITÉ — respect des préférences de mouvement réduit
+   ═══════════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

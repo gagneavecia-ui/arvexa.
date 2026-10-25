@@ -3,7 +3,7 @@
 // Version : OFFLINE v2.2 — Navigation instantanée
 // ================================================================
 
-const SW_VERSION = 'arvexa-offline-v2.4'; // v2.4 : modale uniforme arvexa-confirm.js
+const SW_VERSION = 'arvexa-offline-v2.5'; // v2.5 : design system unifié arvexa-ui.css
 const CACHE_STATIC = `${SW_VERSION}-static`;
 const CACHE_HTML = `${SW_VERSION}-html`;
 
@@ -29,6 +29,7 @@ const PRECACHE = [
   './offline.html',
   './manifest.json',
   './perf.css',
+  './arvexa-ui.css',
   './register-sw.js',
   './arvexa-confirm.js',
   './icon.png'

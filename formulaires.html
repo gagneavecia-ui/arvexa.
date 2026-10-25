@@ -19,6 +19,7 @@
   <script src="register-sw.js" defer></script>
   <script src="katex-utils.js" defer></script>
 
+  <link rel="stylesheet" href="arvexa-ui.css">
   <style>
     /* ============================================================
        ROOT
@@ -112,7 +113,7 @@
 
     /* FORMULA CARD */
     .f-card{background:var(--bg-card);backdrop-filter:blur(10px);border:1px solid var(--card-border);
-      border-radius:14px;padding:14px 16px;position:relative;overflow:hidden;transition:var(--transition);
+      border-radius:16px;padding:14px 16px;position:relative;overflow:hidden;transition:var(--transition);
       animation:fadeInUp .4s cubic-bezier(.25,1,.5,1) backwards}
     .f-card:nth-child(1){animation-delay:.02s}
     .f-card:nth-child(2){animation-delay:.04s}
@@ -131,7 +132,7 @@
     .f-card-title:hover{color:var(--accent-bright)}
     .f-card-actions{display:flex;gap:4px;flex-shrink:0}
     .icon-action{background:none;border:1px solid transparent;color:var(--text-muted);font-size:14px;
-      cursor:pointer;transition:var(--transition);padding:5px 7px;border-radius:8px;line-height:1;
+      cursor:pointer;transition:var(--transition);padding:5px 7px;border-radius:10px;line-height:1;
       display:flex;align-items:center;justify-content:center;min-width:32px;height:32px}
     .icon-action:hover{color:var(--text-light);background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.05)}
     .icon-action.fav:hover{color:var(--accent-bright);background:rgba(184,134,11,.1)}
@@ -171,7 +172,7 @@
     }
 
     .f-card-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
-    .f-tag{font-size:10px;padding:3px 8px;border-radius:8px;font-weight:600}
+    .f-tag{font-size:10px;padding:3px 8px;border-radius:10px;font-weight:600}
     .f-tag.units{background:rgba(26,58,42,.12);color:var(--success-light)}
     .f-tag.condition{background:rgba(184,134,11,.06);color:var(--accent-bright)}
     .f-card-note{font-size:11px;color:var(--text-muted);margin-top:8px;line-height:1.5;font-style:italic}
@@ -186,23 +187,23 @@
     .empty-state p{font-size:12px;color:var(--text-dim)}
 
     /* SKELETON */
-    .skeleton-card{background:var(--bg-card);border:1px solid var(--card-border);border-radius:14px;
+    .skeleton-card{background:var(--bg-card);border:1px solid var(--card-border);border-radius:16px;
       padding:14px 16px;position:relative;overflow:hidden;margin-bottom:8px}
     .skeleton-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
       background:linear-gradient(90deg,rgba(184,134,11,.1) 0%,rgba(184,134,11,.4) 50%,rgba(184,134,11,.1) 100%);
       background-size:200% 100%;animation:skeletonShimmer 1.6s ease-in-out infinite}
     @keyframes skeletonShimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
     .skeleton-line{background:linear-gradient(90deg,rgba(255,255,255,.03) 0%,rgba(255,255,255,.08) 50%,rgba(255,255,255,.03) 100%);
-      background-size:200% 100%;animation:skeletonShimmer 1.6s ease-in-out infinite;border-radius:6px;height:14px;margin-bottom:10px}
+      background-size:200% 100%;animation:skeletonShimmer 1.6s ease-in-out infinite;border-radius:8px;height:14px;margin-bottom:10px}
     .skeleton-line.title{width:70%;height:16px}
-    .skeleton-line.formula{width:100%;height:22px;margin:12px 0;border-radius:8px}
+    .skeleton-line.formula{width:100%;height:22px;margin:12px 0;border-radius:10px}
     .skeleton-line.meta{width:40%;height:10px;margin-bottom:0}
     .skeleton-header{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:8px}
     .skeleton-header .skeleton-line.title{margin-bottom:0}
-    .skeleton-icon{width:32px;height:32px;border-radius:8px;
+    .skeleton-icon{width:32px;height:32px;border-radius:10px;
       background:linear-gradient(90deg,rgba(255,255,255,.03) 0%,rgba(255,255,255,.08) 50%,rgba(255,255,255,.03) 100%);
       background-size:200% 100%;animation:skeletonShimmer 1.6s ease-in-out infinite;flex-shrink:0}
-    .skeleton-category{height:12px;width:120px;border-radius:6px;
+    .skeleton-category{height:12px;width:120px;border-radius:8px;
       background:linear-gradient(90deg,rgba(184,134,11,.05) 0%,rgba(184,134,11,.15) 50%,rgba(184,134,11,.05) 100%);
       background-size:200% 100%;animation:skeletonShimmer 1.6s ease-in-out infinite;margin:8px 0 12px}
     .content-fade-in{animation:contentFadeIn .4s cubic-bezier(.25,1,.5,1)}
@@ -214,13 +215,13 @@
       padding:0;opacity:0;visibility:hidden;transition:all .3s cubic-bezier(.25,1,.5,1)}
     .modal-overlay.show{opacity:1;visibility:visible}
     .modal{background:var(--bg-surface);border:1px solid rgba(184,134,11,.15);
-      border-radius:24px 24px 0 0;padding:24px 20px;padding-bottom:calc(24px + var(--safe-bottom));
+      border-radius:999px 999px 0 0;padding:24px 20px;padding-bottom:calc(24px + var(--safe-bottom));
       max-width:600px;width:100%;max-height:92vh;overflow-y:auto;
       transform:translateY(100%);transition:transform .4s cubic-bezier(.25,1,.5,1);position:relative}
     .modal-overlay.show .modal{transform:translateY(0)}
-    .modal::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:24px 24px 0 0;
+    .modal::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:999px 999px 0 0;
       background:linear-gradient(90deg,var(--accent),var(--accent-bright),var(--accent))}
-    .modal-handle{width:40px;height:4px;border-radius:2px;background:rgba(255,255,255,.15);
+    .modal-handle{width:40px;height:4px;border-radius:8px;background:rgba(255,255,255,.15);
       margin:0 auto 16px;cursor:grab;transition:background .2s ease}
     .modal-handle:hover{background:rgba(224,184,74,.4)}
     .modal-close{position:absolute;top:16px;right:16px;width:34px;height:34px;border-radius:10px;
@@ -237,7 +238,7 @@
     .modal-formula-box{
       background:linear-gradient(135deg,rgba(184,134,11,.08),rgba(184,134,11,.04));
       border:1px solid rgba(184,134,11,.15);
-      border-radius:14px;
+      border-radius:16px;
       padding:24px 20px;
       margin:14px 0;
       text-align:center;
@@ -253,7 +254,7 @@
     }
     .modal-formula-box::before{
       content:'';position:absolute;top:0;left:0;right:0;height:2px;
-      border-radius:14px 14px 0 0;
+      border-radius:16px 16px 0 0;
       background:linear-gradient(90deg,transparent,var(--accent-bright),transparent)
     }
     .modal-formula-box .katex{
@@ -364,7 +365,7 @@
       .modal-handle{display:none}
     }
     @media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
-    a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+    a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:8px}
     ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}
     ::-webkit-scrollbar-thumb{background:rgba(184,134,11,.25);border-radius:10px}
   </style>

@@ -770,6 +770,18 @@ RÈGLES DE PROFONDEUR D'EXPLICATION :
 - Maximum 8 parties (parts) — vise 6-8 parties bien développées si le cours est riche.
 `.trim();
 
+const PROF_PERSONA_RULES = `
+RÈGLES « COMME UN PROF » (style d'explication obligatoire) :
+- Tu es un professeur passionné qui parle DIRECTEMENT à son élève : utilise « tu » (« regarde », « remarque que », « tu vas voir »).
+- Structure chaque "simpleExplanation" en 2 à 3 PARAGRAPHES séparés par le retour à la ligne \\n\\n :
+  ¶1. Une accroche + une ANALOGIE concrète de la vie quotidienne au Niger (marché, monnaie, cuisine, sport, téléphone, transport...).
+  ¶2. L'explication du mécanisme pas à pas, en tutoyant l'élève, avec les termes du cours expliqués.
+  ¶3. Un exemple résolu OU une mise en garde (« attention à... ») + le lien avec le BAC.
+- Commence chaque partie par une phrase courte et frappante, jamais par une tournure creuse (« Cette partie porte sur... »).
+- Développe VRAIMENT : une explication d'une seule phrase ou un paragraphe unique est REFUSÉ.
+- Utilise \\n\\n entre les paragraphes dans les chaînes JSON (échappé correctement).
+`.trim();
+
 function buildScientificPrompts({ subjectLabel, rawInput }) {
   const baseContext = `Matière : ${subjectLabel}
 ═══════════════════════════════════════════════════════════════
@@ -804,7 +816,7 @@ ${JSON_STRICT_RULES}
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'explanation', maxTokens: 4000,
+      name: 'explanation', maxTokens: 5500,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide, sans commentaire.',
       userPrompt: `Tu es professeur expert du BAC. Explique cette section EN PROFONDEUR comme à un élève qui découvre le sujet pour la première fois.
 
@@ -813,6 +825,7 @@ ${baseContext}
 ${PERIMETER_RULES}
 ${LATEX_RULES}
 ${EXPLANATION_DEPTH_RULES}
+${PROF_PERSONA_RULES}
 
 Format JSON :
 {
@@ -937,7 +950,7 @@ ${JSON_STRICT_RULES}
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'explanation', maxTokens: 4000,
+      name: 'explanation', maxTokens: 5500,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide, sans commentaire.',
       userPrompt: `Tu es professeur de SVT. Explique cette section EN PROFONDEUR comme à un élève qui découvre.
 
@@ -945,6 +958,7 @@ ${baseContext}
 
 ${PERIMETER_RULES}
 ${EXPLANATION_DEPTH_RULES}
+${PROF_PERSONA_RULES}
 
 Format JSON :
 {
@@ -1064,7 +1078,7 @@ ${JSON_STRICT_RULES}
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'explanation', maxTokens: 4000,
+      name: 'explanation', maxTokens: 5500,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide, sans commentaire.',
       userPrompt: `Tu es professeur de philosophie. Explique cette section EN PROFONDEUR comme à un élève qui n'y connaît RIEN.
 
@@ -1072,6 +1086,7 @@ ${baseContext}
 
 ${PERIMETER_RULES}
 ${EXPLANATION_DEPTH_RULES}
+${PROF_PERSONA_RULES}
 
 Format JSON :
 {
@@ -1193,7 +1208,7 @@ ${JSON_STRICT_RULES}
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'explanation', maxTokens: 3000,
+      name: 'explanation', maxTokens: 4500,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Présente cette section d'histoire-géo de manière CLAIRE, CONCISE mais COMPLÈTE.
 
@@ -1311,7 +1326,7 @@ ${JSON_STRICT_RULES}
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'explanation', maxTokens: 3500,
+      name: 'explanation', maxTokens: 5000,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Tu es professeur de français. Explique cette section EN PROFONDEUR.
 
@@ -1319,6 +1334,7 @@ ${baseContext}
 
 ${PERIMETER_RULES}
 ${EXPLANATION_DEPTH_RULES}
+${PROF_PERSONA_RULES}
 
 Format JSON :
 {
@@ -1436,7 +1452,7 @@ ${JSON_STRICT_RULES}
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'explanation', maxTokens: 4000,
+      name: 'explanation', maxTokens: 5500,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Tu es professeur d'anglais pour des FRANCOPHONES DÉBUTANTS. Explique EN PROFONDEUR.
 
@@ -1444,6 +1460,7 @@ ${baseContext}
 
 ${PERIMETER_RULES}
 ${EXPLANATION_DEPTH_RULES}
+${PROF_PERSONA_RULES}
 
 Format JSON :
 {

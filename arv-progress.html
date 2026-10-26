@@ -1646,6 +1646,28 @@ main {
   word-break: break-word;
 }
 
+/* ── Task 21 — PAGE FIXE : zéro débordement horizontal ── */
+html, body { max-width: 100%; overflow-x: hidden; }
+main, .content-section, .block, .part, .qa-item, .qcm-item, .formula-block,
+.qa-question, .qa-answer-inner, .part-terms, .simple-list li {
+  max-width: 100%;
+  min-width: 0;
+}
+.qa-q-text, .part-term, .trap-text, .trap-solution, .example-enonce,
+.qa-musthave-list li, .method-list li, .formula-description, .formula-condition,
+.formula-variable, .part-idea, .part-remember, .part-explanation {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  min-width: 0;
+}
+.simple-list li span:last-child { flex: 1; min-width: 0; overflow-wrap: anywhere; word-break: break-word; }
+.katex { display: inline-block; max-width: 100%; overflow-x: auto; overflow-y: hidden; }
+.katex-display { max-width: 100%; }
+.katex-display > .katex { max-width: none; overflow-x: visible; }
+@media (max-width: 640px) {
+  .katex-display { font-size: 0.86em; }
+}
+
 @media (max-width: 640px) {
   .header { padding: calc(8px + var(--safe-top)) 14px 8px; }
   main { padding: 18px 14px 55px; }
@@ -2058,6 +2080,19 @@ function safeText(text) {
         .replace(/>/g, '&gt;');
     }
     return part.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }).join('');
+}
+
+function safeTextP(text) {
+  // Rendu « comme un prof » : les retours à la ligne HORS formules deviennent
+  // des paragraphes visibles (\n\n → saut de paragraphe, \n → <br>).
+  const parts = String(safeText(text) || '').split(/(\$\$[\s\S]*?\$\$|\$[^$\n]+?\$)/g);
+  return parts.map((part, i) => {
+    if (i % 2 === 1) return part; // segment mathématique : intact
+    return part
+      .replace(/\r\n/g, '\n')
+      .replace(/\n{2,}/g, '<br><br>')
+      .replace(/\n/g, '<br>');
   }).join('');
 }
 
@@ -2985,7 +3020,7 @@ function renderAnalysis(a, profile) {
       <div class="content-section-title"><i class="fas fa-graduation-cap"></i>L'explication du prof</div>
       <div class="block">
         <div class="block-head"><i class="fas fa-lightbulb"></i>Ce que tu dois comprendre</div>
-        <div class="block-body">${safeText(expl.understanding)}</div>
+        <div class="block-body">${safeTextP(expl.understanding)}</div>
       </div>
       ${safeArray(expl.parts).map((p) => renderPart(p, profile)).join('')}
     </div>`;
@@ -3026,8 +3061,8 @@ function renderPart(p, profile) {
     const steps = safeArray(p.mechanism.steps);
     if (steps.length > 0) {
       extra += `<div class="part-terms" style="margin-top:10px;">
-        <div class="part-terms-title">⚙️ ${safeText(p.mechanism.description || 'Mécanisme')}</div>
-        <ol class="method-list">${steps.map((s) => `<li>${safeText(s)}</li>`).join('')}</ol>
+        <div class="part-terms-title">⚙️ ${safeTextP(p.mechanism.description || 'Mécanisme')}</div>
+        <ol class="method-list">${steps.map((s) => `<li>${safeTextP(s)}</li>`).join('')}</ol>
       </div>`;
     }
   }
@@ -3036,14 +3071,14 @@ function renderPart(p, profile) {
     if (args.length > 0) {
       extra += `<div class="part-terms" style="margin-top:10px;">
         <div class="part-terms-title">⚖️ Arguments</div>
-        <ul class="simple-list">${args.map((arg, i) => `<li><span class="num">${i + 1}.</span><span>${safeText(arg)}</span></li>`).join('')}</ul>
+        <ul class="simple-list">${args.map((arg, i) => `<li><span class="num">${i + 1}.</span><span>${safeTextP(arg)}</span></li>`).join('')}</ul>
       </div>`;
     }
     const examples = safeArray(p.everydayExamples);
     if (examples.length > 0) {
       extra += `<div class="part-terms" style="margin-top:10px;">
         <div class="part-terms-title">💡 Exemples du quotidien</div>
-        <ul class="simple-list">${examples.map((ex, i) => `<li><span class="num">${i + 1}.</span><span>${safeText(ex)}</span></li>`).join('')}</ul>
+        <ul class="simple-list">${examples.map((ex, i) => `<li><span class="num">${i + 1}.</span><span>${safeTextP(ex)}</span></li>`).join('')}</ul>
       </div>`;
     }
   }
@@ -3055,8 +3090,8 @@ function renderPart(p, profile) {
         <div style="display:flex;flex-direction:column;gap:8px;">
           ${examples.map((ex) => `
             <div>
-              <div style="font-size:14px;color:var(--text-light);font-weight:600;">${safeText(ex.english)}</div>
-              <div style="font-size:13px;color:var(--text-dim);font-style:italic;">→ ${safeText(ex.french)}</div>
+              <div style="font-size:14px;color:var(--text-light);font-weight:600;">${safeTextP(ex.english)}</div>
+              <div style="font-size:13px;color:var(--text-dim);font-style:italic;">→ ${safeTextP(ex.french)}</div>
             </div>
           `).join('')}
         </div>
@@ -3069,8 +3104,8 @@ function renderPart(p, profile) {
         <div style="display:flex;flex-direction:column;gap:6px;">
           ${mistakes.map((m) => `
             <div style="font-size:13px;color:var(--text-body);line-height:1.55;">
-              <span style="color:#ff9a84;">❌ ${safeText(m.mistake)}</span><br>
-              <span style="color:var(--success-light);">✅ ${safeText(m.correction)}</span>
+              <span style="color:#ff9a84;">❌ ${safeTextP(m.mistake)}</span><br>
+              <span style="color:var(--success-light);">✅ ${safeTextP(m.correction)}</span>
             </div>
           `).join('')}
         </div>
@@ -3081,13 +3116,13 @@ function renderPart(p, profile) {
   if (relations.length > 0) {
     extra += `<div class="part-terms" style="margin-top:10px;">
       <div class="part-terms-title">🔗 Relations</div>
-      <ul class="simple-list">${relations.map((r, i) => `<li><span class="num">${i + 1}.</span><span>${safeText(r)}</span></li>`).join('')}</ul>
+      <ul class="simple-list">${relations.map((r, i) => `<li><span class="num">${i + 1}.</span><span>${safeTextP(r)}</span></li>`).join('')}</ul>
     </div>`;
   }
   if (profile === 'scientific' && p.example && typeof p.example === 'string') {
     extra += `<div class="part-terms" style="margin-top:10px;">
       <div class="part-terms-title">📙 Exemple</div>
-      <div style="font-size:13.5px;color:var(--text-body);line-height:1.6;">${safeText(p.example)}</div>
+      <div style="font-size:13.5px;color:var(--text-body);line-height:1.6;">${safeTextP(p.example)}</div>
     </div>`;
   }
 
@@ -3099,11 +3134,11 @@ function renderPart(p, profile) {
       <div class="part-terms-list">
         ${safeTerms.map((t) => {
           if (profile === 'language' && t.english) {
-            return `<div class="part-term"><strong>${safeText(t.english)}</strong> — ${safeText(t.french || t.meaning || '')}${t.example ? ` <span style="color:var(--text-muted);">(${safeText(t.example)})</span>` : ''}</div>`;
+            return `<div class="part-term"><strong>${safeTextP(t.english)}</strong> — ${safeTextP(t.french || t.meaning || '')}${t.example ? ` <span style="color:var(--text-muted);">(${safeTextP(t.example)})</span>` : ''}</div>`;
           }
           const term = t.term || t.name || '';
           const meaning = t.meaning || t.definition || '';
-          return `<div class="part-term"><strong>${safeText(term)}</strong> — ${safeText(meaning)}</div>`;
+          return `<div class="part-term"><strong>${safeTextP(term)}</strong> — ${safeTextP(meaning)}</div>`;
         }).join('')}
       </div>
     </div>`;
@@ -3111,14 +3146,14 @@ function renderPart(p, profile) {
 
   let rememberHtml = '';
   if (toRemember && typeof toRemember === 'string' && toRemember.trim()) {
-    rememberHtml = `<div class="part-remember"><strong>À retenir</strong>${safeText(toRemember)}</div>`;
+    rememberHtml = `<div class="part-remember"><strong>À retenir</strong>${safeTextP(toRemember)}</div>`;
   }
 
   return `
     <div class="part">
-      <div class="part-title">${safeText(partTitle)}</div>
-      ${mainIdea ? `<div class="part-idea">${safeText(mainIdea)}</div>` : ''}
-      ${explanation ? `<div class="part-explanation">${safeText(explanation)}</div>` : ''}
+      <div class="part-title">${safeTextP(partTitle)}</div>
+      ${mainIdea ? `<div class="part-idea">${safeTextP(mainIdea)}</div>` : ''}
+      ${explanation ? `<div class="part-explanation">${safeTextP(explanation)}</div>` : ''}
       ${termsHtml}
       ${extra}
       ${rememberHtml}
@@ -3140,12 +3175,12 @@ function renderStructure(structure, profile) {
             if (latex && !latex.includes('$')) latex = `$$${latex}$$`;
             return `
               <div class="formula-block">
-                <div>${safeText(latex)}</div>
-                ${f.description ? `<div class="formula-description">${safeText(f.description)}</div>` : ''}
-                ${f.condition ? `<div class="formula-condition">${safeText(f.condition)}</div>` : ''}
+                <div>${safeTextP(latex)}</div>
+                ${f.description ? `<div class="formula-description">${safeTextP(f.description)}</div>` : ''}
+                ${f.condition ? `<div class="formula-condition">${safeTextP(f.condition)}</div>` : ''}
                 ${safeArray(f.variables).length > 0 ? `
                   <div class="formula-variables">
-                    ${safeArray(f.variables).map((v) => `<div class="formula-variable"><strong>${safeText(v.symbol)}</strong> : ${safeText(v.meaning)}${v.unit ? ` (${safeText(v.unit)})` : ''}</div>`).join('')}
+                    ${safeArray(f.variables).map((v) => `<div class="formula-variable"><strong>${safeTextP(v.symbol)}</strong> : ${safeTextP(v.meaning)}${v.unit ? ` (${safeTextP(v.unit)})` : ''}</div>`).join('')}
                   </div>
                 ` : ''}
               </div>
@@ -3158,7 +3193,7 @@ function renderStructure(structure, profile) {
       html += `<div class="content-section">
         <div class="content-section-title"><i class="fas fa-list-ol"></i>${escapeHtml(structure.method.title || 'Méthode')}</div>
         <div class="block">
-          <ol class="method-list">${safeArray(structure.method.steps).map((s) => `<li>${safeText(s)}</li>`).join('')}</ol>
+          <ol class="method-list">${safeArray(structure.method.steps).map((s) => `<li>${safeTextP(s)}</li>`).join('')}</ol>
         </div>
       </div>`;
     }
@@ -3168,9 +3203,9 @@ function renderStructure(structure, profile) {
         <div class="content-section-title"><i class="fas fa-check-circle"></i>Exemples corrigés <span class="count">${examples.length}</span></div>
         ${examples.map((ex) => `
           <div class="block">
-            <div class="example-enonce">${safeText(ex.enonce)}</div>
-            ${safeArray(ex.steps).length > 0 ? `<ol class="example-steps">${safeArray(ex.steps).map((s) => `<li>${safeText(s)}</li>`).join('')}</ol>` : ''}
-            ${ex.result ? `<div class="example-result">${safeText(ex.result)}</div>` : ''}
+            <div class="example-enonce">${safeTextP(ex.enonce)}</div>
+            ${safeArray(ex.steps).length > 0 ? `<ol class="example-steps">${safeArray(ex.steps).map((s) => `<li>${safeTextP(s)}</li>`).join('')}</ol>` : ''}
+            ${ex.result ? `<div class="example-result">${safeTextP(ex.result)}</div>` : ''}
           </div>
         `).join('')}
       </div>`;
@@ -3181,8 +3216,8 @@ function renderStructure(structure, profile) {
         <div class="content-section-title"><i class="fas fa-triangle-exclamation"></i>Pièges à éviter</div>
         ${traps.map((t) => `
           <div class="block">
-            <div class="trap-text">${safeText(t.trap)}</div>
-            <div class="trap-solution">${safeText(t.solution)}</div>
+            <div class="trap-text">${safeTextP(t.trap)}</div>
+            <div class="trap-solution">${safeTextP(t.solution)}</div>
           </div>
         `).join('')}
       </div>`;
@@ -3197,9 +3232,9 @@ function renderStructure(structure, profile) {
         ${mechanisms.map((m) => `
           <div class="block">
             <div class="block-head"><i class="fas fa-arrow-right"></i>${escapeHtml(m.name || 'Mécanisme')}</div>
-            ${safeArray(m.steps).length > 0 ? `<ol class="method-list">${safeArray(m.steps).map((s) => `<li>${safeText(s)}</li>`).join('')}</ol>` : ''}
-            ${safeArray(m.relations).length > 0 ? `<div style="margin-top:10px;"><div class="part-terms-title">🔗 Relations</div><ul class="simple-list">${safeArray(m.relations).map((r, i) => `<li><span class="num">${i + 1}.</span><span>${safeText(r)}</span></li>`).join('')}</ul></div>` : ''}
-            ${safeArray(m.consequences).length > 0 ? `<div style="margin-top:10px;"><div class="part-terms-title">➡️ Conséquences</div><ul class="simple-list">${safeArray(m.consequences).map((c, i) => `<li><span class="num">${i + 1}.</span><span>${safeText(c)}</span></li>`).join('')}</ul></div>` : ''}
+            ${safeArray(m.steps).length > 0 ? `<ol class="method-list">${safeArray(m.steps).map((s) => `<li>${safeTextP(s)}</li>`).join('')}</ol>` : ''}
+            ${safeArray(m.relations).length > 0 ? `<div style="margin-top:10px;"><div class="part-terms-title">🔗 Relations</div><ul class="simple-list">${safeArray(m.relations).map((r, i) => `<li><span class="num">${i + 1}.</span><span>${safeTextP(r)}</span></li>`).join('')}</ul></div>` : ''}
+            ${safeArray(m.consequences).length > 0 ? `<div style="margin-top:10px;"><div class="part-terms-title">➡️ Conséquences</div><ul class="simple-list">${safeArray(m.consequences).map((c, i) => `<li><span class="num">${i + 1}.</span><span>${safeTextP(c)}</span></li>`).join('')}</ul></div>` : ''}
           </div>
         `).join('')}
       </div>`;
@@ -3210,7 +3245,7 @@ function renderStructure(structure, profile) {
         <div class="content-section-title"><i class="fas fa-book"></i>Définitions</div>
         <div class="block">
           <ul class="simple-list">
-            ${definitions.map((d, i) => `<li><span class="num">${i + 1}.</span><span><strong>${safeText(d.term)}</strong> — ${safeText(d.definition)}</span></li>`).join('')}
+            ${definitions.map((d, i) => `<li><span class="num">${i + 1}.</span><span><strong>${safeTextP(d.term)}</strong> — ${safeTextP(d.definition)}</span></li>`).join('')}
           </ul>
         </div>
       </div>`;
@@ -3222,7 +3257,7 @@ function renderStructure(structure, profile) {
         ${classifications.map((c) => `
           <div class="block">
             <div class="block-head"><i class="fas fa-tag"></i>${escapeHtml(c.category || 'Catégorie')}</div>
-            <ul class="simple-list">${safeArray(c.items).map((item, i) => `<li><span class="num">${i + 1}.</span><span>${safeText(item)}</span></li>`).join('')}</ul>
+            <ul class="simple-list">${safeArray(c.items).map((item, i) => `<li><span class="num">${i + 1}.</span><span>${safeTextP(item)}</span></li>`).join('')}</ul>
           </div>
         `).join('')}
       </div>`;
@@ -3236,8 +3271,8 @@ function renderStructure(structure, profile) {
         <div class="content-section-title"><i class="fas fa-scale-balanced"></i>Thèses & Arguments</div>
         ${theses.map((t) => `
           <div class="block">
-            <div class="block-head"><i class="fas fa-quote-left"></i>${safeText(t.thesis)}</div>
-            ${safeArray(t.arguments).length > 0 ? `<ul class="simple-list">${safeArray(t.arguments).map((arg, i) => `<li><span class="num">${i + 1}.</span><span>${safeText(arg)}</span></li>`).join('')}</ul>` : ''}
+            <div class="block-head"><i class="fas fa-quote-left"></i>${safeTextP(t.thesis)}</div>
+            ${safeArray(t.arguments).length > 0 ? `<ul class="simple-list">${safeArray(t.arguments).map((arg, i) => `<li><span class="num">${i + 1}.</span><span>${safeTextP(arg)}</span></li>`).join('')}</ul>` : ''}
           </div>
         `).join('')}
       </div>`;
@@ -3248,7 +3283,7 @@ function renderStructure(structure, profile) {
         <div class="content-section-title"><i class="fas fa-spell-check"></i>Vocabulaire</div>
         <div class="block">
           <ul class="simple-list">
-            ${vocabulary.map((v, i) => `<li><span class="num">${i + 1}.</span><span><strong>${safeText(v.term)}</strong> — ${safeText(v.meaning)}</span></li>`).join('')}
+            ${vocabulary.map((v, i) => `<li><span class="num">${i + 1}.</span><span><strong>${safeTextP(v.term)}</strong> — ${safeTextP(v.meaning)}</span></li>`).join('')}
           </ul>
         </div>
       </div>`;
@@ -3260,7 +3295,7 @@ function renderStructure(structure, profile) {
         ${plans.map((p) => `
           <div class="block">
             <div class="block-head"><i class="fas fa-project-diagram"></i>${escapeHtml(p.title || 'Plan')}</div>
-            <ol class="method-list">${safeArray(p.parties).map((x) => `<li>${safeText(x)}</li>`).join('')}</ol>
+            <ol class="method-list">${safeArray(p.parties).map((x) => `<li>${safeTextP(x)}</li>`).join('')}</ol>
           </div>
         `).join('')}
       </div>`;
@@ -3274,7 +3309,7 @@ function renderStructure(structure, profile) {
         <div class="content-section-title"><i class="fas fa-calendar"></i>Repères chronologiques</div>
         <div class="block">
           <ul class="simple-list">
-            ${timeline.map((t, i) => `<li><span class="num">${i + 1}.</span><span><strong>${safeText(t.date)}</strong> — ${safeText(t.event)}</span></li>`).join('')}
+            ${timeline.map((t, i) => `<li><span class="num">${i + 1}.</span><span><strong>${safeTextP(t.date)}</strong> — ${safeTextP(t.event)}</span></li>`).join('')}
           </ul>
         </div>
       </div>`;
@@ -3287,8 +3322,8 @@ function renderStructure(structure, profile) {
           <div class="block">
             <div class="block-head"><i class="fas fa-diagram-project"></i>Relation</div>
             <div style="font-size:14px;line-height:1.7;">
-              <div style="color:#ff9a84;"><strong>Cause :</strong> ${safeText(cc.cause)}</div>
-              <div style="color:var(--success-light);margin-top:6px;"><strong>Conséquence :</strong> ${safeText(cc.consequence)}</div>
+              <div style="color:#ff9a84;"><strong>Cause :</strong> ${safeTextP(cc.cause)}</div>
+              <div style="color:var(--success-light);margin-top:6px;"><strong>Conséquence :</strong> ${safeTextP(cc.consequence)}</div>
             </div>
           </div>
         `).join('')}
@@ -3300,7 +3335,7 @@ function renderStructure(structure, profile) {
         <div class="content-section-title"><i class="fas fa-user-tie"></i>Personnages clés</div>
         <div class="block">
           <ul class="simple-list">
-            ${keyFigures.map((f, i) => `<li><span class="num">${i + 1}.</span><span><strong>${safeText(f.name)}</strong> — ${safeText(f.role)}</span></li>`).join('')}
+            ${keyFigures.map((f, i) => `<li><span class="num">${i + 1}.</span><span><strong>${safeTextP(f.name)}</strong> — ${safeTextP(f.role)}</span></li>`).join('')}
           </ul>
         </div>
       </div>`;
@@ -3311,7 +3346,7 @@ function renderStructure(structure, profile) {
         <div class="content-section-title"><i class="fas fa-spell-check"></i>Vocabulaire</div>
         <div class="block">
           <ul class="simple-list">
-            ${vocabulary.map((v, i) => `<li><span class="num">${i + 1}.</span><span><strong>${safeText(v.term)}</strong> — ${safeText(v.meaning)}</span></li>`).join('')}
+            ${vocabulary.map((v, i) => `<li><span class="num">${i + 1}.</span><span><strong>${safeTextP(v.term)}</strong> — ${safeTextP(v.meaning)}</span></li>`).join('')}
           </ul>
         </div>
       </div>`;
@@ -3329,19 +3364,19 @@ function renderQuestion(q, idx) {
     <div class="qa-item" data-qa="${idx}">
       <div class="qa-question">
         <div class="qa-q-icon ${iconClass}">Q${idx + 1}</div>
-        <div class="qa-q-text">${safeText(q.question)}</div>
+        <div class="qa-q-text">${safeTextP(q.question)}</div>
         <span class="qa-level l${level}">Niv ${level}</span>
         <div class="qa-toggle"><i class="fas fa-chevron-down"></i></div>
       </div>
       <div class="qa-answer">
         <div class="qa-answer-inner">
           <div class="qa-answer-label"><i class="fas fa-check"></i>Réponse</div>
-          <div class="qa-answer-text">${safeText(q.answer)}</div>
+          <div class="qa-answer-text">${safeTextP(q.answer)}</div>
           ${safeArray(q.mustHave).length > 0 ? `
             <div class="qa-musthave">
               <div class="qa-musthave-title">Éléments indispensables</div>
               <ul class="qa-musthave-list">
-                ${safeArray(q.mustHave).map((m) => `<li>${safeText(m)}</li>`).join('')}
+                ${safeArray(q.mustHave).map((m) => `<li>${safeTextP(m)}</li>`).join('')}
               </ul>
             </div>
           ` : ''}
@@ -3354,16 +3389,16 @@ function renderQuestion(q, idx) {
 function renderQcm(q, idx) {
   return `
     <div class="qcm-item" data-correct="${escapeHtml(q.correct || 'A')}">
-      <div class="qcm-question">${idx + 1}. ${safeText(q.question)}</div>
+      <div class="qcm-question">${idx + 1}. ${safeTextP(q.question)}</div>
       <div class="qcm-options">
         ${safeArray(q.options).map((opt) => `
           <button class="qcm-option" data-letter="${escapeHtml(opt.id)}">
             <span class="qcm-option-letter">${escapeHtml(opt.id)}</span>
-            <span>${safeText(opt.text)}</span>
+            <span>${safeTextP(opt.text)}</span>
           </button>
         `).join('')}
       </div>
-      ${q.explanation ? `<div class="qcm-explanation"><strong>💡</strong> ${safeText(q.explanation)}</div>` : ''}
+      ${q.explanation ? `<div class="qcm-explanation"><strong>💡</strong> ${safeTextP(q.explanation)}</div>` : ''}
     </div>
   `;
 }
@@ -3394,7 +3429,7 @@ async function renderLessonView(params) {
       if (a.explanation?.understanding) {
         content += `<div class="block">
           <div class="block-head"><i class="fas fa-lightbulb"></i>À comprendre</div>
-          <div class="block-body">${safeText(a.explanation.understanding)}</div>
+          <div class="block-body">${safeTextP(a.explanation.understanding)}</div>
         </div>`;
       }
       if (a.explanation?.parts) {

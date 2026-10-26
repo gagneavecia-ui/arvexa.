@@ -1420,6 +1420,25 @@
       padding: 6px 0;
     }
 
+    /* ── Task 21 — PAGE FIXE : zéro débordement horizontal ── */
+    html, body { max-width: 100%; }
+    .question-detail, .qd-section, .qd-answers, .qd-answer-box, .exercise-card,
+    .recap-section, .topics-section, .grade-banner, .exercise-explanation {
+      max-width: 100%;
+      min-width: 0;
+    }
+    .qd-section, .qd-answer-text, .qd-statement, .explanation-text,
+    .exercise-card-title, .exercise-detail-meta, .qd-feedback-text {
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      min-width: 0;
+    }
+    .katex { display: inline-block; max-width: 100%; overflow-x: auto; overflow-y: hidden; }
+    .katex-display > .katex { max-width: none; overflow-x: visible; }
+    @media (max-width: 640px) {
+      .katex-display { font-size: 0.86em; }
+    }
+
     a:focus-visible,
     button:focus-visible,
     input:focus-visible,
@@ -2316,6 +2335,20 @@ function escapeHtml(value) {
     .replace(/'/g, '&#39;');
 }
 
+function fmtText(value) {
+  // Rendu « prof » : comme escapeHtml, mais les retours à la ligne deviennent
+  // des sauts visibles (\n\n → paragraphe, \n → <br>). Les segments $math$ restent intacts
+  // pour être rendus par KaTeX (auto-render global).
+  var parts = String(escapeHtml(value)).split(/(\$\$[\s\S]*?\$\$|\$[^$\n]+?\$)/g);
+  return parts.map(function (part, i) {
+    if (i % 2 === 1) return part;
+    return part
+      .replace(/\r\n/g, '\n')
+      .replace(/\n{2,}/g, '<br><br>')
+      .replace(/\n/g, '<br>');
+  }).join('');
+}
+
 function setStatus(id, message, type) {
   var el = $(id);
   if (!el) return;
@@ -3074,8 +3107,8 @@ function showResults(result) {
   banner.innerHTML =
     '<div class="grade-emoji">' + getGradeEmoji(percentage) + '</div>' +
     '<div class="grade-info">' +
-    '<div class="grade-title">' + escapeHtml(grade) + '</div>' +
-    '<div class="grade-sub">' + escapeHtml((result && result.globalFeedback && result.globalFeedback.encouragement) || 'Continue tes efforts !') + '</div>' +
+    '<div class="grade-title">' + fmtText(grade) + '</div>' +
+    '<div class="grade-sub">' + fmtText((result && result.globalFeedback && result.globalFeedback.encouragement) || 'Continue tes efforts !') + '</div>' +
     '</div>';
   details.appendChild(banner);
 
@@ -3091,13 +3124,13 @@ function showResults(result) {
 
       if (hasStrengths) {
         gfHtml += '<div class="qd-section tip"><div class="qd-section-label">✅ Tes points forts</div><ul style="padding-left:20px;margin:0;">';
-        gf.strengths.forEach(function (s) { gfHtml += '<li>' + escapeHtml(s) + '</li>'; });
+        gf.strengths.forEach(function (s) { gfHtml += '<li>' + fmtText(s) + '</li>'; });
         gfHtml += '</ul></div>';
       }
 
       if (hasWeaknesses) {
         gfHtml += '<div class="qd-section why-wrong"><div class="qd-section-label">⚠️ À améliorer</div><ul style="padding-left:20px;margin:0;">';
-        gf.weaknesses.forEach(function (w) { gfHtml += '<li>' + escapeHtml(w) + '</li>'; });
+        gf.weaknesses.forEach(function (w) { gfHtml += '<li>' + fmtText(w) + '</li>'; });
         gfHtml += '</ul></div>';
       }
 
@@ -3122,7 +3155,7 @@ function showResults(result) {
       card.innerHTML =
         '<div class="exercise-card-icon">' + icon + '</div>' +
         '<div class="exercise-card-body">' +
-        '<div class="exercise-card-title">Exercice ' + (exercise.number || (idx + 1)) + (exercise.title ? ' — ' + escapeHtml(exercise.title) : '') + '</div>' +
+        '<div class="exercise-card-title">Exercice ' + (exercise.number || (idx + 1)) + (exercise.title ? ' — ' + fmtText(exercise.title) : '') + '</div>' +
         '<div class="exercise-card-meta">' +
         Math.min(Number(exercise.score || 0), Number(exercise.maxScore || 6.67)).toFixed(2) +
         ' / ' +
@@ -3143,7 +3176,7 @@ function showResults(result) {
     var topics = document.createElement('div');
     topics.className = 'topics-section';
     var topicsHtml = '<h3 class="topics-title">📖 Points à revoir en priorité</h3><ul class="topics-list">';
-    result.revisionTopics.forEach(function (t) { topicsHtml += '<li>' + escapeHtml(t) + '</li>'; });
+    result.revisionTopics.forEach(function (t) { topicsHtml += '<li>' + fmtText(t) + '</li>'; });
     topicsHtml += '</ul>';
     topics.innerHTML = topicsHtml;
     details.appendChild(topics);
@@ -3164,7 +3197,7 @@ function showExerciseDetail(exercise, exerciseIndex) {
     '<button class="back-btn-detail" id="backToRecapBtn"><i class="fas fa-arrow-left"></i> Retour</button>' +
     '<div class="exercise-detail-title">' +
     '<div class="exercise-detail-icon">' + icon + '</div>' +
-    '<div><h3>Exercice ' + (exercise.number || (exerciseIndex + 1)) + (exercise.title ? ' — ' + escapeHtml(exercise.title) : '') + '</h3>' +
+    '<div><h3>Exercice ' + (exercise.number || (exerciseIndex + 1)) + (exercise.title ? ' — ' + fmtText(exercise.title) : '') + '</h3>' +
     '<div class="exercise-detail-meta">' +
     Math.min(Number(exercise.score || 0), Number(exercise.maxScore || 6.67)).toFixed(2) +
     ' / ' +
@@ -3191,7 +3224,7 @@ function showExerciseDetail(exercise, exerciseIndex) {
 
       html +=
         '<div class="qd-header">' +
-        '<div class="qd-number"><span class="q-icon">' + qIcon + '</span> Question ' + escapeHtml(q.number || (idx + 1)) + '</div>' +
+        '<div class="qd-number"><span class="q-icon">' + qIcon + '</span> Question ' + fmtText(q.number || (idx + 1)) + '</div>' +
         '<div class="qd-points ' + pointsClass + '">' + Number(q.points || 0).toFixed(2) + ' / ' + Number(q.maxPoints || 1.33).toFixed(2) + ' pt</div>' +
         '</div>';
 
@@ -3199,7 +3232,7 @@ function showExerciseDetail(exercise, exerciseIndex) {
         html +=
           '<div class="qd-statement">' +
           '<div class="qd-statement-label"><i class="fas fa-question-circle"></i> Énoncé</div>' +
-          '<div>' + escapeHtml(q.questionText) + '</div>' +
+          '<div>' + fmtText(q.questionText) + '</div>' +
           '</div>';
       }
 
@@ -3209,14 +3242,14 @@ function showExerciseDetail(exercise, exerciseIndex) {
       if (q.status === 'unanswered' || !q.studentAnswer) {
         html += '<div class="qd-answer-text muted">Pas de réponse</div>';
       } else {
-        html += '<div class="qd-answer-text">' + escapeHtml(String(q.studentAnswer)) + '</div>';
+        html += '<div class="qd-answer-text">' + fmtText(String(q.studentAnswer)) + '</div>';
       }
       html += '</div>';
 
       if (q.correctAnswer) {
         html += '<div class="qd-answer-box correct">';
         html += '<div class="qd-answer-label">✅ Bonne réponse</div>';
-        html += '<div class="qd-answer-text">' + escapeHtml(String(q.correctAnswer)) + '</div>';
+        html += '<div class="qd-answer-text">' + fmtText(String(q.correctAnswer)) + '</div>';
         html += '</div>';
       }
       html += '</div>';
@@ -3225,7 +3258,7 @@ function showExerciseDetail(exercise, exerciseIndex) {
         html +=
           '<div class="qd-section concept">' +
           '<div class="qd-section-label"><i class="fas fa-brain"></i> Notion testée</div>' +
-          '<div>' + escapeHtml(q.concept) + '</div>' +
+          '<div>' + fmtText(q.concept) + '</div>' +
           '</div>';
       }
 
@@ -3233,7 +3266,7 @@ function showExerciseDetail(exercise, exerciseIndex) {
         html +=
           '<div class="qd-section explanation">' +
           '<div class="qd-section-label"><i class="fas fa-lightbulb"></i> Explication</div>' +
-          '<div>' + escapeHtml(q.explanation) + '</div>' +
+          '<div>' + fmtText(q.explanation) + '</div>' +
           '</div>';
       }
 
@@ -3242,7 +3275,7 @@ function showExerciseDetail(exercise, exerciseIndex) {
           '<div class="qd-section steps">' +
           '<div class="qd-section-label"><i class="fas fa-list-ol"></i> Étapes du calcul</div>' +
           '<ol>' +
-          q.steps.map(function (s) { return '<li>' + escapeHtml(s) + '</li>'; }).join('') +
+          q.steps.map(function (s) { return '<li>' + fmtText(s) + '</li>'; }).join('') +
           '</ol>' +
           '</div>';
       }
@@ -3251,7 +3284,7 @@ function showExerciseDetail(exercise, exerciseIndex) {
         html +=
           '<div class="qd-section why-wrong">' +
           '<div class="qd-section-label"><i class="fas fa-times-circle"></i> Pourquoi tu as raté</div>' +
-          '<div>' + escapeHtml(q.whyWrong) + '</div>' +
+          '<div>' + fmtText(q.whyWrong) + '</div>' +
           '</div>';
       }
 
@@ -3259,7 +3292,7 @@ function showExerciseDetail(exercise, exerciseIndex) {
         html +=
           '<div class="qd-section mistake">' +
           '<div class="qd-section-label"><i class="fas fa-triangle-exclamation"></i> Erreur classique</div>' +
-          '<div>' + escapeHtml(q.commonMistake) + '</div>' +
+          '<div>' + fmtText(q.commonMistake) + '</div>' +
           '</div>';
       }
 
@@ -3267,7 +3300,7 @@ function showExerciseDetail(exercise, exerciseIndex) {
         html +=
           '<div class="qd-section review">' +
           '<div class="qd-section-label"><i class="fas fa-book-open"></i> À revoir</div>' +
-          '<div>' + escapeHtml(q.toReview) + '</div>' +
+          '<div>' + fmtText(q.toReview) + '</div>' +
           '</div>';
       }
 
@@ -3275,7 +3308,7 @@ function showExerciseDetail(exercise, exerciseIndex) {
         html +=
           '<div class="qd-section tip">' +
           '<div class="qd-section-label"><i class="fas fa-star"></i> Astuce bonus</div>' +
-          '<div>' + escapeHtml(q.betterMethod) + '</div>' +
+          '<div>' + fmtText(q.betterMethod) + '</div>' +
           '</div>';
       }
 
@@ -3283,7 +3316,7 @@ function showExerciseDetail(exercise, exerciseIndex) {
         html +=
           '<div class="qd-section feedback">' +
           '<div class="qd-section-label"><i class="fas fa-comment-dots"></i> Commentaire</div>' +
-          '<div class="qd-feedback-text">' + escapeHtml(q.feedback) + '</div>' +
+          '<div class="qd-feedback-text">' + fmtText(q.feedback) + '</div>' +
           '</div>';
       }
 
@@ -3295,14 +3328,14 @@ function showExerciseDetail(exercise, exerciseIndex) {
   if (exercise.explanation) {
     var expl = document.createElement('div');
     expl.className = 'exercise-explanation';
-    expl.innerHTML = '<div class="explanation-label">📝 Bilan de l\'exercice</div><div class="explanation-text">' + escapeHtml(exercise.explanation) + '</div>';
+    expl.innerHTML = '<div class="explanation-label">📝 Bilan de l\'exercice</div><div class="explanation-text">' + fmtText(exercise.explanation) + '</div>';
     details.appendChild(expl);
   }
 
   if (exercise.advice) {
     var advice = document.createElement('div');
     advice.className = 'exercise-explanation';
-    advice.innerHTML = '<div class="explanation-label">🎯 Conseil</div><div class="explanation-text">' + escapeHtml(exercise.advice) + '</div>';
+    advice.innerHTML = '<div class="explanation-label">🎯 Conseil</div><div class="explanation-text">' + fmtText(exercise.advice) + '</div>';
     details.appendChild(advice);
   }
 

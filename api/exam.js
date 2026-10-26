@@ -253,6 +253,11 @@ function getProviders() {
       { name: 'OpenRouter/inkling-small:free', key: process.env.OPENROUTER_API_KEY, endpoint: 'https://openrouter.ai/api/v1/chat/completions', model: 'thinkingmachines/inkling-small:free', jsonMode: true, headers: orHeaders }
     );
   }
+  if (process.env.MISTRAL_API_KEY) {
+    providers.push(
+      { name: 'Mistral/' + (process.env.MISTRAL_MODEL || 'open-mistral-nemo'), key: process.env.MISTRAL_API_KEY, endpoint: 'https://api.mistral.ai/v1/chat/completions', model: process.env.MISTRAL_MODEL || 'open-mistral-nemo', jsonMode: false, headers: {} }
+    );
+  }
   return providers;
 }
 
@@ -642,30 +647,40 @@ function correctionPrompt(body) {
     });
   });
 
-  return `Tu es un professeur correcteur expert du BAC au Niger. Ton rôle : corriger CHAQUE question avec une PÉDAGOGIE MAXIMALE.
+  return `Tu es un professeur correcteur expert du BAC au Niger. Ton rôle : corriger CHAQUE question avec une PÉDAGOGIE MAXIMALE, en attribuant une NOTE et une EXPLICATION à chaque question, sans exception.
 
 ${PEDAGOGY_RULES}
 
 MISSION DE CORRECTION :
-Pour CHAQUE question, tu dois produire une analyse pédagogique complète.
+Pour CHAQUE question, tu dois produire une analyse pédagogique complète ET une note.
 
-DONNÉES :
+DONNÉES (les numéros "number" ci-dessous sont LA SEULE référence valide) :
 ${JSON.stringify(questionsDetail, null, 2)}
 
-CE QUE TU DOIS GÉNÉRER POUR CHAQUE QUESTION :
-1. "explanation" : Explication complète (3-6 phrases).
-2. "steps" : Tableau des ÉTAPES du calcul (3 à 7 étapes).
-3. "concept" : La notion/théorème testée (une phrase).
-4. "whyWrong" : Si l'élève a raté, explication de SON erreur.
-5. "commonMistake" : L'erreur classique.
-6. "toReview" : Ce qu'il faut revoir.
-7. "betterMethod" : Une astuce (si pertinent).
-8. "feedback" : Message encourageant adapté.
+CE QUE TU DOIS GÉNÉRER POUR CHAQUE QUESTION (obligatoire, sans exception) :
+1. "number" : REPRODUIS EXACTEMENT le numéro de la question dans les données (ex: "1.a", "2.c"). INTERDIT de renuméroter, de simplifier ou d'inventer un autre format.
+2. "points" : la note décimale attribuée, entre 0 et maxPoints de la question.
+3. "status" : "correct" (note max ou presque), "partial" (note intermédiaire), "wrong" (0 mais réponse fournie), "unanswered" (pas de réponse).
+4. "explanation" : Explication complète (3-6 phrases), comme un prof qui explique la réponse attendue.
+5. "steps" : Tableau des ÉTAPES du calcul (3 à 7 étapes) pour les questions de calcul.
+6. "concept" : La notion/théorème testée (une phrase).
+7. "whyWrong" : Si l'élève a raté, explication de SON erreur précise.
+8. "commonMistake" : L'erreur classique.
+9. "toReview" : Ce qu'il faut revoir.
+10. "betterMethod" : Une astuce (si pertinent).
+11. "feedback" : Message encourageant adapté à SA réponse.
 
-CALCUL DES POINTS — RÈGLES STRICTES
-- QCM correct = points maximaux. QCM faux = 0. QCM non répondu = 0.
-- Texte libre : évalue le fond. Peut donner 0, 0.5, 1, ou 1.33 pt.
-- Si pas de réponse : 0 point.
+BARÈME STRICT — RÈGLES DE NOTATION (à appliquer rigoureusement) :
+- Réponse complète et juste → points = maxPoints (status "correct").
+- Réponse contenant une partie correcte (bonne méthode, résultat partiel, idée juste mal formulée) → points PARTIELS entre 0.25×maxPoints et 0.75×maxPoints (status "partial").
+- Réponse fournie mais entièrement fausse → 0 (status "wrong").
+- Aucune réponse (null, vide) → 0 et status "unanswered".
+- ⚠️ INTERDIT FORMEL de donner 0 à une réponse non vide si elle contient des éléments justes. Si l'élève a la bonne démarche ou le bon résultat, il gagne des points.
+- ⚠️ Chaque question DOIT avoir "points" ET "status" ET "explanation" — une correction sans note ou sans explication est invalide.
+
+CALCUL DES POINTS — CAS PARTICULIERS
+- QCM : compare la réponse de l'élève à correctAnswer. Correcte = points maximaux. Fausse ou absente = 0.
+- Texte libre : évalue le FOND (idées justes, démarche, résultat), pas la forme.
 
 ${LATEX_RULES}
 
@@ -675,7 +690,17 @@ FORMAT JSON :
   "totalScore": 20,
   "percentage": 77,
   "grade": "Bien",
-  "exercises": [ { ... } ],
+  "exercises": [
+    {
+      "number": 1,
+      "explanation": "Bilan de l'exercice (2-3 phrases)",
+      "advice": "Conseil pour progresser",
+      "questions": [
+        { "number": "1.a", "points": 1.33, "status": "correct", "explanation": "...", "steps": ["..."], "concept": "...", "whyWrong": null, "commonMistake": "...", "toReview": "...", "betterMethod": "...", "feedback": "..." },
+        { "number": "1.b", "points": 0.5, "status": "partial", "explanation": "...", "steps": [], "concept": "...", "whyWrong": "...", "commonMistake": "...", "toReview": "...", "betterMethod": null, "feedback": "..." }
+      ]
+    }
+  ],
   "revisionTopics": ["Notion 1", "Notion 2"],
   "globalFeedback": {
     "strengths": ["Point fort 1"],
@@ -683,6 +708,8 @@ FORMAT JSON :
     "encouragement": "Message personnalisé"
   }
 }
+
+⚠️ Le tableau "exercises" doit contenir les exercices dans le MÊME ORDRE que les données, chaque exercice avec TOUTES ses questions, numéros EXACTS identiques aux données.
 
 Réponds UNIQUEMENT avec l'objet JSON.`;
 }
@@ -857,6 +884,311 @@ async function generateWithFallback(prompt, subjectName) {
   throw new Error('all_providers_failed: ' + errors.join(' | '));
 }
 
+// ═══════════════════════════════════════════════════════════════
+// CORRECTION ROBUSTE — matching, cohérence, explications garanties
+// ═══════════════════════════════════════════════════════════════
+
+function normQNumber(n) {
+  // "1.a" / "1-A" / "1a" / "1 )" → "1a" — comparaison tolérante des numéros
+  return String(n === null || n === undefined ? '' : n).toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+
+function pickAiNumber(aiQ) {
+  return aiQ.number ?? aiQ.num ?? aiQ.questionNumber ?? aiQ.qNumber ?? aiQ.id ?? '';
+}
+
+function pickAiPoints(aiQ, maxQ) {
+  const raw = aiQ.points ?? aiQ.note ?? aiQ.pts ?? (aiQ.score !== undefined && aiQ.score !== null && Number(aiQ.score) <= maxQ * 1.02 ? aiQ.score : undefined);
+  let p = Number(raw);
+  if (!isFinite(p) || raw === null || raw === undefined) return null;
+  if (p > maxQ * 1.02) {
+    // L'IA a parfois noté sur 20 alors que la question vaut maxQ : ramener à l'échelle
+    if (p <= 20 && maxQ > 0) p = (p / 20) * maxQ;
+    else p = maxQ;
+  }
+  return Math.max(0, Math.min(maxQ, p));
+}
+
+function pickAiStatus(aiQ) {
+  const s = String(aiQ.status ?? aiQ.verdict ?? aiQ.result ?? '').toLowerCase();
+  if (s.includes('part') || s.includes('moyen')) return 'partial';
+  if (s.includes('correct') || s.includes('juste') || s.includes('bonne')) return 'correct';
+  if (s.includes('wrong') || s.includes('faux') || s.includes('incorrect') || s.includes('false')) return 'wrong';
+  if (s.includes('unanswered') || s.includes('empty') || s.includes('sans réponse') || s.includes('vide')) return 'unanswered';
+  return '';
+}
+
+const STOPWORDS = new Set(['le', 'la', 'les', 'un', 'une', 'des', 'du', 'de', 'et', 'ou', 'au', 'aux', 'en', 'dans', 'pour', 'par', 'sur', 'que', 'qui', 'quoi', 'est', 'sont', 'ce', 'cet', 'cette', 'ces', 'son', 'sa', 'ses', 'leur', 'leurs', 'il', 'elle', 'ils', 'elles', 'on', 'nous', 'vous', 'je', 'tu', 'se', 'plus', 'moins', 'comme', 'donc', 'alors', 'avec', 'sans', 'tout', 'toute', 'tous', 'toutes', 'etre', 'avoir', 'the', 'and', 'for', 'with', 'this', 'that']);
+
+function tokenizeForSim(text) {
+  return String(text || '')
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .match(/[a-z0-9]{3,}/g)
+    ?.filter((w) => !STOPWORDS.has(w)) || [];
+}
+
+function similarityScore(studentText, expectedText) {
+  const st = tokenizeForSim(studentText);
+  const ex = tokenizeForSim(expectedText);
+  if (st.length === 0 || ex.length === 0) return 0;
+  const exSet = new Set(ex);
+  let hit = 0;
+  st.forEach((w) => { if (exSet.has(w)) hit++; });
+  return hit / ex.length; // couverture des éléments attendus
+}
+
+function letterFromAiCorrectAnswer(aiAnswer, options) {
+  const raw = String(aiAnswer || '').trim();
+  if (!raw) return null;
+  const upper = raw.toUpperCase();
+  let m = upper.match(/^([ABCD])(?![A-Z])/) || upper.match(/^\(?([ABCD])\)?[).\:\s]/);
+  if (m) return m[1];
+  if (Array.isArray(options)) {
+    const norm = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, '');
+    const target = norm(raw);
+    const found = options.find((o) => norm(o && o.text) === target || norm(o && o.id) === target);
+    if (found && found.id) return String(found.id).toUpperCase();
+  }
+  return null;
+}
+
+function isAnswered(a) {
+  return a !== null && a !== undefined && String(a).trim() !== '';
+}
+
+function mergeAiCorrection(deterministicResults, aiResult) {
+  if (!aiResult || !Array.isArray(aiResult.exercises)) return;
+
+  aiResult.exercises.forEach((aiEx, exIdx) => {
+    let target = deterministicResults[exIdx];
+    if (!target && aiEx && aiEx.number !== undefined) {
+      target = deterministicResults.find((r) => String(r.exerciseResult.number) === String(aiEx.number));
+    }
+    if (!target) return;
+
+    const aiQuestions = Array.isArray(aiEx.questions) ? aiEx.questions
+      : Array.isArray(aiEx.results) ? aiEx.results
+      : Array.isArray(aiEx.answers) ? aiEx.answers
+      : [];
+    const matched = new Set();
+
+    aiQuestions.forEach((aiQ) => {
+      if (!aiQ || typeof aiQ !== 'object') return;
+      const numKey = normQNumber(pickAiNumber(aiQ));
+      let match = null;
+      if (numKey) {
+        match = target.exerciseResult.questions.find((q) => !matched.has(q) && normQNumber(q.number) === numKey);
+      }
+      if (!match) {
+        match = target.exerciseResult.questions.find((q) => !matched.has(q) && q.status === 'pending');
+      }
+      if (!match) return;
+      matched.add(match);
+
+      // 1) Champs pédagogiques (toujours, même pour les QCM déjà notés)
+      if (aiQ.explanation) match.explanation = String(aiQ.explanation);
+      if (Array.isArray(aiQ.steps) && aiQ.steps.length > 0) match.steps = aiQ.steps.map((s) => String(s));
+      else if (typeof aiQ.steps === 'string' && aiQ.steps.trim()) match.steps = [aiQ.steps.trim()];
+      if (aiQ.concept) match.concept = String(aiQ.concept);
+      if (aiQ.whyWrong) match.whyWrong = String(aiQ.whyWrong);
+      if (aiQ.commonMistake) match.commonMistake = String(aiQ.commonMistake);
+      if (aiQ.toReview) match.toReview = String(aiQ.toReview);
+      if (aiQ.betterMethod) match.betterMethod = String(aiQ.betterMethod);
+      if (aiQ.feedback) match.feedback = String(aiQ.feedback);
+      if (aiQ.correctAnswer && !match.correctAnswer) match.correctAnswer = String(aiQ.correctAnswer);
+
+      // 2) QCM resté en attente faute de correctAnswer : re-note dès que l'IA le fournit
+      if (String(match.type).toLowerCase() === 'choice' && match.status === 'pending') {
+        const letter = letterFromAiCorrectAnswer(
+          aiQ.correctAnswer || match.correctAnswer,
+          target.exerciseResult._options ? target.exerciseResult._options[match.number] : null
+        );
+        if (letter) {
+          match.correctAnswer = letter;
+          const sa = String(match.studentAnswer || '').trim().toUpperCase();
+          if (!isAnswered(match.studentAnswer)) {
+            match.points = 0;
+            match.status = 'unanswered';
+          } else if (sa === letter) {
+            match.points = Number(match.maxPoints) || 1.33;
+            match.status = 'correct';
+          } else {
+            match.points = 0;
+            match.status = 'wrong';
+          }
+        }
+        return;
+      }
+
+      // 3) Note des questions texte en attente — JAMAIS de 0 silencieux
+      if (match.status === 'pending') {
+        if (!isAnswered(match.studentAnswer)) {
+          match.points = 0;
+          match.status = 'unanswered';
+          return;
+        }
+        const maxQ = Number(match.maxPoints) || 1.33;
+        let p = pickAiPoints(aiQ, maxQ);
+        const st = pickAiStatus(aiQ);
+        if (p === null && st === 'correct') p = maxQ;
+        if (p === null && st === 'partial') p = round2(maxQ * 0.5);
+        if (p === null && (st === 'wrong' || st === 'unanswered')) p = 0;
+        if (p === null) {
+          // L'IA n'a pas donné de note → note partielle prudente (jamais 0 par défaut)
+          p = round2(maxQ * 0.5);
+        }
+        match.points = p;
+        match.status = st || (p >= maxQ * 0.9 ? 'correct' : p > 0 ? 'partial' : 'wrong');
+      }
+    });
+
+    if (aiEx.explanation) target.exerciseResult.explanation = String(aiEx.explanation);
+    if (aiEx.advice) target.exerciseResult.advice = String(aiEx.advice);
+  });
+}
+
+function enforceGradingCoherence(deterministicResults, aiGlobalScore) {
+  let raw = 0;
+  let maxAll = 0;
+  let answeredTextCount = 0;
+  let answeredTextMax = 0;
+
+  deterministicResults.forEach((r) => {
+    r.exerciseResult.questions.forEach((q) => {
+      const maxQ = Number(q.maxPoints) || 1.33;
+      maxAll += maxQ;
+      const answered = isAnswered(q.studentAnswer);
+
+      if (String(q.type).toLowerCase() === 'choice') {
+        // QCM : note TOUJOURS déterministe
+        if (!answered) {
+          q.points = 0;
+          q.status = 'unanswered';
+        } else if (q.status === 'correct') {
+          q.points = maxQ;
+        } else {
+          q.points = 0;
+          if (q.status !== 'wrong' && q.status !== 'unanswered') q.status = 'wrong';
+        }
+      } else if (!answered) {
+        q.points = 0;
+        q.status = 'unanswered';
+      } else {
+        answeredTextCount++;
+        answeredTextMax += maxQ;
+        let p = Math.max(0, Math.min(maxQ, Number(q.points) || 0));
+        if (q.status === 'correct' && p < maxQ * 0.8) p = maxQ; // le prof a validé → max
+        if (p >= maxQ * 0.95) { p = maxQ; q.status = 'correct'; }
+        else if (p > 0) { q.status = (q.status === 'correct') ? 'correct' : 'partial'; }
+        else { q.status = 'wrong'; }
+        q.points = round2(p);
+      }
+      raw += Number(q.points) || 0;
+    });
+  });
+
+  // Filet de sécurité : l'IA donne un score global crédible mais la note calculée est nulle
+  // alors que des réponses texte existent → redistribuer le score de l'IA (jamais 0 injuste).
+  const s = Number(aiGlobalScore);
+  if (isFinite(s) && s > 0.5 && raw < 0.5 && answeredTextCount > 0 && answeredTextMax > 0) {
+    const targetSum = Math.min(answeredTextMax, (Math.min(20, s) / 20) * answeredTextMax);
+    const per = targetSum / answeredTextCount;
+    deterministicResults.forEach((r) => {
+      r.exerciseResult.questions.forEach((q) => {
+        const maxQ = Number(q.maxPoints) || 1.33;
+        if (String(q.type).toLowerCase() !== 'choice' && isAnswered(q.studentAnswer)) {
+          const p = Math.min(maxQ, per);
+          q.points = round2(p);
+          q.status = p >= maxQ * 0.95 ? 'correct' : p > 0 ? 'partial' : 'wrong';
+        }
+      });
+    });
+  }
+}
+
+function ensureEveryQuestionExplained(deterministicResults) {
+  deterministicResults.forEach((r) => {
+    r.exerciseResult.questions.forEach((q) => {
+      const answered = isAnswered(q.studentAnswer);
+      if (!q.explanation || !String(q.explanation).trim()) {
+        if (String(q.type).toLowerCase() === 'choice') {
+          if (q.status === 'correct') {
+            q.explanation = `Bonne réponse : ${q.correctAnswer || '—'}. Tu as bien identifié la réponse attendue.`;
+          } else if (q.status === 'unanswered') {
+            q.explanation = q.correctAnswer
+              ? `La bonne réponse était : ${q.correctAnswer}. Relis la question et retrouve cette information dans ton cours.`
+              : 'Aucune réponse fournie pour cette question.';
+          } else {
+            q.explanation = q.correctAnswer
+              ? `Ta réponse (${q.studentAnswer}) n'était pas la bonne. La bonne réponse était : ${q.correctAnswer}. Compare les deux options pour comprendre la nuance.`
+              : 'Réponse incorrecte. Relis la question et ton cours sur ce point précis.';
+          }
+        } else if (!answered) {
+          q.explanation = 'Aucune réponse fournie. Pour progresser : reprends la question au calme et mobilise le cours correspondant, même une réponse partielle rapporte des points.';
+        } else {
+          const base = q.correctAnswer ? `Réponse attendue : ${q.correctAnswer}. ` : '';
+          q.explanation = base +
+            (q.concept ? `Notion testée : ${q.concept}. ` : '') +
+            "Le correcteur n'a pas pu produire d'analyse détaillée pour cette question cette fois-ci. Compare ta réponse aux éléments attendus et complète avec ton cours.";
+        }
+      }
+      if (!q.feedback || !String(q.feedback).trim()) {
+        q.feedback = q.status === 'correct' ? 'Très bien, continue comme ça !'
+          : q.status === 'partial' ? 'Bonne base — il reste à préciser ta réponse.'
+          : q.status === 'unanswered' ? "N'hésite pas à tenter une réponse la prochaine fois : même partielle, elle rapporte des points."
+          : 'Reprends cette notion tranquillement : tu vas y arriver.';
+      }
+    });
+    if (!r.exerciseResult.explanation || !String(r.exerciseResult.explanation).trim()) {
+      const good = Number(r.exerciseResult.score) >= Number(r.exerciseResult.maxScore) * 0.5;
+      r.exerciseResult.explanation = good
+        ? 'Bilan : de solides bases sur cet exercice. Poursuis tes efforts pour viser le sans-faute.'
+        : 'Bilan : cet exercice doit être revu. Reprends le cours correspondant, puis refais les questions manquées.';
+    }
+    if (!r.exerciseResult.advice || !String(r.exerciseResult.advice).trim()) {
+      const good = Number(r.exerciseResult.score) >= Number(r.exerciseResult.maxScore) * 0.5;
+      r.exerciseResult.advice = good
+        ? "Continue à t'entraîner sur des exercices plus difficiles."
+        : 'Revois les notions manquées avant de passer au prochain examen.';
+    }
+  });
+}
+
+function localFallbackCorrection(deterministicResults) {
+  // L'IA est momentanément indisponible : on corrige localement pour TOUJOURS
+  // donner une note et une explication (QCM déterministes + heuristique texte).
+  deterministicResults.forEach((r) => {
+    r.exerciseResult.questions.forEach((q) => {
+      if (q.status !== 'pending') return;
+      if (!isAnswered(q.studentAnswer)) {
+        q.points = 0;
+        q.status = 'unanswered';
+        return;
+      }
+      const maxQ = Number(q.maxPoints) || 1.33;
+      if (String(q.type).toLowerCase() === 'choice' && q.correctAnswer) {
+        const sa = String(q.studentAnswer).trim().toUpperCase();
+        const ca = String(q.correctAnswer).trim().toUpperCase();
+        if (sa === ca) { q.points = maxQ; q.status = 'correct'; }
+        else { q.points = 0; q.status = 'wrong'; }
+        return;
+      }
+      if (q.correctAnswer) {
+        const sim = similarityScore(q.studentAnswer, q.correctAnswer);
+        if (sim >= 0.5) { q.points = maxQ; q.status = 'correct'; }
+        else if (sim >= 0.25) { q.points = round2(maxQ * 0.5); q.status = 'partial'; }
+        else { q.points = 0; q.status = 'wrong'; }
+        return;
+      }
+      const t = String(q.studentAnswer).trim();
+      const substantive = t.length >= 25 && t.split(/\s+/).length >= 5;
+      q.points = round2(maxQ * (substantive ? 0.5 : 0.25));
+      q.status = 'partial';
+    });
+  });
+}
+
 async function correctWithFallback(prompt) {
   const providers = getProviders();
   if (!providers.length) throw new Error('provider_missing');
@@ -934,6 +1266,11 @@ function correctQCMDeterministic(subject, subjectId, answers) {
         toReview: null,
         betterMethod: null
       };
+
+      if (question.type === 'choice' && Array.isArray(question.options)) {
+        exRes._options = exRes._options || {};
+        exRes._options[qRes.number] = question.options;
+      }
 
       if (question.type === 'choice' && question.correctAnswer) {
         if (studentAnswer === question.correctAnswer) {
@@ -1020,74 +1357,38 @@ async function correctExamHybrid(exam, subjectId, answers, uid) {
   const deterministicResults = correctQCMDeterministic(subject, subjectId, answers);
   const hasTextQuestions = deterministicResults.some((r) => r.textQuestions.length > 0);
 
+  let correctionMode = 'deterministic';
+  let aiGlobalScore = null;
+
   if (hasTextQuestions) {
     try {
       const prompt = correctionPrompt({ exam: { ...exam, subjects: [subject] }, subjectId, answers });
       const aiResponse = await correctWithFallback(prompt);
       const aiResult = aiResponse.result;
+      aiGlobalScore = aiResult ? aiResult.score : null;
 
-      if (Array.isArray(aiResult?.exercises)) {
-        aiResult.exercises.forEach((aiEx, exIdx) => {
-          const target = deterministicResults[exIdx];
-          if (!target) return;
-
-          const aiQuestions = Array.isArray(aiEx.questions) ? aiEx.questions : [];
-          aiQuestions.forEach((aiQ) => {
-            const match = target.exerciseResult.questions.find((q) => String(q.number) === String(aiQ.number));
-            if (!match) return;
-
-            if (aiQ.explanation) match.explanation = aiQ.explanation;
-            if (Array.isArray(aiQ.steps) && aiQ.steps.length > 0) match.steps = aiQ.steps;
-            if (aiQ.concept) match.concept = aiQ.concept;
-            if (aiQ.whyWrong) match.whyWrong = aiQ.whyWrong;
-            if (aiQ.commonMistake) match.commonMistake = aiQ.commonMistake;
-            if (aiQ.toReview) match.toReview = aiQ.toReview;
-            if (aiQ.betterMethod) match.betterMethod = aiQ.betterMethod;
-            if (aiQ.feedback) match.feedback = aiQ.feedback;
-            if (aiQ.correctAnswer && !match.correctAnswer) match.correctAnswer = aiQ.correctAnswer;
-
-            if (match.status === 'pending') {
-              if (!match.studentAnswer || String(match.studentAnswer).trim() === '') {
-                match.points = 0;
-                match.status = 'unanswered';
-                match.feedback = aiQ.feedback || 'Pas de réponse. Voici comment on fait.';
-                return;
-              }
-
-              const studentStr = String(match.studentAnswer).trim().toLowerCase();
-              if (studentStr === '' || studentStr === 'aucune' || studentStr === 'vide' || studentStr === 'null') {
-                match.points = 0;
-                match.status = 'unanswered';
-                return;
-              }
-
-              const maxQ = Number(match.maxPoints) || 1.33;
-              const aiPoints = Math.max(0, Math.min(maxQ, Number(aiQ.points) || 0));
-              match.points = aiPoints;
-              match.status = aiQ.status || (aiPoints > 0 ? 'correct' : 'wrong');
-
-              if (match.status === 'correct') {
-                target.exerciseResult.score += match.points;
-                target.exerciseResult.correctAnswers++;
-              }
-            }
-          });
-
-          if (aiEx.explanation) target.exerciseResult.explanation = aiEx.explanation;
-          if (aiEx.advice) target.exerciseResult.advice = aiEx.advice;
-        });
-      }
-
+      mergeAiCorrection(deterministicResults, aiResult);
       if (Array.isArray(aiResult?.revisionTopics)) deterministicResults.revisionTopics = aiResult.revisionTopics;
       if (aiResult?.globalFeedback) deterministicResults.globalFeedback = aiResult.globalFeedback;
+      correctionMode = 'ai';
     } catch (error) {
-      console.warn('AI correction failed:', error.message);
-      // ✅ CAS B : l'IA n'a pas pu corriger. On ne renvoie PAS une fausse note.
-      throw new Error('CORRECTION_UNAVAILABLE');
+      console.warn('AI correction failed → correction locale (note + explications garanties):', error.message);
+      // ✅ L'IA est indisponible : on corrige QUAND MÊME localement. L'élève reçoit
+      // toujours une note et une explication — jamais de correction refusée.
+      localFallbackCorrection(deterministicResults);
+      correctionMode = 'local';
+      deterministicResults.globalFeedback = deterministicResults.globalFeedback || {};
+      if (!Array.isArray(deterministicResults.globalFeedback.weaknesses) || deterministicResults.globalFeedback.weaknesses.length === 0) {
+        deterministicResults.globalFeedback.weaknesses = ['Analyse détaillée momentanément indisponible : notes provisoires attribuées automatiquement.'];
+      }
     }
   }
 
+  enforceGradingCoherence(deterministicResults, correctionMode === 'ai' ? aiGlobalScore : null);
+  ensureEveryQuestionExplained(deterministicResults);
+
   const finalExercises = deterministicResults.map((r) => r.exerciseResult);
+  finalExercises.forEach((ex) => { delete ex._options; });
 
   let rawScore = 0;
   let maxPossibleScore = 0;
@@ -1158,7 +1459,8 @@ async function correctExamHybrid(exam, subjectId, answers, uid) {
     grade,
     exercises: finalExercises,
     revisionTopics,
-    globalFeedback
+    globalFeedback,
+    correctionMode
   };
 }
 

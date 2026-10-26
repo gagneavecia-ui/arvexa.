@@ -1252,9 +1252,111 @@
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: rgba(184, 134, 11, 0.25); border-radius: 10px; }
     ::-webkit-scrollbar-thumb:hover { background: rgba(184, 134, 11, 0.4); }
+
+    /* ============================================================
+       SPLASH — écran de chargement lié à l'index uniquement.
+       Affiché au 1er chargement de la session ; sur les retours
+       il est retiré du DOM avant la première peinture.
+       ============================================================ */
+    #appSplash {
+      position: fixed; inset: 0; z-index: 20000;
+      display: flex; align-items: center; justify-content: center;
+      background: radial-gradient(120% 120% at 50% 0%, #16130A 0%, #0A0A0A 55%, #050505 100%);
+      opacity: 0; transition: opacity .45s ease;
+    }
+    html[data-theme="light"] #appSplash {
+      background: radial-gradient(120% 120% at 50% 0%, #FFFFFF 0%, #F5F1E6 60%, #EFE9D9 100%);
+    }
+    #appSplash.on { opacity: 1; }
+    #appSplash.hide { opacity: 0; pointer-events: none; }
+    .splash-inner { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+    .splash-logo { position: relative; width: 92px; height: 92px; }
+    .splash-logo img {
+      width: 92px; height: 92px; border-radius: 26px; object-fit: cover; display: block;
+      box-shadow: 0 12px 40px rgba(212, 175, 55, 0.22), 0 0 0 1px rgba(212, 175, 55, 0.25);
+      animation: splashPulse 1.8s ease-in-out infinite;
+    }
+    .splash-ring {
+      position: absolute; inset: -11px; border-radius: 50%;
+      border: 2px solid rgba(212, 175, 55, 0.15);
+      border-top-color: var(--accent-bright);
+      animation: splashSpin 1s linear infinite;
+    }
+    .splash-word {
+      font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700;
+      color: var(--text-light); letter-spacing: 2px;
+    }
+    .splash-word em { color: var(--accent-bright); font-style: italic; }
+    .splash-status { font-size: 12.5px; color: var(--text-muted); letter-spacing: .5px; }
+    @keyframes splashSpin { to { transform: rotate(360deg); } }
+    @keyframes splashPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+
+    /* PILL — synchronisation Firestore en arrière-plan (retour instantané) */
+    #bgSyncPill {
+      position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom));
+      transform: translateX(-50%) translateY(8px);
+      z-index: 9000; display: flex; align-items: center; gap: 8px;
+      padding: 8px 14px; border-radius: 999px; max-width: calc(100vw - 32px);
+      background: rgba(20, 18, 12, 0.92); color: var(--text-light);
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      font-size: 12px; letter-spacing: .3px; white-space: nowrap; overflow: hidden;
+      opacity: 0; pointer-events: none;
+      transition: opacity .35s ease, transform .35s ease;
+    }
+    html[data-theme="light"] #bgSyncPill { background: rgba(255, 253, 247, 0.95); color: #3A3428; }
+    #bgSyncPill.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    #bgSyncPill i { color: var(--accent-bright); animation: splashSpin 1.6s linear infinite; }
   </style>
 </head>
 <body>
+
+  <!-- ============================================================
+       SPLASH — écran de chargement lié à l'index uniquement.
+       1er chargement de la session : affiché ; retours ensuite :
+       supprimé avant la première peinture (zéro flash).
+       ============================================================ -->
+  <div id="appSplash" aria-hidden="true">
+    <div class="splash-inner">
+      <div class="splash-logo">
+        <img src="icon.png" alt="" draggable="false">
+        <span class="splash-ring"></span>
+      </div>
+      <div class="splash-word">ARVEXA <em>School</em></div>
+      <div class="splash-status">Chargement...</div>
+    </div>
+  </div>
+  <script>
+  /* Porte du splash : snapshot de session valide → retour instantané
+     (splash retiré avant peinture) ; sinon → 1er chargement, l'écran
+     d'attente reste visible jusqu'à ce que les données soient prêtes. */
+  (function () {
+    var snap = null;
+    try {
+      var raw = sessionStorage.getItem('arvexa_index_snapshot');
+      var sess = JSON.parse(sessionStorage.getItem('arvexa_session') || 'null');
+      if (raw && sess && sess.uid) {
+        var parsed = JSON.parse(raw);
+        if (parsed && parsed.userData && parsed.uid === sess.uid &&
+            (Date.now() - (parsed.savedAt || 0)) < 43200000) {
+          snap = parsed;
+        }
+      }
+    } catch (e) {}
+    if (snap) {
+      window.__ARVEXA_INSTANT__ = snap;
+      var sp = document.getElementById('appSplash');
+      if (sp && sp.parentNode) sp.parentNode.removeChild(sp);
+    } else {
+      window.__ARVEXA_SPLASH_TS__ = Date.now();
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          var sp2 = document.getElementById('appSplash');
+          if (sp2) sp2.classList.add('on');
+        });
+      });
+    }
+  })();
+  </script>
 
   <!-- ===== BACKGROUND ===== -->
   <div class="gradient-bg"></div>
@@ -1586,6 +1688,62 @@
     </div>
   </div>
 
+  <!-- Pastille de synchronisation arrière-plan (retour instantané) -->
+  <div id="bgSyncPill" role="status" aria-live="polite">
+    <i class="fas fa-sync-alt"></i>
+    <span>Mise à jour en arrière-plan...</span>
+  </div>
+
+  <script>
+  /* RESTAURATION INSTANTE — réapplique la snapshot de session sur le DOM
+     avant même le chargement des modules Firebase (CDN). Le module
+     re-validera ensuite discrètement via Firestore (onSnapshot). */
+  (function () {
+    var snap = window.__ARVEXA_INSTANT__;
+    if (!snap || !snap.userData) return;
+    var d = snap.userData;
+    function $(id) { return document.getElementById(id); }
+    try {
+      var h = new Date().getHours();
+      var g = (h >= 5 && h < 12) ? { t: 'Bonjour', e: '🌅' }
+            : (h >= 12 && h < 18) ? { t: 'Bon après-midi', e: '☀️' }
+            : { t: 'Bonsoir', e: '🌙' };
+      var name = d.firstName || 'Élève';
+      var gt = $('greetingText'); if (gt) gt.textContent = g.t;
+      var un = $('userFirstName'); if (un) un.textContent = name;
+      var ge = $('greetingEmoji'); if (ge) ge.textContent = g.e;
+      var hg = $('heroGreeting'); if (hg) hg.textContent = g.t;
+      var hn = $('heroName'); if (hn) hn.textContent = name;
+      var sk = document.querySelectorAll('.profile-skeleton');
+      for (var i = 0; i < sk.length; i++) sk[i].remove();
+
+      var sub = snap.sub;
+      var rem = $('subscriptionReminder');
+      if (rem && sub) {
+        rem.style.display = sub.display || 'block';
+        var st = $('subTitle'); if (st) st.textContent = sub.title || '';
+        var sx = $('subText'); if (sx) sx.textContent = sub.text || '';
+        var se = $('subExpiry');
+        if (se) {
+          se.style.display = sub.expiryDisplay || 'none';
+          if (sub.expiryText) se.textContent = sub.expiryText;
+        }
+        var sb = $('subBtn');
+        if (sb) {
+          if (sub.btnText) sb.textContent = sub.btnText;
+          sb.className = sub.btnClass || 'sub-btn';
+          if (sub.btnHref) sb.setAttribute('href', sub.btnHref);
+        }
+      }
+
+      var nd = $('notifDot');
+      if (nd) nd.classList.toggle('show', !!snap.notifUnread);
+      var dyn = $('dynamicContent');
+      if (dyn) dyn.style.display = 'block';
+    } catch (e) {}
+  })();
+  </script>
+
   <!-- ============================================================ -->
   <!-- SCRIPTS                                                       -->
   <!-- ============================================================ -->
@@ -1702,6 +1860,8 @@
       localStorage.removeItem(LAST_UID_KEY);
       sessionStorage.removeItem(SESSION_KEY);
       sessionStorage.removeItem('redirectAfterLogin');
+      sessionStorage.removeItem(INDEX_SNAPSHOT_KEY);
+      try { window.__ARVEXA_INSTANT__ = null; } catch (e) {}
     } catch (e) {}
   }
 
@@ -1723,6 +1883,74 @@
       }
       return cached;
     } catch (e) { return null; }
+  }
+
+  // ================================================================
+  // SNAPSHOT DE SESSION — retour instantané sur l'accueil
+  // 1er chargement : splash + Firestore. Retours ensuite : le dernier
+  // rendu est restauré immédiatement (sessionStorage) pendant que
+  // Firestore actualise en arrière-plan (onSnapshot + pill discrète).
+  // ================================================================
+  const INDEX_SNAPSHOT_KEY = 'arvexa_index_snapshot';
+  const INDEX_SNAPSHOT_MAX_AGE = 12 * 60 * 60 * 1000; // 12 h
+  let lastNotifUnread = false;
+  let syncPillTimer = null;
+
+  function readSubStateFromDOM() {
+    const rem = document.getElementById('subscriptionReminder');
+    if (!rem) return null;
+    const st = document.getElementById('subTitle');
+    const sx = document.getElementById('subText');
+    const se = document.getElementById('subExpiry');
+    const sb = document.getElementById('subBtn');
+    return {
+      display: rem.style.display || 'block',
+      title: st ? st.textContent : '',
+      text: sx ? sx.textContent : '',
+      expiryDisplay: se ? (se.style.display || 'none') : 'none',
+      expiryText: se ? se.textContent : '',
+      btnText: sb ? sb.textContent : '',
+      btnClass: sb ? sb.className : 'sub-btn',
+      btnHref: sb ? (sb.getAttribute('href') || 'abonnement.html') : 'abonnement.html'
+    };
+  }
+
+  function saveIndexSnapshot() {
+    try {
+      if (!currentUid || !userData) return;
+      sessionStorage.setItem(INDEX_SNAPSHOT_KEY, JSON.stringify({
+        uid: currentUid,
+        userData: userData,
+        notifUnread: lastNotifUnread,
+        sub: readSubStateFromDOM(),
+        savedAt: Date.now()
+      }));
+    } catch (e) {}
+  }
+
+  function hideSplash() {
+    const sp = document.getElementById('appSplash');
+    if (!sp || sp.classList.contains('hide')) return;
+    const startedAt = window.__ARVEXA_SPLASH_TS__ || 0;
+    const wait = Math.max(0, 700 - (Date.now() - startedAt)); // anti-flash
+    setTimeout(() => {
+      sp.classList.add('hide');
+      setTimeout(() => { if (sp.parentNode) sp.parentNode.removeChild(sp); }, 600);
+    }, wait);
+  }
+
+  function showSyncPill() {
+    const pill = document.getElementById('bgSyncPill');
+    if (!pill) return;
+    pill.classList.add('show');
+    if (syncPillTimer) clearTimeout(syncPillTimer);
+    syncPillTimer = setTimeout(hideSyncPill, 5000); // garde-fou
+  }
+
+  function hideSyncPill() {
+    if (syncPillTimer) { clearTimeout(syncPillTimer); syncPillTimer = null; }
+    const pill = document.getElementById('bgSyncPill');
+    if (pill) pill.classList.remove('show');
   }
 
   function toDate(value) {
@@ -1813,7 +2041,7 @@
     });
   }
 
-  showProfileLoading();
+  if (!window.__ARVEXA_INSTANT__) showProfileLoading();
 
   // ================================================================
   // COMPTE À REBOURS BAC
@@ -2203,9 +2431,12 @@
         limit(1)
       );
       const snapshot = await getDocs(q);
-      if (notifDot) notifDot.classList.toggle('show', !snapshot.empty);
+      lastNotifUnread = !snapshot.empty;
+      if (notifDot) notifDot.classList.toggle('show', lastNotifUnread);
+      saveIndexSnapshot();
     } catch (e) {
       console.warn('[Notif] checkUnread:', e.message);
+      lastNotifUnread = false;
       if (notifDot) notifDot.classList.remove('show');
     }
   }
@@ -2272,9 +2503,11 @@
     updateGreeting(data.firstName || 'Élève');
     const premium = isUserPremium(data);
     updateSubscriptionDisplay(premium, data);
+    saveIndexSnapshot();
   }
 
   function showDashboard() {
+    hideSplash();
     const dynamic = document.getElementById('dynamicContent');
     if (dynamic) dynamic.style.display = 'block';
   }
@@ -2757,6 +2990,7 @@
           renderUserData(userData);
           showDashboard();
           checkUnreadNotifications(user.uid);
+          hideSyncPill();
         } else if (cached) {
           userData = cached;
           renderUserData(cached);
@@ -2774,6 +3008,7 @@
         } else {
           showDashboard();
         }
+        hideSyncPill();
         console.warn('[Firestore] onSnapshot users:', error.code || error.message);
       }
     );
@@ -2899,24 +3134,40 @@
   // LANCER LA PROTECTION
   // ================================================================
   initAuthGuard(async (user) => {
-    const cached = getCachedUserData(user.uid);
-    if (cached) {
-      const cachedSafe = { ...cached };
-      delete cachedSafe.premium;
-      delete cachedSafe.isUnlocked;
-      delete cachedSafe.hasDeposited;
-      delete cachedSafe.subscriptionEndDate;
-      userData = cachedSafe;
-      updateGreeting(cachedSafe.firstName || 'Élève');
-      showDashboard();
+    const instant = !!window.__ARVEXA_INSTANT__;
+
+    // Retour sur l'accueil dans la même session : le DOM est déjà peint
+    // depuis la snapshot — Firestore actualise en arrière-plan via
+    // onSnapshot, inutile de re-rendre le cache localStorage.
+    if (!instant) {
+      const cached = getCachedUserData(user.uid);
+      if (cached) {
+        const cachedSafe = { ...cached };
+        delete cachedSafe.premium;
+        delete cachedSafe.isUnlocked;
+        delete cachedSafe.hasDeposited;
+        delete cachedSafe.subscriptionEndDate;
+        userData = cachedSafe;
+        updateGreeting(cachedSafe.firstName || 'Élève');
+        showDashboard();
+      }
     }
 
     loadUserData(user);
     renderProgress();
 
+    // Retour instantané : signal discret « mise à jour en arrière-plan »
+    if (instant) showSyncPill();
+
     setupFcmForeground();
-    await checkExistingFcmToken(user);
-    setTimeout(() => showFcmBanner(), 1000);
+    if (instant) {
+      // Maintenance FCM différée : priorité à l'affichage instantané
+      setTimeout(() => { checkExistingFcmToken(user).catch(() => {}); }, 3000);
+      setTimeout(() => showFcmBanner(), 4000);
+    } else {
+      await checkExistingFcmToken(user);
+      setTimeout(() => showFcmBanner(), 1000);
+    }
   });
 
   // ================================================================

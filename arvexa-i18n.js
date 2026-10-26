@@ -53,6 +53,7 @@
     "Rechercher": "Search",
     "Envoyer": "Send",
     "Chargement...": "Loading...",
+    "Mise à jour en arrière-plan...": "Updating in the background...",
     "Préparation...": "Preparing...",
     "Vérification...": "Checking...",
     "Vérification en cours...": "Checking...",

@@ -3,7 +3,7 @@
 // Version : OFFLINE v2.2 — Navigation instantanée
 // ================================================================
 
-const SW_VERSION = 'arvexa-offline-v3.3'; // v3.3 : accueil — réparation du commentaire CSS MATIÈRES (grille et espacement des cartes matières restaurés)
+const SW_VERSION = 'arvexa-offline-v3.4'; // v3.4 : unification design — tokens alignés sur l'index (bg-card, card-border, danger, text-dim, header-height, sidebar-width), dérives vert/bleu d'ambiance converties en or (glows, lecture, planificateur, cours), vars mortes supprimées
 const CACHE_STATIC = `${SW_VERSION}-static`;
 const CACHE_HTML = `${SW_VERSION}-html`;
 

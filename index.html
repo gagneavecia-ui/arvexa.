@@ -3171,6 +3171,40 @@
   });
 
   // ================================================================
+  // PRÉCHAUFFAGE DU CACHE — pendant que l'utilisateur consulte
+  // l'accueil, Firestore télécharge en arrière-plan les données des
+  // autres pages (matières, chapitres, notifications) : leurs
+  // visites seront instantanées grâce au cache-first.
+  // ================================================================
+  async function prewarmPagesCache() {
+    try {
+      const u = auth.currentUser;
+      if (!u) return;
+      // 4 matières : doc + sous-collection chapters (données matiere.html)
+      for (const key of ['mathematiques', 'physique', 'chimie', 'svt']) {
+        await getDoc(doc(db, 'subjects', key)).catch(() => {});
+        await getDocs(collection(db, 'subjects', key, 'chapters')).catch(() => {});
+      }
+      // Notifications (notifications.html)
+      await getDocs(collection(db, 'users', u.uid, 'notifications')).catch(() => {});
+      console.log('[Cache] Préchauffage des pages terminé');
+    } catch (e) {}
+  }
+
+  // Une seule fois par session, après l'affichage du tableau de bord
+  setTimeout(() => {
+    try {
+      if (sessionStorage.getItem('arvexa_prewarm_done')) return;
+      sessionStorage.setItem('arvexa_prewarm_done', '1');
+      if (window.requestIdleCallback) {
+        window.requestIdleCallback(() => prewarmPagesCache());
+      } else {
+        setTimeout(prewarmPagesCache, 1500);
+      }
+    } catch (e) {}
+  }, 3000);
+
+  // ================================================================
   // DÉCONNEXION
   // ================================================================
   async function performLogout() {

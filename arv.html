@@ -1519,6 +1519,7 @@ import {
   initializeFirestore, persistentLocalCache, persistentSingleTabManager,
   doc, getDoc
 } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+import { readCacheDoc, docSWR } from './arvexa-cache.js';
 import { requireAuth } from './auth-guard.js';
 
 // ────────────────────────────────────────────────────────────────
@@ -2317,8 +2318,10 @@ requireAuth({
 
     // ✅ C1/C3 — getDoc + blocked/paused + warn
     try {
-      const snap = await getDoc(doc(db, 'users', user.uid));
-      if (snap.exists()) {
+      // ⚡ Cache-first : profil peint depuis le cache Firestore local,
+      // revalidé silencieusement en arrière-plan (réapplication seulement
+      // si le statut du compte a changé entre-temps).
+      const applyProfile = (snap) => {
         const data = snap.data();
         state.userData = data;
         state.isPremium = isUserPremium(data);
@@ -2329,7 +2332,7 @@ requireAuth({
           // ✅ C4 — clearSession
           clearSession();
           // ✅ C6 — signOut tolérant
-          try { await signOut(auth); } catch (e) {}
+          signOut(auth).catch(() => {});
           window.location.replace('auth-choice.html');
           return;
         }
@@ -2349,7 +2352,9 @@ requireAuth({
             _cachedAt: Date.now()
           }));
         } catch (e) {}
-      }
+      };
+      await docSWR(doc(db, 'users', user.uid), applyProfile,
+        (a, b) => a.accountStatus !== b.accountStatus || isUserPremium(a) !== isUserPremium(b));
     } catch (e) {
       // ✅ C3 — warn au lieu du silence
       console.warn('[ARV] Lecture profil impossible :', e.code || e.message);

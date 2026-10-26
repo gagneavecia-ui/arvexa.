@@ -1138,6 +1138,7 @@
   import { initializeApp } from 'firebase/app';
   import { getAuth, onAuthStateChanged, getIdToken } from 'firebase/auth';
   import { getFirestore, doc, getDoc } from 'firebase/firestore';
+  import { readCacheDoc, docSWR } from './arvexa-cache.js';
 
   const firebaseConfig = {
     apiKey: 'AIzaSyDHscOXw3rLuhV6z1Cny-bdYCumqpnG7QE',
@@ -1610,28 +1611,43 @@
     state.user = user;
 
     try {
-      const snap = await getDoc(doc(db, 'users', user.uid));
-      if (!snap.exists()) {
-        window.location.replace('register.html');
-        return;
+      // ⚡ Cache-first : porte appliquée instantanément depuis le cache
+      // Firestore local, revalidée en arrière-plan (réapplication seulement
+      // si le statut Premium a changé entre-temps).
+      const ref = doc(db, 'users', user.uid);
+      const applyAccess = (snap) => {
+        if (!snap.exists()) {
+          window.location.replace('register.html');
+          return;
+        }
+
+        const userData = snap.data();
+
+        // ✅ Vérification Premium AVANT tout chargement
+        if (!isPremiumUser(userData)) {
+          renderPremiumLockScreen();
+          return;
+        }
+
+        state.isPremium = true;
+
+        // ✅ Initialise les filtres seulement si Premium
+        initFilters();
+
+        // ✅ Charge les cahiers
+        loadCahiers();
+      };
+      const cached = await readCacheDoc(ref);
+      if (cached) {
+        applyAccess(cached);
+        getDoc(ref, { source: 'server' }).then((fresh) => {
+          if (fresh.exists() && isPremiumUser(fresh.data()) !== isPremiumUser(cached.data())) {
+            applyAccess(fresh);
+          }
+        }).catch(() => {});
+      } else {
+        applyAccess(await getDoc(ref));
       }
-
-      const userData = snap.data();
-
-      // ✅ Vérification Premium AVANT tout chargement
-      if (!isPremiumUser(userData)) {
-        renderPremiumLockScreen();
-        return;
-      }
-
-      state.isPremium = true;
-
-      // ✅ Initialise les filtres seulement si Premium
-      initFilters();
-
-      // ✅ Charge les cahiers
-      loadCahiers();
-
     } catch (error) {
       console.error('[HISTORIQUE] Erreur vérification Premium:', error);
       $('cahiersContainer').innerHTML =

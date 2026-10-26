@@ -1959,6 +1959,7 @@ select:focus-visible,
 import { initializeApp } from "firebase/app";
 import { getAuth, getIdToken } from "firebase/auth";
 import { getFirestore, doc, getDoc } from "firebase/firestore";
+import { readCacheDoc, docSWR } from './arvexa-cache.js';
 import { requireAuth } from './auth-guard.js';
 
 // ══════════════════════════════════════════════════════════════
@@ -3959,15 +3960,17 @@ requireAuth({
   onUser: async (user) => {
     state.user = user;
     try {
-      const snap = await getDoc(doc(db, 'users', user.uid));
-      if (snap.exists()) {
+      // ⚡ Cache-first : cahier peint depuis le cache Firestore local,
+      // revalidé silencieusement en arrière-plan (réapplication seulement
+      // si le statut Premium a changé entre-temps).
+      await docSWR(doc(db, 'users', user.uid), (snap) => {
         state.userData = snap.data();
         state.isPremium = isPremiumUser(state.userData);
-      }
+        updatePremiumBadge();
+        applyRoute(routeFromHash());
+      }, (a, b) => isPremiumUser(a) !== isPremiumUser(b));
     } catch (_) {}
 
-    updatePremiumBadge();
-    applyRoute(routeFromHash());
     if (!window.location.hash) window.history.replaceState(null, '', '#/notebooks');
 
     cacheToken();

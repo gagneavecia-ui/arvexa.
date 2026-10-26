@@ -453,6 +453,7 @@ import {
   setDoc,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+import { readCacheDoc, docSWR } from './arvexa-cache.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyDHscOXw3rLuhV6z1Cny-bdYCumqpnG7QE",
@@ -2480,13 +2481,14 @@ function initAuthGuard(onAuthenticated) {
 initAuthGuard(async (user) => {
   // ✅ C8 — vérification blocked/paused
   try {
-    const userSnap = await getDoc(doc(db, 'users', user.uid));
-    if (userSnap.exists()) {
-      const userData = userSnap.data();
+    // ⚡ Cache-first : statut vérifié depuis le cache Firestore local,
+    // revalidé silencieusement en arrière-plan.
+    const applyStatus = (snap) => {
+      const userData = snap.data();
 
       if (userData.accountStatus === 'blocked') {
         try { sessionStorage.setItem('arvexa_account_blocked', '1'); } catch (e) {}
-        try { await signOut(auth); } catch (e) {}
+        signOut(auth).catch(() => {});
         window.location.replace('auth-choice.html');
         return;
       }
@@ -2506,7 +2508,9 @@ initAuthGuard(async (user) => {
           _cachedAt: Date.now()
         }));
       } catch (e) {}
-    }
+    };
+    await docSWR(doc(db, 'users', user.uid), applyStatus,
+      (a, b) => a.accountStatus !== b.accountStatus);
   } catch (e) {
     console.warn('[Formulaires] Impossible de vérifier le statut :', e.code || e.message);
   }

@@ -2141,6 +2141,7 @@ import {
   persistentSingleTabManager,
   doc, getDoc, setDoc, deleteDoc, serverTimestamp
 } from 'firebase/firestore';
+import { readCacheDoc, docSWR } from './arvexa-cache.js';
 import { requireAuth } from './auth-guard.js';
 
 var firebaseConfig = {
@@ -2602,7 +2603,12 @@ async function clearActiveSession() {
 async function loadActiveSession() {
   if (!state.user) return null;
   try {
-    var snap = await getDoc(doc(db, 'users', state.user.uid, 'activeExam', 'current'));
+    // ⚡ Cache-first : reprise d'examen instantanée depuis le cache local
+    // (l'activeExam n'est écrit que par cet appareil).
+    var snap = await readCacheDoc(doc(db, 'users', state.user.uid, 'activeExam', 'current'));
+    if (!snap) {
+      snap = await getDoc(doc(db, 'users', state.user.uid, 'activeExam', 'current'));
+    }
     if (!snap.exists()) return null;
     var data = snap.data();
 
@@ -3418,14 +3424,15 @@ requireAuth({
     state.user = user;
 
     // ✅ C2 — vérification blocked/paused (cohérence avec les autres pages)
+    // ⚡ Cache-first : statut peint depuis le cache Firestore local,
+    // revalidé silencieusement en arrière-plan.
     try {
-      var userSnap = await getDoc(doc(db, 'users', user.uid));
-      if (userSnap.exists()) {
-        var userData = userSnap.data();
+      const applyStatus = (snap) => {
+        const userData = snap.data();
 
         if (userData.accountStatus === 'blocked') {
           try { sessionStorage.setItem('arvexa_account_blocked', '1'); } catch (e) {}
-          try { await signOut(auth); } catch (e) {}
+          signOut(auth).catch(() => {});
           window.location.replace('auth-choice.html');
           return;
         }
@@ -3436,7 +3443,9 @@ requireAuth({
           $('generateButton').disabled = true;
           return;
         }
-      }
+      };
+      await docSWR(doc(db, 'users', user.uid), applyStatus,
+        (a, b) => a.accountStatus !== b.accountStatus);
     } catch (e) {
       console.warn('[EXAM] Impossible de vérifier le statut du compte :', e.code || e.message);
     }

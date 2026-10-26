@@ -1,5 +1,8 @@
 // ================================================================
-// API PROGRESS v9.4 — ARVEXA School
+// API PROGRESS v9.5 — ARVEXA School
+// v9.5 : distribution anti-collision des tâches lourdes (explanation/questions ne partent plus
+//        ensemble sur Groq), timeouts 45 s, budget global 150 s, repli incluant le fournisseur
+//        d'origine, persona « comme un prof » (tutoiement, analogies, paragraphes \n\n)
 // v9.4 : matière ANGLAIS (profil language), banque de questions élargie (jusqu'à 50),
 //        QCM 8 (notions différentes), tableaux 8 éléments, fallbacks IA avec
 //        deadline frais par tentative (plus de tâches perdues), meta.providers
@@ -46,7 +49,7 @@ var SUBJECT_INFO = {
 const MIN_CONTENT_LENGTH = 40;
 const MAX_CONTENT_LENGTH = 15000;
 const FREE_SECTION_LIMIT = 5;
-const GLOBAL_AI_TIME_BUDGET_MS = 90000;
+const GLOBAL_AI_TIME_BUDGET_MS = 150000;
 
 const VALID_GRADE_TYPES = new Set([
   'interrogation', 'devoir', 'composition', 'oral', 'autre'
@@ -569,8 +572,9 @@ function repairJson(str) {
 
 async function callProvider(provider, { systemPrompt, userPrompt, maxTokens = 4000, deadline }) {
   const controller = new AbortController();
-  // ✅ v9.3 : timeouts augmentés
-  const timeouts = { 'Groq': 35000, 'OpenRouter': 40000, 'Mistral': 20000 };
+  // ✅ v9.5 : timeouts augmentés — la tâche explanation (persona prof, 5500 tokens)
+  // a besoin de plus de marge sur Groq ; Vercel Fluid laisse largement le temps.
+  const timeouts = { 'Groq': 45000, 'OpenRouter': 45000, 'Mistral': 25000 };
   const baseTimeout = timeouts[provider.name] || 30000;
   const remaining = deadline ? Math.max(5000, deadline - Date.now()) : baseTimeout;
   const timeoutMs = Math.min(baseTimeout, remaining);
@@ -621,16 +625,26 @@ async function callProvider(provider, { systemPrompt, userPrompt, maxTokens = 40
   }
 }
 
-// ✅ v9.3 : priorisation Groq pour explanation et questions
+// ✅ v9.5 : priorisation Groq pour explanation et questions — MAIS les deux tâches
+// lourdes ne partent PLUS en même temps sur Groq (limite de concurrence du tier
+// gratuit → 429 systématique sur l'une des deux). Répartition : 1re lourde → Groq,
+// 2e lourde → 2e fournisseur, puis les légères round-robin sur les autres.
 function distributeTasks(tasks, providers) {
   if (providers.length === 0) return [];
   const heavyTasks = ['explanation', 'questions'];
   const lightTasks = ['extraction', 'structure', 'qcm'];
-  
+
+  let heavySeen = 0;
   return tasks.map((task) => {
     if (heavyTasks.includes(task.name)) {
-      const groq = providers.find((p) => p.name === 'Groq');
-      return { ...task, provider: groq || providers[0] };
+      if (heavySeen === 0) {
+        heavySeen++;
+        const groq = providers.find((p) => p.name === 'Groq');
+        return { ...task, provider: groq || providers[0] };
+      }
+      heavySeen++;
+      const second = providers.find((p) => p.name !== 'Groq') || providers[0];
+      return { ...task, provider: second };
     }
     const lightProviders = providers.filter((p) => p.name !== 'Groq');
     const idx = lightTasks.indexOf(task.name);
@@ -658,8 +672,13 @@ async function runParallelTasks(tasks, providers, deadline) {
         console.warn(`[FAN-OUT] ${tasks[i].name} : ${errMsg} → fallback quand même`);
       }
       if (deadline && Date.now() > deadline - 5000) return { status: 'rejected', error: r.reason, task: tasks[i], provider: 'none' };
-      for (const provider of providers) {
-        if (provider.name === assignments[i].provider.name) continue;
+      // ✅ v9.5 : chaîne de repli = autres fournisseurs PUIS 2e essai du fournisseur
+      // d'origine (deadline fraîche à chaque tentative) — jamais de tâche abandonnée
+      // tant que le budget global n'est pas épuisé.
+      const retryOrder = providers.filter((p) => p.name !== assignments[i].provider.name);
+      const original = providers.find((p) => p.name === assignments[i].provider.name);
+      if (original) retryOrder.push(original);
+      for (const provider of retryOrder) {
         try {
           const value = await callProvider(provider, {
             systemPrompt: tasks[i].systemPrompt,

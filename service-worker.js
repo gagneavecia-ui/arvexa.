@@ -3,7 +3,7 @@
 // Version : OFFLINE v2.2 — Navigation instantanée
 // ================================================================
 
-const SW_VERSION = 'arvexa-offline-v3.4'; // v3.4 : unification design — tokens alignés sur l'index (bg-card, card-border, danger, text-dim, header-height, sidebar-width), dérives vert/bleu d'ambiance converties en or (glows, lecture, planificateur, cours), vars mortes supprimées
+const SW_VERSION = 'arvexa-offline-v3.5'; // v3.5 : mode clair global — tokens [data-theme=light] dans arvexa-ui.css, theme.js (persistance + meta theme-color + sync multi-onglets), boot anti-flash inline sur toutes les pages, couleurs codées en dur thémables (rgb triplets), toggle Apparence dans profil.html
 const CACHE_STATIC = `${SW_VERSION}-static`;
 const CACHE_HTML = `${SW_VERSION}-html`;
 
@@ -29,6 +29,7 @@ const PRECACHE = [
   './manifest.json',
   './perf.css',
   './arvexa-ui.css',
+  './theme.js',
   './register-sw.js',
   './arvexa-confirm.js',
   './icon.png'

@@ -65,6 +65,144 @@
   /* ── Contrôles natifs assortis au thème sombre ── */
   color-scheme: dark;
   accent-color: #B8860B;
+
+  /* ── Tokens canoniques pour les couleurs thémables (mode sombre) ──
+     --rgb-* : triplets RGB utilisés dans rgba(var(--rgb-x), α) pour que
+     les voiles/cartes/fills translucides changent de couleur avec le thème.
+     --bg-deep : extrémité sombre des dégradés de fond de page. */
+  --bg-deep: #060606;
+  --bg-elev: #1A1A1A;
+  --rgb-veil: 10, 10, 10;      /* headers / barres translucides */
+  --rgb-card: 20, 20, 20;      /* cartes, feuilles modales */
+  --rgb-soft: 255, 255, 255;   /* fills/hovers/bordures très subtils */
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   MODE CLAIR — html[data-theme="light"]
+   Spécificité 0-1-1 : bat les blocs :root (0-1-0) définis dans chaque
+   page, quel que soit l'ordre des feuilles. Appliqué par theme.js
+   (persistance localStorage 'arvexa-theme', activable dans Profil).
+   Palette "papier & encre" : fond #F5F1E8 · surface #FFFFFF ·
+   encre #262019 · or foncé #9A7209 (texte) · accents statuts foncés.
+   ═══════════════════════════════════════════════════════════════════ */
+html[data-theme="light"] {
+  color-scheme: light;
+  accent-color: #B8860B;
+
+  /* ── Surfaces ── */
+  --bg-dark: #F5F1E8;
+  --bg: #F5F1E8;
+  --bg-deep: #ECE6D8;
+  --bg-surface: #FFFFFF;
+  --bg-card: rgba(255, 255, 255, 0.88);
+  --bg-card-solid: #FFFFFF;
+  --bg-elev: #FDFBF6;
+  --bg-elevated: #FFFFFF;
+  --bg-hover: rgba(184, 134, 11, 0.10);
+  --bg-input: #FFFFFF;
+  --input-bg: rgba(184, 134, 11, 0.05);
+  --block-bg: rgba(0, 0, 0, 0.045);
+  --card-bg: rgba(255, 255, 255, 0.82);
+
+  /* ── Texte (encre chaude) ── */
+  --text-light: #262019;
+  --text: #262019;
+  --text-body: #4A4438;
+  --text-dim: #6E675A;
+  --text-muted: #948D7C;
+  --text-faint: #B8B1A0;
+
+  /* ── Or : même marque, version foncée pour le texte sur clair ── */
+  --accent: #B8860B;
+  --accent-bright: #9A7209;
+  --accent-dim: rgba(184, 134, 11, 0.12);
+  --accent-soft: rgba(184, 134, 11, 0.12);
+  --accent-line: rgba(184, 134, 11, 0.30);
+  --gold: #B8860B;
+  --gold-bright: #9A7209;
+  --gold-dim: rgba(184, 134, 11, 0.12);
+
+  /* ── Statuts : versions foncées, lisibles sur fond clair ── */
+  --success: #1E7A4E;
+  --success-light: #178A55;
+  --success-bright: #12855A;
+  --danger: #B85C3A;
+  --danger-light: #C0392B;
+  --danger-bright: #C05621;
+  --danger-dim: rgba(231, 76, 60, 0.08);
+  --warning: #A67C00;
+  --warning-light: #8F6B00;
+  --warning-bright: #B45309;
+  --info: #1D7FB5;
+
+  /* ── Bordures ── */
+  --border-soft: rgba(0, 0, 0, 0.08);
+  --border-strong: rgba(0, 0, 0, 0.16);
+  --border-gold: rgba(184, 134, 11, 0.32);
+  --card-border: rgba(184, 134, 11, 0.22);
+  --card-border-hover: rgba(184, 134, 11, 0.48);
+  --input-border: rgba(0, 0, 0, 0.14);
+  --input-border-focus: rgba(184, 134, 11, 0.70);
+  --line: rgba(184, 134, 11, 0.16);
+  --line-strong: rgba(184, 134, 11, 0.32);
+
+  /* ── Ombres chaudes adoucies ── */
+  --shadow: 0 8px 32px rgba(74, 58, 24, 0.12);
+  --shadow-lg: 0 20px 60px rgba(74, 58, 24, 0.16);
+  --shadow-sm: 0 2px 8px rgba(74, 58, 24, 0.10);
+  --shadow-soft: 0 10px 34px rgba(74, 58, 24, 0.12);
+  --shadow-gold: 0 10px 34px rgba(184, 134, 11, 0.25);
+
+  /* ── Triplets RGB inversés ── */
+  --rgb-veil: 250, 247, 240;   /* voiles clairs (headers) */
+  --rgb-card: 255, 255, 255;   /* cartes blanches translucides */
+  --rgb-soft: 32, 27, 18;      /* encre : fills/hovers subtils */
+
+  /* ── Divers ── */
+  --tint-gold: rgba(184, 134, 11, 0.10);
+  --tint-red: rgba(192, 57, 43, 0.09);
+  --tint-warn: rgba(183, 121, 31, 0.10);
+  --bubble-ai: #F1ECE0;
+  --bubble-user: #E8E1CD;
+  --whatsapp-bubble-other: rgba(255, 255, 255, 0.92);
+  --whatsapp-bubble-me: rgba(184, 134, 11, 0.18);
+  --primary-dark: #E3EBE0;     /* héro vert sombre → vert pâle */
+}
+
+/* ── Sélection de texte en mode clair (encre sur or pâle) ── */
+html[data-theme="light"] ::selection {
+  background: rgba(184, 134, 11, 0.28);
+  color: #262019;
+}
+
+/* ── Focus clavier : or foncé plus visible sur fond clair ── */
+html[data-theme="light"] :focus-visible {
+  outline-color: #B8860B;
+}
+
+/* ── Autofill : encre foncée, pas de flash blanc cassé ── */
+html[data-theme="light"] input:-webkit-autofill,
+html[data-theme="light"] input:-webkit-autofill:hover,
+html[data-theme="light"] input:-webkit-autofill:focus,
+html[data-theme="light"] textarea:-webkit-autofill,
+html[data-theme="light"] select:-webkit-autofill {
+  -webkit-text-fill-color: #262019;
+  caret-color: #B8860B;
+  transition: background-color 600000s ease-out, color 600000s ease-out;
+}
+
+/* ── Barres de défilement assorties au papier ── */
+html[data-theme="light"] * {
+  scrollbar-color: #D5CEBD #F5F1E8;
+}
+html[data-theme="light"] ::-webkit-scrollbar-track {
+  background: #F5F1E8;
+}
+html[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: #D5CEBD;
+}
+html[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+  background: #B8860B;
 }
 
 /* ═══════════════════════════════════════════════════════════════════

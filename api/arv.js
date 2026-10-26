@@ -350,7 +350,7 @@ function getProviders() {
       name: 'Mistral',
       key: process.env.MISTRAL_API_KEY,
       endpoint: 'https://api.mistral.ai/v1/chat/completions',
-      model: process.env.MISTRAL_MODEL || 'mistral-small-latest',
+      model: process.env.MISTRAL_MODEL || 'open-mistral-nemo',
       headers: {}
     }
   ].filter((p) => Boolean(p.key));

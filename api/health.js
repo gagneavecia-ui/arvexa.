@@ -128,7 +128,7 @@ export default async function handler(req, res) {
     models: {
       groq: process.env.GROQ_MODEL || 'openai/gpt-oss-120b',
       openrouter: process.env.OPENROUTER_MODEL || 'openai/gpt-oss-120b',
-      mistral: process.env.MISTRAL_MODEL || 'mistral-small-latest'
+      mistral: process.env.MISTRAL_MODEL || 'open-mistral-nemo'
     },
     providers
   });

@@ -109,7 +109,7 @@ export default async function handler(req, res) {
         'HTTP-Referer': (process.env.APP_ORIGIN || '').startsWith('http') ? process.env.APP_ORIGIN : 'https://arvexaschool.vercel.app',
         'X-Title': 'ARVEXA Notebook'
       }),
-      mistral: await probe('https://api.mistral.ai/v1/chat/completions', process.env.MISTRAL_MODEL || 'mistral-large-latest', process.env.MISTRAL_API_KEY)
+      mistral: await probe('https://api.mistral.ai/v1/chat/completions', process.env.MISTRAL_MODEL || 'mistral-small-latest', process.env.MISTRAL_API_KEY)
     };
   }
 
@@ -121,7 +121,7 @@ export default async function handler(req, res) {
     models: {
       groq: process.env.GROQ_MODEL || 'openai/gpt-oss-120b',
       openrouter: process.env.OPENROUTER_MODEL || 'openai/gpt-oss-120b',
-      mistral: process.env.MISTRAL_MODEL || 'mistral-large-latest'
+      mistral: process.env.MISTRAL_MODEL || 'mistral-small-latest'
     },
     providers
   });

@@ -1988,7 +1988,8 @@ var SUBJECTS = {
   svt:           { label: 'SVT',           emoji: '🧬', profile: 'svt' },
   philosophie:   { label: 'Philosophie',   emoji: '🧠', profile: 'philosophy' },
   histoire:      { label: 'Histoire',      emoji: '🌍', profile: 'history' },
-  geographie:    { label: 'Géographie',    emoji: '🗺️', profile: 'history' }
+  geographie:    { label: 'Géographie',    emoji: '🗺️', profile: 'history' },
+  anglais:       { label: 'Anglais',       emoji: '🇬🇧', profile: 'language' }
 };
 const ALL_SUBJECT_KEYS = Object.keys(SUBJECTS);
 
@@ -2870,6 +2871,7 @@ async function renderSectionView(params) {
         <div class="notes-status" id="notesStatus"></div>
       </div>
 
+      ${EXAM_SUBJECT_MAP[subject] ? `
       <div class="content-section">
         <div class="content-section-title"><i class="fas fa-graduation-cap"></i>Teste-toi sur cette partie</div>
         <button class="cta-exam" id="goToExamBtn" data-subject="${escapeHtml(subject)}" data-chapter="${escapeHtml(chapterTitle)}">
@@ -2880,7 +2882,14 @@ async function renderSectionView(params) {
           </div>
           <i class="fas fa-chevron-right cta-exam-arrow"></i>
         </button>
-      </div>
+      </div>` : (subject === 'anglais' ? `
+      <div class="content-section">
+        <div class="content-section-title"><i class="fas fa-graduation-cap"></i>Teste-toi sur cette partie</div>
+        <div class="block">
+          <div class="block-head"><i class="fas fa-circle-info"></i>Pas d'examen en anglais</div>
+          <div class="block-body">Le mode examen n'est pas disponible pour l'anglais. Utilise la banque de questions et les QCM de cette section pour te tester.</div>
+        </div>
+      </div>` : '')}
     `;
 
     const container = $('analysisContainer');
@@ -3686,44 +3695,48 @@ function openAddSectionModal(subject, chapterId) {
     });
   });
 
- // ── Saisie vocale (corrigée) ──
+ // ── Saisie vocale v2 — reconstruction canonique (zéro doublon) ──
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 if (!SpeechRecognition) {
   voiceToggle.style.display = 'none';
 } else {
   let recognition = null;
   let isRecording = false;
-  let savedBaseValue = '';       // texte déjà présent AVANT la dictée
-  let handledResults = new Set(); // indices de résultats déjà traités
+  let savedBaseValue = '';   // texte présent AVANT la dictée + finales validées des sessions précédentes
+  let sessionFinals = '';    // finales de la session courante (reconstruites à chaque event)
+
+  const flushSessionFinals = () => {
+    if (sessionFinals) {
+      savedBaseValue += sessionFinals;
+      sessionFinals = '';
+    }
+  };
 
   voiceToggle.addEventListener('click', () => {
     if (!recognition) {
       recognition = new SpeechRecognition();
-      recognition.lang = 'fr-FR';
+      try {
+        const uiLang = String(localStorage.getItem('arvexa-lang') || 'fr').toLowerCase();
+        recognition.lang = uiLang.startsWith('en') ? 'en-US' : 'fr-FR';
+      } catch (e) { recognition.lang = 'fr-FR'; }
       recognition.continuous = true;
       recognition.interimResults = true;
       recognition.maxAlternatives = 1;
 
       recognition.onresult = (event) => {
+        // ✅ Reconstruction complète à CHAQUE event : les finales sont relues depuis
+        // event.results (jamais accumulées à l'aveugle) → impossible de doubler un mot.
+        let finals = '';
         let interim = '';
-        let newFinal = '';
-
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          const result = event.results[i];
-          if (result.isFinal) {
-            // ✅ Clé unique par résultat pour ne jamais le relire
-            const resultKey = `${i}-${result[0].transcript}`;
-            if (!handledResults.has(resultKey)) {
-              handledResults.add(resultKey);
-              newFinal += result[0].transcript + ' ';
-            }
-          } else {
-            interim += result[0].transcript;
-          }
+        for (let i = 0; i < event.results.length; i++) {
+          const r = event.results[i];
+          const txt = r && r[0] ? r[0].transcript : '';
+          if (!txt) continue;
+          if (r.isFinal) finals += txt + ' ';
+          else interim += txt;
         }
-
-        if (newFinal) savedBaseValue += newFinal;
-        body.value = savedBaseValue + interim;
+        sessionFinals = finals;
+        body.value = savedBaseValue + finals + interim;
         updateReady();
       };
 
@@ -3732,12 +3745,14 @@ if (!SpeechRecognition) {
         if (e.error !== 'no-speech' && e.error !== 'aborted') {
           showToast('Erreur de reconnaissance vocale', 'error');
         }
-        isRecording = false;
-        voiceToggle.classList.remove('active');
-        voiceLabel.textContent = 'Dicter à la voix';
       };
 
       recognition.onend = () => {
+        // ✅ Fin de session (silence/limite Chrome) : les finales de CETTE session
+        // sont validées UNE SEULE fois ici, puis la session repart de la base.
+        flushSessionFinals();
+        body.value = savedBaseValue;
+        updateReady();
         if (isRecording) {
           try { recognition.start(); } catch (e) {}
         }
@@ -3746,13 +3761,12 @@ if (!SpeechRecognition) {
 
     if (isRecording) {
       isRecording = false;
-      recognition.stop();
+      try { recognition.stop(); } catch (e) {}
       voiceToggle.classList.remove('active');
       voiceLabel.textContent = 'Dicter à la voix';
     } else {
-      // ✅ Sauvegarder le contenu existant AVANT la dictée
+      flushSessionFinals();
       savedBaseValue = body.value ? body.value + ' ' : '';
-      handledResults = new Set();
       try {
         recognition.start();
         isRecording = true;

@@ -1,5 +1,9 @@
 // ================================================================
-// API PROGRESS v9.3 — ARVEXA School
+// API PROGRESS v9.4 — ARVEXA School
+// v9.4 : matière ANGLAIS (profil language), banque de questions élargie (jusqu'à 50),
+//        QCM 8 (notions différentes), tableaux 8 éléments, fallbacks IA avec
+//        deadline frais par tentative (plus de tâches perdues), meta.providers
+//        dans la réponse (traçabilité fournisseur par tâche)
 // v9.3 : maxTokens réduits, priorisation Groq, timeouts augmentés,
 //        fallback local pour explanation
 // ================================================================
@@ -24,7 +28,7 @@ const requestLog = new Map();
 
 var ALLOWED_SUBJECTS = new Set([
   'mathematiques', 'physique', 'chimie', 'svt',
-  'philosophie', 'histoire', 'geographie'
+  'philosophie', 'histoire', 'geographie', 'anglais'
 ]);
 var ALLOWED_SUBJECTS_ARRAY = Array.from(ALLOWED_SUBJECTS);
 
@@ -35,13 +39,14 @@ var SUBJECT_INFO = {
   svt:           { label: 'SVT',            profile: 'svt' },
   philosophie:   { label: 'Philosophie',    profile: 'philosophy' },
   histoire:      { label: 'Histoire',       profile: 'history' },
-  geographie:    { label: 'Géographie',     profile: 'history' }
+  geographie:    { label: 'Géographie',     profile: 'history' },
+  anglais:       { label: 'Anglais',        profile: 'language' }
 };
 
 const MIN_CONTENT_LENGTH = 40;
 const MAX_CONTENT_LENGTH = 15000;
 const FREE_SECTION_LIMIT = 5;
-const GLOBAL_AI_TIME_BUDGET_MS = 45000;
+const GLOBAL_AI_TIME_BUDGET_MS = 90000;
 
 const VALID_GRADE_TYPES = new Set([
   'interrogation', 'devoir', 'composition', 'oral', 'autre'
@@ -616,7 +621,7 @@ async function runParallelTasks(tasks, providers, deadline) {
             systemPrompt: tasks[i].systemPrompt,
             userPrompt: tasks[i].userPrompt,
             maxTokens: tasks[i].maxTokens,
-            deadline
+            deadline: Date.now() + 30000
           });
           return { status: 'fulfilled', value, task: tasks[i], provider: provider.name };
         } catch (e) { console.warn(`[FAN-OUT] Fallback ${provider.name} échoué : ${e.message}`); }
@@ -684,17 +689,18 @@ RÈGLE JSON STRICTE :
 
 const JSON_ARRAY_LIMITS = `
 RÈGLE TABLEAUX :
-- Maximum 5 éléments dans les tableaux : parts, keyTerms, relations, examples, traps, definitions, mechanisms, formulas, classifications, theses, vocabulary, plans, timeline, causesConsequences, keyFigures, literaryDevices, texts, grammar, phrases.
+- Maximum 8 éléments dans les tableaux : parts, keyTerms, relations, examples, traps, definitions, mechanisms, formulas, classifications, theses, vocabulary, plans, timeline, causesConsequences, keyFigures, literaryDevices, texts, grammar, phrases.
 - EXCEPTION IMPORTANTE : le tableau "questions" n'a AUCUNE limite. Génère autant de questions que nécessaire pour couvrir TOUTES les notions du cours.
-- EXCEPTION : le tableau "qcm" doit contenir EXACTEMENT 5 QCM (pas plus, pas moins).
+- EXCEPTION : le tableau "qcm" doit contenir EXACTEMENT 8 QCM (pas plus, pas moins).
 `.trim();
 
 const QUESTION_GEN_RULES = `
 RÈGLES DE GÉNÉRATION DES QUESTIONS :
 - Génère 2 à 4 questions par notion importante du cours.
-- Cours court (5-10 lignes) : 8 à 12 questions MINIMUM.
-- Cours moyen (15-20 lignes) : 15 à 25 questions MINIMUM.
-- Cours long (30+ lignes) : 25 à 40 questions MINIMUM.
+- Cours court (5-10 lignes) : 10 à 15 questions MINIMUM.
+- Cours moyen (15-20 lignes) : 20 à 30 questions MINIMUM.
+- Cours long (30+ lignes) : 30 à 50 questions MINIMUM.
+- Expose TOUTES les questions exploitables de la partie, même si tu dépasses 30 questions : la banque doit être EXHAUSTIVE.
 - Couvre TOUTES les définitions, formules, propriétés, méthodes et exemples du cours.
 - Ne te limite JAMAIS à 5 questions — le tableau "questions" n'a pas de limite.
 - Chaque question doit avoir : level (1=facile, 2=moyen, 3=difficile), importance (1=utile, 2=important, 3=indispensable), mustHave (2 à 4 éléments clés attendus).
@@ -702,7 +708,8 @@ RÈGLES DE GÉNÉRATION DES QUESTIONS :
 
 const QCM_GEN_RULES = `
 RÈGLES DE GÉNÉRATION DES QCM :
-- Génère EXACTEMENT 5 QCM (ni plus, ni moins).
+- Génère EXACTEMENT 8 QCM (ni plus, ni moins).
+- Les 8 QCM couvrent des notions DIFFÉRENTES de la section (pas 8 variantes de la même question).
 - Chaque QCM a 4 options (A, B, C, D) avec une seule réponse correcte.
 - Les options incorrectes doivent être plausibles (pas d'options absurdes).
 - Chaque QCM doit avoir une explication pédagogique.
@@ -715,7 +722,7 @@ RÈGLES DE PROFONDEUR D'EXPLICATION :
 - Décompose les raisonnements complexes étape par étape.
 - Pour chaque formule : à quoi elle sert, quand l'utiliser, ses conditions de validité.
 - toRemember : 2 à 3 phrases de synthèse.
-- Maximum 8 parties (parts) — utilisez 6-8 si le cours est riche.
+- Maximum 8 parties (parts) — vise 6-8 parties bien développées si le cours est riche.
 `.trim();
 
 function buildScientificPrompts({ subjectLabel, rawInput }) {
@@ -808,7 +815,7 @@ ${JSON_ARRAY_LIMITS}
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'questions', maxTokens: 6000,
+      name: 'questions', maxTokens: 8000,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Génère une banque EXHAUSTIVE de questions basée UNIQUEMENT sur cette section.
 
@@ -829,9 +836,9 @@ ${JSON_ARRAY_LIMITS}
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'qcm', maxTokens: 3000,
+      name: 'qcm', maxTokens: 4500,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
-      userPrompt: `Génère EXACTEMENT 5 QCM basés UNIQUEMENT sur cette section.
+      userPrompt: `Génère EXACTEMENT 8 QCM basés UNIQUEMENT sur cette section.
 
 ${baseContext}
 
@@ -938,7 +945,7 @@ ${JSON_ARRAY_LIMITS}
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'questions', maxTokens: 6000,
+      name: 'questions', maxTokens: 8000,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Génère une banque EXHAUSTIVE de questions de SVT sur cette section.
 
@@ -958,9 +965,9 @@ ${JSON_ARRAY_LIMITS}
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'qcm', maxTokens: 3000,
+      name: 'qcm', maxTokens: 4500,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
-      userPrompt: `Génère EXACTEMENT 5 QCM de SVT sur cette section.
+      userPrompt: `Génère EXACTEMENT 8 QCM de SVT sur cette section.
 
 ${baseContext}
 
@@ -1065,7 +1072,7 @@ ${JSON_ARRAY_LIMITS}
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'questions', maxTokens: 6000,
+      name: 'questions', maxTokens: 8000,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Génère une banque EXHAUSTIVE de questions de philosophie sur cette section.
 
@@ -1085,9 +1092,9 @@ ${JSON_ARRAY_LIMITS}
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'qcm', maxTokens: 3000,
+      name: 'qcm', maxTokens: 4500,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
-      userPrompt: `Génère EXACTEMENT 5 QCM de philosophie sur cette section.
+      userPrompt: `Génère EXACTEMENT 8 QCM de philosophie sur cette section.
 
 ${baseContext}
 
@@ -1185,7 +1192,7 @@ ${JSON_ARRAY_LIMITS}
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'questions', maxTokens: 6000,
+      name: 'questions', maxTokens: 8000,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Génère une BANQUE MASSIVE de questions d'histoire-géo sur cette section.
 
@@ -1205,9 +1212,9 @@ ${JSON_ARRAY_LIMITS}
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'qcm', maxTokens: 3000,
+      name: 'qcm', maxTokens: 4500,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
-      userPrompt: `Génère EXACTEMENT 5 QCM d'histoire-géo sur cette section.
+      userPrompt: `Génère EXACTEMENT 8 QCM d'histoire-géo sur cette section.
 
 ${baseContext}
 
@@ -1310,7 +1317,7 @@ ${JSON_ARRAY_LIMITS}
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'questions', maxTokens: 6000,
+      name: 'questions', maxTokens: 8000,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Génère une banque EXHAUSTIVE de questions de français sur cette section.
 
@@ -1330,9 +1337,9 @@ ${JSON_ARRAY_LIMITS}
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'qcm', maxTokens: 3000,
+      name: 'qcm', maxTokens: 4500,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
-      userPrompt: `Génère EXACTEMENT 5 QCM de français sur cette section.
+      userPrompt: `Génère EXACTEMENT 8 QCM de français sur cette section.
 
 ${baseContext}
 
@@ -1437,7 +1444,7 @@ ${JSON_ARRAY_LIMITS}
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'questions', maxTokens: 6000,
+      name: 'questions', maxTokens: 8000,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Génère une banque EXHAUSTIVE de questions d'anglais.
 
@@ -1457,9 +1464,9 @@ ${JSON_ARRAY_LIMITS}
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'qcm', maxTokens: 3000,
+      name: 'qcm', maxTokens: 4500,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
-      userPrompt: `Génère EXACTEMENT 5 QCM d'anglais sur cette section.
+      userPrompt: `Génère EXACTEMENT 8 QCM d'anglais sur cette section.
 
 ${baseContext}
 
@@ -1849,11 +1856,14 @@ async function createSection(uid, body) {
   console.log(`[FAN-OUT] ${tasks.length} tâches, ${providers.length} fournisseurs pour "${profile}"`);
 
   let analysis;
+  const t0 = Date.now();
+  const meta = { providers: {}, elapsedMs: 0, counts: {} };
   try {
     const deadline = Date.now() + GLOBAL_AI_TIME_BUDGET_MS;
     const results = await runParallelTasks(tasks, providers, deadline);
 
     results.forEach((r) => {
+      meta.providers[r.task.name] = r.status === 'fulfilled' ? r.provider : 'none';
       if (r.status === 'fulfilled') console.log(`[FAN-OUT] OK ${r.task.name} (via ${r.provider})`);
       else console.error(`[FAN-OUT] FAIL ${r.task.name} - ${r.error?.message || 'unknown'}`);
     });
@@ -1877,6 +1887,14 @@ async function createSection(uid, body) {
     throw err;
   }
 
+  meta.elapsedMs = Date.now() - t0;
+  meta.counts = {
+    parts: (analysis.explanation && Array.isArray(analysis.explanation.parts)) ? analysis.explanation.parts.length : 0,
+    questions: Array.isArray(analysis.questions) ? analysis.questions.length : 0,
+    qcm: Array.isArray(analysis.qcm) ? analysis.qcm.length : 0
+  };
+  console.log(`[PROGRESS v9.4] section créée en ${meta.elapsedMs} ms — questions:${meta.counts.questions} qcm:${meta.counts.qcm}`);
+
   const sectionRef = chapterRef.collection('sections').doc();
   const sectionId = sectionRef.id;
 
@@ -1885,6 +1903,7 @@ async function createSection(uid, body) {
     rawInput: trimmed,
     profile,
     analysis,
+    meta,
     userNotes: '',
     createdAt: FieldValue.serverTimestamp(),
     updatedAt: FieldValue.serverTimestamp()
@@ -1900,6 +1919,7 @@ async function createSection(uid, body) {
   return {
     success: true,
     sectionId,
+    meta,
     section: {
       id: sectionId, title: analysis.sectionTitle || 'Section',
       rawInput: trimmed, profile, analysis, userNotes: ''
@@ -2548,7 +2568,7 @@ module.exports.config = { maxDuration: 120 };
   }
 
   const uid = user.uid;
-  console.log(`[PROGRESS v9.3] ${action} | uid=${uid.slice(0, 8)}`);
+  console.log(`[PROGRESS v9.4] ${action} | uid=${uid.slice(0, 8)}`);
 
   try {
     switch (action) {
@@ -2586,7 +2606,7 @@ module.exports.config = { maxDuration: 120 };
         return jsonError(response, 400, `Action inconnue : "${action}"`);
     }
   } catch (error) {
-    console.error(`[PROGRESS v9.3] "${action}" failed:`, error.message);
+    console.error(`[PROGRESS v9.4] "${action}" failed:`, error.message);
     if (error.status) return jsonError(response, error.status, error.message, error.code);
     return jsonError(response, 500, error.message || 'Erreur serveur.');
   }

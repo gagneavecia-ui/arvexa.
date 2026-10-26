@@ -56,10 +56,54 @@ export default async function handler(req, res) {
   const allCriticalOk = checks.firebaseAdminCredentials && checks.saspayApiKey
     && checks.saspayWebhookSecret && firebaseWorks;
 
+  // ✅ v2 — Banc d'essai RÉEL de chaque fournisseur IA (?providers=1).
+  // Un ping minimal (16 tokens) par fournisseur : ok, latence, message d'erreur.
+  let providers = null;
+  if ((req.query && req.query.providers) || String(req.url || '').includes('providers=1')) {
+    const probe = async (endpoint, model, key) => {
+      if (!key) return { configured: false };
+      const t0 = Date.now();
+      const ctrl = new AbortController();
+      const to = setTimeout(() => ctrl.abort(), 9000);
+      try {
+        const r = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+          body: JSON.stringify({
+            model,
+            max_tokens: 16,
+            messages: [{ role: 'user', content: 'Réponds uniquement : OK' }]
+          }),
+          signal: ctrl.signal
+        });
+        const d = await r.json().catch(() => null);
+        if (!r.ok) {
+          const msg = (d && d.error && d.error.message) || `HTTP ${r.status}`;
+          return { configured: true, ok: false, status: r.status, error: msg, ms: Date.now() - t0 };
+        }
+        const txt = (d && d.choices && d.choices[0] && d.choices[0].message && d.choices[0].message.content) || '';
+        return { configured: true, ok: Boolean(String(txt).trim()), ms: Date.now() - t0 };
+      } catch (e) {
+        return { configured: true, ok: false, error: e.name === 'AbortError' ? 'timeout 9s' : (e.message || 'erreur réseau'), ms: Date.now() - t0 };
+      } finally { clearTimeout(to); }
+    };
+    providers = {
+      groq: await probe('https://api.groq.com/openai/v1/chat/completions', process.env.GROQ_MODEL || 'openai/gpt-oss-120b', process.env.GROQ_API_KEY),
+      openrouter: await probe('https://openrouter.ai/api/v1/chat/completions', process.env.OPENROUTER_MODEL || 'openai/gpt-oss-120b', process.env.OPENROUTER_API_KEY),
+      mistral: await probe('https://api.mistral.ai/v1/chat/completions', process.env.MISTRAL_MODEL || 'mistral-large-latest', process.env.MISTRAL_API_KEY)
+    };
+  }
+
   return res.status(200).json({
     ok: allCriticalOk,
     time: new Date().toISOString(),
     firebase: { works: firebaseWorks, error: firebaseError },
-    env: checks
+    env: checks,
+    models: {
+      groq: process.env.GROQ_MODEL || 'openai/gpt-oss-120b',
+      openrouter: process.env.OPENROUTER_MODEL || 'openai/gpt-oss-120b',
+      mistral: process.env.MISTRAL_MODEL || 'mistral-large-latest'
+    },
+    providers
   });
 }

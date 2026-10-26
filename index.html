@@ -1270,14 +1270,8 @@
     #appSplash.on { opacity: 1; }
     #appSplash.hide { opacity: 0; pointer-events: none; }
     .splash-inner { display: flex; flex-direction: column; align-items: center; gap: 18px; }
-    .splash-logo { position: relative; width: 92px; height: 92px; }
-    .splash-logo img {
-      width: 92px; height: 92px; border-radius: 26px; object-fit: cover; display: block;
-      box-shadow: 0 12px 40px rgba(212, 175, 55, 0.22), 0 0 0 1px rgba(212, 175, 55, 0.25);
-      animation: splashPulse 1.8s ease-in-out infinite;
-    }
     .splash-ring {
-      position: absolute; inset: -11px; border-radius: 50%;
+      position: relative; width: 72px; height: 72px; border-radius: 50%;
       border: 2px solid rgba(212, 175, 55, 0.15);
       border-top-color: var(--accent-bright);
       animation: splashSpin 1s linear infinite;
@@ -1287,9 +1281,12 @@
       color: var(--text-light); letter-spacing: 2px;
     }
     .splash-word em { color: var(--accent-bright); font-style: italic; }
-    .splash-status { font-size: 12.5px; color: var(--text-muted); letter-spacing: .5px; }
     @keyframes splashSpin { to { transform: rotate(360deg); } }
-    @keyframes splashPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+
+    /* Contenu « en dur » : caché jusqu'à la restauration instantanée
+       (mode retour seulement — html.instant posé par la porte du splash) */
+    html.instant #dynamicContent { visibility: hidden; }
+    html.instant.ready #dynamicContent { visibility: visible; }
 
     /* PILL — synchronisation Firestore en arrière-plan (retour instantané) */
     #bgSyncPill {
@@ -1317,12 +1314,8 @@
        ============================================================ -->
   <div id="appSplash" aria-hidden="true">
     <div class="splash-inner">
-      <div class="splash-logo">
-        <img src="icon.png" alt="" draggable="false">
-        <span class="splash-ring"></span>
-      </div>
+      <span class="splash-ring"></span>
       <div class="splash-word">ARVEXA <em>School</em></div>
-      <div class="splash-status">Chargement...</div>
     </div>
   </div>
   <script>
@@ -1343,9 +1336,12 @@
       }
     } catch (e) {}
     if (snap) {
+      document.documentElement.classList.add('instant');
       window.__ARVEXA_INSTANT__ = snap;
       var sp = document.getElementById('appSplash');
       if (sp && sp.parentNode) sp.parentNode.removeChild(sp);
+      /* Filet de sécurité : jamais de contenu masqué plus de 600 ms */
+      setTimeout(function () { document.documentElement.classList.add('ready'); }, 600);
     } else {
       window.__ARVEXA_SPLASH_TS__ = Date.now();
       requestAnimationFrame(function () {
@@ -1428,7 +1424,7 @@
         <section class="countdown-card" aria-labelledby="countdownTitle">
           <div class="hero-date"><i class="fas fa-calendar-day"></i><span id="heroDateText">—</span></div>
           <div class="cd-hero-head">
-            <h1 class="cd-hero-title" id="countdownTitle">BAC 2026</h1>
+            <h1 class="cd-hero-title" id="countdownTitle">BAC 2027</h1>
             <span class="countdown-status early" id="countdownStatus">🌱 Tu as le temps</span>
           </div>
           <div class="countdown-date" id="countdownDate">Date indicative</div>
@@ -1741,6 +1737,178 @@
       var dyn = $('dynamicContent');
       if (dyn) dyn.style.display = 'block';
     } catch (e) {}
+
+    /* ================================================================
+       RESTAURATION « EN DUR » — tout le tableau de bord est recalculé
+       localement (zéro réseau, caches locaux uniquement) pour être peint
+       correctement dès la première image. Le module revalidera ensuite à
+       l'identique via Firestore (aucun changement visible).
+       ⚠ Garder synchronisé avec updateCountdown()/renderHero()/
+       renderProgress()/renderBadges() du module.
+       ================================================================ */
+    var CH = { mathematiques: 11, physique: 17, chimie: 9, svt: 20 };
+    var parts = [];
+    var per = {};
+    try {
+      parts = JSON.parse(localStorage.getItem('arvexa_read_parts') || '[]') || [];
+      Object.keys(CH).forEach(function (k) { per[k] = {}; });
+      parts.forEach(function (key) {
+        var pp = String(key).split('_');
+        if (pp.length >= 2 && per[pp[0]]) per[pp[0]][pp[1]] = true;
+      });
+    } catch (eP) {}
+
+    /* — Compte à rebours BAC (identique au module) — */
+    try {
+      function dashExamDate() {
+        if (typeof window.ARVEXA_getExamDate === 'function') return window.ARVEXA_getExamDate();
+        var n = new Date(), y = n.getFullYear(), j = new Date(y, 5, 1);
+        return n < j ? j : new Date(y + 1, 5, 1);
+      }
+      var now = new Date(), exam = dashExamDate(), diffMs = exam - now;
+      var ct = $('countdownTitle');
+      if (ct) ct.textContent = 'BAC ' + exam.getFullYear();
+      var cd = $('countdownDate');
+      if (cd) {
+        try { cd.textContent = 'Échéance : ' + exam.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }); }
+        catch (e2) { cd.textContent = 'Date indicative'; }
+      }
+      var pf = $('progressFill'), cs = $('countdownStatus');
+      if (diffMs <= 0) {
+        var dJ = $('cdDays'), hJ = $('cdHours'), mJ = $('cdMinutes');
+        if (dJ) dJ.textContent = '0';
+        if (hJ) hJ.textContent = '00';
+        if (mJ) mJ.textContent = '00';
+        if (pf) { pf.style.width = '100%'; pf.className = 'progress-fill critical'; }
+        if (cs) { cs.textContent = "🎉 C'est le jour J !"; cs.className = 'countdown-status critical'; }
+      } else {
+        var days = Math.floor(diffMs / 86400000);
+        var hours = Math.floor((diffMs % 86400000) / 3600000);
+        var mins = Math.floor((diffMs % 3600000) / 60000);
+        var dE = $('cdDays'); if (dE) dE.textContent = days;
+        var hE = $('cdHours'); if (hE) hE.textContent = String(hours).padStart(2, '0');
+        var mE = $('cdMinutes'); if (mE) mE.textContent = String(mins).padStart(2, '0');
+        var exY = exam.getFullYear(), exM = exam.getMonth();
+        var start = new Date(exM < 8 ? exY - 1 : exY, 8, 1);
+        var total = exam - start, elapsed = now - start;
+        var progress = total > 0 ? Math.min(100, Math.max(0, (elapsed / total) * 100)) : 0;
+        if (pf) {
+          var pc = 'early';
+          if (progress > 85) pc = 'critical'; else if (progress > 70) pc = 'late'; else if (progress > 50) pc = 'mid';
+          pf.style.width = progress + '%';
+          pf.className = 'progress-fill ' + pc;
+        }
+        if (cs) {
+          var msg = days < 7 ? { e: '🏆', m: "C'est maintenant ! Dernière ligne droite", c: 'critical' }
+                  : days < 15 ? { e: '🚀', m: 'Sprint final, donne tout', c: 'critical' }
+                  : days < 30 ? { e: '🔥', m: 'Concentre-toi, chaque jour compte', c: 'late' }
+                  : days < 60 ? { e: '⚡', m: "Accélère, c'est le moment clé", c: 'mid' }
+                  : days < 90 ? { e: '📚', m: 'Bon rythme, continue comme ça', c: 'mid' }
+                  : { e: '🌱', m: 'Tu as le temps, commence tranquillement', c: 'early' };
+          cs.textContent = msg.e + ' ' + msg.m;
+          cs.className = 'countdown-status ' + msg.c;
+        }
+      }
+    } catch (e) {}
+
+    /* — Date du jour + citation du jour (identique au module) — */
+    try {
+      var hd = $('heroDateText');
+      if (hd) {
+        var dd = new Date();
+        try {
+          var ds = dd.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+          hd.textContent = ds.charAt(0).toUpperCase() + ds.slice(1);
+        } catch (e2) { hd.textContent = dd.getDate() + '/' + (dd.getMonth() + 1) + '/' + dd.getFullYear(); }
+      }
+      var QUOTES = [
+        { t: "L'éducation est l'arme la plus puissante pour changer le monde.", a: "Nelson Mandela" },
+        { t: "La discipline est le pont entre les objectifs et les accomplissements.", a: "Jim Rohn" },
+        { t: "Petit à petit, l'oiseau fait son nid.", a: "Proverbe" },
+        { t: "Seul on va plus vite, ensemble on va plus loin.", a: "Proverbe africain" },
+        { t: "Le succès, c'est d'aller d'échec en échec sans perdre son enthousiasme.", a: "Winston Churchill" },
+        { t: "La connaissance est un trésor, mais la pratique en est la clé.", a: "Proverbe" },
+        { t: "Le génie est fait de 1 % d'inspiration et de 99 % de transpiration.", a: "Thomas Edison" },
+        { t: "Patience et longueur de temps font plus que force ni que rage.", a: "Jean de La Fontaine" },
+        { t: "Ce n'est pas parce que les choses sont difficiles que nous n'osons pas.", a: "Sénèque" },
+        { t: "Chaque chapitre maîtrisé aujourd'hui est une question gagnée demain.", a: "ARVEXA School" }
+      ];
+      var qt = $('heroQuoteText'), qa = $('heroQuoteAuthor');
+      if (qt && qa) {
+        var yStart = new Date(new Date().getFullYear(), 0, 0);
+        var doy = Math.floor((Date.now() - yStart) / 86400000);
+        var q = QUOTES[doy % QUOTES.length] || QUOTES[0];
+        qt.textContent = '« ' + q.t + ' »';
+        qa.textContent = '— ' + q.a;
+      }
+    } catch (e) {}
+
+    /* — Compteurs de lecture des matières (localStorage) — */
+    try {
+      Object.keys(CH).forEach(function (k) {
+        var el = document.querySelector('[data-subject="' + k + '"]');
+        if (!el) return;
+        var count = Object.keys(per[k]).length;
+        if (count > 0) {
+          el.textContent = count + '/' + CH[k] + ' chapitres lus';
+          el.classList.add('has-progress');
+        } else {
+          el.textContent = CH[k] + ' chapitres';
+          el.classList.remove('has-progress');
+        }
+      });
+    } catch (e) {}
+
+    /* — Badges réalisations (localStorage, identique au module) — */
+    try {
+      var bsc = $('badgesScroll');
+      if (bsc) {
+        var BADGES = [
+          { icon: '📖', name: 'Première section', check: function (st) { return st.totalParts >= 1; } },
+          { icon: '📚', name: '5 sections', check: function (st) { return st.totalParts >= 5; } },
+          { icon: '🎓', name: '15 sections', check: function (st) { return st.totalParts >= 15; } },
+          { icon: '🏅', name: '30 sections', check: function (st) { return st.totalParts >= 30; } },
+          { icon: '🌍', name: 'Toutes matières', check: function (st) { return st.subjectsTouched >= 4; } },
+          { icon: '🔥', name: 'Série de 3 jours', check: function (st) { return st.streak >= 3; } },
+          { icon: '🚀', name: 'Série de 7 jours', check: function (st) { return st.streak >= 7; } },
+          { icon: '💎', name: 'Programme complet', check: function (st) { return st.chaptersRead >= st.chaptersTotal; } }
+        ];
+        var activity = {};
+        try { activity = JSON.parse(localStorage.getItem('arvexa_daily_activity') || '{}') || {}; } catch (e2) { activity = {}; }
+        var dashDayStr = function (dt) {
+          return dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0') + '-' + String(dt.getDate()).padStart(2, '0');
+        };
+        var streak = 0;
+        var cursor = new Date();
+        var dashActive = function (dt) { return (Number(activity[dashDayStr(dt)]) || 0) > 0; };
+        if (!dashActive(cursor)) cursor.setDate(cursor.getDate() - 1);
+        while (dashActive(cursor) && streak < 365) { streak++; cursor.setDate(cursor.getDate() - 1); }
+        var chaptersRead = 0, subjectsTouched = 0, chaptersTotal = 0;
+        Object.keys(CH).forEach(function (k) {
+          chaptersTotal += CH[k];
+          var count = Object.keys(per[k]).length;
+          if (count > 0) { subjectsTouched++; chaptersRead += count; }
+        });
+        var st = { totalParts: parts.length, subjectsTouched: subjectsTouched, chaptersRead: chaptersRead, chaptersTotal: chaptersTotal, streak: streak };
+        bsc.textContent = '';
+        BADGES.forEach(function (b) {
+          var item = document.createElement('div');
+          item.className = 'badge-item' + (b.check(st) ? ' unlocked' : '');
+          var coin = document.createElement('div');
+          coin.className = 'badge-coin';
+          coin.textContent = b.icon;
+          var nm = document.createElement('div');
+          nm.className = 'badge-name';
+          nm.textContent = b.name;
+          item.appendChild(coin);
+          item.appendChild(nm);
+          bsc.appendChild(item);
+        });
+      }
+    } catch (e) {}
+
+    /* Tout est peint depuis le cache : révéler le contenu */
+    document.documentElement.classList.add('ready');
   })();
   </script>
 

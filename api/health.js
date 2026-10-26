@@ -103,13 +103,20 @@ export default async function handler(req, res) {
         return { configured: true, ok: false, error: e.name === 'AbortError' ? 'timeout 15s' : (e.message || 'erreur réseau'), ms: Date.now() - t0 };
       } finally { clearTimeout(to); }
     };
+    const candidates = [process.env.MISTRAL_MODEL, 'mistral-small-latest', 'open-mistral-nemo', 'ministral-8b-latest']
+      .filter(Boolean).filter((m, i, a) => a.indexOf(m) === i);
+    const mistralResults = {};
+    for (const model of candidates) {
+      mistralResults[model] = await probe('https://api.mistral.ai/v1/chat/completions', model, process.env.MISTRAL_API_KEY);
+      if (mistralResults[model].ok) break;
+    }
     providers = {
       groq: await probe('https://api.groq.com/openai/v1/chat/completions', process.env.GROQ_MODEL || 'openai/gpt-oss-120b', process.env.GROQ_API_KEY),
       openrouter: await probe('https://openrouter.ai/api/v1/chat/completions', process.env.OPENROUTER_MODEL || 'openai/gpt-oss-120b', process.env.OPENROUTER_API_KEY, {
         'HTTP-Referer': (process.env.APP_ORIGIN || '').startsWith('http') ? process.env.APP_ORIGIN : 'https://arvexaschool.vercel.app',
         'X-Title': 'ARVEXA Notebook'
       }),
-      mistral: await probe('https://api.mistral.ai/v1/chat/completions', process.env.MISTRAL_MODEL || 'mistral-small-latest', process.env.MISTRAL_API_KEY)
+      mistral: mistralResults
     };
   }
 

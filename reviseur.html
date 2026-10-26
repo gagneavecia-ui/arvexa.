@@ -1438,6 +1438,9 @@
       transform: translateY(-1px);
       box-shadow: 0 8px 26px rgba(224, 184, 74, 0.45);
     }
+      /* ⚡ Anti-flash restauration en dur (pré-CDN, pattern accueil v4.2) */
+    html.instant .shell { visibility: hidden; }
+    html.instant.ready .shell { visibility: visible; }
   </style>
 </head>
 
@@ -1688,7 +1691,72 @@
   }
   </script>
 
- <script type="module">
+ <script>
+/* ⚡ Restauration « en dur » du cahier — pré-CDN (pattern accueil, v4.2).
+   Peint l'accueil du réviseur depuis le snapshot local AVANT que Firebase/CDN
+   chargent : plus jamais « Chargement... » ni « — » ni 0/0 à l'ouverture. */
+(function () {
+  try {
+    function g(id) { return document.getElementById(id); }
+    var subject = localStorage.getItem('arvexa_reviseur_last_subject');
+    var chapter = localStorage.getItem('arvexa_reviseur_last_chapter');
+    if (!subject || !chapter) return;
+    var raw = null;
+    try { raw = localStorage.getItem('arvexa_reviseur_cahier__' + subject + '::' + chapter); } catch (e) {}
+    if (!raw) return;
+    var snap = null;
+    try { snap = JSON.parse(raw); } catch (e) { return; }
+    if (!snap || !snap.savedAt || (Date.now() - snap.savedAt) > 43200000) return;
+    var uid = null;
+    try {
+      var sess = JSON.parse(localStorage.getItem('arvexa_session') || sessionStorage.getItem('arvexa_session') || 'null');
+      uid = sess && sess.uid;
+    } catch (e) {}
+    if (snap.uid && uid && snap.uid !== uid) return;
+    var label = snap.subjectLabel || subject;
+    var el;
+    el = g('subjectLabel'); if (el) el.textContent = label;
+    el = g('chapterTitle'); if (el) el.textContent = snap.chapter || chapter;
+    el = g('chapterSelectorValue'); if (el) el.textContent = snap.chapter || chapter;
+    el = g('subjectSelectorValue'); if (el) el.textContent = label;
+    var total = snap.totalAvailable | 0, gen = snap.generatedCount | 0;
+    var pct = total > 0 ? Math.round((gen / total) * 100) : 0;
+    el = g('progressFill'); if (el) el.style.width = pct + '%';
+    el = g('progressCurrent'); if (el) el.textContent = String(gen);
+    el = g('progressTotal'); if (el) el.textContent = '/ ' + total + ' notions';
+    el = g('viewNotionsDesc');
+    if (el) el.textContent = gen > 0
+      ? gen + ' notion' + (gen > 1 ? 's' : '') + ' disponible' + (gen > 1 ? 's' : '') + '. Lecture gratuite.'
+      : 'Aucune notion générée pour le moment.';
+    var remaining = total - gen;
+    var bGen = g('btnGenerate'), tGen = g('btnGenerateTitle'), dGen = g('btnGenerateDesc');
+    if (gen === 0) {
+      if (tGen) tGen.textContent = 'Générer mes premières notions';
+      if (dGen) dGen.textContent = '4 notions · ~15 secondes';
+      if (bGen) bGen.disabled = false;
+    } else if (remaining === 0) {
+      if (tGen) tGen.textContent = 'Toutes les notions sont générées \u2705';
+      if (dGen) dGen.textContent = 'Tu as terminé ce chapitre !';
+      if (bGen) bGen.disabled = true;
+    } else {
+      var count = Math.min(3, remaining);
+      if (tGen) tGen.textContent = 'Générer de nouvelles notions';
+      if (dGen) dGen.textContent = count + ' notion' + (count > 1 ? 's' : '') + ' · ' + remaining + ' restante' + (remaining > 1 ? 's' : '');
+      if (bGen) bGen.disabled = false;
+    }
+    var bQuiz = g('btnQuiz'), dQuiz = g('btnQuizDesc');
+    if (gen >= 3) {
+      if (bQuiz) bQuiz.disabled = false;
+      if (dQuiz) dQuiz.textContent = 'Teste tes connaissances sur ' + gen + ' notions';
+    } else {
+      if (dQuiz) dQuiz.textContent = 'Génère au moins 3 notions d\'abord';
+    }
+    document.documentElement.classList.add('instant');
+    setTimeout(function () { document.documentElement.classList.add('ready'); }, 150);
+  } catch (e) {}
+})();
+</script>
+<script type="module">
 // ═══════════════════════════════════════════════════════════════
 // RÉVISEUR v7.3 — Multi-format + Historique mobile
 // Corrections appliquées :
@@ -1720,6 +1788,7 @@ import {
   getDoc,
   serverTimestamp
 } from 'firebase/firestore';
+import { docSWR } from './arvexa-cache.js';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyDHscOXw3rLuhV6z1Cny-bdYCumqpnG7QE',
@@ -2206,6 +2275,11 @@ async function callApi(payload, _attempt = 1) {
 // CHARGEMENT DU CAHIER
 // ═══════════════════════════════════════════════════════════════
 async function loadCahier() {
+  // ⚡ Cache local d'abord : un snapshot récent de ce chapitre hydrate l'état
+  // et peint l'UI immédiatement — l'appel réseau ne sert qu'à revalider.
+  const hydrated = hydrateFromSnapshot();
+  if (hydrated) updateHomeUI();
+
   try {
     const data = await callApi({
       action: 'loadCahier',
@@ -2219,9 +2293,15 @@ async function loadCahier() {
     state.generatedIds = data.generatedIds || [];
     state.subjectType = data.subjectType || (SCIENTIFIC_SUBJECTS.has(state.subject) ? 'scientific' : 'lesson');
 
+    saveCahierSnapshot();
     updateHomeUI();
   } catch (err) {
     console.error('[Réviseur] loadCahier error:', err);
+    // ⚡ Contenu déjà servi depuis le cache local → conservé silencieusement
+    if (hydrated && state.notions.length > 0) {
+      updateHomeUI();
+      return;
+    }
     showToast(err.message || 'Impossible de charger le cahier', 'error');
     state.totalAvailable = 0;
     state.generatedCount = 0;
@@ -2232,6 +2312,84 @@ async function loadCahier() {
 }
 
 // ═══════════════════════════════════════════════════════════════
+// ⚡ SNAPSHOTS LOCAUX — cahier « en dur » (pattern accueil, v4.2)
+const CAHIER_KEY_PREFIX = 'arvexa_reviseur_cahier__';
+const CAHIER_MAX_AGE = 12 * 60 * 60 * 1000; // 12 h
+const CAHIER_MAX_SLOTS = 12; // LRU : max 12 chapitres en local
+
+function cahierKey() {
+  return CAHIER_KEY_PREFIX + state.subject + '::' + state.chapter;
+}
+
+function capNotion(n) {
+  if (!n || typeof n !== 'object') return n;
+  const out = {};
+  for (const k in n) {
+    if (!Object.prototype.hasOwnProperty.call(n, k)) continue;
+    const v = n[k];
+    if (typeof v === 'string') out[k] = v.length > 4000 ? v.slice(0, 4000) : v;
+    else if (Array.isArray(v)) out[k] = v.slice(0, 30).map((x) => (typeof x === 'string' && x.length > 2000 ? x.slice(0, 2000) : x));
+    else if (v && typeof v === 'object') { try { out[k] = JSON.parse(JSON.stringify(v)); } catch (e) { /* ignoré */ } }
+    else out[k] = v;
+  }
+  return out;
+}
+
+function saveCahierSnapshot() {
+  try {
+    const payload = {
+      uid: state.user ? state.user.uid : null,
+      subject: state.subject,
+      chapter: state.chapter,
+      subjectLabel: SUBJECTS[state.subject] || state.subject,
+      subjectType: state.subjectType,
+      totalAvailable: state.totalAvailable || 0,
+      generatedCount: state.generatedCount || 0,
+      generatedIds: state.generatedIds || [],
+      notions: (state.notions || []).slice(0, 40).map(capNotion),
+      savedAt: Date.now()
+    };
+    localStorage.setItem(cahierKey(), JSON.stringify(payload));
+
+    // LRU : purge des chapitres les plus anciens au-delà de CAHIER_MAX_SLOTS
+    const keys = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.indexOf(CAHIER_KEY_PREFIX) === 0) keys.push(k);
+    }
+    if (keys.length > CAHIER_MAX_SLOTS) {
+      keys
+        .map((k) => {
+          try { return { k, t: (JSON.parse(localStorage.getItem(k)) || {}).savedAt || 0 }; }
+          catch (e) { return { k, t: 0 }; }
+        })
+        .sort((a, b) => a.t - b.t)
+        .slice(0, keys.length - CAHIER_MAX_SLOTS)
+        .forEach((o) => { try { localStorage.removeItem(o.k); } catch (e) {} });
+    }
+  } catch (e) { /* quota dépassé : on continue sans snapshot */ }
+}
+
+function hydrateFromSnapshot() {
+  try {
+    const raw = localStorage.getItem(cahierKey());
+    if (!raw) return false;
+    const snap = JSON.parse(raw);
+    if (!snap || !snap.savedAt || (Date.now() - snap.savedAt) > CAHIER_MAX_AGE) return false;
+    if (snap.uid && state.user && snap.uid !== state.user.uid) return false;
+    if (snap.subject !== state.subject || snap.chapter !== state.chapter) return false;
+    state.totalAvailable = snap.totalAvailable || 0;
+    state.generatedCount = snap.generatedCount || 0;
+    state.notions = Array.isArray(snap.notions) ? snap.notions : [];
+    state.generatedIds = Array.isArray(snap.generatedIds) ? snap.generatedIds : [];
+    state.subjectType = snap.subjectType || (SCIENTIFIC_SUBJECTS.has(state.subject) ? 'scientific' : 'lesson');
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+// ────────────────────────────────────────────────────────────────
 // MISE À JOUR UI ACCUEIL
 // ═══════════════════════════════════════════════════════════════
 function updateHomeUI() {
@@ -2307,6 +2465,7 @@ async function generateInitial() {
     state.notions = data.notions || [];
     state.generatedCount = data.generatedCount || state.notions.length;
     state.totalAvailable = data.totalAvailable || 0;
+    saveCahierSnapshot();
 
     if (data.message) {
       showToast(data.message, 'success');
@@ -3095,35 +3254,32 @@ function initAuthGuard(onAuthenticated) {
 // LANCER LA PROTECTION — ✅ C4 (blocked/paused)
 // ═══════════════════════════════════════════════════════════════
 initAuthGuard(async (user) => {
-  // ✅ C4 — vérification blocked/paused
-  try {
-    const userSnap = await getDoc(doc(db, 'users', user.uid));
-    if (userSnap.exists()) {
-      const userData = userSnap.data();
+  // ⚡ Cache-first : statut blocked/paused lu du cache IndexedDB (~10-50 ms),
+  // puis revalidé silencieusement côté serveur (réapplication si accountStatus change).
+  await docSWR(doc(db, 'users', user.uid), (userSnap) => {
+    if (!userSnap.exists()) return;
+    const userData = userSnap.data();
 
-      if (userData.accountStatus === 'blocked') {
-        try { sessionStorage.setItem('arvexa_account_blocked', '1'); } catch (e) {}
-        try { await signOut(auth); } catch (e) {}
-        window.location.replace('auth-choice.html');
-        return;
-      }
-
-      if (userData.accountStatus === 'paused') {
-        showToast('Ton compte est temporairement en pause. Contacte le support.', 'error');
-        // On laisse la page consultable mais la génération IA sera refusée côté backend
-      }
-
-      try {
-        localStorage.setItem(USER_DATA_KEY, JSON.stringify({
-          ...userData,
-          _uid: user.uid,
-          _cachedAt: Date.now()
-        }));
-      } catch (e) {}
+    if (userData.accountStatus === 'blocked') {
+      try { sessionStorage.setItem('arvexa_account_blocked', '1'); } catch (e) {}
+      try { signOut(auth); } catch (e) {}
+      window.location.replace('auth-choice.html');
+      return;
     }
-  } catch (e) {
-    console.warn('[Réviseur] Vérification blocked/paused :', e.code || e.message);
-  }
+
+    if (userData.accountStatus === 'paused') {
+      showToast('Ton compte est temporairement en pause. Contacte le support.', 'error');
+      // On laisse la page consultable mais la génération IA sera refusée côté backend
+    }
+
+    try {
+      localStorage.setItem(USER_DATA_KEY, JSON.stringify({
+        ...userData,
+        _uid: user.uid,
+        _cachedAt: Date.now()
+      }));
+    } catch (e) {}
+  }, (a, b) => (a && a.accountStatus) !== (b && b.accountStatus));
 
   state.user = user;
   const conn = $('connectionState');
@@ -3133,6 +3289,7 @@ initAuthGuard(async (user) => {
   }
 
   prefillFromUrl();
+  hydrateFromSnapshot();
   initSubjectSelector();
   initChapterSelector();
 
@@ -3146,6 +3303,7 @@ initAuthGuard(async (user) => {
     console.warn('[Réviseur] replaceState error:', e.message);
   }
 
+  updateHomeUI();
   await loadCahier();
   showView('viewHome');
 });

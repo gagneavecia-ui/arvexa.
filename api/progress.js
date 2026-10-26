@@ -527,6 +527,43 @@ function repairJson(str) {
   while (openBrackets > 0) { candidate += ']'; openBrackets--; }
   while (open > 0) { candidate += '}'; open--; }
   try { return JSON.parse(candidate); } catch (_) {}
+  // ✅ v9.4 : récupération PARTIELLE d'un tableau tronqué — on coupe au dernier
+  // élément complet (} suivi d'une virgule, hors chaînes) et on referme.
+  let inStr = false, esc = false, depth = 0;
+  const cuts = [];
+  for (let i = 0; i < candidate.length; i++) {
+    const ch = candidate[i];
+    if (esc) { esc = false; continue; }
+    if (ch === '\\') { esc = true; continue; }
+    if (ch === '"') { inStr = !inStr; continue; }
+    if (inStr) continue;
+    if (ch === '{' || ch === '[') depth++;
+    else if (ch === '}' || ch === ']') {
+      depth--;
+      if (depth >= 1) {
+        let j = i + 1;
+        while (j < candidate.length && candidate[j] === ' ') j++;
+        if (candidate[j] === ',') cuts.push(j);
+      }
+    }
+  }
+  for (let k = cuts.length - 1; k >= 0 && k >= cuts.length - 40; k--) {
+    let attempt = candidate.slice(0, cuts[k]);
+    let o = 0, b = 0; inStr = false; esc = false;
+    for (const ch of attempt) {
+      if (esc) { esc = false; continue; }
+      if (ch === '\\') { esc = true; continue; }
+      if (ch === '"') { inStr = !inStr; continue; }
+      if (inStr) continue;
+      if (ch === '{') o++;
+      else if (ch === '}') o--;
+      else if (ch === '[') b++;
+      else if (ch === ']') b--;
+    }
+    while (b > 0) { attempt += ']'; b--; }
+    while (o > 0) { attempt += '}'; o--; }
+    try { const recovered = JSON.parse(attempt); console.warn('[AI] repairJson : tableau tronqué récupéré partiellement'); return recovered; } catch (_) {}
+  }
   return null;
 }
 
@@ -548,6 +585,9 @@ async function callProvider(provider, { systemPrompt, userPrompt, maxTokens = 40
         { role: 'user', content: userPrompt }
       ]
     };
+    // ✅ v9.4 : gpt-oss = modèle de raisonnement — effort bas pour réserver
+    // les tokens au CONTENU (JSON) au lieu du raisonnement interne.
+    if (/gpt-oss/.test(provider.model || '')) body.reasoning_effort = 'low';
     // ✅ v9.3 : json_object désactivé pour OpenRouter (support partiel)
     if (provider.jsonMode && provider.name !== 'OpenRouter') {
       body.response_format = { type: 'json_object' };
@@ -611,9 +651,13 @@ async function runParallelTasks(tasks, providers, deadline) {
         return { status: 'fulfilled', value: r.value, task: tasks[i], provider: assignments[i].provider.name };
       }
       const errMsg = String(r.reason?.message || '');
-      const isStructural = errMsg.includes('JSON') || errMsg.includes('structure');
-      if (isStructural) return { status: 'rejected', error: r.reason, task: tasks[i], provider: 'none' };
-      if (deadline && Date.now() > deadline - 10000) return { status: 'rejected', error: r.reason, task: tasks[i], provider: 'none' };
+      // ✅ v9.4 : un JSON invalide n'est PLUS bloquant — on retente via les autres
+      // fournisseurs (Groq peut renvoyer un JSON cassé qu'OpenRouter/Mistral
+      // réussiront). Seule une échéance globale dépassée arrête les tentatives.
+      if (errMsg.includes('JSON') || errMsg.includes('structure')) {
+        console.warn(`[FAN-OUT] ${tasks[i].name} : ${errMsg} → fallback quand même`);
+      }
+      if (deadline && Date.now() > deadline - 5000) return { status: 'rejected', error: r.reason, task: tasks[i], provider: 'none' };
       for (const provider of providers) {
         if (provider.name === assignments[i].provider.name) continue;
         try {
@@ -623,6 +667,7 @@ async function runParallelTasks(tasks, providers, deadline) {
             maxTokens: tasks[i].maxTokens,
             deadline: Date.now() + 30000
           });
+          console.log(`[FAN-OUT] Fallback ${provider.name} a sauvé la tâche ${tasks[i].name}`);
           return { status: 'fulfilled', value, task: tasks[i], provider: provider.name };
         } catch (e) { console.warn(`[FAN-OUT] Fallback ${provider.name} échoué : ${e.message}`); }
       }

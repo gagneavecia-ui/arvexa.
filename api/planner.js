@@ -566,6 +566,8 @@ async function callProvider(provider, prompt, maxTokens = 6000) {
         { role: 'user', content: prompt }
       ]
     };
+    // gpt-oss = modèle de raisonnement : effort bas → tokens réservés au contenu
+    if (/gpt-oss/.test(provider.model || '')) body.reasoning_effort = 'low';
 
     if (provider.name === 'Groq' || provider.name === 'OpenRouter') {
       body.response_format = { type: 'json_object' };

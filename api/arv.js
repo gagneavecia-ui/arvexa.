@@ -367,6 +367,8 @@ async function callProvider(provider, messages, maxTokens = 1200) {
       max_tokens: maxTokens,
       messages
     };
+    // gpt-oss = modèle de raisonnement : effort bas → tokens réservés au contenu
+    if (/gpt-oss/.test(provider.model || '')) body.reasoning_effort = 'low';
 
     const result = await fetch(provider.endpoint, {
       method: 'POST',

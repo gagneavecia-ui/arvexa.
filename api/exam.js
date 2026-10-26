@@ -273,6 +273,8 @@ async function callProvider(provider, prompt, maxTokens) {
       ]
     };
     if (provider.jsonMode) body.response_format = { type: 'json_object' };
+    // gpt-oss = modèle de raisonnement : effort bas → tokens réservés au contenu
+    if (/gpt-oss/.test(provider.model || '')) body.reasoning_effort = 'low';
 
     const headers = {
       'Content-Type': 'application/json',

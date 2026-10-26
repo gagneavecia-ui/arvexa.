@@ -60,36 +60,55 @@ export default async function handler(req, res) {
   // Un ping minimal (16 tokens) par fournisseur : ok, latence, message d'erreur.
   let providers = null;
   if ((req.query && req.query.providers) || String(req.url || '').includes('providers=1')) {
-    const probe = async (endpoint, model, key) => {
+    const probe = async (endpoint, model, key, extraHeaders) => {
       if (!key) return { configured: false };
       const t0 = Date.now();
       const ctrl = new AbortController();
-      const to = setTimeout(() => ctrl.abort(), 9000);
+      const to = setTimeout(() => ctrl.abort(), 15000);
       try {
         const r = await fetch(endpoint, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${key}`,
+            'User-Agent': 'ARVEXA-School/1.0 (health probe)',
+            ...(extraHeaders || {})
+          },
           body: JSON.stringify({
             model,
-            max_tokens: 16,
+            max_tokens: 220,
             messages: [{ role: 'user', content: 'Réponds uniquement : OK' }]
           }),
           signal: ctrl.signal
         });
-        const d = await r.json().catch(() => null);
+        const raw = await r.text();
+        let d = null;
+        try { d = JSON.parse(raw); } catch (e) {}
         if (!r.ok) {
-          const msg = (d && d.error && d.error.message) || `HTTP ${r.status}`;
+          const msg = (d && d.error && d.error.message) || `HTTP ${r.status} — corps : ${raw.slice(0, 160)}`;
           return { configured: true, ok: false, status: r.status, error: msg, ms: Date.now() - t0 };
         }
-        const txt = (d && d.choices && d.choices[0] && d.choices[0].message && d.choices[0].message.content) || '';
-        return { configured: true, ok: Boolean(String(txt).trim()), ms: Date.now() - t0 };
+        const msg0 = (d && d.choices && d.choices[0] && d.choices[0].message) || {};
+        const content = String(msg0.content || '').trim();
+        const hasReasoning = Boolean(msg0.reasoning || (d.choices[0] && d.choices[0].finish_reason));
+        return {
+          configured: true,
+          ok: content.length > 0,
+          contentPreview: content.slice(0, 24) || '(vide)',
+          finishReason: (d.choices && d.choices[0] && d.choices[0].finish_reason) || null,
+          ms: Date.now() - t0,
+          _dbg: content.length > 0 ? undefined : (hasReasoning ? 'content vide mais finish_reason présent' : raw.slice(0, 120))
+        };
       } catch (e) {
-        return { configured: true, ok: false, error: e.name === 'AbortError' ? 'timeout 9s' : (e.message || 'erreur réseau'), ms: Date.now() - t0 };
+        return { configured: true, ok: false, error: e.name === 'AbortError' ? 'timeout 15s' : (e.message || 'erreur réseau'), ms: Date.now() - t0 };
       } finally { clearTimeout(to); }
     };
     providers = {
       groq: await probe('https://api.groq.com/openai/v1/chat/completions', process.env.GROQ_MODEL || 'openai/gpt-oss-120b', process.env.GROQ_API_KEY),
-      openrouter: await probe('https://openrouter.ai/api/v1/chat/completions', process.env.OPENROUTER_MODEL || 'openai/gpt-oss-120b', process.env.OPENROUTER_API_KEY),
+      openrouter: await probe('https://openrouter.ai/api/v1/chat/completions', process.env.OPENROUTER_MODEL || 'openai/gpt-oss-120b', process.env.OPENROUTER_API_KEY, {
+        'HTTP-Referer': (process.env.APP_ORIGIN || '').startsWith('http') ? process.env.APP_ORIGIN : 'https://arvexaschool.vercel.app',
+        'X-Title': 'ARVEXA Notebook'
+      }),
       mistral: await probe('https://api.mistral.ai/v1/chat/completions', process.env.MISTRAL_MODEL || 'mistral-large-latest', process.env.MISTRAL_API_KEY)
     };
   }

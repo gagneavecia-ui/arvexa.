@@ -420,7 +420,7 @@
     "comprendre les cours": "understand the lessons",
     "cours": "lessons",
     "avis": "feedback",
-    "connexion": "login",
+    "connexion": "connection",
     "paiement": "payment",
     "Pour utiliser ARVEXA School, tu dois :": "To use ARVEXA School, you must:",
     "✨ Ce que tu obtiens avec": "✨ What you get with",
@@ -786,7 +786,7 @@
     "connexion sécurisée": "secure login",
     "mot de passe confidentiel": "confidential password",
     "Chiffrement SSL/TLS": "SSL/TLS encryption",
-    "Règles de sécurité Firestore": "Firestore security rules",
+    "Règles de sécurité Firestore": "Strict Firestore security rules",
     "Sauvegardes automatiques": "Automatic backups",
     "T'opposer": "Object to",
     "à certains traitements": "certain processing",
@@ -1117,11 +1117,252 @@
     "Aperçu illustratif de l'interface ARVEXA School : compte à rebours BAC, progression et matières": "Illustrative preview of the ARVEXA School interface: BAC countdown, progress and subjects",
     "Aperçu illustratif d’un exercice": "Illustrative exercise preview",
     "Aperçu illustratif d’une fiche de révision": "Illustrative revision sheet preview",
-    "Les trois piliers de la démarche ARVEXA School": "The three pillars of the ARVEXA School approach"
+    "Les trois piliers de la démarche ARVEXA School": "The three pillars of the ARVEXA School approach",
+    "Erreur": "Error",
+    "État": "Status",
+    "Une erreur est survenue. Réessaie.": "An error occurred. Try again.",
+    "Problème de connexion. Vérifie ta connexion internet.": "Connection problem. Check your internet connection.",
+    "Trop de tentatives. Réessaie dans quelques minutes.": "Too many attempts. Try again in a few minutes.",
+    "Session expirée": "Session expired",
+    "Session expirée. Reconnecte-toi.": "Session expired. Log in again.",
+    "Non authentifié.": "Not authenticated.",
+    "Ton compte est temporairement en pause. Contacte le support.": "Your account is temporarily paused. Contact support.",
+    "Bon après-midi": "Good afternoon",
+    "Impossible de copier": "Cannot copy",
+    "Impossible de supprimer": "Cannot delete",
+    "Aucun résultat": "No results",
+    "Ajouté aux favoris": "Added to favorites",
+    "Appuie sur le cœur pour sauvegarder une formule.": "Tap the heart to save a formula.",
+    "Image trop lourde après compression": "Image too large after compression",
+    "Le fichier n'est pas une image": "The file is not an image",
+    "Impossible de charger cet examen.": "Cannot load this exam.",
+    "Impossible de charger cette conversation": "Cannot load this conversation",
+    "Impossible de charger le chapitre :": "Cannot load the chapter:",
+    "Impossible de charger le plan.": "Cannot load the plan.",
+    "Impossible de charger les messages": "Cannot load the messages",
+    "Impossible de charger l'historique.": "Cannot load history.",
+    "Impossible de charger le cahier": "Cannot load the notebook",
+    "Impossible de créer la notification admin :": "Cannot create the admin notification:",
+    "Impossible de créer ton profil. Vérifie ta connexion et réessaie.": "Cannot create your profile. Check your connection and try again.",
+    "Impossible de créer le profil après 3 tentatives.": "Cannot create your profile after 3 attempts.",
+    "Impossible de démarrer la dictée": "Cannot start dictation",
+    "Arrêter la dictée": "Stop dictation",
+    "Masquer le mot de passe": "Hide password",
+    "Au moins 2 caractères": "At least 2 characters",
+    "Au moins 6 caractères": "At least 6 characters",
+    "Adresse e-mail invalide": "Invalid email address",
+    "Adresse e-mail invalide.": "Invalid email address.",
+    "Plus tard": "Later",
+    "Contenu hors ligne complet": "Complete offline content",
+    "questions ARV restantes": "ARV questions left",
+    "Tu as vu l'essentiel. Passe à Premium pour aller plus loin.": "You've seen the essentials. Go Premium to go further.",
+    "Arv-progress": "ARV Progress",
+    "🌱 Tu as le temps": "🌱 You have time",
+    "Date indicative": "Indicative date",
+    "Ton": "Your",
+    "compte": "matters",
+    "Ton avis est": "Your feedback is",
+    "précieux": "valuable",
+    "pour nous aider à améliorer ARVEXA School.": "and helps us improve ARVEXA School.",
+    "Général": "General",
+    "Contenu": "Content",
+    "Ton message": "Your message",
+    "Avis envoyé.": "Feedback sent.",
+    "Avis enregistré. Notification Telegram différée.": "Feedback saved. Telegram notification delayed.",
+    "Tu as le temps, commence tranquillement": "You have time, start calmly",
+    "Bon rythme, continue comme ça": "Good pace, keep it up",
+    "Concentre-toi, chaque jour compte": "Focus, every day counts",
+    "Sprint final, donne tout": "Final sprint, give it your all",
+    "Accélère, c'est le moment clé": "Speed up, this is the key moment",
+    "C'est maintenant ! Dernière ligne droite": "Now! The final stretch",
+    "C'est le jour J ! Bonne chance !": "It's the big day! Good luck!",
+    "🔓 Compte gratuit": "🔓 Free account",
+    "Paiement sécurisé": "Secure payment",
+    "Activation rapide": "Quick activation",
+    "Référence": "Reference",
+    "Envoyée": "Sent",
+    "actif": "active",
+    "tous": "all",
+    "les contenus ARVEXA School.": "of ARVEXA School content.",
+    "Tous les outils avancés": "All advanced tools",
+    "💳 Confirmation de": "💳 Confirm your",
+    "💡 Économie réalisée": "💡 You save",
+    "Clique sur": "Tap",
+    "\"Confirmer et envoyer\"": "\"Confirm and send\"",
+    "qui suivent": "that follow.",
+    "Plateforme": "Platform",
+    "Parcours": "Journey",
+    "Cours & fiches": "Lessons & sheets",
+    "Assistance": "Support",
+    "Le parcours": "The journey",
+    "Terminale D au Niger": "Terminale D in Niger",
+    "La": "The",
+    ", puis": ", then",
+    "d'ARVEXA School.": "of ARVEXA School.",
+    "d'utilisation": "of Use",
+    "Nos services incluent notamment :": "Our services include:",
+    "📚 Des": "📚",
+    "✏️ Des": "✏️",
+    "🛠️ Des": "🛠️",
+    "🎯 Un": "🎯",
+    "💬 Un": "💬",
+    "🤖 Des outils": "🤖 Tools",
+    "d'intelligence artificielle": "with artificial intelligence",
+    "Important :": "Important:",
+    "Par": "Via",
+    "Nous": "We",
+    "suspendre ou supprimer": "suspend or delete",
+    "NE PAS": "NOT",
+    "Diffuser du": "Distribute",
+    "L'": "The",
+    "abonnement Premium": "Premium subscription",
+    "Mynita, Wave ou Amanata": "Mynita, Wave or Amanata",
+    "manuelle": "manual",
+    "poursuites judiciaires": "legal action",
+    "strictement interdit": "strictly forbidden",
+    "(personnalisation)": "(personalization)",
+    "(connexion et notifications)": "(login and notifications)",
+    "(paiements uniquement)": "(payments only)",
+    "et accessible": "and accessible service",
+    "Maintenir": "Maintain",
+    "Cependant, ARVEXA School": "However, ARVEXA School",
+    "bandeau visible": "visible banner",
+    "Politique de": "Privacy",
+    "Cette politique explique clairement": "This policy clearly explains",
+    "nous les collectons": "we collect it",
+    "au fonctionnement de l'application :": "for the app to work:",
+    "Nous ne collectons": "We never collect",
+    "jamais": "",
+    "favoris": "favorites",
+    "notifications": "important notifications",
+    "importantes": "",
+    "par Firebase Auth": "via Firebase Auth",
+    "strictes": "",
+    "quotidiennes": "daily",
+    "Avis et retours": "Feedback and reviews",
+    "ARVEXA School utilise :": "ARVEXA School uses:",
+    "Stockage local": "Local storage",
+    "aucun cookie publicitaire": "any advertising cookies",
+    "ni de tracking tiers.": "or third-party tracking.",
+    "Rectifier": "Correct",
+    "Exporter": "Export",
+    "Retirer": "Withdraw",
+    "majeure": "major change",
+    "(facile à moyen) puis": "(easy to medium) then",
+    "(moyen à difficile).": "(medium to difficult).",
+    "Analyse de la configuration": "Analyzing your setup",
+    "Analyse de la configuration...": "Analyzing your setup...",
+    "Analyse des exercices...": "Analyzing the exercises...",
+    "Rédaction des exercices": "Writing the exercises",
+    "Contrôle cohérence et réponses": "Checking consistency and answers",
+    "Évaluation pédagogique": "Pedagogical review",
+    "Résultats de l'examen": "Exam results",
+    "Pourcentage": "Percentage",
+    "Limite d'examens": "Exam limit",
+    "atteinte": "reached",
+    "Calcul du score...": "Calculating your score...",
+    "Aucun détail disponible.": "No details available.",
+    "Cette action est": "This action is",
+    "définitive": "permanent",
+    "Cahier supprimé": "Notebook deleted",
+    "Réussite": "Success rate",
+    "Limite": "Limit",
+    "4 notions · ~15 secondes": "4 notions · ~15 seconds",
+    "Aucune notion générée pour le moment.": "No notions generated yet.",
+    "Aucune question générée. Réessaie.": "No questions generated. Try again.",
+    "Limite de sections": "Section limit",
+    "Actualisé": "Updated",
+    "Aucune section à afficher.": "No sections to display.",
+    "Ajoute tes notes personnelles...": "Add your personal notes...",
+    "Analyse littéraire": "Literary analysis",
+    "Août": "August",
+    "Chargement du contenu...": "Loading content...",
+    "📝 Mes": "📝 My",
+    "Cette partie est": "This section is",
+    "réservée": "reserved",
+    "Ce chapitre est": "This chapter is",
+    "réservé": "reserved",
+    "Toutes les parties": "All sections",
+    "Auteur": "Author",
+    "Image": "Photo",
+    "Tu ne peux plus envoyer de messages dans ce groupe. Contacte l'administrateur pour plus d'informations.": "You can no longer send messages in this group. Contact the administrator for more information.",
+    "Aucun message pour le moment.": "No messages yet.",
+    "Sois le premier à écrire !": "Be the first to write!",
+    "Tableau de bord": "Dashboard",
+    "Le Grand Mix": "The Grand Mix",
+    "Prochaine étape": "Next step",
+    "🏆 Mode final": "🏆 Final mode",
+    "11 questions · 11 chapitres": "11 questions · 11 chapters",
+    "Lancer": "Start",
+    "Programme complet": "Full program",
+    "11 fiches · 44 formules": "11 sheets · 44 formulas",
+    "points": "points",
+    "Activer le son": "Turn on sound",
+    "Bonne réponse !": "Correct answer!",
+    "Avec second membre": "With right-hand side",
+    "Alterner les thèmes force le cerveau à choisir la bonne méthode. C'est pour cela que le Grand Mix est un excellent entraînement.": "Alternating topics forces your brain to pick the right method. That is what makes the Grand Mix such good practice.",
+    "Après une erreur, lis l'explication et note la règle qui manquait. C'est exactement là que ton cerveau progresse.": "After a mistake, read the explanation and note the rule you were missing. That is exactly where your brain improves.",
+    "Attaque le chapitre où tu es le moins à l'aise quand ton énergie est la plus haute, puis termine par un chapitre plaisir.": "Tackle the chapter you find hardest when your energy is highest, then finish with an easy chapter.",
+    "Tout lire": "Read all",
+    "Pas de": "No",
+    "introuvable": "not found",
+    "Mode BAC": "BAC mode",
+    "Que faire maintenant ?": "What to do now?",
+    "ARVEXA — Diagnostic": "ARVEXA — Diagnostics",
+    "🔍 Diagnostic ARVEXA": "🔍 ARVEXA diagnostics",
+    "=== FICHIERS RÉSEAU ===": "=== NETWORK FILES ===",
+    "4. CSS tour-styles.css chargé": "4. CSS tour-styles.css loaded",
+    "ARVEXA — PLAN DE RÉVISION": "ARVEXA — REVISION PLAN",
+    "📊 RÉSUMÉ": "📊 SUMMARY",
+    "🎯 OBJECTIF DE LA SEMAINE": "🎯 WEEKLY GOAL",
+    "📋 PRIORITÉS": "📋 PRIORITIES",
+    "📅 PLAN DE LA SEMAINE": "📅 WEEKLY PLAN",
+    "💬 MESSAGE DU COACH": "💬 COACH MESSAGE",
+    "🌱 Tu as le temps, commence tranquillement": "🌱 You have time, start calmly",
+    "📚 Bon rythme, continue comme ça": "📚 Good pace, keep it up",
+    "🔥 Concentre-toi, chaque jour compte": "🔥 Focus, every day counts",
+    "⚡ Accélère, c'est le moment clé": "⚡ Speed up, this is the key moment",
+    "🚀 Sprint final, donne tout": "🚀 Final sprint, give it your all",
+    "🏆 C'est maintenant ! Dernière ligne droite": "🏆 Now! The final stretch",
+    "🎉 C'est le jour J ! Bonne chance !": "🎉 It's the big day! Good luck!",
+    "ARVEXA School — Accueil": "ARVEXA School — Home",
+    "ARVEXA — Abonnement Premium": "ARVEXA — Premium subscription",
+    "ARV Assistant — Ton tuteur IA": "ARV Assistant — Your AI tutor",
+    "ARVEXA — Calculatrice scientifique": "ARVEXA — Scientific calculator",
+    "ARVEXA — Chapitre": "ARVEXA — Chapter",
+    "ARVEXA — Conditions d'utilisation": "ARVEXA — Terms of Use",
+    "ARVEXA — Politique de confidentialité": "ARVEXA — Privacy Policy",
+    "ARVEXA — Historique des examens": "ARVEXA — Exam history",
+    "ARVEXA — Mode examen": "ARVEXA — Exam mode",
+    "ARVEXA — Mot de passe oublié": "ARVEXA — Forgot password",
+    "ARVEXA — Formulaires": "ARVEXA — Formula sheets",
+    "ARVEXA — Lecture de cours": "ARVEXA — Lesson reader",
+    "ARVEXA — Connexion": "ARVEXA — Log in",
+    "ARVEXA — Matière": "ARVEXA — Subject",
+    "ARVEXA School — Bienvenue": "ARVEXA School — Welcome",
+    "ARVEXA — Outils & Ressources": "ARVEXA — Tools & Resources",
+    "ARVEXA — Inscription": "ARVEXA — Sign up",
+    "ARVEXA — Tableau périodique": "ARVEXA — Periodic table",
+    "Première section": "First section",
+    "Toutes matières": "All subjects",
+    "Série de 3 jours": "3-day streak",
+    "Série de 7 jours": "7-day streak",
+    "« L'éducation est l'arme la plus puissante pour changer le monde. »": "« Education is the most powerful weapon to change the world. »",
+    "« La discipline est le pont entre les objectifs et les accomplissements. »": "« Discipline is the bridge between goals and accomplishments. »",
+    "« Petit à petit, l'oiseau fait son nid. »": "« Little by little, the bird builds its nest. »",
+    "« Seul on va plus vite, ensemble on va plus loin. »": "« Alone you go faster, together you go further. »",
+    "« Le succès, c'est d'aller d'échec en échec sans perdre son enthousiasme. »": "« Success is going from failure to failure without losing your enthusiasm. »",
+    "« La connaissance est un trésor, mais la pratique en est la clé. »": "« Knowledge is a treasure, but practice is the key. »",
+    "« Le génie est fait de 1 % d'inspiration et de 99 % de transpiration. »": "« Genius is 1% inspiration and 99% perspiration. »",
+    "« Patience et longueur de temps font plus que force ni que rage. »": "« Patience and time achieve more than force or rage. »",
+    "« Ce n'est pas parce que les choses sont difficiles que nous n'osons pas. »": "« It is not because things are difficult that we do not dare. »",
+    "« Chaque chapitre maîtrisé aujourd'hui est une question gagnée demain. »": "« Every chapter mastered today is a question won tomorrow. »",
+    "Proverbe": "Proverb",
+    "Proverbe africain": "African proverb",
   };
 
   /* ── Normalisation + expansion des variantes ── */
-  function norm(s) { return String(s).replace(/\s+/g, ' ').trim(); }
+  function norm(s) { return String(s).replace(/[\u2019\u2018]/g, "'").replace(/\s+/g, ' ').trim(); }
 
   var DICT = {};
   (function build() {
@@ -1157,28 +1398,30 @@
     mois: 'month'
   };
 
+  var FR_DAYS_EN = {
+    lundi: 'Monday', mardi: 'Tuesday', mercredi: 'Wednesday', jeudi: 'Thursday',
+    vendredi: 'Friday', samedi: 'Saturday', dimanche: 'Sunday'
+  };
+  var FR_MONTHS_EN = {
+    janvier: 'January', f\u00e9vrier: 'February', mars: 'March', avril: 'April',
+    mai: 'May', juin: 'June', juillet: 'July', ao\u00fbt: 'August',
+    septembre: 'September', octobre: 'October', novembre: 'November', d\u00e9cembre: 'December'
+  };
+  function matchCaseEn(src, dst) {
+    if (src === src.toUpperCase() && src.length > 1) return dst.toUpperCase();
+    if (src.charAt(0) === src.charAt(0).toUpperCase()) return dst.charAt(0).toUpperCase() + dst.slice(1);
+    return dst;
+  }
   function patternsReplace(s) {
     var out = s;
-    out = out
-      .replace(/\bjanvier\b/g, 'January')
-      .replace(/\bfévrier\b/g, 'February')
-      .replace(/\bmars\b/g, 'March')
-      .replace(/\bavril\b/g, 'April')
-      .replace(/\bmai\b/g, 'May')
-      .replace(/\bjuin\b/g, 'June')
-      .replace(/\bjuillet\b/g, 'July')
-      .replace(/\baoût\b/g, 'August')
-      .replace(/\bseptembre\b/g, 'September')
-      .replace(/\boctobre\b/g, 'October')
-      .replace(/\bnovembre\b/g, 'November')
-      .replace(/\bdécembre\b/g, 'December')
-      .replace(/\blundi\b/g, 'Monday')
-      .replace(/\bmardi\b/g, 'Tuesday')
-      .replace(/\bmercredi\b/g, 'Wednesday')
-      .replace(/\bjeudi\b/g, 'Thursday')
-      .replace(/\bvendredi\b/g, 'Friday')
-      .replace(/\bsamedi\b/g, 'Saturday')
-      .replace(/\bdimanche\b/g, 'Sunday');
+out = out.replace(/\b(lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche)\b/gi, function (m) {
+      var en = FR_DAYS_EN[m.toLowerCase()];
+      return en ? matchCaseEn(m, en) : m;
+    });
+    out = out.replace(/\b(janvier|f\u00e9vrier|mars|avril|mai|juin|juillet|ao\u00fbt|septembre|octobre|novembre|d\u00e9cembre)\b/gi, function (m) {
+      var en = FR_MONTHS_EN[m.toLowerCase()];
+      return en ? matchCaseEn(m, en) : m;
+    });
     out = out.replace(/\bNiv\.\s*(\d+)/g, 'Lv. $1');
     out = out.replace(/\b(?:Question|question)\s+(\d+)\s+sur\s+(\d+)/g, 'Question $1 of $2');
     out = out.replace(/\b(?:Étape|étape)\s+(\d+)\s*(?:\/|sur)\s*(\d+)/g, 'Step $1 of $2');
@@ -1199,6 +1442,13 @@
         var en = UNITS_EN[u] || u;
         return n + ' ' + en + (n === '1' ? '' : 's') + ' ago';
       });
+    out = out.replace(/\bNiveau\s+(\d+)/g, 'Level $1');
+    out = out.replace(/\bPartie\s+(\d+)/g, 'Section $1');
+    out = out.replace(/\b(\d+)\s+session\b/g, function (m, n) { return n + (n === '1' ? ' session' : ' sessions'); });
+    out = out.replace(/\bCurieux\b/g, 'Curious').replace(/\bApprenti\b/g, 'Apprentice')
+      .replace(/\bAnalyste\b/g, 'Analyst').replace(/\bG\u00e9om\u00e8tre\b/g, 'Geometer')
+      .replace(/\bMath\u00e9maticien\b/g, 'Mathematician').replace(/\bL\u00e9gende\b/g, 'Legend');
+    out = out.replace(/\u00c9ch\u00e9ance\s*:\s*/g, 'Deadline: ');
     return out;
   }
 

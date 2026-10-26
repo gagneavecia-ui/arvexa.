@@ -218,22 +218,56 @@ function toISO(v) {
   return null;
 }
 
-// ✅ Nettoyage LaTeX
+// ✅ Nettoyage LaTeX — v7.5 : exposants multi-caractères + table étendue
+const SUP_MAP = {
+  '⁰': '0', '¹': '1', '²': '2', '³': '3', '⁴': '4', '⁵': '5', '⁶': '6', '⁷': '7',
+  '⁸': '8', '⁹': '9', '⁺': '+', '⁻': '-', '⁼': '=', 'ⁿ': 'n', 'ⁱ': 'i'
+};
+
 const UNICODE_TO_LATEX = {
   'π': '\\pi ', '√': '\\sqrt{}', '×': '\\times ', '÷': '\\div ',
-  '≤': '\\leq ', '≥': '\\geq ', '≠': '\\neq ', '∞': '\\infty ',
-  '→': '\\to ', '∈': '\\in ', '∉': '\\notin ', '⊂': '\\subset ',
-  '∑': '\\sum ', '∫': '\\int ', 'Δ': '\\Delta ', 'α': '\\alpha ',
-  'β': '\\beta ', 'γ': '\\gamma ', 'δ': '\\delta ', 'θ': '\\theta ',
-  'λ': '\\lambda ', 'μ': '\\mu ', 'σ': '\\sigma ', 'ω': '\\omega ',
-  '²': '^{2}', '³': '^{3}', '¹': '^{1}', '⁴': '^{4}', 'ⁿ': '^{n}',
-  '·': '\\cdot ', '⁻': '^{-}', '±': '\\pm '
+  '≤': '\\leq ', '≥': '\\geq ', '≠': '\\neq ', '≈': '\\approx ', '≡': '\\equiv ',
+  '∞': '\\infty ', '→': '\\to ', '⇒': '\\Rightarrow ', '⇔': '\\iff ',
+  '↔': '\\leftrightarrow ', '∈': '\\in ', '∉': '\\notin ', '⊂': '\\subset ',
+  '⊆': '\\subseteq ', '∪': '\\cup ', '∩': '\\cap ', '∅': '\\emptyset ',
+  '∑': '\\sum ', '∫': '\\int ', '∂': '\\partial ', '∇': '\\nabla ',
+  'Δ': '\\Delta ', 'α': '\\alpha ', 'β': '\\beta ', 'γ': '\\gamma ',
+  'δ': '\\delta ', 'θ': '\\theta ', 'λ': '\\lambda ', 'μ': '\\mu ',
+  'µ': '\\mu ', 'σ': '\\sigma ', 'ω': '\\omega ', 'φ': '\\varphi ',
+  'ϕ': '\\phi ', 'ε': '\\varepsilon ', 'ρ': '\\rho ', 'τ': '\\tau ',
+  '·': '\\cdot ', '±': '\\pm ', '⊥': '\\perp ', '∥': '\\parallel ',
+  '∘': '\\circ ', '∝': '\\propto ', '°': '^{\\circ}', '−': '-', '…': '\\ldots ',
+  '∀': '\\forall ', '∃': '\\exists ', 'ℝ': '\\mathbb{R}', 'ℕ': '\\mathbb{N}',
+  'ℤ': '\\mathbb{Z}', 'ℚ': '\\mathbb{Q}', 'ℂ': '\\mathbb{C}',
+  // Exposants isolés (sans base) → chiffres lisibles ; les séquences
+  // collées à une base sont traitées par replaceSuperscripts ci-dessous.
+  '²': '2', '³': '3', '¹': '1', '⁴': '4', '⁵': '5', '⁶': '6', '⁷': '7',
+  '⁸': '8', '⁹': '9', 'ⁿ': 'n', '⁻': '-'
 };
+
+// Séquences d'exposants collées à une base : 10⁻² → 10^{-2} (et non 10^{-}^{2})
+function replaceSuperscripts(text) {
+  return text.replace(/([A-Za-z0-9}\)\]])([⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻⁼ⁿⁱ]+)/g, (m, base, sups) => {
+    const conv = sups.split('').map((c) => SUP_MAP[c] || c).join('');
+    return `${base}^{${conv}}`;
+  });
+}
 
 function replaceUnicodeMath(text) {
   if (!text || typeof text !== 'string') return text;
-  let r = text;
+  let r = replaceSuperscripts(text);
   for (const [u, l] of Object.entries(UNICODE_TO_LATEX)) r = r.split(u).join(l);
+  return r;
+}
+
+// Délimiteurs LaTeX alternatifs → $ / $$ (KaTeX-friendly)
+function normalizeLatexDelimiters(text) {
+  if (!text || typeof text !== 'string') return text;
+  let r = text;
+  r = r.replace(/\\\(([\s\S]*?)\\\)/g, (m, inner) => `$${inner.trim()}$`);
+  r = r.replace(/\\\[([\s\S]*?)\\\]/g, (m, inner) => `$$${inner.trim()}$$`);
+  r = r.replace(/\\begin\{(?:equation|align|gather)\*?\}([\s\S]*?)\\end\{(?:equation|align|gather)\*?\}/g,
+    (m, inner) => `$$${inner.trim()}$$`);
   return r;
 }
 
@@ -259,7 +293,7 @@ function escapeHtmlOutsideLatex(text) {
 
 function cleanText(text) {
   if (!text || typeof text !== 'string') return text;
-  return escapeHtmlOutsideLatex(wrapOrphanLatex(replaceUnicodeMath(text)));
+  return escapeHtmlOutsideLatex(wrapOrphanLatex(replaceUnicodeMath(normalizeLatexDelimiters(text))));
 }
 
 function deepClean(obj) {
@@ -474,6 +508,8 @@ const LATEX_RULES = `
 RÈGLES LATEX :
 - Toute formule mathématique entre $...$ ou $$...$$.
 - INTERDIT : LaTeX brut sans $, symboles Unicode (π → $\\pi$, √ → $\\sqrt{}$, × → $\\times$, ≤ → $\\leq$, ² → $^2$).
+- N'insère JAMAIS de symbole Unicode à l'intérieur des $...$ : uniquement du LaTeX pur (⁻¹ → $^{-1}$, ° → $^{\\circ}$, ℝ → $\\mathbb{R}$).
+- Formules lisibles et standards : fractions avec \\dfrac, ensembles avec \\mathbb{R}/\\mathbb{N}/\\mathbb{Z}/\\mathbb{C}, racines avec \\sqrt{...}, unités entre \\text{...} (ex. $v = \\dfrac{d}{t}$ en $\\text{m/s}$).
 `;
 
 const PEDAGOGY_RULES = `

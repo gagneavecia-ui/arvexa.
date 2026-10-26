@@ -1441,6 +1441,8 @@
       /* ⚡ Anti-flash restauration en dur (pré-CDN, pattern accueil v4.2) */
     html.instant .shell { visibility: hidden; }
     html.instant.ready .shell { visibility: visible; }
+      /* ⚡ Émoji matière dans le hero (v4.2) */
+    .hero-emoji { font-size: 17px; line-height: 1; }
   </style>
 </head>
 
@@ -1484,7 +1486,7 @@
 
       <div class="hero-chapter">
         <div class="hero-subject">
-          <i class="fas fa-book"></i>
+          <span class="hero-emoji" id="subjectEmoji">📖</span>
           <span id="subjectLabel">Chargement...</span>
         </div>
         <div class="hero-title" id="chapterTitle">—</div>
@@ -1714,7 +1716,9 @@
     } catch (e) {}
     if (snap.uid && uid && snap.uid !== uid) return;
     var label = snap.subjectLabel || subject;
+    var EMO = { mathematiques: '📐', physique: '⚡', chimie: '🧪', svt: '🧬', philosophie: '🧠', histoire: '🌍', geographie: '🗺️' };
     var el;
+    el = g('subjectEmoji'); if (el) el.textContent = EMO[subject] || '📖';
     el = g('subjectLabel'); if (el) el.textContent = label;
     el = g('chapterTitle'); if (el) el.textContent = snap.chapter || chapter;
     el = g('chapterSelectorValue'); if (el) el.textContent = snap.chapter || chapter;
@@ -2097,7 +2101,7 @@ window.addEventListener('popstate', (event) => {
         state.currentNotion = notion;
         $('notionDetailEyebrow').textContent = 'Notion ' + (idx + 1);
         $('notionDetailTitle').textContent = notion.notionTitle || 'Notion';
-        $('notionDetailMeta').textContent = state.chapter + ' · ' + (SUBJECTS[state.subject] || state.subject);
+        $('notionDetailMeta').textContent = (SUBJECT_EMOJIS[state.subject] || '📖') + ' ' + state.chapter + ' · ' + (SUBJECTS[state.subject] || state.subject);
         $('notionDetailContent').innerHTML = renderNotionContent(notion);
         showView('viewNotionDetail');
         return;
@@ -2394,6 +2398,8 @@ function hydrateFromSnapshot() {
 // ═══════════════════════════════════════════════════════════════
 function updateHomeUI() {
   $('subjectLabel').textContent = SUBJECTS[state.subject] || state.subject;
+  const heroEmoji = document.getElementById('subjectEmoji');
+  if (heroEmoji) heroEmoji.textContent = SUBJECT_EMOJIS[state.subject] || '📖';
   $('chapterTitle').textContent = state.chapter;
 
   const chapterValueEl = document.getElementById('chapterSelectorValue');
@@ -2625,7 +2631,7 @@ function openNotionDetail(index) {
 
   $('notionDetailEyebrow').textContent = 'Notion ' + (index + 1);
   $('notionDetailTitle').textContent = notion.notionTitle || 'Notion';
-  $('notionDetailMeta').textContent = state.chapter + ' · ' + (SUBJECTS[state.subject] || state.subject);
+  $('notionDetailMeta').textContent = (SUBJECT_EMOJIS[state.subject] || '📖') + ' ' + state.chapter + ' · ' + (SUBJECTS[state.subject] || state.subject);
 
   const content = $('notionDetailContent');
   content.innerHTML = renderNotionContent(notion);

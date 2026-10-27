@@ -59,7 +59,7 @@ const MIN_CONTENT_LENGTH = 40;
 const MAX_CONTENT_LENGTH = 15000;
 
 const FREE_SECTION_LIMIT = 5;
-const GLOBAL_AI_TIME_BUDGET_MS = 70000;
+const GLOBAL_AI_TIME_BUDGET_MS = 78000;
 
 let adminServices = null;
 
@@ -700,17 +700,21 @@ function distributeTasks(tasks, providers) {
 async function runParallelTasks(tasks, providers, deadline) {
   const queues = distributeTasks(tasks, providers);
   const results = new Array(tasks.length).fill(null);
+  // Concurrence max par fournisseur : Mistral (payant) accepte 2 requêtes
+  // parallèles ; Groq est limité à 1 (TPM 8000/min) ; OpenRouter 2.
+  const MAX_CONC = { 'Groq': 1, 'OpenRouter': 2, 'Mistral': 2 };
   const busy = new Map(providers.map((p) => [p.name, 0]));
   const blockedUntil = new Map(providers.map((p) => [p.name, 0]));
 
   function usable(p) {
-    return (busy.get(p.name) || 0) === 0 && (blockedUntil.get(p.name) || 0) <= Date.now();
+    const cap = MAX_CONC[p.name] || 1;
+    return (busy.get(p.name) || 0) < cap && (blockedUntil.get(p.name) || 0) <= Date.now();
   }
   function release(p) {
     busy.set(p.name, Math.max(0, (busy.get(p.name) || 1) - 1));
   }
   // Réserve atomiquement (test-and-set, sans await entre les deux) le premier
-  // fournisseur utilisable (inactif + non bloqué) et le retourne.
+  // fournisseur utilisable (capacité libre + non bloqué) et le retourne.
   async function reserveUsable(excludeNames) {
     while (deadline && Date.now() < deadline - 8000) {
       const found = providers.find((p) => !excludeNames.includes(p.name) && usable(p));
@@ -732,8 +736,15 @@ async function runParallelTasks(tasks, providers, deadline) {
     } catch (e) {
       const msg = String(e?.message || '');
       if (msg.includes('HTTP 429') || /rate limit/i.test(msg) || /quota/i.test(msg)) {
-        blockedUntil.set(provider.name, Date.now() + 25000);
-        console.warn(`[FAN-OUT] ${provider.name} en rate-limit, écarté 25 s`);
+        // Quota JOURNALIER épuisé → inutile de retenter avant longtemps.
+        // Quota à la minute → réessayer dans 25 s.
+        const daily = /per day|TPD|daily/i.test(msg);
+        const waitMs = daily ? 600000 : 25000;
+        blockedUntil.set(provider.name, Date.now() + waitMs);
+        console.warn(`[FAN-OUT] ${provider.name} en rate-limit (${daily ? 'QUOTIDIEN' : 'minute'}), écarté ${waitMs / 1000} s`);
+      } else if (/abort/i.test(msg)) {
+        // Fournisseur qui dépasse systématiquement son timeout → petit repos.
+        blockedUntil.set(provider.name, Date.now() + 15000);
       }
       throw e;
     }

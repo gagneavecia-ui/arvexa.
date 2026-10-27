@@ -2271,10 +2271,6 @@ function showGeneratingState(el, profile) {
           <span class="generating-step-icon">❓</span>
           <span>Banque de questions</span>
         </div>
-        <div class="generating-step" data-step="5">
-          <span class="generating-step-icon">✅</span>
-          <span>QCM</span>
-        </div>
       </div>
       <p style="font-size:12px; color:var(--text-muted); margin-top:8px;">
         Cela peut prendre 30 à 60 secondes.
@@ -2887,7 +2883,6 @@ async function renderChapterView(params) {
               <div class="list-item-title">${idx + 1}. ${escapeHtml(s.title)}</div>
               <div class="list-item-meta">
                 ${s.questionsCount > 0 ? `<span>${s.questionsCount} Q/R</span><span class="dot"></span>` : ''}
-                ${s.qcmCount > 0 ? `<span>${s.qcmCount} QCM</span><span class="dot"></span>` : ''}
                 <span>${escapeHtml(s.time)}</span>
                 ${s.studied ? '<span>· Étudiée</span>' : ''}
               </div>
@@ -3034,7 +3029,7 @@ async function renderSectionView(params) {
         <div class="content-section-title"><i class="fas fa-graduation-cap"></i>Teste-toi sur cette partie</div>
         <div class="block">
           <div class="block-head"><i class="fas fa-circle-info"></i>Pas d'examen en anglais</div>
-          <div class="block-body">Le mode examen n'est pas disponible pour l'anglais. Utilise la banque de questions et les QCM de cette section pour te tester.</div>
+          <div class="block-body">Le mode examen n'est pas disponible pour l'anglais. Utilise la banque de questions de cette section pour te tester.</div>
         </div>
       </div>` : '')}
     `;
@@ -3147,13 +3142,9 @@ function renderAnalysis(a, profile) {
       <div class="qa-list">${questions.map((q, i) => renderQuestion(q, i)).join('')}</div>
     </div>`;
   }
-  const qcm = safeArray(a.qcm);
-  if (qcm.length > 0) {
-    html += `<div class="content-section">
-      <div class="content-section-title"><i class="fas fa-list-check"></i>QCM <span class="count">${qcm.length}</span></div>
-      <div>${qcm.map((q, i) => renderQcm(q, i)).join('')}</div>
-    </div>`;
-  }
+  // ✅ v4.14 — QCM retiré (débordements récurrents sur mobile) :
+  // la section livre l'explication du prof + la banque de questions.
+  // renderQcm/CSS restent dans le fichier pour une réactivation éventuelle.
   if (!html && a.fallback) {
     html = `<div class="block">
       <div class="block-head"><i class="fas fa-info-circle"></i>Information</div>

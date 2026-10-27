@@ -13,7 +13,8 @@
 //     Mistral = structure + qcm (jsonMode), OpenRouter = questions (repli Mistral)
 //   - extraction supprimée (la page n'utilise pas analysis.extracted)
 //   - budget IA 70 s (maxDuration 90) — repli sur fournisseur inactif
-//   - normalisation post-génération : Q&R et QCM toujours exploitables
+//   - v4.14 : tâche QCM retirée (affichage + génération) — explication + banque
+//     de questions uniquement ; les anciennes sections gardent leur QCM en base
 // NOTE : maxDuration est assigné en FIN de module (visible par Vercel AU BUILD).
 // ================================================================
 
@@ -1221,32 +1222,6 @@ Format JSON :
 $${JSON_STRICT_RULES}
 
 Réponds UNIQUEMENT avec le JSON.`
-    },
-    {
-      name: 'qcm',
-      maxTokens: 2500,
-      systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
-      userPrompt: `Génère entre 8 et 12 QCM couvrant des NOTIONS DIFFÉRENTES de cette section.
-
-${baseContext}
-
-${PERIMETER_RULES}
-${LATEX_RULES}
-
-RÈGLES :
-- Exactement 4 options (A, B, C, D), une seule correcte.
-- Distracteurs plausibles mais clairement faux pour quelqu'un qui maîtrise le cours.
-- "correct" = lettre de la bonne réponse, positions variées (pas toujours A).
-- "explanation" : 1 à 2 phrases expliquant pourquoi la réponse est correcte.
-
-Format JSON :
-{
-  "qcm": [{"question": "...", "options": [{"id":"A","text":"..."},{"id":"B","text":"..."},{"id":"C","text":"..."},{"id":"D","text":"..."}], "correct": "A", "explanation": "..."}]
-}
-
-${JSON_STRICT_RULES}
-
-Réponds UNIQUEMENT avec le JSON.`
     }
   ];
 }
@@ -1372,31 +1347,6 @@ Format JSON :
 $${JSON_STRICT_RULES}
 
 Réponds UNIQUEMENT avec le JSON.`
-    },
-    {
-      name: 'qcm',
-      maxTokens: 2500,
-      systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
-      userPrompt: `Génère entre 8 et 12 QCM de SVT couvrant des NOTIONS DIFFÉRENTES de cette section.
-
-${baseContext}
-
-${PERIMETER_RULES}
-
-RÈGLES :
-- Exactement 4 options (A, B, C, D), une seule correcte.
-- Distracteurs plausibles mais clairement faux.
-- "correct" = lettre de la bonne réponse, positions variées.
-- "explanation" : 1 à 2 phrases expliquant la bonne réponse.
-
-Format JSON :
-{
-  "qcm": [{"question": "...", "options": [{"id":"A","text":"..."},{"id":"B","text":"..."},{"id":"C","text":"..."},{"id":"D","text":"..."}], "correct": "A", "explanation": "..."}]
-}
-
-${JSON_STRICT_RULES}
-
-Réponds UNIQUEMENT avec le JSON.`
     }
   ];
 }
@@ -1513,31 +1463,6 @@ Format JSON :
 $${JSON_STRICT_RULES}
 
 Réponds UNIQUEMENT avec le JSON.`
-    },
-    {
-      name: 'qcm',
-      maxTokens: 2500,
-      systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
-      userPrompt: `Génère entre 8 et 12 QCM de philosophie couvrant des NOTIONS DIFFÉRENTES de cette section.
-
-${baseContext}
-
-${PERIMETER_RULES}
-
-RÈGLES :
-- Exactement 4 options (A, B, C, D), une seule correcte.
-- Distracteurs plausibles mais clairement faux.
-- "correct" = lettre de la bonne réponse, positions variées.
-- "explanation" : 1 à 2 phrases expliquant la bonne réponse.
-
-Format JSON :
-{
-  "qcm": [{"question": "...", "options": [{"id":"A","text":"..."},{"id":"B","text":"..."},{"id":"C","text":"..."},{"id":"D","text":"..."}], "correct": "A", "explanation": "..."}]
-}
-
-${JSON_STRICT_RULES}
-
-Réponds UNIQUEMENT avec le JSON.`
     }
   ];
 }
@@ -1644,31 +1569,6 @@ Format JSON :
 }
 
 $${JSON_STRICT_RULES}
-
-Réponds UNIQUEMENT avec le JSON.`
-    },
-    {
-      name: 'qcm',
-      maxTokens: 2500,
-      systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
-      userPrompt: `Génère entre 8 et 12 QCM d'histoire-géo couvrant des NOTIONS DIFFÉRENTES de cette section.
-
-${baseContext}
-
-${PERIMETER_RULES}
-
-RÈGLES :
-- Exactement 4 options (A, B, C, D), une seule correcte.
-- Distracteurs plausibles mais clairement faux (dates ou lieux proches).
-- "correct" = lettre de la bonne réponse, positions variées.
-- "explanation" : 1 à 2 phrases expliquant la bonne réponse.
-
-Format JSON :
-{
-  "qcm": [{"question": "...", "options": [{"id":"A","text":"..."},{"id":"B","text":"..."},{"id":"C","text":"..."},{"id":"D","text":"..."}], "correct": "A", "explanation": "..."}]
-}
-
-${JSON_STRICT_RULES}
 
 Réponds UNIQUEMENT avec le JSON.`
     }
@@ -1778,31 +1678,6 @@ Format JSON :
 }
 
 $${JSON_STRICT_RULES}
-
-Réponds UNIQUEMENT avec le JSON.`
-    },
-    {
-      name: 'qcm',
-      maxTokens: 2500,
-      systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
-      userPrompt: `Génère entre 8 et 12 QCM de français couvrant des NOTIONS DIFFÉRENTES de cette section.
-
-${baseContext}
-
-${PERIMETER_RULES}
-
-RÈGLES :
-- Exactement 4 options (A, B, C, D), une seule correcte.
-- Distracteurs plausibles mais clairement faux.
-- "correct" = lettre de la bonne réponse, positions variées.
-- "explanation" : 1 à 2 phrases expliquant la bonne réponse.
-
-Format JSON :
-{
-  "qcm": [{"question": "...", "options": [{"id":"A","text":"..."},{"id":"B","text":"..."},{"id":"C","text":"..."},{"id":"D","text":"..."}], "correct": "A", "explanation": "..."}]
-}
-
-${JSON_STRICT_RULES}
 
 Réponds UNIQUEMENT avec le JSON.`
     }
@@ -1920,31 +1795,6 @@ Format JSON :
 $${JSON_STRICT_RULES}
 
 Réponds UNIQUEMENT avec le JSON.`
-    },
-    {
-      name: 'qcm',
-      maxTokens: 2500,
-      systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
-      userPrompt: `Génère entre 8 et 12 QCM d'anglais couvrant des NOTIONS DIFFÉRENTES de cette section.
-
-${baseContext}
-
-${PERIMETER_RULES}
-
-RÈGLES :
-- Exactement 4 options (A, B, C, D), une seule correcte.
-- Distracteurs plausibles mais clairement faux (erreurs typiques de francophones bienvenus).
-- "correct" = lettre de la bonne réponse, positions variées.
-- "explanation" : 1 à 2 phrases expliquant la bonne réponse.
-
-Format JSON :
-{
-  "qcm": [{"question": "...", "options": [{"id":"A","text":"..."},{"id":"B","text":"..."},{"id":"C","text":"..."},{"id":"D","text":"..."}], "correct": "A", "explanation": "..."}]
-}
-
-${JSON_STRICT_RULES}
-
-Réponds UNIQUEMENT avec le JSON.`
     }
   ];
 }
@@ -1960,9 +1810,9 @@ function getPromptsForProfile(profile, context) {
     case 'language':   tasks = buildLanguagePrompts(context); break;
     default:           tasks = buildScientificPrompts(context);
   }
-  // Files séquentielles : les tâches LÉGÈRES d'abord (qcm ~13 s, puis
-  // questions ~20 s chacune) pour que chaque tâche ait du budget devant elle.
-  const order = { qcm: 0, questions_a: 1, questions_b: 2, structure: 3, explanation: 4 };
+  // Files séquentielles : les tâches LÉGÈRES d'abord (questions ~20 s chacune)
+  // pour que chaque tâche ait du budget devant elle. (QCM retiré v4.14)
+  const order = { questions_a: 1, questions_b: 2, structure: 3, explanation: 4 };
   return tasks.slice().sort((a, b) => (order[a.name] ?? 9) - (order[b.name] ?? 9));
 }
 
@@ -2433,14 +2283,13 @@ async function createSection(uid, body) {
       console.warn('[FAN-OUT] explanation manquant -> fallback minimal');
       analysis.explanation = {
         sectionTitle: analysis.sectionTitle || 'Section',
-        understanding: 'L\'explication pédagogique n\'a pas pu être générée pour cette section. Les questions et QCM restent disponibles ci-dessous.',
+        understanding: 'L\'explication pédagogique n\'a pas pu être générée pour cette section. Les questions restent disponibles ci-dessous.',
         parts: []
       };
     }
 
     const hasContent = (Array.isArray(analysis.explanation.parts) && analysis.explanation.parts.length > 0) ||
-                       (Array.isArray(analysis.questions) && analysis.questions.length > 0) ||
-                       (Array.isArray(analysis.qcm) && analysis.qcm.length > 0);
+                       (Array.isArray(analysis.questions) && analysis.questions.length > 0);
     if (!hasContent) {
       console.warn('[FAN-OUT] Tout a échoué -> fallback complet');
       analysis = buildFallbackAnalysis({ rawInput: normalizedInput, profile });
@@ -2473,8 +2322,7 @@ async function createSection(uid, body) {
   meta.elapsedMs = Date.now() - t0;
   meta.counts = {
     parts: (Array.isArray(analysis.explanation?.parts) ? analysis.explanation.parts.length : 0),
-    questions: (Array.isArray(analysis.questions) ? analysis.questions.length : 0),
-    qcm: (Array.isArray(analysis.qcm) ? analysis.qcm.length : 0)
+    questions: (Array.isArray(analysis.questions) ? analysis.questions.length : 0)
   };
 
   return {

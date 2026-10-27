@@ -2775,6 +2775,52 @@ async function examFetch(body, headers, onStatus) {
   }
 }
 
+// ✅ v4.16 — anti-répétition : mémo local des énoncés déjà générés.
+// À chaque génération réussie on garde les énoncés (tronqués) des 3 dernières
+// épreuves ; à chaque relance on les envoie au serveur (avoidStatements) qui
+// les interdit à l'IA — fini les exercices recyclés avec juste les nombres
+// changés. Si le localStorage est vide, la variation aléatoire serveur
+// (température 1.0 + tirage de contextes) prend le relais.
+var EXAM_AVOID_KEY = 'arvexaExamAvoid_v1';
+
+function loadExamAvoidStore() {
+  try {
+    var arr = JSON.parse(localStorage.getItem(EXAM_AVOID_KEY) || '[]');
+    return Array.isArray(arr) ? arr : [];
+  } catch (e) { return []; }
+}
+
+function saveExamAvoidStore(store) {
+  try { localStorage.setItem(EXAM_AVOID_KEY, JSON.stringify(store.slice(-3))); } catch (e) {}
+}
+
+function recordExamAvoid(payload) {
+  try {
+    var exam = payload && payload.exam ? payload.exam : payload;
+    if (!exam || !Array.isArray(exam.subjects) || exam.subjects.length < 2) return;
+    var items = [];
+    exam.subjects.forEach(function (sub) {
+      (sub.exercises || []).forEach(function (ex) {
+        var st = String(ex.statement || '').replace(/\s+/g, ' ').trim();
+        if (st.length >= 12) items.push(st.slice(0, 140));
+      });
+    });
+    if (!items.length) return;
+    var store = loadExamAvoidStore();
+    store.push({ subject: exam.subject || '', items: items });
+    saveExamAvoidStore(store);
+  } catch (e) {}
+}
+
+function buildAvoidList(subject) {
+  var out = [];
+  loadExamAvoidStore().forEach(function (gen) {
+    if (subject && gen.subject && gen.subject !== subject) return;
+    (gen.items || []).forEach(function (st) { if (out.length < 18) out.push(st); });
+  });
+  return out;
+}
+
 async function generateExam(event) {
   event.preventDefault();
   if (!navigator.onLine) {
@@ -2811,7 +2857,7 @@ async function generateExam(event) {
       : null;
 
     var responsePromise = examFetch(
-      Object.assign({}, config, { notebookContext: notebookContextPayload }),
+      Object.assign({}, config, { notebookContext: notebookContextPayload, avoidStatements: buildAvoidList(config.subject) }),
       headers,
       function (msg) { statusEl.textContent = msg; }
     );
@@ -2837,6 +2883,7 @@ async function generateExam(event) {
     await sleep(800);
 
     state.exam = normalizeExam(payload);
+    recordExamAvoid(payload); // ✅ v4.16 — mémorise les énoncés pour ne jamais les resservir
     state.answers = {};
     state.exerciseIndex = 0;
     await clearActiveSession();

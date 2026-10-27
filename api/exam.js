@@ -1,9 +1,13 @@
 // ================================================================
-// API EXAM v6.1 — ARVEXA School
+// API EXAM v6.2 — ARVEXA School
 // Corrections : Cas B, Notes strictes, Niveau BAC, Schémas Physique
 // v4.15 : heavy 3→5/min, 429+retryAfter (re-essai auto côté client), contrat de
 // complétion IA (30/30 questions non vides), gradation Sujet 1→2, validation
 // stricte des énoncés + rattrapage "presque complet" depuis le pool d'exercices
+// v4.16 : VARIATION TOTALE — temperature 1.0 en génération, tirage aléatoire
+// (contexte nigérien + approche + contrainte numérique) à CHAQUE appel, liste
+// des énoncés déjà servis (avoidStatements client) interdits de recyclage,
+// tirage ALÉATOIRE dans le pool de rattrapage (fini candidates[0])
 // ================================================================
 
 
@@ -275,7 +279,7 @@ function getProviders() {
   return providers;
 }
 
-async function callProvider(provider, prompt, maxTokens) {
+async function callProvider(provider, prompt, maxTokens, temperature) {
   if (!maxTokens) maxTokens = MAX_TOKENS.PROVIDER_DEFAULT;
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 45000); // ✅ Augmenté à 45s
@@ -284,7 +288,9 @@ async function callProvider(provider, prompt, maxTokens) {
 
     const body = {
       model: provider.model,
-      temperature: 0.3,
+      // ✅ v4.16 — 1.0 pour la GÉNÉRATION (créativité maximale : finis les exercices
+      // clonés d'une relance à l'autre), 0.3 conservé pour la CORRECTION (notation stable).
+      temperature: typeof temperature === 'number' ? temperature : 0.3,
       max_tokens: maxTokens,
       messages: [
         { role: 'system', content: 'Tu produis exclusivement du JSON valide. Tu respectes scrupuleusement le schéma demandé.' },
@@ -550,7 +556,153 @@ CONTRAT DE COMPLÉTION — ABSOLUMENT OBLIGATOIRE :
 - INTERDIT de renvoyer un commentaire, une excuse ou du texte hors JSON.
 `;
 
-function generationPrompt(config) {
+// ═════════════════════════════════════════════════════════════
+// ✅ v4.16 — VARIATION TOTALE À CHAQUE RELANCE
+// Avant : temperature 0.3 + prompt strictement identique ⇒ l'IA resservait
+// presque les mêmes exercices à chaque génération. Désormais : température
+// créative (1.0) + tirage aléatoire d'un contexte nigérien, d'une approche
+// pédagogique et d'une contrainte numérique à CHAQUE appel + liste des
+// énoncés déjà servis à cet élève (interdits de recyclage).
+// ═════════════════════════════════════════════════════════════
+const GEN_TEMPERATURE = 1.0;
+const VARIATION_SCIENCES = new Set(['mathematiques', 'physique', 'chimie', 'svt']);
+
+function sanitizeAvoidList(input) {
+  if (!Array.isArray(input)) return [];
+  return input
+    .filter((s) => typeof s === 'string')
+    .map((s) => s.replace(/\s+/g, ' ').trim().slice(0, 140))
+    .filter((s) => s.length >= 12)
+    .slice(0, 18);
+}
+
+const VARIATION_CONTEXTS = {
+  commun: [
+    'le grand marché de Niamey un jour de forte affluence',
+    'une coopérative maraîchère le long du fleuve',
+    'un chantier de construction dans un nouveau quartier',
+    'un trajet en car entre Niamey et Zinder',
+    'un centre de santé intégré en zone rurale',
+    'un forage et le ravitaillement en eau d\'un village',
+    'une boutique multi services de quartier',
+    'un champ de mil pendant l\'hivernage',
+    'un club de jeunes et un tournoi de football inter-quartiers',
+    'une station de recharge de téléphones à énergie solaire',
+    'une tontine (gada) entre commerçantes',
+    'un élevage de volailles familial',
+    'un quai de chargement de marchandises au bord du fleuve',
+    'une salle de classe lors de la rentrée scolaire',
+    'un petit atelier de couture qui reçoit des commandes'
+  ],
+  mathematiques: [
+    'un partage d\'héritage de bétail entre héritiers',
+    'un prêt à intérêt simple chez un boutiquier',
+    'le tracé d\'une parcelle rectangulaire à clôturer',
+    'la progression des ventes d\'un étal de tissus',
+    'un réservoir qui se remplit et se vide en même temps',
+    'un crédit épargne au sein d\'une association de femmes'
+  ],
+  physique: [
+    'un motard qui rattrape un camion sur la route de Filingué',
+    'un ballon lancé depuis la terrasse d\'une maison',
+    'un circuit d\'éclairage alimenté par un panneau solaire',
+    'un chariot qui descend une rampe de chargement',
+    'un seau d\'eau remonté au-dessus d\'un puits',
+    'un chauffeur qui freine pour éviter un troupeau'
+  ],
+  chimie: [
+    'une solution de soude préparée au laboratoire du lycée',
+    'un engrais dilué avant épandage dans un champ',
+    'le dosage d\'un vinaigre artisanal',
+    'une dissolution de sel dans l\'eau du fleuve',
+    'une pile artisanale à deux électrodes',
+    'une analyse d\'eau de forage'
+  ],
+  svt: [
+    'une enquête sur la transmission d\'un caractère dans une famille nigérienne',
+    'une mare temporaire et sa vie pendant la saison des pluies',
+    'la fermentation d\'un lait local',
+    'une fleur disséquée en travaux pratiques',
+    'le cycle de l\'eau observé pendant l\'hivernage',
+    'un foyer qui s\'éclaire au biogaz'
+  ],
+  philosophie: [
+    'un débat de jeunes sur le travail et la réussite',
+    'un dialogue sur la liberté et la tradition',
+    'un jugement rendu au village et la question de la justice',
+    'une discussion sur la science et la croyance',
+    'une réflexion sur l\'argent et le bonheur'
+  ],
+  histoire: [
+    'les résistances à la pénétration coloniale au Sahel',
+    'les grands empires et royaumes de l\'espace nigérien',
+    'la marche du Niger vers l\'indépendance',
+    'les institutions de la République nigérienne',
+    'les routes transsahariennes et le commerce ancien'
+  ],
+  geographie: [
+    'l\'exode rural et la croissance des villes du Niger',
+    'une région du Niger face à la sécheresse',
+    'l\'exploitation de l\'uranium et ses enjeux',
+    'les échanges commerciaux transfrontaliers',
+    'la mobilité des pasteurs et le peuplement'
+  ]
+};
+
+const VARIATION_ANGLES = [
+  'partir d\'une histoire vécue avant d\'introduire la notion',
+  'faire construire ou estimer une grandeur avant de la calculer',
+  'demander une comparaison entre deux situations distinctes',
+  'faire interpréter le résultat obtenu en fin de question',
+  'glisser une donnée superflue que l\'élève doit savoir écarter',
+  'emboîter deux notions du programme dans le même exercice',
+  'faire une question en deux sous-étapes (a puis b) qui se répondent',
+  'terminer l\'exercice par une question de synthèse ouverte'
+];
+
+const VARIATION_NUMERIC = [
+  'impose-toi des valeurs NON RONDES et inédites (ex. 7,5 ; 12,3 ; 17,25 ; 3/8 ; 2,4×10^3)',
+  'impose-toi au moins deux valeurs décimales et une fraction dans chaque exercice',
+  'impose-toi au moins une valeur en notation scientifique et une valeur impaire',
+  'impose-toi des grandeurs réalistes (masses, distances, durées crédibles au Niger) différentes des valeurs habituelles'
+];
+
+const VARIATION_TEXT = [
+  'appuie chaque argument sur un exemple précis, daté ou localisé',
+  'impose-toi un vocabulaire technique du programme',
+  'fais référence à une situation nigérienne concrète dans au moins une question',
+  'varie les types de questions : une analyse, une mise en relation, un jugement argumenté'
+];
+
+function buildVariationBlock(subject, avoidStatements) {
+  const pool = (VARIATION_CONTEXTS[subject] || []).concat(VARIATION_CONTEXTS.commun);
+  const pick = (arr) => (arr && arr.length ? arr[Math.floor(Math.random() * arr.length)] : '');
+  let c1 = pick(pool);
+  let c2 = pick(pool);
+  for (let guard = 0; c2 === c1 && guard < 8; guard += 1) c2 = pick(pool);
+  const angle = pick(VARIATION_ANGLES);
+  const constraint = VARIATION_SCIENCES.has(subject)
+    ? 'Contrainte numérique : ' + pick(VARIATION_NUMERIC)
+    : 'Contrainte rédactionnelle : ' + pick(VARIATION_TEXT);
+  const avoid = sanitizeAvoidList(avoidStatements);
+  const avoidBlock = avoid.length
+    ? '- ÉNONCÉS DÉJÀ SERVUS à cet élève lors de ses générations précédentes — INTERDIT de les reprendre tels quels, de changer seulement les noms ou les nombres, ou d\'en livrer une variante proche :\n' +
+      avoid.map((s) => '  • ' + s).join('\n')
+    : '';
+
+  return `══════════════════════════════════════════════════════════════
+VARIATION OBLIGATOIRE — TIRAGE N° ${Math.floor(Math.random() * 900000000) + 100000000}
+══════════════════════════════════════════════════════════════
+Chaque appel doit produire un examen 100% INÉDIT : énoncés, contextes, valeurs et questions changent TOTALEMENT d'une génération à l'autre.
+- Contexte imposé Sujet 1 (si compatible avec le contenu exigé) : ${c1}
+- Contexte imposé Sujet 2 (si compatible avec le contenu exigé) : ${c2}
+- Approche imposée : ${angle}
+- ${constraint}
+- INTERDIT de recycler les exercices classiques ou une génération précédente : même trame ou mêmes données = échec.
+${avoidBlock}`;
+}
+
+function generationPrompt(config, avoidStatements) {
   const subjectLabel = SUBJECT_LABELS[config.subject] || config.subject;
   
   let specificRules = '';
@@ -558,6 +710,7 @@ function generationPrompt(config) {
   else if (config.subject === 'chimie') specificRules = CHEMISTRY_RULES;
   
   const diffRules = DIFFICULTY_RULES[config.difficulty] || DIFFICULTY_RULES.medium;
+  const variationBlock = buildVariationBlock(config.subject, avoidStatements);
 
   return `Tu es un professeur expert du BAC au Niger.
 
@@ -576,6 +729,8 @@ ${diffRules}
 SUJET 1 — "Consolidation" (facile à moyen) : tester les bases.
 SUJET 2 — "Approfondissement" (moyen à difficile) : aller plus loin.
 GRADATION OBLIGATOIRE : le Sujet 2 doit être VISIBLEMENT plus difficile que le Sujet 1 (énoncés plus riches, plus d'étapes de calcul, notions combinées) tout en respectant la difficulté exigée ci-dessus. Interdit de livrer deux sujets de même difficulté.
+
+${variationBlock}
 
 ${LATEX_RULES}
 
@@ -597,7 +752,7 @@ ${STRUCTURE_CONTROL}
 Réponds UNIQUEMENT avec le JSON complet et valide.`;
 }
 
-function generationPromptFromNotebook(config, notebookContext) {
+function generationPromptFromNotebook(config, notebookContext, avoidStatements) {
   const subjectLabel = SUBJECT_LABELS[config.subject] || config.subject;
   
   let specificRules = '';
@@ -605,6 +760,7 @@ function generationPromptFromNotebook(config, notebookContext) {
   else if (config.subject === 'chimie') specificRules = CHEMISTRY_RULES;
   
   const diffRules = DIFFICULTY_RULES[config.difficulty] || DIFFICULTY_RULES.medium;
+  const variationBlock = buildVariationBlock(config.subject, avoidStatements);
 
   return `Tu es un professeur expert du BAC au Niger.
 
@@ -625,6 +781,8 @@ CONTENU DU CHAPITRE ÉTUDIÉ
 ${notebookContext.contentText}
 
 RÈGLE ABSOLUE : génère UNIQUEMENT à partir du contenu ci-dessus.
+
+${variationBlock}
 
 ${LATEX_RULES}
 
@@ -931,7 +1089,9 @@ function patchExamFromPoolQuestions(exam, subjectName, poolExercises) {
       const sameLevel = pool.filter((p) => p.level === subject.level);
       const candidates = (sameLevel.length ? sameLevel : pool)
         .filter((p) => !seen.has(String(p.title || '') + '|' + String(p.statement || '').slice(0, 40)));
-      const pick = candidates[0] || null;
+      // ✅ v4.16 — tirage ALÉATOIRE parmi les candidats : deux rattrapages ne
+      // resservent pas mécaniquement le même exercice de secours.
+      const pick = candidates.length ? candidates[Math.floor(Math.random() * candidates.length)] : null;
       if (!pick) return;
       seen.add(String(pick.title || '') + '|' + String(pick.statement || '').slice(0, 40));
       subject.exercises[eIdx] = {
@@ -967,7 +1127,7 @@ async function generateWithFallback(prompt, subjectName, poolLoader) {
     const provider = providers[i];
     try {
       console.log('[AI] Tentative ' + provider.name + '...');
-      let rawExam = await callProvider(provider, prompt, MAX_TOKENS.GENERATE);
+      let rawExam = await callProvider(provider, prompt, MAX_TOKENS.GENERATE, GEN_TEMPERATURE);
       rawExam = repairExamStructure(rawExam, subjectName);
 
       if (validateGeneratedExam(rawExam, subjectName)) {
@@ -1853,9 +2013,12 @@ module.exports = async function handler(request, response) {
         } catch (e) { console.warn('[EXAM] Contexte cahier échoué:', e.message); }
       }
 
+      // ✅ v4.16 — anti-répétition : la liste des énoncés déjà servis vient du
+      // client (localStorage de l'appareil), assainie puis injectée dans le prompt.
+      const avoidStatements = sanitizeAvoidList(body.avoidStatements);
       const prompt = notebookContext
-        ? generationPromptFromNotebook(body, notebookContext)
-        : generationPrompt(body);
+        ? generationPromptFromNotebook(body, notebookContext, avoidStatements)
+        : generationPrompt(body, avoidStatements);
 
       // ✅ v4.15 — accès paresseux au pool pour le rattrapage des sujets presque complets
       const poolLoader = async () => {

@@ -8,6 +8,7 @@
 //   - QCM 8-12 imposés, distracteurs plausibles, explication chaque item
 //   - anglais ré-ajouté (prompts language déjà dans le code)
 //   - FILES séquentielles par fournisseur (anti-collision de concurrence)
+//   - GEMINI 4e fournisseur (JSON natif responseMimeType) : questions + qcm primaires
 //   - affectation calibrée sur les taux de succès réels : Groq = explication,
 //     Mistral = structure + qcm (jsonMode), OpenRouter = questions (repli Mistral)
 //   - extraction supprimée (la page n'utilise pas analysis.extracted)
@@ -970,8 +971,8 @@ function normalizeAnalysis(analysis) {
                      typeof q.answer === 'string' && q.answer.trim().length > 0)
       .map((q, i) => ({
         id: `q${i + 1}`,
-        level: Math.min(3, Math.max(1, Number(q.level) || 1)),
-        type: (typeof q.type === 'string' && q.type.trim()) ? q.type.trim() : 'notion',
+        level: Math.min(3, Math.max(1, Number(q.level) || (i % 2 === 0 ? 1 : 2))),
+        type: (typeof q.type === 'string' && q.type.trim()) ? q.type.trim() : (i % 2 === 0 ? 'definition' : 'application'),
         question: q.question.trim(),
         answer: q.answer.trim(),
         mustHave: Array.isArray(q.mustHave)
@@ -1126,11 +1127,10 @@ $${PERIMETER_RULES}
 RÈGLES :
 - Entre 5 et 13 questions, réponses rédigées (1 à 2 phrases), jamais un mot isolé.
 - mustHave : 2 à 3 éléments indispensables pour une réponse complète.
-- importance : 3 = incontournable au BAC, 2 = important, 1 = complément.
 
 Format JSON :
 {
-  "questions": [{"id": "q1", "level": 1, "type": "definition", "question": "...", "answer": "...", "mustHave": ["..."], "importance": 1}]
+  "questions": [{"id": "q1", "question": "...", "answer": "...", "mustHave": ["..."]}]
 }
 
 $${JSON_STRICT_RULES}
@@ -1151,11 +1151,10 @@ RÈGLES :
 - Entre 5 et 13 questions, réponses rédigées (1 à 2 phrases), jamais un mot isolé.
 - Types variés : application, analyse, raisonnement, calcul si la matière s'y prête.
 - mustHave : 2 à 3 éléments indispensables.
-- importance : 3 = incontournable au BAC, 2 = important, 1 = complément.
 
 Format JSON :
 {
-  "questions": [{"id": "q1", "level": 2, "type": "application", "question": "...", "answer": "...", "mustHave": ["..."], "importance": 2}]
+  "questions": [{"id": "q1", "question": "...", "answer": "...", "mustHave": ["..."]}]
 }
 
 $${JSON_STRICT_RULES}
@@ -1279,11 +1278,10 @@ $${PERIMETER_RULES}
 RÈGLES :
 - Entre 5 et 13 questions, réponses rédigées (1 à 2 phrases), jamais un mot isolé.
 - mustHave : 2 à 3 éléments indispensables pour une réponse complète.
-- importance : 3 = incontournable au BAC, 2 = important, 1 = complément.
 
 Format JSON :
 {
-  "questions": [{"id": "q1", "level": 1, "type": "definition", "question": "...", "answer": "...", "mustHave": ["..."], "importance": 1}]
+  "questions": [{"id": "q1", "question": "...", "answer": "...", "mustHave": ["..."]}]
 }
 
 $${JSON_STRICT_RULES}
@@ -1304,11 +1302,10 @@ RÈGLES :
 - Entre 5 et 13 questions, réponses rédigées (1 à 2 phrases), jamais un mot isolé.
 - Types variés : application, analyse, raisonnement, calcul si la matière s'y prête.
 - mustHave : 2 à 3 éléments indispensables.
-- importance : 3 = incontournable au BAC, 2 = important, 1 = complément.
 
 Format JSON :
 {
-  "questions": [{"id": "q1", "level": 2, "type": "application", "question": "...", "answer": "...", "mustHave": ["..."], "importance": 2}]
+  "questions": [{"id": "q1", "question": "...", "answer": "...", "mustHave": ["..."]}]
 }
 
 $${JSON_STRICT_RULES}
@@ -1422,11 +1419,10 @@ $${PERIMETER_RULES}
 RÈGLES :
 - Entre 5 et 13 questions, réponses rédigées (1 à 2 phrases), jamais un mot isolé.
 - mustHave : 2 à 3 éléments indispensables pour une réponse complète.
-- importance : 3 = incontournable au BAC, 2 = important, 1 = complément.
 
 Format JSON :
 {
-  "questions": [{"id": "q1", "level": 1, "type": "definition", "question": "...", "answer": "...", "mustHave": ["..."], "importance": 1}]
+  "questions": [{"id": "q1", "question": "...", "answer": "...", "mustHave": ["..."]}]
 }
 
 $${JSON_STRICT_RULES}
@@ -1447,11 +1443,10 @@ RÈGLES :
 - Entre 5 et 13 questions, réponses rédigées (1 à 2 phrases), jamais un mot isolé.
 - Types variés : application, analyse, raisonnement, calcul si la matière s'y prête.
 - mustHave : 2 à 3 éléments indispensables.
-- importance : 3 = incontournable au BAC, 2 = important, 1 = complément.
 
 Format JSON :
 {
-  "questions": [{"id": "q1", "level": 2, "type": "application", "question": "...", "answer": "...", "mustHave": ["..."], "importance": 2}]
+  "questions": [{"id": "q1", "question": "...", "answer": "...", "mustHave": ["..."]}]
 }
 
 $${JSON_STRICT_RULES}
@@ -1557,11 +1552,10 @@ $${PERIMETER_RULES}
 RÈGLES :
 - Entre 5 et 13 questions, réponses rédigées (1 à 2 phrases), jamais un mot isolé.
 - mustHave : 2 à 3 éléments indispensables pour une réponse complète.
-- importance : 3 = incontournable au BAC, 2 = important, 1 = complément.
 
 Format JSON :
 {
-  "questions": [{"id": "q1", "level": 1, "type": "definition", "question": "...", "answer": "...", "mustHave": ["..."], "importance": 1}]
+  "questions": [{"id": "q1", "question": "...", "answer": "...", "mustHave": ["..."]}]
 }
 
 $${JSON_STRICT_RULES}
@@ -1582,11 +1576,10 @@ RÈGLES :
 - Entre 5 et 13 questions, réponses rédigées (1 à 2 phrases), jamais un mot isolé.
 - Types variés : application, analyse, raisonnement, calcul si la matière s'y prête.
 - mustHave : 2 à 3 éléments indispensables.
-- importance : 3 = incontournable au BAC, 2 = important, 1 = complément.
 
 Format JSON :
 {
-  "questions": [{"id": "q1", "level": 2, "type": "application", "question": "...", "answer": "...", "mustHave": ["..."], "importance": 2}]
+  "questions": [{"id": "q1", "question": "...", "answer": "...", "mustHave": ["..."]}]
 }
 
 $${JSON_STRICT_RULES}
@@ -1693,11 +1686,10 @@ $${PERIMETER_RULES}
 RÈGLES :
 - Entre 5 et 13 questions, réponses rédigées (1 à 2 phrases), jamais un mot isolé.
 - mustHave : 2 à 3 éléments indispensables pour une réponse complète.
-- importance : 3 = incontournable au BAC, 2 = important, 1 = complément.
 
 Format JSON :
 {
-  "questions": [{"id": "q1", "level": 1, "type": "definition", "question": "...", "answer": "...", "mustHave": ["..."], "importance": 1}]
+  "questions": [{"id": "q1", "question": "...", "answer": "...", "mustHave": ["..."]}]
 }
 
 $${JSON_STRICT_RULES}
@@ -1718,11 +1710,10 @@ RÈGLES :
 - Entre 5 et 13 questions, réponses rédigées (1 à 2 phrases), jamais un mot isolé.
 - Types variés : application, analyse, raisonnement, calcul si la matière s'y prête.
 - mustHave : 2 à 3 éléments indispensables.
-- importance : 3 = incontournable au BAC, 2 = important, 1 = complément.
 
 Format JSON :
 {
-  "questions": [{"id": "q1", "level": 2, "type": "application", "question": "...", "answer": "...", "mustHave": ["..."], "importance": 2}]
+  "questions": [{"id": "q1", "question": "...", "answer": "...", "mustHave": ["..."]}]
 }
 
 $${JSON_STRICT_RULES}
@@ -1835,11 +1826,10 @@ $${PERIMETER_RULES}
 RÈGLES :
 - Entre 5 et 13 questions, réponses rédigées (1 à 2 phrases), jamais un mot isolé.
 - mustHave : 2 à 3 éléments indispensables pour une réponse complète.
-- importance : 3 = incontournable au BAC, 2 = important, 1 = complément.
 
 Format JSON :
 {
-  "questions": [{"id": "q1", "level": 1, "type": "definition", "question": "...", "answer": "...", "mustHave": ["..."], "importance": 1}]
+  "questions": [{"id": "q1", "question": "...", "answer": "...", "mustHave": ["..."]}]
 }
 
 $${JSON_STRICT_RULES}
@@ -1860,11 +1850,10 @@ RÈGLES :
 - Entre 5 et 13 questions, réponses rédigées (1 à 2 phrases), jamais un mot isolé.
 - Types variés : application, analyse, raisonnement, calcul si la matière s'y prête.
 - mustHave : 2 à 3 éléments indispensables.
-- importance : 3 = incontournable au BAC, 2 = important, 1 = complément.
 
 Format JSON :
 {
-  "questions": [{"id": "q1", "level": 2, "type": "application", "question": "...", "answer": "...", "mustHave": ["..."], "importance": 2}]
+  "questions": [{"id": "q1", "question": "...", "answer": "...", "mustHave": ["..."]}]
 }
 
 $${JSON_STRICT_RULES}

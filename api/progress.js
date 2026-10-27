@@ -718,12 +718,11 @@ async function callProvider(provider, { systemPrompt, userPrompt, maxTokens = 40
       const sanitized = escapeControlCharsInJsonStrings(cleaned);
       try { return JSON.parse(sanitized); }
       catch (_) {
-        const quoted = escapeInnerQuotes(sanitized);
-        try { return JSON.parse(quoted); }
+        try { return JSON.parse(sanitized); }
         catch (posErr) {
-          const repaired2 = repairJson(quoted);
+          const repaired2 = repairJson(sanitized);
           if (repaired2) {
-            console.warn(`[AI] ${provider.name} — JSON réparé (contrôles + guillemets internes)`);
+            console.warn(`[AI] ${provider.name} — JSON réparé (contrôles + LaTeX)`);
             return repaired2;
           }
           // Position exacte de l'erreur pour diagnostic
@@ -731,7 +730,7 @@ async function callProvider(provider, { systemPrompt, userPrompt, maxTokens = 40
           const pm = /position (\d+)/.exec(String(posErr?.message || ''));
           if (pm) {
             const p = parseInt(pm[1], 10);
-            ctx = ` [vers ${quoted.slice(Math.max(0, p - 70), p + 70).replace(/[\n\r\t]/g, '⏎')}]`;
+            ctx = ` [vers ${sanitized.slice(Math.max(0, p - 70), p + 70).replace(/[\n\r\t]/g, '⏎')}]`;
           }
           console.warn(`[AI] ${provider.name} — JSON invalide non réparable. Début: ${cleaned.slice(0, 200)}`);
           throw new Error(`${provider.name}: JSON invalide${ctx}`);

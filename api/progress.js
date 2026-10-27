@@ -665,6 +665,7 @@ async function callProvider(provider, { systemPrompt, userPrompt, maxTokens = 40
 // chez le MÊME fournisseur gratuit → concurrence refusée → tâches perdues.
 // Désormais chaque fournisseur exécute SES tâches en file (séquentiel),
 // les files tournent en parallèle. Repli sur fournisseur INACTIF uniquement.
+// + GESTION DES 429 : un fournisseur en rate-limit est écarté 25 s (retry-after si fourni).
 function distributeTasks(tasks, providers) {
   if (providers.length === 0) return [];
   const queues = new Map();
@@ -680,62 +681,88 @@ async function runParallelTasks(tasks, providers, deadline) {
   const queues = distributeTasks(tasks, providers);
   const results = new Array(tasks.length).fill(null);
   const busy = new Map(providers.map((p) => [p.name, 0]));
+  const blockedUntil = new Map(providers.map((p) => [p.name, 0]));
 
-  // Réserve atomiquement (test-and-set, sans await entre les deux) le
-  // premier fournisseur inactif et retourne-le, sinon attend jusqu'à deadline.
-  async function reserveIdleProvider(excludeName, triedNames) {
+  function usable(p) {
+    return (busy.get(p.name) || 0) === 0 && (blockedUntil.get(p.name) || 0) <= Date.now();
+  }
+  function release(p) {
+    busy.set(p.name, Math.max(0, (busy.get(p.name) || 1) - 1));
+  }
+  // Réserve atomiquement (test-and-set, sans await entre les deux) le premier
+  // fournisseur utilisable (inactif + non bloqué) et le retourne.
+  async function reserveUsable(excludeNames) {
     while (deadline && Date.now() < deadline - 8000) {
-      const idle = providers.find((p) =>
-        p.name !== excludeName && !triedNames.includes(p.name) && (busy.get(p.name) || 0) === 0);
-      if (idle) { busy.set(idle.name, (busy.get(idle.name) || 0) + 1); return idle; }
+      const found = providers.find((p) => !excludeNames.includes(p.name) && usable(p));
+      if (found) { busy.set(found.name, (busy.get(found.name) || 0) + 1); return found; }
       await new Promise((r) => setTimeout(r, 700));
     }
     return null;
   }
 
-  async function tryCall(provider, task) {
-    busy.set(provider.name, (busy.get(provider.name) || 0) + 1);
+  async function callMarked(provider, task) {
     try {
-      return await callProvider(provider, {
+      const value = await callProvider(provider, {
         systemPrompt: task.systemPrompt,
         userPrompt: task.userPrompt,
         maxTokens: task.maxTokens,
         deadline
       });
-    } finally {
-      busy.set(provider.name, Math.max(0, (busy.get(provider.name) || 1) - 1));
+      return value;
+    } catch (e) {
+      const msg = String(e?.message || '');
+      if (msg.includes('HTTP 429') || /rate limit/i.test(msg) || /quota/i.test(msg)) {
+        blockedUntil.set(provider.name, Date.now() + 25000);
+        console.warn(`[FAN-OUT] ${provider.name} en rate-limit, écarté 25 s`);
+      }
+      throw e;
     }
+  }
+
+  // Exécute une tâche : fournisseur préféré (si utilisable) puis jusqu'à 2 replis
+  // sur des fournisseurs utilisables. Retourne { value, providerName }.
+  async function executeTask(task, preferred) {
+    const tried = [];
+    let value = null, err = null;
+
+    let first = preferred;
+    if ((blockedUntil.get(first.name) || 0) > Date.now()) {
+      const alt = await reserveUsable([first.name]);
+      if (alt) first = alt;
+      else return { value: null, providerName: first.name, err: new Error(`${first.name} bloqué (rate-limit)`) };
+    }
+
+    tried.push(first.name);
+    try { value = await callMarked(first, task); }
+    catch (e) { err = e; }
+    finally { release(first); }
+
+    for (let attempt = 0; attempt < 2 && !value; attempt++) {
+      if (deadline && Date.now() > deadline - 8000) {
+        console.warn(`[FAN-OUT] Tâche "${task.name}" : deadline proche, plus de repli`);
+        break;
+      }
+      const alt = await reserveUsable(tried);
+      if (!alt) { console.warn(`[FAN-OUT] Tâche "${task.name}" : aucun fournisseur utilisable avant deadline`); break; }
+      tried.push(alt.name);
+      try {
+        value = await callMarked(alt, task);
+        if (value) console.log(`[FAN-OUT] Repli OK : "${task.name}" via ${alt.name}`);
+      } catch (e2) { err = e2; }
+      finally { release(alt); }
+    }
+
+    return { value, providerName: first.name, err };
   }
 
   await Promise.all(queues.map((queue) => (async () => {
     for (const { task, index } of queue.tasks) {
-      let value = null, err = null;
-      try { value = await tryCall(queue.provider, task); }
-      catch (e) { err = e; }
-
+      const { value, providerName, err } = await executeTask(task, queue.provider);
       if (!value) {
-        const tried = [queue.provider.name];
-        console.warn(`[FAN-OUT] Tâche "${task.name}" échouée sur ${queue.provider.name}${err ? ` (${err.message})` : ''}, repli sur fournisseur inactif...`);
-        // Jusqu'à 2 tentatives de repli, toujours sur un fournisseur inactif
-        for (let attempt = 0; attempt < 2 && !value; attempt++) {
-          if (deadline && Date.now() > deadline - 8000) {
-            console.warn(`[FAN-OUT] Tâche "${task.name}" : deadline proche, pas de repli`);
-            break;
-          }
-          const idle = await reserveIdleProvider(queue.provider.name, tried);
-          if (!idle) break;
-          tried.push(idle.name);
-          try {
-            value = await tryCall(idle, task);
-            if (value) console.log(`[FAN-OUT] Repli OK : "${task.name}" via ${idle.name}`);
-          } catch (e2) {
-            console.warn(`[FAN-OUT] Repli ${idle.name} échoué : ${e2.message}`);
-          }
-        }
+        console.warn(`[FAN-OUT] Tâche "${task.name}" échouée — raison: ${err?.message || 'unknown'}`);
       }
-
       results[index] = value
-        ? { status: 'fulfilled', value, task, provider: queue.provider.name }
+        ? { status: 'fulfilled', value, task, provider: providerName }
         : { status: 'rejected', error: err, task, provider: 'none' };
     }
   })()));
@@ -2194,16 +2221,17 @@ async function createSection(uid, body) {
   console.log(`[FAN-OUT] ${tasks.length} tâches, ${providers.length} fournisseurs pour profil "${profile}"`);
 
   let analysis;
+  const t0 = Date.now();
+  const meta = { elapsedMs: 0, counts: {}, providers: {}, failures: {} };
   try {
     const deadline = Date.now() + GLOBAL_AI_TIME_BUDGET_MS;
     const results = await runParallelTasks(tasks, providers, deadline);
 
+    // Diagnostic renvoyé au client (meta) : fournisseur par tâche + échecs
     results.forEach((r) => {
-      if (r.status === 'fulfilled') {
-        console.log(`[FAN-OUT] OK ${r.task.name} (via ${r.provider})`);
-      } else {
-        console.error(`[FAN-OUT] FAIL ${r.task.name} - raison: ${r.error?.message || 'unknown'}`);
-      }
+      if (!r) return;
+      if (r.status === 'fulfilled') meta.providers[r.task.name] = r.provider;
+      else meta.failures[r.task.name] = String(r.error?.message || 'échec').slice(0, 200);
     });
 
     analysis = mergeAnalysis(results, profile);
@@ -2252,9 +2280,17 @@ async function createSection(uid, body) {
 
   await markDailyActivity(uid, { sectionsCreated: 1 });
 
+  meta.elapsedMs = Date.now() - t0;
+  meta.counts = {
+    parts: (Array.isArray(analysis.explanation?.parts) ? analysis.explanation.parts.length : 0),
+    questions: (Array.isArray(analysis.questions) ? analysis.questions.length : 0),
+    qcm: (Array.isArray(analysis.qcm) ? analysis.qcm.length : 0)
+  };
+
   return {
     success: true,
     sectionId,
+    meta,
     section: {
       id: sectionId,
       title: analysis.sectionTitle || 'Section',

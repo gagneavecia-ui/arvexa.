@@ -1570,16 +1570,16 @@ async function loadNotebookContext(uid, subject, chapterId, chapterTitle) {
 
   if (sectionsSnap.empty) return null;
 
-  const sections = sectionsSnap.docs.slice(0, 5).map((d) => {
+  const sections = sectionsSnap.docs.slice(0, 8).map((d) => {
     const s = d.data();
     return { id: d.id, title: s.title || 'Section', rawInput: s.rawInput || '', analysis: s.analysis || {} };
   });
 
   const contentText = sections.map((s, i) => {
     let text = `━━━ SECTION ${i + 1} : ${s.title} ━━━\n`;
-    text += 'Contenu : ' + s.rawInput.slice(0, 1500) + '\n';
+    text += 'Contenu : ' + s.rawInput.slice(0, 1200) + '\n';
     const a = s.analysis || {};
-    if (a.explanation?.understanding) text += 'À comprendre : ' + a.explanation.understanding + '\n';
+    if (a.explanation?.understanding) text += 'À comprendre : ' + String(a.explanation.understanding).slice(0, 300) + '\n';
     return text;
   }).join('\n\n');
 
@@ -1592,10 +1592,6 @@ async function loadNotebookContext(uid, subject, chapterId, chapterTitle) {
 }
 
 module.exports = async function handler(request, response) {
-
-// ✅ FIX — la config DOIT être assignée APRÈS module.exports, sinon elle
-// est écrasée et maxDuration retombe à la valeur par défaut (10s sur Vercel).
-module.exports.config = { maxDuration: 90 };
   applyCors(request, response);
   if (request.method === 'OPTIONS') return response.status(204).end();
   if (request.method !== 'POST') {
@@ -1809,3 +1805,7 @@ module.exports.config = { maxDuration: 90 };
 
   return jsonError(response, 400, 'Action inconnue.');
 };
+
+
+// ✅ Config assignée APRÈS module.exports — visible par Vercel AU BUILD (pas seulement au runtime).
+module.exports.config = { maxDuration: 90 };

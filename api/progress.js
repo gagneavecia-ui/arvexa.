@@ -1,5 +1,10 @@
 // ================================================================
-// API PROGRESS v9.5 — ARVEXA School
+// API PROGRESS v9.6 — ARVEXA School
+// v9.6 : RETOUR aux réglages fiables validés (v8.4) — budget global 48 s,
+//        timeouts resserrés (Groq 18 s / OpenRouter 22 s / Mistral 10 s),
+//        explications « comme un prof » 3-6 phrases (fiabilité JSON retrouvée),
+//        banque de questions exhaustive calibrée (maxTokens 6000, 10-40 questions).
+//        Anti-collision Groq, fallbacks, anglais et actions v9.x conservés.
 // v9.5 : distribution anti-collision des tâches lourdes (explanation/questions ne partent plus
 //        ensemble sur Groq), timeouts 45 s, budget global 150 s, repli incluant le fournisseur
 //        d'origine, persona « comme un prof » (tutoiement, analogies, paragraphes \n\n)
@@ -49,7 +54,7 @@ var SUBJECT_INFO = {
 const MIN_CONTENT_LENGTH = 40;
 const MAX_CONTENT_LENGTH = 15000;
 const FREE_SECTION_LIMIT = 5;
-const GLOBAL_AI_TIME_BUDGET_MS = 150000;
+const GLOBAL_AI_TIME_BUDGET_MS = 48000;
 
 const VALID_GRADE_TYPES = new Set([
   'interrogation', 'devoir', 'composition', 'oral', 'autre'
@@ -574,7 +579,7 @@ async function callProvider(provider, { systemPrompt, userPrompt, maxTokens = 40
   const controller = new AbortController();
   // ✅ v9.5 : timeouts augmentés — la tâche explanation (persona prof, 5500 tokens)
   // a besoin de plus de marge sur Groq ; Vercel Fluid laisse largement le temps.
-  const timeouts = { 'Groq': 45000, 'OpenRouter': 45000, 'Mistral': 25000 };
+  const timeouts = { 'Groq': 18000, 'OpenRouter': 22000, 'Mistral': 10000 };
   const baseTimeout = timeouts[provider.name] || 30000;
   const remaining = deadline ? Math.max(5000, deadline - Date.now()) : baseTimeout;
   const timeoutMs = Math.min(baseTimeout, remaining);
@@ -671,7 +676,7 @@ async function runParallelTasks(tasks, providers, deadline) {
       if (errMsg.includes('JSON') || errMsg.includes('structure')) {
         console.warn(`[FAN-OUT] ${tasks[i].name} : ${errMsg} → fallback quand même`);
       }
-      if (deadline && Date.now() > deadline - 5000) return { status: 'rejected', error: r.reason, task: tasks[i], provider: 'none' };
+      if (deadline && Date.now() > deadline - 8000) return { status: 'rejected', error: r.reason, task: tasks[i], provider: 'none' };
       // ✅ v9.5 : chaîne de repli = autres fournisseurs PUIS 2e essai du fournisseur
       // d'origine (deadline fraîche à chaque tentative) — jamais de tâche abandonnée
       // tant que le budget global n'est pas épuisé.
@@ -684,7 +689,7 @@ async function runParallelTasks(tasks, providers, deadline) {
             systemPrompt: tasks[i].systemPrompt,
             userPrompt: tasks[i].userPrompt,
             maxTokens: tasks[i].maxTokens,
-            deadline: Date.now() + 30000
+            deadline: Math.min(deadline, Date.now() + 18000)
           });
           console.log(`[FAN-OUT] Fallback ${provider.name} a sauvé la tâche ${tasks[i].name}`);
           return { status: 'fulfilled', value, task: tasks[i], provider: provider.name };
@@ -753,21 +758,18 @@ RÈGLE JSON STRICTE :
 
 const JSON_ARRAY_LIMITS = `
 RÈGLE TABLEAUX :
-- Maximum 8 éléments dans les tableaux : parts, keyTerms, relations, examples, traps, definitions, mechanisms, formulas, classifications, theses, vocabulary, plans, timeline, causesConsequences, keyFigures, literaryDevices, texts, grammar, phrases.
-- EXCEPTION IMPORTANTE : le tableau "questions" n'a AUCUNE limite. Génère autant de questions que nécessaire pour couvrir TOUTES les notions du cours.
+- Maximum 6 éléments dans les tableaux : parts, keyTerms, relations, examples, traps, definitions, mechanisms, formulas, classifications, theses, vocabulary, plans, timeline, causesConsequences, keyFigures, literaryDevices, texts, grammar, phrases.
+- EXCEPTION IMPORTANTE : le tableau "questions" n'a AUCUNE limite. Expose TOUTES les questions de la partie, même plus de 30.
 - EXCEPTION : le tableau "qcm" doit contenir EXACTEMENT 8 QCM (pas plus, pas moins).
 `.trim();
 
 const QUESTION_GEN_RULES = `
 RÈGLES DE GÉNÉRATION DES QUESTIONS :
-- Génère 2 à 4 questions par notion importante du cours.
-- Cours court (5-10 lignes) : 10 à 15 questions MINIMUM.
-- Cours moyen (15-20 lignes) : 20 à 30 questions MINIMUM.
-- Cours long (30+ lignes) : 30 à 50 questions MINIMUM.
-- Expose TOUTES les questions exploitables de la partie, même si tu dépasses 30 questions : la banque doit être EXHAUSTIVE.
-- Couvre TOUTES les définitions, formules, propriétés, méthodes et exemples du cours.
-- Ne te limite JAMAIS à 5 questions — le tableau "questions" n'a pas de limite.
-- Chaque question doit avoir : level (1=facile, 2=moyen, 3=difficile), importance (1=utile, 2=important, 3=indispensable), mustHave (2 à 4 éléments clés attendus).
+- Expose TOUTES les questions exploitables de la section, même si tu dépasses 30 questions.
+- Cours court (5-10 lignes) : 10 à 15 questions. Cours moyen : 20 à 30. Cours long (30+ lignes) : 30 à 40.
+- 1 à 2 questions par notion : définitions, formules, propriétés, méthodes, exemples.
+- Chaque question : level (1 facile, 2 moyen, 3 difficile), importance (1 à 3), mustHave (2 à 4 éléments clés).
+- Le tableau "questions" n'a AUCUNE limite d'éléments.
 `.trim();
 
 const QCM_GEN_RULES = `
@@ -781,24 +783,20 @@ RÈGLES DE GÉNÉRATION DES QCM :
 
 const EXPLANATION_DEPTH_RULES = `
 RÈGLES DE PROFONDEUR D'EXPLICATION :
-- Chaque simpleExplanation doit contenir 5 à 10 phrases complètes (PAS 3-6).
-- Ne te contente pas de reformuler le cours : ajoute des analogies, des exemples concrets, des mises en garde.
-- Décompose les raisonnements complexes étape par étape.
-- Pour chaque formule : à quoi elle sert, quand l'utiliser, ses conditions de validité.
-- toRemember : 2 à 3 phrases de synthèse.
-- Maximum 8 parties (parts) — vise 6-8 parties bien développées si le cours est riche.
+- Chaque simpleExplanation : 3 à 6 phrases complètes et naturelles (PAS de listes télégraphiques).
+- Nombre de parties adapté au contenu (2 à 5 parties) : qualité AVANT quantité.
+- Explique chaque idée en français simple, comme si l'élève découvrait le sujet.
+- Ajoute une analogie concrète et, si le cours s'y prête, un exemple chiffré ou une mise en garde.
+- toRemember : 1 à 2 phrases de synthèse.
 `.trim();
 
 const PROF_PERSONA_RULES = `
 RÈGLES « COMME UN PROF » (style d'explication obligatoire) :
-- Tu es un professeur passionné qui parle DIRECTEMENT à son élève : utilise « tu » (« regarde », « remarque que », « tu vas voir »).
-- Structure chaque "simpleExplanation" en 2 à 3 PARAGRAPHES séparés par le retour à la ligne \\n\\n :
-  ¶1. Une accroche + une ANALOGIE concrète de la vie quotidienne au Niger (marché, monnaie, cuisine, sport, téléphone, transport...).
-  ¶2. L'explication du mécanisme pas à pas, en tutoyant l'élève, avec les termes du cours expliqués.
-  ¶3. Un exemple résolu OU une mise en garde (« attention à... ») + le lien avec le BAC.
-- Commence chaque partie par une phrase courte et frappante, jamais par une tournure creuse (« Cette partie porte sur... »).
-- Développe VRAIMENT : une explication d'une seule phrase ou un paragraphe unique est REFUSÉ.
-- Utilise \\n\\n entre les paragraphes dans les chaînes JSON (échappé correctement).
+- Parle DIRECTEMENT à l'élève avec « tu » (« regarde », « remarque que », « tu vas voir »).
+- Structure chaque "simpleExplanation" en 1 à 3 paragraphes séparés par \n\n :
+  une accroche avec une ANALOGIE de la vie quotidienne (marché, cuisine, sport, téléphone...),
+  puis l'explication pas à pas en tutoyant l'élève, puis un exemple ou une mise en garde liée au BAC.
+- Commence chaque partie par une phrase courte et frappante, jamais par « Cette partie porte sur... ».
 `.trim();
 
 function buildScientificPrompts({ subjectLabel, rawInput }) {
@@ -835,7 +833,7 @@ ${JSON_STRICT_RULES}
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'explanation', maxTokens: 5500,
+      name: 'explanation', maxTokens: 4500,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide, sans commentaire.',
       userPrompt: `Tu es professeur expert du BAC. Explique cette section EN PROFONDEUR comme à un élève qui découvre le sujet pour la première fois.
 
@@ -869,7 +867,7 @@ ${JSON_ARRAY_LIMITS}
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'structure', maxTokens: 3000,
+      name: 'structure', maxTokens: 2800,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Extrait la structure scientifique de cette section.
 
@@ -892,7 +890,7 @@ ${JSON_ARRAY_LIMITS}
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'questions', maxTokens: 8000,
+      name: 'questions', maxTokens: 6000,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Génère une banque EXHAUSTIVE de questions basée UNIQUEMENT sur cette section.
 
@@ -913,7 +911,7 @@ ${JSON_ARRAY_LIMITS}
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'qcm', maxTokens: 4500,
+      name: 'qcm', maxTokens: 3200,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Génère EXACTEMENT 8 QCM basés UNIQUEMENT sur cette section.
 
@@ -969,7 +967,7 @@ ${JSON_STRICT_RULES}
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'explanation', maxTokens: 5500,
+      name: 'explanation', maxTokens: 4500,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide, sans commentaire.',
       userPrompt: `Tu es professeur de SVT. Explique cette section EN PROFONDEUR comme à un élève qui découvre.
 
@@ -1002,7 +1000,7 @@ ${JSON_ARRAY_LIMITS}
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'structure', maxTokens: 3000,
+      name: 'structure', maxTokens: 2800,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Structure cette section de SVT.
 
@@ -1023,7 +1021,7 @@ ${JSON_ARRAY_LIMITS}
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'questions', maxTokens: 8000,
+      name: 'questions', maxTokens: 6000,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Génère une banque EXHAUSTIVE de questions de SVT sur cette section.
 
@@ -1043,7 +1041,7 @@ ${JSON_ARRAY_LIMITS}
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'qcm', maxTokens: 4500,
+      name: 'qcm', maxTokens: 3200,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Génère EXACTEMENT 8 QCM de SVT sur cette section.
 
@@ -1097,7 +1095,7 @@ ${JSON_STRICT_RULES}
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'explanation', maxTokens: 5500,
+      name: 'explanation', maxTokens: 4500,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide, sans commentaire.',
       userPrompt: `Tu es professeur de philosophie. Explique cette section EN PROFONDEUR comme à un élève qui n'y connaît RIEN.
 
@@ -1130,7 +1128,7 @@ ${JSON_ARRAY_LIMITS}
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'structure', maxTokens: 3000,
+      name: 'structure', maxTokens: 2800,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Structure cette section de philosophie.
 
@@ -1151,7 +1149,7 @@ ${JSON_ARRAY_LIMITS}
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'questions', maxTokens: 8000,
+      name: 'questions', maxTokens: 6000,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Génère une banque EXHAUSTIVE de questions de philosophie sur cette section.
 
@@ -1171,7 +1169,7 @@ ${JSON_ARRAY_LIMITS}
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'qcm', maxTokens: 4500,
+      name: 'qcm', maxTokens: 3200,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Génère EXACTEMENT 8 QCM de philosophie sur cette section.
 
@@ -1227,7 +1225,7 @@ ${JSON_STRICT_RULES}
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'explanation', maxTokens: 4500,
+      name: 'explanation', maxTokens: 4000,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Présente cette section d'histoire-géo de manière CLAIRE, CONCISE mais COMPLÈTE.
 
@@ -1271,7 +1269,7 @@ ${JSON_ARRAY_LIMITS}
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'questions', maxTokens: 8000,
+      name: 'questions', maxTokens: 6000,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Génère une BANQUE MASSIVE de questions d'histoire-géo sur cette section.
 
@@ -1291,7 +1289,7 @@ ${JSON_ARRAY_LIMITS}
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'qcm', maxTokens: 4500,
+      name: 'qcm', maxTokens: 3200,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Génère EXACTEMENT 8 QCM d'histoire-géo sur cette section.
 
@@ -1345,7 +1343,7 @@ ${JSON_STRICT_RULES}
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'explanation', maxTokens: 5000,
+      name: 'explanation', maxTokens: 4200,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Tu es professeur de français. Explique cette section EN PROFONDEUR.
 
@@ -1397,7 +1395,7 @@ ${JSON_ARRAY_LIMITS}
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'questions', maxTokens: 8000,
+      name: 'questions', maxTokens: 6000,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Génère une banque EXHAUSTIVE de questions de français sur cette section.
 
@@ -1417,7 +1415,7 @@ ${JSON_ARRAY_LIMITS}
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'qcm', maxTokens: 4500,
+      name: 'qcm', maxTokens: 3200,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Génère EXACTEMENT 8 QCM de français sur cette section.
 
@@ -1471,7 +1469,7 @@ ${JSON_STRICT_RULES}
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'explanation', maxTokens: 5500,
+      name: 'explanation', maxTokens: 4500,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Tu es professeur d'anglais pour des FRANCOPHONES DÉBUTANTS. Explique EN PROFONDEUR.
 
@@ -1504,7 +1502,7 @@ ${JSON_ARRAY_LIMITS}
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'structure', maxTokens: 3000,
+      name: 'structure', maxTokens: 2800,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Structure cette section d'anglais.
 
@@ -1525,7 +1523,7 @@ ${JSON_ARRAY_LIMITS}
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'questions', maxTokens: 8000,
+      name: 'questions', maxTokens: 6000,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Génère une banque EXHAUSTIVE de questions d'anglais.
 
@@ -1545,7 +1543,7 @@ ${JSON_ARRAY_LIMITS}
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'qcm', maxTokens: 4500,
+      name: 'qcm', maxTokens: 3200,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Génère EXACTEMENT 8 QCM d'anglais sur cette section.
 
@@ -1974,7 +1972,7 @@ async function createSection(uid, body) {
     questions: Array.isArray(analysis.questions) ? analysis.questions.length : 0,
     qcm: Array.isArray(analysis.qcm) ? analysis.qcm.length : 0
   };
-  console.log(`[PROGRESS v9.4] section créée en ${meta.elapsedMs} ms — questions:${meta.counts.questions} qcm:${meta.counts.qcm}`);
+  console.log(`[PROGRESS v9.6] section créée en ${meta.elapsedMs} ms — questions:${meta.counts.questions} qcm:${meta.counts.qcm}`);
 
   const sectionRef = chapterRef.collection('sections').doc();
   const sectionId = sectionRef.id;
@@ -2625,10 +2623,6 @@ async function computeStudyTime(uid) {
 // HANDLER
 // ═══════════════════════════════════════════════════════════════
 module.exports = async function handler(request, response) {
-
-// ✅ FIX — la config DOIT être assignée APRÈS module.exports, sinon elle
-// est écrasée et maxDuration retombe à la valeur par défaut (10s sur Vercel).
-module.exports.config = { maxDuration: 120 };
   applyCors(request, response);
   if (request.method === 'OPTIONS') return response.status(204).end();
   if (request.method !== 'POST') {
@@ -2692,3 +2686,6 @@ module.exports.config = { maxDuration: 120 };
     return jsonError(response, 500, error.message || 'Erreur serveur.');
   }
 };
+
+// ✅ Config assignée APRÈS module.exports — visible par Vercel AU BUILD (pas seulement au runtime).
+module.exports.config = { maxDuration: 90 };

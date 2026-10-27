@@ -65,7 +65,7 @@ module.exports = async function handler(request, response) {
   }
 
   if (isRateLimited(getClientIp(request))) {
-    return response.status(429).json({ error: 'Trop de demandes. Réessaie dans une minute.' });
+    return response.status(429).json({ error: 'Service momentanément saturé. Réessaie dans quelques secondes.' });
   }
 
   const body = request.body && typeof request.body === 'object' ? request.body : {};

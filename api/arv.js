@@ -6,7 +6,9 @@
 // ================================================================
 
 const WINDOW_MS = 60 * 1000;
-const MAX_REQUESTS_PER_WINDOW = 15;
+// ✅ v4.13 — 15→25/min : derrière une NAT de classe ou d'opérateur (CGNAT),
+// plusieurs élèves partagent la même IP publique — 15/min les bloquait à tort.
+const MAX_REQUESTS_PER_WINDOW = 25;
 const requestLog = new Map();
 
 const FREE_DAILY_LIMIT = 10;
@@ -48,10 +50,16 @@ function clientIp(request) {
 }
 
 function rateLimited(ip) {
+  const key = `${ip}|chat`;
   const now = Date.now();
-  const recent = (requestLog.get(ip) || []).filter((t) => now - t < WINDOW_MS);
+  const recent = (requestLog.get(key) || []).filter((t) => now - t < WINDOW_MS);
   recent.push(now);
-  requestLog.set(ip, recent);
+  requestLog.set(key, recent);
+  if (requestLog.size > 5000) {
+    for (const [k, v] of requestLog) {
+      if (v.every((t) => now - t >= WINDOW_MS)) requestLog.delete(k);
+    }
+  }
   return recent.length > MAX_REQUESTS_PER_WINDOW;
 }
 
@@ -504,7 +512,7 @@ module.exports.config = { maxDuration: 60 };
   }
 
   if (rateLimited(clientIp(request))) {
-    return jsonError(response, 429, 'Trop de demandes. Réessaie dans une minute.');
+    return jsonError(response, 429, 'Beaucoup d\'élèves en ce moment. Réessaie dans une minute.');
   }
 
   let user;

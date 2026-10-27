@@ -2316,7 +2316,15 @@ function getFirstName() {
   return state.userData?.firstName || state.userData?.displayName?.split(' ')[0] || 'Élève';
 }
 
-async function callApi(action, params = {}, _attempt = 1) {
+// ✅ v4.13 — actions légères (lecture/écriture directe, SANS IA) : sur un 429
+// passager elles sont retentées silencieusement côté client. Seule la
+// création de section (IA) affiche immédiatement un message calme.
+const LIGHT_PROGRESS_ACTIONS = new Set([
+  'getDashboard', 'listChapters', 'getChapter', 'getSection',
+  'updateNotes', 'deleteSection', 'deleteChapter', 'getFullLesson', 'trackStudyTime'
+]);
+
+async function callApi(action, params = {}, _attempt = 1, _rateRetried = false) {
   if (!state.user) throw new Error('Non authentifié.');
   // _attempt > 1 -> forceRefresh : le token est régénéré côté Firebase
   const token = await getIdToken(state.user, _attempt > 1);
@@ -2350,8 +2358,21 @@ async function callApi(action, params = {}, _attempt = 1) {
       throw new Error('Session expirée');
     }
 
+    // ✅ v4.13 — 429 sur action légère : UNE retente silencieuse après 1,5 s.
+    // L'élève ne doit JAMAIS voir un message d'erreur pour une lecture ou une
+    // suppression qui finira par passer (bucket serveur isolé par action).
+    if (response.status === 429 && !_rateRetried
+        && !data?.code && LIGHT_PROGRESS_ACTIONS.has(action)) {
+      await new Promise((r) => setTimeout(r, 1500));
+      return callApi(action, params, _attempt, true);
+    }
+
     if (!response.ok || !data?.success) {
-      const err = new Error(data?.error || `Erreur ${response.status}`);
+      const err = new Error(
+        response.status === 429
+          ? 'Service momentanément saturé. Réessaie dans quelques secondes.'
+          : (data?.error || `Erreur ${response.status}`)
+      );
       err.code = data?.code;
       err.status = response.status;
       throw err;
@@ -3632,7 +3653,7 @@ function confirmDelete({ title, message, onConfirm }) {
       await onConfirm();
       closeModal();
     } catch (e) {
-      showToast('Erreur : ' + e.message, 'error');
+      showToast(e.message || 'Impossible de supprimer', 'error');
       btn.disabled = false;
       btn.textContent = 'Supprimer';
     }

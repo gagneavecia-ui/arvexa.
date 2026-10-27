@@ -409,12 +409,21 @@ function clientIp(request) {
 }
 
 // ✅ Rate limit adaptatif par action
+// ⚠️ v4.13 — buckets ISOLÉS par (ip, action) : avant, TOUTES les actions
+// partageaient un compteur unique, donc une navigation normale remplissait le
+// bucket et la 1ʳᵉ suppression héritait d'un faux « trop de demandes ».
 function rateLimited(ip, action) {
   const limit = RATE_LIMITS[action] || DEFAULT_RATE_LIMIT;
+  const key = `${ip}|${action}`;
   const now = Date.now();
-  const recent = (requestLog.get(ip) || []).filter((t) => now - t < WINDOW_MS);
+  const recent = (requestLog.get(key) || []).filter((t) => now - t < WINDOW_MS);
   recent.push(now);
-  requestLog.set(ip, recent);
+  requestLog.set(key, recent);
+  if (requestLog.size > 5000) {
+    for (const [k, v] of requestLog) {
+      if (v.every((t) => now - t >= WINDOW_MS)) requestLog.delete(k);
+    }
+  }
   return recent.length > limit;
 }
 
@@ -2634,9 +2643,9 @@ module.exports = async function handler(request, response) {
   const body = request.body && typeof request.body === 'object' ? request.body : {};
   const action = body.action || '';
 
-  // ✅ Rate limit adaptatif selon l'action
+  // ✅ Rate limit adaptatif selon l'action (bucket isolé par action — v4.13)
   if (rateLimited(clientIp(request), action)) {
-    return jsonError(response, 429, 'Trop de demandes. Réessaie dans une minute.');
+    return jsonError(response, 429, 'Service momentanément saturé. Réessaie dans quelques secondes.');
   }
 
   let user;

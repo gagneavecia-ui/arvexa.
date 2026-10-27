@@ -176,12 +176,20 @@ function clientIp(request) {
   return String(request.headers['x-forwarded-for'] || request.socket?.remoteAddress || 'unknown').split(',')[0].trim();
 }
 
-function rateLimited(ip, maxRequests) {
+// ✅ v4.13 — buckets ISOLÉS light/heavy (fini le compteur partagé qui
+// épuisait le quota lourd avec du trafic léger).
+function rateLimited(ip, maxRequests, group) {
   const limit = typeof maxRequests === 'number' ? maxRequests : MAX_REQUESTS_PER_WINDOW_HEAVY;
+  const key = `${ip}|${group || 'heavy'}`;
   const now = Date.now();
-  const recent = (requestLog.get(ip) || []).filter((t) => now - t < WINDOW_MS);
+  const recent = (requestLog.get(key) || []).filter((t) => now - t < WINDOW_MS);
   recent.push(now);
-  requestLog.set(ip, recent);
+  requestLog.set(key, recent);
+  if (requestLog.size > 5000) {
+    for (const [k, v] of requestLog) {
+      if (v.every((t) => now - t >= WINDOW_MS)) requestLog.delete(k);
+    }
+  }
   return recent.length > limit;
 }
 
@@ -1193,10 +1201,10 @@ module.exports.config = { maxDuration: 60 };
   const isLight = LIGHT_ACTIONS.has(action);
   const rateLimit = isLight ? MAX_REQUESTS_PER_WINDOW_LIGHT : MAX_REQUESTS_PER_WINDOW_HEAVY;
 
-  if (rateLimited(clientIp(request), rateLimit)) {
+  if (rateLimited(clientIp(request), rateLimit, isLight ? 'light' : 'heavy')) {
     return jsonError(response, 429, isLight
-      ? 'Trop de requêtes. Patiente quelques secondes.'
-      : 'Trop de demandes. Réessaie dans une minute.');
+      ? 'Service momentanément saturé. Réessaie dans quelques secondes.'
+      : 'Beaucoup d\'élèves en ce moment. Réessaie dans une minute.');
   }
 
   let user;

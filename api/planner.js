@@ -5,7 +5,7 @@
 // Cache intelligent + invalidation auto si nouvel examen
 // ================================================================
 
-const MAX_REQUESTS_PER_WINDOW = 12;
+const MAX_REQUESTS_PER_WINDOW = 15; // ✅ v4.13 — 12→15 (NAT partagé)
 const requestLog = new Map();
 
 const CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6 heures
@@ -49,10 +49,16 @@ function clientIp(request) {
 }
 
 function rateLimited(ip) {
+  const key = `${ip}|planner`;
   const now = Date.now();
-  const recent = (requestLog.get(ip) || []).filter((time) => now - time < 60000);
+  const recent = (requestLog.get(key) || []).filter((time) => now - time < 60000);
   recent.push(now);
-  requestLog.set(ip, recent);
+  requestLog.set(key, recent);
+  if (requestLog.size > 5000) {
+    for (const [k, v] of requestLog) {
+      if (v.every((t) => now - t >= 60000)) requestLog.delete(k);
+    }
+  }
   return recent.length > MAX_REQUESTS_PER_WINDOW;
 }
 
@@ -923,7 +929,7 @@ module.exports = async function handler(request, response) {
   }
 
   if (rateLimited(clientIp(request))) {
-    return jsonError(response, 429, 'Trop de demandes. Réessaie dans une minute.');
+    return jsonError(response, 429, 'Beaucoup d\'élèves en ce moment. Réessaie dans une minute.');
   }
 
   let user;

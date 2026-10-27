@@ -4,7 +4,9 @@
 // ================================================================
 
 const WINDOW_MS = 60 * 1000;
-const MAX_REQUESTS_PER_WINDOW = 30;
+// ✅ v4.13 — 30→40/min : endpoint en lecture seule (liste des conversations),
+// ne doit jamais bloquer une navigation normale.
+const MAX_REQUESTS_PER_WINDOW = 40;
 const requestLog = new Map();
 
 let adminServices;
@@ -29,10 +31,16 @@ function clientIp(request) {
 }
 
 function rateLimited(ip) {
+  const key = `${ip}|history`;
   const now = Date.now();
-  const recent = (requestLog.get(ip) || []).filter((t) => now - t < WINDOW_MS);
+  const recent = (requestLog.get(key) || []).filter((t) => now - t < WINDOW_MS);
   recent.push(now);
-  requestLog.set(ip, recent);
+  requestLog.set(key, recent);
+  if (requestLog.size > 5000) {
+    for (const [k, v] of requestLog) {
+      if (v.every((t) => now - t >= WINDOW_MS)) requestLog.delete(k);
+    }
+  }
   return recent.length > MAX_REQUESTS_PER_WINDOW;
 }
 
@@ -64,7 +72,7 @@ module.exports = async function handler(request, response) {
   }
 
   if (rateLimited(clientIp(request))) {
-    return response.status(429).json({ success: false, error: 'Trop de demandes.' });
+    return response.status(429).json({ success: false, error: 'Service momentanément saturé. Réessaie dans quelques secondes.' });
   }
 
   let user;

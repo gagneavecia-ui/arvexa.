@@ -601,26 +601,29 @@ function repairJson(str) {
   try { return JSON.parse(s); } catch (_) {}
 
   const firstBrace = s.indexOf('{');
+  if (firstBrace === -1) return null;
   const lastBrace = s.lastIndexOf('}');
-  if (firstBrace === -1 || lastBrace === -1 || lastBrace <= firstBrace) return null;
-
-  let candidate = s.slice(firstBrace, lastBrace + 1);
+  // Reponse tronquee sans AUCUN '}' : reparer depuis la premiere accolade
+  let candidate = (lastBrace > firstBrace) ? s.slice(firstBrace, lastBrace + 1) : s.slice(firstBrace);
   try { return JSON.parse(candidate); } catch (_) {}
 
-  let open = 0, openBrackets = 0;
+  // Rejouer la PILE d'imbrication pour fermer dans le bon ordre
+  const stack = [];
   let inString = false, escape = false;
   for (const ch of candidate) {
     if (escape) { escape = false; continue; }
     if (ch === '\\') { escape = true; continue; }
     if (ch === '"') { inString = !inString; continue; }
     if (inString) continue;
-    if (ch === '{') open++;
-    else if (ch === '}') open--;
-    else if (ch === '[') openBrackets++;
-    else if (ch === ']') openBrackets--;
+    if (ch === '{') stack.push('}');
+    else if (ch === '[') stack.push(']');
   }
-  while (openBrackets > 0) { candidate += ']'; openBrackets--; }
-  while (open > 0) { candidate += '}'; open--; }
+
+  let suffix = '';
+  if (escape) candidate = candidate.slice(0, -1);
+  if (inString) suffix += '"';
+  while (stack.length) suffix += stack.pop();
+  candidate += suffix;
 
   try { return JSON.parse(candidate); } catch (_) {}
   return null;

@@ -788,7 +788,7 @@ async function callProvider(provider, { systemPrompt, userPrompt, maxTokens = 40
 // - OpenRouter (lent mais sans TPM serré) : questions + qcm en file
 // - Mistral : structure
 const TASK_PROVIDER_PREF = {
-  explanation: ['Groq', 'Gemini', 'Mistral', 'OpenRouter'],
+  explanation: ['Groq', 'Mistral', 'Gemini', 'OpenRouter'],
   structure:   ['Mistral', 'Gemini', 'OpenRouter', 'Groq'],
   questions_a: ['Gemini', 'Mistral', 'OpenRouter', 'Groq'],
   questions_b: ['Gemini', 'Mistral', 'OpenRouter', 'Groq'],
@@ -906,13 +906,18 @@ async function runParallelTasks(tasks, providers, deadline) {
 
     // 2e chance pour l'explication : le JSON des longues proses est non
     // déterministe — un même fournisseur peut réussir au 2e essai.
-    if (!value && task.name === 'explanation' && deadline && Date.now() < deadline - 25000) {
-      let retryName = null;
-      for (let i = errs.length - 1; i >= 0; i--) {
-        if (errs[i].includes('JSON invalide')) { retryName = errs[i].split(':')[0]; break; }
-      }
-      const rp = retryName ? providers.find((p) => p.name === retryName) : null;
-      if (rp) {
+    // Jusqu'à 2 retentations (dernier fournisseur en échec JSON d'abord,
+    // sinon Mistral), tant que le deadline le permet.
+    if (!value && task.name === 'explanation') {
+      for (let retry = 0; retry < 2 && !value; retry++) {
+        if (deadline && Date.now() > deadline - 25000) break;
+        let retryName = null;
+        for (let i = errs.length - 1; i >= 0; i--) {
+          if (errs[i].includes('JSON invalide')) { retryName = errs[i].split(':')[0]; break; }
+        }
+        if (!retryName) retryName = 'Mistral';
+        const rp = providers.find((p) => p.name === retryName);
+        if (!rp) break;
         console.warn(`[FAN-OUT] 2e chance : "${task.name}" retenté sur ${rp.name}`);
         busy.set(rp.name, (busy.get(rp.name) || 0) + 1);
         try {

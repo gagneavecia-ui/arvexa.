@@ -1929,15 +1929,20 @@ Réponds UNIQUEMENT avec le JSON.`
 }
 
 function getPromptsForProfile(profile, context) {
+  let tasks;
   switch (profile) {
-    case 'scientific': return buildScientificPrompts(context);
-    case 'svt':        return buildSvtPrompts(context);
-    case 'philosophy': return buildPhilosophyPrompts(context);
-    case 'history':    return buildHistoryPrompts(context);
-    case 'french':     return buildFrenchPrompts(context);
-    case 'language':   return buildLanguagePrompts(context);
-    default:           return buildScientificPrompts(context);
+    case 'scientific': tasks = buildScientificPrompts(context); break;
+    case 'svt':        tasks = buildSvtPrompts(context); break;
+    case 'philosophy': tasks = buildPhilosophyPrompts(context); break;
+    case 'history':    tasks = buildHistoryPrompts(context); break;
+    case 'french':     tasks = buildFrenchPrompts(context); break;
+    case 'language':   tasks = buildLanguagePrompts(context); break;
+    default:           tasks = buildScientificPrompts(context);
   }
+  // Files séquentielles : les tâches LÉGÈRES d'abord (qcm ~13 s, puis
+  // questions ~20 s chacune) pour que chaque tâche ait du budget devant elle.
+  const order = { qcm: 0, questions_a: 1, questions_b: 2, structure: 3, explanation: 4 };
+  return tasks.slice().sort((a, b) => (order[a.name] ?? 9) - (order[b.name] ?? 9));
 }
 
 function buildFallbackAnalysis({ rawInput, profile }) {

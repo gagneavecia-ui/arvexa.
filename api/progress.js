@@ -311,6 +311,11 @@ function cleanLatexText(text) {
   if (!text || typeof text !== 'string') return text;
   if (!text.trim()) return text;
 
+  // Espaces insécables émis par certains modèles (U+00A0 / U+202F) → espace
+  // normal : sinon tout le texte devient une seule ligne insécable qui déborde
+  // des cartes QCM sur mobile (« le test sort de sa zone »).
+  text = text.replace(/[\u00a0\u202f]/g, ' ');
+
   const hasBackslash = text.indexOf('\\') !== -1;
   const hasDollar = text.indexOf('$') !== -1;
   const hasUnicode = hasUnicodeMath(text);

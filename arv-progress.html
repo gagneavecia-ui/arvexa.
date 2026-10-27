@@ -745,7 +745,7 @@ main {
 }
 .qcm-option {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 10px;
   padding: 10px 12px;
   border-radius: 10px;
@@ -758,6 +758,15 @@ main {
   line-height: 1.5;
   text-align: left;
   width: 100%;
+  min-width: 0;
+}
+/* Le texte d'une option doit toujours rester DANS sa carte : rétrécit et
+   revient à la ligne même avec des mots longs ou des espaces insécables. */
+.qcm-option > span:last-child {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 .qcm-option:hover { border-color: rgba(224, 184, 74, 0.25); }
 .qcm-option.correct {
@@ -2197,7 +2206,7 @@ function safeText(text) {
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;');
     }
-    return part.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return part.replace(/[\u00a0\u202f]/g, ' ').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }).join('');
 }
 

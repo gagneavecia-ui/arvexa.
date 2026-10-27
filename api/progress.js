@@ -578,10 +578,21 @@ function escapeControlCharsInJsonStrings(s) {
   if (!s || typeof s !== 'string') return s;
   let out = '';
   let inStr = false, esc = false;
-  for (const ch of s) {
+  const n = s.length;
+  for (let i = 0; i < n; i++) {
+    const ch = s[i];
     if (esc) { out += ch; esc = false; continue; }
-    if (ch === '\\') { out += ch; esc = true; continue; }
     if (ch === '"') { inStr = !inStr; out += ch; continue; }
+    if (ch === '\\' && inStr) {
+      // Backslash : valide seulement \" \\ / et \uXXXX.
+      // b f n r t sont TRAITES COMME LATEX (\neq, \frac, \tan, \bar) car les
+      // vraies nouvelles lignes sont interdites dans les valeurs (regle JSON).
+      const next = i + 1 < n ? s[i + 1] : '';
+      if (next === 'u' && /^[0-9a-fA-F]{4}/.test(s.slice(i + 2, i + 6))) { out += ch; esc = true; continue; }
+      if ('"\\/'.includes(next)) { out += ch; esc = true; continue; }
+      out += '\\\\';
+      continue;
+    }
     if (inStr) {
       if (ch === '\n') { out += '\\n'; continue; }
       if (ch === '\r') { out += '\\r'; continue; }

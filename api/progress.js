@@ -792,7 +792,7 @@ const TASK_PROVIDER_PREF = {
   explanation: ['Groq', 'Mistral', 'Gemini', 'OpenRouter'],
   structure:   ['Mistral', 'Gemini', 'OpenRouter', 'Groq'],
   questions_a: ['Gemini', 'Mistral', 'OpenRouter', 'Groq'],
-  questions_b: ['Gemini', 'Mistral', 'OpenRouter', 'Groq'],
+  questions_b: ['Mistral', 'Gemini', 'OpenRouter', 'Groq'],
   qcm:         ['Gemini', 'Mistral', 'OpenRouter', 'Groq']
 };
 

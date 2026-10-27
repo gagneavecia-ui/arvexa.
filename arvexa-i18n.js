@@ -1154,7 +1154,7 @@
     "Appuie et parle — durée illimitée": "Tap and speak — unlimited time",
     "J'écoute… Appuie pour arrêter": "Listening… Tap to stop",
     "Ton texte apparaîtra ici en direct…": "Your text will appear here live…",
-    "Limite de 15 000 caractères atteinte — dictée arrêtée": "15,000-character limit reached — dictation stopped",
+    "Limite de 2 500 caractères atteinte — dictée arrêtée": "2,500-character limit reached — dictation stopped",
     "Micro bloqué — autorise le micro dans les réglages du navigateur": "Microphone blocked — allow it in your browser settings",
     "Dictée interrompue (réseau) — ton texte est conservé": "Dictation interrupted (network) — your text is saved",
     "Aucun micro détecté": "No microphone detected",

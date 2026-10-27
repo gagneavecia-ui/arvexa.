@@ -58,7 +58,7 @@ var SUBJECT_INFO = {
   anglais:       { label: 'Anglais',        profile: 'language' }
 };
 const MIN_CONTENT_LENGTH = 40;
-const MAX_CONTENT_LENGTH = 15000;
+const MAX_CONTENT_LENGTH = 2500; // calibré IA : aligné sur le cahier (budget analyse)
 
 const FREE_SECTION_LIMIT = 5;
 const GLOBAL_AI_TIME_BUDGET_MS = 78000;

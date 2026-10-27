@@ -2119,7 +2119,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 const MIN_CONTENT_LENGTH = 40;
-const MAX_CONTENT_LENGTH = 15000;
+const MAX_CONTENT_LENGTH = 2500; // calibré IA : taille que l'analyse traite sans problème
 
 var SUBJECTS = {
   mathematiques: { label: 'Mathématiques', emoji: '📐', profile: 'scientific' },
@@ -3889,7 +3889,7 @@ function openAddSectionModal(subject, chapterId) {
   }, { passive: true });
 
   // ── Dictée vocale — étape 2 dédiée : bouton enregistrer bien centré,
-  // durée illimitée (relance automatique), cap 15 000 caractères,
+  // durée illimitée (relance automatique), cap 2 500 caractères (budget IA),
   // tout est en dur : aucun chargement, l'étape est prête dès l'ouverture.
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) {
@@ -3904,12 +3904,90 @@ function openAddSectionModal(subject, chapterId) {
     let startedAt = 0;
     let wakeLock = null;
     let capWarned = false;
+    /* === DEDUP-HELPERS-START (testes par scripts/test_dictation_dedup.js) === */
+    // Normalise un mot pour comparaison : casse, accents et ponctuation ignores.
+    const normTok = (w) => {
+      let s = String(w || '').toLowerCase().replace(/\u0153/g, 'oe');
+      try { s = s.normalize('NFD').replace(/[\u0300-\u036f]/g, ''); } catch (e) {}
+      return s.replace(/[^a-z0-9']+/g, '');
+    };
+    const wordsOf = (t) => String(t || '').split(/\s+/).filter(Boolean);
+    // Retire de `txt` ses premiers mots qui repetent la fin de `base` : apres une
+    // relance auto, le moteur re-transcrit la fin de l'audio deja valide.
+    const withoutOverlap = (base, txt) => {
+      if (!base || !txt) return txt || '';
+      const bw = wordsOf(base); const tw = wordsOf(txt);
+      // Segment entièrement re-transcrit (contigu près de la fin de base) → à jeter.
+      const twN = tw.map(normTok).join(' ');
+      const winN = bw.slice(Math.max(0, bw.length - tw.length - 8)).map(normTok).join(' ');
+      if (twN && winN.indexOf(twN) !== -1) return '';
+      const maxK = Math.min(bw.length, tw.length, 60);
+      for (let k = maxK; k >= 1; k--) {
+        let ok = true;
+        for (let i = 0; i < k; i++) {
+          if (normTok(bw[bw.length - k + i]) !== normTok(tw[i])) { ok = false; break; }
+        }
+        if (ok) return tw.slice(k).join(' ');
+      }
+      return txt;
+    };
+    // Concatene en supprimant le chevauchement prev/next (zero repetition).
+    const mergeNoOverlap = (prev, next) => {
+      if (!prev) return next || '';
+      if (!next) return prev;
+      const kept = withoutOverlap(prev, next);
+      return kept ? prev + ' ' + kept : prev;
+    };
+    // Compresse les begaiements colles du moteur (<< le le >>, << ce que ce que >>).
+    // Les doubles legitimes courants (oui oui, non non, tres tres...) sont gardes.
+    const STUTTER_KEEP = { oui: 1, non: 1, tres: 1, bien: 1, jamais: 1, encore: 1, toujours: 1 };
+    const collapseStutter = (text) => {
+      const w = wordsOf(text);
+      const out = [];
+      let i = 0;
+      while (i < w.length) {
+        let consumed = 1;
+        for (let n = 4; n >= 2; n--) {
+          if (i + 2 * n > w.length) continue;
+          let ok = true;
+          for (let j = 0; j < n; j++) {
+            if (normTok(w[i + j]) !== normTok(w[i + n + j])) { ok = false; break; }
+          }
+          if (ok) { consumed = n; break; }
+        }
+        if (consumed === 1) {
+          out.push(w[i]);
+          const tok = normTok(w[i]);
+          let j = i + 1;
+          while (j < w.length && normTok(w[j]) === tok) {
+            if (STUTTER_KEEP[tok]) out.push(w[j]);
+            j++;
+          }
+          i = j;
+        } else {
+          // Répétition d'un groupe : garde le 1er groupe entier, saute tous
+          // les doublons consécutifs de ce même groupe.
+          for (let j = 0; j < consumed; j++) out.push(w[i + j]);
+          i += consumed;
+          while (i + consumed <= w.length) {
+            let same = true;
+            for (let j = 0; j < consumed; j++) {
+              if (normTok(w[i + j]) !== normTok(w[i - consumed + j])) { same = false; break; }
+            }
+            if (!same) break;
+            i += consumed;
+          }
+        }
+      }
+      return out.join(' ');
+    };
+    /* === DEDUP-HELPERS-END === */
 
     const clampToMax = (txt) => (txt.length > MAX_CONTENT_LENGTH ? txt.slice(0, MAX_CONTENT_LENGTH) : txt);
 
     const flushSessionFinals = () => {
       if (sessionFinals) {
-        savedBaseValue = clampToMax(savedBaseValue + sessionFinals);
+        savedBaseValue = clampToMax(mergeNoOverlap(savedBaseValue, sessionFinals));
         sessionFinals = '';
       }
     };
@@ -3975,27 +4053,34 @@ function openAddSectionModal(subject, chapterId) {
         recognition.maxAlternatives = 1;
 
         recognition.onresult = (event) => {
-          // ✅ Reconstruction complète à CHAQUE event : les finales sont relues
-          // depuis event.results (jamais accumulées à l'aveugle) → zéro doublon.
+          // ✅ Reconstruction complète à CHAQUE event + FUSION anti-chevauchement :
+          // après une relance auto, le moteur re-transcrit la fin de l'audio déjà
+          // validé → chaque segment est fusionné (mergeNoOverlap) au lieu d'être
+          // additionné, puis compressé (collapseStutter) → zéro répétition.
           let finals = '';
           let interim = '';
           for (let i = 0; i < event.results.length; i++) {
             const r = event.results[i];
             const txt = r && r[0] ? r[0].transcript : '';
             if (!txt) continue;
-            if (r.isFinal) finals += txt + ' ';
-            else interim += txt;
+            if (r.isFinal) {
+              finals = mergeNoOverlap(finals, withoutOverlap(savedBaseValue, txt));
+            } else {
+              interim += (interim ? ' ' : '') + txt;
+            }
           }
-          sessionFinals = finals;
-          const total = savedBaseValue + finals + interim;
+          sessionFinals = collapseStutter(finals);
+          const spokenBase = savedBaseValue + (sessionFinals ? ' ' + sessionFinals : '');
+          interim = withoutOverlap(spokenBase, interim);
+          const total = spokenBase + (interim ? ' ' + interim : '');
           if (total.length > MAX_CONTENT_LENGTH) {
-            // Cap 15 000 : coupe nette, avertissement, arrêt propre.
+            // Cap 2 500 : coupe nette, avertissement, arrêt propre.
             body.value = total.slice(0, MAX_CONTENT_LENGTH);
             updateReady();
             updateLive();
             if (!capWarned) {
               capWarned = true;
-              showToast('Limite de 15 000 caractères atteinte — dictée arrêtée', 'info');
+              showToast('Limite de 2 500 caractères atteinte — dictée arrêtée', 'info');
             }
             stopDictation();
             return;

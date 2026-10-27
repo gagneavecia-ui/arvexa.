@@ -1,12 +1,17 @@
 // ================================================================
-// API EXAM v6.0 — ARVEXA School
+// API EXAM v6.1 — ARVEXA School
 // Corrections : Cas B, Notes strictes, Niveau BAC, Schémas Physique
+// v4.15 : heavy 3→5/min, 429+retryAfter (re-essai auto côté client), contrat de
+// complétion IA (30/30 questions non vides), gradation Sujet 1→2, validation
+// stricte des énoncés + rattrapage "presque complet" depuis le pool d'exercices
 // ================================================================
 
 
 const WINDOW_MS = 60 * 1000;
 const MAX_REQUESTS_PER_WINDOW_LIGHT = 60;
-const MAX_REQUESTS_PER_WINDOW_HEAVY = 3;
+// ✅ v4.15 — heavy 3→5/min : une classe entière derrière une IP partagée (CGNAT)
+// essuyait des 429 dès les 3e génération ; 5/min reste prudent pour le quota Groq.
+const MAX_REQUESTS_PER_WINDOW_HEAVY = 5;
 const requestLog = new Map();
 
 const ALLOWED_SUBJECTS = new Set(['mathematiques', 'physique', 'chimie', 'svt', 'philosophie', 'histoire', 'geographie']);
@@ -535,6 +540,14 @@ Ton JSON contient EXACTEMENT :
   - Si "choice" : "options" (4 objets {id:A/B/C/D, text}) + "correctAnswer" (A/B/C/D)
   - Si "text" : PAS d'options, PAS de correctAnswer
   - Si "drawing" : PAS d'options, PAS de correctAnswer (utilisé uniquement en Physique Q1)
+
+CONTRAT DE COMPLÉTION — ABSOLUMENT OBLIGATOIRE :
+- Tu livres l'INTÉGRALITÉ des 30 questions (2 sujets × 3 exercices × 5 questions), JAMAIS une réponse partielle.
+- CHAQUE question a un énoncé ("text") COMPLET et NON VIDE : la question posée, les données numériques et l'unité attendue.
+- CHAQUE exercice a un "statement" non vide qui installe le contexte de ses 5 questions.
+- Si tu manques de place, raccourcis les formulations mais ne supprime JAMAIS une question et ne mets jamais "..." ou "".
+- VÉRIFICATION FINALE AVANT DE RÉPONDRE : compte tes questions (15 par sujet). S'il en manque, complète-les AVANT d'émettre ta réponse.
+- INTERDIT de renvoyer un commentaire, une excuse ou du texte hors JSON.
 `;
 
 function generationPrompt(config) {
@@ -562,6 +575,7 @@ ${diffRules}
 
 SUJET 1 — "Consolidation" (facile à moyen) : tester les bases.
 SUJET 2 — "Approfondissement" (moyen à difficile) : aller plus loin.
+GRADATION OBLIGATOIRE : le Sujet 2 doit être VISIBLEMENT plus difficile que le Sujet 1 (énoncés plus riches, plus d'étapes de calcul, notions combinées) tout en respectant la difficulté exigée ci-dessus. Interdit de livrer deux sujets de même difficulté.
 
 ${LATEX_RULES}
 
@@ -720,6 +734,11 @@ FORMAT JSON :
 
 ⚠️ Le tableau "exercises" doit contenir les exercices dans le MÊME ORDRE que les données, chaque exercice avec TOUTES ses questions, numéros EXACTS identiques aux données.
 
+CONTRAT DE COMPLÉTION — ABSOLUMENT OBLIGATOIRE :
+- Tu rends un verdict (points + status + explanation) pour CHAQUE question des données, SANS EXCEPTION, dans le même ordre.
+- Si une réponse d'élève est ambiguë ou mal formulée, tranche avec ton meilleur jugement professionnel — ne saute JAMAIS une question et ne renvoie jamais un objet partiel.
+- INTERDIT de renvoyer du texte hors JSON.
+
 Réponds UNIQUEMENT avec l'objet JSON.`;
 }
 
@@ -842,6 +861,8 @@ function repairExamStructure(exam, subjectName) {
 function validateGeneratedExam(exam, subjectName) {
   const supportsChoices = CHOICE_SUBJECTS.has(subjectName);
   const validQuestion = (q) => {
+    // ✅ v4.15 — une question SANS énoncé est inacceptable pour l'élève : invalide.
+    if (!q || typeof q.text !== 'string' || !q.text.trim()) return false;
     if (subjectName === 'physique' && q.number && q.number.endsWith('a')) {
       return q.type === 'drawing';
     }
@@ -858,7 +879,77 @@ function validateGeneratedExam(exam, subjectName) {
     );
 }
 
-async function generateWithFallback(prompt, subjectName) {
+// ✅ v4.15 — RATTRAPAGE "PRESQUE COMPLET" : une IA qui livre 13/15 questions
+// valables ne doit pas jeter tout le sujet (ni pire, montrer des questions
+// vides). On remplace les exercices fautifs par des exercices équivalents du
+// pool d'exercices, puis on revalide STRICTEMENT. Si le pool ne suffit pas,
+// le résultat est rejeté et le fournisseur suivant prend le relais.
+const NEAR_MISS_MAX_EMPTY = 3;
+
+function countEmptyQuestions(exam) {
+  let n = 0;
+  (exam && Array.isArray(exam.subjects) ? exam.subjects : []).forEach((s) =>
+    ((s && s.exercises) || []).forEach((ex) =>
+      ((ex && ex.questions) || []).forEach((q) => {
+        if (!q || !String(q.text || '').trim()) n += 1;
+      })
+    )
+  );
+  return n;
+}
+
+function isNearMiss(exam, subjectName) {
+  const empty = countEmptyQuestions(exam);
+  if (empty === 0 || empty > NEAR_MISS_MAX_EMPTY) return false;
+  const lenient = JSON.parse(JSON.stringify(exam));
+  lenient.subjects.forEach((s) => (s.exercises || []).forEach((ex) =>
+    (ex.questions || []).forEach((q) => {
+      if (!String(q.text || '').trim()) q.text = 'placeholder';
+    })
+  ));
+  return validateGeneratedExam(lenient, subjectName);
+}
+
+function patchExamFromPoolQuestions(exam, subjectName, poolExercises) {
+  if (!exam || !Array.isArray(poolExercises) || !poolExercises.length) return null;
+  const seen = new Set();
+  exam.subjects.forEach((s) => (s.exercises || []).forEach((ex) => {
+    seen.add(String(ex.title || '') + '|' + String(ex.statement || '').slice(0, 40));
+  }));
+
+  const pool = poolExercises.filter((p) =>
+    p && Array.isArray(p.questions) && p.questions.length >= QUESTIONS_PER_EXERCISE &&
+    p.questions.every((q) => String(q.text || '').trim())
+  );
+  if (!pool.length) return null;
+
+  let patched = false;
+  exam.subjects.forEach((subject) => {
+    (subject.exercises || []).forEach((ex, eIdx) => {
+      const hasEmpty = (ex.questions || []).some((q) => !String(q.text || '').trim());
+      if (!hasEmpty) return;
+      const sameLevel = pool.filter((p) => p.level === subject.level);
+      const candidates = (sameLevel.length ? sameLevel : pool)
+        .filter((p) => !seen.has(String(p.title || '') + '|' + String(p.statement || '').slice(0, 40)));
+      const pick = candidates[0] || null;
+      if (!pick) return;
+      seen.add(String(pick.title || '') + '|' + String(pick.statement || '').slice(0, 40));
+      subject.exercises[eIdx] = {
+        number: ex.number || (eIdx + 1),
+        title: pick.title || ('Exercice ' + (eIdx + 1)),
+        points: pick.points || 6.67,
+        statement: pick.statement || '',
+        questions: pick.questions
+      };
+      patched = true;
+    });
+  });
+
+  if (!patched) return null;
+  return repairExamStructure(exam, subjectName);
+}
+
+async function generateWithFallback(prompt, subjectName, poolLoader) {
   const providers = getProviders();
   if (!providers.length) throw new Error('provider_missing');
 
@@ -882,6 +973,18 @@ async function generateWithFallback(prompt, subjectName) {
       if (validateGeneratedExam(rawExam, subjectName)) {
         console.log('[AI] OK ' + provider.name);
         return { exam: rawExam, provider: provider.name };
+      }
+
+      // ✅ v4.15 — rattrapage "presque complet" via le pool avant de rejeter
+      if (isNearMiss(rawExam, subjectName) && typeof poolLoader === 'function') {
+        const pool = await poolLoader().catch(() => null);
+        if (pool && pool.length) {
+          const patched = patchExamFromPoolQuestions(rawExam, subjectName, pool);
+          if (patched && validateGeneratedExam(patched, subjectName)) {
+            console.log('[AI] OK ' + provider.name + ' (+rattrapage pool)');
+            return { exam: patched, provider: provider.name + '+pool' };
+          }
+        }
       }
 
       errors.push(provider.name + ': structure invalide');
@@ -1614,9 +1717,15 @@ module.exports = async function handler(request, response) {
   const rateLimit = isLight ? MAX_REQUESTS_PER_WINDOW_LIGHT : MAX_REQUESTS_PER_WINDOW_HEAVY;
 
   if (rateLimited(clientIp(request), rateLimit, isLight ? 'light' : 'heavy')) {
-    return jsonError(response, 429, isLight
-      ? 'Service momentanément saturé. Réessaie dans quelques secondes.'
-      : 'Beaucoup d\'élèves en ce moment. Réessaie dans une minute.');
+    // ✅ v4.15 — retryAfter : le client affiche un compte à rebours et RETENTE
+    // TOUT SEUL au lieu d'afficher une erreur (technique du cahier v4.13).
+    return response.status(429).json({
+      success: false,
+      error: isLight
+        ? 'Service momentanément saturé. Réessaie dans quelques secondes.'
+        : 'Beaucoup d\'élèves en ce moment. Réessaie dans une minute.',
+      retryAfter: isLight ? 6 : 45
+    });
   }
 
   const verifiedUser = await verifyFirebaseToken(request).catch(() => null);
@@ -1748,7 +1857,14 @@ module.exports = async function handler(request, response) {
         ? generationPromptFromNotebook(body, notebookContext)
         : generationPrompt(body);
 
-      const genResult = await generateWithFallback(prompt, body.subject);
+      // ✅ v4.15 — accès paresseux au pool pour le rattrapage des sujets presque complets
+      const poolLoader = async () => {
+        const { db } = getAdminServices();
+        const snap = await db.collection(POOL_COLLECTION)
+          .where('subject', '==', body.subject).limit(80).get();
+        return snap.docs.map((d) => d.data() || {});
+      };
+      const genResult = await generateWithFallback(prompt, body.subject, poolLoader);
       let exam = genResult.exam;
 
       exam = deepClean(exam);

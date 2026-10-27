@@ -1446,6 +1446,16 @@
     @media (max-width: 640px) {
       .katex-display { font-size: 0.86em; }
     }
+    /* ── v4.15 — ANTI-DÉBORDEMENT renforcé (technique du cahier v4.10) ── */
+    .question-title > span:first-child { min-width: 0; overflow-wrap: anywhere; word-break: break-word; }
+    .exercise-head { flex-wrap: wrap; }
+    .exercise-head h3 { min-width: 0; flex: 1 1 160px; overflow-wrap: anywhere; word-break: break-word; }
+    .exercise-head .points { flex-shrink: 0; }
+    .answer-option > span { overflow-wrap: anywhere; }
+    .statement { min-width: 0; overflow-wrap: anywhere; }
+    .subject-card h3, .subject-card p, .subject-kicker { max-width: 100%; min-width: 0; overflow-wrap: anywhere; word-break: break-word; }
+    .grade-title, .grade-sub { overflow-wrap: anywhere; word-break: break-word; }
+    #exerciseStatement, #questionsList, #subjectsList, #resultsDetails, .exercise-card { max-width: 100%; min-width: 0; }
 
     a:focus-visible,
     button:focus-visible,
@@ -2712,6 +2722,59 @@ function normalizeExam(payload) {
 // ═══════════════════════════════════════════════════════════════
 $('configForm').addEventListener('submit', generateExam);
 
+// ✅ v4.15 — technique du cahier (v4.13) appliquée à l'exam : l'élève ne doit
+// JAMAIS voir une erreur qui finirait par passer. 429 → compte à rebours
+// automatique (retryAfter renvoyé par le serveur) puis UNE re-tentative
+// silencieuse ; panne réseau → UNE re-tentative discrète après 2,5 s ;
+// FREE_EXAM_LIMIT → erreur dédiée (popup premium, pas de re-tentative).
+function examDelay(ms) { return new Promise(function (resolve) { setTimeout(resolve, ms); }); }
+async function examFetch(body, headers, onStatus) {
+  var rateRetried = false, netRetried = false;
+  while (true) {
+    var response = null, netError = null;
+    try {
+      response = await fetch('/api/exam', {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(body)
+      });
+    } catch (e) { netError = e; }
+
+    if (!response) {
+      if (!netRetried && navigator.onLine) {
+        netRetried = true;
+        if (onStatus) onStatus('Connexion instable — nouvel essai…');
+        await examDelay(2500);
+        continue;
+      }
+      throw netError || new Error('NETWORK');
+    }
+
+    if (response.status === 429) {
+      var pl429 = await response.json().catch(function () { return null; });
+      if (pl429 && pl429.code === 'FREE_EXAM_LIMIT') {
+        var errFree = new Error('FREE_EXAM_LIMIT');
+        errFree.payload = pl429;
+        throw errFree;
+      }
+      if (!rateRetried) {
+        rateRetried = true;
+        var wait = Math.min(65, Math.max(2, Number(pl429 && pl429.retryAfter) || 45));
+        for (var left = wait; left > 0; left--) {
+          if (onStatus) onStatus('Beaucoup d\'élèves en ce moment — nouvel essai automatique dans ' + left + ' s…');
+          await examDelay(1000);
+        }
+        continue;
+      }
+      var errRate = new Error('RATE_LIMIT');
+      errRate.payload = pl429;
+      throw errRate;
+    }
+
+    return response;
+  }
+}
+
 async function generateExam(event) {
   event.preventDefault();
   if (!navigator.onLine) {
@@ -2747,11 +2810,11 @@ async function generateExam(event) {
       ? { subject: config.subject, chapterId: state.notebookContext.chapterId, chapterTitle: state.notebookContext.chapterTitle }
       : null;
 
-    var responsePromise = fetch('/api/exam', {
-      method: 'POST',
-      headers: headers,
-      body: JSON.stringify(Object.assign({}, config, { notebookContext: notebookContextPayload }))
-    });
+    var responsePromise = examFetch(
+      Object.assign({}, config, { notebookContext: notebookContextPayload }),
+      headers,
+      function (msg) { statusEl.textContent = msg; }
+    );
     await sleep(1500);
 
     activateStep('genStep3', statusEl, 'Rédaction des exercices...');
@@ -2759,12 +2822,6 @@ async function generateExam(event) {
     var payload = await response.json().catch(function () { return null; });
 
     if (response.status === 401) throw new Error('AUTH_REQUIRED');
-    if (response.status === 429 && payload && payload.code === 'FREE_EXAM_LIMIT') {
-      showView('configView');
-      showPremiumPopup();
-      return;
-    }
-    if (response.status === 429) throw new Error('RATE_LIMIT');
     if (!response.ok) {
       console.error('[EXAM] Erreur serveur:', response.status, payload);
       throw new Error((payload && (payload.error || payload.message)) || ('Erreur serveur ' + response.status));
@@ -2792,7 +2849,10 @@ async function generateExam(event) {
     showView('subjectsView');
   } catch (error) {
     console.error('Génération échouée:', error);
-    if (error.message === 'AUTH_REQUIRED') {
+    if (error.message === 'FREE_EXAM_LIMIT') {
+      showView('configView');
+      showPremiumPopup();
+    } else if (error.message === 'AUTH_REQUIRED') {
       setStatus('configStatus', 'Connecte-toi pour générer un examen.', 'error');
     } else if (error.message === 'RATE_LIMIT') {
       setStatus('configStatus', 'Beaucoup d\'élèves en ce moment. Réessaie dans une minute.', 'error');
@@ -3031,22 +3091,19 @@ async function submitExam(auto) {
 
     activateStep('corrStep2', statusEl, 'Analyse des exercices...');
     if (window.ARVEXAWakeLock) ARVEXAWakeLock.acquire('exam-correct');
-    var responsePromise = fetch('/api/exam', {
-      method: 'POST',
-      headers: headers,
-      body: JSON.stringify({
-        action: 'correct',
-        exam: state.exam,
-        subjectId: state.selectedSubject.id,
-        answers: state.answers
-      })
-    });
+    var responsePromise = examFetch({
+      action: 'correct',
+      exam: state.exam,
+      subjectId: state.selectedSubject.id,
+      answers: state.answers
+    }, headers, function (msg) { statusEl.textContent = msg; });
     await sleep(1500);
 
     activateStep('corrStep3', statusEl, 'Évaluation pédagogique...');
     var response = await responsePromise;
     var payload = await response.json().catch(function () { return null; });
 
+    if (response.status === 401) throw new Error('AUTH_REQUIRED');
     if (!response.ok) {
       console.error('[EXAM] Erreur correction:', response.status, payload);
       throw new Error((payload && (payload.error || payload.message)) || ('Erreur correction ' + response.status));
@@ -3066,7 +3123,13 @@ async function submitExam(auto) {
     finishAllSteps(CORRECTION_STEPS, statusEl, '⚠️ Correction indisponible.');
     await sleep(1200);
     showView('examView');
-    setStatus('examStatus', 'Correction temporairement indisponible. Réessaie dans quelques minutes.', 'error');
+    if (error.message === 'RATE_LIMIT') {
+      setStatus('examStatus', 'Beaucoup d\'élèves en ce moment. Réessaie dans une minute.', 'error');
+    } else if (error.message === 'AUTH_REQUIRED') {
+      setStatus('examStatus', 'Connecte-toi pour faire corriger ta copie.', 'error');
+    } else {
+      setStatus('examStatus', 'Correction temporairement indisponible. Réessaie dans quelques minutes.', 'error');
+    }
   } finally {
     if (window.ARVEXAWakeLock) ARVEXAWakeLock.release('exam-correct');
     state.submitting = false;

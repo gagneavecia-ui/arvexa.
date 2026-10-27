@@ -7,8 +7,8 @@
 //   - QCM 8-12 imposés, distracteurs plausibles, explication chaque item
 //   - anglais ré-ajouté (prompts language déjà dans le code)
 //   - FILES séquentielles par fournisseur (anti-collision de concurrence)
-//   - affectation calibrée sur les limites réelles : Groq (TPM 8000/min) =
-//     explication seule ; OpenRouter = questions + qcm ; Mistral = structure
+//   - affectation calibrée sur les taux de succès réels : Groq = explication,
+//     Mistral = structure + qcm (jsonMode), OpenRouter = questions (repli Mistral)
 //   - extraction supprimée (la page n'utilise pas analysis.extracted)
 //   - budget IA 70 s (maxDuration 90) — repli sur fournisseur inactif
 //   - normalisation post-génération : Q&R et QCM toujours exploitables
@@ -566,7 +566,7 @@ function getProviders() {
       key: process.env.MISTRAL_API_KEY,
       endpoint: 'https://api.mistral.ai/v1/chat/completions',
       model: process.env.MISTRAL_MODEL || 'mistral-large-latest',
-      jsonMode: false
+      jsonMode: true
     }
   ].filter((p) => Boolean(p.key));
 }
@@ -607,7 +607,7 @@ function repairJson(str) {
 
 async function callProvider(provider, { systemPrompt, userPrompt, maxTokens = 4000, deadline }) {
   const controller = new AbortController();
-  const timeouts = { 'Groq': 20000, 'OpenRouter': 32000, 'Mistral': 18000 };
+  const timeouts = { 'Groq': 20000, 'OpenRouter': 32000, 'Mistral': 28000 };
   const baseTimeout = timeouts[provider.name] || 15000;
   const remaining = deadline ? Math.max(5000, deadline - Date.now()) : baseTimeout;
   const timeoutMs = Math.min(baseTimeout, remaining);
@@ -674,10 +674,10 @@ async function callProvider(provider, { systemPrompt, userPrompt, maxTokens = 40
 // - OpenRouter (lent mais sans TPM serré) : questions + qcm en file
 // - Mistral : structure
 const TASK_PROVIDER_PREF = {
-  explanation: ['Groq', 'OpenRouter', 'Mistral'],
+  explanation: ['Groq', 'Mistral', 'OpenRouter'],
   structure:   ['Mistral', 'OpenRouter', 'Groq'],
-  questions:   ['OpenRouter', 'Groq', 'Mistral'],
-  qcm:         ['OpenRouter', 'Groq', 'Mistral']
+  questions:   ['OpenRouter', 'Mistral', 'Groq'],
+  qcm:         ['Mistral', 'OpenRouter', 'Groq']
 };
 
 function distributeTasks(tasks, providers) {
@@ -994,7 +994,7 @@ Réponds UNIQUEMENT avec le JSON.`
     },
     {
       name: 'questions',
-      maxTokens: 6500,
+      maxTokens: 5000,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Génère une banque de questions EXHAUSTIVE basée UNIQUEMENT sur cette section.
 
@@ -1021,7 +1021,7 @@ Réponds UNIQUEMENT avec le JSON.`
     },
     {
       name: 'qcm',
-      maxTokens: 4500,
+      maxTokens: 2500,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Génère entre 8 et 12 QCM couvrant des NOTIONS DIFFÉRENTES de cette section.
 
@@ -1125,7 +1125,7 @@ Réponds UNIQUEMENT avec le JSON.`
     },
     {
       name: 'questions',
-      maxTokens: 6500,
+      maxTokens: 5000,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Génère une banque de questions SVT EXHAUSTIVE sur cette section UNIQUEMENT.
 
@@ -1151,7 +1151,7 @@ Réponds UNIQUEMENT avec le JSON.`
     },
     {
       name: 'qcm',
-      maxTokens: 4500,
+      maxTokens: 2500,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Génère entre 8 et 12 QCM de SVT couvrant des NOTIONS DIFFÉRENTES de cette section.
 
@@ -1271,7 +1271,7 @@ Réponds UNIQUEMENT avec le JSON.`
     },
     {
       name: 'qcm',
-      maxTokens: 3500,
+      maxTokens: 2500,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Génère entre 8 et 12 QCM de philosophie couvrant des NOTIONS DIFFÉRENTES de cette section.
 
@@ -1357,7 +1357,7 @@ Réponds UNIQUEMENT avec le JSON.`
     },
     {
       name: 'questions',
-      maxTokens: 6000,
+      maxTokens: 5000,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Génère une BANQUE MASSIVE de questions d'histoire-géo EXHAUSTIVE sur cette section.
 
@@ -1383,7 +1383,7 @@ Réponds UNIQUEMENT avec le JSON.`
     },
     {
       name: 'qcm',
-      maxTokens: 4500,
+      maxTokens: 2500,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Génère entre 8 et 12 QCM d'histoire-géo couvrant des NOTIONS DIFFÉRENTES de cette section.
 
@@ -1496,7 +1496,7 @@ Réponds UNIQUEMENT avec le JSON.`
     },
     {
       name: 'qcm',
-      maxTokens: 3500,
+      maxTokens: 2500,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Génère entre 8 et 12 QCM de français couvrant des NOTIONS DIFFÉRENTES de cette section.
 
@@ -1615,7 +1615,7 @@ Réponds UNIQUEMENT avec le JSON.`
     },
     {
       name: 'qcm',
-      maxTokens: 3500,
+      maxTokens: 2500,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Génère entre 8 et 12 QCM d'anglais couvrant des NOTIONS DIFFÉRENTES de cette section.
 

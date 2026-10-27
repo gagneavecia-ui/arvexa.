@@ -2267,7 +2267,7 @@ async function createSection(uid, body) {
     results.forEach((r) => {
       if (!r) return;
       if (r.status === 'fulfilled') meta.providers[r.task.name] = r.provider;
-      else meta.failures[r.task.name] = String(r.error?.message || 'échec').slice(0, 200);
+      else meta.failures[r.task.name] = String(r.error?.message || 'échec').slice(0, 900);
     });
 
     analysis = mergeAnalysis(results, profile);

@@ -1,5 +1,5 @@
 // ================================================================
-// API PROGRESS v8.6 — ARVEXA School
+// API PROGRESS v8.7 — ARVEXA School
 // Cahier intelligent + Fan-out IA + Tracking temps d'étude
 // v8.6 « édition complète » (base v8.5 inchangée structurellement) :
 //   - explications « comme un prof » enrichies (analogies, étapes)

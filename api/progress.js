@@ -7,7 +7,10 @@
 //   - QCM 8-12 imposés, distracteurs plausibles, explication chaque item
 //   - anglais ré-ajouté (prompts language déjà dans le code)
 //   - FILES séquentielles par fournisseur (anti-collision de concurrence)
-//   - budget IA 60 s (maxDuration 90) — repli sur fournisseur inactif
+//   - affectation calibrée sur les limites réelles : Groq (TPM 8000/min) =
+//     explication seule ; OpenRouter = questions + qcm ; Mistral = structure
+//   - extraction supprimée (la page n'utilise pas analysis.extracted)
+//   - budget IA 70 s (maxDuration 90) — repli sur fournisseur inactif
 //   - normalisation post-génération : Q&R et QCM toujours exploitables
 // NOTE : maxDuration est assigné en FIN de module (visible par Vercel AU BUILD).
 // ================================================================
@@ -56,7 +59,7 @@ const MIN_CONTENT_LENGTH = 40;
 const MAX_CONTENT_LENGTH = 15000;
 
 const FREE_SECTION_LIMIT = 5;
-const GLOBAL_AI_TIME_BUDGET_MS = 60000;
+const GLOBAL_AI_TIME_BUDGET_MS = 70000;
 
 let adminServices = null;
 
@@ -604,7 +607,7 @@ function repairJson(str) {
 
 async function callProvider(provider, { systemPrompt, userPrompt, maxTokens = 4000, deadline }) {
   const controller = new AbortController();
-  const timeouts = { 'Groq': 20000, 'OpenRouter': 25000, 'Mistral': 15000 };
+  const timeouts = { 'Groq': 20000, 'OpenRouter': 32000, 'Mistral': 18000 };
   const baseTimeout = timeouts[provider.name] || 15000;
   const remaining = deadline ? Math.max(5000, deadline - Date.now()) : baseTimeout;
   const timeoutMs = Math.min(baseTimeout, remaining);
@@ -666,11 +669,28 @@ async function callProvider(provider, { systemPrompt, userPrompt, maxTokens = 40
 // Désormais chaque fournisseur exécute SES tâches en file (séquentiel),
 // les files tournent en parallèle. Repli sur fournisseur INACTIF uniquement.
 // + GESTION DES 429 : un fournisseur en rate-limit est écarté 25 s (retry-after si fourni).
+// Affectation calibrée sur les limites réelles observées :
+// - Groq (TPM 8000/min) : UNIQUEMENT l'explication (tâche la plus critique)
+// - OpenRouter (lent mais sans TPM serré) : questions + qcm en file
+// - Mistral : structure
+const TASK_PROVIDER_PREF = {
+  explanation: ['Groq', 'OpenRouter', 'Mistral'],
+  structure:   ['Mistral', 'OpenRouter', 'Groq'],
+  questions:   ['OpenRouter', 'Groq', 'Mistral'],
+  qcm:         ['OpenRouter', 'Groq', 'Mistral']
+};
+
 function distributeTasks(tasks, providers) {
   if (providers.length === 0) return [];
+  const byName = new Map(providers.map((p) => [p.name, p]));
   const queues = new Map();
   tasks.forEach((task, i) => {
-    const provider = providers[i % providers.length];
+    const pref = TASK_PROVIDER_PREF[task.name] || providers.map((p) => p.name);
+    let provider = null;
+    for (const name of pref) {
+      if (byName.has(name)) { provider = byName.get(name); break; }
+    }
+    if (!provider) provider = providers[i % providers.length];
     if (!queues.has(provider.name)) queues.set(provider.name, { provider, tasks: [] });
     queues.get(provider.name).tasks.push({ task, index: i });
   });
@@ -908,31 +928,6 @@ ${rawInput}
 
   return [
     {
-      name: 'extraction',
-      maxTokens: 1500,
-      systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
-      userPrompt: `Analyse cette section de cours scientifique.
-
-${baseContext}
-
-${PERIMETER_RULES}
-
-Extrait UNIQUEMENT les concepts présents dans cette section.
-
-Format JSON :
-{
-  "sectionTitle": "Titre court (max 60 caractères)",
-  "mainConcepts": ["concept 1"],
-  "formulas": ["formule 1"],
-  "variables": [{"symbol": "x", "meaning": "signification", "unit": "unité"}],
-  "definitions": [{"term": "terme", "definition": "définition"}]
-}
-
-${JSON_STRICT_RULES}
-
-Réponds UNIQUEMENT avec le JSON.`
-    },
-    {
       name: 'explanation',
       maxTokens: 5000,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide, sans commentaire.',
@@ -1063,30 +1058,6 @@ ${rawInput}
 
   return [
     {
-      name: 'extraction',
-      maxTokens: 1500,
-      systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
-      userPrompt: `Analyse cette section de SVT.
-
-${baseContext}
-
-${PERIMETER_RULES}
-
-RÈGLE SVT : PAS de formules. Priorise mécanismes, relations, étapes, définitions.
-
-Format JSON :
-{
-  "sectionTitle": "...",
-  "mainConcepts": ["..."],
-  "terms": [{"term": "...", "definition": "..."}],
-  "mechanisms": ["mécanisme 1"]
-}
-
-${JSON_STRICT_RULES}
-
-Réponds UNIQUEMENT avec le JSON.`
-    },
-    {
       name: 'explanation',
       maxTokens: 5000,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide, sans commentaire.',
@@ -1216,29 +1187,6 @@ ${rawInput}
 
   return [
     {
-      name: 'extraction',
-      maxTokens: 1500,
-      systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
-      userPrompt: `Analyse cette section de philosophie.
-
-${baseContext}
-
-${PERIMETER_RULES}
-
-Format JSON :
-{
-  "sectionTitle": "...",
-  "mainConcepts": ["..."],
-  "theses": [{"author": "nom", "thesis": "..."}],
-  "arguments": ["..."],
-  "keyTerms": [{"term": "...", "definition": "..."}]
-}
-
-${JSON_STRICT_RULES}
-
-Réponds UNIQUEMENT avec le JSON.`
-    },
-    {
       name: 'explanation',
       maxTokens: 5000,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide, sans commentaire.',
@@ -1359,31 +1307,6 @@ ${rawInput}
 
   return [
     {
-      name: 'extraction',
-      maxTokens: 1800,
-      systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
-      userPrompt: `Analyse cette section d'histoire-géographie.
-
-${baseContext}
-
-${PERIMETER_RULES}
-
-Format JSON :
-{
-  "sectionTitle": "...",
-  "dates": [{"date": "...", "event": "..."}],
-  "persons": [{"name": "...", "role": "..."}],
-  "places": [{"place": "...", "stake": "..."}],
-  "events": [{"event": "...", "date": "..."}],
-  "causes": ["..."],
-  "consequences": ["..."]
-}
-
-${JSON_STRICT_RULES}
-
-Réponds UNIQUEMENT avec le JSON.`
-    },
-    {
       name: 'explanation',
       maxTokens: 3500,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
@@ -1495,29 +1418,6 @@ ${rawInput}
 ═══════════════════════════════════════════════════════════════`.trim();
 
   return [
-    {
-      name: 'extraction',
-      maxTokens: 1500,
-      systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
-      userPrompt: `Analyse cette section de français.
-
-${baseContext}
-
-${PERIMETER_RULES}
-
-Format JSON :
-{
-  "sectionTitle": "...",
-  "mainConcepts": ["..."],
-  "texts": [{"title": "...", "author": "..."}],
-  "literaryDevices": ["..."],
-  "keyTerms": [{"term": "...", "definition": "..."}]
-}
-
-${JSON_STRICT_RULES}
-
-Réponds UNIQUEMENT avec le JSON.`
-    },
     {
       name: 'explanation',
       maxTokens: 4000,
@@ -1631,29 +1531,6 @@ ${rawInput}
 ═══════════════════════════════════════════════════════════════`.trim();
 
   return [
-    {
-      name: 'extraction',
-      maxTokens: 1500,
-      systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
-      userPrompt: `Analyse cette section d'anglais.
-
-${baseContext}
-
-${PERIMETER_RULES}
-
-Format JSON :
-{
-  "sectionTitle": "...",
-  "vocabulary": [{"english": "word", "french": "traduction"}],
-  "grammarRules": [{"rule": "...", "explanation": "..."}],
-  "structures": ["structure 1"],
-  "keyTerms": [{"term": "...", "definition": "..."}]
-}
-
-${JSON_STRICT_RULES}
-
-Réponds UNIQUEMENT avec le JSON.`
-    },
     {
       name: 'explanation',
       maxTokens: 4500,

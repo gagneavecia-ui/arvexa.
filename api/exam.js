@@ -8,6 +8,13 @@
 // (contexte nigérien + approche + contrainte numérique) à CHAQUE appel, liste
 // des énoncés déjà servis (avoidStatements client) interdits de recyclage,
 // tirage ALÉATOIRE dans le pool de rattrapage (fini candidates[0])
+// v4.17 : DES CALCULS, PAS DES HISTOIRES (référence fiches Pascal Lainé) — les
+// matières scientifiques livrent des exercices de CALCUL PUR (expression /
+// équation / données techniques à transformer) : au minimum 2 sur 3 par sujet,
+// situation réelle devenue FACULTATIVE (max 1/sujet) ; tirage de TECHNIQUES de
+// calcul (VARIATION_CALC_DRILLS) + angles de calcul (VARIATION_CALC_ANGLES) ;
+// difficultés calibrées en exemples de calculs (easy (3+6i)/(-3-4i) → bac
+// z^4+(3-6i)z^2-8-6i=0) ; matières littéraires inchangées (contexte imposé)
 // ================================================================
 
 
@@ -496,13 +503,14 @@ Les exercices doivent être :
 - Progressifs (facile → difficile au sein du même exercice)
 - Chaque question teste UNE notion précise, mais peut nécessiter plusieurs étapes.
 - Les points sont FIXES : Exercice = 6.67 pts, Question = 1.33 pts.
-- INTERDIT de générer des questions simplistes du type "Calculer la vitesse si v=5m/s". L'élève doit réfléchir.
+- STYLE DE RÉFÉRENCE (matières scientifiques) — fiches de CALCULS type "Pascal Lainé" : l'exercice donne une expression, une équation ou des données techniques, et l'élève calcule, transforme, résout. La difficulté vient des CALCULS, pas d'un habillage narratif.
+- INTERDIT de générer une question sans travail réel (simple recopie du cours) comme de noyer un calcul dans un long récit. L'élève doit réfléchir sur des CALCULS.
 `;
 
 const DIFFICULTY_RULES = {
-  easy: `Niveau FACILE : Calculs directs en 1 ou 2 étapes. Application immédiate du cours. Pas de mélange de notions.`,
-  medium: `Niveau MOYEN : Calculs en 3 ou 4 étapes. Application du cours avec une petite réflexion.`,
-  hard: `Niveau DIFFICILE : Problèmes à plusieurs étapes. L'élève doit mobiliser plusieurs notions du chapitre.`,
+  easy: `Niveau FACILE : Calculs directs en 1 ou 2 étapes. Application immédiate du cours. Pas de mélange de notions. (Ex. Maths : mettre sous la forme algébrique z = (3+6i)/(-3-4i) ; calculer (3+2i)(1-3i).)`,
+  medium: `Niveau MOYEN : Calculs en 3 ou 4 étapes. Application du cours avec une petite réflexion. (Ex. Maths : écrire sous forme algébrique 2e^{2iπ/3} et ((1+i)/(2-i))² ; module et argument de (1+i)^9/(1-i)^7.)`,
+  hard: `Niveau DIFFICILE : Calculs longs à plusieurs étapes. L'élève doit mobiliser plusieurs notions du chapitre. (Ex. Maths : module et argument de a = 3i(2+i)(4+2i)(1+i) en fonction de θ₀ ; calcul de ((1+i√3)/2)^{2010}.)`,
   bac: `Niveau BAC (TRÈS DIFFICILE) : Exercices de synthèse type "Pascal Laine" ou "Salissou Nazifi". 
   - Les calculs doivent être longs (équations du 3ème/4ème degré, changements de variable, trigonométrie inverse).
   - Mélanger plusieurs phases de mouvement ou plusieurs réactions.
@@ -515,7 +523,7 @@ const PHYSICS_RULES = `
 ═══════════════════════════════════════════════════════════════
 RÈGLES SPÉCIFIQUES PHYSIQUE
 ═══════════════════════════════════════════════════════════════
-1. L'énoncé doit décrire une situation concrète complexe (ex: train, voiture/motard, projectile).
+1. L'énoncé décrit une situation technique COURTE (1-2 phrases max, ex: un motard rattrape un camion) puis on passe immédiatement au CALCUL : équations horaires, théorèmes, applications numériques. Pas d'histoire longue.
 2. LA PREMIÈRE QUESTION (1.a) EST OBLIGATOIREMENT DE TYPE "drawing" :
    - Demander de faire le schéma, de placer le repère, ou de tracer les vecteurs.
 3. Les questions suivantes (1.b à 1.e) demandent des équations horaires, des calculs de distance/temps, ou des analyses graphiques.
@@ -550,7 +558,7 @@ Ton JSON contient EXACTEMENT :
 CONTRAT DE COMPLÉTION — ABSOLUMENT OBLIGATOIRE :
 - Tu livres l'INTÉGRALITÉ des 30 questions (2 sujets × 3 exercices × 5 questions), JAMAIS une réponse partielle.
 - CHAQUE question a un énoncé ("text") COMPLET et NON VIDE : la question posée, les données numériques et l'unité attendue.
-- CHAQUE exercice a un "statement" non vide qui installe le contexte de ses 5 questions.
+- CHAQUE exercice a un "statement" non vide qui pose les données de ses 5 questions (expression à transformer, équation, données techniques ou courte situation).
 - Si tu manques de place, raccourcis les formulations mais ne supprime JAMAIS une question et ne mets jamais "..." ou "".
 - VÉRIFICATION FINALE AVANT DE RÉPONDRE : compte tes questions (15 par sujet). S'il en manque, complète-les AVANT d'émettre ta réponse.
 - INTERDIT de renvoyer un commentaire, une excuse ou du texte hors JSON.
@@ -674,14 +682,65 @@ const VARIATION_TEXT = [
   'varie les types de questions : une analyse, une mise en relation, un jugement argumenté'
 ];
 
+// ✅ v4.17 — TECHNIQUES de calcul tirées au hasard à CHAQUE appel (matières
+// scientifiques) : la variété vient du TYPE DE CALCUL demandé (style fiches
+// Pascal Lainé : formes à transformer, équations à résoudre, modules/arguments,
+// puissances élevées...) et non plus d'un contexte narratif imposé.
+const VARIATION_CALC_DRILLS = {
+  mathematiques: [
+    'calculs de transformation directe : mettre sous forme algébrique a+ib des quotients, produits ou carrés (ex. z = (3+6i)/(-3-4i) ; ((1+i)/(2-i))²)',
+    'calculs de module, argument, formes trigonométrique et exponentielle (ex. écrire 2e^{2iπ/3} sous forme algébrique ; module et argument d un produit comme 3i(2+i)(4+2i)(1+i))',
+    'puissances élevées obtenues par la forme trigonométrique (ex. ((1+i√3)/2)^{2010} ; (1+i)^9/(1-i)^7)',
+    'résolution d équations (degré 2, équation en z², changement de variable, discriminant)',
+    'calculs d images, de limites, de dérivées, de tangentes, de variations',
+    'suites : calculs de termes, de raison, de sommes, de seuil',
+    'probabilités et dénombrement : calculs directs, arbres pondérés, espérance',
+    'calcul vectoriel, coordonnées, distances, milieux, colinéarité'
+  ],
+  physique: [
+    'équations horaires et mouvements : calculs de position, vitesse, instant de rencontre, distance',
+    'applications en chaîne des théorèmes du cours : chaque grandeur calculée alimente la question suivante',
+    'calculs électriques : loi d Ohm, puissance, énergie, associations de résistors',
+    'conversions, notation scientifique et applications numériques rigoureuses avec unités'
+  ],
+  chimie: [
+    'chaînes de calculs quantité de matière / masse molaire / concentration',
+    'avancement, tableau d avancement, réactif limitant, rendement',
+    'pH, Ka, dosage, dilution : calculs successifs à partir du bloc Données',
+    'écriture et équilibrage d équations suivis d applications numériques'
+  ],
+  svt: [
+    'génétique : croisements, échiquiers, proportions phénotypiques calculées',
+    'calculs de pourcentages, proportions et taux à partir de données brutes',
+    'lecture chiffrée de documents : courbes, tableaux, calculs de variation',
+    'restitution structurée appuyée sur des données précises du chapitre'
+  ]
+};
+
+// ✅ v4.17 — angles de variante 100% CALCUL (remplacent les angles narratifs
+// pour les matières scientifiques ; les littéraires gardent VARIATION_ANGLES).
+const VARIATION_CALC_ANGLES = [
+  'emboîter deux notions du programme dans le même exercice de calcul',
+  'faire une question en deux sous-étapes (a puis b) où le résultat de a sert au calcul de b',
+  'demander la même grandeur par deux méthodes différentes (vérification croisée)',
+  'glisser une expression astucieuse dont une transformation intermédiaire simplifie tout',
+  'faire intervenir une valeur exacte puis sa valeur approchée demandée séparément',
+  'insérer un "montrer que..." qui guide l élève vers la question suivante',
+  'terminer l exercice par une question de synthèse qui combine les résultats précédents'
+];
+
 function buildVariationBlock(subject, avoidStatements) {
+  const isScience = VARIATION_SCIENCES.has(subject);
   const pool = (VARIATION_CONTEXTS[subject] || []).concat(VARIATION_CONTEXTS.commun);
   const pick = (arr) => (arr && arr.length ? arr[Math.floor(Math.random() * arr.length)] : '');
   let c1 = pick(pool);
   let c2 = pick(pool);
   for (let guard = 0; c2 === c1 && guard < 8; guard += 1) c2 = pick(pool);
-  const angle = pick(VARIATION_ANGLES);
-  const constraint = VARIATION_SCIENCES.has(subject)
+  const d1 = pick(VARIATION_CALC_DRILLS[subject]);
+  let d2 = pick(VARIATION_CALC_DRILLS[subject]);
+  for (let guard = 0; d2 === d1 && guard < 8; guard += 1) d2 = pick(VARIATION_CALC_DRILLS[subject]);
+  const angle = isScience ? pick(VARIATION_CALC_ANGLES) : pick(VARIATION_ANGLES);
+  const constraint = isScience
     ? 'Contrainte numérique : ' + pick(VARIATION_NUMERIC)
     : 'Contrainte rédactionnelle : ' + pick(VARIATION_TEXT);
   const avoid = sanitizeAvoidList(avoidStatements);
@@ -690,12 +749,31 @@ function buildVariationBlock(subject, avoidStatements) {
       avoid.map((s) => '  • ' + s).join('\n')
     : '';
 
+  // ✅ v4.17 — sciences : DES CALCULS, PAS DES HISTOIRES (fiches type Pascal
+  // Lainé). La situation réelle devient FACULTATIVE (1 exercice max par sujet)
+  // et la variété vient d abord des TECHNIQUES de calcul tirées au hasard.
+  // Littéraires : contexte imposé conservé (inchangé v4.16).
+  const styleBlock = isScience
+    ? '- STYLE DE RÉFÉRENCE OBLIGATOIRE — DES CALCULS, PAS DES HISTOIRES (fiches d\'entraînement type "Pascal Lainé") :\n' +
+      '  • L\'exercice DONNE une expression, une équation ou des données techniques ; l\'élève calcule, transforme, résout. Pas de récit, pas d\'histoire.\n' +
+      '  • Au minimum 2 exercices sur 3 PAR SUJET sont des calculs PURS (aucune histoire) ; au maximum 1 seul exercice par sujet peut être ancré dans une situation réelle.\n' +
+      '  • La difficulté vient des calculs eux-mêmes (nombre d\'étapes, techniques combinées, expression astucieuse), JAMAIS d\'un habillage narratif.\n' +
+      '  • Les valeurs restent CALCULABLES (résultats exacts ou arrondis propres ; moduli, angles et solutions simples quand le chapitre s\'y prête).\n' +
+      '  • Tirage technique imposé Sujet 1 : ' + d1 + '\n' +
+      '  • Tirage technique imposé Sujet 2 : ' + d2 + '\n' +
+      '  • (Ces techniques imposent le STYLE de l\'exercice ; applique-les au chapitre exigé ci-dessus.)\n'
+    : '';
+  const contextLines = isScience
+    ? '- Situation réelle DISPONIBLE (FACULTATIVE — au maximum 1 exercice sur 3 par sujet ; les 2 autres restent des calculs purs) pour Sujet 1 si vraiment nécessaire : ' + c1 + '\n' +
+      '- Situation réelle DISPONIBLE (FACULTATIVE — même règle) pour Sujet 2 si vraiment nécessaire : ' + c2
+    : '- Contexte imposé Sujet 1 (si compatible avec le contenu exigé) : ' + c1 + '\n' +
+      '- Contexte imposé Sujet 2 (si compatible avec le contenu exigé) : ' + c2;
+
   return `══════════════════════════════════════════════════════════════
 VARIATION OBLIGATOIRE — TIRAGE N° ${Math.floor(Math.random() * 900000000) + 100000000}
 ══════════════════════════════════════════════════════════════
-Chaque appel doit produire un examen 100% INÉDIT : énoncés, contextes, valeurs et questions changent TOTALEMENT d'une génération à l'autre.
-- Contexte imposé Sujet 1 (si compatible avec le contenu exigé) : ${c1}
-- Contexte imposé Sujet 2 (si compatible avec le contenu exigé) : ${c2}
+Chaque appel doit produire un examen 100% INÉDIT : énoncés, valeurs, techniques et questions changent TOTALEMENT d'une génération à l'autre.
+${styleBlock}${contextLines}
 - Approche imposée : ${angle}
 - ${constraint}
 - INTERDIT de recycler les exercices classiques ou une génération précédente : même trame ou mêmes données = échec.

@@ -869,6 +869,26 @@ async function runParallelTasks(tasks, providers, deadline) {
       finally { release(alt); }
     }
 
+    // 2e chance pour l'explication : le JSON des longues proses est non
+    // déterministe — un même fournisseur peut réussir au 2e essai.
+    if (!value && task.name === 'explanation' && deadline && Date.now() < deadline - 25000) {
+      let retryName = null;
+      for (let i = errs.length - 1; i >= 0; i--) {
+        if (errs[i].includes('JSON invalide')) { retryName = errs[i].split(':')[0]; break; }
+      }
+      const rp = retryName ? providers.find((p) => p.name === retryName) : null;
+      if (rp) {
+        console.warn(`[FAN-OUT] 2e chance : "${task.name}" retenté sur ${rp.name}`);
+        busy.set(rp.name, (busy.get(rp.name) || 0) + 1);
+        try {
+          value = await callMarked(rp, task);
+          if (value) console.log(`[FAN-OUT] 2e chance réussie : "${task.name}" via ${rp.name}`);
+          else errs.push(`${rp.name}: 2e essai vide`);
+        } catch (e3) { errs.push(`${rp.name} (2e essai): ${e3?.message || e3}`); }
+        finally { release(rp); }
+      }
+    }
+
     return { value, providerName: first.name, err: errs.length ? new Error(errs.join(' | ')) : null };
   }
 

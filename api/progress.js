@@ -789,7 +789,7 @@ async function callProvider(provider, { systemPrompt, userPrompt, maxTokens = 40
 // - OpenRouter (lent mais sans TPM serré) : questions + qcm en file
 // - Mistral : structure
 const TASK_PROVIDER_PREF = {
-  explanation: ['Groq', 'Mistral', 'Gemini', 'OpenRouter'],
+  explanation: ['Groq', 'Gemini', 'Mistral', 'OpenRouter'],
   structure:   ['Mistral', 'Gemini', 'OpenRouter', 'Groq'],
   questions_a: ['Gemini', 'Mistral', 'OpenRouter', 'Groq'],
   questions_b: ['Mistral', 'Gemini', 'OpenRouter', 'Groq'],
@@ -913,8 +913,15 @@ async function runParallelTasks(tasks, providers, deadline) {
       for (let retry = 0; retry < 2 && !value; retry++) {
         if (deadline && Date.now() > deadline - 25000) break;
         let retryName = null;
+        // D'abord le dernier fournisseur en échec transitoire (demande/abort)
         for (let i = errs.length - 1; i >= 0; i--) {
-          if (errs[i].includes('JSON invalide')) { retryName = errs[i].split(':')[0]; break; }
+          if (/high demand|aborted|429/i.test(errs[i])) { retryName = errs[i].split(':')[0]; break; }
+        }
+        // Sinon le dernier en échec JSON (non déterministe)
+        if (!retryName) {
+          for (let i = errs.length - 1; i >= 0; i--) {
+            if (errs[i].includes('JSON invalide')) { retryName = errs[i].split(':')[0]; break; }
+          }
         }
         if (!retryName) retryName = 'Mistral';
         const rp = providers.find((p) => p.name === retryName);

@@ -572,6 +572,26 @@ function getProviders() {
   ].filter((p) => Boolean(p.key));
 }
 
+// Les modeles (surtout Mistral) inserent des retours a la ligne LITTERAUX
+// dans les longues proses -> JSON invalide. On les echappe avant parsing.
+function escapeControlCharsInJsonStrings(s) {
+  if (!s || typeof s !== 'string') return s;
+  let out = '';
+  let inStr = false, esc = false;
+  for (const ch of s) {
+    if (esc) { out += ch; esc = false; continue; }
+    if (ch === '\\') { out += ch; esc = true; continue; }
+    if (ch === '"') { inStr = !inStr; out += ch; continue; }
+    if (inStr) {
+      if (ch === '\n') { out += '\\n'; continue; }
+      if (ch === '\r') { out += '\\r'; continue; }
+      if (ch === '\t') { out += '\\t'; continue; }
+    }
+    out += ch;
+  }
+  return out;
+}
+
 function repairJson(str) {
   if (!str || typeof str !== 'string') return null;
 
@@ -656,8 +676,17 @@ async function callProvider(provider, { systemPrompt, userPrompt, maxTokens = 40
         console.warn(`[AI] ${provider.name} — JSON réparé avec succès`);
         return repaired;
       }
-      console.warn(`[AI] ${provider.name} — JSON invalide non réparable. Début: ${cleaned.slice(0, 200)}`);
-      throw new Error(`${provider.name}: JSON invalide`);
+      const sanitized = escapeControlCharsInJsonStrings(cleaned);
+      try { return JSON.parse(sanitized); }
+      catch (_) {
+        const repaired2 = repairJson(sanitized);
+        if (repaired2) {
+          console.warn(`[AI] ${provider.name} — JSON réparé après échappement des retours à la ligne`);
+          return repaired2;
+        }
+        console.warn(`[AI] ${provider.name} — JSON invalide non réparable. Début: ${cleaned.slice(0, 200)}`);
+        throw new Error(`${provider.name}: JSON invalide`);
+      }
     }
   } finally {
     clearTimeout(timeout);
@@ -933,6 +962,7 @@ RÈGLE JSON STRICTE :
 - Pas de markdown (\`\`\`).
 - Échappe correctement les guillemets doubles dans les chaînes (\\").
 - Utilise des apostrophes droites (') et non typographiques.
+- INTERDIT les retours à la ligne à l'intérieur d'une valeur : écris chaque valeur sur UNE seule ligne, sépare les idées par des points.
 - Respecte EXACTEMENT les quantités demandées dans la tâche (nombre de parties, de questions, de QCM).
 - Si la réponse risque d'être longue, reste concis sur CHAQUE élément plutôt que de réduire le nombre d'éléments.
 `.trim();

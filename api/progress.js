@@ -6,8 +6,8 @@
 //   - banque de questions EXHAUSTIVE 10-40 (tableau illimité, >30 OK)
 //   - QCM 8-12 imposés, distracteurs plausibles, explication chaque item
 //   - anglais ré-ajouté (prompts language déjà dans le code)
-//   - timeouts élargis Groq 18 s / OpenRouter 22 s / Mistral 10 s
-//   - fallback structurel (JSON) autorisé dans la limite du deadline
+//   - FILES séquentielles par fournisseur (anti-collision de concurrence)
+//   - budget IA 60 s (maxDuration 90) — repli sur fournisseur inactif
 //   - normalisation post-génération : Q&R et QCM toujours exploitables
 // NOTE : maxDuration est assigné en FIN de module (visible par Vercel AU BUILD).
 // ================================================================
@@ -56,7 +56,7 @@ const MIN_CONTENT_LENGTH = 40;
 const MAX_CONTENT_LENGTH = 15000;
 
 const FREE_SECTION_LIMIT = 5;
-const GLOBAL_AI_TIME_BUDGET_MS = 48000;
+const GLOBAL_AI_TIME_BUDGET_MS = 60000;
 
 let adminServices = null;
 
@@ -604,7 +604,7 @@ function repairJson(str) {
 
 async function callProvider(provider, { systemPrompt, userPrompt, maxTokens = 4000, deadline }) {
   const controller = new AbortController();
-  const timeouts = { 'Groq': 18000, 'OpenRouter': 22000, 'Mistral': 10000 };
+  const timeouts = { 'Groq': 20000, 'OpenRouter': 25000, 'Mistral': 15000 };
   const baseTimeout = timeouts[provider.name] || 15000;
   const remaining = deadline ? Math.max(5000, deadline - Date.now()) : baseTimeout;
   const timeoutMs = Math.min(baseTimeout, remaining);
@@ -660,53 +660,93 @@ async function callProvider(provider, { systemPrompt, userPrompt, maxTokens = 40
   }
 }
 
+// v8.6 — FILES SÉQUENTIELLES PAR FOURNISSEUR (anti-collision) :
+// le fan-out simultané faisait partir 2 tâches lourdes (explanation + qcm)
+// chez le MÊME fournisseur gratuit → concurrence refusée → tâches perdues.
+// Désormais chaque fournisseur exécute SES tâches en file (séquentiel),
+// les files tournent en parallèle. Repli sur fournisseur INACTIF uniquement.
 function distributeTasks(tasks, providers) {
   if (providers.length === 0) return [];
-  return tasks.map((task, i) => ({ ...task, provider: providers[i % providers.length] }));
+  const queues = new Map();
+  tasks.forEach((task, i) => {
+    const provider = providers[i % providers.length];
+    if (!queues.has(provider.name)) queues.set(provider.name, { provider, tasks: [] });
+    queues.get(provider.name).tasks.push({ task, index: i });
+  });
+  return Array.from(queues.values());
 }
 
 async function runParallelTasks(tasks, providers, deadline) {
-  const assignments = distributeTasks(tasks, providers);
+  const queues = distributeTasks(tasks, providers);
+  const results = new Array(tasks.length).fill(null);
+  const busy = new Map(providers.map((p) => [p.name, 0]));
 
-  const results = await Promise.allSettled(
-    assignments.map(({ provider, systemPrompt, userPrompt, maxTokens }) =>
-      callProvider(provider, { systemPrompt, userPrompt, maxTokens, deadline })
-    )
-  );
+  // Réserve atomiquement (test-and-set, sans await entre les deux) le
+  // premier fournisseur inactif et retourne-le, sinon attend jusqu'à deadline.
+  async function reserveIdleProvider(excludeName, triedNames) {
+    while (deadline && Date.now() < deadline - 8000) {
+      const idle = providers.find((p) =>
+        p.name !== excludeName && !triedNames.includes(p.name) && (busy.get(p.name) || 0) === 0);
+      if (idle) { busy.set(idle.name, (busy.get(idle.name) || 0) + 1); return idle; }
+      await new Promise((r) => setTimeout(r, 700));
+    }
+    return null;
+  }
 
-  return await Promise.all(
-    results.map(async (r, i) => {
-      if (r.status === 'fulfilled') {
-        return { status: 'fulfilled', value: r.value, task: tasks[i], provider: assignments[i].provider.name };
-      }
+  async function tryCall(provider, task) {
+    busy.set(provider.name, (busy.get(provider.name) || 0) + 1);
+    try {
+      return await callProvider(provider, {
+        systemPrompt: task.systemPrompt,
+        userPrompt: task.userPrompt,
+        maxTokens: task.maxTokens,
+        deadline
+      });
+    } finally {
+      busy.set(provider.name, Math.max(0, (busy.get(provider.name) || 1) - 1));
+    }
+  }
 
-      const errMsg = String(r.reason?.message || '');
-      // v8.6 : une sortie JSON invalide dépend du modèle, pas du prompt →
-      // un autre fournisseur peut réussir. Le fallback reste gardé par le deadline.
-      if (deadline && Date.now() > deadline - 10000) {
-        console.warn(`[FAN-OUT] Tâche "${tasks[i].name}" : deadline proche, pas de fallback`);
-        return { status: 'rejected', error: r.reason, task: tasks[i], provider: 'none' };
-      }
+  await Promise.all(queues.map((queue) => (async () => {
+    for (const { task, index } of queue.tasks) {
+      let value = null, err = null;
+      try { value = await tryCall(queue.provider, task); }
+      catch (e) { err = e; }
 
-      console.warn(`[FAN-OUT] Tâche "${tasks[i].name}" échouée sur ${assignments[i].provider.name}, fallback...`);
-
-      for (const provider of providers) {
-        if (provider.name === assignments[i].provider.name) continue;
-        try {
-          const value = await callProvider(provider, {
-            systemPrompt: tasks[i].systemPrompt,
-            userPrompt: tasks[i].userPrompt,
-            maxTokens: tasks[i].maxTokens,
-            deadline
-          });
-          return { status: 'fulfilled', value, task: tasks[i], provider: provider.name };
-        } catch (e) {
-          console.warn(`[FAN-OUT] Fallback ${provider.name} échoué : ${e.message}`);
+      if (!value) {
+        const tried = [queue.provider.name];
+        console.warn(`[FAN-OUT] Tâche "${task.name}" échouée sur ${queue.provider.name}${err ? ` (${err.message})` : ''}, repli sur fournisseur inactif...`);
+        // Jusqu'à 2 tentatives de repli, toujours sur un fournisseur inactif
+        for (let attempt = 0; attempt < 2 && !value; attempt++) {
+          if (deadline && Date.now() > deadline - 8000) {
+            console.warn(`[FAN-OUT] Tâche "${task.name}" : deadline proche, pas de repli`);
+            break;
+          }
+          const idle = await reserveIdleProvider(queue.provider.name, tried);
+          if (!idle) break;
+          tried.push(idle.name);
+          try {
+            value = await tryCall(idle, task);
+            if (value) console.log(`[FAN-OUT] Repli OK : "${task.name}" via ${idle.name}`);
+          } catch (e2) {
+            console.warn(`[FAN-OUT] Repli ${idle.name} échoué : ${e2.message}`);
+          }
         }
       }
-      return { status: 'rejected', error: r.reason, task: tasks[i], provider: 'none' };
-    })
-  );
+
+      results[index] = value
+        ? { status: 'fulfilled', value, task, provider: queue.provider.name }
+        : { status: 'rejected', error: err, task, provider: 'none' };
+    }
+  })()));
+
+  results.forEach((r) => {
+    if (!r) return;
+    if (r.status === 'fulfilled') console.log(`[FAN-OUT] OK ${r.task.name} (via ${r.provider})`);
+    else console.error(`[FAN-OUT] FAIL ${r.task.name} - raison: ${r.error?.message || 'unknown'}`);
+  });
+
+  return results;
 }
 
 function mergeAnalysis(results, profile) {

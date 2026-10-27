@@ -592,6 +592,31 @@ function escapeControlCharsInJsonStrings(s) {
   return out;
 }
 
+// Guillemets doubles NON echappes a l'interieur des chaines ("le nombre "a" tel que")
+// -> heuristique : un " suivi d'un caractere non structurel est un guillemet interne.
+function escapeInnerQuotes(s) {
+  if (!s || typeof s !== 'string') return s;
+  let out = '';
+  let inStr = false, esc = false;
+  const n = s.length;
+  for (let i = 0; i < n; i++) {
+    const ch = s[i];
+    if (esc) { out += ch; esc = false; continue; }
+    if (ch === '\\') { out += ch; esc = true; continue; }
+    if (ch === '"') {
+      if (!inStr) { inStr = true; out += ch; continue; }
+      let j = i + 1;
+      while (j < n && (s[j] === ' ' || s[j] === '\t' || s[j] === '\n' || s[j] === '\r')) j++;
+      const next = j < n ? s[j] : '';
+      if (next === '' || ':,}]'.includes(next)) { inStr = false; out += ch; }
+      else { out += '\\"'; }
+      continue;
+    }
+    out += ch;
+  }
+  return out;
+}
+
 function repairJson(str) {
   if (!str || typeof str !== 'string') return null;
 
@@ -682,13 +707,24 @@ async function callProvider(provider, { systemPrompt, userPrompt, maxTokens = 40
       const sanitized = escapeControlCharsInJsonStrings(cleaned);
       try { return JSON.parse(sanitized); }
       catch (_) {
-        const repaired2 = repairJson(sanitized);
-        if (repaired2) {
-          console.warn(`[AI] ${provider.name} — JSON réparé après échappement des retours à la ligne`);
-          return repaired2;
+        const quoted = escapeInnerQuotes(sanitized);
+        try { return JSON.parse(quoted); }
+        catch (posErr) {
+          const repaired2 = repairJson(quoted);
+          if (repaired2) {
+            console.warn(`[AI] ${provider.name} — JSON réparé (contrôles + guillemets internes)`);
+            return repaired2;
+          }
+          // Position exacte de l'erreur pour diagnostic
+          let ctx = '';
+          const pm = /position (\d+)/.exec(String(posErr?.message || ''));
+          if (pm) {
+            const p = parseInt(pm[1], 10);
+            ctx = ` [vers ${quoted.slice(Math.max(0, p - 70), p + 70).replace(/[\n\r\t]/g, '⏎')}]`;
+          }
+          console.warn(`[AI] ${provider.name} — JSON invalide non réparable. Début: ${cleaned.slice(0, 200)}`);
+          throw new Error(`${provider.name}: JSON invalide${ctx}`);
         }
-        console.warn(`[AI] ${provider.name} — JSON invalide non réparable. Début: ${cleaned.slice(0, 200)}`);
-        throw new Error(`${provider.name}: JSON invalide [tête: ${cleaned.slice(0, 160).replace(/[\n\r\t]/g, "⏎")}]`);
       }
     }
   } finally {

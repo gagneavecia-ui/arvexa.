@@ -3,7 +3,8 @@
 // Cahier intelligent + Fan-out IA + Tracking temps d'étude
 // v8.6 « édition complète » (base v8.5 inchangée structurellement) :
 //   - explications « comme un prof » enrichies (analogies, étapes)
-//   - banque de questions 10-25 exhaustive (page sans plafond d'affichage)
+//   - banque de questions SPLIT en 2 demi-tâches (base + avancée, 5-13 chacune)
+//     fusionnées + renumérotées → 10-26 questions, taille « QCM » fiable chez Mistral
 //   - QCM 8-12 imposés, distracteurs plausibles, explication chaque item
 //   - anglais ré-ajouté (prompts language déjà dans le code)
 //   - FILES séquentielles par fournisseur (anti-collision de concurrence)
@@ -676,7 +677,8 @@ async function callProvider(provider, { systemPrompt, userPrompt, maxTokens = 40
 const TASK_PROVIDER_PREF = {
   explanation: ['Groq', 'Mistral', 'OpenRouter'],
   structure:   ['Mistral', 'OpenRouter', 'Groq'],
-  questions:   ['OpenRouter', 'Mistral', 'Groq'],
+  questions_a: ['Mistral', 'OpenRouter', 'Groq'],
+  questions_b: ['OpenRouter', 'Mistral', 'Groq'],
   qcm:         ['Mistral', 'OpenRouter', 'Groq']
 };
 
@@ -839,8 +841,9 @@ function mergeAnalysis(results, profile) {
       case 'structure':
         merged.structure = data;
         break;
-      case 'questions':
-        merged.questions = data.questions || [];
+      case 'questions_a':
+      case 'questions_b':
+        merged.questions.push(...(Array.isArray(data.questions) ? data.questions : []));
         break;
       case 'qcm':
         merged.qcm = data.qcm || [];
@@ -944,7 +947,7 @@ ${rawInput}
   return [
     {
       name: 'explanation',
-      maxTokens: 5000,
+      maxTokens: 3500,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide, sans commentaire.',
       userPrompt: `Tu es professeur expert du BAC, pédagogue et passionné. Explique cette section comme à un élève qui découvre, devant ta classe.
 
@@ -1008,21 +1011,18 @@ ${JSON_STRICT_RULES}
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'questions',
-      maxTokens: 3800,
+      name: 'questions_a',
+      maxTokens: 2400,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
-      userPrompt: `Génère une banque de questions EXHAUSTIVE basée UNIQUEMENT sur cette section.
+      userPrompt: `Génère 5 à 13 questions de NOTIONS DE BASE sur cette section (définitions, concepts, faits essentiels).
 
-${baseContext}
+$${baseContext}
 
-${PERIMETER_RULES}
-${LATEX_RULES}
+$${PERIMETER_RULES}
 
 RÈGLES :
-- Entre 10 et 25 questions : couvre TOUTES les notions de la section, même secondaires (2-3 questions par notion importante, 1 par notion secondaire).
-- Types variés : definition, application, analyse, calcul, demonstration.
-- Réponses complètes et rédigées (1 à 3 phrases), jamais un mot isolé.
-- mustHave : 2 à 4 éléments indispensables pour une réponse complète.
+- Entre 5 et 13 questions, réponses rédigées (1 à 2 phrases), jamais un mot isolé.
+- mustHave : 2 à 3 éléments indispensables pour une réponse complète.
 - importance : 3 = incontournable au BAC, 2 = important, 1 = complément.
 
 Format JSON :
@@ -1030,7 +1030,32 @@ Format JSON :
   "questions": [{"id": "q1", "level": 1, "type": "definition", "question": "...", "answer": "...", "mustHave": ["..."], "importance": 1}]
 }
 
-${JSON_STRICT_RULES}
+$${JSON_STRICT_RULES}
+
+Réponds UNIQUEMENT avec le JSON.`
+    },
+    {
+      name: 'questions_b',
+      maxTokens: 2400,
+      systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
+      userPrompt: `Génère 5 à 13 questions AVANCÉES sur cette section (application, analyse, raisonnement, explication d'exemples).
+
+$${baseContext}
+
+$${PERIMETER_RULES}
+
+RÈGLES :
+- Entre 5 et 13 questions, réponses rédigées (1 à 2 phrases), jamais un mot isolé.
+- Types variés : application, analyse, raisonnement, calcul si la matière s'y prête.
+- mustHave : 2 à 3 éléments indispensables.
+- importance : 3 = incontournable au BAC, 2 = important, 1 = complément.
+
+Format JSON :
+{
+  "questions": [{"id": "q1", "level": 2, "type": "application", "question": "...", "answer": "...", "mustHave": ["..."], "importance": 2}]
+}
+
+$${JSON_STRICT_RULES}
 
 Réponds UNIQUEMENT avec le JSON.`
     },
@@ -1074,7 +1099,7 @@ ${rawInput}
   return [
     {
       name: 'explanation',
-      maxTokens: 5000,
+      maxTokens: 3500,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide, sans commentaire.',
       userPrompt: `Tu es professeur de SVT, pédagogue et passionné. Explique cette section comme à un élève qui découvre, devant ta classe.
 
@@ -1139,20 +1164,18 @@ ${JSON_STRICT_RULES}
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'questions',
-      maxTokens: 3800,
+      name: 'questions_a',
+      maxTokens: 2400,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
-      userPrompt: `Génère une banque de questions SVT EXHAUSTIVE sur cette section UNIQUEMENT.
+      userPrompt: `Génère 5 à 13 questions de NOTIONS DE BASE sur cette section (définitions, concepts, faits essentiels).
 
-${baseContext}
+$${baseContext}
 
-${PERIMETER_RULES}
+$${PERIMETER_RULES}
 
 RÈGLES :
-- Entre 10 et 25 questions : couvre TOUTES les notions (2-3 questions par notion importante, 1 par notion secondaire).
-- Types variés : definition, mecanisme, relation, interpretation.
-- Réponses complètes et rédigées (1 à 3 phrases), jamais un mot isolé.
-- mustHave : 2 à 4 éléments indispensables.
+- Entre 5 et 13 questions, réponses rédigées (1 à 2 phrases), jamais un mot isolé.
+- mustHave : 2 à 3 éléments indispensables pour une réponse complète.
 - importance : 3 = incontournable au BAC, 2 = important, 1 = complément.
 
 Format JSON :
@@ -1160,7 +1183,32 @@ Format JSON :
   "questions": [{"id": "q1", "level": 1, "type": "definition", "question": "...", "answer": "...", "mustHave": ["..."], "importance": 1}]
 }
 
-${JSON_STRICT_RULES}
+$${JSON_STRICT_RULES}
+
+Réponds UNIQUEMENT avec le JSON.`
+    },
+    {
+      name: 'questions_b',
+      maxTokens: 2400,
+      systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
+      userPrompt: `Génère 5 à 13 questions AVANCÉES sur cette section (application, analyse, raisonnement, explication d'exemples).
+
+$${baseContext}
+
+$${PERIMETER_RULES}
+
+RÈGLES :
+- Entre 5 et 13 questions, réponses rédigées (1 à 2 phrases), jamais un mot isolé.
+- Types variés : application, analyse, raisonnement, calcul si la matière s'y prête.
+- mustHave : 2 à 3 éléments indispensables.
+- importance : 3 = incontournable au BAC, 2 = important, 1 = complément.
+
+Format JSON :
+{
+  "questions": [{"id": "q1", "level": 2, "type": "application", "question": "...", "answer": "...", "mustHave": ["..."], "importance": 2}]
+}
+
+$${JSON_STRICT_RULES}
 
 Réponds UNIQUEMENT avec le JSON.`
     },
@@ -1203,7 +1251,7 @@ ${rawInput}
   return [
     {
       name: 'explanation',
-      maxTokens: 5000,
+      maxTokens: 3500,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide, sans commentaire.',
       userPrompt: `Tu es professeur de philosophie. Explique cette section COMME SI L'ÉLÈVE N'Y CONNAISSAIT RIEN.
 
@@ -1259,28 +1307,51 @@ ${JSON_STRICT_RULES}
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'questions',
-      maxTokens: 3800,
+      name: 'questions_a',
+      maxTokens: 2400,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
-      userPrompt: `Génère une banque de questions de philosophie EXHAUSTIVE sur cette section UNIQUEMENT.
+      userPrompt: `Génère 5 à 13 questions de NOTIONS DE BASE sur cette section (définitions, concepts, faits essentiels).
 
-${baseContext}
+$${baseContext}
 
-${PERIMETER_RULES}
+$${PERIMETER_RULES}
 
 RÈGLES :
-- Entre 10 et 25 questions couvrant TOUTES les thèses, arguments et distinctions de la section.
-- Types variés : definition, these, argument, critique, exemple.
-- Chaque réponse doit être rédigée en 1 à 3 phrases complètes, jamais un mot isolé.
-- mustHave : 2 à 4 éléments indispensables.
+- Entre 5 et 13 questions, réponses rédigées (1 à 2 phrases), jamais un mot isolé.
+- mustHave : 2 à 3 éléments indispensables pour une réponse complète.
 - importance : 3 = incontournable au BAC, 2 = important, 1 = complément.
 
 Format JSON :
 {
-  "questions": [{"id": "q1", "level": 1, "type": "definition", "question": "...", "answer": "Une phrase complète.", "mustHave": ["..."], "importance": 1}]
+  "questions": [{"id": "q1", "level": 1, "type": "definition", "question": "...", "answer": "...", "mustHave": ["..."], "importance": 1}]
 }
 
-${JSON_STRICT_RULES}
+$${JSON_STRICT_RULES}
+
+Réponds UNIQUEMENT avec le JSON.`
+    },
+    {
+      name: 'questions_b',
+      maxTokens: 2400,
+      systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
+      userPrompt: `Génère 5 à 13 questions AVANCÉES sur cette section (application, analyse, raisonnement, explication d'exemples).
+
+$${baseContext}
+
+$${PERIMETER_RULES}
+
+RÈGLES :
+- Entre 5 et 13 questions, réponses rédigées (1 à 2 phrases), jamais un mot isolé.
+- Types variés : application, analyse, raisonnement, calcul si la matière s'y prête.
+- mustHave : 2 à 3 éléments indispensables.
+- importance : 3 = incontournable au BAC, 2 = important, 1 = complément.
+
+Format JSON :
+{
+  "questions": [{"id": "q1", "level": 2, "type": "application", "question": "...", "answer": "...", "mustHave": ["..."], "importance": 2}]
+}
+
+$${JSON_STRICT_RULES}
 
 Réponds UNIQUEMENT avec le JSON.`
     },
@@ -1371,28 +1442,51 @@ ${JSON_STRICT_RULES}
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'questions',
-      maxTokens: 3800,
+      name: 'questions_a',
+      maxTokens: 2400,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
-      userPrompt: `Génère une BANQUE MASSIVE de questions d'histoire-géo EXHAUSTIVE sur cette section.
+      userPrompt: `Génère 5 à 13 questions de NOTIONS DE BASE sur cette section (définitions, concepts, faits essentiels).
 
-${baseContext}
+$${baseContext}
 
-${PERIMETER_RULES}
+$${PERIMETER_RULES}
 
 RÈGLES :
-- Entre 10 et 25 questions : interroge TOUS les faits, dates, acteurs, lieux et causes de la section.
-- Types variés : date, fait, cause, consequence, definition.
-- Réponses complètes et rédigées (1 à 3 phrases), jamais un mot isolé.
-- mustHave : 2 à 4 éléments indispensables.
+- Entre 5 et 13 questions, réponses rédigées (1 à 2 phrases), jamais un mot isolé.
+- mustHave : 2 à 3 éléments indispensables pour une réponse complète.
 - importance : 3 = incontournable au BAC, 2 = important, 1 = complément.
 
 Format JSON :
 {
-  "questions": [{"id": "q1", "level": 1, "type": "date", "question": "...", "answer": "...", "mustHave": ["..."], "importance": 1}]
+  "questions": [{"id": "q1", "level": 1, "type": "definition", "question": "...", "answer": "...", "mustHave": ["..."], "importance": 1}]
 }
 
-${JSON_STRICT_RULES}
+$${JSON_STRICT_RULES}
+
+Réponds UNIQUEMENT avec le JSON.`
+    },
+    {
+      name: 'questions_b',
+      maxTokens: 2400,
+      systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
+      userPrompt: `Génère 5 à 13 questions AVANCÉES sur cette section (application, analyse, raisonnement, explication d'exemples).
+
+$${baseContext}
+
+$${PERIMETER_RULES}
+
+RÈGLES :
+- Entre 5 et 13 questions, réponses rédigées (1 à 2 phrases), jamais un mot isolé.
+- Types variés : application, analyse, raisonnement, calcul si la matière s'y prête.
+- mustHave : 2 à 3 éléments indispensables.
+- importance : 3 = incontournable au BAC, 2 = important, 1 = complément.
+
+Format JSON :
+{
+  "questions": [{"id": "q1", "level": 2, "type": "application", "question": "...", "answer": "...", "mustHave": ["..."], "importance": 2}]
+}
+
+$${JSON_STRICT_RULES}
 
 Réponds UNIQUEMENT avec le JSON.`
     },
@@ -1435,7 +1529,7 @@ ${rawInput}
   return [
     {
       name: 'explanation',
-      maxTokens: 4000,
+      maxTokens: 3500,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Tu es professeur de français. Explique cette section clairement.
 
@@ -1484,28 +1578,51 @@ ${JSON_STRICT_RULES}
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'questions',
-      maxTokens: 3800,
+      name: 'questions_a',
+      maxTokens: 2400,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
-      userPrompt: `Génère une banque de questions de français EXHAUSTIVE sur cette section.
+      userPrompt: `Génère 5 à 13 questions de NOTIONS DE BASE sur cette section (définitions, concepts, faits essentiels).
 
-${baseContext}
+$${baseContext}
 
-${PERIMETER_RULES}
+$${PERIMETER_RULES}
 
 RÈGLES :
-- Entre 10 et 25 questions couvrant TOUTES les notions, figures de style et textes de la section.
-- Types variés : definition, figure_style, analyse, texte.
-- Réponses rédigées (1 à 3 phrases complètes), jamais un mot isolé.
-- mustHave : 2 à 4 éléments indispensables.
+- Entre 5 et 13 questions, réponses rédigées (1 à 2 phrases), jamais un mot isolé.
+- mustHave : 2 à 3 éléments indispensables pour une réponse complète.
 - importance : 3 = incontournable au BAC, 2 = important, 1 = complément.
 
 Format JSON :
 {
-  "questions": [{"id": "q1", "level": 1, "type": "definition", "question": "...", "answer": "Réponse rédigée (1-3 phrases).", "mustHave": ["..."], "importance": 1}]
+  "questions": [{"id": "q1", "level": 1, "type": "definition", "question": "...", "answer": "...", "mustHave": ["..."], "importance": 1}]
 }
 
-${JSON_STRICT_RULES}
+$${JSON_STRICT_RULES}
+
+Réponds UNIQUEMENT avec le JSON.`
+    },
+    {
+      name: 'questions_b',
+      maxTokens: 2400,
+      systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
+      userPrompt: `Génère 5 à 13 questions AVANCÉES sur cette section (application, analyse, raisonnement, explication d'exemples).
+
+$${baseContext}
+
+$${PERIMETER_RULES}
+
+RÈGLES :
+- Entre 5 et 13 questions, réponses rédigées (1 à 2 phrases), jamais un mot isolé.
+- Types variés : application, analyse, raisonnement, calcul si la matière s'y prête.
+- mustHave : 2 à 3 éléments indispensables.
+- importance : 3 = incontournable au BAC, 2 = important, 1 = complément.
+
+Format JSON :
+{
+  "questions": [{"id": "q1", "level": 2, "type": "application", "question": "...", "answer": "...", "mustHave": ["..."], "importance": 2}]
+}
+
+$${JSON_STRICT_RULES}
 
 Réponds UNIQUEMENT avec le JSON.`
     },
@@ -1548,7 +1665,7 @@ ${rawInput}
   return [
     {
       name: 'explanation',
-      maxTokens: 4500,
+      maxTokens: 3500,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Tu es professeur d'anglais pour des FRANCOPHONES DÉBUTANTS.
 
@@ -1603,28 +1720,51 @@ ${JSON_STRICT_RULES}
 Réponds UNIQUEMENT avec le JSON.`
     },
     {
-      name: 'questions',
-      maxTokens: 3800,
+      name: 'questions_a',
+      maxTokens: 2400,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
-      userPrompt: `Génère une banque de questions d'anglais EXHAUSTIVE.
+      userPrompt: `Génère 5 à 13 questions de NOTIONS DE BASE sur cette section (définitions, concepts, faits essentiels).
 
-${baseContext}
+$${baseContext}
 
-${PERIMETER_RULES}
+$${PERIMETER_RULES}
 
 RÈGLES :
-- Entre 10 et 25 questions couvrant TOUT le vocabulaire et toutes les règles de la section.
-- Types variés : vocabulary, grammar, translation, usage.
-- Réponses rédigées (1 à 3 phrases), exemples en anglais avec traduction française si utile.
-- mustHave : 2 à 4 éléments indispensables.
-- importance : 3 = incontournable, 2 = important, 1 = complément.
+- Entre 5 et 13 questions, réponses rédigées (1 à 2 phrases), jamais un mot isolé.
+- mustHave : 2 à 3 éléments indispensables pour une réponse complète.
+- importance : 3 = incontournable au BAC, 2 = important, 1 = complément.
 
 Format JSON :
 {
-  "questions": [{"id": "q1", "level": 1, "type": "vocabulary", "question": "...", "answer": "...", "mustHave": ["..."], "importance": 1}]
+  "questions": [{"id": "q1", "level": 1, "type": "definition", "question": "...", "answer": "...", "mustHave": ["..."], "importance": 1}]
 }
 
-${JSON_STRICT_RULES}
+$${JSON_STRICT_RULES}
+
+Réponds UNIQUEMENT avec le JSON.`
+    },
+    {
+      name: 'questions_b',
+      maxTokens: 2400,
+      systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
+      userPrompt: `Génère 5 à 13 questions AVANCÉES sur cette section (application, analyse, raisonnement, explication d'exemples).
+
+$${baseContext}
+
+$${PERIMETER_RULES}
+
+RÈGLES :
+- Entre 5 et 13 questions, réponses rédigées (1 à 2 phrases), jamais un mot isolé.
+- Types variés : application, analyse, raisonnement, calcul si la matière s'y prête.
+- mustHave : 2 à 3 éléments indispensables.
+- importance : 3 = incontournable au BAC, 2 = important, 1 = complément.
+
+Format JSON :
+{
+  "questions": [{"id": "q1", "level": 2, "type": "application", "question": "...", "answer": "...", "mustHave": ["..."], "importance": 2}]
+}
+
+$${JSON_STRICT_RULES}
 
 Réponds UNIQUEMENT avec le JSON.`
     },

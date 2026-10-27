@@ -607,7 +607,7 @@ function repairJson(str) {
 
 async function callProvider(provider, { systemPrompt, userPrompt, maxTokens = 4000, deadline }) {
   const controller = new AbortController();
-  const timeouts = { 'Groq': 20000, 'OpenRouter': 32000, 'Mistral': 28000 };
+  const timeouts = { 'Groq': 20000, 'OpenRouter': 32000, 'Mistral': 40000 };
   const baseTimeout = timeouts[provider.name] || 15000;
   const remaining = deadline ? Math.max(5000, deadline - Date.now()) : baseTimeout;
   const timeoutMs = Math.min(baseTimeout, remaining);
@@ -714,11 +714,15 @@ async function runParallelTasks(tasks, providers, deadline) {
     busy.set(p.name, Math.max(0, (busy.get(p.name) || 1) - 1));
   }
   // Réserve atomiquement (test-and-set, sans await entre les deux) le premier
-  // fournisseur utilisable (capacité libre + non bloqué) et le retourne.
-  async function reserveUsable(excludeNames) {
+  // fournisseur UTILISABLE dans l'ordre de préférence donné (capacité libre +
+  // non bloqué). Respecte l'ordre de TASK_PROVIDER_PREF pour les replis.
+  async function reserveFromPref(prefNames, triedNames) {
     while (deadline && Date.now() < deadline - 8000) {
-      const found = providers.find((p) => !excludeNames.includes(p.name) && usable(p));
-      if (found) { busy.set(found.name, (busy.get(found.name) || 0) + 1); return found; }
+      for (const name of prefNames) {
+        if (triedNames.includes(name)) continue;
+        const p = providers.find((x) => x.name === name);
+        if (p && usable(p)) { busy.set(p.name, (busy.get(p.name) || 0) + 1); return p; }
+      }
       await new Promise((r) => setTimeout(r, 700));
     }
     return null;
@@ -750,20 +754,20 @@ async function runParallelTasks(tasks, providers, deadline) {
     }
   }
 
-  // Exécute une tâche : fournisseur préféré (si utilisable) puis jusqu'à 2 replis
-  // sur des fournisseurs utilisables. Retourne { value, providerName }.
+  // Exécute une tâche : réserve le fournisseur préféré (dans l'ordre de
+  // préférence, capacité respectée) puis jusqu'à 2 replis préférentiels.
   async function executeTask(task, preferred) {
     const tried = [];
     let value = null, err = null;
+    const prefNames = TASK_PROVIDER_PREF[task.name] || providers.map((p) => p.name);
+    const order = [preferred.name, ...prefNames.filter((n) => n !== preferred.name)];
 
-    let first = preferred;
-    if ((blockedUntil.get(first.name) || 0) > Date.now()) {
-      const alt = await reserveUsable([first.name]);
-      if (alt) first = alt;
-      else return { value: null, providerName: first.name, err: new Error(`${first.name} bloqué (rate-limit)`) };
+    const first = await reserveFromPref(order, tried);
+    if (!first) {
+      return { value: null, providerName: preferred.name, err: new Error('aucun fournisseur disponible avant deadline') };
     }
-
     tried.push(first.name);
+
     try { value = await callMarked(first, task); }
     catch (e) { err = e; }
     finally { release(first); }
@@ -773,7 +777,7 @@ async function runParallelTasks(tasks, providers, deadline) {
         console.warn(`[FAN-OUT] Tâche "${task.name}" : deadline proche, plus de repli`);
         break;
       }
-      const alt = await reserveUsable(tried);
+      const alt = await reserveFromPref(order, tried);
       if (!alt) { console.warn(`[FAN-OUT] Tâche "${task.name}" : aucun fournisseur utilisable avant deadline`); break; }
       tried.push(alt.name);
       try {

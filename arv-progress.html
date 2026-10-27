@@ -2010,8 +2010,7 @@ var SUBJECTS = {
   svt:           { label: 'SVT',           emoji: '🧬', profile: 'svt' },
   philosophie:   { label: 'Philosophie',   emoji: '🧠', profile: 'philosophy' },
   histoire:      { label: 'Histoire',      emoji: '🌍', profile: 'history' },
-  geographie:    { label: 'Géographie',    emoji: '🗺️', profile: 'history' },
-  anglais:       { label: 'Anglais',       emoji: '🇬🇧', profile: 'language' }
+  geographie:    { label: 'Géographie',    emoji: '🗺️', profile: 'history' }
 };
 const ALL_SUBJECT_KEYS = Object.keys(SUBJECTS);
 
@@ -2305,41 +2304,13 @@ window.addEventListener('hashchange', () => applyRoute(routeFromHash()));
 // ══════════════════════════════════════════════════════════════
 // CHARGEMENT DES DONNÉES NOUVELLES
 // ══════════════════════════════════════════════════════════════
-async function loadProgressionData() {
-  try {
-    const [progression, recommendations, quota] = await Promise.all([
-      callApi('getProgressionSummary').catch(() => null),
-      callApi('getRecommendations').catch(() => null),
-      callApi('getQuotaStatus').catch(() => null)
-    ]);
-    localCache.progression = progression;
-    localCache.recommendations = recommendations?.recommendations || [];
-    localCache.quota = quota;
-  } catch (e) {
-    console.warn('[Progression] Erreur chargement:', e.message);
-  }
-}
+// Backend progress v8.5 : getProgressionSummary / getRecommendations /
+// getQuotaStatus n'existent pas → no-op volontaire, zéro appel inutile.
+async function loadProgressionData() { /* no-op — backend v8.5 */ }
 
-async function loadGoals() {
-  try {
-    const data = await callApi('listGoals');
-    localCache.goals = safeArray(data.goals);
-  } catch (e) { localCache.goals = []; }
-}
-
-async function loadSessions() {
-  try {
-    const data = await callApi('listSessions', { limit: 50 });
-    localCache.sessions = safeArray(data.sessions);
-  } catch (e) { localCache.sessions = []; }
-}
-
-async function loadClassGrades() {
-  try {
-    const data = await callApi('listClassGrades', { limit: 100 });
-    localCache.grades = safeArray(data.grades);
-  } catch (e) { localCache.grades = []; }
-}
+async function loadGoals() { localCache.goals = []; }        // no-op — backend v8.5
+async function loadSessions() { localCache.sessions = []; }  // no-op — backend v8.5
+async function loadClassGrades() { localCache.grades = []; } // no-op — backend v8.5
 
 // ══════════════════════════════════════════════════════════════
 // BLOCS DE RENDU DASHBOARD
@@ -2552,12 +2523,6 @@ async function renderNotebooksView() {
     const data = await callApi('getDashboard');
     state.cache.dashboard = data;
 
-    await Promise.all([
-      loadProgressionData(),
-      loadGoals(),
-      loadSessions()
-    ]);
-
     const safeSubjectsList = safeArray(data.subjects);
     const safeActivityList = safeArray(data.recentActivity);
     const totalSections = data.summary?.totalSections || 0;
@@ -2570,7 +2535,6 @@ async function renderNotebooksView() {
       const info = SUBJECTS[key];
       const active = safeSubjectsList.find((s) => s.key === key);
       const sectionsCount = active ? active.sectionsCount : 0;
-      const sectionsStudied = active ? active.sectionsStudied : 0;
       const last = active ? active.last : '';
       return `
         <button class="subject-card" data-subject="${key}">
@@ -2578,7 +2542,7 @@ async function renderNotebooksView() {
           <div class="subject-name">${escapeHtml(info.label)}</div>
           <div class="subject-meta">
             ${sectionsCount > 0
-              ? `${sectionsStudied}/${sectionsCount} étudiées${last ? ' · ' + last : ''}`
+              ? `${sectionsCount} section${sectionsCount > 1 ? 's' : ''}${last ? ' · ' + last : ''}`
               : 'Vide'}
           </div>
         </button>
@@ -2612,8 +2576,6 @@ async function renderNotebooksView() {
       </div>
 
       ${renderOfficialProgress()}
-      ${renderQuotaBadge()}
-      ${renderProgressionBlocks()}
 
       <div class="streak-card">
         <div class="streak-icon">🔥</div>
@@ -2627,14 +2589,10 @@ async function renderNotebooksView() {
         </div>
       </div>
 
-      ${renderRecommendationsBlock()}
-
       <div class="section-title"><i class="fas fa-book"></i> Mes matières <span class="count">${ALL_SUBJECT_KEYS.length}</span></div>
       <div class="subjects-grid">${subjectCards}</div>
 
       ${activityHtml}
-      ${renderGoalsSummary()}
-      ${renderTodaySessions()}
     `;
 
     el.querySelectorAll('[data-subject]').forEach((btn) => {
@@ -2996,12 +2954,6 @@ async function renderSectionView(params) {
       window.location.href = 'exam.html?' + params.toString();
     });
 
-    // Marquer la section comme étudiée après 3s de consultation
-    setTimeout(async () => {
-      try {
-        await callApi('markSectionStudied', { subject, chapterId, sectionId });
-      } catch (e) { /* silencieux */ }
-    }, 3000);
 
   } catch (err) {
     if (err.status === 404) showEmptyState(el, 'fa-file', 'Section introuvable', 'Cette section n\'existe plus.');
@@ -3023,6 +2975,14 @@ function renderAnalysis(a, profile) {
         <div class="block-body">${safeTextP(expl.understanding)}</div>
       </div>
       ${safeArray(expl.parts).map((p) => renderPart(p, profile)).join('')}
+      ${expl.context ? `<div class="block" style="margin-top:12px;">
+        <div class="block-head"><i class="fas fa-landmark"></i>Contexte</div>
+        <div class="block-body">${safeTextP(expl.context)}</div>
+      </div>` : ''}
+      ${safeArray(expl.keyFacts).length > 0 ? `<div class="block" style="margin-top:12px;">
+        <div class="block-head"><i class="fas fa-star"></i>Faits clés</div>
+        <div class="block-body"><ul class="simple-list">${safeArray(expl.keyFacts).map((f, i) => `<li><span class="num">${i + 1}.</span><span>${safeTextP(f)}</span></li>`).join('')}</ul></div>
+      </div>` : ''}
     </div>`;
   }
   if (a.structure) html += renderStructure(a.structure, profile);
@@ -3838,7 +3798,6 @@ if (!SpeechRecognition) {
       showToast('Section analysée', 'success');
       try { localStorage.removeItem(DRAFT_KEY); } catch (e) {}
       delete state.cache.chapter[`${subject}/${chapterId}`];
-      await loadProgressionData();
       applyRoute({ view: 'section', params: { subject, chapterId, sectionId: result.sectionId } });
     } catch (e) {
       cleanupProgress();
@@ -3855,42 +3814,8 @@ if (!SpeechRecognition) {
   setTimeout(() => body.focus(), 200);
 }
 
-// ══════════════════════════════════════════════════════════════
-// HANDLERS GLOBAUX SESSIONS
-// ══════════════════════════════════════════════════════════════
-document.addEventListener('click', async (e) => {
-  const doneBtn = e.target.closest('[data-session-done]');
-  if (doneBtn) {
-    try {
-      await callApi('updateSession', { sessionId: doneBtn.dataset.sessionDone, status: 'done' });
-      showToast('Séance marquée comme faite', 'success');
-      await loadSessions();
-      applyRoute({ view: 'notebooks', params: {} });
-    } catch (err) {
-      showToast('Erreur : ' + err.message, 'error');
-    }
-    return;
-  }
-
-  const postponeBtn = e.target.closest('[data-session-postpone]');
-  if (postponeBtn) {
-    try {
-      const tomorrow = new Date();
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      await callApi('updateSession', {
-        sessionId: postponeBtn.dataset.sessionPostpone,
-        status: 'postponed',
-        date: tomorrow.toISOString()
-      });
-      showToast('Séance reportée à demain', 'success');
-      await loadSessions();
-      applyRoute({ view: 'notebooks', params: {} });
-    } catch (err) {
-      showToast('Erreur : ' + err.message, 'error');
-    }
-    return;
-  }
-});
+// Backend progress v8.5 : les séances (updateSession) ne font plus partie du
+// serveur → handlers retirés, aucun appel fantôme.
 
 // ══════════════════════════════════════════════════════════════
 // ÉVÉNEMENTS HEADER
@@ -4042,7 +3967,7 @@ function isPremiumUser(data) {
   return false;
 }
 
-console.log('🚀 ARVEXA — Mon cahier v10.0 — Cahier des charges complet');
+console.log('🚀 ARVEXA — Mon cahier — serveur progress v8.5 (11 actions stables)');
 </script>
 </body>
 </html>

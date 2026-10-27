@@ -3,7 +3,7 @@
 // Cahier intelligent + Fan-out IA + Tracking temps d'étude
 // v8.6 « édition complète » (base v8.5 inchangée structurellement) :
 //   - explications « comme un prof » enrichies (analogies, étapes)
-//   - banque de questions EXHAUSTIVE 10-40 (tableau illimité, >30 OK)
+//   - banque de questions 10-25 exhaustive (page sans plafond d'affichage)
 //   - QCM 8-12 imposés, distracteurs plausibles, explication chaque item
 //   - anglais ré-ajouté (prompts language déjà dans le code)
 //   - FILES séquentielles par fournisseur (anti-collision de concurrence)
@@ -1009,7 +1009,7 @@ Réponds UNIQUEMENT avec le JSON.`
     },
     {
       name: 'questions',
-      maxTokens: 5000,
+      maxTokens: 3800,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Génère une banque de questions EXHAUSTIVE basée UNIQUEMENT sur cette section.
 
@@ -1019,7 +1019,7 @@ ${PERIMETER_RULES}
 ${LATEX_RULES}
 
 RÈGLES :
-- Entre 10 et 40 questions : couvre TOUTES les notions de la section, même secondaires (2-3 questions par notion importante, 1 par notion secondaire).
+- Entre 10 et 25 questions : couvre TOUTES les notions de la section, même secondaires (2-3 questions par notion importante, 1 par notion secondaire).
 - Types variés : definition, application, analyse, calcul, demonstration.
 - Réponses complètes et rédigées (1 à 3 phrases), jamais un mot isolé.
 - mustHave : 2 à 4 éléments indispensables pour une réponse complète.
@@ -1140,7 +1140,7 @@ Réponds UNIQUEMENT avec le JSON.`
     },
     {
       name: 'questions',
-      maxTokens: 5000,
+      maxTokens: 3800,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Génère une banque de questions SVT EXHAUSTIVE sur cette section UNIQUEMENT.
 
@@ -1149,7 +1149,7 @@ ${baseContext}
 ${PERIMETER_RULES}
 
 RÈGLES :
-- Entre 10 et 40 questions : couvre TOUTES les notions (2-3 questions par notion importante, 1 par notion secondaire).
+- Entre 10 et 25 questions : couvre TOUTES les notions (2-3 questions par notion importante, 1 par notion secondaire).
 - Types variés : definition, mecanisme, relation, interpretation.
 - Réponses complètes et rédigées (1 à 3 phrases), jamais un mot isolé.
 - mustHave : 2 à 4 éléments indispensables.
@@ -1260,7 +1260,7 @@ Réponds UNIQUEMENT avec le JSON.`
     },
     {
       name: 'questions',
-      maxTokens: 5000,
+      maxTokens: 3800,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Génère une banque de questions de philosophie EXHAUSTIVE sur cette section UNIQUEMENT.
 
@@ -1269,7 +1269,7 @@ ${baseContext}
 ${PERIMETER_RULES}
 
 RÈGLES :
-- Entre 10 et 30 questions couvrant TOUTES les thèses, arguments et distinctions de la section.
+- Entre 10 et 25 questions couvrant TOUTES les thèses, arguments et distinctions de la section.
 - Types variés : definition, these, argument, critique, exemple.
 - Chaque réponse doit être rédigée en 1 à 3 phrases complètes, jamais un mot isolé.
 - mustHave : 2 à 4 éléments indispensables.
@@ -1372,7 +1372,7 @@ Réponds UNIQUEMENT avec le JSON.`
     },
     {
       name: 'questions',
-      maxTokens: 5000,
+      maxTokens: 3800,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Génère une BANQUE MASSIVE de questions d'histoire-géo EXHAUSTIVE sur cette section.
 
@@ -1381,7 +1381,7 @@ ${baseContext}
 ${PERIMETER_RULES}
 
 RÈGLES :
-- Entre 12 et 40 questions : interroge TOUS les faits, dates, acteurs, lieux et causes de la section.
+- Entre 10 et 25 questions : interroge TOUS les faits, dates, acteurs, lieux et causes de la section.
 - Types variés : date, fait, cause, consequence, definition.
 - Réponses complètes et rédigées (1 à 3 phrases), jamais un mot isolé.
 - mustHave : 2 à 4 éléments indispensables.
@@ -1485,7 +1485,7 @@ Réponds UNIQUEMENT avec le JSON.`
     },
     {
       name: 'questions',
-      maxTokens: 5000,
+      maxTokens: 3800,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Génère une banque de questions de français EXHAUSTIVE sur cette section.
 
@@ -1494,7 +1494,7 @@ ${baseContext}
 ${PERIMETER_RULES}
 
 RÈGLES :
-- Entre 10 et 30 questions couvrant TOUTES les notions, figures de style et textes de la section.
+- Entre 10 et 25 questions couvrant TOUTES les notions, figures de style et textes de la section.
 - Types variés : definition, figure_style, analyse, texte.
 - Réponses rédigées (1 à 3 phrases complètes), jamais un mot isolé.
 - mustHave : 2 à 4 éléments indispensables.
@@ -1604,7 +1604,7 @@ Réponds UNIQUEMENT avec le JSON.`
     },
     {
       name: 'questions',
-      maxTokens: 5000,
+      maxTokens: 3800,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Génère une banque de questions d'anglais EXHAUSTIVE.
 
@@ -1613,7 +1613,7 @@ ${baseContext}
 ${PERIMETER_RULES}
 
 RÈGLES :
-- Entre 10 et 30 questions couvrant TOUT le vocabulaire et toutes les règles de la section.
+- Entre 10 et 25 questions couvrant TOUT le vocabulaire et toutes les règles de la section.
 - Types variés : vocabulary, grammar, translation, usage.
 - Réponses rédigées (1 à 3 phrases), exemples en anglais avec traduction française si utile.
 - mustHave : 2 à 4 éléments indispensables.

@@ -674,7 +674,7 @@ function repairJson(str) {
 
 async function callProvider(provider, { systemPrompt, userPrompt, maxTokens = 4000, deadline }) {
   const controller = new AbortController();
-  const timeouts = { 'Groq': 20000, 'OpenRouter': 32000, 'Mistral': 55000, 'Gemini': 30000 };
+  const timeouts = { 'Groq': 20000, 'OpenRouter': 32000, 'Mistral': 55000, 'Gemini': 45000 };
   const baseTimeout = timeouts[provider.name] || 20000;
   const remaining = deadline ? Math.max(5000, deadline - Date.now()) : baseTimeout;
   const timeoutMs = Math.min(baseTimeout, remaining);
@@ -691,7 +691,8 @@ async function callProvider(provider, { systemPrompt, userPrompt, maxTokens = 40
         generationConfig: {
           temperature: 0.3,
           maxOutputTokens: maxTokens,
-          responseMimeType: 'application/json'
+          responseMimeType: 'application/json',
+          thinkingConfig: { thinkingBudget: 0 }
         }
       };
       const result = await fetch(`${provider.endpoint}?key=${provider.key}`, {

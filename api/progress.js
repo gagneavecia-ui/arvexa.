@@ -758,9 +758,11 @@ async function runParallelTasks(tasks, providers, deadline) {
 
   // Exécute une tâche : réserve le fournisseur préféré (dans l'ordre de
   // préférence, capacité respectée) puis jusqu'à 2 replis préférentiels.
+  // Toutes les erreurs rencontrées sont accumulées pour le diagnostic meta.
   async function executeTask(task, preferred) {
     const tried = [];
-    let value = null, err = null;
+    const errs = [];
+    let value = null;
     const prefNames = TASK_PROVIDER_PREF[task.name] || providers.map((p) => p.name);
     const order = [preferred.name, ...prefNames.filter((n) => n !== preferred.name)];
 
@@ -771,7 +773,7 @@ async function runParallelTasks(tasks, providers, deadline) {
     tried.push(first.name);
 
     try { value = await callMarked(first, task); }
-    catch (e) { err = e; }
+    catch (e) { errs.push(`${first.name}: ${e?.message || e}`); }
     finally { release(first); }
 
     for (let attempt = 0; attempt < 2 && !value; attempt++) {
@@ -785,11 +787,11 @@ async function runParallelTasks(tasks, providers, deadline) {
       try {
         value = await callMarked(alt, task);
         if (value) console.log(`[FAN-OUT] Repli OK : "${task.name}" via ${alt.name}`);
-      } catch (e2) { err = e2; }
+      } catch (e2) { errs.push(`${alt.name}: ${e2?.message || e2}`); }
       finally { release(alt); }
     }
 
-    return { value, providerName: first.name, err };
+    return { value, providerName: first.name, err: errs.length ? new Error(errs.join(' | ')) : null };
   }
 
   await Promise.all(queues.map((queue) => (async () => {
@@ -843,10 +845,12 @@ function mergeAnalysis(results, profile) {
         break;
       case 'questions_a':
       case 'questions_b':
-        merged.questions.push(...(Array.isArray(data.questions) ? data.questions : []));
+        if (Array.isArray(data.questions)) merged.questions.push(...data.questions);
+        else if (data.questions && typeof data.questions === 'object') merged.questions.push(data.questions);
         break;
       case 'qcm':
-        merged.qcm = data.qcm || [];
+        if (Array.isArray(data.qcm)) merged.qcm.push(...data.qcm);
+        else if (data.qcm && typeof data.qcm === 'object' && data.qcm.question) merged.qcm.push(data.qcm);
         break;
     }
   }

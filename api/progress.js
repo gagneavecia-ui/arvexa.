@@ -569,6 +569,12 @@ function getProviders() {
       endpoint: 'https://api.mistral.ai/v1/chat/completions',
       model: process.env.MISTRAL_MODEL || 'mistral-large-latest',
       jsonMode: true
+    },
+    {
+      name: 'Gemini',
+      key: process.env.GEMINI_API_KEY,
+      endpoint: `https://generativelanguage.googleapis.com/v1beta/models/${process.env.GEMINI_MODEL || 'gemini-2.0-flash'}:generateContent`,
+      gemini: true
     }
   ].filter((p) => Boolean(p.key));
 }
@@ -668,44 +674,75 @@ function repairJson(str) {
 
 async function callProvider(provider, { systemPrompt, userPrompt, maxTokens = 4000, deadline }) {
   const controller = new AbortController();
-  const timeouts = { 'Groq': 20000, 'OpenRouter': 32000, 'Mistral': 55000 };
-  const baseTimeout = timeouts[provider.name] || 15000;
+  const timeouts = { 'Groq': 20000, 'OpenRouter': 32000, 'Mistral': 55000, 'Gemini': 30000 };
+  const baseTimeout = timeouts[provider.name] || 20000;
   const remaining = deadline ? Math.max(5000, deadline - Date.now()) : baseTimeout;
   const timeoutMs = Math.min(baseTimeout, remaining);
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
-    const body = {
-      model: provider.model,
-      temperature: 0.3,
-      max_tokens: maxTokens,
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt }
-      ]
-    };
+    let rawContent = null;
 
-    if (provider.jsonMode) body.response_format = { type: 'json_object' };
+    if (provider.gemini) {
+      // API generateContent : JSON natif via responseMimeType
+      const body = {
+        system_instruction: { parts: [{ text: systemPrompt }] },
+        contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
+        generationConfig: {
+          temperature: 0.3,
+          maxOutputTokens: maxTokens,
+          responseMimeType: 'application/json'
+        }
+      };
+      const result = await fetch(`${provider.endpoint}?key=${provider.key}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+        signal: controller.signal
+      });
+      const data = await result.json().catch(() => null);
+      if (!result.ok) {
+        const msg = data?.error?.message || `HTTP ${result.status}`;
+        throw new Error(`${provider.name}: ${msg}`);
+      }
+      rawContent = (data?.candidates?.[0]?.content?.parts || []).map((p) => p.text || '').join('');
+      if (!rawContent) {
+        const reason = data?.candidates?.[0]?.finishReason || data?.promptFeedback?.blockReason || 'réponse vide';
+        throw new Error(`${provider.name}: ${reason}`);
+      }
+    } else {
+      const body = {
+        model: provider.model,
+        temperature: 0.3,
+        max_tokens: maxTokens,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt }
+        ]
+      };
 
-    const result = await fetch(provider.endpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${provider.key}`,
-        ...(provider.headers || {})
-      },
-      body: JSON.stringify(body),
-      signal: controller.signal
-    });
+      if (provider.jsonMode) body.response_format = { type: 'json_object' };
 
-    const data = await result.json().catch(() => null);
-    if (!result.ok) {
-      const msg = data?.error?.message || `HTTP ${result.status}`;
-      throw new Error(`${provider.name}: ${msg}`);
+      const result = await fetch(provider.endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${provider.key}`,
+          ...(provider.headers || {})
+        },
+        body: JSON.stringify(body),
+        signal: controller.signal
+      });
+
+      const data = await result.json().catch(() => null);
+      if (!result.ok) {
+        const msg = data?.error?.message || `HTTP ${result.status}`;
+        throw new Error(`${provider.name}: ${msg}`);
+      }
+
+      rawContent = data?.choices?.[0]?.message?.content;
+      if (!rawContent) throw new Error(`${provider.name}: réponse vide`);
     }
-
-    const rawContent = data?.choices?.[0]?.message?.content;
-    if (!rawContent) throw new Error(`${provider.name}: réponse vide`);
 
     const cleaned = String(rawContent).replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
 
@@ -718,24 +755,20 @@ async function callProvider(provider, { systemPrompt, userPrompt, maxTokens = 40
       }
       const sanitized = escapeControlCharsInJsonStrings(cleaned);
       try { return JSON.parse(sanitized); }
-      catch (_) {
-        try { return JSON.parse(sanitized); }
-        catch (posErr) {
-          const repaired2 = repairJson(sanitized);
-          if (repaired2) {
-            console.warn(`[AI] ${provider.name} — JSON réparé (contrôles + LaTeX)`);
-            return repaired2;
-          }
-          // Position exacte de l'erreur pour diagnostic
-          let ctx = '';
-          const pm = /position (\d+)/.exec(String(posErr?.message || ''));
-          if (pm) {
-            const p = parseInt(pm[1], 10);
-            ctx = ` [vers ${sanitized.slice(Math.max(0, p - 70), p + 70).replace(/[\n\r\t]/g, '⏎')}]`;
-          }
-          console.warn(`[AI] ${provider.name} — JSON invalide non réparable. Début: ${cleaned.slice(0, 200)}`);
-          throw new Error(`${provider.name}: JSON invalide${ctx}`);
+      catch (posErr) {
+        const repaired2 = repairJson(sanitized);
+        if (repaired2) {
+          console.warn(`[AI] ${provider.name} — JSON réparé (contrôles + LaTeX)`);
+          return repaired2;
         }
+        let ctx = '';
+        const pm = /position (\d+)/.exec(String(posErr?.message || ''));
+        if (pm) {
+          const p = parseInt(pm[1], 10);
+          ctx = ` [vers ${sanitized.slice(Math.max(0, p - 70), p + 70).replace(/[\n\r\t]/g, '⏎')}]`;
+        }
+        console.warn(`[AI] ${provider.name} — JSON invalide non réparable. Début: ${cleaned.slice(0, 200)}`);
+        throw new Error(`${provider.name}: JSON invalide${ctx}`);
       }
     }
   } finally {
@@ -754,11 +787,11 @@ async function callProvider(provider, { systemPrompt, userPrompt, maxTokens = 40
 // - OpenRouter (lent mais sans TPM serré) : questions + qcm en file
 // - Mistral : structure
 const TASK_PROVIDER_PREF = {
-  explanation: ['Groq', 'Mistral', 'OpenRouter'],
-  structure:   ['Mistral', 'OpenRouter', 'Groq'],
-  questions_a: ['Mistral', 'OpenRouter', 'Groq'],
-  questions_b: ['OpenRouter', 'Mistral', 'Groq'],
-  qcm:         ['Mistral', 'OpenRouter', 'Groq']
+  explanation: ['Groq', 'Gemini', 'Mistral', 'OpenRouter'],
+  structure:   ['Mistral', 'Gemini', 'OpenRouter', 'Groq'],
+  questions_a: ['Gemini', 'Mistral', 'OpenRouter', 'Groq'],
+  questions_b: ['Gemini', 'Mistral', 'OpenRouter', 'Groq'],
+  qcm:         ['Gemini', 'Mistral', 'OpenRouter', 'Groq']
 };
 
 function distributeTasks(tasks, providers) {
@@ -783,7 +816,7 @@ async function runParallelTasks(tasks, providers, deadline) {
   const results = new Array(tasks.length).fill(null);
   // Concurrence max par fournisseur : Mistral (payant) accepte 2 requêtes
   // parallèles ; Groq est limité à 1 (TPM 8000/min) ; OpenRouter 2.
-  const MAX_CONC = { 'Groq': 1, 'OpenRouter': 2, 'Mistral': 2 };
+  const MAX_CONC = { 'Groq': 1, 'OpenRouter': 2, 'Mistral': 2, 'Gemini': 3 };
   const busy = new Map(providers.map((p) => [p.name, 0]));
   const blockedUntil = new Map(providers.map((p) => [p.name, 0]));
 

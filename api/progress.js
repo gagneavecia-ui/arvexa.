@@ -688,7 +688,7 @@ async function callProvider(provider, { systemPrompt, userPrompt, maxTokens = 40
           return repaired2;
         }
         console.warn(`[AI] ${provider.name} — JSON invalide non réparable. Début: ${cleaned.slice(0, 200)}`);
-        throw new Error(`${provider.name}: JSON invalide`);
+        throw new Error(`${provider.name}: JSON invalide [tête: ${cleaned.slice(0, 160).replace(/[\n\r\t]/g, "⏎")}]`);
       }
     }
   } finally {

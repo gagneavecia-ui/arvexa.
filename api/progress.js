@@ -608,7 +608,7 @@ function repairJson(str) {
 
 async function callProvider(provider, { systemPrompt, userPrompt, maxTokens = 4000, deadline }) {
   const controller = new AbortController();
-  const timeouts = { 'Groq': 20000, 'OpenRouter': 32000, 'Mistral': 40000 };
+  const timeouts = { 'Groq': 20000, 'OpenRouter': 32000, 'Mistral': 55000 };
   const baseTimeout = timeouts[provider.name] || 15000;
   const remaining = deadline ? Math.max(5000, deadline - Date.now()) : baseTimeout;
   const timeoutMs = Math.min(baseTimeout, remaining);
@@ -947,7 +947,7 @@ ${rawInput}
   return [
     {
       name: 'explanation',
-      maxTokens: 3500,
+      maxTokens: 3200,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide, sans commentaire.',
       userPrompt: `Tu es professeur expert du BAC, pédagogue et passionné. Explique cette section comme à un élève qui découvre, devant ta classe.
 
@@ -1099,7 +1099,7 @@ ${rawInput}
   return [
     {
       name: 'explanation',
-      maxTokens: 3500,
+      maxTokens: 3200,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide, sans commentaire.',
       userPrompt: `Tu es professeur de SVT, pédagogue et passionné. Explique cette section comme à un élève qui découvre, devant ta classe.
 
@@ -1251,7 +1251,7 @@ ${rawInput}
   return [
     {
       name: 'explanation',
-      maxTokens: 3500,
+      maxTokens: 3200,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide, sans commentaire.',
       userPrompt: `Tu es professeur de philosophie. Explique cette section COMME SI L'ÉLÈVE N'Y CONNAISSAIT RIEN.
 
@@ -1394,7 +1394,7 @@ ${rawInput}
   return [
     {
       name: 'explanation',
-      maxTokens: 3500,
+      maxTokens: 3200,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Tu es professeur d'histoire-géographie. Présente cette section CLAIREMENT, comme devant ta classe.
 
@@ -1529,7 +1529,7 @@ ${rawInput}
   return [
     {
       name: 'explanation',
-      maxTokens: 3500,
+      maxTokens: 3200,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Tu es professeur de français. Explique cette section clairement.
 
@@ -1665,7 +1665,7 @@ ${rawInput}
   return [
     {
       name: 'explanation',
-      maxTokens: 3500,
+      maxTokens: 3200,
       systemPrompt: 'Tu produis EXCLUSIVEMENT du JSON valide.',
       userPrompt: `Tu es professeur d'anglais pour des FRANCOPHONES DÉBUTANTS.
 

@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
   <meta name="theme-color" content="#0A0A0A">
 <script>(function(){try{if(localStorage.getItem('arvexa-theme')==='light')document.documentElement.setAttribute('data-theme','light')}catch(e){}})();</script>
-<script src="theme.js"></script><script src="arvexa-i18n.js" defer></script>
+<script src="theme.js"></script><script src="wake-lock.js"></script><script src="arvexa-i18n.js" defer></script>
   <meta name="description" content="ARV Assistant — Ton tuteur IA personnel">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icon.png" type="image/png">
@@ -2177,6 +2177,7 @@ async function sendMessage() {
   showTyping();
 
   try {
+    if (window.ARVEXAWakeLock) ARVEXAWakeLock.acquire('arv');
     const token = await getIdToken(state.user);
     const response = await fetch('/api/arv', {
       method: 'POST',
@@ -2242,6 +2243,7 @@ async function sendMessage() {
     statusText.textContent = 'Erreur';
     setTimeout(() => { statusText.textContent = 'Prêt à t\'aider'; }, 3000);
   } finally {
+    if (window.ARVEXAWakeLock) ARVEXAWakeLock.release('arv');
     state.sending = false;
     updateSendBtn();
     sendBtn.classList.remove('loading');

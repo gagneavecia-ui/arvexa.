@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0A0A0A">
 <script>(function(){try{if(localStorage.getItem('arvexa-theme')==='light')document.documentElement.setAttribute('data-theme','light')}catch(e){}})();</script>
-<script src="theme.js"></script><script src="arvexa-i18n.js" defer></script>
+<script src="theme.js"></script><script src="wake-lock.js"></script><script src="arvexa-i18n.js" defer></script>
   <title>ARVEXA — Historique Réviseur</title>
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icon.png" type="image/png">
@@ -1335,15 +1335,21 @@
   // ═══════════════════════════════════════════════════════════════
   async function callApi(payload) {
     const token = await getIdToken(state.user);
-    const res = await fetch('/api/reviseur', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + token
-      },
-      body: JSON.stringify(payload)
-    });
-    const data = await res.json().catch(function () { return null; });
+    if (window.ARVEXAWakeLock) ARVEXAWakeLock.acquire('reviseur-hist');
+    let res, data;
+    try {
+      res = await fetch('/api/reviseur', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify(payload)
+      });
+      data = await res.json().catch(function () { return null; });
+    } finally {
+      if (window.ARVEXAWakeLock) ARVEXAWakeLock.release('reviseur-hist');
+    }
 
     if (!res.ok || !data || !data.success) {
       throw new Error((data && data.error) || ('Erreur ' + res.status));

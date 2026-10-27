@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#0A0A0A">
 <script>(function(){try{if(localStorage.getItem('arvexa-theme')==='light')document.documentElement.setAttribute('data-theme','light')}catch(e){}})();</script>
-<script src="theme.js"></script><script src="arvexa-i18n.js" defer></script>
+<script src="theme.js"></script><script src="wake-lock.js"></script><script src="arvexa-i18n.js" defer></script>
 <title>ARVEXA — Mon cahier</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.png" type="image/png">
@@ -2321,6 +2321,7 @@ async function callApi(action, params = {}, _attempt = 1) {
   // _attempt > 1 -> forceRefresh : le token est régénéré côté Firebase
   const token = await getIdToken(state.user, _attempt > 1);
 
+  if (window.ARVEXAWakeLock) ARVEXAWakeLock.acquire('progress');
   let response;
   try {
     response = await fetch('/api/progress', {
@@ -2337,24 +2338,28 @@ async function callApi(action, params = {}, _attempt = 1) {
     throw err;
   }
 
-  const data = await response.json().catch(() => null);
+  try {
+    const data = await response.json().catch(() => null);
 
-  if (response.status === 401 && data?.code === 'AUTH_REQUIRED') {
-    // ✅ Anti-boucle : rafraîchissement forcé du token + UNE retente avant
-    // de renvoyer vers la connexion. Les 401 passagers (token expiré,
-    // démarrage à froid du serveur) n'éjectent plus l'élève.
-    if (_attempt === 1) return callApi(action, params, 2);
-    window.location.replace('auth-choice.html');
-    throw new Error('Session expirée');
-  }
+    if (response.status === 401 && data?.code === 'AUTH_REQUIRED') {
+      // ✅ Anti-boucle : rafraîchissement forcé du token + UNE retente avant
+      // de renvoyer vers la connexion. Les 401 passagers (token expiré,
+      // démarrage à froid du serveur) n'éjectent plus l'élève.
+      if (_attempt === 1) return callApi(action, params, 2);
+      window.location.replace('auth-choice.html');
+      throw new Error('Session expirée');
+    }
 
-  if (!response.ok || !data?.success) {
-    const err = new Error(data?.error || `Erreur ${response.status}`);
-    err.code = data?.code;
-    err.status = response.status;
-    throw err;
+    if (!response.ok || !data?.success) {
+      const err = new Error(data?.error || `Erreur ${response.status}`);
+      err.code = data?.code;
+      err.status = response.status;
+      throw err;
+    }
+    return data;
+  } finally {
+    if (window.ARVEXAWakeLock) ARVEXAWakeLock.release('progress');
   }
-  return data;
 }
 
 function routeFromHash() {

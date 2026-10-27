@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#0A0A0A">
 <script>(function(){try{if(localStorage.getItem('arvexa-theme')==='light')document.documentElement.setAttribute('data-theme','light')}catch(e){}})();</script>
-<script src="theme.js"></script><script src="arvexa-i18n.js" defer></script>
+<script src="theme.js"></script><script src="wake-lock.js"></script><script src="arvexa-i18n.js" defer></script>
   <meta name="description" content="ARVEXA School — Mode examen BAC">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icon.png" type="image/png">
@@ -2741,6 +2741,7 @@ async function generateExam(event) {
     var headers = { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token };
 
     activateStep('genStep2', statusEl, 'Génération des deux sujets...');
+    if (window.ARVEXAWakeLock) ARVEXAWakeLock.acquire('exam-gen');
 
     var notebookContextPayload = state.notebookContext
       ? { subject: config.subject, chapterId: state.notebookContext.chapterId, chapterTitle: state.notebookContext.chapterTitle }
@@ -2800,6 +2801,7 @@ async function generateExam(event) {
     }
     showView('configView');
   } finally {
+    if (window.ARVEXAWakeLock) ARVEXAWakeLock.release('exam-gen');
     btn.disabled = false;
     btn.classList.remove('loading');
   }
@@ -3028,6 +3030,7 @@ async function submitExam(auto) {
     var headers = { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token };
 
     activateStep('corrStep2', statusEl, 'Analyse des exercices...');
+    if (window.ARVEXAWakeLock) ARVEXAWakeLock.acquire('exam-correct');
     var responsePromise = fetch('/api/exam', {
       method: 'POST',
       headers: headers,
@@ -3065,6 +3068,7 @@ async function submitExam(auto) {
     showView('examView');
     setStatus('examStatus', 'Correction temporairement indisponible. Réessaie dans quelques minutes.', 'error');
   } finally {
+    if (window.ARVEXAWakeLock) ARVEXAWakeLock.release('exam-correct');
     state.submitting = false;
     $('finishButton').disabled = false;
   }

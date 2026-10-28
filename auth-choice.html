@@ -375,6 +375,7 @@
     .hero-copy .hero-lede      { animation-delay: 0.45s; }
     .hero-copy .hero-actions   { animation-delay: 0.6s; }
     .hero-copy .hero-meta      { animation-delay: 0.75s; }
+    .hero-copy .hero-prefs     { animation-delay: 0.9s; } /* encart onboarding : dernier de la cascade */
     @keyframes riseIn {
       to { opacity: 1; transform: translateY(0); }
     }
@@ -1060,6 +1061,66 @@
       .bac-wrap { padding: 56px 48px; }
     }
 
+    /* ============================================================
+       PRÉFÉRENCES ONBOARDING — mode clair + langue (pré-réglage
+       des nouveaux dès la porte d'entrée, avant inscription)
+       Variables thémables : suit le mode clair automatiquement
+       ============================================================ */
+    .pref-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      height: 38px; padding: 0 16px;
+      border-radius: 999px;
+      border: 1px solid var(--border-soft);
+      background: var(--bg-card);
+      color: var(--text-light);
+      font-size: 13px; font-weight: 600;
+      cursor: pointer;
+      transition: border-color .2s var(--ease-out), box-shadow .2s var(--ease-out), transform .15s var(--ease-out);
+    }
+    .pref-btn:hover { border-color: var(--border-gold); box-shadow: 0 4px 14px rgba(184, 134, 11, 0.18); }
+    .pref-btn:active { transform: scale(0.96); }
+    .header-actions .pref-btn { padding: 0; width: 38px; justify-content: center; }
+    .lang-pill {
+      display: inline-flex; align-items: center;
+      height: 38px; padding: 3px;
+      border-radius: 999px;
+      border: 1px solid var(--border-soft);
+      background: var(--bg-card);
+    }
+    .lang-p {
+      height: 100%; padding: 0 13px;
+      border: none; border-radius: 999px;
+      background: transparent; color: var(--text-dim);
+      font-size: 12px; font-weight: 700; letter-spacing: .05em;
+      cursor: pointer;
+      transition: background .2s var(--ease-out), color .2s var(--ease-out);
+    }
+    .lang-p.active {
+      background: linear-gradient(135deg, var(--accent-bright), var(--accent));
+      color: var(--bg-dark);
+      box-shadow: 0 2px 10px rgba(184, 134, 11, 0.25);
+    }
+    .hero-prefs {
+      margin-top: 28px;
+      padding: 18px 20px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-soft);
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      display: flex; flex-direction: column; gap: 12px;
+      max-width: 420px;
+    }
+    .prefs-title { font-size: 13px; font-weight: 600; color: var(--text-light); }
+    .prefs-controls { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .prefs-note { font-size: 12px; color: var(--text-dim); }
+    /* Desktop : le header porte déjà les contrôles → encart masqué */
+    @media (min-width: 980px) { .hero-prefs { display: none; } }
+    @media (max-width: 380px) {
+      .header-actions .pref-btn { width: 34px; height: 34px; }
+      .header-actions .lang-pill { height: 34px; }
+      .hero-prefs { padding: 16px; }
+    }
     @media (min-width: 980px) {
       .nav-desktop { display: flex; }
       .header-actions { display: flex; }
@@ -1124,6 +1185,11 @@
       </nav>
 
       <div class="header-actions">
+        <button class="pref-btn js-theme-toggle" type="button" aria-label="Activer le mode clair">🌙</button>
+        <div class="lang-pill" role="group" aria-label="Choix de la langue">
+          <button type="button" class="lang-p active js-lang-fr" aria-pressed="true">FR</button>
+          <button type="button" class="lang-p js-lang-en" aria-pressed="false">EN</button>
+        </div>
         <a href="login.html" class="btn btn-ghost btn-sm">Se connecter</a>
         <a href="register.html" class="btn btn-primary btn-sm">Créer mon compte</a>
       </div>
@@ -1194,6 +1260,17 @@
               <span>Inscription gratuite</span>
               <span class="dot" aria-hidden="true"></span>
               <span>Accès immédiat après création</span>
+            </div>
+            <div class="hero-prefs">
+              <div class="prefs-title">Avant de commencer, réglez vos préférences</div>
+              <div class="prefs-controls">
+                <button class="pref-btn js-theme-toggle" type="button" aria-label="Activer le mode clair"><span class="pref-ico">🌙</span><span class="pref-lab">Mode nuit</span></button>
+                <div class="lang-pill" role="group" aria-label="Choix de la langue">
+                  <button type="button" class="lang-p active js-lang-fr" aria-pressed="true">FR</button>
+                  <button type="button" class="lang-p js-lang-en" aria-pressed="false">EN</button>
+                </div>
+              </div>
+              <div class="prefs-note">Modifiable à tout moment dans Mon profil.</div>
             </div>
           </div>
 
@@ -1587,6 +1664,55 @@
         }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
         sections.forEach(function (el) { observer.observe(el); });
       }
+
+      /* --- 3. PRÉFÉRENCES (mode clair + langue) — pré-réglage des nouveaux
+         Même mécanique que profil.html : window.ARVEXA_THEME / window.ARVEXA_LANG
+         (persistance localStorage + sync multi-onglets). Multi-instances via
+         classes .js-* (header + encart hero). arvexa-i18n.js est defer →
+         re-sync au load en sécurité. */
+      var themeBtns = document.querySelectorAll('.js-theme-toggle');
+      var frBtns = document.querySelectorAll('.js-lang-fr');
+      var enBtns = document.querySelectorAll('.js-lang-en');
+
+      function syncTheme() {
+        var light = window.ARVEXA_THEME && window.ARVEXA_THEME.get() === 'light';
+        themeBtns.forEach(function (btn) {
+          var ico = btn.querySelector('.pref-ico');
+          if (ico) ico.textContent = light ? '☀️' : '🌙';
+          else btn.textContent = light ? '☀️' : '🌙';
+          var lab = btn.querySelector('.pref-lab');
+          if (lab) lab.textContent = light ? 'Mode jour' : 'Mode nuit';
+          btn.setAttribute('aria-label', light ? 'Activer le mode sombre' : 'Activer le mode clair');
+        });
+      }
+      function syncLang() {
+        var isEn = window.ARVEXA_LANG && window.ARVEXA_LANG.get() === 'en';
+        frBtns.forEach(function (b) {
+          b.classList.toggle('active', !isEn);
+          b.setAttribute('aria-pressed', isEn ? 'false' : 'true');
+        });
+        enBtns.forEach(function (b) {
+          b.classList.toggle('active', isEn);
+          b.setAttribute('aria-pressed', isEn ? 'true' : 'false');
+        });
+      }
+      themeBtns.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          if (!window.ARVEXA_THEME) return;
+          window.ARVEXA_THEME.set(window.ARVEXA_THEME.get() === 'light' ? 'dark' : 'light');
+        });
+      });
+      frBtns.forEach(function (b) {
+        b.addEventListener('click', function () { if (window.ARVEXA_LANG) window.ARVEXA_LANG.set('fr'); });
+      });
+      enBtns.forEach(function (b) {
+        b.addEventListener('click', function () { if (window.ARVEXA_LANG) window.ARVEXA_LANG.set('en'); });
+      });
+      window.addEventListener('arvexa-themechange', syncTheme);
+      window.addEventListener('arvexa-langchange', syncLang);
+      window.addEventListener('load', function () { syncTheme(); syncLang(); });
+      syncTheme();
+      syncLang();
     })();
   </script>
 

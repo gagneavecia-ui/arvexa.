@@ -2754,7 +2754,9 @@
     if (!messaging) return false;
     if (!('serviceWorker' in navigator)) return false;
     if (Notification.permission === 'granted') return false;
-    if (Notification.permission === 'denied') return false;
+    // permission 'denied' INCLUSE : le bandeau guide vers les réglages du
+    // téléphone (popup native impossible après un refus) — « tout
+    // utilisateur voit le bandeau s'il n'a pas activé »
     try {
       const dismissed = localStorage.getItem(FCM_DISMISSED_KEY);
       if (dismissed) {
@@ -2773,16 +2775,21 @@
 
     const banner = document.createElement('div');
     banner.id = 'fcmBanner';
+    // Deux variantes : jamais demandé (popup native possible) / refusé
+    // (popup bloquée → instructions réglages du téléphone)
+    const denied = Notification.permission === 'denied';
     banner.innerHTML = `
       <div class="fcm-banner-content">
-        <div class="fcm-icon">🔔</div>
+        <div class="fcm-icon">${denied ? '🔕' : '🔔'}</div>
         <div class="fcm-text">
-          <div class="fcm-title">Active les notifications</div>
-          <div class="fcm-desc">Reçois une alerte quand un nouveau chapitre est disponible.</div>
+          <div class="fcm-title">${denied ? 'Notifications désactivées' : 'Active les notifications'}</div>
+          <div class="fcm-desc">${denied
+            ? 'Réglages → Applications → Chrome ou ARVEXA → Notifications → Autoriser, puis rouvrez l\'app.'
+            : 'Reçois une alerte quand un nouveau chapitre est disponible.'}</div>
         </div>
         <div class="fcm-actions">
           <button class="fcm-btn-later" id="fcmLater">Plus tard</button>
-          <button class="fcm-btn-activate" id="fcmActivate">Activer</button>
+          <button class="fcm-btn-activate" id="fcmActivate">${denied ? 'Réessayer' : 'Activer'}</button>
         </div>
       </div>
     `;
@@ -2803,9 +2810,32 @@
         banner.remove();
         showToast('Notifications activées !', 'success');
       } else {
+        const stillDenied = ('Notification' in window) && Notification.permission === 'denied';
         btn.disabled = false;
-        btn.textContent = 'Activer';
-        showToast('Impossible d\'activer les notifications', 'error');
+        btn.textContent = stillDenied ? 'Réessayer' : 'Activer';
+        showToast(stillDenied
+          ? 'Toujours bloqué : Réglages → Applications → Chrome ou ARVEXA → Notifications'
+          : 'Impossible d\'activer les notifications', 'error');
+      }
+    });
+  }
+
+  // ================================================================
+  // FCM — RELANCE PÉRIODIQUE DU BANDEAU (toutes les 12h)
+  // Tout utilisateur qui n'a pas activé les notifications revoit le
+  // bandeau : à chaque retour sur l'app (visibilitychange) et toutes
+  // les 12h pendant une session longue. « Plus tard » = pause 12h
+  // (FCM_DISMISSED_KEY), « Autoriser » = plus jamais (permission
+  // granted → shouldShowFcmBanner retourne false).
+  // ================================================================
+  let fcmRecurringInstalled = false;
+  function installFcmRecurring() {
+    if (fcmRecurringInstalled) return;
+    fcmRecurringInstalled = true;
+    setInterval(() => showFcmBanner(), FCM_DISMISSED_DURATION);
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        setTimeout(() => showFcmBanner(), 2000);
       }
     });
   }
@@ -3328,6 +3358,7 @@
     if (instant) showSyncPill();
 
     setupFcmForeground();
+    installFcmRecurring();
     if (instant) {
       // Maintenance FCM différée : priorité à l'affichage instantané
       setTimeout(() => { checkExistingFcmToken(user).catch(() => {}); }, 3000);

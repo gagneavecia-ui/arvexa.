@@ -125,7 +125,8 @@ const NO_ARG_LATEX_COMMANDS = [
   'Longleftrightarrow', 'Longleftarrow', 'Longrightarrow',
   'Leftrightarrow', 'leftrightarrow', 'rightarrow', 'leftarrow',
   'updownarrow', 'hookrightarrow', 'hookleftarrow',
-  'Rightarrow', 'Leftarrow',
+  'Rightarrow', 'Leftarrow', 'to', 'gets', 'implies', 'impliedby',
+  'iff', 'mapsto', 'longmapsto', 'leadsto',
   'varepsilon', 'vartheta', 'varsigma', 'varrho', 'varphi', 'varpi',
   'cdotp', 'cdot', 'times', 'div', 'pm', 'mp', 'ast', 'star', 'bullet',
   'circ', 'leq', 'geq', 'neq', 'approx', 'equiv', 'sim', 'simeq', 'propto',
@@ -178,8 +179,9 @@ function replaceUnicodeMath(text) {
   const parts = text.split(/(\$\$[\s\S]*?\$\$|\$[^$\n]+\$)/g);
 
   return parts.map((part, i) => {
-    if (i % 2 === 1) return part;
+    if (i % 2 === 0) return part; // prose : la flèche Unicode reste Unicode (lisible)
 
+    // DANS les maths : Unicode → LaTeX (KaTeX-friendly, fix $x → 3$)
     let r = part;
     for (const [uni, latex] of Object.entries(UNICODE_MATH_MAP)) {
       if (r.indexOf(uni) !== -1) {
@@ -218,6 +220,35 @@ function cleanBrokenDelimiters(text) {
   r = r.replace(/\$\$\s*\$\$/g, ' ');
 
   return r;
+}
+
+// ✅ FIX « ADN\to ARN » : flèches LaTeX/ASCII orphelines (HORS des $…$)
+// → Unicode lisible dans la prose. Dans les maths délimitées, on ne touche rien.
+const ARROW_LAT2UNI = {
+  Longleftrightarrow:'\u27FA', Longrightarrow:'\u27F9', Longleftarrow:'\u27F8',
+  Leftrightarrow:'\u21D4', rightleftharpoons:'\u21CC', leftrightharpoons:'\u21CB',
+  longrightarrow:'\u27F6', longleftarrow:'\u27F5', longmapsto:'\u27FC',
+  leftrightarrow:'\u2194', hookrightarrow:'\u21AA', hookleftarrow:'\u21A9',
+  Rightarrow:'\u21D2', Leftarrow:'\u21D0', updownarrow:'\u2195', Uparrow:'\u21D1', Downarrow:'\u21D3',
+  downarrow:'\u2193', uparrow:'\u2191', nearrow:'\u2197', searrow:'\u2198', swarrow:'\u2199', nwarrow:'\u2196',
+  mapsto:'\u21A6', rightarrow:'\u2192', leftarrow:'\u2190', leadsto:'\u2933',
+  implies:'\u21D2', impliedby:'\u21D0', iff:'\u21D4', to:'\u2192', gets:'\u2190'
+};
+const ARROW_LAT2UNI_RE = new RegExp(
+  '\\\\(' + Object.keys(ARROW_LAT2UNI).sort((a, b) => b.length - a.length).join('|') + ')(?![a-zA-Z])', 'g'
+);
+
+function arrowsToUnicode(text) {
+  if (!text || typeof text !== 'string') return text;
+  const parts = text.split(/(\$\$[\s\S]*?\$\$|\$[^$\n]+\$)/g);
+  return parts.map((part, i) => {
+    if (i % 2 === 1) return part; // maths délimitées : intactes
+    let r = part.replace(ARROW_LAT2UNI_RE, (m, c) => ARROW_LAT2UNI[c] || m);
+    // Flèches ASCII usuelles écrites par les modèles (prose uniquement)
+    r = r.replace(/<=>/g, '\u21D4').replace(/<->/g, '\u2194').replace(/-->/g, '\u27F6')
+         .replace(/==>/g, '\u27F9').replace(/->/g, '\u2192').replace(/=>/g, '\u21D2');
+    return r;
+  }).join('');
 }
 
 function wrapOrphanLatex(text) {
@@ -329,6 +360,7 @@ function cleanLatexText(text) {
   r = cleanBrokenDelimiters(r);
   r = replaceUnicodeScripts(r);
   r = replaceUnicodeMath(r);
+  r = arrowsToUnicode(r);
   r = fixCommandSpacing(r);
   r = wrapOrphanLatex(r);
 

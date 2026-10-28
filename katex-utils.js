@@ -1,5 +1,5 @@
 // ================================================================
-// KATEX UTILS v5.0 — ARVEXA School
+// KATEX UTILS v5.1 — ARVEXA School
 // Rendu mathématique robuste, global, auto-injecté
 // ✅ OPTIMISÉ : cache regex + une seule passe Unicode
 // ================================================================
@@ -358,6 +358,36 @@
     return r;
   }
 
+  // ═══════════════════════════════════════════════════════════════
+  // 6-bis. FIX « ADN\to ARN » : flèches LaTeX/ASCII orphelines → Unicode
+  // (appliqué HORS des maths délimitées ; répare aussi le contenu stocké)
+  // ═══════════════════════════════════════════════════════════════
+  const ARROW_LAT2UNI = {
+    Longleftrightarrow:'\u27FA', Longrightarrow:'\u27F9', Longleftarrow:'\u27F8',
+    Leftrightarrow:'\u21D4', rightleftharpoons:'\u21CC', leftrightharpoons:'\u21CB',
+    longrightarrow:'\u27F6', longleftarrow:'\u27F5', longmapsto:'\u27FC',
+    leftrightarrow:'\u2194', hookrightarrow:'\u21AA', hookleftarrow:'\u21A9',
+    Rightarrow:'\u21D2', Leftarrow:'\u21D0', updownarrow:'\u2195', Uparrow:'\u21D1', Downarrow:'\u21D3',
+    downarrow:'\u2193', uparrow:'\u2191', nearrow:'\u2197', searrow:'\u2198', swarrow:'\u2199', nwarrow:'\u2196',
+    mapsto:'\u21A6', rightarrow:'\u2192', leftarrow:'\u2190', leadsto:'\u2933',
+    implies:'\u21D2', impliedby:'\u21D0', iff:'\u21D4', to:'\u2192', gets:'\u2190'
+  };
+  const ARROW_LAT2UNI_RE = new RegExp(
+    '\\\\(' + Object.keys(ARROW_LAT2UNI).sort((a, b) => b.length - a.length).join('|') + ')(?![a-zA-Z])', 'g'
+  );
+
+  function fixOrphanArrows(text) {
+    if (!text || typeof text !== 'string') return text;
+    const parts = text.split(/(\$\$[\s\S]*?\$\$|\$[^$\n]+\$)/g);
+    return parts.map((part, i) => {
+      if (i % 2 === 1) return part;
+      let r = part.replace(ARROW_LAT2UNI_RE, (m, c) => ARROW_LAT2UNI[c] || m);
+      r = r.replace(/<=>/g, '\u21D4').replace(/<->/g, '\u2194').replace(/-->/g, '\u27F6')
+           .replace(/==>/g, '\u27F9').replace(/->/g, '\u2192').replace(/=>/g, '\u21D2');
+      return r;
+    }).join('');
+  }
+
   // ✅ OPTIMISÉ : une seule passe regex au lieu de 200 itérations
   function replaceUnicodeMath(text) {
     if (!text || typeof text !== 'string') return text;
@@ -365,7 +395,7 @@
     const parts = text.split(/(\$\$[\s\S]*?\$\$|\$[^$\n]+\$)/g);
 
     return parts.map((part, i) => {
-      if (i % 2 === 1) return part;
+      if (i % 2 === 0) return part; // prose : les symboles Unicode restent lisibles
       return part.replace(__UNICODE_REGEX, (match) => UNICODE_MAP[match] || match);
     }).join('');
   }
@@ -696,6 +726,7 @@
     r = cleanBrokenDelimiters(r);
     r = replaceUnicodeScripts(r);
     r = replaceUnicodeMath(r);
+    r = fixOrphanArrows(r);
     r = fixCommandSpacing(r);
     r = fixTextInternals(r);
     r = normalizeSpacesAndCommas(r);
@@ -884,6 +915,8 @@
 
         let fixed = repairBrokenLatexCommands(original);
         fixed = fixDelimiters(fixed);
+        fixed = replaceUnicodeMath(fixed);   // Unicode → LaTeX DANS les $…$ (fix $x → 3$)
+        fixed = fixOrphanArrows(fixed);      // flèches LaTeX/ASCII orphelines → Unicode (fix « ADN\to ARN »)
 
         if (/\\text\{/.test(fixed)) {
           fixed = fixTextInternals(fixed);
@@ -1030,6 +1063,7 @@
 
     containsKnownLatex,
     hasUnicodeMath,
+    fixOrphanArrows,
 
     MACROS,
     DELIMITERS,
@@ -1047,6 +1081,6 @@
     initAutoRender();
   }
 
-  console.log('📐 KaTeXUtils v5.0 chargé (optimisé)');
+  console.log('📐 KaTeXUtils v5.1 chargé (fix flèches orphelines)');
 
 })();

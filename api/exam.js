@@ -188,15 +188,73 @@ function replaceUnicodeMath(text) {
   return r;
 }
 
+// ✅ Délimiteurs LaTeX alternatifs → $ / $$ (KaTeX-friendly)
+function normalizeLatexDelimiters(text) {
+  if (!text || typeof text !== 'string') return text;
+  let r = text;
+  r = r.replace(/\\\(([\s\S]*?)\\\)/g, (m, inner) => `$${inner.trim()}$`);
+  r = r.replace(/\\\[([\s\S]*?)\\\]/g, (m, inner) => `$$${inner.trim()}$$`);
+  r = r.replace(/\\begin\{(?:equation|align|gather)\*?\}([\s\S]*?)\\end\{(?:equation|align|gather)\*?\}/g,
+    (m, inner) => `$$${inner.trim()}$$`);
+  return r;
+}
+
+// ✅ FIX « ADN\to ARN » : flèches LaTeX/ASCII orphelines (HORS des $…$)
+// → Unicode lisible dans la prose. Dans les maths délimitées, on ne touche rien.
+const ARROW_LAT2UNI = {
+  Longleftrightarrow:'\u27FA', Longrightarrow:'\u27F9', Longleftarrow:'\u27F8',
+  Leftrightarrow:'\u21D4', rightleftharpoons:'\u21CC', leftrightharpoons:'\u21CB',
+  longrightarrow:'\u27F6', longleftarrow:'\u27F5', longmapsto:'\u27FC',
+  leftrightarrow:'\u2194', hookrightarrow:'\u21AA', hookleftarrow:'\u21A9',
+  Rightarrow:'\u21D2', Leftarrow:'\u21D0', updownarrow:'\u2195', Uparrow:'\u21D1', Downarrow:'\u21D3',
+  downarrow:'\u2193', uparrow:'\u2191', nearrow:'\u2197', searrow:'\u2198', swarrow:'\u2199', nwarrow:'\u2196',
+  mapsto:'\u21A6', rightarrow:'\u2192', leftarrow:'\u2190', leadsto:'\u2933',
+  implies:'\u21D2', impliedby:'\u21D0', iff:'\u21D4', to:'\u2192', gets:'\u2190'
+};
+const ARROW_LAT2UNI_RE = new RegExp(
+  '\\\\(' + Object.keys(ARROW_LAT2UNI).sort((a, b) => b.length - a.length).join('|') + ')(?![a-zA-Z])', 'g'
+);
+
+function arrowsToUnicode(text) {
+  if (!text || typeof text !== 'string') return text;
+  const parts = text.split(/(\$\$[\s\S]*?\$\$|\$[^$\n]+\$)/g);
+  return parts.map((part, i) => {
+    if (i % 2 === 1) return part; // maths délimitées : intactes
+    let r = part.replace(ARROW_LAT2UNI_RE, (m, c) => ARROW_LAT2UNI[c] || m);
+    // Flèches ASCII usuelles écrites par les modèles (prose uniquement)
+    r = r.replace(/<=>/g, '\u21D4').replace(/<->/g, '\u2194').replace(/-->/g, '\u27F6')
+         .replace(/==>/g, '\u27F9').replace(/->/g, '\u2192').replace(/=>/g, '\u21D2');
+    return r;
+  }).join('');
+}
+
 function wrapOrphanLatex(text) {
   if (!text || typeof text !== 'string') return text;
-  if (text.includes('$')) return text;
+  if (text.includes('$')) {
+    // Segment-aware : ne wrapper QUE ce qui est hors des maths déjà délimitées
+    const segs = text.split(/(\$\$[\s\S]*?\$\$|\$[^$\n]+\$)/g);
+    return segs.map((s, i) => (i % 2 === 1 ? s : wrapOrphanLatex(s))).join('');
+  }
+  // Préserver les espaces de bord : le trim final ne doit pas coller le texte aux maths voisines
+  const leadWs = (text.match(/^\s+/) || [''])[0];
+  const trailWs = (text.match(/\s+$/) || [''])[0];
   let r = text;
-  r = r.replace(/(\\[a-zA-Z]+(?:\{[^}]*\}){1,3})/g, ' $$$1$$ ');
-  r = r.replace(/(\\[a-zA-Z]+)(?![a-zA-Z{]|\$)/g, ' $$$1$$ ');
-  r = r.replace(/([_^]\{[^}]*\})/g, ' $$$1$$ ');
+  // 1. Environnements complets (\begin{…}…\end{…}) → display, masqués pendant les passes suivantes
+  const stash = [];
+  r = r.replace(/(\\begin\{[a-zA-Z*]+\}[\s\S]*?\\end\{[a-zA-Z*]+\})/g, (m) => {
+    stash.push(m);
+    return '\u0000' + (stash.length - 1) + '\u0000';
+  });
+  // 2. Commandes avec arguments → INLINE (une formule dans une phrase ne doit pas casser la ligne)
+  r = r.replace(/(\\[a-zA-Z]+(?:\{[^}]*\}){1,3})/g, ' $$$1$ ');
+  // 3. Commandes sans argument (pas suivies de {, (, [ ou lettre) → INLINE
+  r = r.replace(/(\\[a-zA-Z]+)(?![a-zA-Z{(\[])/g, ' $$$1$ ');
+  // 4. Scripts orphelins (^{2}, _{n}) → INLINE
+  r = r.replace(/([_^]\{[^}]*\})/g, ' $$$1$ ');
+  // 5. Restauration des environnements
+  r = r.replace(/\u0000(\d+)\u0000/g, (m, idx) => ' $$' + stash[+idx] + '$$ ');
   r = r.replace(/\${3,}/g, '$$').replace(/\$\s*\$/g, '').replace(/\s+/g, ' ').trim();
-  return r;
+  return leadWs + r + trailWs;
 }
 
 function escapeHtmlOutsideLatex(text) {
@@ -210,7 +268,14 @@ function escapeHtmlOutsideLatex(text) {
 
 function cleanText(text) {
   if (!text || typeof text !== 'string') return text;
-  return escapeHtmlOutsideLatex(wrapOrphanLatex(replaceUnicodeMath(text)));
+  let r = normalizeLatexDelimiters(text);
+  // Pipeline segment-aware : les maths $…$ / $$…$$ restent INTACTES,
+  // la prose ne reçoit jamais de \commande LaTeX brute.
+  const parts = r.split(/(\$\$[\s\S]*?\$\$|\$[^$\n]+\$)/g);
+  return parts.map((part, i) => {
+    if (i % 2 === 1) return replaceUnicodeMath(part); // maths : Unicode → LaTeX (KaTeX ok)
+    return escapeHtmlOutsideLatex(wrapOrphanLatex(arrowsToUnicode(replaceUnicodeMath(part))));
+  }).join('');
 }
 
 function deepClean(obj) {

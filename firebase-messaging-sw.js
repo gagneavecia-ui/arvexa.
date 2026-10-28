@@ -1,6 +1,6 @@
 // ================================================================
 // FIREBASE MESSAGING SERVICE WORKER — ARVEXA School
-// Version : 1.1.0
+// Version : 1.2.0
 // Corrections appliquées :
 //  - C1 : client.navigate() avec fallback openWindow (navigation fiable)
 //  - C2 : try/catch sur showNotification (évite les rejets silencieux)
@@ -26,6 +26,20 @@ firebase.initializeApp({
 });
 
 const messaging = firebase.messaging();
+
+// ⚡ ANTI-DOUBLON — ACTIVATION IMMÉDIATE des mises à jour du SW :
+// sans skipWaiting, un onglet laissé ouvert gardait l'ANCIEN SW actif
+// et les correctifs déployés ne s'appliquaient jamais chez
+// l'utilisateur (doublons persistants). skipWaiting + clients.claim
+// activent le SW à jour instantanément, sans attendre la fermeture
+// de tous les onglets.
+self.addEventListener('install', () => {
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(self.clients.claim());
+});
 
 function getSafeNotificationUrl(value) {
   const fallback = new URL('notifications.html', self.location.origin).href;
@@ -166,4 +180,4 @@ self.addEventListener('pushsubscriptionchange', (event) => {
   event.waitUntil(Promise.resolve());
 });
 
-console.log('[FCM-SW] Firebase Messaging Service Worker chargé (v1.1.0).');
+console.log('[FCM-SW] Firebase Messaging Service Worker chargé (v1.2.0).');

@@ -361,6 +361,7 @@ async function saveExercisesToPool(exam, subject, difficulty, uid) {
           statement: exercise.statement || '',
           questions: exercise.questions || [],
           source: 'ai',
+          genStyle: VARIATION_SCIENCES.has(subject) ? 'calc' : 'recit',
           generatedBy: uid,
           createdAt: FieldValue.serverTimestamp(),
           usedCount: 0
@@ -390,9 +391,17 @@ async function buildExamFromPool(config) {
 
     const allEx = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
 
-    let poolEx = allEx;
+    // ✅ v4.19 — sciences : la reconstruction ne puise QUE dans le régime
+    // « calcul pur » (genStyle='calc') ; aucun exercice narratif d'avant
+    // v4.19 ne peut reconstruire un examen. Littéraires : inchangé.
+    const eligible = VARIATION_SCIENCES.has(config.subject)
+      ? allEx.filter((e) => e.genStyle === 'calc')
+      : allEx;
+    if (!eligible.length) return null;
+
+    let poolEx = eligible;
     if (config.chapter && config.chapter !== 'all') {
-      const byChapter = allEx.filter((e) => e.chapter === config.chapter);
+      const byChapter = eligible.filter((e) => e.chapter === config.chapter);
       if (byChapter.length >= 6) {
         poolEx = byChapter;
       }
@@ -499,11 +508,11 @@ MISSION PÉDAGOGIQUE (NIVEAU BAC NIGER)
 ═══════════════════════════════════════════════════════════════
 Tu prépares un élève de Terminale D au Niger pour le BAC.
 Les exercices doivent être :
-- Réalistes (niveau BAC, comme les épreuves officielles)
+- Fidèles au programme officiel (niveau BAC)
 - Progressifs (facile → difficile au sein du même exercice)
 - Chaque question teste UNE notion précise, mais peut nécessiter plusieurs étapes.
 - Les points sont FIXES : Exercice = 6.67 pts, Question = 1.33 pts.
-- STYLE DE RÉFÉRENCE (matières scientifiques) — fiches de CALCULS type "Pascal Lainé" : l'exercice donne une expression, une équation ou des données techniques, et l'élève calcule, transforme, résout. La difficulté vient des CALCULS, pas d'un habillage narratif.
+- STYLE DE RÉFÉRENCE OBLIGATOIRE (matières scientifiques) — 100% CALCULS type "Pascal Lainé" : chaque énoncé DONNE une expression, une équation, une fonction ou un bloc "Données :", et l'élève calcule, transforme, résout. AUCUN récit, AUCUNE histoire, AUCUNE situation vécue. La difficulté vient UNIQUEMENT des calculs.
 - INTERDIT de générer une question sans travail réel (simple recopie du cours) comme de noyer un calcul dans un long récit. L'élève doit réfléchir sur des CALCULS.
 `;
 
@@ -511,19 +520,19 @@ const DIFFICULTY_RULES = {
   easy: `Niveau FACILE : Calculs directs en 1 ou 2 étapes. Application immédiate du cours. Pas de mélange de notions. (Ex. Maths : mettre sous la forme algébrique z = (3+6i)/(-3-4i) ; calculer (3+2i)(1-3i).)`,
   medium: `Niveau MOYEN : Calculs en 3 ou 4 étapes. Application du cours avec une petite réflexion. (Ex. Maths : écrire sous forme algébrique 2e^{2iπ/3} et ((1+i)/(2-i))² ; module et argument de (1+i)^9/(1-i)^7.)`,
   hard: `Niveau DIFFICILE : Calculs longs à plusieurs étapes. L'élève doit mobiliser plusieurs notions du chapitre. (Ex. Maths : module et argument de a = 3i(2+i)(4+2i)(1+i) en fonction de θ₀ ; calcul de ((1+i√3)/2)^{2010}.)`,
-  bac: `Niveau BAC (TRÈS DIFFICILE) : Exercices de synthèse type "Pascal Laine" ou "Salissou Nazifi". 
+  bac: `Niveau BAC (TRÈS DIFFICILE) : Exercices de synthèse type "Pascal Lainé" ou "Salissou Nazifi". 
   - Les calculs doivent être longs (équations du 3ème/4ème degré, changements de variable, trigonométrie inverse).
-  - Mélanger plusieurs phases de mouvement ou plusieurs réactions.
+  - Enchaîner plusieurs phases de calcul (mouvements composés, réactions successives).
   - L'élève doit utiliser un cahier de brouillon pour réussir.
   - Exemple Maths : "Résoudre z^4 + (3-6i)z^2 - 8 - 6i = 0".
-  - Exemple Physique : "Une voiture et un motard se croisent, calculer l'instant et la position de dépassement."`
+  - Exemple Physique : "Un mobile M a pour équation horaire x_M(t) = -30t + 0,3t² et un mobile C : x_C(t) = 20t + 40 ; calculer l'instant et la position de rencontre, puis les vitesses à cet instant."`
 };
 
 const PHYSICS_RULES = `
 ═══════════════════════════════════════════════════════════════
 RÈGLES SPÉCIFIQUES PHYSIQUE
 ═══════════════════════════════════════════════════════════════
-1. L'énoncé décrit une situation technique COURTE (1-2 phrases max, ex: un motard rattrape un camion) puis on passe immédiatement au CALCUL : équations horaires, théorèmes, applications numériques. Pas d'histoire longue.
+1. L'énoncé DONNE directement les données techniques (équation(s) horaire(s), valeurs de v0, a, U, R, m...), avec au maximum UNE phrase de cadrage neutre ("Un mobile M et un camion C se déplacent sur une route rectiligne."), puis on passe immédiatement au CALCUL. STRICTEMENT INTERDIT de raconter une histoire.
 2. LA PREMIÈRE QUESTION (1.a) EST OBLIGATOIREMENT DE TYPE "drawing" :
    - Demander de faire le schéma, de placer le repère, ou de tracer les vecteurs.
 3. Les questions suivantes (1.b à 1.e) demandent des équations horaires, des calculs de distance/temps, ou des analyses graphiques.
@@ -749,23 +758,26 @@ function buildVariationBlock(subject, avoidStatements) {
       avoid.map((s) => '  • ' + s).join('\n')
     : '';
 
-  // ✅ v4.17 — sciences : DES CALCULS, PAS DES HISTOIRES (fiches type Pascal
-  // Lainé). La situation réelle devient FACULTATIVE (1 exercice max par sujet)
-  // et la variété vient d abord des TECHNIQUES de calcul tirées au hasard.
-  // Littéraires : contexte imposé conservé (inchangé v4.16).
+  // ✅ v4.19 — sciences : 100% CALCULS PURS (3/3 par sujet), AUCUNE situation
+  // réelle proposée (l'offre facultative v4.17 était systématiquement prise à
+  // température 1.0) + exemples few-shot Pascal Lainé + anti-exemple explicite.
+  // Littéraires : contexte imposé conservé (inchangé).
   const styleBlock = isScience
-    ? '- STYLE DE RÉFÉRENCE OBLIGATOIRE — DES CALCULS, PAS DES HISTOIRES (fiches d\'entraînement type "Pascal Lainé") :\n' +
-      '  • L\'exercice DONNE une expression, une équation ou des données techniques ; l\'élève calcule, transforme, résout. Pas de récit, pas d\'histoire.\n' +
-      '  • Au minimum 2 exercices sur 3 PAR SUJET sont des calculs PURS (aucune histoire) ; au maximum 1 seul exercice par sujet peut être ancré dans une situation réelle.\n' +
-      '  • La difficulté vient des calculs eux-mêmes (nombre d\'étapes, techniques combinées, expression astucieuse), JAMAIS d\'un habillage narratif.\n' +
-      '  • Les valeurs restent CALCULABLES (résultats exacts ou arrondis propres ; moduli, angles et solutions simples quand le chapitre s\'y prête).\n' +
+    ? '- STYLE OBLIGATOIRE — 100% DES CALCULS, ZÉRO HISTOIRE (fiches d\'entraînement type "Pascal Lainé") :\n' +
+      '  • TOUS les exercices (3 sur 3 PAR SUJET) sont des CALCULS PURS : l\'énoncé DONNE une expression, une équation, une fonction ou un bloc « Données : », et l\'élève calcule, transforme, résout.\n' +
+      '  • STRICTEMENT INTERDIT : récit, histoire, situation vécue, personnages, achat au marché, trajet, forage, tontine — AUCUNE mise en scène, même en 1 phrase.\n' +
+      '  • La difficulté vient UNIQUEMENT des calculs (nombre d\'étapes, techniques combinées, expression astucieuse).\n' +
+      '  • Valeurs CALCULABLES (résultats exacts ou arrondis propres ; moduli, angles et solutions simples quand le chapitre s\'y prête).\n' +
       '  • Tirage technique imposé Sujet 1 : ' + d1 + '\n' +
       '  • Tirage technique imposé Sujet 2 : ' + d2 + '\n' +
-      '  • (Ces techniques imposent le STYLE de l\'exercice ; applique-les au chapitre exigé ci-dessus.)\n'
+      '  • (Ces techniques imposent le STYLE de l\'exercice ; applique-les au chapitre exigé ci-dessus.)\n' +
+      '  • EXEMPLE DE STYLE ATTENDU — respecte EXACTEMENT cette forme, adaptée au chapitre exigé :\n' +
+      '    Maths : Énoncé « On considère z = (3+6i)/(-3-4i). 1.a) Mettre z sous forme algébrique. b) En déduire le module et un argument. » — ET PAS « Aïcha achète au marché... »\n' +
+      '    Physique : Énoncé « Un mobile M a pour équation horaire x_M(t) = 40 - 4t et un mobile C : x_C(t) = 10 + t² (t en s, x en m). 1.a) Placer le repère et tracer les vecteurs vitesse. b) Calculer l\'instant de rencontre. »\n'
     : '';
+  // ✅ v4.19 — sciences : AUCUNE situation réelle proposée (100% calculs purs).
   const contextLines = isScience
-    ? '- Situation réelle DISPONIBLE (FACULTATIVE — au maximum 1 exercice sur 3 par sujet ; les 2 autres restent des calculs purs) pour Sujet 1 si vraiment nécessaire : ' + c1 + '\n' +
-      '- Situation réelle DISPONIBLE (FACULTATIVE — même règle) pour Sujet 2 si vraiment nécessaire : ' + c2
+    ? ''
     : '- Contexte imposé Sujet 1 (si compatible avec le contenu exigé) : ' + c1 + '\n' +
       '- Contexte imposé Sujet 2 (si compatible avec le contenu exigé) : ' + c2;
 
@@ -1153,8 +1165,13 @@ function patchExamFromPoolQuestions(exam, subjectName, poolExercises) {
     seen.add(String(ex.title || '') + '|' + String(ex.statement || '').slice(0, 40));
   }));
 
+  // ✅ v4.19 — sciences : seuls les exercices du régime « calcul pur »
+  // (genStyle='calc', archivés v4.19+) servent au rattrapage ; les anciens
+  // exercices narratifs ne peuvent plus ressurgir. Littéraires : inchangé.
+  const science = VARIATION_SCIENCES.has(subjectName);
   const pool = poolExercises.filter((p) =>
-    p && Array.isArray(p.questions) && p.questions.length >= QUESTIONS_PER_EXERCISE &&
+    p && (!science || p.genStyle === 'calc') &&
+    Array.isArray(p.questions) && p.questions.length >= QUESTIONS_PER_EXERCISE &&
     p.questions.every((q) => String(q.text || '').trim())
   );
   if (!pool.length) return null;

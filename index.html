@@ -3440,6 +3440,14 @@
 
   document.getElementById('avisBtnInline').addEventListener('click', openAvisModal);
 
+  // Ouverture auto de la modale Avis (?avis=1) — lien « Donner mon avis » des autres pages
+  try {
+    if (new URLSearchParams(window.location.search).get('avis') === '1') {
+      openAvisModal();
+      history.replaceState(null, '', window.location.pathname);
+    }
+  } catch (e) { /* no-op */ }
+
   avisClose.addEventListener('click', closeAvisModal);
   avisCancel.addEventListener('click', closeAvisModal);
   avisSuccessClose.addEventListener('click', closeAvisModal);

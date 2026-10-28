@@ -5,6 +5,8 @@
 //  - C1 : client.navigate() avec fallback openWindow (navigation fiable)
 //  - C2 : try/catch sur showNotification (évite les rejets silencieux)
 //  - C3 : handler pushsubscriptionchange (robustesse FCM)
+//  - C4 : anti-doublon — payload notification natif = affiché par le SDK,
+//         le handler ne traite plus que les messages data-only
 // ================================================================
 
 // ⚡ Imports FCM (version compat, obligatoire pour Service Worker)
@@ -43,6 +45,13 @@ function getSafeNotificationUrl(value) {
 // ================================================================
 messaging.onBackgroundMessage((payload) => {
   console.log('[FCM-SW] Message reçu en arrière-plan:', payload);
+
+  // ✅ C4 — ANTI-DOUBLON : si le push contient un payload `notification`
+  // natif (backend ≥ v4.21), le SDK FCM l'affiche AUTOMATIQUEMENT en
+  // arrière-plan (affichage natif fiable, même navigateur fermé) ET nous
+  // appelle quand même ici → on n'affiche PLUS une 2e fois, sinon doublon.
+  // Ce handler ne traite désormais que les messages data-only (historique).
+  if (payload.notification && payload.notification.title) return;
 
   const notificationTitle =
     payload.data?.title ||
@@ -90,6 +99,12 @@ messaging.onBackgroundMessage((payload) => {
 // ================================================================
 self.addEventListener('notificationclick', (event) => {
   console.log('[FCM-SW] Notification cliquée:', event.notification.data);
+
+  // ✅ C4 — les notifications nativement affichées par le SDK portent
+  // data.FCM_MSG : le SDK a SON propre handler notificationclick qui ouvre
+  // le lien fcmOptions — on ne fait rien ici (sinon double navigation).
+  if (event.notification.data && event.notification.data.FCM_MSG) return;
+
   event.notification.close();
 
   const url = event.notification.data?.url || 'notifications.html';

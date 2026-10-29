@@ -2578,15 +2578,34 @@ function loadContent() {
       }
 
       if (currentIndex >= parts.length) currentIndex = 0;
-      // ✅ v4.30 — préchauffage silencieux des AUTRES parties du chapitre :
+      // ✅ v4.31 — préchauffage silencieux des AUTRES parties du chapitre :
       // le Service Worker les met en cache (network-first) → le chapitre
       // entier devient consultable hors-ligne et la navigation instantanée.
-      setTimeout(() => {
+      // ⚠ on attend que le SW CONTRÔLE la page : avant clients.claim()
+      // (premier chargement), les fetch contournent le SW et ne cachent RIEN
+      // (constaté en test réel hors-ligne v4.30).
+      const prefetchParts = () => {
         parts.forEach((p, i) => {
           if (i === currentIndex || !p.file) return;
           setTimeout(() => { fetch(p.file).catch(() => {}); }, 350 * i);
         });
-      }, 1200);
+      };
+      if (!navigator.serviceWorker) {
+        setTimeout(prefetchParts, 1200);
+      } else if (navigator.serviceWorker.controller) {
+        setTimeout(prefetchParts, 1200);
+      } else {
+        let prefetchStarted = false;
+        const startPrefetchOnce = () => {
+          if (prefetchStarted) return;
+          prefetchStarted = true;
+          setTimeout(prefetchParts, 600);
+        };
+        try {
+          navigator.serviceWorker.addEventListener('controllerchange', startPrefetchOnce, { once: true });
+          navigator.serviceWorker.ready.then(() => setTimeout(startPrefetchOnce, 800)).catch(() => startPrefetchOnce());
+        } catch (e) { startPrefetchOnce(); }
+      }
       renderPart();
     })
     .catch(() => {

@@ -1714,85 +1714,86 @@
       word-wrap: break-word;
     }
     /* ============================================================
-       LECTEUR PDF LOCAL — ouverture de la partie en PDF
-       (le PDF existe à côté du HTML → lecture A4 ; repli HTML si absent)
+       LECTEUR PDF ARVEXA PERSONNALISÉ (v5.1)
+       Visionneuse canvas maison (pdf.js embarqué) — zéro dépendance
+       au lecteur PDF du système/navigateur. Feuilles A4 empilées dans
+       le flux, rendu paresseux (IntersectionObserver), zoom, 100 %
+       hors-ligne (SW). Fonctionne identiquement desktop et mobile.
        ============================================================ */
-    .pdf-reader {
-      width: 100%;
-      max-width: var(--content-max);
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .pdf-reader-bar {
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 12px; flex-wrap: wrap;
-      padding: 10px 16px;
-      border: 1px solid var(--card-border);
-      background: var(--bg-card);
+    .arv-pdf { width: 100%; max-width: var(--content-max); margin: 0 auto; }
+    .arv-pdf-toolbar {
+      position: sticky;
+      top: calc(var(--header-h) + var(--safe-top) + 10px);
+      z-index: 40;
+      display: flex; align-items: center; justify-content: center;
+      gap: 2px;
+      padding: 7px 10px;
       border-radius: 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--card-border);
+      box-shadow: 0 8px 26px rgba(0, 0, 0, 0.16);
+      margin-bottom: 16px;
     }
-    .pdf-reader-info {
-      display: flex; align-items: center; gap: 10px;
-      font-size: 13px; font-weight: 600; color: var(--text-body);
-      min-width: 0;
+    .arv-pdf-tbtn {
+      width: 36px; height: 36px; flex-shrink: 0;
+      display: inline-flex; align-items: center; justify-content: center;
+      border: none; border-radius: 10px;
+      background: transparent; color: var(--text-body);
+      font-size: 14px; cursor: pointer; text-decoration: none;
+      transition: var(--transition);
     }
-    .pdf-reader-info i { color: var(--accent-bright); font-size: 15px; flex-shrink: 0; }
-    .pdf-reader-info span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .pdf-reader-btn {
+    .arv-pdf-tbtn:active { transform: scale(0.94); }
+    .arv-pdf-tbtn[disabled] { opacity: 0.32; pointer-events: none; }
+    .arv-pdf-tbtn.gold { color: var(--accent-bright); }
+    .arv-pdf-count {
+      min-width: 62px; text-align: center; flex-shrink: 0;
+      font-size: 12.5px; font-weight: 700; color: var(--text-body);
+      font-variant-numeric: tabular-nums;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .arv-pdf-sep { width: 1px; height: 20px; background: var(--card-border); flex-shrink: 0; margin: 0 4px; }
+    .arv-pdf-viewport { overflow-x: auto; overflow-y: hidden; padding-bottom: 4px; }
+    .arv-pdf-pages { display: flex; flex-direction: column; align-items: center; gap: 16px; min-width: 0; }
+    .arv-pdf-page {
+      position: relative; flex-shrink: 0;
+      background: #FFFFFF;
+      border-radius: 4px;
+      box-shadow: 0 2px 16px rgba(0, 0, 0, 0.18);
+      overflow: hidden;
+    }
+    .arv-pdf-page canvas { display: block; }
+    .arv-pdf-page .arv-pdf-ph {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      gap: 8px;
+      color: var(--text-muted); font-size: 12px; font-weight: 600;
+      background: var(--bg-surface);
+    }
+    .arv-pdf-page.rendered .arv-pdf-ph { display: none; }
+    .arv-pdf-status {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 14px; text-align: center;
+      min-height: 300px; padding: 40px 20px;
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      background: var(--bg-card);
+      color: var(--text-body); font-size: 14px;
+    }
+    .arv-pdf-status .spinner { width: 34px; height: 34px; }
+    .arv-pdf-status h3 { font-size: 16px; font-weight: 700; color: var(--text-light); }
+    .arv-pdf-status p { font-size: 13px; color: var(--text-dim); max-width: 360px; line-height: 1.6; }
+    .arv-pdf-status-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+    .arv-pdf-status-btn {
       display: inline-flex; align-items: center; gap: 8px;
       border: 1px solid var(--border-gold);
       background: var(--tint-gold);
       color: var(--accent-bright);
-      border-radius: 999px; padding: 7px 16px;
-      font-size: 12.5px; font-weight: 700; letter-spacing: 0.4px;
+      border-radius: 999px; padding: 9px 20px;
+      font-size: 13px; font-weight: 700;
       cursor: pointer; text-decoration: none;
       transition: var(--transition);
-      flex-shrink: 0;
     }
-    .pdf-reader-btn:active { transform: scale(0.97); }
-    .pdf-reader-frame-wrap {
-      width: 100%;
-      height: calc(100vh - var(--header-h) - 130px - var(--safe-top) - var(--safe-bottom));
-      min-height: 420px;
-      border: 1px solid var(--card-border);
-      border-radius: 16px;
-      overflow: hidden;
-      background: var(--bg-surface);
-    }
-    .pdf-reader-frame-wrap iframe {
-      display: block; width: 100%; height: 100%; border: 0; background: transparent;
-    }
-    .pdf-reader-note { font-size: 12px; color: var(--text-muted); text-align: center; }
-    .pdf-reader-note a { color: var(--accent-bright); font-weight: 600; }
-    /* Mobile / tactile : iframes PDF non fiables (Android) → carte
-       d'ouverture directe dans la visionneuse native de l'appareil. */
-    .pdf-reader-card {
-      display: none;
-      flex-direction: column; align-items: center; text-align: center;
-      gap: 14px;
-      padding: 34px 22px;
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius-lg);
-      background: var(--bg-card);
-    }
-    .pdf-reader-card-icon {
-      width: 74px; height: 74px; border-radius: 20px;
-      display: flex; align-items: center; justify-content: center;
-      background: var(--tint-gold);
-      border: 1px solid var(--border-gold);
-      color: var(--accent-bright);
-      font-size: 30px;
-    }
-    .pdf-reader-card h3 { font-size: 17px; font-weight: 700; color: var(--text-light); }
-    .pdf-reader-card p { font-size: 13px; color: var(--text-dim); max-width: 340px; line-height: 1.6; }
-    .pdf-reader-card .pdf-reader-btn { font-size: 14px; padding: 11px 26px; }
-
-    @media (max-width: 900px), (pointer: coarse) {
-      .pdf-reader-frame-wrap, .pdf-reader-note { display: none; }
-      .pdf-reader-card { display: flex; }
-    }
+    .arv-pdf-status-btn:active { transform: scale(0.97); }
 
     /* ============================================================
        RESPONSIVE
@@ -2792,27 +2793,38 @@ function renderPdfReader(pdfPath) {
   if (ttsBtn) ttsBtn.style.display = 'none';
 
   contentBody.innerHTML = `
-    <div class="pdf-reader">
-      <div class="pdf-reader-bar">
-        <div class="pdf-reader-info">
-          <i class="fas fa-file-pdf"></i>
-          <span>PDF local · ${safeTitle}</span>
+    <div class="arv-pdf">
+      <div class="arv-pdf-toolbar" id="arvPdfToolbar">
+        <button class="arv-pdf-tbtn" id="arvPdfPrev" aria-label="Page précédente" title="Page précédente">
+          <i class="fas fa-chevron-up"></i>
+        </button>
+        <span class="arv-pdf-count" id="arvPdfCount">… / …</span>
+        <button class="arv-pdf-tbtn" id="arvPdfNext" aria-label="Page suivante" title="Page suivante">
+          <i class="fas fa-chevron-down"></i>
+        </button>
+        <span class="arv-pdf-sep"></span>
+        <button class="arv-pdf-tbtn" id="arvPdfZoomOut" aria-label="Réduire" title="Réduire">
+          <i class="fas fa-minus"></i>
+        </button>
+        <span class="arv-pdf-count" id="arvPdfZoom">100 %</span>
+        <button class="arv-pdf-tbtn" id="arvPdfZoomIn" aria-label="Agrandir" title="Agrandir">
+          <i class="fas fa-plus"></i>
+        </button>
+        <span class="arv-pdf-sep"></span>
+        <button class="arv-pdf-tbtn gold" id="arvPdfHtml" title="Lire la version HTML (lecture à voix haute, notes)">
+          <i class="fas fa-globe"></i>
+        </button>
+        <a class="arv-pdf-tbtn gold" href="${pdfPath}" download title="Télécharger le PDF">
+          <i class="fas fa-download"></i>
+        </a>
+      </div>
+      <div class="arv-pdf-viewport" id="arvPdfViewport">
+        <div class="arv-pdf-pages" id="arvPdfPages">
+          <div class="arv-pdf-status" id="arvPdfStatus">
+            <div class="spinner"></div>
+            <p>Chargement du PDF…</p>
+          </div>
         </div>
-        <a class="pdf-reader-btn" href="${pdfPath}" target="_blank" rel="noopener">
-          <i class="fas fa-up-right-from-square"></i> Ouvrir
-        </a>
-      </div>
-      <div class="pdf-reader-frame-wrap">
-        <iframe id="pdfFrame" src="${pdfPath}#view=FitH" title="PDF — ${safeTitle}"></iframe>
-      </div>
-      <p class="pdf-reader-note">Le PDF ne s'affiche pas ? <a href="${pdfPath}" target="_blank" rel="noopener">Ouvre-le dans un onglet</a>.</p>
-      <div class="pdf-reader-card">
-        <div class="pdf-reader-card-icon"><i class="fas fa-file-pdf"></i></div>
-        <h3>${safeTitle}</h3>
-        <p>Cette partie est disponible en PDF : formules, schémas et tableaux mis en page proprement sur des feuilles A4. Touche « Ouvrir le PDF » pour lancer la lecture — elle restera ensuite accessible même sans Internet.</p>
-        <a class="pdf-reader-btn" href="${pdfPath}" target="_blank" rel="noopener">
-          <i class="fas fa-book-open"></i> Ouvrir le PDF
-        </a>
       </div>
     </div>
   `;
@@ -2823,11 +2835,362 @@ function renderPdfReader(pdfPath) {
   try {
     if (navigator.serviceWorker && navigator.serviceWorker.controller) {
       navigator.serviceWorker.controller.postMessage({ type: 'CACHE_URL', url: pdfPath });
+      navigator.serviceWorker.controller.postMessage({ type: 'CACHE_URL', url: 'assets/pdfjs/pdf.min.js' });
+      navigator.serviceWorker.controller.postMessage({ type: 'CACHE_URL', url: 'assets/pdfjs/pdf.worker.min.js' });
+    }
+  } catch (e) {}
+
+  openArvPdf(pdfPath, pdfPath);
+}
+
+// ================================================================
+// ✅ v5.1 — VISIONNEUSE PDF ARVEXA (canvas pdf.js, maison)
+// Zéro lecteur système : les pages A4 sont rendues en canvas,
+// empilées dans le flux (la barre de progression de l'app suit le
+// scroll normalement). Rendu paresseux ±1 écran, nettoyage mémoire
+// des pages lointaines, zoom 60–300 %, navigation clavier/boutons.
+// ================================================================
+const ARV_PDF_ZOOMS = [0.6, 0.8, 1, 1.25, 1.5, 2, 2.5, 3];
+const ARV_PDF_JS = 'assets/pdfjs/pdf.min.js';
+const ARV_PDF_WORKER = 'assets/pdfjs/pdf.worker.min.js';
+let arvPdfState = null;   // état de la visionneuse courante
+let arvPdfSeq = 0;        // anti-course (changement rapide de partie)
+
+function destroyArvPdf() {
+  if (!arvPdfState) return;
+  try { if (arvPdfState.observer) arvPdfState.observer.disconnect(); } catch (e) {}
+  try { if (arvPdfState.doc) arvPdfState.doc.destroy(); } catch (e) {}
+  arvPdfState = null;
+}
+
+function loadArvPdfJs() {
+  if (window.pdfjsLib) return Promise.resolve();
+  return new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = ARV_PDF_JS;
+    s.onload = () => resolve();
+    s.onerror = () => reject(new Error('pdf.js indisponible'));
+    document.head.appendChild(s);
+  });
+}
+
+function openArvPdf(pdfPath, downloadRef) {
+  destroyArvPdf();
+  const token = ++arvPdfSeq;
+  arvPdfState = { token, doc: null, pagesMeta: [], wraps: [], canvases: [],
+                  rendered: [], rendering: [], zoomIdx: 2, observer: null,
+                  pageCount: 0, path: pdfPath };
+  // défini AVANT toute utilisation (buildArvPdfPages s'en sert)
+  arvPdfState.zoomFactor = () => ARV_PDF_ZOOMS[arvPdfState.zoomIdx] || 1;
+
+  loadArvPdfJs()
+    .then(() => {
+      if (token !== arvPdfSeq) return;
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc = ARV_PDF_WORKER;
+      const task = window.pdfjsLib.getDocument({ url: pdfPath });
+      task.onProgress = (d) => {
+        if (token !== arvPdfSeq || !d || !d.total) return;
+        const pct = Math.round((d.loaded / d.total) * 100);
+        const st = document.getElementById('arvPdfStatus');
+        if (st && pct > 4) {
+          const p = st.querySelector('p');
+          if (p) p.textContent = `Chargement du PDF… ${Math.min(99, pct)} %`;
+        }
+      };
+      return task.promise;
+    })
+    .then((doc) => {
+      if (token !== arvPdfSeq) return;
+      arvPdfState.doc = doc;
+      arvPdfState.pageCount = doc.numPages;
+      return buildArvPdfPages(doc, token);
+    })
+    .then(() => { if (token === arvPdfSeq) wireArvPdf(pdfPath); })
+    .catch((err) => {
+      if (token !== arvPdfSeq) return;
+      console.warn('[ARV-PDF] échec :', err);
+      showArvPdfError(pdfPath);
+    });
+}
+
+async function buildArvPdfPages(doc, token) {
+  const state = arvPdfState;
+  const pagesWrap = document.getElementById('arvPdfPages');
+  if (!state || !pagesWrap) return;
+  pagesWrap.innerHTML = '';
+
+  // Métrage exact de chaque page (placeholders à la bonne hauteur :
+  // zéro saut de scroll quand le canvas arrive).
+  for (let i = 0; i < doc.numPages; i++) {
+    const page = await doc.getPage(i + 1);
+    if (token !== arvPdfSeq) return;
+    const vp = page.getViewport({ scale: 1 });
+    state.pagesMeta.push({ w: vp.width, h: vp.height });
+  }
+
+  const viewport = document.getElementById('arvPdfViewport');
+  state.containerW = Math.max(240, (viewport ? viewport.clientWidth : 320));
+
+  for (let i = 0; i < doc.numPages; i++) {
+    const meta = state.pagesMeta[i];
+    const cssW = state.containerW * state.zoomFactor();
+    const cssH = cssW * (meta.h / meta.w);
+    const wrap = document.createElement('div');
+    wrap.className = 'arv-pdf-page';
+    wrap.style.width = Math.round(cssW) + 'px';
+    wrap.style.height = Math.round(cssH) + 'px';
+    wrap.innerHTML = `<div class="arv-pdf-ph"><i class="fas fa-file-lines"></i> Page ${i + 1}</div>`;
+    const canvas = document.createElement('canvas');
+    wrap.appendChild(canvas);
+    pagesWrap.appendChild(wrap);
+    state.wraps.push(wrap);
+    state.canvases.push(canvas);
+    state.rendered.push(false);
+    state.rendering.push(false);
+  }
+
+  // Rendu paresseux : ±1,5 écran autour du viewport
+  state.observer = new IntersectionObserver((entries) => {
+    entries.forEach((en) => {
+      const idx = state.wraps.indexOf(en.target);
+      if (idx < 0) return;
+      if (en.isIntersecting) renderArvPdfPage(idx);
+      else scheduleArvPdfCleanup(idx);
+    });
+  }, { rootMargin: '160% 0px 160% 0px' });
+  state.wraps.forEach((w) => state.observer.observe(w));
+  updateArvPdfCurrent();
+
+  // Resynchronisation après pose des 41 pages : la barre de défilement
+  // verticale qui vient d'apparaître réduit la largeur utile (desktop,
+  // rotation…). Sans recadrage, les feuilles A4 débordent de l'écran.
+  syncArvPdfWidth();
+  requestAnimationFrame(() => requestAnimationFrame(syncArvPdfWidth));
+}
+
+// Recadre toutes les pages sur la largeur réelle du conteneur.
+// Retourne true si une resynchronisation a eu lieu.
+function syncArvPdfWidth() {
+  const state = arvPdfState;
+  if (!state || !state.pageCount || !state.wraps.length) return false;
+  const vp = document.getElementById('arvPdfViewport');
+  if (!vp) return false;
+  const w = Math.max(240, vp.clientWidth);
+  if (Math.abs(w - state.containerW) <= 2) return false;
+  state.containerW = w;
+  const z = state.zoomFactor();
+  for (let i = 0; i < state.pageCount; i++) {
+    const meta = state.pagesMeta[i];
+    const cssW = Math.round(w * z);
+    const cssH = Math.round(cssW * (meta.h / meta.w));
+    state.wraps[i].style.width = cssW + 'px';
+    state.wraps[i].style.height = cssH + 'px';
+    if (state.rendered[i]) {
+      const c = state.canvases[i];
+      c.width = 0; c.height = 0;
+      state.rendered[i] = false;
+      state.wraps[i].classList.remove('rendered');
+    }
+  }
+  const cur = Math.max(0, (state.currentPage || 1) - 1);
+  renderArvPdfPage(cur);
+  renderArvPdfPage(Math.min(state.pageCount - 1, cur + 1));
+  return true;
+}
+
+function renderArvPdfPage(i) {
+  const state = arvPdfState;
+  if (!state || !state.doc || state.rendered[i] || state.rendering[i]) return;
+  state.rendering[i] = true;
+  const token = state.token;
+  state.doc.getPage(i + 1).then((page) => {
+    if (token !== arvPdfSeq) return;
+    const meta = state.pagesMeta[i];
+    const cssW = state.containerW * state.zoomFactor();
+    const cssScale = cssW / meta.w;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+    const viewport = page.getViewport({ scale: cssScale * dpr });
+    const canvas = state.canvases[i];
+    canvas.width = Math.floor(viewport.width);
+    canvas.height = Math.floor(viewport.height);
+    canvas.style.width = Math.round(cssW) + 'px';
+    canvas.style.height = Math.round(cssW * (meta.h / meta.w)) + 'px';
+    const ctx = canvas.getContext('2d', { alpha: false });
+    return page.render({ canvasContext: ctx, viewport }).promise.then(() => {
+      if (token !== arvPdfSeq) return;
+      state.rendered[i] = true;
+      state.rendering[i] = false;
+      state.wraps[i].classList.add('rendered');
+    });
+  }).catch(() => {
+    if (state) state.rendering[i] = false;
+  });
+}
+
+// Libère la mémoire des pages trop loin du viewport (mobiles modestes)
+function scheduleArvPdfCleanup(idx) {
+  const state = arvPdfState;
+  if (!state || state.cleanupTimer) return;
+  state.cleanupTimer = setTimeout(() => {
+    state.cleanupTimer = null;
+    if (!arvPdfState) return;
+    const cur = arvPdfState.currentPage || 0;
+    if (Math.abs(idx - cur) > 4 && arvPdfState.rendered[idx]) {
+      const c = arvPdfState.canvases[idx];
+      c.width = 0; c.height = 0;
+      c.removeAttribute('style');
+      arvPdfState.rendered[idx] = false;
+      arvPdfState.wraps[idx].classList.remove('rendered');
+    }
+  }, 400);
+}
+
+function rerenderArvPdf() {
+  const state = arvPdfState;
+  if (!state) return;
+  const viewport = document.getElementById('arvPdfViewport');
+  if (viewport) state.containerW = Math.max(240, viewport.clientWidth);
+  const z = state.zoomFactor();
+  for (let i = 0; i < state.pageCount; i++) {
+    const meta = state.pagesMeta[i];
+    const cssW = Math.round(state.containerW * z);
+    const cssH = Math.round(cssW * (meta.h / meta.w));
+    state.wraps[i].style.width = cssW + 'px';
+    state.wraps[i].style.height = cssH + 'px';
+    if (state.rendered[i]) {
+      const c = state.canvases[i];
+      c.width = 0; c.height = 0;
+      state.rendered[i] = false;
+      state.wraps[i].classList.remove('rendered');
+    }
+  }
+  const cur = Math.max(0, (state.currentPage || 1) - 1);
+  renderArvPdfPage(cur);
+  renderArvPdfPage(Math.min(state.pageCount - 1, cur + 1));
+  updateArvPdfZoomLabel();
+}
+
+// suivi continu du conteneur (rotation, barres latérales, split-screen)
+if (typeof ResizeObserver !== 'undefined') {
+  const arvPdfRO = new ResizeObserver(() => {
+    if (arvPdfState && arvPdfState.pageCount) syncArvPdfWidth();
+  });
+  const roWatch = setInterval(() => {
+    const vp = document.getElementById('arvPdfViewport');
+    if (vp) { arvPdfRO.observe(vp); clearInterval(roWatch); }
+  }, 1000);
+  setTimeout(() => clearInterval(roWatch), 30000);
+}
+
+function updateArvPdfZoomLabel() {
+  const el = document.getElementById('arvPdfZoom');
+  if (el && arvPdfState) el.textContent = Math.round(arvPdfState.zoomFactor() * 100) + ' %';
+}
+
+function updateArvPdfCurrent() {
+  const state = arvPdfState;
+  if (!state || !state.pageCount) return;
+  const wraps = state.wraps;
+  const ref = window.scrollY + window.innerHeight * 0.35;
+  let cur = 0;
+  for (let i = 0; i < wraps.length; i++) {
+    if (wraps[i].offsetTop <= ref) cur = i; else break;
+  }
+  state.currentPage = cur + 1;
+  const count = document.getElementById('arvPdfCount');
+  if (count) count.textContent = `${cur + 1} / ${state.pageCount}`;
+  const prev = document.getElementById('arvPdfPrev');
+  const next = document.getElementById('arvPdfNext');
+  if (prev) prev.disabled = cur <= 0;
+  if (next) next.disabled = cur >= state.pageCount - 1;
+}
+
+function scrollToArvPdfPage(i) {
+  const state = arvPdfState;
+  if (!state || !state.wraps[i]) return;
+  const y = state.wraps[i].offsetTop - 8;
+  window.scrollTo({ top: y, behavior: 'smooth' });
+}
+
+function wireArvPdf(pdfPath) {
+  const state = arvPdfState;
+  if (!state) return;
+  updateArvPdfZoomLabel();
+  updateArvPdfCurrent();
+
+  const on = (id, fn) => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('click', fn);
+  };
+  on('arvPdfPrev', () => scrollToArvPdfPage(Math.max(0, (state.currentPage || 1) - 2)));
+  on('arvPdfNext', () => scrollToArvPdfPage(Math.min(state.pageCount - 1, (state.currentPage || 1))));
+  on('arvPdfZoomIn', () => {
+    if (state.zoomIdx < ARV_PDF_ZOOMS.length - 1) { state.zoomIdx++; rerenderArvPdf(); }
+  });
+  on('arvPdfZoomOut', () => {
+    if (state.zoomIdx > 0) { state.zoomIdx--; rerenderArvPdf(); }
+  });
+  on('arvPdfHtml', () => {
+    const part = parts[currentIndex];
+    if (part && part.file) loadPartHtml(part.file);
+  });
+
+  if (!state.scrollHook) {
+    state.scrollHook = () => updateArvPdfCurrent();
+    window.addEventListener('scroll', state.scrollHook, { passive: true });
+  }
+
+  // redimensionnement : largeur recalculée (zoom « ajusté » conservé)
+  if (!state.resizeHook) {
+    let rt = null;
+    state.resizeHook = () => {
+      clearTimeout(rt);
+      rt = setTimeout(() => {
+        if (!arvPdfState) return;
+        const vp = document.getElementById('arvPdfViewport');
+        if (vp && Math.abs(vp.clientWidth - arvPdfState.containerW) > 24) rerenderArvPdf();
+      }, 220);
+    };
+    window.addEventListener('resize', state.resizeHook);
+  }
+
+  // cache SW du worker si chargé à la volée
+  try {
+    if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage({ type: 'CACHE_URL', url: ARV_PDF_WORKER });
+      navigator.serviceWorker.controller.postMessage({ type: 'CACHE_URL', url: ARV_PDF_JS });
     }
   } catch (e) {}
 }
 
+function showArvPdfError(pdfPath) {
+  const status = document.getElementById('arvPdfStatus');
+  if (!status) return;
+  status.innerHTML = `
+    <i class="fas fa-triangle-exclamation" style="font-size:30px;color:var(--warning-bright,#E0B84A);"></i>
+    <h3>PDF indisponible</h3>
+    <p>Le PDF n'a pas pu être chargé (connexion ou mémoire). Réessaie, ou lis la version HTML de cette partie.</p>
+    <div class="arv-pdf-status-actions">
+      <button class="arv-pdf-status-btn" id="arvPdfRetry"><i class="fas fa-rotate-right"></i> Réessayer</button>
+      <button class="arv-pdf-status-btn" id="arvPdfFallback"><i class="fas fa-globe"></i> Version HTML</button>
+    </div>
+  `;
+  const retry = document.getElementById('arvPdfRetry');
+  const fb = document.getElementById('arvPdfFallback');
+  if (retry) retry.addEventListener('click', () => {
+    status.innerHTML = `<div class="spinner"></div><p>Chargement du PDF…</p>`;
+    openArvPdf(pdfPath, pdfPath);
+  });
+  if (fb) fb.addEventListener('click', () => {
+    const part = parts[currentIndex];
+    if (part && part.file) loadPartHtml(part.file);
+  });
+}
+
 function loadPartHtml(filePath) {
+  // retour depuis le lecteur PDF : visionneuse démontée + bouton écouter rendu
+  destroyArvPdf();
+  if (ttsBtn) ttsBtn.style.display = '';
   fetch(filePath)
     .then(r => {
       if (!r.ok) {

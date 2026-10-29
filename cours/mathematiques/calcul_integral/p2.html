@@ -1,11 +1,11 @@
-<!-- PARTIE 2 : PRIMITIVES COMPOSÉES & DÉFINITION DE L'INTÉGRALE    -->
-<!-- Notion 1 : formes composées de référence (u'uⁿ, u'/u, u'e^u)   -->
-<!-- Notion 2 : reconnaissance des formes (couple u, u')            -->
-<!-- Notion 3 : définition de l'intégrale (théorème fondamental)    -->
-<!-- Notion 4 : premiers calculs d'intégrales                       -->
-
+<!-- ============================================================ -->
+<!-- COURS MATHÉMATIQUES · TERMINALE D · CALCUL INTÉGRAL          -->
+<!-- PARTIE 2 : PRIMITIVES COMPOSÉES & DÉFINITION DE L'INTÉGRALE  -->
+<!-- Notion 1 : primitives_composees — u'·uⁿ, u'/u, u'·e^u        -->
+<!-- Notion 2 : integrale — ∫ₐᵇ f(x) dx = F(b) − F(a), aires      -->
+<!-- Refonte présentation v2 : 1 étape = 1 calcul, ligne dédiée   -->
+<!-- ============================================================ -->
 <div class="lecture-container">
-
   <!-- ===== HERO ===== -->
   <header class="lecture-hero">
     <div class="lecture-hero-badge">
@@ -13,465 +13,467 @@
       <span class="lecture-hero-label">Partie 02 · Calcul intégral</span>
     </div>
     <h1 class="lecture-hero-title">
-      Primitives composées &amp; <em>définition de l'intégrale</em>
+      Primitives composées &amp; <em>Définition de l'intégrale</em>
     </h1>
     <p class="lecture-hero-intro">
-      Le tableau usuel a ses limites : que faire de <span class="math">x·√(x² + 1)</span> ou de <span class="math">e^x/(1 + e^x)</span> ? Cette partie installe d'abord les <strong>trois formes composées de référence</strong> — <span class="math">u'·uⁿ</span>, <span class="math">u'/u</span> et <span class="math">u'·e^u</span> — et t'entraîne à <strong>reconnaître</strong> le couple (<span class="math">u</span>, <span class="math">u'</span>) dans une expression. Puis vient l'objet central du chapitre : la <strong>définition de l'intégrale</strong> <span class="math">∫ₐᵇ f(x) dx</span> par le théorème fondamental de l'analyse, avec les <strong>premiers calculs</strong> complets.
+      Dans la Partie 1, tu savais intégrer les formes simples. Mais devant <span class="math">x·√(x² + 1)</span> ou <span class="math">cos x·sin⁴x</span>, le tableau ne suffit plus : il faut <strong>reconnaître des structures</strong>. Cette partie couvre <strong>2 notions</strong> : les <strong>primitives composées</strong> (les trois formes <span class="math">u'·uⁿ</span>, <span class="math">u'/u</span> et <span class="math">u'·e^u</span>), puis la <strong>définition de l'intégrale</strong> <span class="math">∫ₐᵇ f(x) dx = F(b) − F(a)</span> avec ses premiers calculs pas à pas.
     </p>
     <div class="lecture-hero-meta">
-      <span class="lecture-hero-meta-item">⏱ 25 min</span> <span class="lecture-hero-meta-item">🧮 4 notions</span> <span class="lecture-hero-meta-item">📊 8 sections</span> <span class="lecture-hero-meta-item">🎓 Terminale D</span>
+      <span class="lecture-hero-meta-item">⏱ 25 min</span>
+      <span class="lecture-hero-meta-item">🧮 2 notions</span>
+      <span class="lecture-hero-meta-item">📊 8 sections</span>
+      <span class="lecture-hero-meta-item">🎓 Terminale D</span>
     </div>
   </header>
-
   <!-- ===== SOMMAIRE ===== -->
   <nav class="lecture-toc">
     <div class="lecture-toc-header">
       <span>Dans cette partie</span>
-      <span class="lecture-toc-count">4 notions · 8 sections</span>
+      <span class="lecture-toc-count">2 notions · 8 sections</span>
     </div>
     <ol class="lecture-toc-list">
-      <li><a href="#s0"><span class="toc-num">00</span><span>Motivation — Des formes qui se reconnaissent</span></a></li>
-      <li><a href="#s1"><span class="toc-num">01</span><span>Les trois formes composées de référence</span></a></li>
-      <li><a href="#s2"><span class="toc-num">02</span><span>Reconnaître la forme — la chasse au couple (u, u')</span></a></li>
-      <li><a href="#s3"><span class="toc-num">03</span><span>Exemples complets de primitives composées</span></a></li>
-      <li><a href="#s4"><span class="toc-num">04</span><span>Définition de l'intégrale — le théorème fondamental</span></a></li>
-      <li><a href="#s5"><span class="toc-num">05</span><span>Calculer une intégrale : la méthode</span></a></li>
-      <li><a href="#s6"><span class="toc-num">06</span><span>Premiers calculs — exemples guidés</span></a></li>
-      <li><a href="#s7"><span class="toc-num">07</span><span>Bilan — la boîte à outils</span></a></li>
+      <li><a href="#s0"><span class="toc-num">00</span><span>Motivation — du cumul des récoltes à l'intégrale</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>Notion 1 · primitives_composees — Les trois formes à reconnaître</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>Notion 1 · primitives_composees — Exemple 1 : reconnaître u'·√u</span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>Notion 1 · primitives_composees — Exemple 2 : u'·uⁿ en trigo, et u'/u</span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>Notion 2 · integrale — La définition de l'intégrale</span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>Notion 2 · integrale — L'aire sous la courbe</span></a></li>
+      <li><a href="#s6"><span class="toc-num">06</span><span>Notion 2 · integrale — Trois intégrales calculées pas à pas</span></a></li>
+      <li><a href="#s7"><span class="toc-num">07</span><span>Bilan — L'essentiel de la partie</span></a></li>
     </ol>
   </nav>
-
-  <!-- SECTION 0 : MOTIVATION                                        -->
+  <!-- ============================================================ -->
+  <!-- SECTION 0 : MOTIVATION                                       -->
+  <!-- ============================================================ -->
   <section class="lecture-section" id="s0">
     <div class="lecture-section-header">
       <div class="lecture-section-num">00</div>
       <div class="lecture-section-heading">
         <span class="lecture-section-eyebrow">Motivation</span>
-        <h2 class="lecture-section-title">Des formes qui se reconnaissent</h2>
+        <h2 class="lecture-section-title">Du cumul des récoltes à l'intégrale</h2>
       </div>
     </div>
-
     <div class="lecture-section-body">
       <p class="lecture-text">
-        Avec la Partie 1, tu sais primitiver <span class="math">x³</span>, <span class="math">√x</span>, <span class="math">cos x</span>… mais un exercice d'examen te proposera plutôt des produits et des quotients : <span class="math">2x·(x² + 1)³</span>, <span class="math">cos x·sin⁴x</span>, <span class="math">e^x/(1 + e^x)</span>. Inutile de paniquer : ces expressions ont une <strong>structure</strong>, et cette structure se <strong>reconnaît</strong> comme on reconnaît un visage.
+        Une coopérative du fleuve Niger reçoit chaque jour une livraison de mil et note le cumul dans un registre. Si le <strong>cumul</strong> du jour est connu, la <strong>livraison du jour</strong> s'obtient par différence entre deux lignes du registre. En mathématiques, c'est exactement le duo primitive/intégrale : la primitive <span class="math">F</span> joue le rôle du cumul, la fonction <span class="math">f</span> celui des livraisons quotidiennes, et l'<strong>intégrale</strong> mesure ce qui s'est accumulé entre deux dates.
       </p>
-
       <p class="lecture-text">
-        L'idée maîtresse : quand on dérive une fonction composée, un facteur <span class="math">u'</span> apparaît <em>tout seul</em> dans le résultat. En lisant ces dérivées <strong>à l'envers</strong>, on obtient des primitives de produits contenant <span class="math">u'</span>. C'est le premier thème de cette partie. Le second est la <strong>récompense</strong> : munis de nos primitives, nous pourrons enfin définir et calculer <span class="math">∫ₐᵇ f(x) dx</span> — l'intégrale — grâce au théorème fondamental de l'analyse.
+        Cette partie te donne d'abord les <strong>doigts</strong> : trois formes composées à reconnaître d'un coup d'œil pour trouver des primitives sans calculs lourds. Elle te donne ensuite la <strong>définition officielle</strong> de l'intégrale, l'objet central du chapitre, et trois premiers calculs complets.
       </p>
-
       <div class="lecture-callout lecture-callout-gold">
-        <div class="lecture-callout-body">
-          <div class="lecture-callout-title">Les questions de cette partie</div>
+        <div class="lecture-callout-body"><div class="lecture-callout-title">Les objectifs de cette partie</div>
           <ul class="lecture-list">
-            <li><strong>Quelles formes composées</strong> faut-il reconnaître par cœur ? (<span class="math">u'·uⁿ</span>, <span class="math">u'/u</span>, <span class="math">u'·e^u</span>)</li>
-            <li><strong>Comment repérer</strong> le couple (<span class="math">u</span>, <span class="math">u'</span>) dans une expression donnée ?</li>
-            <li><strong>Qu'est-ce que</strong> <span class="math">∫ₐᵇ f(x) dx</span> et que signifient les bornes ? (Notion 3)</li>
-            <li><strong>Comment calculer</strong> une intégrale avec <span class="math">F(b) − F(a)</span>, vite et sans faute ?</li>
+            <li><strong>Reconnaître</strong> et intégrer les formes composées : <span class="math">u'·uⁿ</span>, <span class="math">u'/u</span> et <span class="math">u'·e^u</span>.</li>
+            <li><strong>Définir</strong> l'intégrale <span class="math">∫ₐᵇ f(x) dx</span> à partir d'une primitive, et manipuler la notation.</li>
+            <li><strong>Calculer</strong> des intégrales simples pas à pas et les interpréter comme des aires.</li>
           </ul>
         </div>
       </div>
-
       <div class="lecture-aside">
         <div class="lecture-aside-label">🌍 Pour aller plus loin</div>
         <div class="lecture-aside-content">
-          Le symbole <span class="math">∫</span> est un <strong>S étiré</strong> : Leibniz l'a choisi en 1675 d'après le mot latin <em>summa</em> (« somme »), car une intégrale additionne des contributions infiniment petites. La notation <span class="math">dx</span> rappelle la petite variation de la variable — tu verras en Partie 4 que l'intégrale mesure bien une <strong>aire</strong>.
+          Les techniciens des barrages sur le Niger raisonnent exactement ainsi : le débit du fleuve varie à chaque instant (c'est la fonction <span class="math">f</span>), et le <strong>volume d'eau écoulé</strong> entre deux dates est l'intégrale du débit (c'est <span class="math">F(b) − F(a)</span>, où <span class="math">F</span> est le volume cumulé). Une seule formule gère les crues, les lâchers d'eau et l'irrigation des périmètres maraîchers.
         </div>
       </div>
     </div>
   </section>
-
-  <!-- SECTION 1 : LES TROIS FORMES COMPOSÉES                        -->
+  <!-- ============================================================ -->
+  <!-- SECTION 1 : NOTION 1 · primitives_composees — LES 3 FORMES   -->
+  <!-- ============================================================ -->
   <section class="lecture-section" id="s1">
     <div class="lecture-section-header">
       <div class="lecture-section-num">01</div>
       <div class="lecture-section-heading">
-        <span class="lecture-section-eyebrow">Notion 1 · formes de référence</span>
-        <h2 class="lecture-section-title">Les trois formes composées de référence</h2>
+        <span class="lecture-section-eyebrow">Notion 1 · primitives_composees</span>
+        <h2 class="lecture-section-title">Les trois formes à reconnaître</h2>
       </div>
     </div>
-
     <div class="lecture-section-body">
       <p class="lecture-text">
-        Rappel de Partie 3 (dérivation) : <span class="math">(uⁿ)' = n·u'·u^(n − 1)</span>, <span class="math">(ln u)' = u'/u</span> et <span class="math">(e^u)' = u'·e^u</span>. Lisons ces trois égalités <strong>de droite à gauche</strong> : elles nous disent quelles expressions admettent des primitives toutes faites.
+        L'idée est simple : si <span class="math">u</span> est une fonction dérivable et si l'expression contient <strong>la dérivée <span class="math">u'</span> multipliée par une expression de <span class="math">u</span></strong>, alors le tableau des primitives s'applique avec la variable <span class="math">u</span> au lieu de <span class="math">x</span>. La forme la plus importante :
       </p>
-
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-label">La forme vedette — puissance composée (n ≠ −1)</div>
+        <div class="lecture-formula-hero-main">u'·uⁿ&nbsp;&nbsp;→&nbsp;&nbsp;u^(n+1)/(n+1)</div>
+        <div class="lecture-formula-hero-desc">
+          Vérification : en dérivant u^(n+1)/(n+1), on obtient successivement :<br>
+          <span class="math">(u^(n+1)/(n+1))' = ((n+1)·uⁿ·u')/(n+1)</span><br>
+          <span class="math">= u'·uⁿ</span><br>
+          Exactement la même règle que xⁿ → x^(n+1)/(n+1), avec u à la place de x.
+        </div>
+      </div>
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">u'/u&nbsp;&nbsp;→&nbsp;&nbsp;ln(u)&nbsp;&nbsp;(à condition que u &gt; 0)</div>
+        <div class="lecture-formula-desc">Car (ln(u))' = u'/u. La condition u &gt; 0 est obligatoire : ln n'existe que pour un nombre strictement positif. C'est LE contrôle à faire avant d'utiliser cette forme.</div>
+      </div>
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">u'·e^u&nbsp;&nbsp;→&nbsp;&nbsp;e^u</div>
+        <div class="lecture-formula-desc">Car (e^u)' = u'·e^u : l'exponentielle composée est sa propre primitive, dès que u' accompagne l'expression.</div>
+      </div>
+      <p class="lecture-text">
+        Voici la table de reconnaissance à connaître par cœur : la forme, sa primitive, et un exemple concret de fonction qui l'utilise.
+      </p>
       <div class="lecture-table">
         <table>
           <thead>
-            <tr><th>Forme de f(x)</th><th>Primitive F(x)</th><th>Condition</th></tr>
+            <tr><th>Forme à repérer dans f</th><th>Une primitive</th><th>Condition</th><th>Exemple concret (bloc u)</th></tr>
           </thead>
           <tbody>
-            <tr><td><span class="math">u'(x)·[u(x)]ⁿ</span></td><td><span class="math">u^(n+1)/(n+1)</span></td><td><span class="math">n ≠ −1</span></td></tr>
-            <tr><td><span class="math">u'(x)/u(x)</span></td><td><span class="math">ln(u(x))</span></td><td><span class="math">u(x) &gt; 0</span> sur l'intervalle</td></tr>
-            <tr><td><span class="math">u'(x)·e^(u(x))</span></td><td><span class="math">e^(u(x))</span></td><td>aucune (u quelconque)</td></tr>
+            <tr>
+              <td><span class="math">u'·uⁿ</span></td>
+              <td><span class="math">u^(n+1)/(n+1)</span></td>
+              <td><span class="math">n ≠ −1</span></td>
+              <td><span class="math">x·(x² + 1)³</span> avec <span class="math">u = x² + 1</span></td>
+            </tr>
+            <tr>
+              <td><span class="math">u'/u</span></td>
+              <td><span class="math">ln(u)</span></td>
+              <td><span class="math">u &gt; 0</span></td>
+              <td><span class="math">(2x + 3)/√(x² + 3x)</span> avec <span class="math">u = √(x² + 3x)</span></td>
+            </tr>
+            <tr>
+              <td><span class="math">u'·e^u</span></td>
+              <td><span class="math">e^u</span></td>
+              <td>aucune</td>
+              <td><span class="math">2x·e^(x²)</span> avec <span class="math">u = x²</span></td>
+            </tr>
           </tbody>
         </table>
       </div>
-
-      <div class="lecture-callout lecture-callout-gold">
-        <div class="lecture-callout-body">
-          <div class="lecture-callout-title">💡 Pourquoi ça marche — les dérivées composées lues à l'envers</div>
-          <ul class="lecture-list">
-            <li><span class="math">(u^(n+1))' = (n + 1)·u'·uⁿ</span>, donc en divisant par <span class="math">(n + 1)</span> : une primitive de <span class="math">u'·uⁿ</span> est <span class="math">u^(n+1)/(n+1)</span>.</li>
-            <li><span class="math">(ln u)' = u'/u</span> : une primitive de <span class="math">u'/u</span> est <span class="math">ln(u)</span> — à condition que <span class="math">u &gt; 0</span> pour que <span class="math">ln(u)</span> existe.</li>
-            <li><span class="math">(e^u)' = u'·e^u</span> : une primitive de <span class="math">u'·e^u</span> est <span class="math">e^u</span>.</li>
-          </ul>
-          <p>Dans les trois cas, le signe de réussite est le même : le facteur <span class="math">u'</span> doit être <strong>déjà présent</strong> dans <span class="math">f</span> (à un facteur constant près).</p>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body"><div class="lecture-callout-title">📗 Les trois exemples à savoir reconnaître d'un coup d'œil</div>
+          <p>Le bloc <span class="math">u</span> peut être un trinôme, une racine ou une exponentielle — la méthode ne change jamais :</p>
+          <p><span class="math">x·(x² + 1)³</span> : bloc <span class="math">u = x² + 1</span>, et <span class="math">u' = 2x</span> se promène dans l'expression (à un facteur <span class="math">1/2</span> près).</p>
+          <p><span class="math">(2x + 3)/√(x² + 3x)</span> : bloc <span class="math">u = √(x² + 3x)</span>. Sa dérivée s'écrit :</p>
+          <p><span class="math">u' = (2x + 3)/(2·√(x² + 3x))</span></p>
+          <p>Le numérateur est bien <span class="math">u'</span> à un facteur 2 près.</p>
+          <p><span class="math">e^x·(e^x + 1)²</span> : bloc <span class="math">u = e^x + 1</span>, et <span class="math">u' = e^x</span> est exactement le facteur de gauche — forme <span class="math">u'·uⁿ</span> avec <span class="math">n = 2</span>.</p>
         </div>
       </div>
-
-      <div class="lecture-callout lecture-callout-warning">
-        <div class="lecture-callout-body">
-          <div class="lecture-callout-title">⚠️ Le cas n = −1 réapparaît… en mieux</div>
-          <p>Prends la première forme avec <span class="math">n = −1</span> : <span class="math">u'·u⁻¹ = u'/u</span>. Le cas « interdit » du tableau usuel devient justement la deuxième forme, de primitive <span class="math">ln(u)</span>. Vérifie simplement que <span class="math">u &gt; 0</span> sur tout l'intervalle — sinon <span class="math">ln(u)</span> n'existe pas.</p>
+      <div class="lecture-rule">
+        <div class="lecture-rule-label">🧠 Méthode à retenir — Reconnaître la forme en 4 gestes</div>
+        <div class="lecture-rule-body">
+          <ul class="lecture-list">
+            <li><strong>Geste 1 :</strong> repérer un « bloc » <span class="math">u(x)</span> qui apparaît plusieurs fois (une racine, une puissance, un trinôme…).</li>
+            <li><strong>Geste 2 :</strong> calculer <span class="math">u'(x)</span> et vérifier qu'il se promène dans l'expression (parfois à un coefficient près).</li>
+            <li><strong>Geste 3 :</strong> ajuster le coefficient : si <span class="math">u'</span> manque d'un facteur <span class="math">k</span>, on multiplie et on divise par <span class="math">k</span>.</li>
+            <li><strong>Geste 4 :</strong> conclure avec le tableau ci-dessus, puis <strong>vérifier en dérivant</strong>.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="lecture-callout lecture-callout-danger">
+        <div class="lecture-callout-body"><div class="lecture-callout-title">Erreur fréquente au Bac</div>
+          <p>Deux pièges : (1) oublier de <strong>compenser le coefficient</strong> — dans <span class="math">x·√(x² + 1)</span>, le facteur est <span class="math">x</span> alors que <span class="math">u' = 2x</span> : sans le facteur <span class="math">1/2</span>, le résultat est faux ; (2) écrire <span class="math">ln(u)</span> sans vérifier <span class="math">u &gt; 0</span> — si <span class="math">u</span> peut s'annuler ou devenir négatif sur l'intervalle, la forme <span class="math">u'/u</span> n'est pas utilisable telle quelle.</p>
         </div>
       </div>
     </div>
   </section>
-
-  <!-- SECTION 2 : RECONNAÎTRE LA FORME                              -->
+  <!-- ============================================================ -->
+  <!-- SECTION 2 : NOTION 1 — EXEMPLE 1 : u'·√u                     -->
+  <!-- ============================================================ -->
   <section class="lecture-section" id="s2">
     <div class="lecture-section-header">
       <div class="lecture-section-num">02</div>
       <div class="lecture-section-heading">
-        <span class="lecture-section-eyebrow">Notion 2 · reconnaissance</span>
-        <h2 class="lecture-section-title">Reconnaître la forme — la chasse au couple (u, u')</h2>
+        <span class="lecture-section-eyebrow">Notion 1 · primitives_composees</span>
+        <h2 class="lecture-section-title">Exemple 1 : reconnaître <span class="math">u'·√u</span></h2>
       </div>
     </div>
-
     <div class="lecture-section-body">
-      <div class="lecture-rule">
-        <div class="lecture-rule-label">🧠 Méthode — reconnaître une forme composée</div>
-        <div class="lecture-rule-body">
-          <strong>(1)</strong> Chercher « ce qui est à l'intérieur » : une puissance, une racine, un logarithme, un exposant… c'est le candidat <span class="math">u</span>. <strong>(2)</strong> Calculer <span class="math">u'</span> et vérifier qu'il apparaît (ou presque) comme <strong>facteur</strong> de <span class="math">f</span>. <strong>(3)</strong> Réécrire <span class="math">f</span> sous la forme <span class="math">k·u'·uⁿ</span>, <span class="math">k·u'/u</span> ou <span class="math">k·u'·e^u</span> (le facteur constant <span class="math">k</span> est autorisé). <strong>(4)</strong> Appliquer la formule, multiplier par <span class="math">k</span>, puis vérifier en dérivant.
-        </div>
+      <p class="lecture-text">
+        Premier exemple type, avec la racine carrée. On cherche une primitive de :
+      </p>
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">f(x) = x·√(x² + 1)</div>
+        <div class="lecture-formula-desc">Le bloc (x² + 1) apparaît à la fois sous la racine et « à côté » : c'est le signal du choix u(x) = x² + 1.</div>
       </div>
-
-      <div class="lecture-example">
-        <div class="lecture-example-label">🔍 Entraînement à l'œil — trouver le couple (u, u')</div>
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">🧮 Exemple complet — Une primitive de <span class="math">f(x) = x·√(x² + 1)</span></div>
         <div class="lecture-example-content">
-          <ul class="lecture-list">
-            <li><span class="math">f(x) = 2x·(x² + 1)³</span> : le facteur <span class="math">2x</span> est la dérivée de <span class="math">x² + 1</span>. Forme <span class="math">u'·u³</span> avec <span class="math">u = x² + 1</span> ⇒ primitive <span class="math">(x² + 1)⁴/4</span>.</li>
-            <li><span class="math">f(x) = e^x/(1 + e^x)</span> : le numérateur <span class="math">e^x</span> est la dérivée du dénominateur <span class="math">1 + e^x</span>. Forme <span class="math">u'/u</span> ⇒ primitive <span class="math">ln(1 + e^x)</span>.</li>
-            <li><span class="math">f(x) = cos x·sin⁴x</span> : <span class="math">cos x</span> est la dérivée de <span class="math">sin x</span>. Forme <span class="math">u'·u⁴</span> avec <span class="math">u = sin x</span> ⇒ primitive <span class="math">sin⁵x/5</span>.</li>
-            <li><span class="math">f(x) = (ln x)/x</span> : <span class="math">1/x</span> est la dérivée de <span class="math">ln x</span>. Forme <span class="math">u'·u¹</span> avec <span class="math">u = ln x</span> ⇒ primitive <span class="math">(ln x)²/2</span>.</li>
-          </ul>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Identification — choix de u :</strong></p><p><span class="math">u(x) = x² + 1</span></p><p><span class="math">u'(x) = 2x</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Compensation du coefficient :</strong> dans f, le facteur est <span class="math">x</span>, pas <span class="math">2x</span>. On écrit :</p><p><span class="math">x = (1/2) × 2x</span></p><p><span class="math">f(x) = (1/2) × u'(x) × √(u(x))</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Application de la formule</strong> (forme <span class="math">u'·uⁿ</span> avec <span class="math">n = 1/2</span>) :</p><p><span class="math">u'·u^(1/2)&nbsp;&nbsp;→&nbsp;&nbsp;u^(3/2)/(3/2)</span></p><p>Diviser par <span class="math">3/2</span> revient à multiplier par <span class="math">2/3</span> :</p><p><span class="math">u^(3/2)/(3/2) = (2/3)·u^(3/2)</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>On assemble</strong> (produit des deux coefficients) :</p><p><span class="math">(1/2) × (2/3) = 1/3</span></p><p><span class="math">F(x) = (1/3)·(x² + 1)^(3/2)</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">5</div><div class="lecture-step-content"><p><strong>Vérification, une ligne par étape.</strong> On dérive F :</p><p><span class="math">F'(x) = (1/3) × (3/2)·(x² + 1)^(1/2) × 2x</span></p><p>Les coefficients se simplifient : <span class="math">(1/3) × (3/2) × 2 = 1</span>, donc :</p><p><span class="math">F'(x) = x·√(x² + 1)</span></p><p><span class="math">F'(x) = f(x)</span>&nbsp;&nbsp;✓</p></div></div>
+          </div>
         </div>
       </div>
-
-      <div class="lecture-callout lecture-callout-danger">
-        <div class="lecture-callout-body">
-          <div class="lecture-callout-title">🚨 Erreur fréquente — oublier le facteur constant</div>
-          <p>Pour <span class="math">f(x) = x·√(x² + 1)</span>, la dérivée de <span class="math">u = x² + 1</span> est <span class="math">2x</span>, pas <span class="math">x</span> : il faut réécrire <span class="math">f = (1/2)·2x·√(x² + 1)</span> et n'oublier <strong>ni le 1/2 ni le facteur (n + 1)</strong> au moment de primitiver. Le contrôle par la dérivée attrape cette erreur à tous les coups.</p>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body"><div class="lecture-callout-title">⚠️ Une ligne, une transformation</div>
+          <p>Relis les étapes ci-dessus : chacune ne fait <strong>qu'une seule chose</strong> (choisir u, compenser, intégrer, assembler, vérifier). C'est la présentation attendue sur ta copie : des lignes courtes, une justification par ligne. Un calcul entassé sur deux lignes est la première cause d'erreurs de signe et de coefficient.</p>
         </div>
       </div>
     </div>
   </section>
-
-  <!-- SECTION 3 : EXEMPLES COMPLETS DE PRIMITIVES COMPOSÉES         -->
+  <!-- ============================================================ -->
+  <!-- SECTION 3 : NOTION 1 — EXEMPLE 2 : u'·uⁿ TRIGO ET u'/u       -->
+  <!-- ============================================================ -->
   <section class="lecture-section" id="s3">
     <div class="lecture-section-header">
       <div class="lecture-section-num">03</div>
       <div class="lecture-section-heading">
-        <span class="lecture-section-eyebrow">Entraînement</span>
-        <h2 class="lecture-section-title">Exemples complets de primitives composées</h2>
+        <span class="lecture-section-eyebrow">Notion 1 · primitives_composees</span>
+        <h2 class="lecture-section-title">Exemple 2 : <span class="math">u'·uⁿ</span> en trigonométrie, et la forme <span class="math">u'/u</span></h2>
       </div>
     </div>
-
     <div class="lecture-section-body">
+      <p class="lecture-text">
+        Même méthode, autre décor : en trigonométrie, le bloc <span class="math">u</span> est souvent <span class="math">sin x</span> ou <span class="math">cos x</span>, puisque l'un est la dérivée de l'autre.
+      </p>
       <div class="lecture-example lecture-example-featured">
-        <div class="lecture-example-label">🧮 Exemple 1 — x·√(x² + 1) : la forme u'·uⁿ avec facteur 1/2</div>
+        <div class="lecture-example-label">🧮 Exemple complet — Une primitive de <span class="math">f(x) = cos x·sin⁴x</span></div>
         <div class="lecture-example-content">
-          <p>Cherchons les primitives de <span class="math">f(x) = x·√(x² + 1)</span> sur <span class="math">ℝ</span>.</p>
           <div class="lecture-steps">
-            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Choisir u.</strong> L'intérieur est <span class="math">u(x) = x² + 1</span>, donc <span class="math">u'(x) = 2x</span>.</p></div></div>
-            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Réécrire.</strong> <span class="math">x = (1/2)·2x</span>, donc <span class="math">f(x) = (1/2)·u'(x)·√(u(x)) = (1/2)·u'(x)·[u(x)]^(1/2)</span> : forme <span class="math">u'·uⁿ</span> avec <span class="math">n = 1/2</span>.</p></div></div>
-            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Primitiver.</strong> <span class="math">F(x) = (1/2)·u^(3/2)/(3/2) = (1/2)·(2/3)·u^(3/2) = (1/3)·(x² + 1)^(3/2) + C</span>.</p></div></div>
-            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Vérifier.</strong> <span class="math">F'(x) = (1/3)·(3/2)·(x² + 1)^(1/2)·2x = x·√(x² + 1) = f(x)</span> ✓.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Identification — choix de u :</strong></p><p><span class="math">u(x) = sin x</span></p><p><span class="math">u'(x) = cos x</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Reconnaissance :</strong> on réécrit f avec u :</p><p><span class="math">f(x) = u'(x) × (u(x))⁴</span></p><p>C'est la forme <span class="math">u'·uⁿ</span> avec <span class="math">n = 4</span>, sans coefficient à compenser.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Application de la formule :</strong></p><p><span class="math">u'·u⁴&nbsp;&nbsp;→&nbsp;&nbsp;u⁵/5</span></p><p>Une primitive est donc <span class="math">u⁵/5</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Conclusion :</strong> on remplace u par sa valeur :</p><p><span class="math">F(x) = (sin⁵x)/5</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">5</div><div class="lecture-step-content"><p><strong>Vérification, une ligne par étape.</strong> On dérive F :</p><p><span class="math">F'(x) = (5·sin⁴x × cos x)/5</span></p><p>Le facteur <span class="math">5/5 = 1</span> disparaît :</p><p><span class="math">F'(x) = cos x·sin⁴x</span></p><p><span class="math">F'(x) = f(x)</span>&nbsp;&nbsp;✓</p></div></div>
           </div>
         </div>
       </div>
-
       <div class="lecture-example">
-        <div class="lecture-example-label">🧮 Exemple 2 — e^x/(1 + e^x) : la forme u'/u</div>
+        <div class="lecture-example-label">🧮 Exemple complet 2 — Une primitive de <span class="math">g(x) = e^x/(1 + e^x)</span></div>
         <div class="lecture-example-content">
-          <p>Cherchons les primitives de <span class="math">f(x) = e^x/(1 + e^x)</span> sur <span class="math">ℝ</span>.</p>
           <div class="lecture-steps">
-            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Choisir u.</strong> Dénominateur : <span class="math">u(x) = 1 + e^x</span>, donc <span class="math">u'(x) = e^x</span> — exactement le numérateur.</p></div></div>
-            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Vérifier la condition.</strong> <span class="math">u(x) = 1 + e^x ≥ 1 &gt; 0</span> pour tout <span class="math">x</span> : la forme <span class="math">u'/u</span> est autorisée.</p></div></div>
-            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Primitiver.</strong> <span class="math">F(x) = ln(1 + e^x) + C</span>.</p></div></div>
-            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Vérifier.</strong> <span class="math">F'(x) = e^x/(1 + e^x) = f(x)</span> ✓.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Identification — choix de u :</strong> le dénominateur est le bloc :</p><p><span class="math">u(x) = 1 + e^x</span></p><p><span class="math">u'(x) = e^x</span></p><p>Le numérateur est exactement <span class="math">u'</span> : c'est la forme <span class="math">u'/u</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Condition d'utilisation</strong> (obligatoire pour <span class="math">u'/u</span>) :</p><p><span class="math">u(x) = 1 + e^x ≥ 1 &gt; 0</span></p><p>pour tout réel <span class="math">x</span> : la forme <span class="math">u'/u</span> est autorisée.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Conclusion :</strong></p><p><span class="math">G(x) = ln(u(x)) = ln(1 + e^x)</span></p><p><strong>Vérification :</strong> on dérive G :</p><p><span class="math">G'(x) = u'(x)/u(x)</span></p><p><span class="math">G'(x) = e^x/(1 + e^x) = g(x)</span>&nbsp;&nbsp;✓</p></div></div>
           </div>
         </div>
       </div>
-
-      <div class="lecture-example">
-        <div class="lecture-example-label">🧮 Exemple 3 — cos x·sin⁴x : la forme u'·uⁿ trigonométrique</div>
-        <div class="lecture-example-content">
-          <p>Cherchons les primitives de <span class="math">f(x) = cos x·sin⁴x</span> sur <span class="math">ℝ</span>.</p>
-          <div class="lecture-steps">
-            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Choisir u.</strong> <span class="math">u(x) = sin x</span>, donc <span class="math">u'(x) = cos x</span> : le facteur est déjà là, sans coefficient à ajuster.</p></div></div>
-            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Réécrire.</strong> <span class="math">f(x) = u'(x)·[u(x)]⁴</span> : forme <span class="math">u'·uⁿ</span> avec <span class="math">n = 4</span>.</p></div></div>
-            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Primitiver.</strong> <span class="math">F(x) = sin⁵x/5 + C</span>.</p></div></div>
-            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Vérifier.</strong> <span class="math">F'(x) = (5·sin⁴x·cos x)/5 = cos x·sin⁴x = f(x)</span> ✓.</p></div></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="lecture-example">
-        <div class="lecture-example-label">🧮 Exemple 4 — 2x/(x² + 1) : la forme u'/u polynomiale</div>
-        <div class="lecture-example-content">
-          <p>Cherchons les primitives de <span class="math">f(x) = 2x/(x² + 1)</span> sur <span class="math">ℝ</span>.</p>
-          <div class="lecture-steps">
-            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Choisir u.</strong> <span class="math">u(x) = x² + 1</span>, donc <span class="math">u'(x) = 2x</span> : le numérateur, pile.</p></div></div>
-            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Vérifier la condition.</strong> <span class="math">u(x) = x² + 1 ≥ 1 &gt; 0</span> sur <span class="math">ℝ</span> ✓.</p></div></div>
-            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Primitiver.</strong> <span class="math">F(x) = ln(x² + 1) + C</span>.</p></div></div>
-            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Vérifier.</strong> <span class="math">F'(x) = 2x/(x² + 1) = f(x)</span> ✓.</p></div></div>
-          </div>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body"><div class="lecture-callout-title">📗 Les réflexes de reconnaissance</div>
+          <p>Devant <span class="math">cos x</span> accompagné d'une puissance de <span class="math">sin x</span>, pense immédiatement <span class="math">u = sin x</span> (et inversement). Devant une fraction dont le numérateur ressemble à la dérivée du dénominateur, pense <span class="math">u'/u → ln(u)</span> — après avoir vérifié que le dénominateur est strictement positif.</p>
         </div>
       </div>
     </div>
   </section>
-
-  <!-- SECTION 4 : DÉFINITION DE L'INTÉGRALE                         -->
+  <!-- ============================================================ -->
+  <!-- SECTION 4 : NOTION 2 · integrale — DÉFINITION                -->
+  <!-- ============================================================ -->
   <section class="lecture-section" id="s4">
     <div class="lecture-section-header">
       <div class="lecture-section-num">04</div>
       <div class="lecture-section-heading">
-        <span class="lecture-section-eyebrow">Notion 3 · l'intégrale</span>
-        <h2 class="lecture-section-title">Définition de l'intégrale — le théorème fondamental</h2>
+        <span class="lecture-section-eyebrow">Notion 2 · integrale</span>
+        <h2 class="lecture-section-title">La définition de l'intégrale</h2>
       </div>
     </div>
-
     <div class="lecture-section-body">
       <p class="lecture-text">
-        Voilà <strong>le</strong> théorème du chapitre : il relie le calcul des primitives (Partie 1) au calcul de <strong>cumuls</strong> et d'<strong>aires</strong> (Parties 3 et 4). On note <span class="math">∫ₐᵇ f(x) dx</span> l'intégrale de <span class="math">f</span> entre les <strong>bornes</strong> <span class="math">a</span> (en indice) et <span class="math">b</span> (en exposant). Les bornes s'écrivent en Unicode quand elles sont simples : <span class="math">∫₀¹</span>, <span class="math">∫₁³</span>, <span class="math">∫₋₁²</span>, <span class="math">∫₁ᵉ</span>, <span class="math">∫ₐᵇ</span> — et entre parenthèses sinon : <span class="math">∫₀^(π/2)</span>, <span class="math">∫₁^(+∞)</span>.
+        Voici LA définition du chapitre, celle qui transforme ta maîtrise des primitives en machine à calculer. Elle est due à Newton et Leibniz et s'appelle le <strong>théorème fondamental de l'analyse</strong>.
       </p>
-
       <div class="lecture-callout lecture-callout-key">
-        <div class="lecture-callout-body">
-          <div class="lecture-callout-title">📗 Définition — Intégrale d'une fonction continue</div>
-          <p>Soit <span class="math">f</span> une fonction <strong>continue</strong> sur un intervalle <span class="math">[a ; b]</span>. Pour toute primitive <span class="math">F</span> de <span class="math">f</span> sur <span class="math">[a ; b]</span>, on définit l'<strong>intégrale de <span class="math">f</span> entre <span class="math">a</span> et <span class="math">b</span></strong> par : <span class="math">∫ₐᵇ f(x) dx = F(b) − F(a)</span>.</p>
+        <div class="lecture-callout-body"><div class="lecture-callout-title">📗 Définition officielle — Intégrale</div>
+          <p>Soit <span class="math">f</span> une fonction <strong>continue</strong> sur un intervalle <span class="math">[a ; b]</span>, et <span class="math">F</span> une primitive de <span class="math">f</span> sur cet intervalle. L'<strong>intégrale</strong> de <span class="math">f</span> entre <span class="math">a</span> et <span class="math">b</span> est le nombre :</p>
+          <p><span class="math">∫ₐᵇ f(x) dx = F(b) − F(a)</span></p>
+          <p>Le résultat ne dépend <strong>pas</strong> de la primitive choisie : changer de primitive change <span class="math">F</span> en <span class="math">F + c</span>, et la constante <span class="math">c</span> s'élimine dans la différence <span class="math">F(b) − F(a)</span>.</p>
         </div>
       </div>
-
       <div class="lecture-formula-hero">
-        <div class="lecture-formula-hero-label">Théorème fondamental de l'analyse</div>
+        <div class="lecture-formula-hero-label">LA formule du chapitre — à connaître mot pour mot</div>
         <div class="lecture-formula-hero-main">∫ₐᵇ f(x) dx = F(b) − F(a)</div>
-        <div class="lecture-formula-hero-desc"><span class="math">f</span> continue sur <span class="math">[a ; b]</span>, <span class="math">F</span> une primitive de <span class="math">f</span> sur <span class="math">[a ; b]</span>. On note aussi <span class="math">[F(x)]ₐᵇ = F(b) − F(a)</span>.</div>
+        <div class="lecture-formula-hero-desc">f continue sur [a ; b], F une primitive de f. On évalue la primitive à la borne HAUTE, puis à la borne basse, et on SOUSTRAIT dans cet ordre.</div>
       </div>
-
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">[F(x)]ₐᵇ = F(b) − F(a)</div>
+        <div class="lecture-formula-desc">Notation abrégée universelle : le crochet avec les bornes signifie « valeur en b moins valeur en a ». Exemple, une ligne par étape :<br>
+          <span class="math">[x³]₀² = 2³ − 0³</span><br>
+          <span class="math">[x³]₀² = 8</span>
+        </div>
+      </div>
       <p class="lecture-text">
-        <strong>Peu importe la primitive choisie.</strong> Si l'on prend <span class="math">F + C</span> au lieu de <span class="math">F</span>, alors <span class="math">(F + C)(b) − (F + C)(a) = F(b) + C − F(a) − C = F(b) − F(a)</span> : la constante disparaît dans la soustraction. C'est pour cela qu'ici on n'écrit jamais <span class="math">+ C</span>.
+        Trois mots de vocabulaire à placer correctement : <span class="math">a</span> et <span class="math">b</span> sont les <strong>bornes</strong> (ou limites) d'intégration ; <span class="math">f(x)</span> s'appelle l'<strong>intégrande</strong> ; et la variable <span class="math">x</span> est une <strong>variable muette</strong> : elle disparaît dans le calcul final, donc <span class="math">∫₀¹ x² dx = ∫₀¹ t² dt</span> — même nombre, autre lettre.
       </p>
-
-      <div class="lecture-vocab-grid">
-        <div class="vocab-card">
-          <div class="vocab-symbol">∫</div>
-          <div class="vocab-name">Intégrale</div>
-          <div class="vocab-notation">∫ₐᵇ f(x) dx se lit « intégrale de f de a à b »</div>
-        </div>
-        <div class="vocab-card">
-          <div class="vocab-symbol">ₐᵇ</div>
-          <div class="vocab-name">Bornes</div>
-          <div class="vocab-notation">a = borne inférieure (indice) ; b = borne supérieure (exposant)</div>
-        </div>
-        <div class="vocab-card">
-          <div class="vocab-symbol">[ ]ₐᵇ</div>
-          <div class="vocab-name">Différence des valeurs</div>
-          <div class="vocab-notation">[F(x)]ₐᵇ = F(b) − F(a) : borne du haut moins borne du bas</div>
-        </div>
-        <div class="vocab-card">
-          <div class="vocab-symbol">dx</div>
-          <div class="vocab-name">Variable muette</div>
-          <div class="vocab-notation">∫₀¹ x² dx = ∫₀¹ t² dt : la lettre x ou t ne change rien</div>
-        </div>
-      </div>
-
-      <div class="lecture-callout lecture-callout-warning">
-        <div class="lecture-callout-body">
-          <div class="lecture-callout-title">⚠️ Les hypothèses du théorème fondamental</div>
-          <p>Le théorème exige que <span class="math">f</span> soit <strong>continue sur l'intervalle entre les bornes</strong> — c'est automatique pour les fonctions usuelles sur leur domaine (polynômes sur <span class="math">ℝ</span>, <span class="math">1/x</span> sur <span class="math">]0 ; +∞[</span>, <span class="math">√x</span> sur <span class="math">[0 ; +∞[</span>…). Pense aussi à vérifier le <strong>domaine</strong> : on ne calcule pas <span class="math">∫₋₁¹ (dx/x)</span>, car <span class="math">1/x</span> n'est pas continue sur <span class="math">[−1 ; 1]</span>.</p>
+      <div class="lecture-callout lecture-callout-danger">
+        <div class="lecture-callout-body"><div class="lecture-callout-title">Erreur fréquente au Bac</div>
+          <p>L'ordre est <span class="math">F(b) − F(a)</span> : valeur en la borne <strong>haute</strong> moins valeur en la borne <strong>basse</strong>. Écrire <span class="math">F(a) − F(b)</span> change le signe du résultat et fait perdre tous les points de la question, même si la primitive est juste. Écris systématiquement le crochet <span class="math">[… ]ₐᵇ</span> avant de substituer.</p>
         </div>
       </div>
     </div>
   </section>
-
-  <!-- SECTION 5 : MÉTHODE DE CALCUL                                 -->
+  <!-- ============================================================ -->
+  <!-- SECTION 5 : NOTION 2 · integrale — AIRE SOUS LA COURBE       -->
+  <!-- ============================================================ -->
   <section class="lecture-section" id="s5">
     <div class="lecture-section-header">
       <div class="lecture-section-num">05</div>
       <div class="lecture-section-heading">
-        <span class="lecture-section-eyebrow">Méthode</span>
-        <h2 class="lecture-section-title">Calculer une intégrale : la méthode</h2>
+        <span class="lecture-section-eyebrow">Notion 2 · integrale</span>
+        <h2 class="lecture-section-title">L'aire sous la courbe</h2>
       </div>
     </div>
-
     <div class="lecture-section-body">
-      <div class="lecture-rule">
-        <div class="lecture-rule-label">🧠 Méthode — calculer ∫ₐᵇ f(x) dx</div>
-        <div class="lecture-rule-body">
-          <strong>(1)</strong> Vérifier que <span class="math">f</span> est continue entre <span class="math">a</span> et <span class="math">b</span>. <strong>(2)</strong> Trouver <strong>une</strong> primitive <span class="math">F</span> de <span class="math">f</span> (tableau de la Partie 1, formes composées ci-dessus) — sans écrire <span class="math">+ C</span>. <strong>(3)</strong> Écrire <span class="math">[F(x)]ₐᵇ</span> <strong>avant</strong> de substituer. <strong>(4)</strong> Calculer <span class="math">F(b) − F(a)</span> en prenant soin des signes, et simplifier. <strong>(5)</strong> Contrôler : si <span class="math">f ≥ 0</span> et <span class="math">a ≤ b</span>, le résultat doit être positif (Partie 3).
-        </div>
-      </div>
-
+      <p class="lecture-text">
+        La définition par <span class="math">F(b) − F(a)</span> est un <strong>calcul</strong>, mais l'intégrale a un <strong>sens géométrique</strong> : lorsque <span class="math">f</span> est positive, <span class="math">∫ₐᵇ f(x) dx</span> est l'aire du domaine compris entre la courbe, l'axe des abscisses et les verticales <span class="math">x = a</span> et <span class="math">x = b</span>.
+      </p>
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 520 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Aire sous la courbe de f entre a et b, colorée entre l'axe des abscisses et la courbe">
+          <line x1="30" y1="250" x2="490" y2="250" style="stroke:var(--text-dim)" stroke-width="2"/>
+          <polygon points="500,250 488,244 488,256" style="fill:var(--text-dim)"/>
+          <line x1="50" y1="280" x2="50" y2="35" style="stroke:var(--text-dim)" stroke-width="2"/>
+          <polygon points="50,25 44,37 56,37" style="fill:var(--text-dim)"/>
+          <text x="36" y="268" style="fill:var(--text-dim)" font-size="12" font-family="Inter">O</text>
+          <text x="494" y="270" style="fill:var(--text-dim)" font-size="12" font-family="Inter">x</text>
+          <text x="62" y="42" style="fill:var(--text-dim)" font-size="12" font-family="Inter">y</text>
+          <path d="M 180 250 L 180 212 Q 285 186 370 127 L 370 250 Z" style="fill:var(--accent);fill-opacity:0.25;stroke:none"/>
+          <path d="M 70 230 Q 300 210 450 60" style="fill:none;stroke:var(--green-bright)" stroke-width="3"/>
+          <line x1="180" y1="250" x2="180" y2="212" style="stroke:var(--text-dim)" stroke-width="2" stroke-dasharray="5 5"/>
+          <line x1="370" y1="250" x2="370" y2="127" style="stroke:var(--text-dim)" stroke-width="2" stroke-dasharray="5 5"/>
+          <circle cx="180" cy="212" r="4" style="fill:var(--accent-bright)"/>
+          <circle cx="370" cy="127" r="4" style="fill:var(--accent-bright)"/>
+          <text x="180" y="268" style="fill:var(--text-dim)" font-size="12" font-family="Inter" text-anchor="middle">a</text>
+          <text x="370" y="268" style="fill:var(--text-dim)" font-size="12" font-family="Inter" text-anchor="middle">b</text>
+          <text x="428" y="52" style="fill:var(--green-bright)" font-size="13" font-weight="700" font-family="Inter">y = f(x)</text>
+          <text x="206" y="196" style="fill:var(--accent-bright)" font-size="13" font-weight="700" font-family="Inter">∫ₐᵇ f(x) dx</text>
+        </svg>
+        <figcaption class="lecture-figure-caption">Pour <span class="math">f ≥ 0</span> : l'intégrale <span class="math">∫ₐᵇ f(x) dx</span> est l'<strong>aire</strong> du domaine coloré, entre la courbe, l'axe des abscisses et les droites <span class="math">x = a</span> et <span class="math">x = b</span>. Elle se mesure en <strong>unités d'aire</strong> (u.a.) : l'aire du rectangle de côtés 1 porté par les unités du repère.</figcaption>
+      </figure>
       <div class="lecture-formula-box">
-        <div class="lecture-formula-main">[F(x)]ₐᵇ = F(b) − F(a)</div>
-        <div class="lecture-formula-desc">La notation crochet : on remplace <span class="math">x</span> par la borne du haut <span class="math">b</span>, puis par la borne du bas <span class="math">a</span>, et on <strong>soustrait</strong> — toujours dans cet ordre.</div>
+        <div class="lecture-formula-main">f ≥ 0 sur [a ; b]&nbsp;&nbsp;⇒&nbsp;&nbsp;∫ₐᵇ f(x) dx = aire du domaine (en u.a.)</div>
+        <div class="lecture-formula-desc">Si le repère n'a pas la même unité en abscisse et en ordonnée, l'unité d'aire est l'aire du rectangle de largeur 1 (en unité des x) et de hauteur 1 (en unité des y) — par exemple 1 u.a. = 2 cm × 3 cm = 6 cm².</div>
       </div>
-
-      <div class="lecture-callout lecture-callout-danger">
-        <div class="lecture-callout-body">
-          <div class="lecture-callout-title">🚨 Erreur fréquente — inverser les bornes dans le crochet</div>
-          <p>Écrire <span class="math">[x³]₁² = 1 − 8 = −7</span> au lieu de <span class="math">8 − 1 = 7</span> : c'est la faute la plus fréquente du chapitre. Réflexe : borne du <strong>haut</strong> d'abord (celle de l'<strong>exposant</strong>), borne du <strong>bas</strong> ensuite, puis soustraction. Et si les bornes sont données dans l'ordre décroissant, garde le signe − (Partie 3).</p>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body"><div class="lecture-callout-title">⚠️ Aire ou intégrale ?</div>
+          <p>L'interprétation en aire exige <span class="math">f ≥ 0</span>. Si <span class="math">f</span> prend des valeurs négatives, l'intégrale compte les aires <strong>au-dessus</strong> de l'axe avec un signe « + » et celles en dessous avec un signe « − » : elle peut être négative ou nulle sans qu'aucune aire ne le soit. La Partie 3 reviendra précisément sur ce point.</p>
         </div>
       </div>
     </div>
   </section>
-
-  <!-- SECTION 6 : PREMIERS CALCULS                                  -->
+  <!-- ============================================================ -->
+  <!-- SECTION 6 : NOTION 2 · integrale — TROIS CALCULS             -->
+  <!-- ============================================================ -->
   <section class="lecture-section" id="s6">
     <div class="lecture-section-header">
       <div class="lecture-section-num">06</div>
       <div class="lecture-section-heading">
-        <span class="lecture-section-eyebrow">Notion 4 · premiers calculs</span>
-        <h2 class="lecture-section-title">Premiers calculs — exemples guidés</h2>
+        <span class="lecture-section-eyebrow">Notion 2 · integrale</span>
+        <h2 class="lecture-section-title">Trois intégrales calculées pas à pas</h2>
       </div>
     </div>
-
     <div class="lecture-section-body">
+      <p class="lecture-text">
+        La méthode tient en trois gestes : (1) trouver une primitive, (2) écrire le crochet <span class="math">[… ]ₐᵇ</span>, (3) substituer les bornes dans l'ordre <span class="math">F(b) − F(a)</span>. Trois exemples complets, un par famille du tableau.
+      </p>
       <div class="lecture-example lecture-example-featured">
-        <div class="lecture-example-label">🧮 Exemple 1 — un polynôme : ∫₀¹ (3x² + 2x) dx</div>
+        <div class="lecture-example-label">🧮 Exemple complet 1 — Calculer <span class="math">∫₀¹ (3x² + 2x) dx</span></div>
         <div class="lecture-example-content">
           <div class="lecture-steps">
-            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Continuité.</strong> <span class="math">3x² + 2x</span> est polynomiale : continue sur <span class="math">[0 ; 1]</span> ✓.</p></div></div>
-            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Primitive.</strong> <span class="math">F(x) = x³ + x²</span> (car <span class="math">3x² ↦ 3·x³/3 = x³</span> et <span class="math">2x ↦ 2·x²/2 = x²</span>).</p></div></div>
-            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Crochet.</strong> <span class="math">[x³ + x²]₀¹ = (1³ + 1²) − (0³ + 0²) = (1 + 1) − 0</span>.</p></div></div>
-            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Conclure.</strong> <span class="math">∫₀¹ (3x² + 2x) dx = 2</span>. Contrôle : <span class="math">3x² + 2x ≥ 0</span> sur <span class="math">[0 ; 1]</span> et le résultat est bien positif ✓.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Ligne 1 — la primitive :</strong> règle des puissances, terme à terme :</p><p><span class="math">F(x) = x³ + x²</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Ligne 2 — le crochet :</strong></p><p><span class="math">∫₀¹ (3x² + 2x) dx = [x³ + x²]₀¹</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Ligne 3 — l'évaluation</strong> (borne haute, puis borne basse) :</p><p><span class="math">[x³ + x²]₀¹ = (1³ + 1²) − (0³ + 0²)</span></p><p><span class="math">= (1 + 1) − 0 = 2</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Ligne 4 — le résultat :</strong></p><p><span class="math">∫₀¹ (3x² + 2x) dx = 2</span></p></div></div>
           </div>
         </div>
       </div>
-
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">🧮 Exemple complet 2 — Calculer <span class="math">∫₁^e dx/x</span></div>
+        <div class="lecture-example-content">
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Ligne 1 — la primitive :</strong> sur <span class="math">[1 ; e]</span> (inclus dans <span class="math">]0 ; +∞[</span>) :</p><p><span class="math">F(x) = ln x</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Ligne 2 — le crochet :</strong></p><p><span class="math">∫₁^e dx/x = [ln x]₁^e</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Ligne 3 — l'évaluation :</strong></p><p><span class="math">[ln x]₁^e = ln e − ln 1</span></p><p><span class="math">= 1 − 0 = 1</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Ligne 4 — le résultat :</strong></p><p><span class="math">∫₁^e dx/x = 1</span></p><p>Et comme <span class="math">1/x &gt; 0</span>, cette intégrale est l'aire sous l'hyperbole entre 1 et e : exactement 1 u.a.</p></div></div>
+          </div>
+        </div>
+      </div>
       <div class="lecture-example">
-        <div class="lecture-example-label">🧮 Exemple 2 — avec le logarithme : ∫₁ᵉ dx/x</div>
+        <div class="lecture-example-label">🧮 Exemple complet 3 — Calculer <span class="math">∫₀^(π/2) cos x dx</span></div>
         <div class="lecture-example-content">
           <div class="lecture-steps">
-            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Continuité.</strong> <span class="math">1/x</span> est continue sur <span class="math">[1 ; e]</span> (car <span class="math">1 ≥ 1 &gt; 0</span>) ✓.</p></div></div>
-            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Primitive.</strong> <span class="math">F(x) = ln x</span> sur <span class="math">]0 ; +∞[</span>.</p></div></div>
-            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Crochet.</strong> <span class="math">[ln x]₁ᵉ = ln e − ln 1 = 1 − 0</span>.</p></div></div>
-            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Conclure.</strong> <span class="math">∫₁ᵉ dx/x = 1</span> : entre <span class="math">1</span> et <span class="math">e ≈ 2,718</span>, l'aire sous <span class="math">y = 1/x</span> vaut exactement <span class="math">1</span> unité d'aire.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Ligne 1 — la primitive :</strong></p><p><span class="math">F(x) = sin x</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Ligne 2 — le crochet :</strong></p><p><span class="math">∫₀^(π/2) cos x dx = [sin x]₀^(π/2)</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Ligne 3 — l'évaluation :</strong></p><p><span class="math">[sin x]₀^(π/2) = sin(π/2) − sin(0)</span></p><p><span class="math">= 1 − 0 = 1</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Ligne 4 — le résultat :</strong></p><p><span class="math">∫₀^(π/2) cos x dx = 1</span></p></div></div>
           </div>
         </div>
       </div>
-
-      <div class="lecture-example">
-        <div class="lecture-example-label">🧮 Exemple 3 — avec le cosinus : ∫₀^(π/2) cos x dx</div>
-        <div class="lecture-example-content">
-          <div class="lecture-steps">
-            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Continuité.</strong> <span class="math">cos x</span> est continue sur <span class="math">[0 ; π/2]</span> ✓.</p></div></div>
-            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Primitive.</strong> <span class="math">F(x) = sin x</span>.</p></div></div>
-            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Crochet.</strong> <span class="math">[sin x]₀^(π/2) = sin(π/2) − sin(0) = 1 − 0</span>.</p></div></div>
-            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Conclure.</strong> <span class="math">∫₀^(π/2) cos x dx = 1</span>. La borne <span class="math">π/2</span> ne s'écrivant pas en exposant Unicode, on la met entre parenthèses : <span class="math">∫₀^(π/2)</span>.</p></div></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="lecture-example">
-        <div class="lecture-example-label">🧮 Exemple 4 — bornes négatives : ∫₋₁² x dx</div>
-        <div class="lecture-example-content">
-          <div class="lecture-steps">
-            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Primitive.</strong> <span class="math">F(x) = x²/2</span>, continue partout ; les bornes s'écrivent <span class="math">∫₋₁²</span> (indice <span class="math">−1</span>, exposant <span class="math">2</span>).</p></div></div>
-            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Crochet.</strong> <span class="math">[x²/2]₋₁² = 2²/2 − (−1)²/2 = 2 − 0,5</span>.</p></div></div>
-            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Conclure.</strong> <span class="math">∫₋₁² x dx = 3/2</span>.</p></div></div>
-            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Remarque.</strong> <span class="math">f(x) = x</span> est négative sur <span class="math">[−1 ; 0]</span> et positive sur <span class="math">[0 ; 2]</span> : l'intégrale additionne les aires <strong>avec leur signe</strong>. L'aire réelle du domaine se calculera en Partie 4, en découpant au point <span class="math">0</span>.</p></div></div>
-          </div>
-        </div>
-      </div>
-
       <div class="lecture-callout lecture-callout-warning">
-        <div class="lecture-callout-body">
-          <div class="lecture-callout-title">⚠️ La variable est muette</div>
-          <p><span class="math">∫₀¹ x² dx = ∫₀¹ t² dt = 1/3</span> : la lettre placée dans <span class="math">f(x) dx</span> n'a pas d'existence propre — seul compte l'intervalle entre les bornes. En revanche, ne mélange pas les lettres <em>dans un même calcul</em> : choisis <span class="math">x</span> ou <span class="math">t</span> et garde-la.</p>
+        <div class="lecture-callout-body"><div class="lecture-callout-title">⚠️ Valeurs à avoir en tête</div>
+          <p>Les substitutions de ce type d'exercice utilisent des valeurs remarquables : <span class="math">ln e = 1</span>, <span class="math">ln 1 = 0</span>, <span class="math">sin(π/2) = 1</span>, <span class="math">sin 0 = 0</span>, <span class="math">cos 0 = 1</span>, <span class="math">e⁰ = 1</span>. Revois le tableau trigonométrique du chapitre « fonctions » : c'est lui qui fait gagner du temps ici.</p>
         </div>
       </div>
     </div>
   </section>
-
-  <!-- SECTION 7 : BILAN                                             -->
+  <!-- ============================================================ -->
+  <!-- SECTION 7 : BILAN                                            -->
+  <!-- ============================================================ -->
   <section class="lecture-section" id="s7">
     <div class="lecture-section-header">
       <div class="lecture-section-num">07</div>
       <div class="lecture-section-heading">
         <span class="lecture-section-eyebrow">Bilan</span>
-        <h2 class="lecture-section-title">La boîte à outils</h2>
+        <h2 class="lecture-section-title">L'essentiel de la partie</h2>
       </div>
     </div>
-
     <div class="lecture-section-body">
+      <p class="lecture-text">
+        Tu sais désormais intégrer les trois formes composées en repérant le bloc <span class="math">u</span> et sa dérivée, et tu maîtrises la définition de l'intégrale — le pont entre primitives et aires. La Partie 3 organisera les <strong>propriétés de calcul</strong> de ce nouvel outil.
+      </p>
       <div class="lecture-formula-hero">
-        <div class="lecture-formula-hero-label">La formule de la partie à connaître par cœur</div>
-        <div class="lecture-formula-hero-main">∫ₐᵇ f(x) dx = F(b) − F(a) = [F(x)]ₐᵇ</div>
-        <div class="lecture-formula-hero-desc"><span class="math">f</span> continue sur <span class="math">[a ; b]</span> et <span class="math">F</span> primitive de <span class="math">f</span>. Toute primitive convient (la constante disparaît) : on n'écrit jamais <span class="math">+ C</span> dans un calcul d'intégrale.</div>
+        <div class="lecture-formula-hero-label">La carte d'identité de la partie</div>
+        <div class="lecture-formula-hero-main">
+          u'·uⁿ&nbsp;&nbsp;→&nbsp;&nbsp;u^(n+1)/(n+1)<br>
+          u'/u&nbsp;&nbsp;→&nbsp;&nbsp;ln(u)<br>
+          ∫ₐᵇ f(x) dx = F(b) − F(a)
+        </div>
+        <div class="lecture-formula-hero-desc">Trois formes composées à reconnaître, et la définition de l'intégrale : valeur en la borne haute MOINS valeur en la borne basse.</div>
       </div>
-
       <ul class="lecture-list-elegant">
-        <li>Trois formes composées à reconnaître : <span class="math">u'·uⁿ ↦ u^(n+1)/(n+1)</span> (<span class="math">n ≠ −1</span>), <span class="math">u'/u ↦ ln(u)</span> (<span class="math">u &gt; 0</span>), <span class="math">u'·e^u ↦ e^u</span>.</li>
-        <li>Le signal : un facteur <span class="math">u'</span> (à un coefficient près) collé à une fonction de <span class="math">u</span> — puissance, logarithme ou exponentielle.</li>
-        <li>Notation : <span class="math">∫ₐᵇ f(x) dx</span> — <span class="math">a</span> en indice, <span class="math">b</span> en exposant ; <span class="math">[F(x)]ₐᵇ = F(b) − F(a)</span>.</li>
-        <li>Méthode de calcul : continuité → primitive → crochet → soustraction → contrôle du signe.</li>
-        <li>La variable <span class="math">x</span> est <strong>muette</strong> : <span class="math">∫₀¹ f(x) dx = ∫₀¹ f(t) dt</span>.</li>
+        <li>Formes composées : <span class="math">u'·uⁿ → u^(n+1)/(n+1)</span> ; <span class="math">u'/u → ln(u)</span> avec <span class="math">u &gt; 0</span> ; <span class="math">u'·e^u → e^u</span>.</li>
+        <li>Méthode de reconnaissance : repérer le bloc <span class="math">u</span>, vérifier la présence de <span class="math">u'</span>, compenser le coefficient, conclure, <strong>vérifier en dérivant</strong>.</li>
+        <li>Définition : pour <span class="math">f</span> continue sur <span class="math">[a ; b]</span> et <span class="math">F</span> primitive de <span class="math">f</span>, <span class="math">∫ₐᵇ f(x) dx = F(b) − F(a)</span> — indépendant du choix de <span class="math">F</span>.</li>
+        <li>Notation <span class="math">[F(x)]ₐᵇ = F(b) − F(a)</span> ; <span class="math">a</span> et <span class="math">b</span> sont les bornes, <span class="math">x</span> est une variable muette.</li>
+        <li>Sens géométrique : si <span class="math">f ≥ 0</span>, l'intégrale est l'aire sous la courbe, en <strong>unités d'aire</strong>.</li>
+        <li>Exemples à savoir refaire les yeux fermés : <span class="math">∫₀¹ (3x² + 2x) dx = 2</span> ; <span class="math">∫₁^e dx/x = 1</span> ; <span class="math">∫₀^(π/2) cos x dx = 1</span>.</li>
       </ul>
-
       <div class="lecture-callout lecture-callout-warning">
-        <div class="lecture-callout-body">
-          <div class="lecture-callout-title">⚠️ Rédaction type pour l'examen</div>
-          <p>Un calcul d'intégrale bien noté passe toujours par la ligne <span class="math">∫₀¹ (3x² + 2x) dx = [x³ + x²]₀¹</span> : primitive <strong>entre crochets avec les bornes</strong>, et seulement après la substitution. Une réponse donnée directement, sans crochet, est quasiment toujours mal évaluée — même juste.</p>
+        <div class="lecture-callout-body"><div class="lecture-callout-title">⚠️ Réflexe rédaction pour l'examen</div>
+          <p>Le barème récompense la présentation : ligne « primitive choisie », ligne « crochet », ligne « substitution », ligne « résultat ». Et pour une primitive composée, la phrase « posons u(x) = … » est obligatoire : elle montre que tu as reconnu la forme, pas seulement deviné.</p>
         </div>
       </div>
     </div>
   </section>
-
   <!-- ===== QCM D'ENTRAÎNEMENT ===== -->
   <div class="lecture-quiz">
     <div class="lecture-quiz-item">
-      <p class="lecture-quiz-q">Q1 — Une primitive de f(x) = 2x·(x² + 1)² est :</p>
-      <div class="lecture-quiz-options"><span>A) (x² + 1)³/3</span><span>B) 2(x² + 1)³</span><span>C) (x² + 1)³</span><span>D) 6x·(x² + 1)</span></div>
-      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><strong>A) (x² + 1)³/3.</strong> Forme <span class="math">u'·u²</span> avec <span class="math">u = x² + 1</span> et <span class="math">u' = 2x</span> : primitive <span class="math">u³/3</span>. Vérification : <span class="math">((x² + 1)³/3)' = 3(x² + 1)²·2x/3 = 2x·(x² + 1)²</span> ✓.</div></details>
+      <p class="lecture-quiz-q">Q1 — Une primitive de <span class="math">f(x) = 2x·(x² + 1)²</span> est :</p>
+      <div class="lecture-quiz-options"><span>A) (x² + 1)³/3</span><span>B) 2·(x² + 1)³</span><span>C) (x² + 1)³</span><span>D) 3·(x² + 1)²</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><strong>A) (x² + 1)³/3.</strong> Posons u = x² + 1, u' = 2x : f = u'·u², donc une primitive est u³/3 = (x² + 1)³/3. Vérification : ((x² + 1)³/3)' = (3·(x² + 1)² × 2x)/3 = 2x·(x² + 1)² ✓.</div></details>
     </div>
     <div class="lecture-quiz-item">
-      <p class="lecture-quiz-q">Q2 — ∫₀¹ (2x + 1) dx est égal à :</p>
-      <div class="lecture-quiz-options"><span>A) 1</span><span>B) 2</span><span>C) 3/2</span><span>D) 1/2</span></div>
-      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><strong>B) 2.</strong> <span class="math">∫₀¹ (2x + 1) dx = [x² + x]₀¹ = (1 + 1) − (0 + 0) = 2</span>. Contrôle : <span class="math">2x + 1 ≥ 1 &gt; 0</span> sur <span class="math">[0 ; 1]</span>, le résultat est bien positif.</div></details>
+      <p class="lecture-quiz-q">Q2 — Que vaut <span class="math">∫₁³ 2x dx</span> ?</p>
+      <div class="lecture-quiz-options"><span>A) 6</span><span>B) 8</span><span>C) 9</span><span>D) 4</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><strong>B) 8.</strong> Une primitive de 2x est x², donc ∫₁³ 2x dx = [x²]₁³ = 3² − 1² = 9 − 1 = 8. Attention : si tu écris [x²]₁³ = 1² − 3² = −8, tu as inversé l'ordre des bornes !</div></details>
     </div>
     <div class="lecture-quiz-item">
-      <p class="lecture-quiz-q">Q3 — ∫₁ᵉ dx/x est égal à :</p>
-      <div class="lecture-quiz-options"><span>A) e − 1</span><span>B) 1</span><span>C) e</span><span>D) 0</span></div>
-      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><strong>B) 1.</strong> <span class="math">∫₁ᵉ dx/x = [ln x]₁ᵉ = ln e − ln 1 = 1 − 0 = 1</span>. L'option A (« e − 1 ») serait le résultat de <span class="math">∫₀¹ e^x dx</span> — ne pas confondre les deux calculs classiques.</div></details>
+      <p class="lecture-quiz-q">Q3 — Que vaut <span class="math">∫₁^e dx/x</span> ?</p>
+      <div class="lecture-quiz-options"><span>A) e − 1</span><span>B) e</span><span>C) 1</span><span>D) 0</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><strong>C) 1.</strong> ∫₁^e dx/x = [ln x]₁^e = ln e − ln 1 = 1 − 0 = 1. (A) e − 1 = ∫₁^e e^x dx — autre intégrale, autre résultat : ne pas mélanger les primitives.</div></details>
     </div>
   </div>
-
   <!-- ===== RÉCAPITULATIF ===== -->
   <div class="lecture-recap">
     <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
     <ul class="lecture-recap-list">
-      <li><strong>[formes_composees]</strong> <span class="math">u'·uⁿ ↦ u^(n+1)/(n+1)</span> (<span class="math">n ≠ −1</span>) ; <span class="math">u'/u ↦ ln(u)</span> avec <span class="math">u &gt; 0</span> ; <span class="math">u'·e^u ↦ e^u</span> — les dérivées composées lues à l'envers</li>
-      <li><strong>[formes_composees]</strong> Le cas <span class="math">n = −1</span> de <span class="math">u'·uⁿ</span> est exactement <span class="math">u'/u ↦ ln(u)</span></li>
-      <li><strong>[reconnaissance]</strong> Chercher « l'intérieur » <span class="math">u</span>, vérifier que <span class="math">u'</span> apparaît en facteur (à un coefficient près), réécrire, appliquer, <strong>vérifier en dérivant</strong></li>
-      <li><strong>[integrale_def]</strong> <span class="math">f</span> continue sur <span class="math">[a ; b]</span>, <span class="math">F</span> primitive de <span class="math">f</span> : <span class="math">∫ₐᵇ f(x) dx = F(b) − F(a)</span> — théorème fondamental de l'analyse</li>
-      <li><strong>[integrale_def]</strong> Notation : <span class="math">a</span> en indice, <span class="math">b</span> en exposant ; <span class="math">[F(x)]ₐᵇ = F(b) − F(a)</span> ; pas de <span class="math">+ C</span> (elle disparaît dans la soustraction)</li>
-      <li><strong>[calcul]</strong> Méthode : continuité → primitive → crochet → <span class="math">F(b) − F(a)</span> → contrôle du signe</li>
-      <li><strong>[calcul]</strong> Calculs de référence : <span class="math">∫₀¹ (3x² + 2x) dx = 2</span> ; <span class="math">∫₁ᵉ dx/x = 1</span> ; <span class="math">∫₀^(π/2) cos x dx = 1</span> ; <span class="math">∫₋₁² x dx = 3/2</span></li>
-      <li><strong>[calcul]</strong> La variable est muette : <span class="math">∫₀¹ f(x) dx = ∫₀¹ f(t) dt</span> — et si <span class="math">f ≥ 0</span> avec <span class="math">a ≤ b</span>, l'intégrale est ≥ 0</li>
+      <li><strong>[primitives_composees]</strong> <span class="math">u'·uⁿ → u^(n+1)/(n+1)</span> (n ≠ −1) : même règle que xⁿ, appliquée au bloc u</li>
+      <li><strong>[primitives_composees]</strong> <span class="math">u'/u → ln(u)</span> avec la condition <span class="math">u &gt; 0</span> à vérifier avant d'écrire</li>
+      <li><strong>[primitives_composees]</strong> <span class="math">u'·e^u → e^u</span> : l'exponentielle composée est sa propre primitive</li>
+      <li><strong>[primitives_composees]</strong> Si <span class="math">u'</span> manque d'un coefficient k, on multiplie et divise par k — jamais oublier de compenser</li>
+      <li><strong>[integrale]</strong> Définition : <span class="math">∫ₐᵇ f(x) dx = F(b) − F(a)</span> pour f continue sur [a ; b] et F primitive de f</li>
+      <li><strong>[integrale]</strong> Ordre obligatoire : valeur en b MOINS valeur en a ; notation abrégée <span class="math">[F(x)]ₐᵇ</span></li>
+      <li><strong>[integrale]</strong> La variable x est muette ; le résultat ne dépend pas de la primitive choisie</li>
+      <li><strong>[integrale]</strong> Si f ≥ 0 : l'intégrale est l'aire sous la courbe, en unités d'aire (u.a.)</li>
+      <li><strong>[integrale]</strong> Exemples fondamentaux : <span class="math">∫₀¹ (3x² + 2x) dx = 2</span> ; <span class="math">∫₁^e dx/x = 1</span> ; <span class="math">∫₀^(π/2) cos x dx = 1</span></li>
     </ul>
   </div>
-
   <!-- ===== FIN ===== -->
   <div class="lecture-end">
     <span class="lecture-end-icon">🎯</span>
     <div class="lecture-end-text">Partie 2 terminée !</div>
-    <div class="lecture-end-sub">Passe à la partie suivante : linéarité, relation de Chasles et encadrements d'intégrales</div>
+    <div class="lecture-end-sub">Passe à la partie suivante : linéarité, relation de Chasles et propriétés de l'intégrale</div>
     <div class="lecture-end-divider"></div>
   </div>
-
 </div>

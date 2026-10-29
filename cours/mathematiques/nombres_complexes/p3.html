@@ -4,6 +4,7 @@
 <!-- Notion 1 : forme_trigo — Forme trigonométrique et passages   -->
 <!-- Notion 2 : exponentielle — Notation d'Euler et égalité       -->
 <!-- Notion 3 : operations — Produit, quotient, puissances        -->
+<!-- Présentation v2 : calculs aérés, 1 ligne = 1 étape           -->
 <!-- ============================================================ -->
 <div class="lecture-container">
   <!-- ===== HERO ===== -->
@@ -55,7 +56,28 @@
     </div>
     <div class="lecture-section-body">
       <p class="lecture-text">
-        Compare ces deux calculs du même produit <span class="math">z = (1 + i)(1 + i√3)</span>. En forme algébrique, il faut développer : <span class="math">z = 1 + i√3 + i + i²√3 = (1 − √3) + i(1 + √3)</span> — trois lignes et un résultat peu parlant. Avec les outils de la Partie 2, on sait que <span class="math">|1 + i| = √2</span>, <span class="math">arg(1 + i) ≡ π/4 [2π]</span>, <span class="math">|1 + i√3| = 2</span> et <span class="math">arg(1 + i√3) ≡ π/3 [2π]</span> : le produit devrait donc avoir pour module <span class="math">√2 × 2</span> et pour argument <span class="math">π/4 + π/3</span>…
+        Compare ces deux calculs du même produit <span class="math">z = (1 + i) × (1 + i√3)</span>. En forme algébrique, il faut développer :
+      </p>
+      <p><span class="math">z = (1 + i) × (1 + i√3)</span></p>
+      <p><span class="math">z = 1 + i√3 + i + i²√3</span></p>
+      <p><span class="math">z = (1 − √3) + i(1 + √3)</span></p>
+      <p class="lecture-text">
+        Trois lignes… et un résultat peu parlant. Avec les outils de la Partie 2, on connaît déjà le module et l'argument de chaque facteur :
+      </p>
+      <div class="lecture-table">
+        <table>
+          <thead>
+            <tr><th>Facteur</th><th>Module</th><th>Argument</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><span class="math">1 + i</span></td><td><span class="math">√2</span></td><td><span class="math">π/4 [2π]</span></td></tr>
+            <tr><td><span class="math">1 + i√3</span></td><td><span class="math">2</span></td><td><span class="math">π/3 [2π]</span></td></tr>
+            <tr><td><strong>produit attendu</strong></td><td><span class="math">√2 × 2</span></td><td><span class="math">π/4 + π/3</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="lecture-text">
+        Le produit devrait donc se lire presque instantanément en termes de module et d'argument…
       </p>
       <p class="lecture-text">
         L'idée du jour : <strong>écrire directement le complexe sous la forme « module + argument »</strong>, comme on écrit un nombre décimal en notation scientifique <span class="math">m × 10ⁿ</span> pour voir d'un coup d'œil l'ordre de grandeur. Ce sera la forme trigonométrique, puis — sous une notation encore plus compacte — la forme exponentielle. Les produits, quotients et puissances deviendront presque immédiats.
@@ -84,7 +106,12 @@
     </div>
     <div class="lecture-section-body">
       <p class="lecture-text">
-        Soit <span class="math">z</span> un complexe <strong>non nul</strong>, de module <span class="math">r = |z|</span> et d'argument <span class="math">θ</span>. Alors <span class="math">a = r·cos θ</span> et <span class="math">b = r·sin θ</span> (d'après les formules de la définition de l'argument), donc <span class="math">z = a + ib = r·cos θ + i·r·sin θ</span>. On met <span class="math">r</span> en facteur et la nouvelle forme apparaît :
+        Soit <span class="math">z</span> un complexe <strong>non nul</strong>, de module <span class="math">r = |z|</span> et d'argument <span class="math">θ</span>. D'après les formules de la définition de l'argument :
+      </p>
+      <p><span class="math">a = r·cos θ</span></p>
+      <p><span class="math">b = r·sin θ</span></p>
+      <p class="lecture-text">
+        Donc <span class="math">z = a + ib = r·cos θ + i·r·sin θ</span>. On met <span class="math">r</span> en facteur et la nouvelle forme apparaît :
       </p>
       <div class="lecture-callout lecture-callout-key">
         <div class="lecture-callout-body"><div class="lecture-callout-title">📗 Définition officielle — Forme trigonométrique</div>
@@ -95,12 +122,15 @@
       </div>
       <div class="lecture-formula-hero">
         <div class="lecture-formula-hero-label">La nouvelle carte d'identité</div>
-        <div class="lecture-formula-hero-main">z = r(cos θ + i·sin θ)&nbsp;&nbsp;·&nbsp;&nbsp;r = |z| &gt; 0&nbsp;&nbsp;·&nbsp;&nbsp;θ = arg(z)</div>
+        <div class="lecture-formula-hero-main">z = r(cos θ + i·sin θ)<br>r = |z| &gt; 0<br>θ = arg(z)</div>
         <div class="lecture-formula-hero-desc">Le facteur devant la parenthèse est TOUJOURS le module, un réel strictement positif ; à l'intérieur, on reconnaît cos θ et sin θ du MÊME angle.</div>
       </div>
       <div class="lecture-callout lecture-callout-danger">
         <div class="lecture-callout-body"><div class="lecture-callout-title">Erreur fréquente au Bac</div>
-          <p>Dans une forme trigonométrique, <strong>le module doit être strictement positif</strong>. L'écriture <span class="math">z = −2(cos π/3 + i·sin π/3)</span> n'est <strong>pas</strong> une forme trigonométrique ! Il faut « sortir » le signe : <span class="math">z = 2(−cos π/3 − i·sin π/3) = 2(cos 4π/3 + i·sin 4π/3)</span>, car ajouter π à l'argument change cos et sin de signe. Vérifie toujours le signe du facteur et que les deux angles sont identiques.</p>
+          <p>Dans une forme trigonométrique, <strong>le module doit être strictement positif</strong>. L'écriture <span class="math">z = −2(cos π/3 + i·sin π/3)</span> n'est <strong>pas</strong> une forme trigonométrique ! Il faut « sortir » le signe :</p>
+          <p><span class="math">z = 2(−cos π/3 − i·sin π/3)</span></p>
+          <p><span class="math">z = 2(cos 4π/3 + i·sin 4π/3)</span></p>
+          <p>Car ajouter π à l'argument change cos et sin de signe. Vérifie toujours le signe du facteur et que les deux angles sont identiques.</p>
         </div>
       </div>
     </div>
@@ -136,24 +166,34 @@
         <div class="lecture-example-label">🧮 Exemple complet 1 — Mettre z = 1 + i√3 sous forme trigonométrique</div>
         <div class="lecture-example-content">
           <div class="lecture-steps">
-            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Module :</strong> <span class="math">r = √(1² + (√3)²) = √(1 + 3) = 2</span>.</p></div></div>
-            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Cosinus et sinus :</strong> <span class="math">cos θ = 1/2</span> et <span class="math">sin θ = √3/2</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Module :</strong></p><p><span class="math">r = √(1² + (√3)²) = √(1 + 3)</span></p><p><span class="math">= 2</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Cosinus et sinus :</strong></p><p><span class="math">cos θ = 1/2</span></p><p><span class="math">sin θ = √3/2</span></p></div></div>
             <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Argument :</strong> le point <span class="math">M(1 ; √3)</span> est dans le premier quadrant ; la valeur qui convient est <span class="math">θ = π/3</span>.</p></div></div>
-            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Conclusion :</strong> <span class="math">z = 2(cos π/3 + i·sin π/3)</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Conclusion :</strong></p><p><span class="math">z = 2(cos π/3 + i·sin π/3)</span></p></div></div>
           </div>
         </div>
       </div>
       <div class="lecture-example"><div class="lecture-example-label">🧮 Exemple 2 — Avec un argument négatif</div><div class="lecture-example-content">
           <div class="lecture-steps">
-            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p>Pour <span class="math">z = √2 − √2·i</span> : <span class="math">r = √(2 + 2) = 2</span>.</p></div></div>
-            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><span class="math">cos θ = √2/2</span> et <span class="math">sin θ = −√2/2</span> : cosinus positif, sinus négatif → quatrième quadrant.</p></div></div>
-            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p>Donc <span class="math">θ = −π/4</span> et <span class="math">z = 2(cos(−π/4) + i·sin(−π/4))</span>.</p></div></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p>Pour <span class="math">z = √2 − √2·i</span>, le module :</p><p><span class="math">r = √(2 + 2) = 2</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Cosinus et sinus :</strong></p><p><span class="math">cos θ = √2/2</span></p><p><span class="math">sin θ = −√2/2</span></p><p>Cosinus positif, sinus négatif → quatrième quadrant.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Conclusion :</strong> <span class="math">θ = −π/4</span>, donc :</p><p><span class="math">z = 2(cos(−π/4) + i·sin(−π/4))</span></p></div></div>
+          </div>
         </div>
       </div>
-      <div class="lecture-example"><div class="lecture-example-label">🧮 Exemple 3 — Le cas d'un réel négatif</div><div class="lecture-example-content"><p>Pour <span class="math">z = −5</span> : <span class="math">r = |−5| = 5</span> et le point image <span class="math">(−5 ; 0)</span> est sur l'axe des réels, côté négatif, donc <span class="math">θ = π</span>. D'où <span class="math">z = 5(cos π + i·sin π)</span>. On retrouve bien <span class="math">5 × (−1) = −5</span>.</p></div></div>
+      <div class="lecture-example"><div class="lecture-example-label">🧮 Exemple 3 — Le cas d'un réel négatif</div><div class="lecture-example-content">
+          <p class="lecture-text">Pour <span class="math">z = −5</span>, le module :</p>
+          <p><span class="math">r = |−5| = 5</span></p>
+          <p class="lecture-text">Le point image <span class="math">(−5 ; 0)</span> est sur l'axe des réels, côté négatif, donc <span class="math">θ = π</span> :</p>
+          <p><span class="math">z = 5(cos π + i·sin π)</span></p>
+          <p class="lecture-text">On retrouve bien la valeur de départ : <span class="math">5 × (−1) = −5</span>.</p>
+        </div></div>
       <div class="lecture-callout lecture-callout-warning">
         <div class="lecture-callout-body"><div class="lecture-callout-title">⚠️ Piège de la racine carrée</div>
-          <p>Pour <span class="math">z = 1 + i√3</span>, le module est <span class="math">√(1² + (√3)²) = √(1 + 3) = 2</span>. L'erreur classique est d'écrire <span class="math">√(1 + 3) = √4 = 2</span>… mais aussi de « simplifier » <span class="math">√(1 + 3)</span> en <span class="math">1 + √3</span>, ce qui est faux : la racine carrée ne se distribue <strong>pas</strong> sur une somme. Calcule d'abord la somme sous la racine, puis extrais la racine.</p>
+          <p>Pour <span class="math">z = 1 + i√3</span>, le module se calcule en deux temps :</p>
+          <p><span class="math">√(1² + (√3)²) = √(1 + 3)</span></p>
+          <p><span class="math">= √4 = 2</span></p>
+          <p>L'erreur classique est de « simplifier » <span class="math">√(1 + 3)</span> en <span class="math">1 + √3</span>, ce qui est faux : la racine carrée ne se distribue <strong>pas</strong> sur une somme. Calcule d'abord la somme sous la racine, puis extrais la racine.</p>
         </div>
       </div>
     </div>
@@ -183,17 +223,25 @@
         <div class="lecture-example-label">🧮 Exemple complet 1 — Donner la forme algébrique de z = 4(cos 2π/3 + i·sin 2π/3)</div>
         <div class="lecture-example-content">
           <div class="lecture-steps">
-            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p>On rappelle les valeurs remarquables : <span class="math">cos 2π/3 = −1/2</span> et <span class="math">sin 2π/3 = √3/2</span>.</p></div></div>
-            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Partie réelle :</strong> <span class="math">a = 4 × (−1/2) = −2</span>.</p></div></div>
-            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Partie imaginaire :</strong> <span class="math">b = 4 × √3/2 = 2√3</span>.</p></div></div>
-            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Conclusion :</strong> <span class="math">z = −2 + 2√3·i</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p>On rappelle les valeurs remarquables :</p><p><span class="math">cos 2π/3 = −1/2</span></p><p><span class="math">sin 2π/3 = √3/2</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Partie réelle :</strong></p><p><span class="math">a = 4 × (−1/2) = −2</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Partie imaginaire :</strong></p><p><span class="math">b = 4 × √3/2 = 2√3</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Conclusion :</strong></p><p><span class="math">z = −2 + 2√3·i</span></p></div></div>
           </div>
         </div>
       </div>
-      <div class="lecture-example"><div class="lecture-example-label">🧮 Exemple 2 — Avec un angle droit</div><div class="lecture-example-content"><p>Pour <span class="math">z = 3(cos π/2 + i·sin π/2)</span> : <span class="math">cos π/2 = 0</span> et <span class="math">sin π/2 = 1</span>, donc <span class="math">z = 3 × 0 + i × 3 × 1 = 3i</span>. Le point image est sur l'axe des imaginaires, comme l'annonçait l'argument <span class="math">π/2</span>.</p></div></div>
+      <div class="lecture-example"><div class="lecture-example-label">🧮 Exemple 2 — Avec un angle droit</div><div class="lecture-example-content">
+          <p class="lecture-text">Pour <span class="math">z = 3(cos π/2 + i·sin π/2)</span>, on a <span class="math">cos π/2 = 0</span> et <span class="math">sin π/2 = 1</span> :</p>
+          <p><span class="math">z = 3 × 0 + i × 3 × 1</span></p>
+          <p><span class="math">= 3i</span></p>
+          <p class="lecture-text">Le point image est sur l'axe des imaginaires, comme l'annonçait l'argument <span class="math">π/2</span>.</p>
+        </div></div>
       <div class="lecture-callout lecture-callout-warning">
         <div class="lecture-callout-body"><div class="lecture-callout-title">⚠️ Vérification gratuite</div>
-          <p>Après un passage vers la forme algébrique, vérifie le module : <span class="math">√((−2)² + (2√3)²) = √(4 + 12) = √16 = 4</span> — on retrouve le <span class="math">r = 4</span> de départ. Ce contrôle prend dix secondes et détecte la plupart des erreurs de signe.</p>
+          <p>Après un passage vers la forme algébrique, vérifie le module :</p>
+          <p><span class="math">√((−2)² + (2√3)²) = √(4 + 12)</span></p>
+          <p><span class="math">= √16 = 4</span></p>
+          <p>On retrouve le <span class="math">r = 4</span> de départ. Ce contrôle prend dix secondes et détecte la plupart des erreurs de signe.</p>
         </div>
       </div>
     </div>
@@ -224,6 +272,34 @@
         <div class="lecture-formula-hero-main">e^(iθ) = cos θ + i·sin θ</div>
         <div class="lecture-formula-hero-desc">Les trois écritures désignent le même nombre : z = a + ib = r(cos θ + i·sin θ) = r·e^(iθ), avec r = |z| et θ = arg(z) [2π].</div>
       </div>
+      <p class="lecture-text">
+        Visuellement, un point du cercle trigonométrique de rayon 1, repéré par son angle :
+      </p>
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 520 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cercle trigonométrique avec le point e^(iπ/3) égal 1/2 plus i fois racine de 3 sur 2">
+          <line x1="30" y1="160" x2="500" y2="160" style="stroke:var(--text-dim)" stroke-width="2"/>
+          <polygon points="508,160 496,154 496,166" style="fill:var(--text-dim)"/>
+          <line x1="180" y1="305" x2="180" y2="25" style="stroke:var(--text-dim)" stroke-width="2"/>
+          <polygon points="180,17 174,29 186,29" style="fill:var(--text-dim)"/>
+          <text x="452" y="182" style="fill:var(--text-dim)" font-size="11" font-family="Inter">axe des réels</text>
+          <text x="190" y="38" style="fill:var(--text-dim)" font-size="11" font-family="Inter">axe des imaginaires</text>
+          <text x="168" y="178" style="fill:var(--text-dim)" font-size="12" font-family="Inter" text-anchor="end">O</text>
+          <circle cx="180" cy="160" r="120" style="fill:none;stroke:var(--text-dim)" stroke-width="2"/>
+          <line x1="300" y1="155" x2="300" y2="165" style="stroke:var(--text-dim)" stroke-width="2"/>
+          <text x="300" y="182" style="fill:var(--text-dim)" font-size="12" font-family="Inter" text-anchor="middle">1</text>
+          <line x1="180" y1="160" x2="240" y2="56" style="stroke:var(--green-bright)" stroke-width="3"/>
+          <line x1="240" y1="56" x2="240" y2="160" style="stroke:var(--text-dim)" stroke-width="2" stroke-dasharray="5 5"/>
+          <line x1="180" y1="56" x2="240" y2="56" style="stroke:var(--text-dim)" stroke-width="2" stroke-dasharray="5 5"/>
+          <path d="M 220 160 A 40 40 0 0 0 200 125" style="fill:none;stroke:var(--info)" stroke-width="2"/>
+          <text x="228" y="142" style="fill:var(--info)" font-size="13" font-weight="700" font-family="Inter">π/3</text>
+          <text x="240" y="182" style="fill:var(--text-dim)" font-size="12" font-family="Inter" text-anchor="middle">1/2</text>
+          <text x="172" y="60" style="fill:var(--text-dim)" font-size="12" font-family="Inter" text-anchor="end">√3/2</text>
+          <circle cx="240" cy="56" r="5" style="fill:var(--accent-bright)"/>
+          <text x="252" y="52" style="fill:var(--accent-bright)" font-size="13" font-weight="700" font-family="Inter">e^(iπ/3)</text>
+          <text x="252" y="70" style="fill:var(--accent-bright)" font-size="12" font-family="Inter">= 1/2 + i·√3/2</text>
+        </svg>
+        <figcaption class="lecture-figure-caption">Sur le cercle trigonométrique : <span class="math">e^(iπ/3) = cos π/3 + i·sin π/3</span>, soit <span class="math">1/2 + i·√3/2</span> — à distance 1 de <span class="math">O</span>, dans la direction <span class="math">π/3</span>.</figcaption>
+      </figure>
       <div class="lecture-table">
         <table>
           <thead>
@@ -244,11 +320,19 @@
           <p>Deux complexes non nuls sont égaux si et seulement s'ils ont le <strong>même module</strong> et le <strong>même argument à 2π près</strong>.</p>
         </div>
       </div>
-      <div class="lecture-example"><div class="lecture-example-label">🧮 Exemple — Deux écritures du même complexe</div><div class="lecture-example-content"><p>Les nombres <span class="math">z₁ = 2e^(iπ/3)</span> et <span class="math">z₂ = 2e^(i7π/3)</span> sont-ils égaux ? Mêmes modules (<span class="math">2 = 2</span>) ; pour les arguments : <span class="math">7π/3 − π/3 = 6π/3 = 2π ≡ 0 [2π]</span>. Les arguments sont égaux à 2π près, donc <span class="math">z₁ = z₂</span> : ce sont deux écritures du même nombre.</p></div></div>
+      <div class="lecture-example"><div class="lecture-example-label">🧮 Exemple — Deux écritures du même complexe</div><div class="lecture-example-content">
+          <p class="lecture-text">Les nombres <span class="math">z₁ = 2e^(iπ/3)</span> et <span class="math">z₂ = 2e^(i7π/3)</span> sont-ils égaux ? Les modules sont égaux (<span class="math">2 = 2</span>). Comparons les arguments :</p>
+          <p><span class="math">7π/3 − π/3 = 6π/3</span></p>
+          <p><span class="math">6π/3 = 2π ≡ 0 [2π]</span></p>
+          <p class="lecture-text">Les arguments sont égaux à 2π près, donc <span class="math">z₁ = z₂</span> : ce sont deux écritures du même nombre.</p>
+        </div></div>
       <div class="lecture-aside">
         <div class="lecture-aside-label">🌍 Petite histoire des sciences</div>
         <div class="lecture-aside-content">
-          Euler introduit cette notation en 1748. En posant <span class="math">θ = π</span>, sa formule donne <span class="math">e^(iπ) = cos π + i·sin π = −1</span>, c'est-à-dire <span class="math">e^(iπ) + 1 = 0</span> — souvent citée comme « la plus belle formule des mathématiques », car elle relie en une ligne les cinq constantes majeures : e, i, π, 1 et 0.
+          <p>Euler introduit cette notation en 1748. En posant <span class="math">θ = π</span>, sa formule donne :</p>
+          <p><span class="math">e^(iπ) = cos π + i·sin π</span></p>
+          <p><span class="math">= −1</span></p>
+          <p>c'est-à-dire <span class="math">e^(iπ) + 1 = 0</span> — souvent citée comme « la plus belle formule des mathématiques », car elle relie en une ligne les cinq constantes majeures : e, i, π, 1 et 0.</p>
         </div>
       </div>
     </div>
@@ -269,21 +353,62 @@
         Voici la récompense de tous ces changements de forme. Les propriétés du module et de l'argument (Partie 2) se combinent en des formules d'une simplicité désarmante :
       </p>
       <div class="lecture-formula-box">
-        <div class="lecture-formula-main">z₁·z₂ = r₁·r₂ · e^(i(θ₁+θ₂))&nbsp;&nbsp;;&nbsp;&nbsp;z₁/z₂ = (r₁/r₂) · e^(i(θ₁−θ₂))</div>
+        <div class="lecture-formula-main">z₁·z₂ = r₁·r₂ · e^(i(θ₁+θ₂))<br>z₁/z₂ = (r₁/r₂) · e^(i(θ₁−θ₂))</div>
         <div class="lecture-formula-desc">Produit : on multiplie les modules et on additionne les arguments. Quotient : on divise les modules et on soustrait les arguments (z₂ ≠ 0). Mêmes résultats sous forme trigonométrique, avec cos(θ₁ ± θ₂) + i·sin(θ₁ ± θ₂).</div>
       </div>
       <div class="lecture-example lecture-example-featured">
         <div class="lecture-example-label">🧮 Exemple complet — Produit et quotient de z₁ = 2e^(iπ/6) et z₂ = 3e^(iπ/3)</div>
         <div class="lecture-example-content">
           <div class="lecture-steps">
-            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Produit :</strong> on multiplie les modules et on ajoute les arguments : <span class="math">z₁·z₂ = 2 × 3 × e^(i(π/6 + π/3)) = 6·e^(iπ/2)</span>, car <span class="math">π/6 + π/3 = π/6 + 2π/6 = 3π/6 = π/2</span>.</p></div></div>
-            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p>Comme <span class="math">e^(iπ/2) = i</span>, on conclut : <span class="math">z₁·z₂ = 6i</span>. Une seule ligne, sans développement !</p></div></div>
-            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Quotient :</strong> <span class="math">z₁/z₂ = (2/3)·e^(i(π/6 − π/3)) = (2/3)·e^(−iπ/6)</span>.</p></div></div>
-            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p>Si on veut la forme algébrique du quotient : <span class="math">(2/3)(cos(−π/6) + i·sin(−π/6)) = (2/3)(√3/2 − i/2) = √3/3 − (1/3)i</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Produit :</strong> on multiplie les modules et on ajoute les arguments :</p><p><span class="math">z₁·z₂ = 2 × 3 × e^(i(π/6 + π/3))</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>On réduit la somme des angles :</strong></p><p><span class="math">π/6 + π/3 = π/6 + 2π/6</span></p><p><span class="math">= 3π/6 = π/2</span></p><p><span class="math">d'où z₁·z₂ = 6·e^(iπ/2)</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>On conclut :</strong> comme <span class="math">e^(iπ/2) = i</span> :</p><p><span class="math">z₁·z₂ = 6i</span></p><p>Une seule ligne, sans développement !</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Quotient :</strong> on divise les modules et on soustrait les arguments :</p><p><span class="math">z₁/z₂ = (2/3)·e^(i(π/6 − π/3))</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">5</div><div class="lecture-step-content"><p><strong>On réduit la différence des angles :</strong></p><p><span class="math">π/6 − π/3 = −π/6</span></p><p><span class="math">d'où z₁/z₂ = (2/3)·e^(−iπ/6)</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">6</div><div class="lecture-step-content"><p><strong>Si on veut la forme algébrique du quotient :</strong></p><p><span class="math">z₁/z₂ = (2/3)(cos(−π/6) + i·sin(−π/6))</span></p><p><span class="math">= (2/3)(√3/2 − i/2)</span></p><p><span class="math">= √3/3 − (1/3)·i</span></p></div></div>
           </div>
         </div>
       </div>
-      <div class="lecture-example"><div class="lecture-example-label">🧮 Exemple — Produit sous forme trigonométrique</div><div class="lecture-example-content"><p>Pour <span class="math">z₁ = √2(cos π/4 + i·sin π/4)</span> et <span class="math">z₂ = 2(cos π/3 + i·sin π/3)</span> : <span class="math">z₁·z₂ = √2 × 2 × (cos(π/4 + π/3) + i·sin(π/4 + π/3))</span>, donc <span class="math">z₁·z₂ = 2√2(cos 7π/12 + i·sin 7π/12)</span>. Les modules se multiplient (<span class="math">√2 × 2 = 2√2</span>), les angles s'ajoutent (<span class="math">3π/12 + 4π/12 = 7π/12</span>).</p></div></div>
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 520 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Produit de deux complexes : rotation d'angle et multiplication des longueurs">
+          <line x1="30" y1="280" x2="500" y2="280" style="stroke:var(--text-dim)" stroke-width="2"/>
+          <polygon points="508,280 496,274 496,286" style="fill:var(--text-dim)"/>
+          <line x1="100" y1="305" x2="100" y2="40" style="stroke:var(--text-dim)" stroke-width="2"/>
+          <polygon points="100,32 94,44 106,44" style="fill:var(--text-dim)"/>
+          <text x="452" y="302" style="fill:var(--text-dim)" font-size="11" font-family="Inter">axe des réels</text>
+          <text x="110" y="52" style="fill:var(--text-dim)" font-size="11" font-family="Inter">axe des imaginaires</text>
+          <text x="88" y="296" style="fill:var(--text-dim)" font-size="12" font-family="Inter" text-anchor="end">O</text>
+          <line x1="130" y1="275" x2="130" y2="285" style="stroke:var(--text-dim)" stroke-width="2"/>
+          <text x="130" y="300" style="fill:var(--text-dim)" font-size="12" font-family="Inter" text-anchor="middle">1</text>
+          <line x1="100" y1="280" x2="145" y2="253" style="stroke:var(--info)" stroke-width="3"/>
+          <polygon points="152,250 141,259 145,251" style="fill:var(--info)"/>
+          <circle cx="152" cy="250" r="4" style="fill:var(--info)"/>
+          <text x="160" y="248" style="fill:var(--info)" font-size="12" font-weight="700" font-family="Inter">z₁ = 2e^(iπ/6)</text>
+          <line x1="100" y1="280" x2="140" y2="208" style="stroke:var(--green-bright)" stroke-width="3"/>
+          <polygon points="145,202 134,209 140,214" style="fill:var(--green-bright)"/>
+          <circle cx="145" cy="202" r="4" style="fill:var(--green-bright)"/>
+          <text x="152" y="200" style="fill:var(--green-bright)" font-size="12" font-weight="700" font-family="Inter">z₂ = 3e^(iπ/3)</text>
+          <line x1="100" y1="280" x2="100" y2="112" style="stroke:var(--accent-bright)" stroke-width="3"/>
+          <polygon points="100,100 94,113 106,113" style="fill:var(--accent-bright)"/>
+          <circle cx="100" cy="100" r="5" style="fill:var(--accent-bright)"/>
+          <text x="112" y="106" style="fill:var(--accent-bright)" font-size="12" font-weight="700" font-family="Inter">z₁·z₂ = 6e^(iπ/2) = 6i</text>
+          <path d="M 140 280 A 40 40 0 0 0 134 260" style="fill:none;stroke:var(--info)" stroke-width="2"/>
+          <text x="146" y="268" style="fill:var(--info)" font-size="12" font-weight="700" font-family="Inter">π/6</text>
+          <path d="M 155 280 A 55 55 0 0 0 100 225" style="fill:none;stroke:var(--accent-bright)" stroke-width="2"/>
+          <text x="164" y="196" style="fill:var(--accent-bright)" font-size="12" font-weight="700" font-family="Inter">π/6 + π/3 = π/2</text>
+        </svg>
+        <figcaption class="lecture-figure-caption">Le produit <span class="math">z₁·z₂</span> : la longueur se multiplie (<span class="math">2 × 3 = 6</span>) et l'angle s'ajoute (<span class="math">π/6 + π/3 = π/2</span>) — le résultat tombe sur l'axe des imaginaires, à 6 unités de <span class="math">O</span>.</figcaption>
+      </figure>
+      <div class="lecture-example"><div class="lecture-example-label">🧮 Exemple — Produit sous forme trigonométrique</div><div class="lecture-example-content">
+          <p class="lecture-text">Pour <span class="math">z₁ = √2(cos π/4 + i·sin π/4)</span> et <span class="math">z₂ = 2(cos π/3 + i·sin π/3)</span> :</p>
+          <p><span class="math">z₁·z₂ = √2 × 2 × (cos(π/4 + π/3) + i·sin(π/4 + π/3))</span></p>
+          <p><span class="math">√2 × 2 = 2√2</span></p>
+          <p><span class="math">π/4 + π/3 = 3π/12 + 4π/12</span></p>
+          <p><span class="math">= 7π/12</span></p>
+          <p class="lecture-text">D'où :</p>
+          <p><span class="math">z₁·z₂ = 2√2(cos 7π/12 + i·sin 7π/12)</span></p>
+          <p class="lecture-text">Les modules se multiplient, les angles s'ajoutent — exactement comme en forme exponentielle.</p>
+        </div></div>
       <div class="lecture-rule">
         <div class="lecture-rule-label">🧠 Stratégie d'examen</div>
         <div class="lecture-rule-body">
@@ -315,10 +440,11 @@
         <div class="lecture-example-label">🧮 Exemple complet — Calculer (1 + i)⁸</div>
         <div class="lecture-example-content">
           <div class="lecture-steps">
-            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>On passe en forme exponentielle :</strong> <span class="math">1 + i = √2·e^(iπ/4)</span> (module <span class="math">√2</span>, argument <span class="math">π/4</span> — calculs de la Partie 2).</p></div></div>
-            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>On applique la formule :</strong> <span class="math">(1 + i)⁸ = (√2)⁸ · e^(i·8·π/4)</span>.</p></div></div>
-            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>On simplifie :</strong> <span class="math">(√2)⁸ = 2⁴ = 16</span> et <span class="math">e^(i·8·π/4) = e^(i·2π) = 1</span>.</p></div></div>
-            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Conclusion :</strong> <span class="math">(1 + i)⁸ = 16</span>. En développant à la main, ce calcul serait interminable ; ici, quatre lignes.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>On passe en forme exponentielle :</strong></p><p><span class="math">1 + i = √2·e^(iπ/4)</span></p><p>(module <span class="math">√2</span>, argument <span class="math">π/4</span> — calculs de la Partie 2)</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>On applique la formule :</strong></p><p><span class="math">(1 + i)⁸ = (√2)⁸ · e^(i·8·π/4)</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>On simplifie le module :</strong></p><p><span class="math">(√2)⁸ = 2⁴ = 16</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>On simplifie l'argument :</strong></p><p><span class="math">e^(i·8·π/4) = e^(i·2π) = 1</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">5</div><div class="lecture-step-content"><p><strong>Conclusion :</strong></p><p><span class="math">(1 + i)⁸ = 16</span></p><p>En développant à la main, ce calcul serait interminable ; ici, quatre lignes.</p></div></div>
           </div>
         </div>
       </div>
@@ -336,7 +462,11 @@
           Pour le quotient <span class="math">z' = z / (r·e^(iθ))</span> : homothétie de rapport <span class="math">1/r</span> et rotation d'angle <span class="math">−θ</span>.
         </div>
       </div>
-      <div class="lecture-example"><div class="lecture-example-label">🧮 Exemple — Où tombe l'image de 1 ?</div><div class="lecture-example-content"><p>Multiplions <span class="math">z = 1</span> par <span class="math">2e^(iπ/2)</span> : <span class="math">z' = 2e^(iπ/2) = 2i</span>. Le point image de <span class="math">1</span> (à distance 1 sur l'axe des réels) a été envoyé à distance 2 dans la direction <span class="math">π/2</span> : c'est bien une homothétie de rapport 2 suivie d'un quart de tour.</p></div></div>
+      <div class="lecture-example"><div class="lecture-example-label">🧮 Exemple — Où tombe l'image de 1 ?</div><div class="lecture-example-content">
+          <p class="lecture-text">Multiplions <span class="math">z = 1</span> par <span class="math">2e^(iπ/2)</span> :</p>
+          <p><span class="math">z' = 2e^(iπ/2) = 2i</span></p>
+          <p class="lecture-text">Le point image de <span class="math">1</span> (à distance 1 sur l'axe des réels) a été envoyé à distance 2 dans la direction <span class="math">π/2</span> : c'est bien une homothétie de rapport 2 suivie d'un quart de tour.</p>
+        </div></div>
       <div class="lecture-callout lecture-callout-danger">
         <div class="lecture-callout-body"><div class="lecture-callout-title">Erreur fréquente au Bac</div>
           <p>Ne mélange pas les rôles : c'est le <strong>module</strong> qui « agrandit » (distance) et l'<strong>argument</strong> qui « tourne » (angle). Écrire qu'un produit « tourne d'un angle égal au module » ou « multiplie la distance par l'argument » est une confusion rédhibitoire. Module → longueur ; argument → angle.</p>
@@ -394,17 +524,17 @@
     <div class="lecture-quiz-item">
       <p class="lecture-quiz-q">Q1 — Quelle est la forme exponentielle de <span class="math">i</span> ?</p>
       <div class="lecture-quiz-options"><span>A) e^(iπ)</span><span>B) e^(iπ/2)</span><span>C) e^(i0)</span><span>D) e^(−iπ/2)</span></div>
-      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><strong>B) e^(iπ/2).</strong> Le module de i est 1 et son argument est π/2 : i = 1 × e^(iπ/2). Vérification : e^(iπ/2) = cos π/2 + i·sin π/2 = 0 + i = i. (A donne −1, C donne 1, D donne −i.)</div></details>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><strong>B) e^(iπ/2).</strong> Le module de <span class="math">i</span> est 1 et son argument est <span class="math">π/2</span> : <span class="math">i = 1 × e^(iπ/2)</span>. Vérification : <span class="math">e^(iπ/2) = cos π/2 + i·sin π/2 = 0 + i = i</span>. (A donne <span class="math">−1</span>, C donne <span class="math">1</span>, D donne <span class="math">−i</span>.)</div></details>
     </div>
     <div class="lecture-quiz-item">
       <p class="lecture-quiz-q">Q2 — Que vaut <span class="math">2e^(iπ/6) × 2e^(iπ/3)</span> ?</p>
       <div class="lecture-quiz-options"><span>A) 4e^(iπ/18)</span><span>B) 4e^(iπ/2)</span><span>C) 2e^(iπ/2)</span><span>D) 4e^(iπ/9)</span></div>
-      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><strong>B) 4e^(iπ/2).</strong> Les modules se multiplient (2 × 2 = 4) et les arguments s'additionnent : π/6 + π/3 = π/6 + 2π/6 = 3π/6 = π/2. Le résultat vaut donc 4i. (On n'additionne ni les modules, ni les arguments en les « multipliant » entre eux.)</div></details>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><strong>B) 4e^(iπ/2).</strong> Les modules se multiplient (<span class="math">2 × 2 = 4</span>) et les arguments s'additionnent : <span class="math">π/6 + π/3 = π/6 + 2π/6 = 3π/6 = π/2</span>. Le résultat vaut donc <span class="math">4i</span>. (On n'additionne ni les modules, ni les arguments en les « multipliant » entre eux.)</div></details>
     </div>
     <div class="lecture-quiz-item">
       <p class="lecture-quiz-q">Q3 — Que vaut <span class="math">(1 + i)⁸</span> ?</p>
       <div class="lecture-quiz-options"><span>A) 16</span><span>B) −16</span><span>C) 16i</span><span>D) 8√2</span></div>
-      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><strong>A) 16.</strong> 1 + i = √2·e^(iπ/4), donc (1 + i)⁸ = (√2)⁸·e^(i·8·π/4) = 2⁴·e^(i·2π) = 16 × 1 = 16. Le module passe à la puissance 8 et l'argument est multiplié par 8, ce qui fait deux tours complets : retour à la direction initiale.</div></details>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><strong>A) 16.</strong> <span class="math">1 + i = √2·e^(iπ/4)</span>, donc <span class="math">(1 + i)⁸ = (√2)⁸·e^(i·8·π/4) = 2⁴·e^(i·2π) = 16 × 1 = 16</span>. Le module passe à la puissance 8 et l'argument est multiplié par 8, ce qui fait deux tours complets : retour à la direction initiale.</div></details>
     </div>
   </div>
   <!-- ===== RÉCAPITULATIF ===== -->

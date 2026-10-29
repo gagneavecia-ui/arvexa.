@@ -1,13 +1,12 @@
 <!-- ============================================================ -->
-<!-- PARTIE 2 : VARIABLE ALÉATOIRE — ESPÉRANCE MATHÉMATIQUE        -->
-<!-- Notion 1 : esperance — Définition E(X) = Σpᵢ·xᵢ, interprétation -->
-<!--               valeur moyenne, jeu équitable, gain moyen       -->
-<!-- Notion 2 : linearite — E(aX + b) = a·E(X) + b ; E(X + Y) =    -->
-<!--               E(X) + E(Y)                                     -->
+<!-- COURS MATHÉMATIQUES · TERMINALE D · VARIABLE ALÉATOIRE       -->
+<!-- PARTIE 2 : ESPÉRANCE MATHÉMATIQUE                            -->
+<!-- Notion 1 : esperance — E(X) = Σpᵢ·xᵢ, valeur moyenne,        -->
+<!--            gain moyen sur beaucoup de parties                -->
+<!-- Notion 2 : linearite — E(aX + b) = a·E(X) + b ;              -->
+<!--            E(X + Y) = E(X) + E(Y) ; jeu équitable            -->
 <!-- ============================================================ -->
-
 <div class="lecture-container">
-
   <!-- ===== HERO ===== -->
   <header class="lecture-hero">
     <div class="lecture-hero-badge">
@@ -18,7 +17,7 @@
       Espérance <em>mathématique</em>
     </h1>
     <p class="lecture-hero-intro">
-      Si tu joues 600 fois au même jeu, combien gagneras-tu <em>en moyenne</em> par partie ? L'espérance mathématique <span class="math">E(X)</span> répond précisément à cette question : c'est la moyenne des valeurs de <span class="math">X</span> pondérée par leurs probabilités. Cette partie définit <strong>2 notions</strong> : l'<strong>espérance</strong> elle-même (formule, interprétation, jeu équitable, gain moyen) et sa <strong>linéarité</strong> — les deux propriétés qui font d'elle l'outil de calcul le plus efficace du chapitre.
+      Un billet de tombola peut rapporter 5000 F… ou rien du tout. Alors combien « vaut » réellement un billet ? La réponse est un nombre remarquable : l'<strong>espérance</strong>, la moyenne pondérée des valeurs de la variable. Cette partie couvre <strong>2 notions</strong> : la définition et le sens de l'espérance <span class="math">E(X)</span> (avec le jeu équitable comme application vedette), puis la <strong>linéarité</strong> <span class="math">E(aX + b)</span> et <span class="math">E(X + Y)</span>, qui permet de calculer vite et de tout vérifier.
     </p>
     <div class="lecture-hero-meta">
       <span class="lecture-hero-meta-item">⏱ 20 min</span>
@@ -27,7 +26,6 @@
       <span class="lecture-hero-meta-item">🎓 Terminale D</span>
     </div>
   </header>
-
   <!-- ===== SOMMAIRE ===== -->
   <nav class="lecture-toc">
     <div class="lecture-toc-header">
@@ -35,497 +33,466 @@
       <span class="lecture-toc-count">2 notions · 8 sections</span>
     </div>
     <ol class="lecture-toc-list">
-      <li><a href="#s0"><span class="toc-num">00</span><span>Motivation — Quel gain moyen attendre d'un jeu ?</span></a></li>
-      <li><a href="#s1"><span class="toc-num">01</span><span>Notion 1 · esperance — Définir E(X) = Σpᵢ·xᵢ</span></a></li>
-      <li><a href="#s2"><span class="toc-num">02</span><span>Notion 1 · esperance — Exemple : l'espérance d'un dé</span></a></li>
-      <li><a href="#s3"><span class="toc-num">03</span><span>Notion 1 · esperance — Interpréter : la moyenne sur N répétitions</span></a></li>
-      <li><a href="#s4"><span class="toc-num">04</span><span>Notion 2 · linearite — Linéarité et additivité de l'espérance</span></a></li>
-      <li><a href="#s5"><span class="toc-num">05</span><span>Notion 1 · esperance — Le jeu équitable : calculer la mise</span></a></li>
-      <li><a href="#s6"><span class="toc-num">06</span><span>Notion 1 · esperance — Gain moyen : l'exemple du marché</span></a></li>
-      <li><a href="#s7"><span class="toc-num">07</span><span>Bilan — Méthodes et pièges de l'espérance</span></a></li>
+      <li><a href="#s0"><span class="toc-num">00</span><span>Motivation — Combien « vaut » un billet ?</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>Notion 1 · esperance — Définir et comprendre E(X)</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>Notion 1 · esperance — Le fil rouge : E(somme de deux dés) = 7</span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>Notion 1 · esperance — La tombola de la tontine : E(G) = 400 F</span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>Notion 2 · linearite — Le jeu équitable : trouver la bonne mise</span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>Notion 2 · linearite — Linéarité : E(aX + b) et E(X + Y)</span></a></li>
+      <li><a href="#s6"><span class="toc-num">06</span><span>Notion 1 · esperance — Encore un exemple : le nombre de piles</span></a></li>
+      <li><a href="#s7"><span class="toc-num">07</span><span>Bilan — L'essentiel de la partie</span></a></li>
     </ol>
   </nav>
-
   <!-- ============================================================ -->
-  <!-- SECTION 0 : MOTIVATION                                       -->
+  <!-- SECTION 0 : MOTIVATION -->
   <!-- ============================================================ -->
   <section class="lecture-section" id="s0">
     <div class="lecture-section-header">
       <div class="lecture-section-num">00</div>
       <div class="lecture-section-heading">
         <span class="lecture-section-eyebrow">Motivation</span>
-        <h2 class="lecture-section-title">Quel gain moyen attendre d'un jeu ?</h2>
+        <h2 class="lecture-section-title">Combien « vaut » un billet ?</h2>
       </div>
     </div>
-
     <div class="lecture-section-body">
       <p class="lecture-text">
-        Voici deux jeux très simples. <strong>Jeu A</strong> : on lance une pièce équilibrée ; si c'est pile tu gagnes <span class="math">4</span>, sinon tu ne gagnes rien. <strong>Jeu B</strong> : même pièce ; si c'est pile tu gagnes <span class="math">1</span>, si c'est face tu gagnes <span class="math">3</span>. Si tu devais jouer 1 000 fois à l'un des deux, lequel choisir ? La question est mal posée tant qu'on ne sait pas calculer un <strong>gain moyen par partie</strong> : une seule valeur qui résume tout le tableau de la loi. C'est exactement l'objet de l'espérance.
+        Revois la tombola de la tontine « Solidarité » (partie 1) : 20 billets, un lot de 5000 F, trois lots de 1000 F, et pour les seize autres billets… rien. Un seul tirage est une pure loterie : ton billet peut tout gagner ou ne rien gagner. Mais si la tontine recommence <strong>chaque semaine, pendant des années</strong>, quelque chose d'étonnant se produit : ta moyenne de gains se stabilise. Le hasard s'efface, un nombre fixe émerge.
       </p>
-
       <p class="lecture-text">
-        L'espérance ne dit pas ce qui va <em>t'arriver</em> à la prochaine partie — le hasard reste le hasard — mais ce que tu peux <strong>attendre en moyenne</strong> si le jeu se répète longtemps. C'est le critère des assureurs, des compagnies de loterie, des tontines… et le premier réflexe du Bac dès qu'une variable aléatoire apparaît.
+        Ce nombre, c'est l'<strong>espérance</strong> de la variable aléatoire : le <strong>gain moyen par partie</strong>, calculé d'avance, sans jouer une seule fois. C'est l'outil des décideurs : l'assureur qui fixe une prime, l'exploitant de parc qui tarife un manège, la foire qui installe une roue de la fortune — tous calculent des espérances. Cette partie te donne la formule, le sens, et l'application star : <strong>le jeu équitable</strong>, celui dont l'espérance du gain net est nulle.
       </p>
-
       <div class="lecture-callout lecture-callout-gold">
-        <div class="lecture-callout-body">
-          <div class="lecture-callout-title">Les trois objectifs de cette partie</div>
+        <div class="lecture-callout-body"><div class="lecture-callout-title">Les objectifs de cette partie</div>
           <ul class="lecture-list">
-            <li><strong>Calculer</strong> <span class="math">E(X)</span> à partir du tableau de la loi de <span class="math">X</span>.</li>
-            <li><strong>Interpréter</strong> <span class="math">E(X)</span> comme une valeur moyenne sur de nombreuses répétitions.</li>
-            <li><strong>Aller vite</strong> grâce à la linéarité : <span class="math">E(aX + b) = a·E(X) + b</span> et <span class="math">E(X + Y) = E(X) + E(Y)</span>, puis régler les questions de <strong>jeu équitable</strong>.</li>
+            <li><strong>Définir</strong> l'espérance <span class="math">E(X)</span> comme la moyenne pondérée des valeurs <span class="math">xᵢ</span> par les probabilités <span class="math">pᵢ</span>, et l'interpréter comme un gain moyen.</li>
+            <li><strong>Calculer</strong> une espérance avec le tableau (colonne <span class="math">pᵢ·xᵢ</span>, total = <span class="math">E(X)</span>).</li>
+            <li><strong>Utiliser</strong> la linéarité : <span class="math">E(aX + b)</span> et <span class="math">E(X + Y)</span>, et caractériser le <strong>jeu équitable</strong>.</li>
           </ul>
         </div>
       </div>
-
       <div class="lecture-aside">
-        <div class="lecture-aside-label">🌍 Pour aller plus loin</div>
+        <div class="lecture-aside-label">🌍 Petite histoire des sciences</div>
         <div class="lecture-aside-content">
-          Le mot « espérance » vient du latin <em>expectatio</em>, employé par Huygens en 1657 : ce qu'on peut « espérer » gagner. Christiaan Huygens, Pascal et Fermat cherchaient alors à savoir comment partager équitablement la mise d'un jeu de dés interrompu — c'est-à-dire, déjà, à calculer un gain moyen.
+          En 1657, le Hollandais <strong>Christiaan Huygens</strong> publie le premier traité de calcul des probabilités, <em>De ratiociniis in ludo aleae</em> (« sur le raisonnement dans les jeux de dés »). Il y appelle notre espérance la « <em>valor</em> » — la valeur d'un jeu — et l'obtient exactement comme nous : en pondérant chaque gain par sa chance d'arriver. Trois siècles plus tard, ce même nombre sert à dimensionner les réseaux électriques, à fixer les primes d'assurance du CIMA ou à évaluer les rendements agricoles : l'espérance est devenue la mesure universelle du « en moyenne ».
         </div>
       </div>
     </div>
   </section>
-
   <!-- ============================================================ -->
-  <!-- SECTION 1 : DÉFINIR E(X)                                     -->
+  <!-- SECTION 1 : NOTION 1 · esperance — DÉFINIR E(X) -->
   <!-- ============================================================ -->
   <section class="lecture-section" id="s1">
     <div class="lecture-section-header">
       <div class="lecture-section-num">01</div>
       <div class="lecture-section-heading">
         <span class="lecture-section-eyebrow">Notion 1 · esperance</span>
-        <h2 class="lecture-section-title">Définir E(X) = Σpᵢ·xᵢ</h2>
+        <h2 class="lecture-section-title">Définir et comprendre E(X)</h2>
       </div>
     </div>
-
     <div class="lecture-section-body">
       <p class="lecture-text">
-        Tu connais déjà, en statistiques, la <strong>moyenne pondérée</strong> : on multiplie chaque valeur par son effectif (ou son coefficient) et on divise par l'effectif total. L'espérance fait exactement la même chose, avec les probabilités comme coefficients — et pas besoin de diviser, puisque leur somme vaut déjà <span class="math">1</span>.
+        Tu connais déjà la moyenne d'une série statistique : on pondère chaque valeur par son effectif. L'espérance fait <strong>exactement la même chose</strong>, en pondérant chaque valeur par sa <strong>probabilité</strong>. Voici la définition officielle :
       </p>
-
       <div class="lecture-callout lecture-callout-key">
-        <div class="lecture-callout-body">
-          <div class="lecture-callout-title">📗 Définition officielle — Espérance mathématique</div>
-          <p>Soit <span class="math">X</span> une variable aléatoire dont la loi de probabilité est donnée par les valeurs <span class="math">x₁, x₂, …, xₙ</span> et les probabilités <span class="math">p₁, p₂, …, pₙ</span>. L'<strong>espérance mathématique</strong> de <span class="math">X</span> est le réel : <span class="math">E(X) = p₁·x₁ + p₂·x₂ + … + pₙ·xₙ = Σpᵢ·xᵢ</span>.</p>
+        <div class="lecture-callout-body"><div class="lecture-callout-title">📗 Définition officielle — Espérance mathématique</div>
+          <p>Soit <span class="math">X</span> une variable aléatoire prenant les valeurs <span class="math">x₁ ; x₂ ; … ; xₙ</span> avec les probabilités <span class="math">p₁ ; p₂ ; … ; pₙ</span>. L'<strong>espérance</strong> de <span class="math">X</span> est le nombre réel :</p>
+          <p><span class="math">E(X) = p₁·x₁ + p₂·x₂ + … + pₙ·xₙ = Σ pᵢ·xᵢ</span></p>
+          <p>C'est la <strong>moyenne pondérée</strong> des valeurs de <span class="math">X</span>, les poids étant les probabilités.</p>
         </div>
       </div>
-
       <div class="lecture-formula-hero">
-        <div class="lecture-formula-hero-label">La formule majeure de la partie</div>
-        <div class="lecture-formula-hero-main">E(X) = Σpᵢ·xᵢ = p₁·x₁ + p₂·x₂ + … + pₙ·xₙ</div>
-        <div class="lecture-formula-hero-desc">Chaque valeur <span class="math">xᵢ</span> est pondérée par sa probabilité <span class="math">pᵢ</span> ; la somme vaut une moyenne car <span class="math">Σpᵢ = 1</span>.</div>
+        <div class="lecture-formula-hero-label">LA formule de la partie — à connaître par cœur</div>
+        <div class="lecture-formula-hero-main">E(X) = Σ pᵢ·xᵢ</div>
+        <div class="lecture-formula-hero-desc">Chaque valeur xᵢ multipliée par sa probabilité pᵢ, puis tout additionné. En pratique : une colonne pᵢ·xᵢ dans le tableau, et le total est E(X).</div>
       </div>
-
       <p class="lecture-text">
-        Le mécanisme est donc simple : on parcourt le tableau de la loi ligne par ligne, on multiplie chaque valeur par sa probabilité, et on additionne tout. Deux remarques avant de calculer :
+        Que signifie ce nombre ? Trois lectures complémentaires, à mobiliser selon la question :
       </p>
-
       <ul class="lecture-list-elegant">
-        <li><strong>Toutes les valeurs participent</strong>, y compris les valeurs faibles ou négatives — chaque valeur multipliée par <em>sa</em> probabilité.</li>
-        <li><strong>Le résultat n'est pas forcément une valeur possible</strong> de <span class="math">X</span> : une moyenne peut tomber entre deux valeurs (tu vas voir <span class="math">E(X) = 3,5</span> pour un dé qui ne sort jamais 3,5).</li>
+        <li><strong>Une moyenne pondérée</strong> : si l'on répétait l'expérience une infinité de fois, la moyenne des valeurs obtenues convergerait vers <span class="math">E(X)</span>. C'est le « centre de gravité » de la loi.</li>
+        <li><strong>Un gain moyen</strong> : sur un grand nombre de parties, le gain par partie se rapproche de <span class="math">E(X)</span>. À un tirage près, tout peut arriver ; à long terme, c'est l'espérance qui commande.</li>
+        <li><strong>Une valeur de référence</strong> : une variable peut n'être <strong>jamais</strong> égale à son espérance — ce n'est pas une valeur « probable », c'est une valeur « moyenne ».</li>
       </ul>
-
-      <div class="lecture-callout lecture-callout-warning">
-        <div class="lecture-callout-body">
-          <div class="lecture-callout-title">⚠️ Le produit, pas le produit des carrés</div>
-          <p>À ce stade, aucun carré n'intervient : on calcule <span class="math">pᵢ × xᵢ</span> (valeur × probabilité), jamais <span class="math">xᵢ²</span> ni <span class="math">pᵢ²</span>. Les carrés, c'est l'affaire de la variance — partie 3. Et rappelle-toi le contrôle de la partie 1 : si <span class="math">Σpᵢ ≠ 1</span>, ton tableau est faux et l'espérance le sera aussi.</p>
-        </div>
-      </div>
-
-      <div class="lecture-example">
-        <div class="lecture-example-label">🔍 Premier calcul — Nombre de piles sur 2 lancers</div>
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">🧮 Exemple complet — L'espérance d'un dé équilibré vaut 3,5</div>
         <div class="lecture-example-content">
-          <p>La loi de <span class="math">X</span> = « nombre de piles sur 2 lancers » est <span class="math">1/4 ; 1/2 ; 1/4</span> sur les valeurs <span class="math">0 ; 1 ; 2</span> (partie 1). Donc :</p>
-          <p><span class="math">E(X) = 0 × 1/4 + 1 × 1/2 + 2 × 1/4 = 0 + 0,5 + 0,5 = 1</span>.</p>
-          <p>Cohérent avec l'intuition : en moyenne, deux lancers produisent <strong>un</strong> pile.</p>
+          <p class="lecture-text" style="margin-bottom:12px">On note <span class="math">Y</span> le score d'un dé équilibré : les six valeurs <span class="math">1</span> à <span class="math">6</span> ont chacune la probabilité <span class="math">1/6</span>. Calculons <span class="math">E(Y)</span> :</p>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p>On substitue la définition : <span class="math">E(Y) = 1/6 × 1 + 1/6 × 2 + 1/6 × 3 + 1/6 × 4 + 1/6 × 5 + 1/6 × 6</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p>On met <span class="math">1/6</span> en facteur : <span class="math">E(Y) = (1 + 2 + 3 + 4 + 5 + 6)/6</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p>On calcule la somme : <span class="math">1 + 2 + 3 + 4 + 5 + 6 = 21</span>, donc <span class="math">E(Y) = 21/6</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p>On simplifie : <span class="math">E(Y) = 3,5</span>. L'espérance d'un dé équilibré est <strong>3,5</strong>.</p></div></div>
+          </div>
         </div>
       </div>
+      <div class="lecture-callout lecture-callout-danger">
+        <div class="lecture-callout-body"><div class="lecture-callout-title">Erreur fréquente au Bac</div>
+          <p>« Le dé ne peut pas sortir 3,5, donc l'espérance 3,5 est absurde » : <strong>faux</strong> ! L'espérance n'a aucune obligation d'être une valeur possible de la variable : elle est en moyenne 3,5, entre les faces 3 et 4. Deuxième piège : oublier de <strong>multiplier par les probabilités</strong> et écrire <span class="math">E(Y) = 1 + 2 + … + 6 = 21</span>. Non : chaque valeur est pondérée par <span class="math">pᵢ</span>.</p>
+        </div>
+      </div>
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 540 292" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Loi du dé équilibré en barres, toutes égales à 1/6, avec ligne verticale pointillée marquant l'espérance 3,5 entre les faces 3 et 4">
+          <text x="270" y="24" style="fill:var(--text-dim)" font-size="12" font-family="Inter" text-anchor="middle">Loi du dé équilibré : chaque probabilité vaut 1/6</text>
+          <line x1="40" y1="232" x2="500" y2="232" style="stroke:var(--text-dim)" stroke-width="2"/>
+          <polygon points="510,232 498,226 498,238" style="fill:var(--text-dim)"/>
+          <text x="506" y="252" style="fill:var(--text-dim)" font-size="11" font-family="Inter">xᵢ</text>
+          <rect x="64" y="82" width="48" height="150" style="fill:var(--accent)"/>
+          <rect x="140" y="82" width="48" height="150" style="fill:var(--accent)"/>
+          <rect x="216" y="82" width="48" height="150" style="fill:var(--accent)"/>
+          <rect x="292" y="82" width="48" height="150" style="fill:var(--accent)"/>
+          <rect x="368" y="82" width="48" height="150" style="fill:var(--accent)"/>
+          <rect x="444" y="82" width="48" height="150" style="fill:var(--accent)"/>
+          <text x="88" y="74" style="fill:var(--text-dim)" font-size="10" font-family="Inter" text-anchor="middle">1/6</text>
+          <text x="164" y="74" style="fill:var(--text-dim)" font-size="10" font-family="Inter" text-anchor="middle">1/6</text>
+          <text x="240" y="74" style="fill:var(--text-dim)" font-size="10" font-family="Inter" text-anchor="middle">1/6</text>
+          <text x="316" y="74" style="fill:var(--text-dim)" font-size="10" font-family="Inter" text-anchor="middle">1/6</text>
+          <text x="392" y="74" style="fill:var(--text-dim)" font-size="10" font-family="Inter" text-anchor="middle">1/6</text>
+          <text x="468" y="74" style="fill:var(--text-dim)" font-size="10" font-family="Inter" text-anchor="middle">1/6</text>
+          <text x="88" y="252" style="fill:var(--text-dim)" font-size="11" font-family="Inter" text-anchor="middle">1</text>
+          <text x="164" y="252" style="fill:var(--text-dim)" font-size="11" font-family="Inter" text-anchor="middle">2</text>
+          <text x="240" y="252" style="fill:var(--text-dim)" font-size="11" font-family="Inter" text-anchor="middle">3</text>
+          <text x="316" y="252" style="fill:var(--text-dim)" font-size="11" font-family="Inter" text-anchor="middle">4</text>
+          <text x="392" y="252" style="fill:var(--text-dim)" font-size="11" font-family="Inter" text-anchor="middle">5</text>
+          <text x="468" y="252" style="fill:var(--text-dim)" font-size="11" font-family="Inter" text-anchor="middle">6</text>
+          <line x1="278" y1="40" x2="278" y2="232" style="stroke:var(--green-bright)" stroke-width="2" stroke-dasharray="6 4"/>
+          <text x="278" y="34" style="fill:var(--green-bright)" font-size="12" font-weight="700" font-family="Inter" text-anchor="middle">E(Y) = 3,5</text>
+          <text x="278" y="274" style="fill:var(--green-bright)" font-size="10" font-family="Inter" text-anchor="middle">l'espérance tombe ENTRE les valeurs 3 et 4 : elle n'a pas besoin d'être atteinte</text>
+        </svg>
+        <figcaption class="lecture-figure-caption">La loi du dé est uniforme : toutes les barres ont la même hauteur <span class="math">1/6</span>, et leur somme vaut <span class="math">1</span>. L'espérance <span class="math">E(Y) = 3,5</span> est le <strong>centre d'équilibre</strong> de cette loi : six barres identiques s'équilibrent exactement entre les faces 3 et 4.</figcaption>
+      </figure>
     </div>
   </section>
-
   <!-- ============================================================ -->
-  <!-- SECTION 2 : EXEMPLE — ESPÉRANCE D'UN DÉ                      -->
+  <!-- SECTION 2 : NOTION 1 · esperance — FIL ROUGE 2 DÉS -->
   <!-- ============================================================ -->
   <section class="lecture-section" id="s2">
     <div class="lecture-section-header">
       <div class="lecture-section-num">02</div>
       <div class="lecture-section-heading">
         <span class="lecture-section-eyebrow">Notion 1 · esperance</span>
-        <h2 class="lecture-section-title">Exemple : l'espérance d'un dé</h2>
+        <h2 class="lecture-section-title">Le fil rouge : E(somme de deux dés) = 7</h2>
       </div>
     </div>
-
     <div class="lecture-section-body">
       <p class="lecture-text">
-        Calculons l'espérance du résultat d'un dé cubique équilibré. La loi est <em>uniforme</em> : chaque face a la probabilité <span class="math">1/6</span>.
+        Reprenons le fil rouge de la partie 1 : <span class="math">X</span> est la somme des faces de deux dés équilibrés, avec sa loi complète. Calculons son espérance <strong>avec la méthode du tableau</strong>, celle que tu utiliseras dans les exercices : on ajoute une colonne <span class="math">pᵢ·xᵢ</span> et on en prend le total.
       </p>
-
+      <div class="lecture-steps">
+        <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p>On reprend le tableau de la loi de <span class="math">X</span> (onze valeurs de 2 à 12, probabilités en 36ᵉ) et on prépare une colonne <span class="math">pᵢ·xᵢ</span>.</p></div></div>
+        <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p>Exemple de calcul de ligne : pour <span class="math">xᵢ = 7</span>, <span class="math">pᵢ·xᵢ = 6/36 × 7 = 42/36</span>.</p></div></div>
+        <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p>On remplit les onze lignes puis on additionne la colonne : <span class="math">Σ pᵢ·xᵢ = 252/36</span> (détail dans le tableau ci-dessous).</p></div></div>
+        <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p>On simplifie : <span class="math">252/36 = 7</span>. Donc <span class="math">E(X) = 7</span> : la somme de deux dés vaut <strong>7 en moyenne</strong> — exactement la valeur la plus fréquente, mais ici en tant que moyenne.</p></div></div>
+        <div class="lecture-step"><div class="lecture-step-number">5</div><div class="lecture-step-content"><p>Double vérification (section 05 le justifiera) : chaque dé vaut <span class="math">3,5</span> en moyenne, et la somme de deux moyennes est la moyenne des sommes : <span class="math">3,5 + 3,5 = 7</span> ✓.</p></div></div>
+      </div>
       <div class="lecture-table">
         <table>
           <thead>
-            <tr><th>Valeurs xᵢ</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th></tr>
+            <tr><th>Valeur <span class="math">xᵢ</span></th><th>Effectif <span class="math">nᵢ</span></th><th><span class="math">pᵢ = nᵢ/36</span></th><th>Produit <span class="math">pᵢ·xᵢ</span></th></tr>
           </thead>
           <tbody>
-            <tr><td>P(X = xᵢ)</td><td>1/6</td><td>1/6</td><td>1/6</td><td>1/6</td><td>1/6</td><td>1/6</td></tr>
+            <tr><td>2</td><td>1</td><td>1/36</td><td>2/36</td></tr>
+            <tr><td>3</td><td>2</td><td>2/36</td><td>6/36</td></tr>
+            <tr><td>4</td><td>3</td><td>3/36</td><td>12/36</td></tr>
+            <tr><td>5</td><td>4</td><td>4/36</td><td>20/36</td></tr>
+            <tr><td>6</td><td>5</td><td>5/36</td><td>30/36</td></tr>
+            <tr><td>7</td><td>6</td><td>6/36</td><td>42/36</td></tr>
+            <tr><td>8</td><td>5</td><td>5/36</td><td>40/36</td></tr>
+            <tr><td>9</td><td>4</td><td>4/36</td><td>36/36</td></tr>
+            <tr><td>10</td><td>3</td><td>3/36</td><td>30/36</td></tr>
+            <tr><td>11</td><td>2</td><td>2/36</td><td>22/36</td></tr>
+            <tr><td>12</td><td>1</td><td>1/36</td><td>12/36</td></tr>
+            <tr><th>Totaux</th><th>36</th><th>1</th><th>252/36 = 7</th></tr>
           </tbody>
         </table>
       </div>
-
-      <div class="lecture-example">
-        <div class="lecture-example-label">🧮 Calcul pas à pas</div>
-        <div class="lecture-example-content">
-          <div class="lecture-steps">
-            <div class="lecture-step">
-              <div class="lecture-step-number">1</div>
-              <div class="lecture-step-content"><p><strong>Vérifier la loi.</strong> <span class="math">1/6 × 6 = 1</span> ✓ — le tableau est correct, on peut espérer.</p></div>
-            </div>
-            <div class="lecture-step">
-              <div class="lecture-step-number">2</div>
-              <div class="lecture-step-content"><p><strong>Appliquer la définition.</strong> <span class="math">E(X) = 1 × 1/6 + 2 × 1/6 + 3 × 1/6 + 4 × 1/6 + 5 × 1/6 + 6 × 1/6</span>.</p></div>
-            </div>
-            <div class="lecture-step">
-              <div class="lecture-step-number">3</div>
-              <div class="lecture-step-content"><p><strong>Factoriser.</strong> Comme toutes les probabilités sont égales : <span class="math">E(X) = (1 + 2 + 3 + 4 + 5 + 6)/6 = 21/6 = 3,5</span>.</p></div>
-            </div>
-            <div class="lecture-step">
-              <div class="lecture-step-number">4</div>
-              <div class="lecture-step-content"><p><strong>Conclure.</strong> En moyenne, un lancer de dé « vaut » <span class="math">3,5</span> — un nombre que le dé ne sort jamais, mais autour duquel les lancers s'équilibrent.</p></div>
-            </div>
-          </div>
+      <div class="lecture-callout">
+        <div class="lecture-callout-body"><div class="lecture-callout-title">✅ Vérification systématique du tableau</div>
+          <p>Colonne <span class="math">pᵢ</span> : <span class="math">Σpᵢ = 36/36 = 1</span> ✓ — c'est bien une loi de probabilité. Colonne <span class="math">pᵢ·xᵢ</span> : <span class="math">2 + 6 + 12 + 20 + 30 + 42 + 40 + 36 + 30 + 22 + 12 = 252</span>, donc <span class="math">E(X) = 252/36 = 7</span> ✓. Détail de l'addition ligne à ligne : <span class="math">2 + 6 = 8</span>, puis <span class="math">+ 12 = 20</span>, <span class="math">+ 20 = 40</span>, <span class="math">+ 30 = 70</span>, <span class="math">+ 42 = 112</span>, <span class="math">+ 40 = 152</span>, <span class="math">+ 36 = 188</span>, <span class="math">+ 30 = 218</span>, <span class="math">+ 22 = 240</span>, <span class="math">+ 12 = 252</span>.</p>
         </div>
       </div>
-
-      <div class="lecture-callout lecture-callout-danger">
-        <div class="lecture-callout-body">
-          <div class="lecture-callout-title">Erreur fréquente au Bac</div>
-          <p>Répondre « l'espérance est 3,5, donc c'est impossible car le dé ne donne jamais 3,5 » : l'espérance est une <strong>moyenne</strong>, pas une valeur prise par <span class="math">X</span>. De même, ne conclue pas que la face 4 est « plus probable » parce qu'elle est proche de 3,5 : toutes les faces restent équiprobables, c'est la <em>moyenne à long terme</em> qui tend vers 3,5.</p>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body"><div class="lecture-callout-title">⚠️ E(X) = 7 ne signifie pas « on obtient souvent 7 »</div>
+          <p>L'espérance dit « <strong>7 en moyenne</strong> », pas « 7 le plus souvent » — même si ici les deux coïncident. Sur un seul lancer, tu obtiens 2 aussi souvent que 7 sort de proportion ; c'est la <strong>moyenne sur des milliers de lancers</strong> qui glisse vers 7. Ne confonds jamais espérance et mode (valeur la plus probable).</p>
         </div>
       </div>
     </div>
   </section>
-
   <!-- ============================================================ -->
-  <!-- SECTION 3 : INTERPRÉTATION — MOYENNE SUR N RÉPÉTITIONS       -->
+  <!-- SECTION 3 : NOTION 1 · esperance — TONTINE -->
   <!-- ============================================================ -->
   <section class="lecture-section" id="s3">
     <div class="lecture-section-header">
       <div class="lecture-section-num">03</div>
       <div class="lecture-section-heading">
         <span class="lecture-section-eyebrow">Notion 1 · esperance</span>
-        <h2 class="lecture-section-title">Interpréter : la moyenne sur N répétitions</h2>
+        <h2 class="lecture-section-title">La tombola de la tontine : E(G) = 400 F</h2>
       </div>
     </div>
-
     <div class="lecture-section-body">
       <p class="lecture-text">
-        Que signifie concrètement <span class="math">E(X) = 3,5</span> ? Imagine que tu lances le dé <strong>600 fois de suite</strong> et que tu notes chaque résultat. Environ 100 fois le 1, environ 100 fois le 2, etc. La moyenne de tes 600 résultats est donc, approximativement :
+        Appliquons la formule au gain brut <span class="math">G</span> de la tombola de la tontine « Solidarité » : 20 billets, un lot de 5000 F, trois lots de 1000 F. Sa loi (partie 1) donne les probabilités 0,80 ; 0,15 ; 0,05 pour les gains 0 ; 1000 ; 5000 F. Voici le calcul, d'abord en étapes, puis en tableau :
       </p>
-
-      <p class="lecture-text">
-        <span class="math">(1 × 100 + 2 × 100 + 3 × 100 + 4 × 100 + 5 × 100 + 6 × 100)/600 = (600 × 3,5)/600 = 3,5</span>.
-      </p>
-
-      <div class="lecture-callout lecture-callout-key">
-        <div class="lecture-callout-body">
-          <div class="lecture-callout-title">📗 Interprétation — Valeur moyenne à long terme</div>
-          <p>Si l'on répète <span class="math">N</span> fois, de façon identique et indépendante, la même expérience, la <strong>moyenne des valeurs obtenues se rapproche de l'espérance</strong> <span class="math">E(X)</span> quand <span class="math">N</span> devient grand. C'est la <strong>loi (faible) des grands nombres</strong>.</p>
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">🧮 Exemple complet — Calculer E(G) et l'interpréter</div>
+        <div class="lecture-example-content">
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p>On substitue la définition : <span class="math">E(G) = 0,80 × 0 + 0,15 × 1000 + 0,05 × 5000</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p>On calcule chaque produit : <span class="math">E(G) = 0 + 150 + 250</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p>On additionne : <span class="math">E(G) = 400</span>. Le gain brut espéré d'un billet est <strong>400 F</strong>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p>On interprète : si la tontine recommence de nombreuses années, ton gain moyen par billet se stabilisera autour de 400 F — jamais exactement 400 F à un tirage donné (400 n'est même pas une valeur possible !).</p></div></div>
+          </div>
+          <div class="lecture-table">
+            <table>
+              <thead>
+                <tr><th>Gain brut <span class="math">xᵢ</span> (F)</th><th>Probabilité <span class="math">pᵢ</span></th><th>Produit <span class="math">pᵢ·xᵢ</span> (F)</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>0</td><td>0,80</td><td>0</td></tr>
+                <tr><td>1000</td><td>0,15</td><td>150</td></tr>
+                <tr><td>5000</td><td>0,05</td><td>250</td></tr>
+                <tr><th>Totaux</th><th>1</th><th>E(G) = 400</th></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
-
-      <div class="lecture-formula-box">
-        <div class="lecture-formula-main">Sur N répétitions : somme totale ≈ N × E(X)</div>
-        <div class="lecture-formula-desc">Exemple : pour 600 lancers de dé, la somme totale des résultats est voisine de <span class="math">600 × 3,5 = 2 100</span> — et non de 600 × 3,5 « au hasard » : c'est une prévision chiffrée.</div>
+      <div class="lecture-callout">
+        <div class="lecture-callout-body"><div class="lecture-callout-title">✅ Deux vérifications indépendantes</div>
+          <p><strong>Par la colonne</strong> : <span class="math">Σpᵢ = 0,80 + 0,15 + 0,05 = 1</span> ✓ et <span class="math">Σpᵢ·xᵢ = 0 + 150 + 250 = 400</span> ✓. <strong>Par l'argent total</strong> : les lots s'élèvent à <span class="math">5000 + 3 × 1000 = 8000</span> F pour 20 billets, soit <span class="math">8000/20 = 400</span> F par billet ✓. Les deux chemins mènent au même 400 : le calcul est sûr.</p>
+        </div>
       </div>
-
       <p class="lecture-text">
-        C'est cette lecture qui rend l'espérance <strong>décisionnaire</strong> : un assureur, une tontine, un organisateur de loterie savent qu'à l'échelle de milliers de contrats ou de parties, ce qui compte, c'est l'espérance — pas un coup de chance isolé. Un jeu dont l'espérance de gain est négative te ruinera <em>en moyenne</em>, même si tu peux gagner une partie précise.
+        Maintenant la question qui intéresse le joueur : le billet coûte <strong>400 F</strong>. Le gain <strong>net</strong> vaut donc <span class="math">G − 400</span>, et son gain net moyen vaut <span class="math">400 − 400 = 0</span> F : ni bénéfice moyen, ni perte moyenne. La tombola est un <strong>jeu équitable</strong> — et cette notion mérite sa propre section.
       </p>
     </div>
   </section>
-
   <!-- ============================================================ -->
-  <!-- SECTION 4 : LINÉARITÉ ET ADDITIVITÉ                          -->
+  <!-- SECTION 4 : NOTION 2 · linearite — JEU ÉQUITABLE -->
   <!-- ============================================================ -->
   <section class="lecture-section" id="s4">
     <div class="lecture-section-header">
       <div class="lecture-section-num">04</div>
       <div class="lecture-section-heading">
         <span class="lecture-section-eyebrow">Notion 2 · linearite</span>
-        <h2 class="lecture-section-title">Linéarité et additivité de l'espérance</h2>
+        <h2 class="lecture-section-title">Le jeu équitable : trouver la bonne mise</h2>
       </div>
     </div>
-
     <div class="lecture-section-body">
       <p class="lecture-text">
-        Refaire tout le tableau de la loi dès que <span class="math">X</span> est transformée serait long. Heureusement, l'espérance a deux propriétés magnifiques qui permettent de passer directement de <span class="math">E(X)</span> à l'espérance d'une expression construite sur <span class="math">X</span>.
+        Un jeu d'argent oppose le joueur à l'organisateur. Le jeu est <strong>équitable</strong> quand, sur la durée, aucun des deux ne gagne ni ne perd en moyenne : le gain <strong>net</strong> (gain brut moins mise) a une espérance nulle.
       </p>
-
-      <div class="lecture-callout lecture-callout-gold">
-        <div class="lecture-callout-body">
-          <div class="lecture-callout-title">📗 Théorème — Linéarité de l'espérance</div>
-          <ul class="lecture-list">
-            <li>Pour tous réels <span class="math">a</span> et <span class="math">b</span> : <span class="math">E(aX + b) = a·E(X) + b</span>.</li>
-            <li>Pour deux variables aléatoires <span class="math">X</span> et <span class="math">Y</span> définies sur le même univers : <span class="math">E(X + Y) = E(X) + E(Y)</span> (additivité).</li>
-            <li>Cas particuliers : <span class="math">E(aX) = a·E(X)</span>, <span class="math">E(X + b) = E(X) + b</span>, et pour une constante <span class="math">k</span>, <span class="math">E(k) = k</span>.</li>
-          </ul>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body"><div class="lecture-callout-title">📗 Définition officielle — Jeu équitable</div>
+          <p>Notons <span class="math">B</span> le gain brut d'une partie et <span class="math">m</span> la mise. Le <strong>gain net</strong> est la variable <span class="math">B − m</span>. Le jeu est <strong>équitable</strong> si et seulement si l'espérance du gain net est nulle :</p>
+          <p><span class="math">E(B − m) = 0</span>, c'est-à-dire <span class="math">E(B) = m</span> : la mise doit égaler le gain brut moyen.</p>
         </div>
       </div>
-
-      <div class="lecture-example">
-        <div class="lecture-example-label">🧮 Exemples — Utiliser la linéarité (dé équilibré, E(X) = 3,5)</div>
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-label">La condition d'équité — le test à poser dans toute copie</div>
+        <div class="lecture-formula-hero-main">E(gain net) = 0</div>
+        <div class="lecture-formula-hero-desc">Gain net = gain brut − mise. Équitable : E(gain net) = 0. Favorable au joueur si E(gain net) &gt; 0, défavorable si E(gain net) &lt; 0.</div>
+      </div>
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">E(gain net) &gt; 0 : favorable&nbsp;&nbsp;·&nbsp;&nbsp;= 0 : équitable&nbsp;&nbsp;·&nbsp;&nbsp;&lt; 0 : défavorable</div>
+        <div class="lecture-formula-desc">Le signe de l'espérance du gain net tranche la question. Un organisateur qui veut dégager une recette choisit une mise telle que le jeu soit défavorable aux joueurs.</div>
+      </div>
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">🧮 Exemple complet — À quelle mise la roue de la fête est-elle équitable ?</div>
         <div class="lecture-example-content">
+          <p class="lecture-text" style="margin-bottom:12px">Une roue de la foire compte <strong>10 secteurs</strong> : 2 secteurs rapportent <span class="math">300</span> F, les 8 autres rien. Quelle mise <span class="math">m</span> rendre le jeu équitable ? Calcul complet, pas à pas :</p>
           <div class="lecture-steps">
-            <div class="lecture-step">
-              <div class="lecture-step-number">1</div>
-              <div class="lecture-step-content"><p><strong>Doubler puis décaler.</strong> Soit <span class="math">Y = 2X + 3</span> : <span class="math">E(Y) = 2 × E(X) + 3 = 2 × 3,5 + 3 = 10</span>. Sans la propriété, il aurait fallu refaire la loi de <span class="math">Y</span> de zéro.</p></div>
-            </div>
-            <div class="lecture-step">
-              <div class="lecture-step-number">2</div>
-              <div class="lecture-step-content"><p><strong>Coefficient négatif.</strong> Soit <span class="math">Z = 3 − 2X</span> : <span class="math">E(Z) = 3 − 2 × E(X) = 3 − 7 = −4</span>. Le facteur <span class="math">−2</span> multiplie l'espérance tout entière, signe compris.</p></div>
-            </div>
-            <div class="lecture-step">
-              <div class="lecture-step-number">3</div>
-              <div class="lecture-step-content"><p><strong>Somme de deux dés.</strong> Les résultats <span class="math">X₁</span> et <span class="math">X₂</span> des deux dés ont chacun pour espérance <span class="math">3,5</span>, donc pour <span class="math">S = X₁ + X₂</span> : <span class="math">E(S) = E(X₁) + E(X₂) = 3,5 + 3,5 = 7</span>.</p></div>
-            </div>
-            <div class="lecture-step">
-              <div class="lecture-step-number">4</div>
-              <div class="lecture-step-content"><p><strong>Vérification directe.</strong> Avec le tableau de la partie 1 : <span class="math">Σk·P(S = k) = (2×1 + 3×2 + 4×3 + 5×4 + 6×5 + 7×6 + 8×5 + 9×4 + 10×3 + 11×2 + 12×1)/36 = 252/36 = 7</span> ✓ — la linéarité donne le même résultat en une ligne.</p></div>
-            </div>
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p>On définit le gain brut <span class="math">B</span> : il prend la valeur <span class="math">300</span> avec la probabilité <span class="math">2/10 = 0,2</span>, et la valeur <span class="math">0</span> avec la probabilité <span class="math">8/10 = 0,8</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p>Le gain net est <span class="math">B − m</span> : ses valeurs sont <span class="math">300 − m</span> (probabilité 0,2) et <span class="math">−m</span> (probabilité 0,8).</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p>On écrit l'espérance du gain net : <span class="math">E(B − m) = 0,2 × (300 − m) + 0,8 × (−m)</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p>On développe : <span class="math">E(B − m) = 60 − 0,2m − 0,8m</span>, puis on réduit : <span class="math">E(B − m) = 60 − m</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">5</div><div class="lecture-step-content"><p>On résout l'équation d'équité : <span class="math">60 − m = 0</span>, donc <span class="math">m = 60</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">6</div><div class="lecture-step-content"><p>On vérifie avec une mise de 60 F : <span class="math">E(B − m) = 0,2 × (300 − 60) + 0,8 × (−60) = 0,2 × 240 − 48 = 48 − 48 = 0</span> ✓. La mise équitable est <strong>60 F</strong>.</p></div></div>
           </div>
         </div>
       </div>
-
-      <div class="lecture-rule">
-        <div class="lecture-rule-label">🧠 Réflexe de calcul</div>
-        <div class="lecture-rule-body">
-          Dès qu'on te demande l'espérance d'une expression du type <span class="math">aX + b</span> ou <span class="math">X + Y</span>, <strong>n'établis jamais la nouvelle loi</strong> : calcule <span class="math">E(X)</span> une fois, puis applique <span class="math">E(aX + b) = a·E(X) + b</span>. C'est plus rapide, moins risqué, et c'est ce que le correcteur attend.
+      <div class="lecture-example"><div class="lecture-example-label">🧮 Exemple — Et pour la tombola de la tontine ?</div><div class="lecture-example-content">
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p>Section 03 : le gain brut espéré vaut <span class="math">E(G) = 400</span> F.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p>Avec une mise <span class="math">m</span>, le gain net moyen vaut <span class="math">E(G) − m = 400 − m</span> (la mise est déduite à chaque billet, elle ne change pas la moyenne du brut).</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p>Équité : <span class="math">400 − m = 0</span>, donc <span class="math">m = 400</span> F — c'est exactement le prix du billet : la tombola est <strong>équitable</strong> ✓.</p></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body"><div class="lecture-callout-title">⚠️ Équitable ne veut pas dire « sans risque »</div>
+          <p>Un jeu équitable a un gain net moyen nul, mais chaque partie reste une loterie : tu peux perdre 60 F à la roue, puis gagner 240 F plus tard. De plus, « équitable » décrit le jeu, pas la stratégie : aucune mise ne rend favorable un jeu défavorable. Si la buvette de l'école installe la roue avec une mise de 100 F, le jeu rapporte <span class="math">60 − 100 = −40</span> F par partie en moyenne au joueur — 40 F de recette moyenne par partie pour la buvette.</p>
         </div>
       </div>
     </div>
   </section>
-
   <!-- ============================================================ -->
-  <!-- SECTION 5 : LE JEU ÉQUITABLE                                 -->
+  <!-- SECTION 5 : NOTION 2 · linearite — LINÉARITÉ -->
   <!-- ============================================================ -->
   <section class="lecture-section" id="s5">
     <div class="lecture-section-header">
       <div class="lecture-section-num">05</div>
       <div class="lecture-section-heading">
-        <span class="lecture-section-eyebrow">Notion 1 · esperance</span>
-        <h2 class="lecture-section-title">Le jeu équitable : calculer la mise</h2>
+        <span class="lecture-section-eyebrow">Notion 2 · linearite</span>
+        <h2 class="lecture-section-title">Linéarité : E(aX + b) et E(X + Y)</h2>
       </div>
     </div>
-
     <div class="lecture-section-body">
       <p class="lecture-text">
-        L'application la plus classique de l'espérance aux examens : déterminer la mise qui rend un jeu « juste ». Le point de vigilance est le vocabulaire : on raisonne sur le <strong>gain algébrique</strong>, c'est-à-dire le gain net (ce qu'on reçoit <em>moins</em> ce qu'on a misé).
+        Recalculer une espérance à chaque fois serait épuisant. Heureusement, l'espérance se comporte <strong>linéairement</strong> : multiplier et décaler une variable multiplie et décale son espérance. Ces deux propriétés sont au programme et économisent des tableaux entiers.
       </p>
-
-      <div class="lecture-callout lecture-callout-key">
-        <div class="lecture-callout-body">
-          <div class="lecture-callout-title">📗 Définition officielle — Jeu équitable</div>
-          <p>Un jeu est <strong>équitable</strong> si l'espérance du gain algébrique est nulle : <span class="math">E(G) = 0</span>. Si <span class="math">E(G) &gt; 0</span>, le jeu est favorable au joueur ; si <span class="math">E(G) &lt; 0</span>, il lui est défavorable.</p>
-        </div>
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">E(aX + b) = a·E(X) + b</div>
+        <div class="lecture-formula-desc">La variable aX + b prend les valeurs a·xᵢ + b avec les mêmes probabilités pᵢ : chaque produit devient pᵢ·(a·xᵢ + b), d'où le résultat. Valable pour tous réels a et b.</div>
       </div>
-
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">E(X + Y) = E(X) + E(Y)</div>
+        <div class="lecture-formula-desc">L'espérance d'une somme est la somme des espérances — sans aucune hypothèse de plus. C'est elle qui justifie la double vérification de la section 02.</div>
+      </div>
+      <p class="lecture-text">
+        La première propriété se démontre en trois lignes, avec la définition et la vérification <span class="math">Σpᵢ = 1</span> :
+      </p>
+      <div class="lecture-steps">
+        <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p>La variable <span class="math">aX + b</span> prend les valeurs <span class="math">a·xᵢ + b</span> avec les mêmes probabilités <span class="math">pᵢ</span>. Par définition : <span class="math">E(aX + b) = Σ pᵢ·(a·xᵢ + b)</span>.</p></div></div>
+        <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p>On distribue la somme : <span class="math">E(aX + b) = a·Σ pᵢ·xᵢ + b·Σ pᵢ</span>.</p></div></div>
+        <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p>On reconnaît <span class="math">E(X)</span> dans la première somme et <span class="math">Σpᵢ = 1</span> dans la seconde : <span class="math">E(aX + b) = a·E(X) + b</span> ✓.</p></div></div>
+      </div>
       <div class="lecture-example lecture-example-featured">
-        <div class="lecture-example-label">🧮 Exemple complet — Trouver la mise équitable</div>
+        <div class="lecture-example-label">🧮 Exemples complets — Calculer sans refaire le tableau</div>
         <div class="lecture-example-content">
-          <p><strong>Énoncé.</strong> On lance un dé cubique équilibré. Si tu obtiens un 6, tu reçois 600 F ; sinon tu ne reçois rien. Quelle mise <span class="math">m</span> (payée avant le lancer) rend le jeu équitable ?</p>
           <div class="lecture-steps">
-            <div class="lecture-step">
-              <div class="lecture-step-number">1</div>
-              <div class="lecture-step-content"><p><strong>Définir le gain algébrique.</strong> Si le 6 sort (probabilité <span class="math">1/6</span>) : <span class="math">G = 600 − m</span>. Sinon (probabilité <span class="math">5/6</span>) : <span class="math">G = −m</span> — la mise est perdue.</p></div>
-            </div>
-            <div class="lecture-step">
-              <div class="lecture-step-number">2</div>
-              <div class="lecture-step-content"><p><strong>Poser l'espérance.</strong> <span class="math">E(G) = (600 − m) × 1/6 + (−m) × 5/6</span>.</p></div>
-            </div>
-            <div class="lecture-step">
-              <div class="lecture-step-number">3</div>
-              <div class="lecture-step-content"><p><strong>Réduire.</strong> <span class="math">E(G) = (600 − m − 5m)/6 = (600 − 6m)/6 = 100 − m</span>.</p></div>
-            </div>
-            <div class="lecture-step">
-              <div class="lecture-step-number">4</div>
-              <div class="lecture-step-content"><p><strong>Écrire l'équité.</strong> Le jeu est équitable si <span class="math">E(G) = 0</span>, soit <span class="math">100 − m = 0</span>, donc <span class="math">m = 100</span>.</p></div>
-            </div>
-            <div class="lecture-step">
-              <div class="lecture-step-number">5</div>
-              <div class="lecture-step-content"><p><strong>Interpréter.</strong> Avec une mise de 100 F, le jeu est équitable. Au-delà de 100 F, <span class="math">E(G) &lt; 0</span> : le jeu est défavorable ; en dessous, il est favorable au joueur.</p></div>
-            </div>
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p>Fil rouge : <span class="math">E(X) = 7</span> pour la somme de deux dés. Pour la variable « double plus un » <span class="math">2X + 1</span> : <span class="math">E(2X + 1) = 2 × 7 + 1 = 15</span>. Sans aucun tableau !</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p>Encore : <span class="math">E(3X − 5) = 3 × 7 − 5 = 21 − 5 = 16</span>. On multiplie d'abord, on décale ensuite.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p>Double vérification du fil rouge : en notant <span class="math">X₁</span> et <span class="math">X₂</span> les scores des deux dés, <span class="math">X = X₁ + X₂</span>, donc <span class="math">E(X) = E(X₁) + E(X₂) = 3,5 + 3,5 = 7</span> ✓ — on retrouve le résultat de la section 02 par un second chemin.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p>Tombola : le gain net est <span class="math">G − 400</span>, donc <span class="math">E(G − 400) = E(G) − 400 = 400 − 400 = 0</span> ✓ — la linéarité avec <span class="math">a = 1 ; b = −400</span> confirme l'équité trouvée en section 04.</p></div></div>
           </div>
         </div>
       </div>
-
-      <div class="lecture-callout lecture-callout-warning">
-        <div class="lecture-callout-body">
-          <div class="lecture-callout-title">⚠️ Compter les pertes en négatif</div>
-          <p>Toute la question repose sur le signe : la mise perdue s'écrit <span class="math">−m</span>, pas <span class="math">m</span>, et le gain net d'un lancer gagnant est <span class="math">600 − m</span>, pas <span class="math">600</span>. Relis l'énoncé pour savoir si les montants donnés sont des gains <em>bruts</em> (il faut soustraire la mise) ou des gains <em>nets</em> (rien à soustraire).</p>
+      <div class="lecture-callout lecture-callout-danger">
+        <div class="lecture-callout-body"><div class="lecture-callout-title">Erreur fréquente au Bac</div>
+          <p>La linéarité concerne les <strong>constantes</strong> <span class="math">a</span> et <span class="math">b</span>, pas les carrés ni les produits de variables : <span class="math">E(X²) ≠ (E(X))²</span> en général, et il n'existe <strong>aucune</strong> formule simple pour <span class="math">E(X·Y)</span> au programme. Pour <span class="math">E(X²)</span>, pas de raccourci : on calcule <span class="math">Σ pᵢ·xᵢ²</span> — c'est justement l'objet de la partie 3 (variance).</p>
         </div>
       </div>
     </div>
   </section>
-
   <!-- ============================================================ -->
-  <!-- SECTION 6 : GAIN MOYEN — L'EXEMPLE DU MARCHÉ                 -->
+  <!-- SECTION 6 : NOTION 1 · esperance — PILES -->
   <!-- ============================================================ -->
   <section class="lecture-section" id="s6">
     <div class="lecture-section-header">
       <div class="lecture-section-num">06</div>
       <div class="lecture-section-heading">
         <span class="lecture-section-eyebrow">Notion 1 · esperance</span>
-        <h2 class="lecture-section-title">Gain moyen : l'exemple du marché</h2>
+        <h2 class="lecture-section-title">Encore un exemple : le nombre de piles</h2>
       </div>
     </div>
-
     <div class="lecture-section-body">
       <p class="lecture-text">
-        Le même calcul sert à prévoir un résultat d'exploitation : voici un exemple à la tontine, où l'on peut <strong>gagner ou perdre</strong> selon le jour.
+        Un dernier exemple pour automatiser le réflexe « tableau + colonne produit + total ». On lance deux fois une pièce équilibrée et on note <span class="math">N</span> le nombre de piles ; sa loi (partie 1) est 1/4 ; 1/2 ; 1/4 sur les valeurs 0 ; 1 ; 2.
       </p>
-
       <div class="lecture-example lecture-example-featured">
-        <div class="lecture-example-label">🧮 Exemple — Gain moyen journalier d'une commerçante</div>
+        <div class="lecture-example-label">🧮 Exemple complet — E(N) par la colonne produit</div>
         <div class="lecture-example-content">
-          <p><strong>Énoncé.</strong> Chaque jour de marché, une commerçante réalise un bénéfice de 5 000 F avec une probabilité de <span class="math">0,7</span>, et subit une perte de 2 000 F avec une probabilité de <span class="math">0,3</span>. Quel est son gain moyen journalier ? Que peut-elle espérer sur 30 jours de marché ?</p>
           <div class="lecture-steps">
-            <div class="lecture-step">
-              <div class="lecture-step-number">1</div>
-              <div class="lecture-step-content"><p><strong>Définir la variable.</strong> <span class="math">G</span> = gain algébrique du jour : <span class="math">G = 5 000</span> avec probabilité <span class="math">0,7</span> ; <span class="math">G = −2 000</span> avec probabilité <span class="math">0,3</span> (perte = gain négatif).</p></div>
-            </div>
-            <div class="lecture-step">
-              <div class="lecture-step-number">2</div>
-              <div class="lecture-step-content"><p><strong>Vérifier la loi.</strong> <span class="math">0,7 + 0,3 = 1</span> ✓.</p></div>
-            </div>
-            <div class="lecture-step">
-              <div class="lecture-step-number">3</div>
-              <div class="lecture-step-content"><p><strong>Calculer l'espérance.</strong> <span class="math">E(G) = 0,7 × 5 000 + 0,3 × (−2 000) = 3 500 − 600 = 2 900</span>. Le gain moyen journalier est de <strong>2 900 F</strong>.</p></div>
-            </div>
-            <div class="lecture-step">
-              <div class="lecture-step-number">4</div>
-              <div class="lecture-step-content"><p><strong>Projeter sur 30 jours.</strong> Par la loi des grands nombres, le gain total attendu sur 30 jours est voisin de <span class="math">30 × 2 900 = 87 000 F</span>.</p></div>
-            </div>
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p>On dresse le tableau avec la colonne <span class="math">pᵢ·xᵢ</span> (voir ci-dessous) : les produits valent <span class="math">0 ; 1/2 ; 1/2</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p>On vérifie la loi : <span class="math">Σpᵢ = 1/4 + 1/2 + 1/4 = 1</span> ✓.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p>On additionne la colonne : <span class="math">E(N) = 0 + 1/2 + 1/2 = 1</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p>On interprète : sur deux lancers, on obtient <strong>1 pile en moyenne</strong>. Vérification de bon sens : sur beaucoup de séries de deux lancers, environ une série sur deux donne un pile, une sur quatre donne deux piles, une sur quatre aucune — la moyenne s'établit bien à 1 pile par série.</p></div></div>
+          </div>
+          <div class="lecture-table">
+            <table>
+              <thead>
+                <tr><th>Valeur <span class="math">xᵢ</span></th><th>Probabilité <span class="math">pᵢ</span></th><th>Produit <span class="math">pᵢ·xᵢ</span></th></tr>
+              </thead>
+              <tbody>
+                <tr><td>0</td><td>1/4</td><td>0</td></tr>
+                <tr><td>1</td><td>1/2</td><td>1/2</td></tr>
+                <tr><td>2</td><td>1/4</td><td>1/2</td></tr>
+                <tr><th>Totaux</th><th>1</th><th>E(N) = 1</th></tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
-
-      <p class="lecture-text">
-        Remarque le rôle des deux probabilités : le bénéfice fréquent (<span class="math">0,7</span>) pèse plus lourd dans la moyenne que la perte plus rare (<span class="math">0,3</span>), et c'est justement ce qui rend l'activité rentable <em>en moyenne</em>. Si la probabilité de perte montait à <span class="math">0,5</span>, l'espérance deviendrait <span class="math">0,5 × 5 000 + 0,5 × (−2 000) = 1 500</span> : même activité, perspectives très différentes.
-      </p>
-
-      <div class="lecture-callout lecture-callout-danger">
-        <div class="lecture-callout-body">
-          <div class="lecture-callout-title">Erreur fréquente au Bac</div>
-          <p>Ne confonds pas <strong>valeur la plus probable</strong> et <strong>espérance</strong> : ici la valeur la plus probable est <span class="math">5 000</span> (probabilité <span class="math">0,7</span>), mais l'espérance vaut <span class="math">2 900</span> car la perte, même plus rare, tire la moyenne vers le bas. Les deux nombres répondent à deux questions différentes.</p>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body"><div class="lecture-callout-title">⚠️ L'ordre des opérations qui rapporte les points</div>
+          <p>Avant tout calcul d'espérance : <strong>1)</strong> écrire ou rappeler le tableau de loi ; <strong>2)</strong> vérifier <span class="math">Σpᵢ = 1</span> ; <strong>3)</strong> seulement ensuite, poser <span class="math">E(X) = Σ pᵢ·xᵢ</span> et calculer. Poser la formule sans tableau, ou calculer sans vérification, sont les deux pertes de points les plus courantes sur ce thème.</p>
         </div>
       </div>
     </div>
   </section>
-
   <!-- ============================================================ -->
-  <!-- SECTION 7 : BILAN                                            -->
+  <!-- SECTION 7 : BILAN -->
   <!-- ============================================================ -->
   <section class="lecture-section" id="s7">
     <div class="lecture-section-header">
       <div class="lecture-section-num">07</div>
       <div class="lecture-section-heading">
         <span class="lecture-section-eyebrow">Bilan</span>
-        <h2 class="lecture-section-title">Méthodes et pièges de l'espérance</h2>
+        <h2 class="lecture-section-title">L'essentiel de la partie</h2>
       </div>
     </div>
-
     <div class="lecture-section-body">
       <p class="lecture-text">
-        Réunissons les trois formules qui font tout le travail de cette partie.
+        Tu sais maintenant attacher un « centre de gravité » à toute loi de probabilité : l'espérance, moyenne pondérée des valeurs, interprétée en gain moyen sur la durée — et maîtrisée encore mieux grâce à la linéarité, qui vérifie tout en deux lignes.
       </p>
-
       <div class="lecture-formula-hero">
-        <div class="lecture-formula-hero-label">Les formules à connaître par cœur</div>
-        <div class="lecture-formula-hero-main">E(X) = Σpᵢ·xᵢ · E(aX + b) = a·E(X) + b · E(X + Y) = E(X) + E(Y)</div>
-        <div class="lecture-formula-hero-desc">Définition, puis linéarité et additivité : avec ces trois lignes, plus besoin de refaire un tableau de loi.</div>
+        <div class="lecture-formula-hero-label">La carte d'identité de l'espérance</div>
+        <div class="lecture-formula-hero-main">E(X) = Σ pᵢ·xᵢ&nbsp;&nbsp;·&nbsp;&nbsp;E(aX + b) = a·E(X) + b&nbsp;&nbsp;·&nbsp;&nbsp;E(X + Y) = E(X) + E(Y)</div>
+        <div class="lecture-formula-hero-desc">Définition, effet d'une transformation affine, additivité : les trois propriétés qui font tout le travail du chapitre.</div>
       </div>
-
       <ul class="lecture-list-elegant">
-        <li><strong>Calcul direct</strong> : parcourir le tableau de la loi, multiplier chaque <span class="math">xᵢ</span> par son <span class="math">pᵢ</span>, tout additionner.</li>
-        <li><strong>Interprétation</strong> : <span class="math">E(X)</span> est la valeur moyenne sur un grand nombre de répétitions ; somme totale attendue ≈ <span class="math">N × E(X)</span>.</li>
-        <li><strong>Jeux</strong> : équitable ⇔ <span class="math">E(G) = 0</span> ; favorable ⇔ <span class="math">E(G) &gt; 0</span> ; toujours raisonner sur le gain <em>algébrique</em> (pertes comptées négativement).</li>
-        <li><strong>Repères numériques</strong> : dé équilibré, <span class="math">E(X) = 3,5</span> · piles sur 2 lancers, <span class="math">E(X) = 1</span> · somme de deux dés, <span class="math">E(S) = 7</span> · marché, <span class="math">E(G) = 2 900 F</span>.</li>
+        <li><span class="math">E(X) = Σ pᵢ·xᵢ</span> : chaque valeur pondérée par sa probabilité. En pratique : colonne <span class="math">pᵢ·xᵢ</span> dans le tableau de loi, le total est <span class="math">E(X)</span>.</li>
+        <li><span class="math">E(X)</span> est une <strong>moyenne</strong>, pas une valeur fréquente : elle peut ne jamais être prise par la variable (le dé : 3,5).</li>
+        <li>Interprétation gains : sur un grand nombre de parties, le gain moyen par partie tend vers <span class="math">E(X)</span> (tombola : 400 F le billet).</li>
+        <li>Jeu équitable : <span class="math">E(gain net) = 0</span>, c'est-à-dire mise = gain brut moyen (roue de la fête : 60 F ; tombola : 400 F).</li>
+        <li>Linéarité : <span class="math">E(aX + b) = a·E(X) + b</span> et <span class="math">E(X + Y) = E(X) + E(Y)</span> — pour calculer vite (double + un : 15) et vérifier (3,5 + 3,5 = 7).</li>
+        <li>Nombre de piles sur 2 lancers : <span class="math">E(N) = 1</span> — le réflexe tableau + colonne produit + total.</li>
       </ul>
-
       <div class="lecture-callout lecture-callout-warning">
-        <div class="lecture-callout-body">
-          <div class="lecture-callout-title">⚠️ Rédaction type pour l'examen</div>
-          <p>Un calcul d'espérance bien noté contient : le <strong>tableau de la loi</strong> (avec <span class="math">Σpᵢ = 1</span> vérifié), la <strong>définition appliquée</strong> (<span class="math">E(X) = Σpᵢ·xᵢ</span>), puis le <strong>résultat avec son interprétation</strong> (« gain moyen de… », « jeu équitable pour… »). L'interprétation finale fait souvent la différence entre une copie moyenne et une bonne copie.</p>
+        <div class="lecture-callout-body"><div class="lecture-callout-title">⚠️ Réflexe rédaction pour l'examen</div>
+          <p>« Calculer l'espérance » impose : tableau de loi (ou son rappel), vérification <span class="math">Σpᵢ = 1</span>, formule <span class="math">E(X) = Σ pᵢ·xᵢ</span> posée, puis <strong>une phrase d'interprétation</strong> avec unité (« le gain moyen par billet est de 400 F »). Et n'oublie pas : <span class="math">E(X²) ≠ (E(X))²</span> — le carré de l'espérance n'est pas l'espérance du carré, c'est le sujet de la partie 3.</p>
         </div>
       </div>
     </div>
   </section>
-
   <!-- ===== QCM D'ENTRAÎNEMENT ===== -->
   <div class="lecture-quiz">
     <div class="lecture-quiz-item">
-      <p class="lecture-quiz-q">Q1 — L'espérance du résultat d'un dé cubique équilibré vaut :</p>
-      <div class="lecture-quiz-options">
-        <span>A) 3</span>
-        <span>B) 3,5</span>
-        <span>C) 4</span>
-        <span>D) 21</span>
-      </div>
-      <details>
-        <summary>Voir la réponse</summary>
-        <div class="lecture-quiz-answer"><strong>B) 3,5.</strong> <span class="math">E(X) = (1 + 2 + 3 + 4 + 5 + 6)/6 = 21/6 = 3,5</span>. L'option D) 21 est la somme des faces <em>sans</em> la division par 6 ; l'option A) 3 oublie que la moyenne des 6 premières valeurs n'est pas la valeur centrale de la liste de 1 à 6.</div>
-      </details>
+      <p class="lecture-quiz-q">Q1 — Quelle est l'espérance du score d'un dé équilibré ?</p>
+      <div class="lecture-quiz-options"><span>A) 3</span><span>B) 3,5</span><span>C) 4</span><span>D) 21</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><strong>B) 3,5.</strong> E(Y) = (1 + 2 + 3 + 4 + 5 + 6) × 1/6 = 21/6 = 3,5. (D est la somme brute sans pondération par les probabilités — le piège classique.)</div></details>
     </div>
     <div class="lecture-quiz-item">
-      <p class="lecture-quiz-q">Q2 — Une variable aléatoire X a pour espérance E(X) = 5. Alors E(2X + 1) vaut :</p>
-      <div class="lecture-quiz-options">
-        <span>A) 11</span>
-        <span>B) 10</span>
-        <span>C) 6</span>
-        <span>D) 21</span>
-      </div>
-      <details>
-        <summary>Voir la réponse</summary>
-        <div class="lecture-quiz-answer"><strong>A) 11.</strong> Par linéarité : <span class="math">E(2X + 1) = 2·E(X) + 1 = 2 × 5 + 1 = 11</span>. L'option B) 10 oublie le <span class="math">+ b</span> ; c'est <span class="math">E(2X)</span> qui vaut 10.</div>
-      </details>
+      <p class="lecture-quiz-q">Q2 — Si <span class="math">E(X) = 5</span>, que vaut <span class="math">E(3X − 2)</span> ?</p>
+      <div class="lecture-quiz-options"><span>A) 13</span><span>B) 15</span><span>C) 17</span><span>D) 3</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><strong>A) 13.</strong> Par linéarité : E(3X − 2) = 3 × E(X) − 2 = 3 × 5 − 2 = 13. On multiplie l'espérance par 3, puis on décale de −2.</div></details>
     </div>
     <div class="lecture-quiz-item">
-      <p class="lecture-quiz-q">Q3 — Un jeu est équitable lorsque l'espérance du gain algébrique vérifie :</p>
-      <div class="lecture-quiz-options">
-        <span>A) E(G) &gt; 0</span>
-        <span>B) E(G) = 0</span>
-        <span>C) E(G) &lt; 0</span>
-        <span>D) E(G) = 1</span>
-      </div>
-      <details>
-        <summary>Voir la réponse</summary>
-        <div class="lecture-quiz-answer"><strong>B) E(G) = 0.</strong> C'est la définition : ni le joueur ni l'organisateur n'est avantagé en moyenne. Si <span class="math">E(G) &gt; 0</span> le jeu est favorable au joueur, si <span class="math">E(G) &lt; 0</span> il lui est défavorable — le cas des loteries et casinos, dont l'organisateur garde une espérance positive.</div>
-      </details>
+      <p class="lecture-quiz-q">Q3 — Un jeu est équitable lorsque :</p>
+      <div class="lecture-quiz-options"><span>A) E(gain brut) = 0</span><span>B) E(gain net) = 0</span><span>C) P(gagner) = P(perdre)</span><span>D) la mise est toujours remboursée</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><strong>B) E(gain net) = 0.</strong> Le gain net (brut − mise) doit avoir une espérance nulle : ni gain ni perte en moyenne. (C est le piège : des chances égales ne rendent pas le jeu équitable si les montants sont inégaux — mise 100 F contre gain 150 F avec 50 % chacun donne E(gain net) = 0,5 × 50 − 0,5 × 100 = −25 F.)</div></details>
     </div>
   </div>
-
   <!-- ===== RÉCAPITULATIF ===== -->
   <div class="lecture-recap">
     <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
     <ul class="lecture-recap-list">
-      <li><strong>[esperance]</strong> Définition : <span class="math">E(X) = Σpᵢ·xᵢ</span> — chaque valeur multipliée par sa probabilité, le tout additionné</li>
-      <li><strong>[esperance]</strong> <span class="math">E(X)</span> est une moyenne pondérée : elle peut ne pas être une valeur possible de <span class="math">X</span> (dé : <span class="math">E(X) = 3,5</span>)</li>
-      <li><strong>[esperance]</strong> Interprétation : sur <span class="math">N</span> répétitions, la moyenne des valeurs obtenues se rapproche de <span class="math">E(X)</span> ; somme totale ≈ <span class="math">N × E(X)</span></li>
-      <li><strong>[esperance]</strong> Jeu équitable ⇔ <span class="math">E(gain algébrique) = 0</span> ; pertes comptées en négatif</li>
-      <li><strong>[esperance]</strong> Repères : dé, <span class="math">E = 3,5</span> · piles sur 2 lancers, <span class="math">E = 1</span> · jeu du 6 (600 F), mise équitable 100 F · marché, gain moyen 2 900 F</li>
-      <li><strong>[linearite]</strong> <span class="math">E(aX + b) = a·E(X) + b</span> pour tous réels <span class="math">a</span>, <span class="math">b</span> — nul besoin de refaire la loi de <span class="math">aX + b</span></li>
-      <li><strong>[linearite]</strong> <span class="math">E(X + Y) = E(X) + E(Y)</span> : l'espérance d'une somme est la somme des espérances (somme de deux dés : <span class="math">3,5 + 3,5 = 7</span>)</li>
-      <li><strong>[esperance]</strong> Valeur la plus probable ≠ espérance : ce sont deux questions différentes</li>
-      <li><strong>[methode]</strong> Toujours : vérifier <span class="math">Σpᵢ = 1</span> avant de calculer, interpréter le résultat après</li>
+      <li><strong>[esperance]</strong> <span class="math">E(X) = p₁·x₁ + p₂·x₂ + … + pₙ·xₙ = Σ pᵢ·xᵢ</span> : moyenne des valeurs pondérée par les probabilités</li>
+      <li><strong>[esperance]</strong> Méthode tableau : colonne <span class="math">pᵢ·xᵢ</span>, vérifier <span class="math">Σpᵢ = 1</span>, le total de la colonne est <span class="math">E(X)</span></li>
+      <li><strong>[esperance]</strong> <span class="math">E(X)</span> peut ne jamais être prise par la variable : un dé équilibré a pour espérance 3,5</li>
+      <li><strong>[esperance]</strong> Sens : gain moyen par partie sur un grand nombre de parties — tombola : <span class="math">E(G) = 400</span> F par billet</li>
+      <li><strong>[esperance]</strong> Fil rouge : la somme de deux dés a pour espérance <span class="math">E(X) = 252/36 = 7</span>, retrouvée aussi par <span class="math">3,5 + 3,5</span></li>
+      <li><strong>[linearite]</strong> <span class="math">E(aX + b) = a·E(X) + b</span> pour tous réels a et b — démontrée avec <span class="math">Σpᵢ = 1</span></li>
+      <li><strong>[linearite]</strong> <span class="math">E(X + Y) = E(X) + E(Y)</span> — l'espérance d'une somme est la somme des espérances</li>
+      <li><strong>[linearite]</strong> Jeu équitable ⇔ <span class="math">E(gain net) = 0</span> ⇔ mise = gain brut moyen ; favorable si &gt; 0, défavorable si &lt; 0 (roue : mise équitable 60 F)</li>
+      <li><strong>[linearite]</strong> Attention : <span class="math">E(X²) ≠ (E(X))²</span> — l'espérance du carré se calcule par <span class="math">Σ pᵢ·xᵢ²</span> (partie 3)</li>
     </ul>
   </div>
-
   <!-- ===== FIN ===== -->
   <div class="lecture-end">
     <span class="lecture-end-icon">🎯</span>
     <div class="lecture-end-text">Partie 2 terminée !</div>
-    <div class="lecture-end-sub">Passe à la partie suivante : variance et écart-type — mesurer la dispersion du hasard</div>
+    <div class="lecture-end-sub">Passe à la partie suivante : la variance et l'écart-type, pour mesurer le risque autour de E(X)</div>
     <div class="lecture-end-divider"></div>
   </div>
-
 </div>

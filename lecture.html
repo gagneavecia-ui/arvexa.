@@ -2564,12 +2564,16 @@ function promoteMathLines(root) {
       if (!others.length) return;
 
       // ponctuation de fin de phrase collée au span → suit la formule
+      // v5.2 : tolère l'espace avant la ponctuation (« 2i = 0 + 2i » + « : »)
+      // → le « : » est collé à la formule (fini le « : » orphelin) ;
+      // espace insécable avant : et ; (typographie FR)
       const nx = sp.nextSibling;
       if (nx && nx.nodeType === 3) {
-        const m = nx.textContent.match(/^([.,;…]+)/);
+        const m = nx.textContent.match(/^[ \t\u00a0]*([:;,….]+)/);
         if (m) {
-          sp.appendChild(document.createTextNode(m[1]));
-          nx.textContent = nx.textContent.slice(m[1].length);
+          const glue = (m[1] === ':' || m[1] === ';') ? '\u00a0' : '';
+          sp.appendChild(document.createTextNode(glue + m[1]));
+          nx.textContent = nx.textContent.slice(m[0].length);
         }
       }
       sp.classList.add('math-line');
@@ -2811,9 +2815,6 @@ function renderPdfReader(pdfPath) {
           <i class="fas fa-plus"></i>
         </button>
         <span class="arv-pdf-sep"></span>
-        <button class="arv-pdf-tbtn gold" id="arvPdfHtml" title="Lire la version HTML (lecture à voix haute, notes)">
-          <i class="fas fa-globe"></i>
-        </button>
         <a class="arv-pdf-tbtn gold" href="${pdfPath}" download title="Télécharger le PDF">
           <i class="fas fa-download"></i>
         </a>
@@ -2844,15 +2845,24 @@ function renderPdfReader(pdfPath) {
 }
 
 // ================================================================
-// ✅ v5.1 — VISIONNEUSE PDF ARVEXA (canvas pdf.js, maison)
+// ✅ v5.2 — VISIONNEUSE PDF ARVEXA (canvas pdf.js, maison)
 // Zéro lecteur système : les pages A4 sont rendues en canvas,
 // empilées dans le flux (la barre de progression de l'app suit le
 // scroll normalement). Rendu paresseux ±1 écran, nettoyage mémoire
 // des pages lointaines, zoom 60–300 %, navigation clavier/boutons.
+// v5.2 : NETTETÉ — rendu au minimum 2× la densité d'écran (plancher
+// dpr, fini le flou sur les écrans dpr 1), garde-fou mémoire canvas
+// (≤ ~12 Mpx, ≤ 4096 px par côté — au-delà les navigateurs mobiles
+// brident le canvas en silence et tout devient flou), et RE-RENDU
+// automatique au pinch-zoom (visualViewport.scale) : zoomer avec
+// les doigts reste net. Affichage 100 % PDF : plus aucun bouton de
+// retour vers la version HTML (consigne propriétaire).
 // ================================================================
 const ARV_PDF_ZOOMS = [0.6, 0.8, 1, 1.25, 1.5, 2, 2.5, 3];
 const ARV_PDF_JS = 'assets/pdfjs/pdf.min.js';
 const ARV_PDF_WORKER = 'assets/pdfjs/pdf.worker.min.js';
+const ARV_PDF_MAX_CANVAS_PX = 12 * 1024 * 1024;   // ~12 Mpx (limite iOS safe)
+const ARV_PDF_MAX_CANVAS_DIM = 4096;              // largeur max par canvas
 let arvPdfState = null;   // état de la visionneuse courante
 let arvPdfSeq = 0;        // anti-course (changement rapide de partie)
 
@@ -2860,6 +2870,12 @@ function destroyArvPdf() {
   if (!arvPdfState) return;
   try { if (arvPdfState.observer) arvPdfState.observer.disconnect(); } catch (e) {}
   try { if (arvPdfState.doc) arvPdfState.doc.destroy(); } catch (e) {}
+  try {
+    if (arvPdfState.vvHook && window.visualViewport) {
+      window.visualViewport.removeEventListener('resize', arvPdfState.vvHook);
+      window.visualViewport.removeEventListener('scroll', arvPdfState.vvHook);
+    }
+  } catch (e) {}
   arvPdfState = null;
 }
 
@@ -2874,12 +2890,63 @@ function loadArvPdfJs() {
   });
 }
 
+// ── Netteté (v5.2) ────────────────────────────────────────────
+// Échelle interne visée = cssScale × max(dpr, 2) × pinch-zoom.
+// Le plancher 2 garantit un texte net même sur les écrans déclarés
+// dpr 1 ; le pinch-zoom (visualViewport.scale) est intégré pour que
+// zoomer avec les doigts ne dégrade jamais la netteté. Garde-fou :
+// le canvas final reste ≤ ~12 Mpx et ≤ 4096 px par côté (au-delà,
+// les navigateurs mobiles brident le canvas EN SILENCE → flou).
+function arvVvScale() {
+  try {
+    const s = (window.visualViewport && window.visualViewport.scale) || 1;
+    return Math.min(Math.max(s, 1), 4);
+  } catch (e) { return 1; }
+}
+
+function arvPdfDpr(cssScale, pageW, pageH) {
+  if (!(cssScale > 0) || !(pageW > 0) || !(pageH > 0)) return 2;
+  const base = Math.max(window.devicePixelRatio || 1, 2);
+  const want = cssScale * base * arvVvScale();
+  const maxTotal = Math.sqrt(ARV_PDF_MAX_CANVAS_PX / (pageW * pageH));
+  const maxDim = ARV_PDF_MAX_CANVAS_DIM / pageW;
+  const s = Math.max(1, Math.min(want, maxTotal, maxDim));
+  return s / cssScale;
+}
+
+// Pinch-zoom : re-rend les pages visibles à la nouvelle résolution.
+function wireArvVvZoom(state) {
+  if (!window.visualViewport || state.vvHook) return;
+  let timer = null;
+  let lastScale = 1;
+  state.vvHook = () => {
+    const s = arvVvScale();
+    if (Math.abs(s - lastScale) < 0.05) return;
+    lastScale = s;
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      const st = arvPdfState;
+      if (!st || !st.pageCount) return;
+      const cur = Math.max(0, (st.currentPage || 1) - 1);
+      for (let k = Math.max(0, cur - 1); k <= Math.min(st.pageCount - 1, cur + 1); k++) {
+        if (st.rendered[k]) {
+          st.rendered[k] = false;
+          st.wraps[k].classList.remove('rendered');
+        }
+        renderArvPdfPage(k);
+      }
+    }, 240);
+  };
+  window.visualViewport.addEventListener('resize', state.vvHook);
+  window.visualViewport.addEventListener('scroll', state.vvHook, { passive: true });
+}
+
 function openArvPdf(pdfPath, downloadRef) {
   destroyArvPdf();
   const token = ++arvPdfSeq;
   arvPdfState = { token, doc: null, pagesMeta: [], wraps: [], canvases: [],
                   rendered: [], rendering: [], zoomIdx: 2, observer: null,
-                  pageCount: 0, path: pdfPath };
+                  pageCount: 0, path: pdfPath, vvHook: null };
   // défini AVANT toute utilisation (buildArvPdfPages s'en sert)
   arvPdfState.zoomFactor = () => ARV_PDF_ZOOMS[arvPdfState.zoomIdx] || 1;
 
@@ -3008,7 +3075,7 @@ function renderArvPdfPage(i) {
     const meta = state.pagesMeta[i];
     const cssW = state.containerW * state.zoomFactor();
     const cssScale = cssW / meta.w;
-    const dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+    const dpr = arvPdfDpr(cssScale, meta.w, meta.h);
     const viewport = page.getViewport({ scale: cssScale * dpr });
     const canvas = state.canvases[i];
     canvas.width = Math.floor(viewport.width);
@@ -3117,6 +3184,7 @@ function wireArvPdf(pdfPath) {
   if (!state) return;
   updateArvPdfZoomLabel();
   updateArvPdfCurrent();
+  wireArvVvZoom(state);
 
   const on = (id, fn) => {
     const el = document.getElementById(id);
@@ -3129,10 +3197,6 @@ function wireArvPdf(pdfPath) {
   });
   on('arvPdfZoomOut', () => {
     if (state.zoomIdx > 0) { state.zoomIdx--; rerenderArvPdf(); }
-  });
-  on('arvPdfHtml', () => {
-    const part = parts[currentIndex];
-    if (part && part.file) loadPartHtml(part.file);
   });
 
   if (!state.scrollHook) {
@@ -3169,21 +3233,15 @@ function showArvPdfError(pdfPath) {
   status.innerHTML = `
     <i class="fas fa-triangle-exclamation" style="font-size:30px;color:var(--warning-bright,#E0B84A);"></i>
     <h3>PDF indisponible</h3>
-    <p>Le PDF n'a pas pu être chargé (connexion ou mémoire). Réessaie, ou lis la version HTML de cette partie.</p>
+    <p>Le PDF n'a pas pu être chargé (connexion ou mémoire). Vérifie ta connexion puis réessaie.</p>
     <div class="arv-pdf-status-actions">
       <button class="arv-pdf-status-btn" id="arvPdfRetry"><i class="fas fa-rotate-right"></i> Réessayer</button>
-      <button class="arv-pdf-status-btn" id="arvPdfFallback"><i class="fas fa-globe"></i> Version HTML</button>
     </div>
   `;
   const retry = document.getElementById('arvPdfRetry');
-  const fb = document.getElementById('arvPdfFallback');
   if (retry) retry.addEventListener('click', () => {
     status.innerHTML = `<div class="spinner"></div><p>Chargement du PDF…</p>`;
     openArvPdf(pdfPath, pdfPath);
-  });
-  if (fb) fb.addEventListener('click', () => {
-    const part = parts[currentIndex];
-    if (part && part.file) loadPartHtml(part.file);
   });
 }
 

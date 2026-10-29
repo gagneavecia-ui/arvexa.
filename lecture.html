@@ -1714,6 +1714,87 @@
       word-wrap: break-word;
     }
     /* ============================================================
+       LECTEUR PDF LOCAL — ouverture de la partie en PDF
+       (le PDF existe à côté du HTML → lecture A4 ; repli HTML si absent)
+       ============================================================ */
+    .pdf-reader {
+      width: 100%;
+      max-width: var(--content-max);
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .pdf-reader-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; flex-wrap: wrap;
+      padding: 10px 16px;
+      border: 1px solid var(--card-border);
+      background: var(--bg-card);
+      border-radius: 14px;
+    }
+    .pdf-reader-info {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 13px; font-weight: 600; color: var(--text-body);
+      min-width: 0;
+    }
+    .pdf-reader-info i { color: var(--accent-bright); font-size: 15px; flex-shrink: 0; }
+    .pdf-reader-info span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .pdf-reader-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      border: 1px solid var(--border-gold);
+      background: var(--tint-gold);
+      color: var(--accent-bright);
+      border-radius: 999px; padding: 7px 16px;
+      font-size: 12.5px; font-weight: 700; letter-spacing: 0.4px;
+      cursor: pointer; text-decoration: none;
+      transition: var(--transition);
+      flex-shrink: 0;
+    }
+    .pdf-reader-btn:active { transform: scale(0.97); }
+    .pdf-reader-frame-wrap {
+      width: 100%;
+      height: calc(100vh - var(--header-h) - 130px - var(--safe-top) - var(--safe-bottom));
+      min-height: 420px;
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      overflow: hidden;
+      background: var(--bg-surface);
+    }
+    .pdf-reader-frame-wrap iframe {
+      display: block; width: 100%; height: 100%; border: 0; background: transparent;
+    }
+    .pdf-reader-note { font-size: 12px; color: var(--text-muted); text-align: center; }
+    .pdf-reader-note a { color: var(--accent-bright); font-weight: 600; }
+    /* Mobile / tactile : iframes PDF non fiables (Android) → carte
+       d'ouverture directe dans la visionneuse native de l'appareil. */
+    .pdf-reader-card {
+      display: none;
+      flex-direction: column; align-items: center; text-align: center;
+      gap: 14px;
+      padding: 34px 22px;
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      background: var(--bg-card);
+    }
+    .pdf-reader-card-icon {
+      width: 74px; height: 74px; border-radius: 20px;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--tint-gold);
+      border: 1px solid var(--border-gold);
+      color: var(--accent-bright);
+      font-size: 30px;
+    }
+    .pdf-reader-card h3 { font-size: 17px; font-weight: 700; color: var(--text-light); }
+    .pdf-reader-card p { font-size: 13px; color: var(--text-dim); max-width: 340px; line-height: 1.6; }
+    .pdf-reader-card .pdf-reader-btn { font-size: 14px; padding: 11px 26px; }
+
+    @media (max-width: 900px), (pointer: coarse) {
+      .pdf-reader-frame-wrap, .pdf-reader-note { display: none; }
+      .pdf-reader-card { display: flex; }
+    }
+
+    /* ============================================================
        RESPONSIVE
        ============================================================ */
     @media (max-width: 768px) {
@@ -2656,6 +2737,97 @@ function renderPart() {
     </div>
   `;
 
+  // ✅ v5-PDF — ouverture locale du PDF de la partie quand il existe
+  // (formules, schémas et tableaux mis en page A4), repli automatique sur le
+  // rendu HTML sinon (zéro régression). Verrou premium conservé sur les
+  // corrections : pas de PDF sans abonnement.
+  const pdfPath = toLocalPdfPath(filePath);
+  if (pdfPath && (tab !== 'corrections' || getPremiumNow())) {
+    probeLocalPdf(pdfPath)
+      .then((available) => {
+        if (available) renderPdfReader(pdfPath);
+        else loadPartHtml(filePath);
+      })
+      .catch(() => loadPartHtml(filePath));
+  } else {
+    loadPartHtml(filePath);
+  }
+}
+
+// ================================================================
+// ✅ v5-PDF — LECTEUR PDF LOCAL
+// ================================================================
+function escapeAttr(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+  ));
+}
+
+function toLocalPdfPath(htmlPath) {
+  try {
+    if (typeof htmlPath !== 'string' || !/\.html$/i.test(htmlPath)) return null;
+    const pdf = htmlPath.replace(/\.html$/i, '.pdf');
+    // garde-fou : même arborescence cours/<matiere>/<chapitre>/ que le HTML
+    // d'origine (aucun caractère dangereux possible dans les attributs)
+    if (!/^cours\/[a-z0-9_]+\/[a-z0-9_]+\/[A-Za-z0-9_-]+\.pdf$/.test(pdf)) return null;
+    return pdf;
+  } catch (e) { return null; }
+}
+
+function probeLocalPdf(url) {
+  // HEAD léger : détection sans télécharger le PDF.
+  // Hors ligne, le SW retrouve l'entrée en cache par URL (méthode ignorée)
+  // → un PDF déjà consulté reste détecté comme disponible.
+  return fetch(url, { method: 'HEAD' })
+    .then((r) => !!r && r.ok)
+    .catch(() => false);
+}
+
+function renderPdfReader(pdfPath) {
+  const part = parts[currentIndex];
+  const rawTitle = (part && part.title) || pageTitle.textContent || 'Partie';
+  const safeTitle = escapeAttr(rawTitle);
+
+  // TTS impossible sur un PDF → bouton masqué (renderPart le remonte en HTML)
+  if (ttsBtn) ttsBtn.style.display = 'none';
+
+  contentBody.innerHTML = `
+    <div class="pdf-reader">
+      <div class="pdf-reader-bar">
+        <div class="pdf-reader-info">
+          <i class="fas fa-file-pdf"></i>
+          <span>PDF local · ${safeTitle}</span>
+        </div>
+        <a class="pdf-reader-btn" href="${pdfPath}" target="_blank" rel="noopener">
+          <i class="fas fa-up-right-from-square"></i> Ouvrir
+        </a>
+      </div>
+      <div class="pdf-reader-frame-wrap">
+        <iframe id="pdfFrame" src="${pdfPath}#view=FitH" title="PDF — ${safeTitle}"></iframe>
+      </div>
+      <p class="pdf-reader-note">Le PDF ne s'affiche pas ? <a href="${pdfPath}" target="_blank" rel="noopener">Ouvre-le dans un onglet</a>.</p>
+      <div class="pdf-reader-card">
+        <div class="pdf-reader-card-icon"><i class="fas fa-file-pdf"></i></div>
+        <h3>${safeTitle}</h3>
+        <p>Cette partie est disponible en PDF : formules, schémas et tableaux mis en page proprement sur des feuilles A4. Touche « Ouvrir le PDF » pour lancer la lecture — elle restera ensuite accessible même sans Internet.</p>
+        <a class="pdf-reader-btn" href="${pdfPath}" target="_blank" rel="noopener">
+          <i class="fas fa-book-open"></i> Ouvrir le PDF
+        </a>
+      </div>
+    </div>
+  `;
+
+  markPartAsRead();
+
+  // préchauffage hors-ligne : le PDF consulté est mis en cache par le SW
+  try {
+    if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage({ type: 'CACHE_URL', url: pdfPath });
+    }
+  } catch (e) {}
+}
+
+function loadPartHtml(filePath) {
   fetch(filePath)
     .then(r => {
       if (!r.ok) {

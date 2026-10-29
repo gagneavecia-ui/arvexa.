@@ -180,7 +180,10 @@
     const SKIP = [
       'login', 'register', 'forgot-password', 'auth-choice',
       'onboarding.html', 'conditions', 'confidentialite',
-      'offline', '404', 'onboarding-tour'
+      'offline', '404', 'onboarding-tour',
+      // ✅ v4.30 — ne JAMAIS interrompre une lecture ou un examen :
+      // le tour reprendra au retour sur l'accueil / les listes
+      'lecture.html', 'exam.html', 'exam-history.html'
     ];
 
     if (SKIP.some((p) => path.includes(p))) return;

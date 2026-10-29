@@ -129,7 +129,7 @@
 
       // 5. ARV-PROGRESS — le cœur du suivi
       {
-        element: '.tools-grid a[href*="arv-progress"]',
+        element: '.tools-grid a[href*="arv-progress.html"]',
         popover: {
           title: '📊 ARV-PROGRESS',
           description: 'Ton carnet intelligent. Ajoute tes cours, l\'IA les analyse et te dit exactement quoi réviser. Ton meilleur allié pour progresser.',
@@ -252,6 +252,14 @@
           injectProgressBar(idx, validSteps.length, options);
         },
         onDestroyStarted: () => {
+          // ✅ v4.30 — « Passer le tutoriel » ferme SANS confirmation
+          // (le × du popover garde sa demande de confirmation, lui)
+          if (window.__arvexaTourSkipRequested) {
+            window.__arvexaTourSkipRequested = false;
+            window.__arvexaTourSkipped = true;
+            tour.destroy();
+            return;
+          }
           const hasNext = tour.hasNextStep();
           if (!hasNext || confirm('Quitter le tutoriel ?')) {
             tour.destroy();
@@ -260,10 +268,15 @@
         onDestroyed: () => {
           clearStep();
           markTourDone();
-          showPremiumPopup();
+          const skipped = window.__arvexaTourSkipped === true;
+          window.__arvexaTourSkipped = false;
+          if (!skipped) showPremiumPopup();
         },
         steps: validSteps
       });
+
+      // ✅ v4.30 — référence globale pour une fermeture fiable depuis « Passer »
+      window.__arvexaTourActive = tour;
 
       setTimeout(() => {
         tour.drive(startIndex);
@@ -310,7 +323,11 @@
       skipBtn.addEventListener('click', () => {
         clearStep();
         markTourDone();
-        // Fermer le tour proprement
+        // ✅ v4.30 — « Passer » doit passer : fermeture DIRECTE du tour
+        // (plus de confirm), le popup premium est sautée aussi.
+        try { window.__arvexaTourSkipRequested = true; } catch (e) {}
+        const t = window.__arvexaTourActive;
+        if (t && typeof t.destroy === 'function') { t.destroy(); return; }
         const closeBtn = activePopover.querySelector('.driver-popover-close-btn');
         if (closeBtn) closeBtn.click();
       });

@@ -865,6 +865,24 @@
        ============================================================ */
     #contentBody .math { color: var(--text-light); }
 
+    /* v4.30 — formule « posée » : le client met en page sans toucher au
+       contenu. Chaque formule/comparaison extraite d'une phrase tient sur
+       SA propre ligne (nowrap + scroll horizontal si vraiment longue),
+       comme un calcul au tableau. Thème clair/sombre via variables. */
+    #contentBody .math-line {
+      display: block;
+      margin: 10px 0;
+      padding: 7px 12px;
+      text-align: left;
+      font-size: 1.05em;
+      line-height: 1.65;
+      overflow-x: auto;
+      overflow-y: hidden;
+      white-space: nowrap;
+      -webkit-overflow-scrolling: touch;
+    }
+    html[data-theme="light"] #contentBody .math-line { color: var(--text-light); }
+
     .katex { font-size: 1.06em; color: var(--text-light); }
     .katex-display {
       margin: 22px 0; padding: 2px 6px;
@@ -1359,10 +1377,13 @@
       overflow-wrap: break-word;
       padding-top: 4px;
     }
+    /* v4.30 — strong redevient inline : « Titre : texte » reste UNE phrase,
+       le deux-points ne se retrouve plus orphelin en début de ligne.
+       Les titres seuls (<p><strong>Titre</strong></p>) gardent leur ligne. */
     .lecture-step-content strong {
-      display: block; color: var(--text-light);
-      font-size: 15px; font-weight: 600;
-      margin-bottom: 5px; line-height: 1.5;
+      display: inline; color: var(--text-light);
+      font-size: inherit; font-weight: 700;
+      line-height: 1.75;
     }
     .lecture-step-content p {
       margin: 0; font-size: 14.5px;
@@ -2210,8 +2231,13 @@ function preprocessContent(html) {
 // ================================================================
 // KATEX
 // ================================================================
+let katexRetries = 0;
 function renderKaTeX() {
   if (typeof renderMathInElement !== 'function') {
+    // ✅ v4.30 — plafond de tentatives : CDN KaTeX bloqué/hors ligne → on
+    // abandonne silencieusement (les cours sont en maths Unicode et restent
+    // lisibles sans KaTeX). Plus de boucle infinie.
+    if (++katexRetries > 30) return;
     setTimeout(renderKaTeX, 200);
     return;
   }
@@ -2420,7 +2446,57 @@ function initTocSpy() {
   });
 }
 
+// ================================================================
+// v4.30 — MISE EN PAGE DES FORMULES (présentation seulement, le
+// contenu des cours n'est PAS modifié) : une formule de calcul
+// (=, ≈, →, ≥…) noyée dans une phrase passe sur SA propre ligne,
+// comme un calcul posé au tableau. Fini les formules coupées en
+// deux par le retour à la ligne du téléphone.
+// ================================================================
+function promoteMathLines(root) {
+  try {
+    if (!root) return;
+    const spans = root.querySelectorAll('p > .math, li > .math');
+    spans.forEach((sp) => {
+      if (sp.classList.contains('math-line')) return;
+      if (sp.closest('.lecture-formula-hero, .lecture-formula-box, .katex, .lecture-table')) return;
+      const txt = (sp.textContent || '').trim();
+      if (!txt) return;
+      const hasRel = /[=≈≠→⇔≥≤±]/.test(txt);
+      if (!(hasRel ? txt.length >= 8 : txt.length >= 14)) return;
+      const parent = sp.parentElement;
+      if (!parent) return;
+
+      // contexte texte AVANT / APRÈS la formule
+      let before = '', after = '';
+      let n = sp.previousSibling;
+      while (n && n.nodeType === 3) { before = n.textContent + before; n = n.previousSibling; }
+      n = sp.nextSibling;
+      while (n && n.nodeType === 3) { after += n.textContent; n = n.nextSibling; }
+      // formule serrée dans une parenthèse de la phrase → on ne touche pas
+      if (/\(\s*$/.test(before) || /^\s*\)/.test(after)) return;
+
+      // déjà seule dans son paragraphe → rien à faire
+      const others = Array.from(parent.childNodes).filter((c) =>
+        c !== sp && !(c.nodeType === 3 && !c.textContent.trim()));
+      if (!others.length) return;
+
+      // ponctuation de fin de phrase collée au span → suit la formule
+      const nx = sp.nextSibling;
+      if (nx && nx.nodeType === 3) {
+        const m = nx.textContent.match(/^([.,;…]+)/);
+        if (m) {
+          sp.appendChild(document.createTextNode(m[1]));
+          nx.textContent = nx.textContent.slice(m[1].length);
+        }
+      }
+      sp.classList.add('math-line');
+    });
+  } catch (e) {}
+}
+
 function enhanceContent() {
+  try { promoteMathLines(contentBody); } catch (e) {}
   try {
     contentBody.querySelectorAll('table').forEach(tbl => {
       const parent = tbl.parentElement;
@@ -2502,6 +2578,15 @@ function loadContent() {
       }
 
       if (currentIndex >= parts.length) currentIndex = 0;
+      // ✅ v4.30 — préchauffage silencieux des AUTRES parties du chapitre :
+      // le Service Worker les met en cache (network-first) → le chapitre
+      // entier devient consultable hors-ligne et la navigation instantanée.
+      setTimeout(() => {
+        parts.forEach((p, i) => {
+          if (i === currentIndex || !p.file) return;
+          setTimeout(() => { fetch(p.file).catch(() => {}); }, 350 * i);
+        });
+      }, 1200);
       renderPart();
     })
     .catch(() => {
@@ -2521,6 +2606,11 @@ function renderPart() {
     showContentUnavailable();
     return;
   }
+
+  // ✅ v4.30 — les écrans d'erreur masquent la navigation : on la remontre
+  [prevBtn, nextBtn, partCounter, notesBtn].forEach((el) => { el.style.display = ''; });
+  if (partDots) partDots.style.display = '';
+  if (ttsBtn) ttsBtn.style.display = '';
 
   stopTTS();
 
@@ -2548,7 +2638,15 @@ function renderPart() {
   `;
 
   fetch(filePath)
-    .then(r => { if (!r.ok) throw new Error('not found'); return r.text(); })
+    .then(r => {
+      if (!r.ok) {
+        const err = new Error(r.status === 504 ? 'offline' : 'not found');
+        err.isOffline = (r.status === 504) || navigator.onLine === false;
+        err.isMissing = !err.isOffline;
+        throw err;
+      }
+      return r.text();
+    })
     .then(html => {
       const cleaned = preprocessContent(html);
       contentBody.innerHTML = cleaned;
@@ -2559,9 +2657,44 @@ function renderPart() {
       updateReadProgress();
       resetStudyTimer();
     })
-    .catch(() => {
-      showContentUnavailable();
+    .catch((err) => {
+      // ✅ v4.30 — plus de faux « bientôt disponible » : si c'est le réseau
+      // (hors ligne, 504 du SW, requête avortée) on affiche le panneau
+      // hors-ligne avec Réessayer ; « bientôt disponible » = vrai 404.
+      const offline = !err || err.isOffline || err instanceof TypeError || navigator.onLine === false;
+      if (offline) showOfflinePanel();
+      else showContentUnavailable();
     });
+}
+
+// ================================================================
+// ✅ v4.30 — PANNEAU HORS LIGNE honnête + Réessayer
+// (les boutons de navigation restent visibles : la partie précédente,
+// déjà en cache, reste accessible)
+// ================================================================
+function showOfflinePanel() {
+  stopTTS();
+  contentBody.innerHTML = `
+    <div class="content-unavailable">
+      <div class="hourglass-wrap" style="font-size: 42px; color: var(--info, #6FC8F0);">
+        <i class="fas fa-wifi"></i>
+      </div>
+      <h2>Pas de connexion</h2>
+      <p>Cette partie n'est pas encore enregistrée sur ton téléphone. Reconnecte-toi puis réessaie : elle restera ensuite disponible même sans Internet.</p>
+      <div class="cu-actions">
+        <button id="retryPartBtn" class="cu-btn primary">
+          <i class="fas fa-rotate-right"></i> Réessayer
+        </button>
+        <a href="chapitre.html?subject=${subject}&chapter=${chapter}&tab=${tab}" class="cu-btn">
+          <i class="fas fa-arrow-left"></i> Retour
+        </a>
+      </div>
+    </div>
+  `;
+  pageTitle.textContent = 'Hors ligne';
+  document.title = 'ARVEXA - Hors ligne';
+  const rb = document.getElementById('retryPartBtn');
+  if (rb) rb.addEventListener('click', () => { renderPart(); });
 }
 
 // ================================================================

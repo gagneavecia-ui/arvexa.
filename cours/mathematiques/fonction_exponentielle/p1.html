@@ -1,0 +1,554 @@
+<!-- ============================================================ -->
+<!-- PARTIE 1 : DÉFINITION & PROPRIÉTÉS ALGÉBRIQUES DE L'EXPONENTIELLE -->
+<!-- Notion 1 : definition_exp — La fonction exponentielle,       -->
+<!--            réciproque de ln ; le nombre e ; conséquences     -->
+<!-- Notion 2 : proprietes_algebriques — Calcul algébrique,       -->
+<!--            signe, premières équations                        -->
+<!-- ============================================================ -->
+
+<div class="lecture-container">
+
+  <!-- ===== HERO ===== -->
+  <header class="lecture-hero">
+    <div class="lecture-hero-badge">
+      <span class="lecture-hero-icon">📘</span>
+      <span class="lecture-hero-label">Partie 01 · Fonction exponentielle</span>
+    </div>
+    <h1 class="lecture-hero-title">
+      Définition &amp; <em>propriétés algébriques</em>
+    </h1>
+    <p class="lecture-hero-intro">
+      Après le logarithme népérien, voici sa sœur jumelle : la <strong>fonction exponentielle</strong>, la fonction qui « défait » ce que ln fait. Cette partie pose les fondations de tout le chapitre, en <strong>2 notions</strong> : la <strong>définition de exp</strong> comme réciproque de ln (avec le célèbre nombre e ≈ 2,718), puis les <strong>propriétés algébriques</strong> — somme, inverse, quotient, puissance — sans oublier le signe et les premières équations.
+    </p>
+    <div class="lecture-hero-meta">
+      <span class="lecture-hero-meta-item">⏱ 20 min</span>
+      <span class="lecture-hero-meta-item">🧮 2 notions</span>
+      <span class="lecture-hero-meta-item">📊 8 sections</span>
+      <span class="lecture-hero-meta-item">🎓 Terminale D</span>
+    </div>
+  </header>
+
+  <!-- ===== SOMMAIRE ===== -->
+  <nav class="lecture-toc">
+    <div class="lecture-toc-header">
+      <span>Dans cette partie</span>
+      <span class="lecture-toc-count">2 notions · 8 sections</span>
+    </div>
+    <ol class="lecture-toc-list">
+      <li><a href="#s0"><span class="toc-num">00</span><span>Motivation — Une croissance qui s'emballe</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>Notion 1 · definition_exp — La fonction exponentielle, réciproque de ln</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>Notion 1 · definition_exp — Le nombre e et la notation e^x</span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>Notion 1 · definition_exp — Les conséquences immédiates</span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>Notion 2 · proprietes_algebriques — Les propriétés algébriques</span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>Notion 2 · proprietes_algebriques — Le signe : e^x &gt; 0, toujours</span></a></li>
+      <li><a href="#s6"><span class="toc-num">06</span><span>Notion 2 · proprietes_algebriques — Premières équations</span></a></li>
+      <li><a href="#s7"><span class="toc-num">07</span><span>Bilan — Atelier de calculs purs</span></a></li>
+    </ol>
+  </nav>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 0 : MOTIVATION -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s0">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">00</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Motivation</span>
+        <h2 class="lecture-section-title">Une croissance qui s'emballe</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Un capital placé à la banque avec des <strong>intérêts composés</strong>, la population d'une ville comme Niamey qui augmente chaque année d'un pourcentage fixe, une culture de bactéries qui double toutes les heures… Ces phénomènes ont un point commun : <strong>plus ils avancent, plus ils vont vite</strong>. La fonction mathématique qui les modélise existe et porte un nom : la <strong>fonction exponentielle</strong>.
+      </p>
+
+      <p class="lecture-text">
+        Dans le chapitre précédent, tu as étudié le <strong>logarithme népérien</strong> ln, défini sur <span class="math">]0 ; +∞[</span>. On va maintenant construire sa <strong>fonction réciproque</strong> : celle qui, à partir du résultat donné par ln, retrouve le nombre de départ. C'est exactement le rôle de la fonction exponentielle, notée <strong>exp</strong>.
+      </p>
+
+      <div class="lecture-callout lecture-callout-gold">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Les trois questions de cette partie</div>
+          <ul class="lecture-list">
+            <li><strong>Qu'est-ce que</strong> la fonction exponentielle, et d'où vient le nombre e ? (sections 01 à 03)</li>
+            <li><strong>Quelles sont</strong> ses propriétés de calcul et son signe ? (sections 04 et 05)</li>
+            <li><strong>Comment résoudre</strong> les premières équations qui la mettent en jeu ? (sections 06 et 07)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="lecture-aside">
+        <div class="lecture-aside-label">🌍 Pourquoi « exponentielle » ?</div>
+        <div class="lecture-aside-content">
+          Le nom vient de la notation <span class="math">e^x</span>, qui se lit « e exposant x » et rappelle les puissances. Ce n'est pas un hasard : on verra en section 04 que exp obéit <em>exactement</em> aux mêmes règles de calcul que les puissances — sommes d'exposants, quotients, puissances répétées.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 1 : NOTION 1 · definition_exp — DÉFINITION -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s1">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">01</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1 · definition_exp</span>
+        <h2 class="lecture-section-title">La fonction exponentielle, réciproque de ln</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Rappel du chapitre précédent : la fonction ln est continue et <strong>strictement croissante</strong> sur <span class="math">]0 ; +∞[</span>, avec <span class="math">lim(x→0⁺) ln x = −∞</span> et <span class="math">lim(x→+∞) ln x = +∞</span>. Elle réalise donc une <strong>bijection</strong> de <span class="math">]0 ; +∞[</span> sur ℝ : chaque réel x admet un <strong>unique</strong> antécédent y &gt; 0 par ln. La fonction qui à x associe cet unique y s'appelle la fonction exponentielle.
+      </p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">📗 Définition officielle — Fonction exponentielle</div>
+          <p><strong>La fonction exponentielle, notée exp, est la fonction réciproque de la fonction logarithme népérien.</strong> Pour tout <span class="math">x ∈ ℝ</span> et tout <span class="math">y &gt; 0</span> : <span class="math">exp x = y ⇔ x = ln y</span>. Elle est <strong>définie sur ℝ</strong> et ses valeurs sont <strong>strictement positives</strong>.</p>
+        </div>
+      </div>
+
+      <p class="lecture-text">
+        La double flèche <span class="math">⇔</span> se lit comme une porte à double sens : <span class="math">exp x = y</span> signifie <em>exactement</em> la même chose que <span class="math">x = ln y</span>. Concrètement, pour calculer <span class="math">exp x</span>, on cherche <strong>le nombre y &gt; 0 dont le logarithme vaut x</strong>. Trois théorèmes, admis ici et démontrés dans les parties suivantes, complètent le portrait : exp est <strong>continue et dérivable sur ℝ</strong> (la dérivée est l'objet de la partie 2) et <strong>strictement croissante</strong> sur ℝ (l'étude complète est l'objet de la partie 3).
+      </p>
+
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-label">L'équivalence fondatrice de tout le chapitre</div>
+        <div class="lecture-formula-hero-main">exp x = y ⇔ x = ln y</div>
+        <div class="lecture-formula-hero-desc">Avec x ∈ ℝ et y &gt; 0. exp est définie sur ℝ et prend ses valeurs dans ]0 ; +∞[.</div>
+      </div>
+
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">🧮 Exemple travaillé — Calculer exp(0) et exp(2)</div>
+        <div class="lecture-example-content"><p>On applique la définition : pour chaque valeur, on cherche le nombre y &gt; 0 dont le logarithme est connu.</p></div>
+      </div>
+
+      <div class="lecture-steps">
+        <div class="lecture-step">
+          <div class="lecture-step-number">1</div>
+          <div class="lecture-step-content"><p><span class="math">exp(0) = y ⇔ ln y = 0</span>. Or <span class="math">ln 1 = 0</span> et <span class="math">1 &gt; 0</span>, donc <span class="math">y = 1</span>. Conclusion : <span class="math">exp(0) = 1</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">2</div>
+          <div class="lecture-step-content"><p><span class="math">exp(2) = y ⇔ ln y = 2</span>. Or <span class="math">ln(e²) = 2</span> (cours sur ln) et <span class="math">e² &gt; 0</span>, donc <span class="math">y = e²</span>. Conclusion : <span class="math">exp(2) = e²</span>.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 2 : NOTION 1 · definition_exp — LE NOMBRE e -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s2">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">02</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1 · definition_exp</span>
+        <h2 class="lecture-section-title">Le nombre e et la notation e^x</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Que vaut <span class="math">exp(1)</span> ? C'est le nombre y &gt; 0 tel que <span class="math">ln y = 1</span>. Ce nombre joue un rôle si central qu'il porte un nom, comme π : c'est le nombre <strong>e</strong>.
+      </p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">📗 Définition — Le nombre e</div>
+          <p><span class="math">e = exp(1) ≈ 2,718</span>. Autrement dit, <strong>e est le nombre dont le logarithme népérien vaut 1</strong> : <span class="math">ln e = 1</span> et <span class="math">e¹ = e</span>.</p>
+        </div>
+      </div>
+
+      <p class="lecture-text">
+        De même, pour tout x, on convient d'écrire <span class="math">exp x = e^x</span> : les deux notations sont strictement équivalentes et désignent la même chose. Dans toute la suite du chapitre, on écrira <span class="math">e^x</span>. Vérification immédiate avec la définition : <span class="math">e⁰ = 1</span> et <span class="math">e¹ = e ≈ 2,718</span>. Voici un petit tableau de valeurs :
+      </p>
+
+      <div class="lecture-table">
+        <table>
+          <thead>
+            <tr><th>x</th><th>−1</th><th>0</th><th>1</th><th>2</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>e^x</td><td>e^(−1) ≈ 0,368</td><td>1</td><td>e ≈ 2,718</td><td>e² ≈ 7,389</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="lecture-aside">
+        <div class="lecture-aside-label">🌍 Petite histoire des sciences</div>
+        <div class="lecture-aside-content">
+          Le nombre e apparaît d'abord chez Jacob Bernoulli (1683), en étudiant… les intérêts composés ! C'est <strong>Euler</strong> qui lui donne la lettre e et calcule ses décimales dans son <em>Introductio</em> (1748) : <span class="math">e ≈ 2,718281828…</span> Comme π, e est un nombre <strong>irrationnel</strong> : son écriture décimale est infinie et non périodique. Et non, la lettre e ne vient pas de « exponentielle », mais d'Euler.
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ e n'est pas e^x</div>
+          <p><strong>e est une constante</strong> (≈ 2,718) ; <strong>e^x est une fonction</strong> de x. Écrire <span class="math">e = 2,718</span> est correct ; écrire <span class="math">e^x = 2,718</span> est faux en général (ce n'est vrai que pour x = 1) ! Dans un devoir, ne mélange jamais les deux.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 3 : NOTION 1 · definition_exp — CONSÉQUENCES -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s3">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">03</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1 · definition_exp</span>
+        <h2 class="lecture-section-title">Les conséquences immédiates</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        De l'équivalence <span class="math">exp x = y ⇔ x = ln y</span>, on tire quatre égalités immédiates. Elles sont à connaître <strong>par cœur</strong> : ce sont elles qui font fonctionner tous les calculs du chapitre. Les deux dernières se lisent directement dans l'équivalence fondatrice : prendre y = ln x dans « exp y = x », ou prendre y = e^x dans « x = ln y ».
+      </p>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">e⁰ = 1 ; e¹ = e ; exp(ln x) = x (pour x &gt; 0) ; ln(e^x) = x (pour tout x ∈ ℝ)</div>
+        <div class="lecture-formula-desc">Les deux dernières sont la réciproque lue dans les deux sens : exp « défait » ln (si x &gt; 0), ln « défait » exp (toujours, car e^x &gt; 0).</div>
+      </div>
+
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">🧮 Exemple travaillé — Calculer A = e^(ln 3) + ln(e²)</div>
+        <div class="lecture-example-content"><p>Un calcul pur, sans aucune histoire : chaque terme se simplifie avec une des deux formules de réciproque.</p></div>
+      </div>
+
+      <div class="lecture-steps">
+        <div class="lecture-step">
+          <div class="lecture-step-number">1</div>
+          <div class="lecture-step-content"><p><span class="math">e^(ln 3) = 3</span> : formule <span class="math">exp(ln x) = x</span> avec x = 3 (valable car 3 &gt; 0).</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">2</div>
+          <div class="lecture-step-content"><p><span class="math">ln(e²) = 2</span> : formule <span class="math">ln(e^x) = x</span> avec x = 2 (toujours valable).</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">3</div>
+          <div class="lecture-step-content"><p>Donc <span class="math">A = 3 + 2 = 5</span>.</p></div>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ Attention aux conditions !</div>
+          <p>La formule <span class="math">exp(ln x) = x</span> <strong>exige x &gt; 0</strong> : <span class="math">exp(ln(−2))</span> n'existe pas, car <span class="math">ln(−2)</span> n'existe pas. En revanche, <span class="math">ln(e^x) = x</span> marche pour <strong>tout</strong> x, même négatif : <span class="math">ln(e^(−3)) = −3</span>. Retiens : exp après ln exige un x positif ; ln après exp est toujours licite.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 4 : NOTION 2 · proprietes_algebriques — PROPRIÉTÉS -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s4">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">04</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2 · proprietes_algebriques</span>
+        <h2 class="lecture-section-title">Les propriétés algébriques</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        C'est ici que la notation <span class="math">e^x</span> prend tout son sens : les propriétés de calcul de exp sont <strong>exactement celles des puissances</strong>. On additionne les exposants dans un produit, on les soustrait dans un quotient, on les multiplie dans une puissance répétée.
+      </p>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">e^(a + b) = e^a · e^b ; e^(−a) = 1/e^a ; e^(a − b) = e^a / e^b ; (e^a)ⁿ = e^(n·a)</div>
+        <div class="lecture-formula-desc">Pour tous a, b ∈ ℝ et tout n ∈ ℤ. Quatre formules à savoir réciter sans hésiter.</div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-gold">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">💡 D'où viennent ces formules ? (idée de démonstration)</div>
+          <p>Prenons la première. D'une part <span class="math">ln(e^(a + b)) = a + b</span> (formule de la section 03). D'autre part <span class="math">ln(e^a · e^b) = ln(e^a) + ln(e^b) = a + b</span> (propriétés de ln). Les deux nombres sont donc strictement positifs et ont <strong>le même logarithme</strong> ; comme ln est strictement croissante (donc injective), ils sont égaux : <span class="math">e^(a + b) = e^a · e^b</span>. Les trois autres se démontrent de la même façon.</p>
+        </div>
+      </div>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">🧮 Exemple — Simplifier B = (e³ · e⁵)/e⁶ et C = (e²)³ · e^(−4)</div>
+        <div class="lecture-example-content"><p>Deux simplifications types : produit puis quotient, puissance puis produit.</p></div>
+      </div>
+
+      <div class="lecture-steps">
+        <div class="lecture-step">
+          <div class="lecture-step-number">1</div>
+          <div class="lecture-step-content"><p><span class="math">e³ · e⁵ = e^(3 + 5) = e⁸</span>, donc <span class="math">B = e⁸/e⁶ = e^(8 − 6) = e²</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">2</div>
+          <div class="lecture-step-content"><p><span class="math">(e²)³ = e^(2·3) = e⁶</span> (formule <span class="math">(e^a)ⁿ = e^(n·a)</span> avec a = 2 et n = 3).</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">3</div>
+          <div class="lecture-step-content"><p>Donc <span class="math">C = e⁶ · e^(−4) = e^(6 − 4) = e²</span>.</p></div>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-danger">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Erreur fréquente au Bac</div>
+          <p>Écrire <span class="math">e^(a + b) = e^a + e^b</span> est <strong>faux</strong> : l'exponentielle ne se « distribue » pas sur les sommes ! <span class="math">e^(a · b) = e^a · e^b</span> est faux aussi. Contre-exemple numérique : <span class="math">e^(1 + 1) = e² ≈ 7,389</span> alors que <span class="math">e¹ + e¹ = 2e ≈ 5,437</span>. Les formules portent sur les <strong>exposants</strong>, jamais sur les valeurs.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 5 : NOTION 2 · proprietes_algebriques — SIGNE -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s5">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">05</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2 · proprietes_algebriques</span>
+        <h2 class="lecture-section-title">Le signe : e^x &gt; 0, toujours</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Une question toute simple, aux conséquences énormes : quel est le signe de <span class="math">e^x</span> ? La réponse est dans la définition même de la fonction.
+      </p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">📗 Notion clé — Le signe de l'exponentielle</div>
+          <p><strong>Pour tout x ∈ ℝ, e^x &gt; 0.</strong> En effet, par définition, <span class="math">e^x</span> est <em>le</em> nombre y &gt; 0 qui vérifie <span class="math">ln y = x</span> — or ln n'est défini que pour y &gt; 0. L'exponentielle <strong>ne s'annule jamais</strong> et <strong>ne change jamais de signe</strong> : c'est une conséquence majeure du cours.</p>
+        </div>
+      </div>
+
+      <p class="lecture-text">Trois conséquences à connaître, elles tombent à tous les examens :</p>
+
+      <ul class="lecture-list-elegant">
+        <li>Les équations <span class="math">e^x = 0</span> et <span class="math">e^x = −5</span> n'ont <strong>aucune solution</strong> : un nombre strictement positif ne vaut jamais 0 ni un négatif.</li>
+        <li>Dans un produit ou un quotient, le facteur <span class="math">e^(u)</span> ne compte <strong>pas</strong> dans le tableau des signes : il est toujours positif, c'est l'autre facteur qui décide. Écris directement « comme <span class="math">e^x &gt; 0</span>, le signe est celui de… ».</li>
+        <li>C'est aussi pour cela que <span class="math">exp(ln x) = x</span> n'a de sens que pour <span class="math">x &gt; 0</span> : exp ne produit que des positifs.</li>
+      </ul>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">🧮 Exemple — Signe de f(x) = (x − 2) · e^x</div>
+        <div class="lecture-example-content"><p>Un calcul pur de signe, très classique dans les tableaux de variations.</p></div>
+      </div>
+
+      <div class="lecture-steps">
+        <div class="lecture-step">
+          <div class="lecture-step-number">1</div>
+          <div class="lecture-step-content"><p>On sait que <span class="math">e^x &gt; 0</span> pour tout x : ce facteur ne change jamais le signe du produit.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">2</div>
+          <div class="lecture-step-content"><p>Donc <span class="math">f(x)</span> a le signe de <span class="math">(x − 2)</span> : <span class="math">f(x) &lt; 0</span> si <span class="math">x &lt; 2</span> ; <span class="math">f(2) = 0 × e² = 0</span> ; <span class="math">f(x) &gt; 0</span> si <span class="math">x &gt; 2</span>.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 6 : NOTION 2 · proprietes_algebriques — ÉQUATIONS -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s6">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">06</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2 · proprietes_algebriques</span>
+        <h2 class="lecture-section-title">Premières équations</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Armés de la réciproque et du signe, on peut résoudre les équations les plus simples du chapitre. La méthode tient en une question préalable : <strong>le second membre est-il positif ?</strong>
+      </p>
+
+      <div class="lecture-rule">
+        <div class="lecture-rule-label">🧠 Méthode à retenir</div>
+        <div class="lecture-rule-body">
+          Pour résoudre <span class="math">e^x = a</span> : si <span class="math">a ≤ 0</span>, il n'y a <strong>aucune solution</strong> (car <span class="math">e^x &gt; 0</span>) ; si <span class="math">a &gt; 0</span>, il y a une <strong>unique solution</strong> : <span class="math">x = ln a</span>. L'unicité vient de la stricte croissance de exp (étudiée en partie 3) : une fonction strictement croissante prend chaque valeur au plus une fois.
+        </div>
+      </div>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">🧮 Exemple 1 — Résoudre e^x = 5, puis e^x = 1, puis e^x = −3</div>
+        <div class="lecture-example-content"><p>Trois cas : le cas général, la valeur spéciale 1, et une valeur impossible.</p></div>
+      </div>
+
+      <div class="lecture-steps">
+        <div class="lecture-step">
+          <div class="lecture-step-number">1</div>
+          <div class="lecture-step-content"><p><span class="math">e^x = 5</span> : comme <span class="math">5 &gt; 0</span>, une unique solution existe : <span class="math">x = ln 5</span>. Conclusion : <span class="math">S = {ln 5}</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">2</div>
+          <div class="lecture-step-content"><p><span class="math">e^x = 1 ⇔ x = ln 1 = 0</span> : on retrouve <span class="math">e⁰ = 1</span>. Conclusion : <span class="math">S = {0}</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">3</div>
+          <div class="lecture-step-content"><p><span class="math">e^x = −3</span> : comme <span class="math">−3 ≤ 0</span> et que <span class="math">e^x &gt; 0</span> pour tout x, aucune solution. Conclusion : <span class="math">S = ∅</span>.</p></div>
+        </div>
+      </div>
+
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">🧮 Exemple 2 — Résoudre e^(2x) = 7</div>
+        <div class="lecture-example-content"><p>L'inconnue est cachée dans l'exposant : on applique ln des deux côtés pour la libérer.</p></div>
+      </div>
+
+      <div class="lecture-steps">
+        <div class="lecture-step">
+          <div class="lecture-step-number">1</div>
+          <div class="lecture-step-content"><p>On applique ln aux deux membres (ln est croissante, l'équivalence est conservée) : <span class="math">ln(e^(2x)) = ln 7</span>, soit <span class="math">2x = ln 7</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">2</div>
+          <div class="lecture-step-content"><p>Donc <span class="math">x = ln 7 / 2</span>, qu'on peut aussi écrire <span class="math">x = (1/2) ln 7</span>. Conclusion : <span class="math">S = {ln 7 / 2}</span>.</p></div>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ Réflexe de rédaction</div>
+          <p>Ne « simplifie » jamais <span class="math">e^x = a</span> en <span class="math">x = a</span> : la solution passe <strong>toujours</strong> par ln. Et cite le raisonnement : « comme a &gt; 0, l'équation admet une unique solution <span class="math">x = ln a</span> ». Une réponse sans justification perd des points.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 7 : BILAN — ATELIER DE CALCULS PURS -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s7">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">07</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Bilan</span>
+        <h2 class="lecture-section-title">Atelier de calculs purs</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Terminons par l'exercice type du contrôle : une rafale de simplifications. À toi de repérer, pour chacune, la bonne formule — réciproque, produit, quotient ou puissance.
+      </p>
+
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">🧮 Exercice — Simplifier les cinq expressions suivantes</div>
+        <div class="lecture-example-content">
+          <p><span class="math">A = e^(2 ln 5)</span> ; <span class="math">B = e^(ln 2 + 1)</span> ; <span class="math">C = e⁴/(e · e²)</span> ; <span class="math">D = e^(x + 3) · e^(2 − x)</span> ; <span class="math">E = e^(2x)/(e^x)²</span>.</p>
+        </div>
+      </div>
+
+      <div class="lecture-steps">
+        <div class="lecture-step">
+          <div class="lecture-step-number">1</div>
+          <div class="lecture-step-content"><p><span class="math">A = e^(2 ln 5) = (e^(ln 5))² = 5² = 25</span>, grâce à <span class="math">exp(ln x) = x</span> (5 &gt; 0 ✓).</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">2</div>
+          <div class="lecture-step-content"><p><span class="math">B = e^(ln 2 + 1) = e^(ln 2) · e¹ = 2e</span>, avec la formule <span class="math">e^(a + b) = e^a · e^b</span> prise avec a = ln 2 et b = 1.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">3</div>
+          <div class="lecture-step-content"><p><span class="math">e · e² = e³</span>, donc <span class="math">C = e⁴/e³ = e^(4 − 3) = e</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">4</div>
+          <div class="lecture-step-content"><p><span class="math">D = e^(x + 3) · e^(2 − x) = e^((x + 3) + (2 − x)) = e⁵</span> : les x disparaissent, le résultat est une constante.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">5</div>
+          <div class="lecture-step-content"><p><span class="math">(e^x)² = e^(2x)</span>, donc <span class="math">E = e^(2x)/e^(2x) = 1</span>.</p></div>
+        </div>
+      </div>
+
+      <ul class="lecture-list-elegant">
+        <li><strong>Définition</strong> : <span class="math">exp x = y ⇔ x = ln y</span>, exp définie sur ℝ, à valeurs dans <span class="math">]0 ; +∞[</span>.</li>
+        <li><strong>Nombre e</strong> : <span class="math">e = exp(1) ≈ 2,718</span> et <span class="math">ln e = 1</span> ; notation <span class="math">e^x = exp x</span>.</li>
+        <li><strong>Calcul</strong> : <span class="math">e^(a + b) = e^a · e^b</span>, <span class="math">e^(−a) = 1/e^a</span>, <span class="math">e^(a − b) = e^a / e^b</span>, <span class="math">(e^a)ⁿ = e^(n·a)</span>.</li>
+        <li><strong>Signe</strong> : <span class="math">e^x &gt; 0</span> pour tout x — jamais de solution à <span class="math">e^x = 0</span> ni à <span class="math">e^x = a</span> avec <span class="math">a ≤ 0</span>.</li>
+        <li><strong>Équations</strong> : <span class="math">e^x = a ⇔ x = ln a</span> (a &gt; 0), solution unique.</li>
+      </ul>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ Rédaction pour l'examen</div>
+          <p>Chaque simplification doit citer sa formule : « d'après <span class="math">exp(ln x) = x</span>, valable car 5 &gt; 0… ». Et vérifie toujours la condition d'application avant d'écrire le résultat : c'est elle que le correcteur regarde en premier.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== QCM D'ENTRAÎNEMENT ===== -->
+  <div class="lecture-quiz">
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q1 — Que vaut e^(ln 5) ?</p>
+      <div class="lecture-quiz-options">
+        <span>A) ln 5</span>
+        <span>B) 5</span>
+        <span>C) e⁵</span>
+        <span>D) 1/5</span>
+      </div>
+      <details>
+        <summary>Voir la réponse</summary>
+        <div class="lecture-quiz-answer"><strong>B) 5.</strong> La formule <span class="math">exp(ln x) = x</span> s'applique car 5 &gt; 0 : exp « défait » ln et redonne le nombre de départ.</div>
+      </details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q2 — L'équation e^x = 9 équivaut à :</p>
+      <div class="lecture-quiz-options">
+        <span>A) x = 3</span>
+        <span>B) x = e⁹</span>
+        <span>C) x = ln 9</span>
+        <span>D) x = 9</span>
+      </div>
+      <details>
+        <summary>Voir la réponse</summary>
+        <div class="lecture-quiz-answer"><strong>C) x = ln 9.</strong> Comme 9 &gt; 0, l'équation <span class="math">e^x = 9</span> admet une unique solution <span class="math">x = ln 9</span>. Attention : ln 9 = 2 ln 3, ce n'est pas 3 ! Et l'option D confond e^x avec x.</div>
+      </details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q3 — Que vaut (e²)³ · e^(−4) ?</p>
+      <div class="lecture-quiz-options">
+        <span>A) e</span>
+        <span>B) e²</span>
+        <span>C) e³</span>
+        <span>D) e¹⁰</span>
+      </div>
+      <details>
+        <summary>Voir la réponse</summary>
+        <div class="lecture-quiz-answer"><strong>B) e².</strong> <span class="math">(e²)³ = e⁶</span>, puis <span class="math">e⁶ · e^(−4) = e^(6 − 4) = e²</span>. On additionne les exposants, jamais les valeurs.</div>
+      </details>
+    </div>
+  </div>
+
+  <!-- ===== RÉCAPITULATIF ===== -->
+  <div class="lecture-recap">
+    <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
+    <ul class="lecture-recap-list">
+      <li><strong>[definition_exp]</strong> exp est la réciproque de ln : <span class="math">exp x = y ⇔ x = ln y</span> — définie sur ℝ, à valeurs strictement positives</li>
+      <li><strong>[definition_exp]</strong> <span class="math">e = exp(1) ≈ 2,718</span> et <span class="math">ln e = 1</span> ; notation <span class="math">e^x = exp x</span> ; <span class="math">e⁰ = 1</span> ; <span class="math">e¹ = e</span></li>
+      <li><strong>[definition_exp]</strong> <span class="math">exp(ln x) = x</span> pour x &gt; 0 ; <span class="math">ln(e^x) = x</span> pour tout x ; exp est dérivable sur ℝ et strictement croissante</li>
+      <li><strong>[proprietes_algebriques]</strong> <span class="math">e^(a + b) = e^a · e^b</span> ; <span class="math">e^(−a) = 1/e^a</span> ; <span class="math">e^(a − b) = e^a / e^b</span> ; <span class="math">(e^a)ⁿ = e^(n·a)</span> (n ∈ ℤ)</li>
+      <li><strong>[proprietes_algebriques]</strong> <span class="math">e^(a + b) ≠ e^a + e^b</span> : l'exponentielle ne se distribue pas sur les sommes</li>
+      <li><strong>[proprietes_algebriques]</strong> <span class="math">e^x &gt; 0</span> pour tout x : jamais de solution à <span class="math">e^x = 0</span> ni à <span class="math">e^x = a</span> avec a ≤ 0 ; le facteur e^(u) ne compte pas dans les signes</li>
+      <li><strong>[proprietes_algebriques]</strong> <span class="math">e^x = a ⇔ x = ln a</span> (a &gt; 0) : une unique solution ; <span class="math">e^a = e^b ⇔ a = b</span></li>
+    </ul>
+  </div>
+
+  <!-- ===== FIN ===== -->
+  <div class="lecture-end">
+    <span class="lecture-end-icon">🎯</span>
+    <div class="lecture-end-text">Partie 1 terminée !</div>
+    <div class="lecture-end-sub">Passe à la partie 2 : la dérivée de exp, la fonction qui est sa propre dérivée</div>
+    <div class="lecture-end-divider"></div>
+  </div>
+
+</div>

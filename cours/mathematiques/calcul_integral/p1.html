@@ -1,0 +1,586 @@
+<!-- ============================================================ -->
+<!-- PARTIE 1 : PRIMITIVES & PRIMITIVES USUELLES                   -->
+<!-- Notion 1 : primitive — Définition, existence, unicité à une   -->
+<!--            constante près, condition initiale F(x0) = y0      -->
+<!-- Notion 2 : primitives_usuelles — Tableau + calculs purs       -->
+<!-- ============================================================ -->
+
+<div class="lecture-container">
+
+  <!-- ===== HERO ===== -->
+  <header class="lecture-hero">
+    <div class="lecture-hero-badge">
+      <span class="lecture-hero-icon">📘</span>
+      <span class="lecture-hero-label">Partie 01 · Calcul intégral</span>
+    </div>
+    <h1 class="lecture-hero-title">
+      Primitives &amp; <em>Primitives usuelles</em>
+    </h1>
+    <p class="lecture-hero-intro">
+      Tu sais passer d'une fonction à sa dérivée ; ici, on prend le problème <strong>à l'envers</strong> : connaissant la dérivée, retrouver la fonction. Cette partie pose les fondations de tout le chapitre : la <strong>définition d'une primitive</strong>, son <strong>existence</strong>, le théorème qui dit que <strong>deux primitives diffèrent d'une constante</strong>, la détermination de la primitive vérifiant une <strong>condition initiale</strong>, puis le <strong>tableau des primitives usuelles</strong> — à connaître par cœur.
+    </p>
+    <div class="lecture-hero-meta">
+      <span class="lecture-hero-meta-item">⏱ 20 min</span>
+      <span class="lecture-hero-meta-item">🧮 2 notions</span>
+      <span class="lecture-hero-meta-item">📐 8 sections</span>
+      <span class="lecture-hero-meta-item">🎓 Terminale D</span>
+    </div>
+  </header>
+
+  <!-- ===== SOMMAIRE ===== -->
+  <nav class="lecture-toc">
+    <div class="lecture-toc-header">
+      <span>Dans cette partie</span>
+      <span class="lecture-toc-count">2 notions · 8 sections</span>
+    </div>
+    <ol class="lecture-toc-list">
+      <li><a href="#s0"><span class="toc-num">00</span><span>Motivation — remonter de la dérivée à la fonction</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>Notion 1 · primitive — Définir une primitive</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>Notion 1 · primitive — Existence des primitives</span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>Notion 1 · primitive — Deux primitives diffèrent d'une constante</span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>Notion 1 · primitive — La primitive vérifiant F(x₀) = y₀</span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>Notion 2 · primitives_usuelles — Le tableau à connaître par cœur</span></a></li>
+      <li><a href="#s6"><span class="toc-num">06</span><span>Notion 2 · primitives_usuelles — Entraînement : calculs purs</span></a></li>
+      <li><a href="#s7"><span class="toc-num">07</span><span>Bilan — L'essentiel de la partie</span></a></li>
+    </ol>
+  </nav>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 0 : MOTIVATION -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s0">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">00</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Motivation</span>
+        <h2 class="lecture-section-title">Remonter de la dérivée à la fonction</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Un car quitte Niamey pour Zinder. Son GPS enregistre sa <strong>vitesse</strong> <span class="math">v(t)</span> à chaque instant. À l'arrivée, une question toute simple : quelle <strong>distance</strong> a-t-il parcourue ? Autrement dit, connaissant la vitesse, peut-on retrouver la « fonction distance » dont la dérivée est <span class="math">v</span> ? C'est exactement le problème de ce chapitre — et tu verras que sa réponse, l'<strong>intégrale</strong>, mesure aussi des <strong>aires</strong>.
+      </p>
+
+      <p class="lecture-text">
+        Dériver, tu sais déjà faire : de <span class="math">f(x) = x²</span> on passe à <span class="math">f'(x) = 2x</span>. Mais comment faire le chemin inverse : partir de <span class="math">2x</span> et retrouver <span class="math">x²</span> ? Ce mouvement inverse s'appelle <strong>primitiver</strong>, et la fonction trouvée s'appelle une <strong>primitive</strong>. Toute la mécanique du calcul intégral repose sur ce geste.
+      </p>
+
+      <div class="lecture-callout lecture-callout-gold">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Le programme de cette partie</div>
+          <ul class="lecture-list">
+            <li><strong>Définir</strong> une primitive : <span class="math">F' = f</span>.</li>
+            <li><strong>Existence</strong> : toute fonction continue sur un intervalle admet des primitives.</li>
+            <li><strong>Unicité… à une constante près</strong> : deux primitives diffèrent d'une constante.</li>
+            <li><strong>Condition initiale</strong> : trouver la primitive vérifiant <span class="math">F(x₀) = y₀</span>.</li>
+            <li><strong>Tableau des primitives usuelles</strong> + calculs d'entraînement.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="lecture-aside">
+        <div class="lecture-aside-label">🌍 Petite histoire des sciences</div>
+        <div class="lecture-aside-content">
+          Le calcul des primitives et des intégrales est né au XVIIᵉ siècle, presque simultanément chez <strong>Isaac Newton</strong> (Angleterre) et <strong>Gottfried Leibniz</strong> (Allemagne) — d'où une célèbre querelle de priorité. C'est à Leibniz que l'on doit le symbole <span class="math">∫</span>, un « S » allongé (comme <em>somma</em>, « somme » en latin).
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 1 : NOTION 1 · primitive — DÉFINITION -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s1">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">01</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1 · primitive</span>
+        <h2 class="lecture-section-title">Définir une primitive</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Commençons par la définition officielle, celle qu'il faut savoir restituer <em>mot pour mot</em> à l'examen. Elle tient en une ligne, mais chaque mot compte.
+      </p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">📗 Définition officielle — Primitive</div>
+          <p><strong>Soient f une fonction définie sur un intervalle I et F une fonction définie sur I. On dit que F est une primitive de f sur I si F est dérivable sur I et si, pour tout x ∈ I :</strong></p>
+          <p><span class="math">F'(x) = f(x)</span></p>
+          <p>Autrement dit : <strong>dériver F redonne exactement f</strong>. Primitiver, c'est dériver à l'envers.</p>
+        </div>
+      </div>
+
+      <p class="lecture-text">
+        Vérifions la définition sur un exemple simple. Prenons <span class="math">f(x) = 2x</span> sur <span class="math">ℝ</span>. La fonction <span class="math">F(x) = x² + 7</span> est dérivable sur <span class="math">ℝ</span> et <span class="math">F'(x) = 2x = f(x)</span> : c'est donc une primitive de <span class="math">f</span>. Mais <span class="math">G(x) = x² − 3</span> aussi, et <span class="math">H(x) = x²</span> aussi… Il y en a <strong>une infinité</strong> — d'où l'importance de dire « <strong>une</strong> primitive » et non « la primitive ». (On comprendra pourquoi en section 03.)
+      </p>
+
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">🔍 Exemple 1 — Vérifier qu'une fonction est une primitive</div>
+        <div class="lecture-example-content"><p>Vérifier que <span class="math">F(x) = x³ − 2x + 5</span> est une primitive de <span class="math">f(x) = 3x² − 2</span> sur <span class="math">ℝ</span>.</p></div>
+      </div>
+      <div class="lecture-steps">
+        <div class="lecture-step">
+          <div class="lecture-step-number">1</div>
+          <div class="lecture-step-content"><p><span class="math">F</span> est dérivable sur <span class="math">ℝ</span> (polynôme).</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">2</div>
+          <div class="lecture-step-content"><p>On dérive : <span class="math">F'(x) = 3x² − 2</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">3</div>
+          <div class="lecture-step-content"><p>On compare : <span class="math">F'(x) = f(x)</span> pour tout <span class="math">x ∈ ℝ</span>. <strong>Conclusion : F est bien une primitive de f sur ℝ.</strong></p></div>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-danger">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Erreur fréquente au Bac</div>
+          <p>Confondre « primitive » et « dérivée » : la primitive de <span class="math">f</span> n'est pas <span class="math">f'</span> ! Et ne jamais répondre « <em>la</em> primitive » : comme <span class="math">+ C</span> est possible, il y en a une infinité. Réflexe universel : <strong>toute primitive proposée se vérifie en 5 secondes en la dérivant</strong> — si le résultat n'est pas <span class="math">f</span>, c'est faux.</p>
+        </div>
+      </div>
+
+      <div class="lecture-vocab-grid">
+        <div class="vocab-card">
+          <div class="vocab-symbol">🔄</div>
+          <div class="vocab-name">Primitive</div>
+          <div class="vocab-notation">F telle que F' = f sur I</div>
+        </div>
+        <div class="vocab-card">
+          <div class="vocab-symbol">⬅️</div>
+          <div class="vocab-name">Primitiver</div>
+          <div class="vocab-notation">Passer de f à F (mouvement inverse de la dérivation)</div>
+        </div>
+        <div class="vocab-card vocab-card-success">
+          <div class="vocab-symbol">🎯</div>
+          <div class="vocab-name">Condition initiale</div>
+          <div class="vocab-notation">F(x₀) = y₀ : fixe la constante et désigne UNE primitive</div>
+        </div>
+        <div class="vocab-card vocab-card-info">
+          <div class="vocab-symbol">📏</div>
+          <div class="vocab-name">Intervalle I</div>
+          <div class="vocab-notation">Le cadre de la définition : on primitive toujours SUR un intervalle</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 2 : NOTION 1 · primitive — EXISTENCE -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s2">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">02</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1 · primitive</span>
+        <h2 class="lecture-section-title">Existence des primitives</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        A-t-on toujours le droit de chercher une primitive ? Oui — à une seule condition, que voici. Ce théorème est <strong>admis</strong> (on ne le démontre pas en Terminale) : il faut savoir l'énoncer <em>exactement</em>.
+      </p>
+
+      <div class="lecture-callout lecture-callout-gold">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">💡 Théorème (admis) — Existence</div>
+          <p><strong>Toute fonction continue sur un intervalle I admet au moins une primitive sur I.</strong></p>
+          <p>Deux hypothèses sont essentielles : la fonction doit être <strong>continue</strong> (pas besoin d'être dérivable !) et l'ensemble de départ doit être <strong>un intervalle</strong>.</p>
+        </div>
+      </div>
+
+      <p class="lecture-text">
+        Ce théorème garantit que la recherche a un sens : toutes les fonctions usuelles du programme (polynômes, <span class="math">1/x</span> sur un intervalle ne contenant pas 0, <span class="math">eˣ</span>, <span class="math">cos x</span>, <span class="math">sin x</span>, <span class="math">√x</span>…) sont continues sur leurs intervalles de définition, donc admettent des primitives. Exemple typique de fonction continue mais <strong>non dérivable</strong> qui admet pourtant une primitive : <span class="math">f(x) = √x</span> sur <span class="math">[0 ; +∞[</span>, dont une primitive est <span class="math">F(x) = (2/3)·x·√x</span> — vérifie : en dérivant un produit, <span class="math">F'(x) = (2/3)·(√x + x/(2√x)) = (2/3)·(3x/(2√x)) = x/√x = √x</span> pour <span class="math">x &gt; 0</span>. ✔️
+      </p>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ L'hypothèse « intervalle » est sérieuse</div>
+          <p>La fonction <span class="math">f(x) = 1/x</span> est continue sur <span class="math">]0 ; +∞[</span> et sur <span class="math">]−∞ ; 0[</span> : elle admet donc des primitives <strong>sur chacun de ces intervalles</strong> (par exemple <span class="math">ln x</span> à droite, <span class="math">ln(−x)</span> à gauche). Mais sur la réunion <span class="math">]−∞ ; 0[ ∪ ]0 ; +∞[</span> — qui n'est <strong>pas un intervalle</strong> — on ne peut pas définir une primitive unique. Toujours préciser l'intervalle !</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 3 : NOTION 1 · primitive — DEUX PRIMITIVES -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s3">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">03</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1 · primitive</span>
+        <h2 class="lecture-section-title">Deux primitives diffèrent d'une constante</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Nous l'avons vu : <span class="math">2x</span> admet une infinité de primitives, toutes de la forme <span class="math">x² + C</span>. Ce n'est pas un hasard : c'est un théorème général, avec une démonstration courte que tu peux <em>toute entière</em> recaser dans une copie.
+      </p>
+
+      <div class="lecture-callout lecture-callout-gold">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">💡 Théorème — Deux primitives d'une même fonction</div>
+          <p><strong>Si F et G sont deux primitives de f sur un intervalle I, alors il existe un réel C tel que, pour tout x ∈ I :</strong></p>
+          <p><span class="math">G(x) = F(x) + C</span></p>
+          <p>Autrement dit : deux primitives d'une même fonction sur un intervalle <strong>diffèrent d'une constante</strong>.</p>
+        </div>
+      </div>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">F et G primitives de f sur I ⇒ (G − F)(x) = C, C ∈ ℝ</div>
+        <div class="lecture-formula-desc">Conséquence directe : connaître UNE primitive F de f donne toutes les autres : F + C, avec C réel quelconque.</div>
+      </div>
+
+      <p class="lecture-text">Démonstration (trois lignes, à retenir) :</p>
+      <div class="lecture-steps">
+        <div class="lecture-step">
+          <div class="lecture-step-number">1</div>
+          <div class="lecture-step-content"><p>Posons <span class="math">H = G − F</span>. Comme <span class="math">F</span> et <span class="math">G</span> sont dérivables sur <span class="math">I</span>, <span class="math">H</span> l'est aussi, et <span class="math">H'(x) = G'(x) − F'(x) = f(x) − f(x) = 0</span> pour tout <span class="math">x ∈ I</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">2</div>
+          <div class="lecture-step-content"><p>Or on sait que <strong>une fonction dont la dérivée est nulle sur un intervalle est constante sur cet intervalle</strong>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">3</div>
+          <div class="lecture-step-content"><p>Donc <span class="math">H(x) = C</span> pour un certain réel <span class="math">C</span>, c'est-à-dire <span class="math">G(x) = F(x) + C</span>. ∎</p></div>
+        </div>
+      </div>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">📚 Exemple — Toutes les primitives de f(x) = 2x</div>
+        <div class="lecture-example-content"><p><span class="math">x²</span> est une primitive de <span class="math">2x</span> sur <span class="math">ℝ</span>. Donc <em>toutes</em> les primitives de <span class="math">2x</span> sont les fonctions <span class="math">x² + C</span>, avec <span class="math">C ∈ ℝ</span> : <span class="math">x² + 4</span>, <span class="math">x² − 7</span>, <span class="math">x² + 0,5</span>, <span class="math">x² + π</span>…</p></div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-danger">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Erreur fréquente au Bac</div>
+          <p><strong>Oublier le « + C »</strong> en fin de recherche de primitive est l'erreur n°1 du chapitre. Sans lui, tu ne donnes qu'UNE primitive, pas « les » primitives demandées. Autre variante du piège : croire que deux primitives diffèrent d'un facteur (« ×2 ») ou d'un signe — <strong>non, toujours d'une constante additive</strong>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 4 : NOTION 1 · primitive — CONDITION INITIALE -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s4">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">04</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1 · primitive</span>
+        <h2 class="lecture-section-title">La primitive vérifiant F(x₀) = y₀</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Parmi l'infinité de primitives de <span class="math">f</span>, une seule passe par le point <span class="math">(x₀ ; y₀)</span>, c'est-à-dire vérifie <span class="math">F(x₀) = y₀</span>. C'est <strong>la</strong> primitive qu'on demande dans les exercices classiques (« Déterminer la primitive F de f telle que… »). La méthode est un petit ballet en quatre temps :
+      </p>
+
+      <div class="lecture-rule">
+        <div class="lecture-rule-label">🧠 Méthode à retenir</div>
+        <div class="lecture-rule-body">
+          <strong>(1)</strong> Écrire la forme générale : <span class="math">F(x) = G(x) + C</span> où <span class="math">G</span> est une primitive trouvée dans le tableau. <strong>(2)</strong> Écrire la condition <span class="math">F(x₀) = y₀</span>. <strong>(3)</strong> Résoudre l'équation pour trouver <span class="math">C</span>. <strong>(4)</strong> Conclure et <strong>vérifier</strong> : <span class="math">F' = f</span> et <span class="math">F(x₀) = y₀</span>.
+        </div>
+      </div>
+
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">🔍 Exemple complet — Déterminer F telle que F' = 2x et F(1) = 5</div>
+        <div class="lecture-example-content"><p>Déterminer la primitive <span class="math">F</span> de <span class="math">f(x) = 2x</span> sur <span class="math">ℝ</span> qui vérifie <span class="math">F(1) = 5</span>.</p></div>
+      </div>
+      <div class="lecture-steps">
+        <div class="lecture-step">
+          <div class="lecture-step-number">1</div>
+          <div class="lecture-step-content"><p><strong>Forme générale.</strong> Une primitive de <span class="math">2x</span> est <span class="math">x²</span>, donc <span class="math">F(x) = x² + C</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">2</div>
+          <div class="lecture-step-content"><p><strong>Condition initiale.</strong> <span class="math">F(1) = 1² + C = 1 + C</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">3</div>
+          <div class="lecture-step-content"><p><strong>Équation.</strong> <span class="math">1 + C = 5</span>, donc <span class="math">C = 4</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">4</div>
+          <div class="lecture-step-content"><p><strong>Conclusion.</strong> <span class="math">F(x) = x² + 4</span>. <strong>Vérification :</strong> <span class="math">F'(x) = 2x = f(x)</span> ✔️ et <span class="math">F(1) = 1 + 4 = 5</span> ✔️.</p></div>
+        </div>
+      </div>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">📚 Exemple 2 — Avec f(x) = 3x²</div>
+        <div class="lecture-example-content"><p>Déterminer <span class="math">F</span> telle que <span class="math">F'(x) = 3x²</span> et <span class="math">F(0) = −2</span>. Forme générale : <span class="math">F(x) = x³ + C</span>. Condition : <span class="math">F(0) = 0³ + C = C = −2</span>. Conclusion : <span class="math">F(x) = x³ − 2</span>. Vérification : <span class="math">F'(x) = 3x²</span> ✔️, <span class="math">F(0) = −2</span> ✔️.</p></div>
+      </div>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">📚 Exemple 3 — Avec f(x) = eˣ</div>
+        <div class="lecture-example-content"><p>Déterminer <span class="math">F</span> telle que <span class="math">F'(x) = eˣ</span> et <span class="math">F(0) = 3</span>. Forme générale : <span class="math">F(x) = eˣ + C</span>. Condition : <span class="math">F(0) = e⁰ + C = 1 + C = 3</span>, donc <span class="math">C = 2</span>. Conclusion : <span class="math">F(x) = eˣ + 2</span>. Vérification : <span class="math">F'(x) = eˣ</span> ✔️, <span class="math">F(0) = 1 + 2 = 3</span> ✔️.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 5 : NOTION 2 · primitives_usuelles — TABLEAU -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s5">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">05</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2 · primitives_usuelles</span>
+        <h2 class="lecture-section-title">Le tableau à connaître par cœur</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Tout le calcul intégral tient dans ce tableau : à chaque fonction de départ <span class="math">f</span>, sa primitive <span class="math">F</span>. Il faut le connaître <strong>par cœur, dans les deux sens</strong> (de <span class="math">f</span> vers <span class="math">F</span>, et de <span class="math">F</span> vers <span class="math">f</span>).
+      </p>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">
+          xⁿ → x^(n + 1)/(n + 1) (n ≠ −1) · 1/x² → −1/x · 1/√x → 2√x<br>
+          eˣ → eˣ · 1/x → ln|x| (x ≠ 0) · cos x → sin x · sin x → −cos x
+        </div>
+        <div class="lecture-formula-desc">Les sept primitives usuelles du programme (+ k → k·x pour les constantes). Chacune se vérifie en dérivant F : c'est ton filet de sécurité.</div>
+      </div>
+
+      <div class="lecture-table">
+        <table>
+          <thead>
+            <tr><th>Fonction f(x)</th><th>Primitive F(x)</th><th>Vérification : F'(x)</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><span class="math">k</span> (constante)</td><td><span class="math">k·x</span></td><td><span class="math">k</span> ✔️</td></tr>
+            <tr><td><span class="math">xⁿ</span> (n ≠ −1)</td><td><span class="math">x^(n + 1)/(n + 1)</span></td><td><span class="math">((n + 1)·xⁿ)/(n + 1) = xⁿ</span> ✔️</td></tr>
+            <tr><td><span class="math">1/x²</span></td><td><span class="math">−1/x</span></td><td><span class="math">−(−1/x²) = 1/x²</span> ✔️</td></tr>
+            <tr><td><span class="math">1/√x</span> (x &gt; 0)</td><td><span class="math">2√x</span></td><td><span class="math">2/(2√x) = 1/√x</span> ✔️</td></tr>
+            <tr><td><span class="math">eˣ</span></td><td><span class="math">eˣ</span></td><td><span class="math">eˣ</span> ✔️ (l'unique fonction égale à sa dérivée !)</td></tr>
+            <tr><td><span class="math">1/x</span> (x ≠ 0)</td><td><span class="math">ln|x|</span></td><td><span class="math">1/x</span> ✔️</td></tr>
+            <tr><td><span class="math">cos x</span></td><td><span class="math">sin x</span></td><td><span class="math">cos x</span> ✔️</td></tr>
+            <tr><td><span class="math">sin x</span></td><td><span class="math">−cos x</span></td><td><span class="math">−(−sin x) = sin x</span> ✔️</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ Deux pièges du tableau</div>
+          <p><strong>1) Pourquoi n ≠ −1 ?</strong> Si <span class="math">n = −1</span>, la formule <span class="math">x^(n + 1)/(n + 1)</span> donne <span class="math">x⁰/0</span>, absurde : c'est justement le cas particulier <span class="math">1/x → ln|x|</span>. <strong>2) La valeur absolue dans ln|x|</strong> est obligatoire car le logarithme n'existe que pour un nombre strictement positif ; quand tu travailles sur un intervalle où <span class="math">x &gt; 0</span>, tu peux écrire simplement <span class="math">ln x</span>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 6 : NOTION 2 · primitives_usuelles — CALCULS PURS -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s6">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">06</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2 · primitives_usuelles</span>
+        <h2 class="lecture-section-title">Entraînement : calculs purs</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        À l'examen, on demande rarement « réciter le tableau » : on demande de <strong>calculer</strong> des primitives. La stratégie tient en trois gestes : <strong>transformer</strong> l'expression (développer, réduire), <strong>primitiver terme à terme</strong> avec le tableau, <strong>ajouter + C</strong>, puis <strong>vérifier en dérivant</strong>.
+      </p>
+
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">🧮 Exemple 1 — Polynôme</div>
+        <div class="lecture-example-content"><p>Chercher une primitive de <span class="math">f(x) = x⁴ − 2x + 3</span> sur <span class="math">ℝ</span>.</p></div>
+      </div>
+      <div class="lecture-steps">
+        <div class="lecture-step">
+          <div class="lecture-step-number">1</div>
+          <div class="lecture-step-content"><p>Terme à terme : une primitive de <span class="math">x⁴</span> est <span class="math">x⁵/5</span> ; de <span class="math">−2x</span> est <span class="math">−x²</span> ; de <span class="math">3</span> est <span class="math">3x</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">2</div>
+          <div class="lecture-step-content"><p>Donc <span class="math">F(x) = x⁵/5 − x² + 3x + C</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">3</div>
+          <div class="lecture-step-content"><p><strong>Vérification :</strong> <span class="math">F'(x) = 5x⁴/5 − 2x + 3 = x⁴ − 2x + 3 = f(x)</span> ✔️.</p></div>
+        </div>
+      </div>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">🧮 Exemple 2 — Développer d'abord !</div>
+        <div class="lecture-example-content"><p>Chercher une primitive de <span class="math">f(x) = (x + 1)(2x − 1)</span>.</p></div>
+      </div>
+      <div class="lecture-steps">
+        <div class="lecture-step">
+          <div class="lecture-step-number">1</div>
+          <div class="lecture-step-content"><p><strong>Transformation :</strong> <span class="math">f(x) = 2x² − x + 2x − 1 = 2x² + x − 1</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">2</div>
+          <div class="lecture-step-content"><p><strong>Primitivation :</strong> <span class="math">F(x) = (2/3)x³ + (1/2)x² − x + C</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">3</div>
+          <div class="lecture-step-content"><p><strong>Vérification :</strong> <span class="math">F'(x) = 2x² + x − 1 = f(x)</span> ✔️.</p></div>
+        </div>
+      </div>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">🧮 Exemple 3 — Racine et cosinus</div>
+        <div class="lecture-example-content"><p>Chercher une primitive de <span class="math">f(x) = 4/√x + 3·cos x</span> sur <span class="math">]0 ; +∞[</span>.</p></div>
+      </div>
+      <div class="lecture-steps">
+        <div class="lecture-step">
+          <div class="lecture-step-number">1</div>
+          <div class="lecture-step-content"><p>Une primitive de <span class="math">4/√x = 4·(1/√x)</span> est <span class="math">4·2√x = 8√x</span> ; une primitive de <span class="math">3·cos x</span> est <span class="math">3·sin x</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">2</div>
+          <div class="lecture-step-content"><p>Donc <span class="math">F(x) = 8√x + 3·sin x + C</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">3</div>
+          <div class="lecture-step-content"><p><strong>Vérification :</strong> <span class="math">F'(x) = 8/(2√x) + 3·(−sin x)' = 4/√x + 3·cos x</span> ✔️.</p></div>
+        </div>
+      </div>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">🧮 Exemple 4 — Quotients avec x⁻² et 1/x</div>
+        <div class="lecture-example-content"><p>Chercher une primitive de <span class="math">f(x) = 2/x² − 5/x</span> sur <span class="math">]0 ; +∞[</span>.</p></div>
+      </div>
+      <div class="lecture-steps">
+        <div class="lecture-step">
+          <div class="lecture-step-number">1</div>
+          <div class="lecture-step-content"><p>Une primitive de <span class="math">2/x² = 2·(1/x²)</span> est <span class="math">−2/x</span> ; une primitive de <span class="math">−5/x</span> est <span class="math">−5·ln x</span> (ici <span class="math">x &gt; 0</span>, donc <span class="math">ln|x| = ln x</span>).</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">2</div>
+          <div class="lecture-step-content"><p>Donc <span class="math">F(x) = −2/x − 5·ln x + C</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">3</div>
+          <div class="lecture-step-content"><p><strong>Vérification :</strong> <span class="math">F'(x) = 2/x² − 5/x = f(x)</span> ✔️.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 7 : BILAN -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s7">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">07</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Bilan</span>
+        <h2 class="lecture-section-title">L'essentiel de la partie</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Une idée, un théorème, un tableau : voilà toute la partie. Si tu ne dois retenir qu'une chose, c'est que <strong>primitiver, c'est dériver à l'envers</strong> — et que le « + C » n'est jamais loin.
+      </p>
+
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-label">L'idée centrale de la partie</div>
+        <div class="lecture-formula-hero-main">F primitive de f sur I ⇔ F'(x) = f(x) pour tout x ∈ I</div>
+        <div class="lecture-formula-hero-desc">Toute fonction continue sur I admet des primitives · toutes les primitives sont F + C · la condition F(x₀) = y₀ fixe C.</div>
+      </div>
+
+      <ul class="lecture-list-elegant">
+        <li><strong>Définition</strong> : <span class="math">F</span> est une primitive de <span class="math">f</span> sur <span class="math">I</span> si <span class="math">F</span> est dérivable sur <span class="math">I</span> et <span class="math">F' = f</span>.</li>
+        <li><strong>Existence (admis)</strong> : toute fonction <strong>continue sur un intervalle</strong> <span class="math">I</span> admet au moins une primitive sur <span class="math">I</span>.</li>
+        <li><strong>Unicité à une constante près</strong> : <span class="math">G = F + C</span> ; démonstration : <span class="math">(G − F)' = 0</span> donc <span class="math">G − F</span> constante.</li>
+        <li><strong>Condition initiale</strong> : <span class="math">F(x₀) = y₀</span> → forme générale, équation, valeur de <span class="math">C</span>, vérification.</li>
+        <li><strong>Tableau</strong> : <span class="math">xⁿ → x^(n + 1)/(n + 1)</span> ; <span class="math">1/x² → −1/x</span> ; <span class="math">1/√x → 2√x</span> ; <span class="math">eˣ → eˣ</span> ; <span class="math">1/x → ln|x|</span> ; <span class="math">cos x → sin x</span> ; <span class="math">sin x → −cos x</span>.</li>
+        <li><strong>Réflexe d'or</strong> : toute primitive se vérifie en la dérivant — 5 secondes, zéro risque.</li>
+      </ul>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ Réflexe rédaction pour l'examen</div>
+          <p>Face à « déterminer les primitives de f », la rédaction attendue : <strong>(1)</strong> préciser l'intervalle, <strong>(2)</strong> donner la forme générale avec « <span class="math">+ C</span>, <span class="math">C ∈ ℝ</span> », <strong>(3)</strong> vérifier en dérivant. Face à « la primitive vérifiant <span class="math">F(x₀) = y₀</span> », ne pas oublier de conclure par la valeur explicite de <span class="math">C</span>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== QCM D'ENTRAÎNEMENT ===== -->
+  <div class="lecture-quiz">
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q1 — Une primitive de <span class="math">f(x) = 6x²</span> sur <span class="math">ℝ</span> est :</p>
+      <div class="lecture-quiz-options">
+        <span>A) <span class="math">2x³</span></span>
+        <span>B) <span class="math">3x³</span></span>
+        <span>C) <span class="math">6x³</span></span>
+        <span>D) <span class="math">2x²</span></span>
+      </div>
+      <details>
+        <summary>Voir la réponse</summary>
+        <div class="lecture-quiz-answer"><strong>A) 2x³.</strong> On vérifie en dérivant : <span class="math">(2x³)' = 6x² = f(x)</span> ✔️. Les autres propositions donnent <span class="math">9x²</span> (B), <span class="math">18x²</span> (C) et <span class="math">4x</span> (D) — fausses.</div>
+      </details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q2 — Deux primitives d'une même fonction sur un intervalle I diffèrent :</p>
+      <div class="lecture-quiz-options">
+        <span>A) d'une constante</span>
+        <span>B) d'un signe</span>
+        <span>C) d'un facteur x</span>
+        <span>D) de rien du tout</span>
+      </div>
+      <details>
+        <summary>Voir la réponse</summary>
+        <div class="lecture-quiz-answer"><strong>A) d'une constante.</strong> Théorème du cours : si F et G sont deux primitives de f sur I, alors (G − F)' = 0 sur I, donc G − F est constante sur l'intervalle I.</div>
+      </details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q3 — La primitive F de <span class="math">f(x) = 2x</span> sur <span class="math">ℝ</span> vérifiant <span class="math">F(3) = 10</span> est :</p>
+      <div class="lecture-quiz-options">
+        <span>A) <span class="math">F(x) = x² + 1</span></span>
+        <span>B) <span class="math">F(x) = x² + 10</span></span>
+        <span>C) <span class="math">F(x) = x² + 9</span></span>
+        <span>D) <span class="math">F(x) = x²</span></span>
+      </div>
+      <details>
+        <summary>Voir la réponse</summary>
+        <div class="lecture-quiz-answer"><strong>A) F(x) = x² + 1.</strong> Forme générale F(x) = x² + C ; condition : F(3) = 9 + C = 10, donc C = 1. Vérification : F'(x) = 2x ✔️ et F(3) = 9 + 1 = 10 ✔️.</div>
+      </details>
+    </div>
+  </div>
+
+  <!-- ===== RÉCAPITULATIF ===== -->
+  <div class="lecture-recap">
+    <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
+    <ul class="lecture-recap-list">
+      <li><strong>[primitive]</strong> F est une <strong>primitive de f sur I</strong> si F est dérivable sur I et si <span class="math">F'(x) = f(x)</span> pour tout <span class="math">x ∈ I</span></li>
+      <li><strong>[primitive]</strong> On dit « <strong>une</strong> primitive » : il en existe une infinité — toute primitive se vérifie en dérivant</li>
+      <li><strong>[existence]</strong> Toute fonction <strong>continue sur un intervalle I</strong> admet au moins une primitive sur I (théorème admis)</li>
+      <li><strong>[unicite]</strong> Deux primitives d'une même fonction sur I <strong>diffèrent d'une constante</strong> : <span class="math">G(x) = F(x) + C</span></li>
+      <li><strong>[unicite]</strong> Démonstration : <span class="math">(G − F)' = f − f = 0</span> sur l'intervalle I, donc <span class="math">G − F</span> est constante</li>
+      <li><strong>[condition_initiale]</strong> Pour <span class="math">F(x₀) = y₀</span> : forme générale <span class="math">F(x) = G(x) + C</span>, équation <span class="math">G(x₀) + C = y₀</span>, résoudre, vérifier</li>
+      <li><strong>[condition_initiale]</strong> Exemple type : <span class="math">F' = 2x</span> et <span class="math">F(1) = 5</span> → <span class="math">F(x) = x² + 4</span></li>
+      <li><strong>[primitives_usuelles]</strong> <span class="math">xⁿ → x^(n + 1)/(n + 1)</span> (n ≠ −1) ; <span class="math">1/x² → −1/x</span> ; <span class="math">1/√x → 2√x</span> ; <span class="math">eˣ → eˣ</span></li>
+      <li><strong>[primitives_usuelles]</strong> <span class="math">1/x → ln|x|</span> (x ≠ 0) ; <span class="math">cos x → sin x</span> ; <span class="math">sin x → −cos x</span> ; <span class="math">k → k·x</span></li>
+      <li><strong>[primitives_usuelles]</strong> Pièges : n = −1 relève du logarithme ; ne pas oublier la valeur absolue de <span class="math">ln|x|</span> ni le « + C » final</li>
+    </ul>
+  </div>
+
+  <!-- ===== FIN ===== -->
+  <div class="lecture-end">
+    <span class="lecture-end-icon">🎯</span>
+    <div class="lecture-end-text">Partie 1 terminée !</div>
+    <div class="lecture-end-sub">Passe à la partie 2 : primitives composées et définition de l'intégrale</div>
+    <div class="lecture-end-divider"></div>
+  </div>
+
+</div>

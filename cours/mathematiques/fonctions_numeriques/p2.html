@@ -1,0 +1,627 @@
+<!-- ============================================================ -->
+<!-- PARTIE 2 : CONTINUITÉ, TVI ET THÉORÈME DE LA BIJECTION         -->
+<!-- Chapitre : Fonctions numériques — Terminale D                  -->
+<!-- Notion 1 : continuite — Continuité en un point, sur un         -->
+<!--            intervalle, fonctions usuelles et opérations        -->
+<!-- Notion 2 : tvi — Théorème des valeurs intermédiaires et        -->
+<!--            corollaire (signes contraires)                      -->
+<!-- Notion 3 : bijection — Théorème de la bijection, unicité,      -->
+<!--            encadrement d'une solution par balayage             -->
+<!-- Examen  : exemple_bac — x³ + x − 1 = 0 traité de bout en bout  -->
+<!-- ============================================================ -->
+
+<div class="lecture-container">
+
+  <!-- ===== HERO ===== -->
+  <header class="lecture-hero">
+    <div class="lecture-hero-badge">
+      <span class="lecture-hero-icon">📘</span>
+      <span class="lecture-hero-label">Partie 02 · Fonctions numériques</span>
+    </div>
+    <h1 class="lecture-hero-title">
+      Continuité, TVI &amp; <em>Théorème de la bijection</em>
+    </h1>
+    <p class="lecture-hero-intro">
+      Certaines fonctions se tracent <strong>sans lever le crayon</strong>, d'autres « sautent ». Cette propriété — la <strong>continuité</strong> — est la clé qui ouvre les deux grands théorèmes du chapitre. Cette partie installe <strong>3 notions</strong> : la <strong>continuité</strong> (définition par la limite, fonctions usuelles et opérations), le <strong>théorème des valeurs intermédiaires</strong> et son corollaire sur les signes contraires, puis le <strong>théorème de la bijection</strong> — l'outil qui garantit l'unicité de la solution de <span class="math">f(x) = k</span> et permet d'en donner un <strong>encadrement numérique</strong>, exactement comme au Bac.
+    </p>
+    <div class="lecture-hero-meta">
+      <span class="lecture-hero-meta-item">⏱ 25 min</span>
+      <span class="lecture-hero-meta-item">🧮 3 notions</span>
+      <span class="lecture-hero-meta-item">📊 8 sections</span>
+      <span class="lecture-hero-meta-item">🎓 Terminale D</span>
+    </div>
+  </header>
+
+  <!-- ===== SOMMAIRE ===== -->
+  <nav class="lecture-toc">
+    <div class="lecture-toc-header">
+      <span>Dans cette partie</span>
+      <span class="lecture-toc-count">3 notions · 8 sections</span>
+    </div>
+    <ol class="lecture-toc-list">
+      <li><a href="#s0"><span class="toc-num">00</span><span>Motivation — Sans lever le crayon</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>Notion 1 · continuite — Continuité en un point et sur un intervalle</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>Notion 1 · continuite — Fonctions usuelles et opérations</span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>Notion 2 · tvi — Le théorème des valeurs intermédiaires</span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>Notion 2 · tvi — Corollaire : signes contraires, zéro garanti</span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>Notion 3 · bijection — Le théorème de la bijection</span></a></li>
+      <li><a href="#s6"><span class="toc-num">06</span><span>Notion 3 · bijection — Encadrement d'une solution : le balayage</span></a></li>
+      <li><a href="#s7"><span class="toc-num">07</span><span>Examen · exemple_bac — <span class="math">x³ + x − 1 = 0</span> de bout en bout</span></a></li>
+    </ol>
+  </nav>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 0 : MOTIVATION -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s0">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">00</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Motivation</span>
+        <h2 class="lecture-section-title">Sans lever le crayon</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Pose ton crayon sur une feuille et trace le profil d'une <strong>route bitumée</strong> qui ondule doucement : tu peux dessiner toute la courbe <strong>sans lever le crayon</strong>. Maintenant trace un <strong>escalier</strong> : à chaque marche, tu es obligé de sauter. La route est « continue », l'escalier ne l'est pas. Cette image est toute la partie 2 en un dessin.
+      </p>
+
+      <p class="lecture-text">
+        Pourquoi s'en préoccuper ? Parce que les deux questions favorites du Bac — « <strong>montrer que l'équation <span class="math">f(x) = k</span> admet une solution</strong> » et « <strong>montrer qu'elle admet une unique solution</strong> » — se résolvent avec deux théorèmes qui exigent précisément la continuité. Cette partie te donne les énoncés exacts, les hypothèses à vérifier, et la méthode de <strong>balayage numérique</strong> pour encadrer la solution.
+      </p>
+
+      <div class="lecture-callout lecture-callout-gold">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Les trois questions de cette partie</div>
+          <ul class="lecture-list">
+            <li><strong>Quand dit-on</strong> qu'une fonction est continue — et quelles fonctions le sont sans calcul ? (Notion 1)</li>
+            <li><strong>Garantit-on</strong> l'existence d'une solution de <span class="math">f(x) = k</span> ? (Notion 2 — TVI)</li>
+            <li><strong>Garantit-on</strong> son unicité, et comment l'encadrer numériquement ? (Notion 3 — bijection)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="lecture-aside">
+        <div class="lecture-aside-label">🌍 Pour aller plus loin</div>
+        <div class="lecture-aside-content">
+          Le théorème des valeurs intermédiaires a une version célèbre, dite « du théorème du bol de thé » : si tu mélanges le thé, il existe un instant où chaque goutte a la température moyenne du bol. Existence garantie… mais le théorème ne dit pas <em>quand</em> : c'est toute la différence entre existence et calcul.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 1 : NOTION 1 · continuite — DÉFINITION -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s1">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">01</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1 · continuite</span>
+        <h2 class="lecture-section-title">Continuité en un point et sur un intervalle</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        La continuité s'écrit avec l'outil de la partie 1 : la <strong>limite</strong>. Une fonction est continue en un point quand, approchée depuis les deux côtés, elle aboutit exactement à sa propre valeur en ce point — pas de trou, pas de saut.
+      </p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">📗 Définition officielle — Continuité</div>
+          <p>La fonction <span class="math">f</span> est <strong>continue en</strong> <span class="math">a</span> lorsque <span class="math">lim(x→a) f(x) = f(a)</span>. Cela revient à exiger trois conditions : <strong>(1)</strong> <span class="math">f(a)</span> existe ; <strong>(2)</strong> <span class="math">lim(x→a) f(x)</span> existe (limites à droite et à gauche égales) ; <strong>(3)</strong> cette limite vaut exactement <span class="math">f(a)</span>.</p>
+          <p>On dit que <span class="math">f</span> est <strong>continue sur un intervalle</strong> <span class="math">I</span> lorsqu'elle est continue en tout point de <span class="math">I</span>.</p>
+        </div>
+      </div>
+
+      <p class="lecture-text">
+        L'image du crayon levé est un bon <em>réflexe visuel</em> : une fonction continue sur un intervalle se trace d'un seul trait. Mais à l'examen, on justifie la continuité <strong>par un théorème</strong> (section 02), jamais par le dessin.
+      </p>
+
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">🧮 Exemples résolus — continue, trou, saut</div>
+        <div class="lecture-example-content"><p>Étudier la continuité en <span class="math">2</span> de <span class="math">f(x) = x² + 1</span>, puis en <span class="math">2</span> de <span class="math">g(x) = (x² − 4)/(x − 2)</span>, puis en <span class="math">0</span> de <span class="math">h(x) = 1/x</span>.</p></div>
+      </div>
+
+      <div class="lecture-steps">
+        <div class="lecture-step">
+          <div class="lecture-step-number">1</div>
+          <div class="lecture-step-content"><p><strong>f(x) = x² + 1 en 2</strong> : <span class="math">f(2) = 5</span> existe, et <span class="math">lim(x→2) f(x) = 5</span> (partie 1). Limite = valeur : <span class="math">f</span> est <strong>continue en 2</strong> (et d'ailleurs sur <span class="math">ℝ</span> tout entier).</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">2</div>
+          <div class="lecture-step-content"><p><strong>g(x) = (x² − 4)/(x − 2) en 2</strong> : la limite existe et vaut <span class="math">4</span> (partie 1 : simplification par <span class="math">x − 2</span>), mais <span class="math">g(2)</span> n'existe <strong>pas</strong>. Condition (1) en défaut : <span class="math">g</span> n'est <strong>pas continue en 2</strong> — la courbe a un « trou » en <span class="math">(2 ; 4)</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">3</div>
+          <div class="lecture-step-content"><p><strong>h(x) = 1/x en 0</strong> : <span class="math">h(0)</span> n'existe pas, et les limites à droite et à gauche (<span class="math">+∞</span> puis <span class="math">−∞</span>) diffèrent : double rupture. La courbe « explose » : <span class="math">h</span> n'est pas continue en <span class="math">0</span>.</p></div>
+        </div>
+      </div>
+
+      <div class="lecture-vocab-grid">
+        <div class="vocab-card">
+          <div class="vocab-symbol">✏️</div>
+          <div class="vocab-name">Continue en a</div>
+          <div class="vocab-notation">lim(x→a) f(x) = f(a) : ni trou ni saut</div>
+        </div>
+        <div class="vocab-card">
+          <div class="vocab-symbol">🕳️</div>
+          <div class="vocab-name">Point de discontinuité</div>
+          <div class="vocab-notation">Valeur interdite ou limite ≠ valeur : le crayon saute</div>
+        </div>
+        <div class="vocab-card vocab-card-success">
+          <div class="vocab-symbol">🛣️</div>
+          <div class="vocab-name">Continue sur I</div>
+          <div class="vocab-notation">Continue en chaque point de l'intervalle I</div>
+        </div>
+        <div class="vocab-card vocab-card-info">
+          <div class="vocab-symbol">🎓</div>
+          <div class="vocab-name">Ce que ça débloque</div>
+          <div class="vocab-notation">TVI (existence) et bijection (unicité)</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 2 : NOTION 1 · continuite — FONCTIONS USUELLES & OPÉRATIONS -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s2">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">02</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1 · continuite</span>
+        <h2 class="lecture-section-title">Fonctions usuelles et opérations</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Heureusement, on ne vérifie pas la continuité point par point : un stock de <strong>fonctions connues</strong> et <strong>quatre opérations</strong> qui la conservent suffisent pour tous les exercices.
+      </p>
+
+      <div class="lecture-callout lecture-callout-gold">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">📘 Théorème — Le stock de fonctions continues</div>
+          <p>Les fonctions usuelles sont <strong>continues sur leur domaine</strong> : <span class="math">x ↦ xⁿ</span> (tout entier <span class="math">n</span>, sur les <span class="math">x</span> où elle est définie), <span class="math">x ↦ 1/x</span> sur <span class="math">ℝ*</span>, <span class="math">x ↦ √x</span> sur <span class="math">[0 ; +∞[</span>, <span class="math">x ↦ e^x</span> et <span class="math">x ↦ cos x</span>, <span class="math">x ↦ sin x</span> sur <span class="math">ℝ</span>, <span class="math">x ↦ ln x</span> sur <span class="math">]0 ; +∞[</span>.</p>
+          <p><strong>Opérations conservant la continuité :</strong> la <strong>somme</strong>, le <strong>produit</strong> et la <strong>composée</strong> de fonctions continues sont continus ; le <strong>quotient</strong> <span class="math">f/g</span> est continu là où <span class="math">g ≠ 0</span>.</p>
+        </div>
+      </div>
+
+      <p class="lecture-text">
+        Conséquences immédiates, à citer telles quelles en rédaction :
+      </p>
+
+      <ul class="lecture-list-elegant">
+        <li><strong>Toute fonction polynôme est continue sur <span class="math">ℝ</span></strong> (somme de monômes <span class="math">x ↦ xⁿ</span>).</li>
+        <li><strong>Toute fonction rationnelle est continue sur son domaine</strong> : par exemple <span class="math">f(x) = (2x + 1)/(x − 3)</span> est continue sur <span class="math">ℝ \ {3}</span>.</li>
+        <li><strong>Les composées suivent</strong> : <span class="math">x ↦ e^(x² + 1)</span> est continue sur <span class="math">ℝ</span> ; <span class="math">x ↦ ln(x² + 1)</span> aussi (car <span class="math">x² + 1 &gt; 0</span>) ; <span class="math">x ↦ √(x + 5)</span> est continue sur <span class="math">[−5 ; +∞[</span>.</li>
+      </ul>
+
+      <div class="lecture-callout lecture-callout-danger">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Erreur fréquente au Bac</div>
+          <p>Conclure trop vite : « f est continue » sans <strong>préciser l'intervalle</strong>. La bonne rédaction est par exemple : « <span class="math">f</span> est continue sur <span class="math">[0 ; 1]</span> comme somme et composée de fonctions continues ». Et méfie-toi des valeurs interdites : <span class="math">ln(2x − 5)</span> n'existe que pour <span class="math">x &gt; 5/2</span> — une continuité se déclare <em>sur un intervalle précis</em>.</p>
+        </div>
+      </div>
+
+      <div class="lecture-rule">
+        <div class="lecture-rule-label">🧠 Pourquoi c'est si important</div>
+        <div class="lecture-rule-body">
+          La continuité est <strong>l'hypothèse nº 1</strong> des théorèmes qui suivent. Dans une copie, une phrase suffit : « <span class="math">f</span> est continue sur <span class="math">[a ; b]</span> car… ». Sans cette phrase, la conclusion du TVI ou de la bijection ne rapporte <strong>aucun</strong> point, même si le reste du calcul est juste.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 3 : NOTION 2 · tvi — THÉORÈME DES VALEURS INTERMÉDIAIRES -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s3">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">03</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2 · tvi</span>
+        <h2 class="lecture-section-title">Le théorème des valeurs intermédiaires</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Voici le premier grand théorème. Il répond à la question : « une fonction continue qui passe d'une valeur à une autre doit-elle passer par <em>toutes</em> les valeurs intermédiaires ? ». Réponse : <strong>oui</strong> — c'est exactement le « sans lever le crayon ».
+      </p>
+
+      <div class="lecture-callout lecture-callout-gold">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">📘 Théorème des valeurs intermédiaires (énoncé exact)</div>
+          <p><strong>Si</strong> <span class="math">f</span> est <strong>continue</strong> sur l'intervalle <span class="math">[a ; b]</span>, <strong>alors</strong> pour tout réel <span class="math">k</span> <strong>compris entre</strong> <span class="math">f(a)</span> et <span class="math">f(b)</span>, l'équation <span class="math">f(x) = k</span> admet <strong>au moins une</strong> solution <span class="math">x</span> dans <span class="math">[a ; b]</span>.</p>
+          <p><strong>Hypothèses à vérifier :</strong> (1) <span class="math">f</span> est continue <em>sur tout</em> l'intervalle <span class="math">[a ; b]</span> ; (2) <span class="math">k</span> est bien compris entre <span class="math">f(a)</span> et <span class="math">f(b)</span> (<span class="math">f(a) ≤ k ≤ f(b)</span> ou <span class="math">f(b) ≤ k ≤ f(a)</span>). <strong>Conclusion : existence</strong> d'au moins une solution — jamais l'unicité.</p>
+        </div>
+      </div>
+
+      <p class="lecture-text">
+        Lecture graphique : toute droite horizontale <span class="math">y = k</span>, placée entre les hauteurs <span class="math">f(a)</span> et <span class="math">f(b)</span>, coupe au moins une fois la courbe entre <span class="math">a</span> et <span class="math">b</span> — car pour passer de <span class="math">f(a)</span> à <span class="math">f(b)</span> sans lever le crayon, la courbe traverse obligatoirement la hauteur <span class="math">k</span>.
+      </p>
+
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">🧮 Exemple résolu — une existence à déclarer</div>
+        <div class="lecture-example-content"><p>Montrer que l'équation <span class="math">x² = 3</span> admet au moins une solution dans <span class="math">[0 ; 2]</span>.</p></div>
+      </div>
+
+      <div class="lecture-steps">
+        <div class="lecture-step">
+          <div class="lecture-step-number">1</div>
+          <div class="lecture-step-content"><p><strong>Choisir la fonction</strong> : posons <span class="math">f(x) = x²</span> sur <span class="math">[0 ; 2]</span>. <span class="math">f</span> est continue sur <span class="math">[0 ; 2]</span> (fonction polynôme).</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">2</div>
+          <div class="lecture-step-content"><p><strong>Valeurs aux bornes</strong> : <span class="math">f(0) = 0</span> et <span class="math">f(2) = 4</span>. Or <span class="math">3</span> est compris entre <span class="math">0</span> et <span class="math">4</span> : <span class="math">0 ≤ 3 ≤ 4</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">3</div>
+          <div class="lecture-step-content"><p><strong>Conclusion (TVI)</strong> : l'équation <span class="math">f(x) = 3</span>, c'est-à-dire <span class="math">x² = 3</span>, admet au moins une solution dans <span class="math">[0 ; 2]</span>. (Ici on la connaît : <span class="math">x = √3 ≈ 1,732</span> — le TVI garantit l'existence même quand on <em>ne</em> peut pas la calculer.)</p></div>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ Existence ≠ unicité</div>
+          <p>Le TVI dit « <strong>au moins une</strong> » solution. Sur <span class="math">[−2 ; 2]</span>, la fonction continue <span class="math">f(x) = x³ − 3x</span> vérifie <span class="math">f(−2) = −2</span> et <span class="math">f(2) = 2</span>, donc <span class="math">f(x) = 0</span> a au moins une solution… en réalité <strong>trois</strong> : <span class="math">x = 0</span> et <span class="math">x = ±√3 ≈ ±1,732</span>. Pour l'unicité, il faut la stricte monotonie — c'est la notion suivante.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 4 : NOTION 2 · tvi — COROLLAIRE -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s4">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">04</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2 · tvi</span>
+        <h2 class="lecture-section-title">Corollaire : signes contraires, zéro garanti</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Le cas <span class="math">k = 0</span> est si fréquent au Bac qu'on en a fait une version express du TVI : c'est le corollaire du « changement de signe ». Si la fonction est négative d'un côté, positive de l'autre, et qu'elle ne peut pas sauter — elle doit couper zéro.
+      </p>
+
+      <div class="lecture-callout lecture-callout-gold">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">📘 Corollaire du TVI (énoncé exact)</div>
+          <p><strong>Si</strong> <span class="math">f</span> est <strong>continue</strong> sur <span class="math">[a ; b]</span> <strong>et si</strong> <span class="math">f(a) × f(b) &lt; 0</span> (signes contraires), <strong>alors</strong> il existe au moins un réel <span class="math">c</span> de <span class="math">]a ; b[</span> tel que <span class="math">f(c) = 0</span>.</p>
+        </div>
+      </div>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main"> f continue sur [a ; b] et f(a) × f(b) &lt; 0 ⇒ f s'annule entre a et b</div>
+        <div class="lecture-formula-desc">Le produit des valeurs aux bornes suffit : signes contraires + continuité = au moins un zéro sur ]a ; b[.</div>
+      </div>
+
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">🧮 Exemple résolu — le zéro repéré en deux lignes</div>
+        <div class="lecture-example-content"><p>Montrer que l'équation <span class="math">x³ + x − 5 = 0</span> admet au moins une solution dans <span class="math">[1 ; 2]</span>.</p></div>
+      </div>
+
+      <div class="lecture-steps">
+        <div class="lecture-step">
+          <div class="lecture-step-number">1</div>
+          <div class="lecture-step-content"><p><strong>Continuité</strong> : <span class="math">f(x) = x³ + x − 5</span> est une fonction polynôme, donc continue sur <span class="math">[1 ; 2]</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">2</div>
+          <div class="lecture-step-content"><p><strong>Valeurs aux bornes</strong> : <span class="math">f(1) = 1 + 1 − 5 = −3 &lt; 0</span> et <span class="math">f(2) = 8 + 2 − 5 = 5 &gt; 0</span>. Donc <span class="math">f(1) × f(2) = −15 &lt; 0</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">3</div>
+          <div class="lecture-step-content"><p><strong>Conclusion</strong> : par le corollaire du TVI, <span class="math">f</span> s'annule au moins une fois sur <span class="math">]1 ; 2[</span> : l'équation <span class="math">x³ + x − 5 = 0</span> admet au moins une solution dans <span class="math">]1 ; 2[</span>.</p></div>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-danger">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Erreur fréquente au Bac — la continuité n'est pas optionnelle</div>
+          <p>Le contre-exemple classique : <span class="math">f(x) = 1/x</span> sur <span class="math">[−1 ; 1]</span>. On a <span class="math">f(−1) = −1</span> et <span class="math">f(1) = 1</span>, donc <span class="math">f(−1) × f(1) = −1 &lt; 0</span>… pourtant <span class="math">f</span> ne s'annule <strong>jamais</strong> sur <span class="math">[−1 ; 1]</span> ! Pourquoi ? Elle n'est <strong>pas continue</strong> sur cet intervalle (non définie en <span class="math">0</span>). Les hypothèses se vérifient <em>toutes</em>, toujours — même celles qui semblent évidentes.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 5 : NOTION 3 · bijection — THÉORÈME DE LA BIJECTION -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s5">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">05</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 3 · bijection</span>
+        <h2 class="lecture-section-title">Le théorème de la bijection</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Ajoutons au TVI une seconde hypothèse : la fonction est <strong>strictement monotone</strong> (strictement croissante ou strictement décroissante) sur l'intervalle. Alors la courbe ne peut plus repasser deux fois par la même hauteur — chaque valeur <span class="math">k</span> est prise <strong>exactement une fois</strong>. C'est le théorème de la bijection, l'outil de l'unicité.
+      </p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">📗 Théorème de la bijection (énoncé exact)</div>
+          <p><strong>Si</strong> <span class="math">f</span> est <strong>continue</strong> et <strong>strictement monotone</strong> sur l'intervalle <span class="math">[a ; b]</span>, <strong>alors</strong> <span class="math">f</span> réalise une <strong>bijection</strong> de l'intervalle <span class="math">[a ; b]</span> sur l'intervalle <span class="math">[f(a) ; f(b)]</span> (ou <span class="math">[f(b) ; f(a)]</span> si <span class="math">f</span> est strictement décroissante).</p>
+          <p><strong>Conséquence (l'essentiel) :</strong> pour tout réel <span class="math">k</span> compris entre <span class="math">f(a)</span> et <span class="math">f(b)</span>, l'équation <span class="math">f(x) = k</span> admet <strong>une unique solution</strong> dans <span class="math">[a ; b]</span>.</p>
+        </div>
+      </div>
+
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-label">La chaîne de raisonnement à retenir</div>
+        <div class="lecture-formula-hero-main">f continue + f strictement monotone sur [a ; b] ⇒ bijection ⇒ f(x) = k a une unique solution</div>
+        <div class="lecture-formula-hero-desc">Continuité = pas de trou (existence) · stricte monotonie = pas de retour en arrière (unicité). Les deux hypothèses sont indispensables.</div>
+      </div>
+
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">🧮 Exemple résolu — unicité, avec vérification</div>
+        <div class="lecture-example-content"><p>Montrer que l'équation <span class="math">x² + 1 = 3</span> admet une unique solution dans <span class="math">[0 ; 2]</span>.</p></div>
+      </div>
+
+      <div class="lecture-steps">
+        <div class="lecture-step">
+          <div class="lecture-step-number">1</div>
+          <div class="lecture-step-content"><p><strong>Continuité</strong> : <span class="math">f(x) = x² + 1</span> est continue sur <span class="math">[0 ; 2]</span> (polynôme).</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">2</div>
+          <div class="lecture-step-content"><p><strong>Stricte monotonie</strong> : pour <span class="math">0 ≤ u &lt; v ≤ 2</span>, on a <span class="math">u² &lt; v²</span>, donc <span class="math">f(u) &lt; f(v)</span> : <span class="math">f</span> est <strong>strictement croissante</strong> sur <span class="math">[0 ; 2]</span>. (On peut aussi invoquer la dérivée : <span class="math">f'(x) = 2x &gt; 0</span> sur <span class="math">]0 ; 2]</span> — partie 3.)</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">3</div>
+          <div class="lecture-step-content"><p><strong>Bijection</strong> : <span class="math">f(0) = 1</span> et <span class="math">f(2) = 5</span>. Donc <span class="math">f</span> réalise une bijection de <span class="math">[0 ; 2]</span> sur <span class="math">[1 ; 5]</span>, et comme <span class="math">3 ∈ [1 ; 5]</span>, l'équation <span class="math">f(x) = 3</span> admet une <strong>unique</strong> solution dans <span class="math">[0 ; 2]</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">4</div>
+          <div class="lecture-step-content"><p><strong>Vérification (quand c'est possible)</strong> : <span class="math">x² + 1 = 3 ⇔ x² = 2 ⇔ x = √2</span> (positif sur <span class="math">[0 ; 2]</span>). Et <span class="math">√2 ≈ 1,414 ∈ [0 ; 2]</span> : cohérent avec l'unicité annoncée.</p></div>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ Sans stricte monotonie, l'unicité s'effondre</div>
+          <p>Reprends <span class="math">f(x) = x³ − 3x</span> sur <span class="math">[−2 ; 2]</span> (section 03) : continue, mais <strong>non monotone</strong> — elle monte, descend, remonte. Résultat : l'équation <span class="math">f(x) = 0</span> a <strong>trois</strong> solutions (<span class="math">−√3</span>, <span class="math">0</span>, <span class="math">√3</span>). Une seule hypothèse manquante, et le « unique » devient faux : cite donc <em>les deux</em> hypothèses dans ta copie.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 6 : NOTION 3 · bijection — ENCADREMENT / BALAYAGE -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s6">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">06</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 3 · bijection</span>
+        <h2 class="lecture-section-title">Encadrement d'une solution : le balayage</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Le théorème de la bijection garantit qu'une solution existe et est unique — mais il ne donne <em>pas</em> sa valeur. Quand l'équation ne se résout pas algébriquement, on <strong>encadre</strong> la solution par un <strong>balayage numérique</strong> : on fait défiler des valeurs, on repère le changement de signe, on affine.
+      </p>
+
+      <div class="lecture-rule">
+        <div class="lecture-rule-label">🧠 Méthode — Encadrer la solution de f(x) = 0 sur [a ; b]</div>
+        <div class="lecture-rule-body">
+          <strong>(1)</strong> Justifier que <span class="math">f</span> est continue et strictement monotone sur <span class="math">[a ; b]</span> (théorème de la bijection ⇒ unicité). <strong>(2)</strong> Vérifier que <span class="math">0</span> est compris entre <span class="math">f(a)</span> et <span class="math">f(b)</span>. <strong>(3)</strong> Dresser un <strong>tableau de valeurs</strong> en balayant l'intervalle (pas de <span class="math">0,1</span> d'abord). <strong>(4)</strong> Repérer le <strong>changement de signe</strong> de <span class="math">f</span> : la solution est entre les deux valeurs encadrantes. <strong>(5)</strong> Affiner avec un pas de <span class="math">0,01</span> si l'énoncé demande une précision de <span class="math">10⁻²</span>.
+        </div>
+      </div>
+
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">🧮 Exemple résolu complet — balayage sur e^x − 3x</div>
+        <div class="lecture-example-content"><p>Soit <span class="math">g(x) = e^x − 3x</span> sur <span class="math">[0 ; 1]</span>. Montrer que l'équation <span class="math">g(x) = 0</span> admet une unique solution <span class="math">α</span> dans <span class="math">[0 ; 1]</span>, puis encadrer <span class="math">α</span> par deux décimales consécutives.</p></div>
+      </div>
+
+      <div class="lecture-steps">
+        <div class="lecture-step">
+          <div class="lecture-step-number">1</div>
+          <div class="lecture-step-content"><p><strong>Continuité et monotonie</strong> : <span class="math">g</span> est continue sur <span class="math">[0 ; 1]</span> (somme de fonctions continues). Sa dérivée (partie 3) est <span class="math">g'(x) = e^x − 3</span> ; sur <span class="math">[0 ; 1]</span>, on a <span class="math">e^x ≤ e ≈ 2,718 &lt; 3</span>, donc <span class="math">g'(x) &lt; 0</span> : <span class="math">g</span> est <strong>strictement décroissante</strong> sur <span class="math">[0 ; 1]</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">2</div>
+          <div class="lecture-step-content"><p><strong>Aux bornes</strong> : <span class="math">g(0) = 1 − 0 = 1 &gt; 0</span> et <span class="math">g(1) = e − 3 ≈ −0,282 &lt; 0</span>. Donc <span class="math">0</span> est compris entre <span class="math">g(1)</span> et <span class="math">g(0)</span> : par le théorème de la bijection, l'équation <span class="math">g(x) = 0</span> admet une <strong>unique</strong> solution <span class="math">α</span> dans <span class="math">[0 ; 1]</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">3</div>
+          <div class="lecture-step-content"><p><strong>Balayage</strong> (valeurs de <span class="math">g(x) = e^x − 3x</span> arrondies à <span class="math">10⁻⁴</span>) :</p>
+            <div class="lecture-table">
+              <table>
+                <thead>
+                  <tr><th>x</th><th>0</th><th>0,2</th><th>0,4</th><th>0,5</th><th>0,6</th><th>0,7</th><th>0,8</th><th>1</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td><span class="math">g(x)</span></td><td><span class="math">1</span></td><td><span class="math">0,6214</span></td><td><span class="math">0,2918</span></td><td><span class="math">0,1487</span></td><td><span class="math">0,0221</span></td><td><span class="math">−0,0862</span></td><td><span class="math">−0,1745</span></td><td><span class="math">−0,2817</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">4</div>
+          <div class="lecture-step-content"><p><strong>Lecture du tableau</strong> : <span class="math">g</span> change de signe entre <span class="math">0,6</span> (<span class="math">g(0,6) ≈ 0,0221 &gt; 0</span>) et <span class="math">0,7</span> (<span class="math">g(0,7) ≈ −0,0862 &lt; 0</span>). <strong>Conclusion :</strong> <span class="math">0,6 &lt; α &lt; 0,7</span>. Pour aller à <span class="math">10⁻²</span>, on balayerait <span class="math">]0,6 ; 0,7[</span> par pas de <span class="math">0,01</span> de la même façon.</p></div>
+        </div>
+      </div>
+
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 520 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Courbe continue passant de f(a) négatif à f(b) positif, coupant l'axe en alpha unique">
+          <text x="260" y="20" style="fill:var(--accent-bright)" font-size="11" font-weight="700" font-family="Inter" text-anchor="middle" letter-spacing="2">CONTINUITÉ + CHANGEMENT DE SIGNE = UN ZÉRO SUR LA TRAJECTOIRE</text>
+
+          <!-- axes -->
+          <line x1="40" y1="170" x2="494" y2="170" style="stroke:var(--text-dim)" stroke-width="1.5"/>
+          <polygon points="500,170 490,166 490,174" style="fill:var(--text-dim)"/>
+          <line x1="80" y1="272" x2="80" y2="46" style="stroke:var(--text-dim)" stroke-width="1.5"/>
+          <polygon points="80,40 76,50 84,50" style="fill:var(--text-dim)"/>
+          <text x="506" y="174" style="fill:var(--text-dim)" font-size="11" font-family="Inter">x</text>
+          <text x="68" y="46" style="fill:var(--text-dim)" font-size="11" font-family="Inter">y</text>
+          <text x="68" y="186" style="fill:var(--text-dim)" font-size="11" font-family="Inter">O</text>
+
+          <!-- courbe -->
+          <path d="M 100 240 C 155 233, 205 200, 250 170 C 295 140, 330 115, 380 95 C 412 82, 428 72, 445 62" style="fill:none;stroke:var(--accent-bright)" stroke-width="2.5"/>
+          <text x="128" y="262" style="fill:var(--accent-bright)" font-size="12" font-weight="700" font-family="Inter">Cf</text>
+
+          <!-- bornes a et b -->
+          <line x1="100" y1="170" x2="100" y2="240" style="stroke:var(--text-dim)" stroke-width="1.2" stroke-dasharray="5 4"/>
+          <line x1="445" y1="170" x2="445" y2="62" style="stroke:var(--text-dim)" stroke-width="1.2" stroke-dasharray="5 4"/>
+          <circle cx="100" cy="240" r="5" style="fill:var(--green-bright)"/>
+          <circle cx="445" cy="62" r="5" style="fill:var(--green-bright)"/>
+          <text x="92" y="190" style="fill:var(--text-dim)" font-size="12" font-weight="700" font-family="Inter" text-anchor="end">a</text>
+          <text x="450" y="190" style="fill:var(--text-dim)" font-size="12" font-weight="700" font-family="Inter">b</text>
+          <text x="108" y="258" style="fill:var(--text-dim)" font-size="11" font-family="Inter">f(a) &lt; 0</text>
+          <text x="368" y="52" style="fill:var(--text-dim)" font-size="11" font-family="Inter">f(b) &gt; 0</text>
+
+          <!-- solution alpha -->
+          <line x1="250" y1="170" x2="250" y2="200" style="stroke:var(--info)" stroke-width="1.2" stroke-dasharray="5 4"/>
+          <circle cx="250" cy="170" r="5" style="fill:var(--info)"/>
+          <text x="250" y="218" style="fill:var(--info)" font-size="12" font-weight="700" font-family="Inter" text-anchor="middle">α</text>
+        </svg>
+        <figcaption class="lecture-figure-caption">Schéma : <span class="math">f</span> continue sur <span class="math">[a ; b]</span> avec <span class="math">f(a) &lt; 0</span> et <span class="math">f(b) &gt; 0</span>. La courbe coupe l'axe au point <span class="math">α</span> ; si de plus <span class="math">f</span> est strictement monotone, ce point est <strong>unique</strong>.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 7 : EXAMEN · EXEMPLE TYPE BAC -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s7">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">07</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Examen · exemple_bac</span>
+        <h2 class="lecture-section-title">Exemple type Bac : <span class="math">x³ + x − 1 = 0</span></h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Terminons par l'exercice-type complet, rédigé comme en copie : <strong>montrer que l'équation <span class="math">x³ + x − 1 = 0</span> admet une unique solution <span class="math">α</span> dans <span class="math">[0 ; 1]</span>, puis encadrer <span class="math">α</span> à <span class="math">10⁻¹</span> près</strong>. Chaque ligne correspond à un point de la barème-type : hypothèses, conclusion, encadrement.
+      </p>
+
+      <div class="lecture-steps">
+        <div class="lecture-step">
+          <div class="lecture-step-number">1</div>
+          <div class="lecture-step-content"><p><strong>Continuité</strong> : soit <span class="math">f(x) = x³ + x − 1</span>. C'est une fonction polynôme, donc <strong>continue sur <span class="math">ℝ</span></strong>, en particulier sur <span class="math">[0 ; 1]</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">2</div>
+          <div class="lecture-step-content"><p><strong>Stricte monotonie</strong> : pour <span class="math">0 ≤ u &lt; v</span>, on a <span class="math">u³ &lt; v³</span> et <span class="math">u &lt; v</span>, donc <span class="math">u³ + u &lt; v³ + v</span>, d'où <span class="math">f(u) &lt; f(v)</span> : <span class="math">f</span> est <strong>strictement croissante</strong> sur <span class="math">[0 ; 1]</span>. (Avec la partie 3 : <span class="math">f'(x) = 3x² + 1 &gt; 0</span> pour tout <span class="math">x</span>.)</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">3</div>
+          <div class="lecture-step-content"><p><strong>Valeurs aux bornes</strong> : <span class="math">f(0) = 0 + 0 − 1 = −1</span> et <span class="math">f(1) = 1 + 1 − 1 = 1</span>. Donc <span class="math">f</span> réalise une <strong>bijection</strong> de <span class="math">[0 ; 1]</span> sur <span class="math">[−1 ; 1]</span>, et <span class="math">0 ∈ [−1 ; 1]</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">4</div>
+          <div class="lecture-step-content"><p><strong>Conclusion (unicité)</strong> : l'équation <span class="math">f(x) = 0</span>, c'est-à-dire <span class="math">x³ + x − 1 = 0</span>, admet une <strong>unique solution</strong> <span class="math">α</span> dans <span class="math">[0 ; 1]</span>. Comme <span class="math">f(0) ≠ 0</span> et <span class="math">f(1) ≠ 0</span>, on a même <span class="math">α ∈ ]0 ; 1[</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">5</div>
+          <div class="lecture-step-content"><p><strong>Balayage par pas de 0,1</strong> (valeurs de <span class="math">f(x) = x³ + x − 1</span>) :</p>
+            <div class="lecture-table">
+              <table>
+                <thead>
+                  <tr><th>x</th><th>0</th><th>0,1</th><th>0,2</th><th>0,3</th><th>0,4</th><th>0,5</th><th>0,6</th><th>0,7</th><th>0,8</th><th>0,9</th><th>1</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td><span class="math">f(x)</span></td><td><span class="math">−1</span></td><td><span class="math">−0,899</span></td><td><span class="math">−0,792</span></td><td><span class="math">−0,673</span></td><td><span class="math">−0,536</span></td><td><span class="math">−0,375</span></td><td><span class="math">−0,184</span></td><td><span class="math">0,043</span></td><td><span class="math">0,312</span></td><td><span class="math">0,629</span></td><td><span class="math">1</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">6</div>
+          <div class="lecture-step-content"><p><strong>Encadrement final</strong> : <span class="math">f</span> change de signe entre <span class="math">0,6</span> (<span class="math">f(0,6) = −0,184 &lt; 0</span>) et <span class="math">0,7</span> (<span class="math">f(0,7) = 0,043 &gt; 0</span>). Donc <span class="math">0,6 &lt; α &lt; 0,7</span>. <em>Pour aller plus loin</em> : <span class="math">f(0,68) = 0,314432 + 0,68 − 1 ≈ −0,0056 &lt; 0</span> et <span class="math">f(0,69) = 0,328509 + 0,69 − 1 ≈ 0,0185 &gt; 0</span>, d'où l'encadrement affiné <span class="math">0,68 &lt; α &lt; 0,69</span>.</p></div>
+        </div>
+      </div>
+
+      <div class="lecture-rule">
+        <div class="lecture-rule-label">🧠 Réflexe rédaction pour l'examen</div>
+        <div class="lecture-rule-body">
+          La conclusion attendue s'écrit en trois appuis : <strong>(1)</strong> « <span class="math">f</span> est continue et strictement croissante sur <span class="math">[a ; b]</span> » ; <strong>(2)</strong> « <span class="math">0</span> est compris entre <span class="math">f(a)</span> et <span class="math">f(b)</span> » ; <strong>(3)</strong> « donc d'après le théorème de la bijection, l'équation <span class="math">f(x) = 0</span> admet une unique solution <span class="math">α</span> dans <span class="math">[a ; b]</span> ». Une conclusion sans les hypothèses citées ne rapporte pas tous les points.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== QCM D'ENTRAÎNEMENT ===== -->
+  <div class="lecture-quiz">
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q1 — Si f est continue sur [a ; b], avec k compris entre f(a) et f(b), on peut conclure que f(x) = k admet :</p>
+      <div class="lecture-quiz-options">
+        <span>A) aucune solution</span>
+        <span>B) au moins une solution dans [a ; b]</span>
+        <span>C) exactement une solution dans [a ; b]</span>
+        <span>D) une infinité de solutions</span>
+      </div>
+      <details>
+        <summary>Voir la réponse</summary>
+        <div class="lecture-quiz-answer"><strong>B) au moins une solution.</strong> C'est le TVI : continuité + k entre les valeurs aux bornes = existence. Pour avoir l'<em>unicité</em> (option C), il faudrait en plus la <strong>stricte monotonie</strong> — théorème de la bijection.</div>
+      </details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q2 — Pour garantir que f(x) = k admet une UNIQUE solution dans [a ; b], il faut et il suffit (dans le cadre du cours) que :</p>
+      <div class="lecture-quiz-options">
+        <span>A) f soit continue sur [a ; b]</span>
+        <span>B) f soit continue et strictement monotone sur [a ; b], avec k entre f(a) et f(b)</span>
+        <span>C) f(a) × f(b) &lt; 0</span>
+        <span>D) f soit polynôme</span>
+      </div>
+      <details>
+        <summary>Voir la réponse</summary>
+        <div class="lecture-quiz-answer"><strong>B) continuité + stricte monotonie (et k bien placé).</strong> C'est le théorème de la bijection. L'option A donne l'existence seulement ; l'option C (corollaire du TVI) donne aussi seulement l'existence d'un zéro.</div>
+      </details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q3 — f(x) = x³ + x − 1 vérifie f(0,6) = −0,184 et f(0,7) = 0,043, et f est strictement croissante sur [0 ; 1]. La solution α de f(x) = 0 vérifie :</p>
+      <div class="lecture-quiz-options">
+        <span>A) α = 0,65</span>
+        <span>B) 0,6 &lt; α &lt; 0,7</span>
+        <span>C) α = 0,7</span>
+        <span>D) α n'existe pas</span>
+      </div>
+      <details>
+        <summary>Voir la réponse</summary>
+        <div class="lecture-quiz-answer"><strong>B) 0,6 &lt; α &lt; 0,7.</strong> La fonction continue et strictement croissante change de signe entre 0,6 et 0,7 : la solution unique y est piégée. On ne peut rien dire de plus précis (A, C) sans un balayage plus fin.</div>
+      </details>
+    </div>
+  </div>
+
+  <!-- ===== RÉCAPITULATIF ===== -->
+  <div class="lecture-recap">
+    <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
+    <ul class="lecture-recap-list">
+      <li><strong>[continuite]</strong> <span class="math">f</span> continue en <span class="math">a</span> ⇔ <span class="math">lim(x→a) f(x) = f(a)</span> : la valeur existe, la limite existe, et elles coïncident</li>
+      <li><strong>[continuite]</strong> « Sans lever le crayon » : image utile, mais la justification en copie passe par les fonctions usuelles et les opérations</li>
+      <li><strong>[continuite]</strong> Usuelles continues sur leur domaine (<span class="math">xⁿ</span>, <span class="math">1/x</span>, <span class="math">√x</span>, <span class="math">e^x</span>, <span class="math">ln x</span>, <span class="math">cos</span>, <span class="math">sin</span>) ; somme, produit, composée et quotient (<span class="math">g ≠ 0</span>) restent continus</li>
+      <li><strong>[tvi]</strong> TVI : <span class="math">f</span> continue sur <span class="math">[a ; b]</span> ⇒ tout <span class="math">k</span> compris entre <span class="math">f(a)</span> et <span class="math">f(b)</span> est atteint : <span class="math">f(x) = k</span> a au moins une solution</li>
+      <li><strong>[tvi]</strong> Corollaire : <span class="math">f</span> continue sur <span class="math">[a ; b]</span> et <span class="math">f(a) × f(b) &lt; 0</span> ⇒ <span class="math">f</span> s'annule au moins une fois sur <span class="math">]a ; b[</span></li>
+      <li><strong>[tvi]</strong> Le TVI donne l'existence, jamais l'unicité ; sans continuité, rien n'est garanti (contre-exemple : <span class="math">1/x</span> sur <span class="math">[−1 ; 1]</span>)</li>
+      <li><strong>[bijection]</strong> Théorème de la bijection : <span class="math">f</span> continue + strictement monotone sur <span class="math">[a ; b]</span> ⇒ bijection de <span class="math">[a ; b]</span> sur <span class="math">[f(a) ; f(b)]</span> ⇒ solution <strong>unique</strong> de <span class="math">f(x) = k</span></li>
+      <li><strong>[bijection]</strong> Encadrement : balayage par tableau de valeurs, repérer le changement de signe, puis affiner (pas 0,1 puis 0,01)</li>
+      <li><strong>[bijection]</strong> Rédaction Bac : citer continuité + stricte monotonie + position de k, avant toute conclusion</li>
+      <li><strong>[bijection]</strong> Modèle d'exercice : <span class="math">x³ + x − 1 = 0</span> a une unique solution <span class="math">α</span> dans <span class="math">[0 ; 1]</span> avec <span class="math">0,6 &lt; α &lt; 0,7</span></li>
+    </ul>
+  </div>
+
+  <!-- ===== FIN ===== -->
+  <div class="lecture-end">
+    <span class="lecture-end-icon">🎯</span>
+    <div class="lecture-end-text">Partie 2 terminée !</div>
+    <div class="lecture-end-sub">Passe à la partie 3 : dérivabilité, dérivées et opérations</div>
+    <div class="lecture-end-divider"></div>
+  </div>
+
+</div>

@@ -1,0 +1,539 @@
+<!-- ============================================================ -->
+<!-- PARTIE 1 : DÉFINITION & ÉCRITURE COMPLEXE                    -->
+<!-- Chapitre : Similitudes planes directes — Mathématiques       -->
+<!-- Classe : Terminale D (Niger)                                 -->
+<!-- Notions : rappels (transformations du plan) · définition     -->
+<!--           d'une similitude directe (rapport k, angle θ) ·    -->
+<!--           écriture complexe z' = az + b · images et          -->
+<!--           antécédents                                        -->
+<!-- ============================================================ -->
+
+<div class="lecture-container">
+
+  <!-- ===== HERO ===== -->
+  <header class="lecture-hero">
+    <div class="lecture-hero-badge">
+      <span class="lecture-hero-icon">📘</span>
+      <span class="lecture-hero-label">Partie 01 · Similitudes planes directes</span>
+    </div>
+    <h1 class="lecture-hero-title">
+      Définition &amp; <em>Écriture complexe</em>
+    </h1>
+    <p class="lecture-hero-intro">
+      Tourne un motif de poterie, agrandis-le : il garde exactement ses proportions, il est simplement <em>plus grand et penché autrement</em>. C'est l'idée des <strong>similitudes</strong>, les transformations qui agrandissent ou réduisent <em>et</em> tournent les figures sans jamais les déformer. Cette partie pose les fondations du chapitre avec <strong>3 notions</strong> : le <strong>rappel des transformations du plan</strong>, la <strong>définition d'une similitude directe</strong> (rapport <span class="math">k</span>, angle <span class="math">θ</span>), puis son <strong>écriture complexe</strong> <span class="math">z' = az + b</span>, l'outil qui fera tout travailler jusqu'au Bac.
+    </p>
+    <div class="lecture-hero-meta">
+      <span class="lecture-hero-meta-item">⏱ 20 min</span>
+      <span class="lecture-hero-meta-item">🧮 3 notions</span>
+      <span class="lecture-hero-meta-item">📊 7 sections</span>
+      <span class="lecture-hero-meta-item">🎓 Terminale D</span>
+    </div>
+  </header>
+
+  <!-- ===== SOMMAIRE ===== -->
+  <nav class="lecture-toc">
+    <div class="lecture-toc-header">
+      <span>Dans cette partie</span>
+      <span class="lecture-toc-count">3 notions · 7 sections</span>
+    </div>
+    <ol class="lecture-toc-list">
+      <li><a href="#s0"><span class="toc-num">00</span><span>Motivation — Des figures qui se ressemblent</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>Rappels · Les transformations du plan</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>Notion 1 · def_similitude — Définir la similitude directe</span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>Notion 2 · ecriture_complexe — L'écriture <span class="math">z' = az + b</span></span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>Notion 2 · ecriture_complexe — Retrouver les transformations connues</span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>Calculs — Images et antécédents</span></a></li>
+      <li><a href="#s6"><span class="toc-num">06</span><span>Synthèse — Distances multipliées et le piège <span class="math">a ≠ 0</span></span></a></li>
+    </ol>
+  </nav>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 0 : MOTIVATION -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s0">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">00</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Motivation</span>
+        <h2 class="lecture-section-title">Des figures qui se ressemblent</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Regarde les <strong>motifs géométriques</strong> qui décorent les poteries, les fresques et les broderies sahéliennes : un même dessin revient en petit, en grand, parfois incliné. Le dessineur ne redessine pas le motif à chaque fois : il l'<strong>agrandit</strong> (ou le réduit) et le <strong>fait pivoter</strong>. De la même façon, zoomer sur une carte ou agrandir une photo donne une image <em>plus grande</em> mais <em>exactement de même forme</em>.
+      </p>
+
+      <p class="lecture-text">
+        En mathématiques, deux figures de même forme sont dites <strong>semblables</strong>. La transformation qui passe de l'une à l'autre a un nom : c'est une <strong>similitude</strong>. Quand elle ne « retourne » pas la figure (pas d'effet miroir), on dit qu'elle est <strong>directe</strong>. Ce chapitre a pour mission de définir ces transformations, de les écrire avec les nombres complexes — leur langage naturel — et de calculer avec elles.
+      </p>
+
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 520 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Un petit triangle motif et son image par une similitude : agrandie deux fois et tournée de 45 degrés">
+          <text x="260" y="20" style="fill:var(--accent-bright)" font-size="11" font-weight="700" font-family="Inter" text-anchor="middle" letter-spacing="2">MÊME FORME — AUTRE TAILLE, AUTRE DIRECTION</text>
+          <polygon points="100,170 140,170 100,130" style="fill:none;stroke:var(--accent)" stroke-width="2.5"/>
+          <text x="70" y="195" style="fill:var(--text-dim)" font-size="11" font-family="Inter">motif original</text>
+          <polygon points="300,170 357,113 243,113" style="fill:none;stroke:var(--green-bright)" stroke-width="2.5"/>
+          <text x="230" y="95" style="fill:var(--text-dim)" font-size="11" font-family="Inter">image : agrandie ×2 et tournée de 45°</text>
+        </svg>
+        <figcaption class="lecture-figure-caption">Le triangle image a des côtés deux fois plus longs et a pivoté : les deux triangles ont exactement la même forme. Le passage du premier au second est une <strong>similitude</strong>.</figcaption>
+      </figure>
+
+      <div class="lecture-callout lecture-callout-gold">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Les trois questions de cette partie</div>
+          <ul class="lecture-list">
+            <li><strong>Qu'est-ce qu'</strong>une similitude directe, avec son rapport <span class="math">k</span> et son angle <span class="math">θ</span> ? (section 02)</li>
+            <li><strong>Comment l'écrire</strong> avec les nombres complexes : <span class="math">z' = az + b</span> ? (sections 03 et 04)</li>
+            <li><strong>Comment calculer</strong> des images et des antécédents de points ? (sections 05 et 06)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="lecture-aside">
+        <div class="lecture-aside-label">🌍 Pour aller plus loin</div>
+        <div class="lecture-aside-content">
+          Les artisans qui décorent poteries et tissus répètent un même motif à des échelles différentes, parfois légèrement tourné : sans le nommer, ils composent des <strong>similitudes</strong>. Les frises et les pavages sont un terrain de jeu naturel pour ces transformations.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 1 : RAPPELS — LES TRANSFORMATIONS DU PLAN -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s1">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">01</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Rappels</span>
+        <h2 class="lecture-section-title">Les transformations du plan</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Une <strong>transformation du plan</strong> associe à chaque point <span class="math">M</span> un unique point <span class="math">M'</span>, son <strong>image</strong>. Tu en connais déjà plusieurs ; remettons-les d'accord, avec leurs écritures complexes dans le plan rapporté à un repère orthonormé direct (le point <span class="math">M</span> a pour affixe <span class="math">z</span>, son image a pour affixe <span class="math">z'</span>).
+      </p>
+
+      <div class="lecture-table">
+        <table>
+          <thead>
+            <tr><th>Transformation</th><th>Ce qu'elle fait</th><th>Écriture complexe</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Translation de vecteur →u d'affixe <span class="math">b</span></td><td><span class="math">→MM' = →u</span> : glisse sans tourner</td><td><span class="math">z' = z + b</span></td></tr>
+            <tr><td>Rotation de centre O et d'angle <span class="math">θ</span></td><td>tourne le plan autour de O</td><td><span class="math">z' = e^(iθ)·z</span></td></tr>
+            <tr><td>Symétrie centrale de centre O</td><td>rotation d'angle <span class="math">π</span> : <span class="math">M'</span> est le symétrique de <span class="math">M</span> par rapport à O</td><td><span class="math">z' = −z</span></td></tr>
+            <tr><td>Homothétie de centre O et de rapport <span class="math">k</span> (<span class="math">k</span> réel &gt; 0)</td><td><span class="math">→OM' = k·→OM</span> : agrandit ou réduit depuis O</td><td><span class="math">z' = k·z</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="lecture-text">
+        Classe ces transformations selon ce qu'elles font des <strong>distances</strong> :
+      </p>
+
+      <ul class="lecture-list-elegant">
+        <li>La <strong>translation</strong> et la <strong>rotation</strong> conservent les distances : ce sont des <strong>isométries</strong> (la symétrie centrale est une rotation d'angle <span class="math">π</span>, donc aussi une isométrie).</li>
+        <li>L'<strong>homothétie</strong> de rapport <span class="math">k &gt; 0</span> multiplie toutes les distances par <span class="math">k</span> : si <span class="math">k &gt; 1</span> c'est un agrandissement, si <span class="math">0 &lt; k &lt; 1</span> une réduction.</li>
+        <li>Aucune de ces transformations ne <em>tourne</em> les figures tout en les <em>agrandissant</em>… Il manque quelque chose : c'est précisément la similitude.</li>
+      </ul>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ Rappel de vocabulaire</div>
+          <p>Une <strong>isométrie</strong> conserve les distances (donc les longueurs, les angles et les aires). Une <strong>homothétie</strong> multiplie les distances par <span class="math">k</span> mais ne tourne pas les directions. Garde ces deux idées en tête : la similitude va les <strong>réunir</strong> en une seule transformation.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 2 : NOTION 1 · def_similitude — DÉFINITION -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s2">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">02</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1 · def_similitude</span>
+        <h2 class="lecture-section-title">Définir la similitude directe</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Voici la définition officielle, celle qu'il faut savoir restituer <em>mot pour mot</em>. Elle contient deux conditions qu'on va décortiquer.
+      </p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">📗 Définition officielle — Similitude directe</div>
+          <p>Une <strong>similitude directe</strong> de <strong>rapport</strong> <span class="math">k &gt; 0</span> et d'<strong>angle</strong> <span class="math">θ</span> est une transformation du plan qui, pour tous points <span class="math">A ≠ B</span> d'images <span class="math">A'</span> et <span class="math">B'</span>, vérifie :</p>
+          <p><strong>1.</strong> <span class="math">A'B' = k × AB</span> — toutes les distances sont multipliées par <span class="math">k</span> ;<br>
+          <strong>2.</strong> <span class="math">(→AB ; →A'B') = θ</span> — toute direction est tournée du <em>même</em> angle <span class="math">θ</span> (les angles orientés sont conservés).</p>
+        </div>
+      </div>
+
+      <p class="lecture-text">
+        En clair : une similitude directe <strong>agrandit ou réduit</strong> (facteur <span class="math">k</span>) <strong>et tourne</strong> (angle <span class="math">θ</span>) — mais elle ne déforme jamais. Un triangle reste un triangle de même forme, un cercle reste un cercle, un angle reste un angle de même mesure.
+      </p>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">distances : × k &nbsp;·&nbsp; angles orientés : + θ</div>
+        <div class="lecture-formula-desc">Toute longueur <span class="math">AB</span> devient <span class="math">k × AB</span> ; toute direction <span class="math">→AB</span> devient la direction <span class="math">→A'B'</span> obtenue en tournant <span class="math">→AB</span> de l'angle <span class="math">θ</span>.</div>
+      </div>
+
+      <ul class="lecture-list-elegant">
+        <li>Si <span class="math">k = 1</span> : les distances sont conservées — la similitude est une <strong>isométrie directe</strong> (translation ou rotation).</li>
+        <li>Si <span class="math">θ = 0</span> (modulo <span class="math">2π</span>) : les directions ne tournent pas — c'est une <strong>homothétie</strong> de rapport <span class="math">k</span>.</li>
+        <li>Le cas général <span class="math">k ≠ 1</span> et <span class="math">θ ≠ 0</span> est le nouveau venu : il <em>combine</em> agrandissement et rotation.</li>
+      </ul>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ Pourquoi « directe » ?</div>
+          <p>« Directe » signifie que les <strong>angles orientés</strong> sont conservés : la transformation ne retourne pas la figure, pas d'effet miroir. Il existe des similitudes <em>indirectes</em> (avec réflexion), mais elles ne sont pas au programme de cette partie : ici, <strong>toutes les similitudes étudiées sont directes</strong>.</p>
+        </div>
+      </div>
+
+      <div class="lecture-vocab-grid">
+        <div class="vocab-card">
+          <div class="vocab-symbol">📐</div>
+          <div class="vocab-name">Similitude directe</div>
+          <div class="vocab-notation">Multipie les distances par k et tourne les directions de θ</div>
+        </div>
+        <div class="vocab-card">
+          <div class="vocab-symbol">🔍</div>
+          <div class="vocab-name">Rapport k</div>
+          <div class="vocab-notation">Facteur d'agrandissement (k &gt; 1) ou de réduction (0 &lt; k &lt; 1)</div>
+        </div>
+        <div class="vocab-card">
+          <div class="vocab-symbol">🔄</div>
+          <div class="vocab-name">Angle θ</div>
+          <div class="vocab-notation">Rotation appliquée à toutes les directions (en radians)</div>
+        </div>
+        <div class="vocab-card vocab-card-info">
+          <div class="vocab-symbol">📏</div>
+          <div class="vocab-name">Isométrie directe</div>
+          <div class="vocab-notation">Cas particulier k = 1 : translation ou rotation</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 3 : NOTION 2 · ecriture_complexe — LA FORMULE -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s3">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">03</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2 · ecriture_complexe</span>
+        <h2 class="lecture-section-title">L'écriture complexe <span class="math">z' = az + b</span></h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Les nombres complexes donnent aux similitudes une écriture d'une simplicité remarquable : <strong>deux nombres suffisent</strong> pour décrire toute la transformation. C'est la formule centrale du chapitre.
+      </p>
+
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-label">La formule centrale du chapitre</div>
+        <div class="lecture-formula-hero-main">z' = az + b &nbsp;avec&nbsp; a ≠ 0</div>
+        <div class="lecture-formula-hero-desc">a et b sont des complexes fixés. Le nombre a contient à la fois le rapport et l'angle ; le nombre b est l'affixe de l'image de l'origine O.</div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-gold">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">💡 Théorème (admis) — Écriture complexe d'une similitude directe</div>
+          <p>Une transformation <span class="math">S</span> est une similitude directe <strong>si et seulement si</strong> son écriture complexe est de la forme <span class="math">z' = az + b</span> avec <span class="math">a ≠ 0</span>.</p>
+          <p>Dans ce cas, son rapport est <span class="math">k = |a|</span> et son angle est <span class="math">θ = arg(a)</span> (modulo <span class="math">2π</span>).</p>
+        </div>
+      </div>
+
+      <p class="lecture-text">
+        Le nombre <span class="math">a</span> est donc un réservoir à deux étages : son <strong>module</strong> donne le rapport, son <strong>argument</strong> donne l'angle. Premier exemple, pour goûter la chose : si <span class="math">a = 1 + i</span>, alors <span class="math">|a| = √2</span> et <span class="math">arg(a) = π/4</span> — la transformation <span class="math">z' = (1 + i)z + b</span> agrandit les distances d'un facteur <span class="math">√2</span> et tourne les directions de <span class="math">45°</span>. (Ces calculs seront systématisés en partie 2.)
+      </p>
+
+      <div class="lecture-callout lecture-callout-danger">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Erreur fréquente au Bac — oublier a ≠ 0</div>
+          <p>Si <span class="math">a = 0</span>, la formule devient <span class="math">z' = b</span> : <strong>tous</strong> les points du plan ont la même image ! Ce n'est plus une transformation du plan (chaque point n'a pas une image distincte) et une telle application ne peut pas être une similitude. À l'examen, vérifie toujours que le coefficient <span class="math">a</span> est <strong>non nul</strong> avant d'annoncer « similitude directe ».</p>
+        </div>
+      </div>
+
+      <div class="lecture-rule">
+        <div class="lecture-rule-label">🧠 Méthode à retenir</div>
+        <div class="lecture-rule-body">
+          Face à une application donnée par <span class="math">z' = az + b</span>, le réflexe est toujours le même : identifier <span class="math">a</span> et <span class="math">b</span>, puis calculer <span class="math">|a|</span> (le rapport) et <span class="math">arg(a)</span> (l'angle). Face à une similitude décrite en français (« rapport 2, angle π/2 »), le réflexe inverse : reconstruire <span class="math">a</span> sous la forme <span class="math">a = k·e^(iθ)</span>.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 4 : NOTION 2 · ecriture_complexe — CAS CONNUS -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s4">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">04</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2 · ecriture_complexe</span>
+        <h2 class="lecture-section-title">Retrouver les transformations connues</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Les transformations rappelées en section 01 sont des <strong>cas particuliers</strong> de similitudes directes. Tout se lit sur le coefficient <span class="math">a</span> :
+      </p>
+
+      <div class="lecture-table">
+        <table>
+          <thead>
+            <tr><th>Condition sur a</th><th>Nature de la transformation</th><th>Exemple</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="math">a = 1</span></td>
+              <td><strong>translation</strong> de vecteur d'affixe <span class="math">b</span></td>
+              <td><span class="math">z' = z + 2 − 3i</span></td>
+            </tr>
+            <tr>
+              <td><span class="math">|a| = 1</span> (avec <span class="math">a ≠ 1</span>)</td>
+              <td><strong>rotation</strong> de centre O et d'angle <span class="math">θ = arg(a)</span></td>
+              <td><span class="math">z' = iz</span> : rotation de centre O, d'angle <span class="math">π/2</span></td>
+            </tr>
+            <tr>
+              <td><span class="math">a</span> réel strictement positif</td>
+              <td><strong>homothétie</strong> de centre O et de rapport <span class="math">a</span></td>
+              <td><span class="math">z' = 3z</span> : homothétie de centre O, de rapport 3</td>
+            </tr>
+            <tr>
+              <td><span class="math">a = 1</span> et <span class="math">b = 0</span></td>
+              <td><strong>identité</strong> : chaque point est sa propre image</td>
+              <td><span class="math">z' = z</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="lecture-text">
+        Vérifions le cas de la rotation, pour bien voir la mécanique : pour <span class="math">a = i</span>, on a <span class="math">|a| = |i| = 1</span> (aucun agrandissement : c'est une isométrie) et <span class="math">arg(i) = π/2</span>. Donc <span class="math">z' = iz</span> est la rotation de centre O et d'angle <span class="math">π/2</span> : le point <span class="math">M(1 + i)</span> a pour image <span class="math">M'</span> d'affixe <span class="math">i(1 + i) = i + i² = −1 + i</span> — bien tourné de <span class="math">90°</span> autour de O, à même distance (<span class="math">|1 + i| = |−1 + i| = √2</span>).
+      </p>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">🧮 Exemple éclair — reconnaître la nature</div>
+        <div class="lecture-example-content"><p>Soit <span class="math">S : z' = 3z</span>. Ici <span class="math">a = 3</span> est réel strictement positif et <span class="math">b = 0</span> : <span class="math">S</span> est l'homothétie de centre O et de rapport 3. Le point <span class="math">M(2 + i)</span> a pour image <span class="math">M'(6 + 3i)</span> : même direction depuis O, distance triplée.</p></div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">📗 À retenir</div>
+          <p>Translation, rotation, homothétie : trois visages d'une même formule <span class="math">z' = az + b</span>. La similitude générale est simplement le cas où <span class="math">a</span> n'est <em>ni 1</em>, <em>ni de module 1</em>, <em>ni réel</em> — elle agrandit <strong>et</strong> tourne à la fois. Et dans le cas général, le centre n'est plus O : on apprendra à le calculer en partie 2.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 5 : CALCULS — IMAGES ET ANTÉCÉDENTS -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s5">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">05</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Calculs</span>
+        <h2 class="lecture-section-title">Images et antécédents</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Deux gestes techniques à posséder absolument : <strong>calculer l'image</strong> d'un point (remplacer <span class="math">z</span> par son affixe et développer) et <strong>calculer un antécédent</strong> (résoudre l'équation <span class="math">az + b = w</span>). Exemple complet au pas à pas.
+      </p>
+
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">🧮 Exemple 1 — Calculer des images</div>
+        <div class="lecture-example-content">
+          <p>Soit <span class="math">S</span> la similitude directe d'écriture <span class="math">z' = (1 + i)z + 2</span>. Calculons les images de <span class="math">A(1 + 2i)</span> et <span class="math">B(2 − i)</span>.</p>
+          <div class="lecture-steps">
+            <div class="lecture-step">
+              <div class="lecture-step-number">1</div>
+              <div class="lecture-step-content"><p><strong>Pour A</strong> : on remplace <span class="math">z</span> par <span class="math">1 + 2i</span> : <span class="math">z'_A = (1 + i)(1 + 2i) + 2</span>.</p></div>
+            </div>
+            <div class="lecture-step">
+              <div class="lecture-step-number">2</div>
+              <div class="lecture-step-content"><p>On développe : <span class="math">(1 + i)(1 + 2i) = 1 + 2i + i + 2i² = 1 + 3i − 2 = −1 + 3i</span>.</p></div>
+            </div>
+            <div class="lecture-step">
+              <div class="lecture-step-number">3</div>
+              <div class="lecture-step-content"><p>On conclut : <span class="math">z'_A = −1 + 3i + 2 = 1 + 3i</span>, donc <span class="math">S(A) = A'(1 + 3i)</span>.</p></div>
+            </div>
+            <div class="lecture-step">
+              <div class="lecture-step-number">4</div>
+              <div class="lecture-step-content"><p><strong>Pour B</strong> : <span class="math">z'_B = (1 + i)(2 − i) + 2 = 2 − i + 2i − i² + 2 = 2 + i + 1 + 2 = 5 + i</span>, donc <span class="math">S(B) = B'(5 + i)</span>.</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">🧮 Exemple 2 — Calculer un antécédent</div>
+        <div class="lecture-example-content">
+          <p>Soit <span class="math">S : z' = 2iz + 3</span>. Cherchons l'antécédent du point d'affixe <span class="math">5</span>.</p>
+          <div class="lecture-steps">
+            <div class="lecture-step">
+              <div class="lecture-step-number">1</div>
+              <div class="lecture-step-content"><p>On pose l'équation : <span class="math">2iz + 3 = 5</span>.</p></div>
+            </div>
+            <div class="lecture-step">
+              <div class="lecture-step-number">2</div>
+              <div class="lecture-step-content"><p>On isole : <span class="math">2iz = 2</span>, d'où <span class="math">z = 2/(2i) = 1/i</span>.</p></div>
+            </div>
+            <div class="lecture-step">
+              <div class="lecture-step-number">3</div>
+              <div class="lecture-step-content"><p>On simplifie : <span class="math">1/i = −i</span> car <span class="math">i × (−i) = −i² = 1</span>.</p></div>
+            </div>
+            <div class="lecture-step">
+              <div class="lecture-step-number">4</div>
+              <div class="lecture-step-content"><p>On vérifie (réflexe obligatoire) : <span class="math">2i × (−i) + 3 = −2i² + 3 = 2 + 3 = 5</span> ✓. L'antécédent de 5 est le point d'affixe <span class="math">−i</span>.</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ Réflexe rédaction</div>
+          <p>Un calcul d'image commence par la phrase : « <span class="math">S</span> a pour écriture complexe <span class="math">z' = az + b</span>, donc l'image de <span class="math">M(z)</span> a pour affixe <span class="math">z' = az + b</span>… » et se termine par une <strong>conclusion</strong> avec le point nommé. Toujours terminer par la <strong>vérification</strong> pour un antécédent : elle rapporte des points et attrape les erreurs de signe.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 6 : SYNTHÈSE — DISTANCES ET PIÈGE -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s6">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">06</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Synthèse</span>
+        <h2 class="lecture-section-title">Distances multipliées et le piège <span class="math">a ≠ 0</span></h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Terminons par la propriété qui définit la similitude : les distances sont multipliées par <span class="math">k = |a|</span>. Vérifions-le sur un exemple chiffré, une fois, complètement.
+      </p>
+
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">🧮 Exemple — la distance est bien multipliée par k</div>
+        <div class="lecture-example-content">
+          <p>Soit <span class="math">S : z' = 2z</span> (homothétie de centre O, de rapport <span class="math">k = |2| = 2</span>). Prenons <span class="math">A(1 + i)</span> et <span class="math">B(3 + 3i)</span>.</p>
+          <div class="lecture-steps">
+            <div class="lecture-step">
+              <div class="lecture-step-number">1</div>
+              <div class="lecture-step-content"><p><strong>Images</strong> : <span class="math">A'(2 + 2i)</span> et <span class="math">B'(6 + 6i)</span> (on multiplie chaque affixe par 2).</p></div>
+            </div>
+            <div class="lecture-step">
+              <div class="lecture-step-number">2</div>
+              <div class="lecture-step-content"><p><strong>Distance AB</strong> : <span class="math">AB = |(3 + 3i) − (1 + i)| = |2 + 2i| = √(2² + 2²) = √8 = 2√2</span>.</p></div>
+            </div>
+            <div class="lecture-step">
+              <div class="lecture-step-number">3</div>
+              <div class="lecture-step-content"><p><strong>Distance A'B'</strong> : <span class="math">A'B' = |(6 + 6i) − (2 + 2i)| = |4 + 4i| = √(4² + 4²) = √32 = 4√2</span>.</p></div>
+            </div>
+            <div class="lecture-step">
+              <div class="lecture-step-number">4</div>
+              <div class="lecture-step-content"><p><strong>Conclusion</strong> : <span class="math">A'B' = 4√2 = 2 × (2√2) = 2 × AB</span>. La distance a bien été multipliée par <span class="math">k = 2</span>, le module de <span class="math">a</span>. ✓</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">M'N' = k × MN &nbsp;avec&nbsp; k = |a|</div>
+        <div class="lecture-formula-desc">Pour une similitude d'écriture <span class="math">z' = az + b</span>, toute distance est multipliée par le module du coefficient <span class="math">a</span>. C'est la traduction chiffrée de la définition.</div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-danger">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Erreur fréquente au Bac — le piège a = 0</div>
+          <p>Une application définie par <span class="math">z' = b</span> (avec <span class="math">a = 0</span>) n'est <strong>pas</strong> une similitude : elle écrase tout le plan sur un seul point, on ne peut plus revenir en arrière (pas d'antécédents). Devant toute écriture <span class="math">z' = az + b</span>, la première vérification est : <strong>est-ce que <span class="math">a ≠ 0</span> ?</strong> — et la première justification d'une réponse est : « comme <span class="math">a ≠ 0</span>, cette application est une similitude directe de rapport <span class="math">|a|</span> et d'angle <span class="math">arg(a)</span> ».</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== QCM D'ENTRAÎNEMENT ===== -->
+  <div class="lecture-quiz">
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q1 — L'écriture complexe d'une similitude directe est de la forme :</p>
+      <div class="lecture-quiz-options">
+        <span>A) <span class="math">z' = az + b</span> avec <span class="math">a ≠ 0</span></span>
+        <span>B) <span class="math">z' = az + b</span> avec n'importe quel complexe <span class="math">a</span></span>
+        <span>C) <span class="math">z' = z + b</span> uniquement</span>
+        <span>D) <span class="math">z' = az</span> avec obligatoirement <span class="math">b = 0</span></span>
+      </div>
+      <details>
+        <summary>Voir la réponse</summary>
+        <div class="lecture-quiz-answer"><strong>A) z' = az + b avec a ≠ 0.</strong> La condition <span class="math">a ≠ 0</span> est indispensable (sinon tous les points ont la même image), et <span class="math">b</span> peut être quelconque : il traduit un déplacement de la transformation. Les cas <span class="math">b = 0</span> (D) ou <span class="math">a = 1</span> (C) ne sont que des situations particulières.</div>
+      </details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q2 — Soit <span class="math">S : z' = (1 + i)z + 2</span>. L'image du point <span class="math">A(1 + 2i)</span> a pour affixe :</p>
+      <div class="lecture-quiz-options">
+        <span>A) <span class="math">1 + 3i</span></span>
+        <span>B) <span class="math">−1 + 3i</span></span>
+        <span>C) <span class="math">3 + i</span></span>
+        <span>D) <span class="math">2 + 3i</span></span>
+      </div>
+      <details>
+        <summary>Voir la réponse</summary>
+        <div class="lecture-quiz-answer"><strong>A) 1 + 3i.</strong> On calcule <span class="math">(1 + i)(1 + 2i) + 2 = (−1 + 3i) + 2 = 1 + 3i</span>. La réponse B est le piège classique : c'est le produit <span class="math">(1 + i)(1 + 2i)</span> <em>sans</em> ajouter <span class="math">b = 2</span>. Toujours finir le calcul !</div>
+      </details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q3 — Soit <span class="math">S : z' = 2iz + 3</span>. L'antécédent du point d'affixe 5 est :</p>
+      <div class="lecture-quiz-options">
+        <span>A) <span class="math">−i</span></span>
+        <span>B) <span class="math">i</span></span>
+        <span>C) <span class="math">1</span></span>
+        <span>D) <span class="math">−2i</span></span>
+      </div>
+      <details>
+        <summary>Voir la réponse</summary>
+        <div class="lecture-quiz-answer"><strong>A) −i.</strong> On résout <span class="math">2iz + 3 = 5</span>, d'où <span class="math">z = 2/(2i) = 1/i = −i</span>. Vérification : <span class="math">2i × (−i) + 3 = −2i² + 3 = 5</span> ✓. La réponse D vient de l'erreur <span class="math">1/i = i</span> (faux : <span class="math">i × i = −1</span>).</div>
+      </details>
+    </div>
+  </div>
+
+  <!-- ===== RÉCAPITULATIF ===== -->
+  <div class="lecture-recap">
+    <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
+    <ul class="lecture-recap-list">
+      <li><strong>[rappels]</strong> Translation : <span class="math">z' = z + b</span> · rotation de centre O et d'angle <span class="math">θ</span> : <span class="math">z' = e^(iθ)·z</span> · homothétie de centre O et de rapport <span class="math">k &gt; 0</span> : <span class="math">z' = k·z</span></li>
+      <li><strong>[rappels]</strong> Les isométries (translations, rotations, symétries centrales) conservent les distances : ce sont des similitudes de rapport 1</li>
+      <li><strong>[def_similitude]</strong> Une <strong>similitude directe</strong> de rapport <span class="math">k &gt; 0</span> et d'angle <span class="math">θ</span> multiplie toutes les distances par <span class="math">k</span> et tourne toutes les directions du même angle <span class="math">θ</span> (angles orientés conservés)</li>
+      <li><strong>[def_similitude]</strong> <span class="math">k = 1</span> : isométrie directe · <span class="math">θ = 0</span> : homothétie · le cas général combine les deux</li>
+      <li><strong>[ecriture_complexe]</strong> Toute similitude directe s'écrit <span class="math">z' = az + b</span> avec <span class="math">a ≠ 0</span> ; réciproquement, <span class="math">z' = az + b</span> (<span class="math">a ≠ 0</span>) définit une similitude directe de rapport <span class="math">|a|</span> et d'angle <span class="math">arg(a)</span> (mod <span class="math">2π</span>)</li>
+      <li><strong>[ecriture_complexe]</strong> <span class="math">a = 1</span> : translation · <span class="math">|a| = 1</span> : rotation · <span class="math">a</span> réel &gt; 0 : homothétie</li>
+      <li><strong>[ecriture_complexe]</strong> Image : remplacer <span class="math">z</span> par l'affixe du point · antécédent de <span class="math">w</span> : résoudre <span class="math">az + b = w</span> puis vérifier</li>
+      <li><strong>[ecriture_complexe]</strong> ⚠️ <span class="math">a ≠ 0</span> est obligatoire : <span class="math">z' = b</span> n'est pas une transformation du plan</li>
+    </ul>
+  </div>
+
+  <!-- ===== FIN ===== -->
+  <div class="lecture-end">
+    <span class="lecture-end-icon">🎯</span>
+    <div class="lecture-end-text">Partie 1 terminée !</div>
+    <div class="lecture-end-sub">Passe à la partie 2 : rapport, angle et centre — les éléments caractéristiques d'une similitude</div>
+    <div class="lecture-end-divider"></div>
+  </div>
+
+</div>

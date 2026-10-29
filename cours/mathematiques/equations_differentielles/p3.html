@@ -1,0 +1,420 @@
+<!-- PARTIE 3 : ÉQUATION y' = ay + f(x)                             -->
+<!-- Notion 1 : principe — solutions = particulière + C·e^(ax)      -->
+<!-- Notion 2 : f polynôme (degré ≤ 2) — identification             -->
+<!-- Notion 3 : f exponentielle e^(kx) avec k ≠ a — identification  -->
+<!-- Notion 4 : f trigonométrique (sin, cos) & superposition        -->
+
+<div class="lecture-container">
+
+  <!-- ===== HERO ===== -->
+  <header class="lecture-hero">
+    <div class="lecture-hero-badge">
+      <span class="lecture-hero-icon">📘</span>
+      <span class="lecture-hero-label">Partie 03 · Équations différentielles</span>
+    </div>
+    <h1 class="lecture-hero-title">
+      L&rsquo;équation <em><span class="math">y' = ay + f(x)</span></em>
+    </h1>
+    <p class="lecture-hero-intro">
+      Et si le second membre devenait <strong>variable</strong> ? Un prélèvement qui évolue avec le temps, une charge proportionnelle à <span class="math">x²</span>, un effet périodique : voici l&rsquo;équation <span class="math">y' = ay + f(x)</span>, avec <span class="math">f</span> donnée. La stratégie tient en une phrase : <strong>une solution particulière, plus <span class="math">C·e^(ax)</span></strong>. Cette partie apprend à <strong>fabriquer la solution particulière par identification</strong> — pour un polynôme, une exponentielle, un sinus ou un cosinus — puis à conclure avec la <strong>condition initiale</strong>.
+    </p>
+    <div class="lecture-hero-meta">
+      <span class="lecture-hero-meta-item">⏱ 25 min</span> <span class="lecture-hero-meta-item">🧮 4 notions</span> <span class="lecture-hero-meta-item">📊 8 sections</span> <span class="lecture-hero-meta-item">🎓 Terminale D</span>
+    </div>
+  </header>
+
+  <!-- ===== SOMMAIRE ===== -->
+  <nav class="lecture-toc">
+    <div class="lecture-toc-header">
+      <span>Dans cette partie</span>
+      <span class="lecture-toc-count">4 notions · 8 sections</span>
+    </div>
+    <ol class="lecture-toc-list">
+      <li><a href="#s0"><span class="toc-num">00</span><span>Motivation — Quand le second membre varie</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>Le principe : particulière + C·e^(ax)</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>f polynôme — la méthode d&rsquo;identification</span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>Exemple complet : y&rsquo; = 2y + x²</span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>f exponentielle e^(kx) avec k ≠ a</span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>f trigonométrique — sinus et cosinus</span></a></li>
+      <li><a href="#s6"><span class="toc-num">06</span><span>Superposition — quand f se décompose</span></a></li>
+      <li><a href="#s7"><span class="toc-num">07</span><span>Exemple type Bac avec condition initiale &amp; bilan</span></a></li>
+    </ol>
+  </nav>
+
+  <!-- SECTION 0 : MOTIVATION                                        -->
+  <section class="lecture-section" id="s0">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">00</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Motivation</span>
+        <h2 class="lecture-section-title">Quand le second membre varie</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        En Partie 2, le second membre était <strong>constant</strong> : un versement fixe, une température ambiante fixe. Mais la réalité est souvent plus riche : un projet dont les coûts augmentent avec le temps (<span class="math">f(x) = x</span> ou <span class="math">x²</span>), une campagne de vaccination dont l&rsquo;intensité décroît exponentiellement (<span class="math">f(x) = e^(−x)</span>), une activité qui oscille avec les saisons (<span class="math">f(x) = sin x</span>). L&rsquo;équation devient <span class="math">y' = ay + f(x)</span>.
+      </p>
+
+      <p class="lecture-text">
+        Bonne nouvelle : la <strong>recette générale ne change pas</strong>. On garde les solutions homogènes <span class="math">C·e^(ax)</span> de la Partie 1, on cherche <em>une seule</em> solution particulière de l&rsquo;équation complète, on additionne, puis la condition initiale fixe <span class="math">C</span>. La seule vraie question nouvelle est : <strong>comment deviner la bonne forme de solution particulière ?</strong> Réponse : on la <em>devine</em> au sens fort du terme — on la <strong>pose</strong> avec des coefficients inconnus, et l&rsquo;équation les révèle. C&rsquo;est l&rsquo;<strong>identification</strong>.
+      </p>
+
+      <div class="lecture-callout lecture-callout-gold">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Les trois formes à connaître du programme</div>
+          <ul class="lecture-list">
+            <li><span class="math">f</span> est un <strong>polynôme de degré ≤ 2</strong> → on pose <span class="math">y_p</span> polynôme de même degré.</li>
+            <li><span class="math">f(x) = e^(kx)</span> avec <span class="math">k ≠ a</span> → on pose <span class="math">y_p = A·e^(kx)</span>.</li>
+            <li><span class="math">f</span> est un mélange (somme) → principe de <strong>superposition</strong> : traiter chaque morceau, puis additionner.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 1 : LE PRINCIPE                                       -->
+  <section class="lecture-section" id="s1">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">01</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1 · principe</span>
+        <h2 class="lecture-section-title">Le principe : particulière + C·e^(ax)</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <div class="lecture-callout lecture-callout-gold">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">💡 THÉORÈME — Structure des solutions de y' = ay + f(x)</div>
+          <p>Soient <span class="math">a</span> un réel non nul et <span class="math">f</span> une fonction continue sur <span class="math">ℝ</span>. Si <span class="math">y_p</span> est <strong>une</strong> solution particulière de <span class="math">y' = ay + f(x)</span>, alors les solutions sur <span class="math">ℝ</span> sont <strong>exactement</strong> :</p>
+          <p><span class="math">y(x) = y_p(x) + C·e^(ax)</span> &nbsp;où&nbsp; <span class="math">C ∈ ℝ</span></p>
+          <p>c&rsquo;est-à-dire : <strong>solution particulière + solutions de l&rsquo;équation homogène</strong> <span class="math">y' = ay</span>.</p>
+        </div>
+      </div>
+
+      <p class="lecture-text">
+        Justification du « dans ce sens » (exigible par le calcul) : si <span class="math">y_p</span> et <span class="math">y</span> sont solutions de <span class="math">y' = ay + f(x)</span>, alors leur différence <span class="math">z = y − y_p</span> vérifie <span class="math">z' = y' − y_p' = (a·y + f) − (a·y_p + f) = a·(y − y_p) = a·z</span> : la différence résout l&rsquo;équation homogène, donc <span class="math">z = C·e^(ax)</span> (Partie 1), d&rsquo;où <span class="math">y = y_p + C·e^(ax)</span>.
+      </p>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">🔍 Vérification directe — la somme fonctionne</div>
+        <div class="lecture-example-content">
+          <p>Posons <span class="math">y = y_p + C·e^(ax)</span> où <span class="math">y_p' = a·y_p + f</span>. Alors <span class="math">y' = y_p' + C·a·e^(ax) = a·y_p + f + a·C·e^(ax) = a·(y_p + C·e^(ax)) + f = a·y + f</span> : la somme est bien solution de l&rsquo;équation complète, pour toute valeur de <span class="math">C</span>. ✅</p>
+        </div>
+      </div>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">y' = ay + f(x) ⇔ y = y_p + C·e^(ax)</div>
+        <div class="lecture-formula-desc">Le plan de bataille : <strong>(1)</strong> solutions homogènes <span class="math">C·e^(ax)</span> — connues ; <strong>(2)</strong> une solution particulière <span class="math">y_p</span> — à fabriquer ; <strong>(3)</strong> somme ; <strong>(4)</strong> condition initiale pour <span class="math">C</span>.</div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ Une particulière suffit — et on ne la cherche pas « au hasard »</div>
+          <p>Il faut <strong>une seule</strong> solution particulière, n&rsquo;importe laquelle : les autres sont absorbées par le terme <span class="math">C·e^(ax)</span>. Et pour la fabriquer, on ne tâtonne pas : on <strong>pose une forme</strong> dépendant de <span class="math">f</span> (même nature que <span class="math">f</span>), avec des coefficients inconnus à déterminer. C&rsquo;est l&rsquo;objet des sections suivantes.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 2 : f POLYNÔME — IDENTIFICATION                       -->
+  <section class="lecture-section" id="s2">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">02</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2 · identification polynôme</span>
+        <h2 class="lecture-section-title">f polynôme — la méthode d&rsquo;identification</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Quand <span class="math">f</span> est un polynôme de degré ≤ 2, une solution particulière existe parmi les polynômes de <strong>même degré</strong>. On la pose donc avec des coefficients inconnus, on injecte dans l&rsquo;équation, et on <strong>identifie les coefficients</strong> de chaque puissance de <span class="math">x</span>.
+      </p>
+
+      <div class="lecture-rule">
+        <div class="lecture-rule-label">🧠 Méthode — Identification avec un polynôme</div>
+        <div class="lecture-rule-body">
+          <strong>(1)</strong> Poser la forme : <span class="math">f(x) = c</span> (constante) → <span class="math">y_p = A</span> ; <span class="math">f(x) = px + q</span> → <span class="math">y_p = Ax + B</span> ; <span class="math">f(x) = px² + qx + r</span> → <span class="math">y_p = Ax² + Bx + D</span> (on évite la lettre C, réservée à la constante de la solution générale). <strong>(2)</strong> Dériver <span class="math">y_p</span>. <strong>(3)</strong> Remplacer dans l&rsquo;équation et développer. <strong>(4)</strong> Identifier les coefficients de <span class="math">x²</span>, de <span class="math">x</span> et la constante, membre à membre. <strong>(5)</strong> Résoudre le petit système obtenu.
+        </div>
+      </div>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">🧮 Premier exemple — résoudre y' = y + x</div>
+        <div class="lecture-example-content">
+          <p>Ici <span class="math">a = 1</span> et <span class="math">f(x) = x</span> (degré 1). Cherchons <span class="math">y_p = Ax + B</span> : alors <span class="math">y_p' = A</span>, et l&rsquo;équation <span class="math">y_p' = y_p + x</span> s&rsquo;écrit <span class="math">A = (Ax + B) + x = (A + 1)x + B</span>.</p>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Identifier en x.</strong> Coefficient de <span class="math">x</span> : à gauche <span class="math">0</span>, à droite <span class="math">A + 1</span>. Donc <span class="math">0 = A + 1</span>, soit <span class="math">A = −1</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Identifier la constante.</strong> Constante : à gauche <span class="math">A</span>, à droite <span class="math">B</span>. Donc <span class="math">A = B</span>, soit <span class="math">B = −1</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Solution particulière.</strong> <span class="math">y_p = −x − 1</span>. Contrôle : <span class="math">y_p' = −1</span> et <span class="math">y_p + x = −x − 1 + x = −1</span> ✓.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Solutions générales.</strong> <span class="math">y(x) = C·e^x − x − 1</span>, <span class="math">C ∈ ℝ</span>. Contrôle global : <span class="math">y' = C·e^x − 1</span> et <span class="math">y + x = C·e^x − x − 1 + x = C·e^x − 1</span> ✓.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ Poser la forme complète, pas le strict minimum</div>
+          <p>Pour <span class="math">f(x) = x²</span>, pose <span class="math">y_p = Ax² + Bx + D</span> et <strong>pas</strong> <span class="math">Ax²</span> : en dérivant, un <span class="math">x</span> apparaît, et l&rsquo;équation en fabrique aussi — il faut de la place pour tous les degrés, jusqu&rsquo;à la constante. Omettre un degré rend l&rsquo;identification impossible (ou fausse).</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 3 : EXEMPLE COMPLET y' = 2y + x²                      -->
+  <section class="lecture-section" id="s3">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">03</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2 · exemple complet</span>
+        <h2 class="lecture-section-title">Exemple complet : y&rsquo; = 2y + x²</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        C&rsquo;est LE calcul modèle de la partie : seconde membre polynôme de degré 2, coefficient <span class="math">a = 2</span>. Refais-le toi-même après lecture, sans regarder.
+      </p>
+
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">🧮 Exemple travaillé — résoudre y' = 2y + x²</div>
+        <div class="lecture-example-content">
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Poser la forme.</strong> <span class="math">f(x) = x²</span> : on pose <span class="math">y_p = Ax² + Bx + D</span>, donc <span class="math">y_p' = 2Ax + B</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Injecter dans l&rsquo;équation.</strong> On veut <span class="math">y_p' = 2y_p + x²</span>, c&rsquo;est-à-dire <span class="math">2Ax + B = 2(Ax² + Bx + D) + x² = (2A + 1)x² + 2B·x + 2D</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Identifier les coefficients.</strong> En <span class="math">x²</span> : <span class="math">0 = 2A + 1</span>, donc <span class="math">A = −1/2</span>. En <span class="math">x</span> : <span class="math">2A = 2B</span>, donc <span class="math">B = A = −1/2</span>. En constante : <span class="math">B = 2D</span>, donc <span class="math">D = B/2 = −1/4</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Solution particulière.</strong> <span class="math">y_p = −x²/2 − x/2 − 1/4</span>. <strong>Contrôle obligatoire :</strong> <span class="math">y_p' = −x − 1/2</span>, et <span class="math">2y_p + x² = −x² − x − 1/2 + x² = −x − 1/2</span> ✓ — les deux membres coïncident.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">5</div><div class="lecture-step-content"><p><strong>Solutions générales.</strong> <span class="math">y(x) = C·e^(2x) − x²/2 − x/2 − 1/4</span>, <span class="math">C ∈ ℝ</span>. Contrôle global : <span class="math">y' = 2C·e^(2x) − x − 1/2</span> et <span class="math">2y + x² = 2C·e^(2x) − x² − x − 1/2 + x² = 2C·e^(2x) − x − 1/2</span> ✓.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-danger">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Erreur fréquente au Bac</div>
+          <p>S&rsquo;arrêter avant le contrôle. L&rsquo;identification produit des coefficients (<span class="math">A = −1/2</span>, <span class="math">B = −1/2</span>, <span class="math">D = −1/4</span>) obtenus en quatre petits calculs : une erreur de signe n&rsquo;importe où se <strong>voit immédiatement</strong> au contrôle final, puisque <span class="math">y_p'</span> doit redonner exactement <span class="math">2y_p + x²</span>. Ce contrôle de la section 03, étape 4, prend trois lignes et sécurise tout l&rsquo;exercice.</p>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">📗 À retenir sur l&rsquo;identification</div>
+          <p>L&rsquo;identification transforme une équation différentielle en <strong>petit système linéaire</strong> : autant d&rsquo;équations que de coefficients inconnus (un par puissance de <span class="math">x</span>). Écris les membres <em>dans le même ordre de puissances</em> des deux côtés avant d&rsquo;identifier : c&rsquo;est là que se cachent 90 % des erreurs.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 4 : f EXPONENTIELLE                                   -->
+  <section class="lecture-section" id="s4">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">04</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 3 · identification exponentielle</span>
+        <h2 class="lecture-section-title">f exponentielle e^(kx) avec k ≠ a</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Quand <span class="math">f(x) = e^(kx)</span> avec <span class="math">k ≠ a</span>, la solution particulière est de la <strong>même famille</strong> : <span class="math">y_p = A·e^(kx)</span>. L&rsquo;exponentielle <span class="math">e^(kx)</span> se factorise dans l&rsquo;équation, et il reste un petit calcul sur <span class="math">A</span>.
+      </p>
+
+      <div class="lecture-rule">
+        <div class="lecture-rule-label">🧠 Méthode — Identification avec e^(kx), k ≠ a</div>
+        <div class="lecture-rule-body">
+          <strong>(1)</strong> Poser <span class="math">y_p = A·e^(kx)</span>, donc <span class="math">y_p' = kA·e^(kx)</span>. <strong>(2)</strong> Injecter : <span class="math">kA·e^(kx) = aA·e^(kx) + e^(kx)</span>. <strong>(3)</strong> Factoriser <span class="math">e^(kx)</span> (jamais nul) et simplifier : <span class="math">kA = aA + 1</span>. <strong>(4)</strong> En déduire <span class="math">A = 1/(k − a)</span>, puis écrire les solutions générales <span class="math">y = A·e^(kx) + C·e^(ax)</span>.
+        </div>
+      </div>
+
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">🧮 Exemple 1 — résoudre y' = y + e^(2x)</div>
+        <div class="lecture-example-content">
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Poser.</strong> Ici <span class="math">a = 1</span> et <span class="math">k = 2 ≠ 1</span> ✓ : on pose <span class="math">y_p = A·e^(2x)</span>, donc <span class="math">y_p' = 2A·e^(2x)</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Injecter.</strong> <span class="math">2A·e^(2x) = A·e^(2x) + e^(2x)</span>. En simplifiant par <span class="math">e^(2x)</span> : <span class="math">2A = A + 1</span>, donc <span class="math">A = 1</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Solution particulière.</strong> <span class="math">y_p = e^(2x)</span>. Contrôle : <span class="math">y_p' = 2e^(2x)</span> et <span class="math">y_p + e^(2x) = 2e^(2x)</span> ✓.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Solutions générales.</strong> <span class="math">y(x) = C·e^x + e^(2x)</span>, <span class="math">C ∈ ℝ</span>. Contrôle : <span class="math">y' = C·e^x + 2e^(2x)</span> et <span class="math">y + e^(2x) = C·e^x + 2e^(2x)</span> ✓.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">🧮 Exemple 2 — résoudre y' = 3y + e^(−x)</div>
+        <div class="lecture-example-content">
+          <p>Ici <span class="math">a = 3</span> et <span class="math">k = −1 ≠ 3</span> ✓. On pose <span class="math">y_p = A·e^(−x)</span>, donc <span class="math">y_p' = −A·e^(−x)</span>. L&rsquo;équation donne <span class="math">−A·e^(−x) = 3A·e^(−x) + e^(−x)</span>, d&rsquo;où <span class="math">−A = 3A + 1</span>, soit <span class="math">−4A = 1</span> et <span class="math">A = −1/4</span>. Solution particulière : <span class="math">y_p = −e^(−x)/4</span>. Contrôle : <span class="math">y_p' = e^(−x)/4</span> et <span class="math">3y_p + e^(−x) = −3e^(−x)/4 + e^(−x) = e^(−x)/4</span> ✓. Solutions générales : <span class="math">y(x) = C·e^(3x) − e^(−x)/4</span>, <span class="math">C ∈ ℝ</span>.</p>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-danger">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Erreur fréquente au Bac — le cas interdit k = a</div>
+          <p>La méthode exige <span class="math">k ≠ a</span> : si <span class="math">k = a</span>, poser <span class="math">A·e^(kx)</span> mène à <span class="math">kA = kA + 1</span>, c&rsquo;est-à-dire <span class="math">0 = 1</span> — absurde, donc <strong>aucune</strong> solution particulière de cette forme n&rsquo;existe (la bonne forme, hors programme, fait intervenir <span class="math">x·e^(kx)</span>). Vérifie <span class="math">k ≠ a</span> <strong>avant</strong> de poser quoi que ce soit, et dis-le sur ta copie.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 5 : f TRIGONOMÉTRIQUE                                 -->
+  <section class="lecture-section" id="s5">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">05</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 4 · identification trigo</span>
+        <h2 class="lecture-section-title">f trigonométrique — sinus et cosinus</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Quand <span class="math">f(x) = sin x</span> ou <span class="math">cos x</span>, il faut poser une solution particulière qui contient <strong>les deux</strong> : <span class="math">y_p = A·sin x + B·cos x</span>. La raison : dériver un sinus donne un cosinus (et réciproquement), donc les deux familles se mélangent à chaque dérivation — impossible de les séparer.
+      </p>
+
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">🧮 Exemple travaillé — résoudre y' = y + cos x</div>
+        <div class="lecture-example-content">
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Poser.</strong> <span class="math">y_p = A·sin x + B·cos x</span>, donc <span class="math">y_p' = A·cos x − B·sin x</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Injecter.</strong> On veut <span class="math">y_p' = y_p + cos x</span>, c&rsquo;est-à-dire <span class="math">A·cos x − B·sin x = A·sin x + B·cos x + cos x</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Identifier.</strong> En <span class="math">cos x</span> : <span class="math">A = B + 1</span>. En <span class="math">sin x</span> : <span class="math">−B = A</span>. En remplaçant : <span class="math">−B = B + 1</span>, donc <span class="math">B = −1/2</span>, puis <span class="math">A = 1/2</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Solution particulière.</strong> <span class="math">y_p = (1/2)·sin x − (1/2)·cos x</span>. Contrôle : <span class="math">y_p' = (1/2)·cos x + (1/2)·sin x</span> et <span class="math">y_p + cos x = (1/2)·sin x + (1/2)·cos x</span> ✓.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">5</div><div class="lecture-step-content"><p><strong>Solutions générales.</strong> <span class="math">y(x) = C·e^x + (1/2)·sin x − (1/2)·cos x</span>, <span class="math">C ∈ ℝ</span>.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ Deux inconnues, deux identifications</div>
+          <p>Avec le sinus et le cosinus, il y a <strong>toujours deux coefficients</strong> (<span class="math">A</span> et <span class="math">B</span>) et <strong>toujours deux identifications</strong> (une en <span class="math">sin x</span>, une en <span class="math">cos x</span>). N&rsquo;essaye pas de poser <span class="math">y_p = A·sin x</span> seul pour <span class="math">f(x) = sin x</span> : la dérivée fait apparaître un cosinus, et l&rsquo;identification bloque.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 6 : SUPERPOSITION                                     -->
+  <section class="lecture-section" id="s6">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">06</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 4 · superposition</span>
+        <h2 class="lecture-section-title">Superposition — quand f se décompose</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <div class="lecture-callout lecture-callout-gold">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">💡 Principe de superposition</div>
+          <p>Si <span class="math">f = f₁ + f₂</span> et si <span class="math">y₁</span> est solution particulière de <span class="math">y' = ay + f₁(x)</span> tandis que <span class="math">y₂</span> est solution particulière de <span class="math">y' = ay + f₂(x)</span>, alors <span class="math">y_p = y₁ + y₂</span> est solution particulière de <span class="math">y' = ay + f₁(x) + f₂(x)</span>.</p>
+          <p>Preuve rapide : <span class="math">(y₁ + y₂)' = (a·y₁ + f₁) + (a·y₂ + f₂) = a·(y₁ + y₂) + f₁ + f₂</span>. ✅ On traite chaque morceau avec <em>sa</em> méthode, puis on additionne.</p>
+        </div>
+      </div>
+
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">🧮 Exemple travaillé — résoudre y' = 2y + x + e^(x)</div>
+        <div class="lecture-example-content">
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Décomposer.</strong> <span class="math">f(x) = x + e^(x) = f₁(x) + f₂(x)</span> avec <span class="math">f₁(x) = x</span> (polynôme) et <span class="math">f₂(x) = e^(x)</span> (exponentielle, <span class="math">k = 1 ≠ a = 2</span> ✓).</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Morceau polynomial.</strong> Pour <span class="math">y' = 2y + x</span> : pose <span class="math">y₁ = Ax + B</span>, <span class="math">y₁' = A</span>. L&rsquo;équation donne <span class="math">A = 2Ax + 2B + x = (2A + 1)x + 2B</span> ; identification : <span class="math">0 = 2A + 1</span> et <span class="math">A = 2B</span>, donc <span class="math">A = −1/2</span>, <span class="math">B = −1/4</span>. D&rsquo;où <span class="math">y₁ = −x/2 − 1/4</span>. Contrôle : <span class="math">y₁' = −1/2</span> et <span class="math">2y₁ + x = −x − 1/2 + x = −1/2</span> ✓.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Morceau exponentiel.</strong> Pour <span class="math">y' = 2y + e^(x)</span> : pose <span class="math">y₂ = A·e^(x)</span>, <span class="math">y₂' = A·e^(x)</span>. L&rsquo;équation donne <span class="math">A = 2A + 1</span>, donc <span class="math">A = −1</span>. D&rsquo;où <span class="math">y₂ = −e^(x)</span>. Contrôle : <span class="math">y₂' = −e^(x)</span> et <span class="math">2y₂ + e^(x) = −2e^(x) + e^(x) = −e^(x)</span> ✓.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Solution particulière totale.</strong> <span class="math">y_p = y₁ + y₂ = −x/2 − 1/4 − e^(x)</span>. Contrôle : <span class="math">y_p' = −1/2 − e^(x)</span> et <span class="math">2y_p + x + e^(x) = −x − 1/2 − 2e^(x) + x + e^(x) = −1/2 − e^(x)</span> ✓.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">5</div><div class="lecture-step-content"><p><strong>Solutions générales.</strong> <span class="math">y(x) = C·e^(2x) − x/2 − 1/4 − e^(x)</span>, <span class="math">C ∈ ℝ</span>.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <p class="lecture-text">
+        Le principe de superposition n&rsquo;est pas un gadget : c&rsquo;est lui qui permet de traiter des seconds membres riches comme <span class="math">x² + e^(2x)</span> ou <span class="math">3x + cos x</span> sans jamais poser une forme monstrueuse d&rsquo;un coup. Décompose, résous chaque morceau, additionne, contrôle l&rsquo;ensemble.
+      </p>
+    </div>
+  </section>
+
+  <!-- SECTION 7 : EXEMPLE TYPE BAC & BILAN                          -->
+  <section class="lecture-section" id="s7">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">07</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Examen · bilan</span>
+        <h2 class="lecture-section-title">Exemple type Bac avec condition initiale &amp; bilan</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">🧮 Exemple type Bac — y' = 2y + x² avec y(0) = 1</div>
+        <div class="lecture-example-content">
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Solutions générales.</strong> Travail déjà fait (section 03) : <span class="math">y(x) = C·e^(2x) − x²/2 − x/2 − 1/4</span>, avec la solution particulière polynomiale contrôlée.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Condition initiale.</strong> En <span class="math">x = 0</span> : <span class="math">y(0) = C·e^(0) − 0 − 0 − 1/4 = C − 1/4</span>. On veut <span class="math">y(0) = 1</span>, donc <span class="math">C − 1/4 = 1</span>, soit <span class="math">C = 5/4</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Conclusion.</strong> L&rsquo;unique solution est <span class="math">y(x) = (5/4)·e^(2x) − x²/2 − x/2 − 1/4</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Vérification complète.</strong> Condition : <span class="math">y(0) = 5/4 − 1/4 = 1</span> ✓. Équation : <span class="math">y' = (5/2)·e^(2x) − x − 1/2</span> et <span class="math">2y + x² = (5/2)·e^(2x) − x² − x − 1/2 + x² = (5/2)·e^(2x) − x − 1/2</span> ✓. Les deux exigences sont satisfaites.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-label">La recette universelle de la partie</div>
+        <div class="lecture-formula-hero-main">y = y_p + C·e^(ax) &nbsp;·&nbsp; avec y_p posée « comme f » puis identifiée</div>
+        <div class="lecture-formula-hero-desc">Polynôme → <span class="math">Ax² + Bx + D</span> · exponentielle <span class="math">e^(kx)</span>, <span class="math">k ≠ a</span> → <span class="math">A·e^(kx)</span> · sin/cos → <span class="math">A·sin x + B·cos x</span> · somme → superposition.</div>
+      </div>
+
+      <ul class="lecture-list-elegant">
+        <li>Solutions de <span class="math">y' = ay + f(x)</span> : <strong>une particulière + <span class="math">C·e^(ax)</span></strong> — la différence de deux solutions est toujours solution de <span class="math">y' = ay</span>.</li>
+        <li><strong>Identification</strong> : poser la forme, dériver, injecter, identifier coefficient par coefficient, résoudre.</li>
+        <li><strong>Hypothèses à citer</strong> : <span class="math">a ≠ 0</span> ; pour l&rsquo;exponentielle, <span class="math">k ≠ a</span> vérifié avant de poser <span class="math">A·e^(kx)</span>.</li>
+        <li><strong>Condition initiale en dernier</strong> : écrire <span class="math">y(0)</span> avec la solution générale complète (particulière comprise !), puis en tirer <span class="math">C</span>.</li>
+        <li><strong>Contrôles</strong> : redériver <span class="math">y_p</span> seule, puis la solution finale complète avec sa condition initiale.</li>
+      </ul>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ Rédaction type pour l&rsquo;examen</div>
+          <p>Quatre blocs attendus : la <strong>forme posée</strong> (« on cherche une solution particulière de la forme… »), le <strong>calcul d&rsquo;identification</strong> complet, la <strong>solution générale</strong> écrite avec <span class="math">C ∈ ℝ</span>, puis la <strong>détermination de <span class="math">C</span></strong> par la condition initiale. Le tout couronné par la vérification. Un bloc manquant = des points perdus, même avec le bon résultat.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== QCM D'ENTRAÎNEMENT ===== -->
+  <div class="lecture-quiz">
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q1 — La solution générale de y' = y + x est :</p>
+      <div class="lecture-quiz-options"><span>A) y = C·e^x − x − 1</span><span>B) y = C·e^x + x + 1</span><span>C) y = C·e^x − x</span><span>D) y = C·e^(2x) − x − 1</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><strong>A) y = C·e^x − x − 1.</strong> On pose <span class="math">y_p = Ax + B</span> : l&rsquo;identification donne <span class="math">0 = A + 1</span> et <span class="math">A = B</span>, donc <span class="math">y_p = −x − 1</span>, plus l&rsquo;homogène <span class="math">C·e^x</span>. Contrôle : <span class="math">y' = C·e^x − 1</span> et <span class="math">y + x = C·e^x − x − 1 + x = C·e^x − 1</span> ✓.</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q2 — Pour chercher une solution particulière de y' = y + e^(2x), on pose :</p>
+      <div class="lecture-quiz-options"><span>A) y_p = A·e^(2x)</span><span>B) y_p = A·x·e^(2x)</span><span>C) y_p = A·e^x</span><span>D) y_p = Ax + B</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><strong>A) y_p = A·e^(2x).</strong> Le second membre est <span class="math">e^(2x)</span> avec <span class="math">k = 2 ≠ a = 1</span> : on pose la même forme. L&rsquo;identification donne <span class="math">2A = A + 1</span>, soit <span class="math">A = 1</span> et <span class="math">y_p = e^(2x)</span>. La forme B (avec un <span class="math">x</span> en facteur) ne sert que dans le cas interdit <span class="math">k = a</span>, hors programme.</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q3 — Pour y' = 2y + x², la solution particulière polynomiale est :</p>
+      <div class="lecture-quiz-options"><span>A) y_p = −x²/2 − x/2 − 1/4</span><span>B) y_p = x²/2 + x/2 + 1/4</span><span>C) y_p = −x²/2</span><span>D) y_p = −x²/4</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><strong>A) y_p = −x²/2 − x/2 − 1/4.</strong> L&rsquo;identification (<span class="math">0 = 2A + 1</span> ; <span class="math">2A = 2B</span> ; <span class="math">B = 2D</span>) donne <span class="math">A = B = −1/2</span> et <span class="math">D = −1/4</span>. Contrôle : <span class="math">y_p' = −x − 1/2</span> et <span class="math">2y_p + x² = −x² − x − 1/2 + x² = −x − 1/2</span> ✓. Les options C et D omettent des degrés : l&rsquo;identification ne peut alors pas aboutir.</div></details>
+    </div>
+  </div>
+
+  <!-- ===== RÉCAPITULATIF ===== -->
+  <div class="lecture-recap">
+    <div class="lecture-recap-title">📌 Ce qu&rsquo;il faut retenir</div>
+    <ul class="lecture-recap-list">
+      <li><strong>[principe]</strong> Solutions de <span class="math">y' = ay + f(x)</span> : <span class="math">y = y_p + C·e^(ax)</span> — une solution particulière plus l&rsquo;homogène ; la différence de deux solutions résout <span class="math">y' = ay</span></li>
+      <li><strong>[polynome]</strong> <span class="math">f</span> polynôme de degré ≤ 2 → poser <span class="math">y_p</span> polynôme <strong>complet</strong> de même degré (<span class="math">Ax² + Bx + D</span>) et identifier coefficient par coefficient</li>
+      <li><strong>[exponentielle]</strong> <span class="math">f(x) = e^(kx)</span> avec <span class="math">k ≠ a</span> (à vérifier !) → poser <span class="math">y_p = A·e^(kx)</span> ; l&rsquo;identification donne <span class="math">A = 1/(k − a)</span></li>
+      <li><strong>[trigo]</strong> <span class="math">f(x) = sin x</span> ou <span class="math">cos x</span> → poser <span class="math">y_p = A·sin x + B·cos x</span> (les deux !) et identifier en <span class="math">sin x</span> et en <span class="math">cos x</span></li>
+      <li><strong>[superposition]</strong> Si <span class="math">f = f₁ + f₂</span> : particulière de chaque morceau, puis <span class="math">y_p = y₁ + y₂</span> — contrôler la somme finale</li>
+      <li><strong>[methode]</strong> Ordre imposé : homogène → particulière (identification) → somme → <strong>condition initiale en dernier</strong> → vérification par redérivation</li>
+    </ul>
+  </div>
+
+  <!-- ===== FIN ===== -->
+  <div class="lecture-end">
+    <span class="lecture-end-icon">🎯</span>
+    <div class="lecture-end-text">Partie 3 terminée !</div>
+    <div class="lecture-end-sub">Passe à la fiche complète : méthode universelle en 4 étapes, applications et réflexes Bac</div>
+    <div class="lecture-end-divider"></div>
+  </div>
+
+</div>

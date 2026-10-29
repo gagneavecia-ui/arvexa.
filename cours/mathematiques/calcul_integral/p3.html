@@ -1,0 +1,450 @@
+<!-- PARTIE 3 : PROPRIÉTÉS, LINÉARITÉ & RELATION DE CHASLES         -->
+<!-- Notion 1 : linéarité de l'intégrale                            -->
+<!-- Notion 2 : relation de Chasles & borne inversée                -->
+<!-- Notion 3 : positivité & croissance (ordre)                     -->
+<!-- Notion 4 : encadrement d'une intégrale & applications          -->
+
+<div class="lecture-container">
+
+  <!-- ===== HERO ===== -->
+  <header class="lecture-hero">
+    <div class="lecture-hero-badge">
+      <span class="lecture-hero-icon">📘</span>
+      <span class="lecture-hero-label">Partie 03 · Calcul intégral</span>
+    </div>
+    <h1 class="lecture-hero-title">
+      Propriétés, linéarité &amp; <em>relation de Chasles</em>
+    </h1>
+    <p class="lecture-hero-intro">
+      Savoir calculer <span class="math">∫ₐᵇ f(x) dx</span> ne suffit pas : il faut savoir <strong>manipuler</strong> les intégrales comme on manipule les sommes. Cette partie installe les <strong>propriétés de calcul</strong> — la <strong>linéarité</strong> (facteurs et sommes sortent de l'intégrale) et la <strong>relation de Chasles</strong> (on découpe l'intervalle) — puis les <strong>propriétés d'ordre</strong> : positivité, croissance et <strong>encadrements</strong>. Ce sont elles qui permettent de comparer, d'estimer et de démontrer des inégalités, sans même connaître de primitive.
+    </p>
+    <div class="lecture-hero-meta">
+      <span class="lecture-hero-meta-item">⏱ 20 min</span> <span class="lecture-hero-meta-item">🧮 4 notions</span> <span class="lecture-hero-meta-item">📊 8 sections</span> <span class="lecture-hero-meta-item">🎓 Terminale D</span>
+    </div>
+  </header>
+
+  <!-- ===== SOMMAIRE ===== -->
+  <nav class="lecture-toc">
+    <div class="lecture-toc-header">
+      <span>Dans cette partie</span>
+      <span class="lecture-toc-count">4 notions · 8 sections</span>
+    </div>
+    <ol class="lecture-toc-list">
+      <li><a href="#s0"><span class="toc-num">00</span><span>Motivation — Additionner des morceaux de cumuls</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>Linéarité de l'intégrale</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>Relation de Chasles — découper l'intervalle</span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>Borne inversée &amp; intégrale nulle</span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>Positivité &amp; croissance — l'ordre</span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>Encadrement d'une intégrale</span></a></li>
+      <li><a href="#s6"><span class="toc-num">06</span><span>Applications aux inégalités — exemples complets</span></a></li>
+      <li><a href="#s7"><span class="toc-num">07</span><span>Bilan — les réflexes de calcul</span></a></li>
+    </ol>
+  </nav>
+
+  <!-- SECTION 0 : MOTIVATION                                        -->
+  <section class="lecture-section" id="s0">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">00</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Motivation</span>
+        <h2 class="lecture-section-title">Additionner des morceaux de cumuls</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Un coopérative regroupe trois producteurs d'oignon : si le premier livre 300 kg et le second 450 kg, le total se lit directement <span class="math">300 + 450</span>. Personne ne recalcule les pesées ! Pour les intégrales, c'est pareil : <span class="math">∫</span> se comporte comme une <strong>somme</strong> — on peut en sortir les facteurs, séparer les termes, et découper un intervalle en morceaux. Ces règles de « comptabilité » évitent des calculs inutiles et rendent possible des démonstrations d'<strong>inégalités</strong> qu'aucun calcul direct n'attaquerait.
+      </p>
+
+      <p class="lecture-text">
+        Autre situation : le stock de mil d'un magasin suit la même loi de consommation du lundi au vendredi, puis une autre le week-end. Le cumul total s'obtient en <strong>sommant les morceaux</strong> : c'est exactement la relation de Chasles. Et pour contrôler un résultat sans primitive — ou démontrer une inégalité d'examen — on <strong>encadre</strong> la fonction entre deux constantes : le théorème d'encadrement fait le reste.
+      </p>
+
+      <div class="lecture-callout lecture-callout-gold">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Les questions de cette partie</div>
+          <ul class="lecture-list">
+            <li><strong>Comment sortir</strong> les constantes et séparer les termes ? (linéarité)</li>
+            <li><strong>Comment découper</strong> une intégrale en plusieurs morceaux ? (Chasles)</li>
+            <li><strong>Que se passe-t-il</strong> si l'on inverse les bornes ? (borne inversée)</li>
+            <li><strong>Comment comparer</strong> deux intégrales et <strong>encadrer</strong> une valeur sans primitive ? (ordre &amp; encadrement)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 1 : LINÉARITÉ                                         -->
+  <section class="lecture-section" id="s1">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">01</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1 · linéarité</span>
+        <h2 class="lecture-section-title">Linéarité de l'intégrale</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <div class="lecture-callout lecture-callout-gold">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">💡 Propriété — Linéarité</div>
+          <p>Si <span class="math">f</span> et <span class="math">g</span> sont continues sur <span class="math">[a ; b]</span> et si <span class="math">α</span> et <span class="math">β</span> sont deux réels, alors : <span class="math">∫ₐᵇ (α·f(x) + β·g(x)) dx = α·∫ₐᵇ f(x) dx + β·∫ₐᵇ g(x) dx</span>.</p>
+          <p><em>Pourquoi ?</em> Une primitive de <span class="math">α·f + β·g</span> est <span class="math">α·F + β·G</span> (règles somme/facteur de la Partie 1) ; en substituant les bornes, les constantes <span class="math">α</span> et <span class="math">β</span> sortent de la différence <span class="math">F(b) − F(a)</span>.</p>
+        </div>
+      </div>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">∫ₐᵇ (α·f(x) + β·g(x)) dx = α·∫ₐᵇ f(x) dx + β·∫ₐᵇ g(x) dx</div>
+        <div class="lecture-formula-desc">En pratique : l'intégrale d'une somme est la somme des intégrales ; les constantes multiplicatives sortent de l'intégrale.</div>
+      </div>
+
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">🧮 Exemple 1 — retrouver ∫₀¹ (3x² + 2x) dx par linéarité</div>
+        <div class="lecture-example-content">
+          <p>Calculons <span class="math">∫₀¹ (3x² + 2x) dx</span> en décomposant (nous avions trouvé <span class="math">2</span> en Partie 2).</p>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Décomposer.</strong> <span class="math">∫₀¹ (3x² + 2x) dx = 3·∫₀¹ x² dx + 2·∫₀¹ x dx</span> (linéarité).</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Calculer les morceaux.</strong> <span class="math">∫₀¹ x² dx = [x³/3]₀¹ = 1/3</span> et <span class="math">∫₀¹ x dx = [x²/2]₀¹ = 1/2</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Recomposer.</strong> <span class="math">3·(1/3) + 2·(1/2) = 1 + 1 = 2</span> ✓ — on retrouve bien le résultat de la Partie 2.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">🧮 Exemple 2 — un coefficient négatif</div>
+        <div class="lecture-example-content">
+          <p>Calculons <span class="math">∫₀¹ (x² − 3x + 2) dx</span>.</p>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Décomposer.</strong> <span class="math">∫₀¹ (x² − 3x + 2) dx = ∫₀¹ x² dx − 3·∫₀¹ x dx + 2·∫₀¹ 1 dx</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Morceaux.</strong> <span class="math">1/3</span>, puis <span class="math">3·(1/2) = 3/2</span>, puis <span class="math">2·(1 − 0) = 2</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Recomposer.</strong> <span class="math">1/3 − 3/2 + 2 = 2/6 − 9/6 + 12/6 = 5/6</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Contrôle direct.</strong> <span class="math">[x³/3 − 3x²/2 + 2x]₀¹ = 1/3 − 3/2 + 2 = 5/6</span> ✓.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ Les constantes sortent, pas les variables</div>
+          <p>On peut écrire <span class="math">∫₀¹ 5x² dx = 5·∫₀¹ x² dx</span> car <span class="math">5</span> est une <strong>constante</strong>. Mais <span class="math">∫₀¹ x·x dx ≠ x·∫₀¹ x dx</span> : ici <span class="math">x</span> est la <strong>variable</strong> d'intégration, elle ne sort jamais. Avant de sortir un facteur, demande-toi : <em>ce facteur dépend-il de x ?</em></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 2 : RELATION DE CHASLES                               -->
+  <section class="lecture-section" id="s2">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">02</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2 · Chasles</span>
+        <h2 class="lecture-section-title">Relation de Chasles — découper l'intervalle</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <div class="lecture-callout lecture-callout-gold">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">💡 Propriété — Relation de Chasles</div>
+          <p>Si <span class="math">f</span> est continue sur un intervalle contenant les réels <span class="math">a</span>, <span class="math">b</span> et <span class="math">c</span>, alors : <span class="math">∫ₐᵇ f(x) dx + ∫ᵇᶜ f(x) dx = ∫ₐᶜ f(x) dx</span>.</p>
+          <p>La borne commune <span class="math">b</span> joue le rôle de <strong>point de coupe</strong> : intégrer de <span class="math">a</span> à <span class="math">c</span>, c'est intégrer de <span class="math">a</span> à <span class="math">b</span>, puis de <span class="math">b</span> à <span class="math">c</span>.</p>
+        </div>
+      </div>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">∫ₐᵇ f(x) dx + ∫ᵇᶜ f(x) dx = ∫ₐᶜ f(x) dx</div>
+        <div class="lecture-formula-desc">Pourquoi ça marche : <span class="math">[F]ₐᵇ + [F]ᵇᶜ = (F(b) − F(a)) + (F(c) − F(b)) = F(c) − F(a) = [F]ₐᶜ</span> — le terme <span class="math">F(b)</span> s'élimine.</div>
+      </div>
+
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">🧮 Exemple — recomposer ∫₀² x² dx à partir de deux morceaux</div>
+        <div class="lecture-example-content">
+          <p>On sait que <span class="math">∫₀¹ x² dx = 1/3</span> et <span class="math">∫₁² x² dx = [x³/3]₁² = 8/3 − 1/3 = 7/3</span>. Calculons <span class="math">∫₀² x² dx</span>.</p>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Appliquer Chasles.</strong> <span class="math">∫₀² x² dx = ∫₀¹ x² dx + ∫₁² x² dx</span> (le point de coupe est <span class="math">1</span>).</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Additionner.</strong> <span class="math">1/3 + 7/3 = 8/3</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Contrôle direct.</strong> <span class="math">[x³/3]₀² = 8/3 − 0 = 8/3</span> ✓.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ Même fonction, borne de coupe commune</div>
+          <p>Chasles exige <strong>la même fonction</strong> des deux côtés et une borne de coupe <strong>identique</strong> : la borne de droite du premier morceau doit être la borne de gauche du second. Et le point de coupe n'a pas besoin d'être entre <span class="math">a</span> et <span class="math">c</span> : la relation reste vraie pour n'importe quels réels <span class="math">a</span>, <span class="math">b</span>, <span class="math">c</span> (à condition que <span class="math">f</span> y soit continue).</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 3 : BORNE INVERSÉE & INTÉGRALE NULLE                  -->
+  <section class="lecture-section" id="s3">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">03</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2 · bornes</span>
+        <h2 class="lecture-section-title">Borne inversée &amp; intégrale nulle</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <div class="lecture-callout lecture-callout-gold">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">💡 Propriété — Borne inversée</div>
+          <p>Pour <span class="math">f</span> continue sur un intervalle contenant <span class="math">a</span> et <span class="math">b</span> : <span class="math">∫ᵇₐ f(x) dx = −∫ₐᵇ f(x) dx</span>.</p>
+          <p><em>Pourquoi ?</em> <span class="math">∫ᵇₐ f(x) dx = F(a) − F(b) = −(F(b) − F(a))</span> : échanger les bornes change le signe. Cas particulier immédiat : <span class="math">∫ₐᵃ f(x) dx = F(a) − F(a) = 0</span>.</p>
+        </div>
+      </div>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">∫ᵇₐ f(x) dx = −∫ₐᵇ f(x) dx&nbsp; · &nbsp;∫ₐᵃ f(x) dx = 0</div>
+        <div class="lecture-formula-desc">Intégrer « à l'envers » retourne le signe ; intégrer sur un intervalle réduit à un point donne zéro.</div>
+      </div>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">🧮 Exemple — ∫²₁ x dx</div>
+        <div class="lecture-example-content">
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Borne inversée.</strong> <span class="math">∫²₁ x dx = −∫₁² x dx</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Calcul du morceau.</strong> <span class="math">∫₁² x dx = [x²/2]₁² = 2 − 0,5 = 1,5</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Conclure.</strong> <span class="math">∫²₁ x dx = −3/2</span>.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-danger">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">🚨 Erreur fréquente — ignorer l'ordre des bornes</div>
+          <p>Face à <span class="math">∫³¹ x² dx</span>, beaucoup calculent <span class="math">∫₁³ x² dx</span> et répondent <span class="math">26/3</span> : faux ! Les bornes sont dans l'ordre décroissant, la réponse est <span class="math">−26/3</span>. Prends l'habitude de <strong>lire les bornes avant de commencer</strong> — et utilise Chasles ou la borne inversée pour remettre de l'ordre si besoin.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 4 : POSITIVITÉ & CROISSANCE                           -->
+  <section class="lecture-section" id="s4">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">04</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 3 · l'ordre</span>
+        <h2 class="lecture-section-title">Positivité &amp; croissance — l'ordre</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        L'intégrale hérite de l'ordre des fonctions : une fonction positive donne une intégrale positive, et une fonction « en dessous » d'une autre donne une intégrale plus petite. Deux théorèmes à citer tels quels.
+      </p>
+
+      <div class="lecture-callout lecture-callout-gold">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">💡 Théorèmes — Positivité et croissance</div>
+          <ul class="lecture-list">
+            <li><strong>Positivité</strong> : si <span class="math">f ≥ 0</span> sur <span class="math">[a ; b]</span> avec <span class="math">a ≤ b</span>, alors <span class="math">∫ₐᵇ f(x) dx ≥ 0</span>.</li>
+            <li><strong>Croissance (ordre)</strong> : si <span class="math">f ≤ g</span> sur <span class="math">[a ; b]</span> avec <span class="math">a ≤ b</span>, alors <span class="math">∫ₐᵇ f(x) dx ≤ ∫ₐᵇ g(x) dx</span>. (Applique la positivité à <span class="math">g − f ≥ 0</span> et utilise la linéarité.)</li>
+          </ul>
+        </div>
+      </div>
+
+      <p class="lecture-text">
+        Conséquence pratique immédiate : si tu sais que <span class="math">f ≥ 0</span> sur <span class="math">[a ; b]</span> et que ton calcul donne un résultat négatif, <strong>ton calcul est faux</strong> — reviens au crochet <span class="math">[F(x)]ₐᵇ</span>. C'est le contrôle automatique annoncé en Partie 2.
+      </p>
+
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">🧮 Exemple — comparer ∫₀¹ x² dx et ∫₀¹ √x dx</div>
+        <div class="lecture-example-content">
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Comparer les fonctions.</strong> Pour <span class="math">0 ≤ x ≤ 1</span> : on a <span class="math">x² ≤ x</span> (car <span class="math">x(x − 1) ≤ 0</span>) et <span class="math">x ≤ √x</span>, donc <span class="math">x² ≤ √x</span> sur <span class="math">[0 ; 1]</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Conclure l'ordre des intégrales.</strong> Par croissance (et <span class="math">0 ≤ 1</span>) : <span class="math">∫₀¹ x² dx ≤ ∫₀¹ √x dx</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Calculer pour voir.</strong> <span class="math">∫₀¹ x² dx = [x³/3]₀¹ = 1/3</span> et <span class="math">∫₀¹ √x dx = [(2/3)·x·√x]₀¹ = 2/3</span> : on a bien <span class="math">1/3 ≤ 2/3</span> ✓.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ Ordre des fonctions ≠ ordre des valeurs</div>
+          <p>La croissance compare les intégrales <strong>sur le même intervalle et dans le même sens</strong> (<span class="math">a ≤ b</span>). Si les bornes sont inversées, l'inégalité se retourne : <span class="math">f ≤ g</span> sur <span class="math">[a ; b]</span> donne <span class="math">∫ᵇₐ f ≥ ∫ᵇₐ g</span>, car chaque intégrale change de signe. Gère d'abord les bornes, ensuite l'ordre.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 5 : ENCADREMENT                                       -->
+  <section class="lecture-section" id="s5">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">05</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 4 · encadrement</span>
+        <h2 class="lecture-section-title">Encadrement d'une intégrale</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Voici l'outil qui permet d'estimer une intégrale <strong>sans connaître la primitive</strong> — et de démontrer des inégalités du type « montrer que… » en deux lignes.
+      </p>
+
+      <div class="lecture-callout lecture-callout-gold">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">💡 Théorème — Encadrement</div>
+          <p>Si <span class="math">m ≤ f(x) ≤ M</span> pour tout <span class="math">x ∈ [a ; b]</span> avec <span class="math">a ≤ b</span>, alors : <span class="math">m·(b − a) ≤ ∫ₐᵇ f(x) dx ≤ M·(b − a)</span>.</p>
+          <p><em>Pourquoi ?</em> Intègre l'encadrement par croissance : <span class="math">∫ₐᵇ m dx ≤ ∫ₐᵇ f(x) dx ≤ ∫ₐᵇ M dx</span>, et <span class="math">∫ₐᵇ m dx = m·(b − a)</span> car <span class="math">m</span> est constante. Géométriquement : l'aire sous la courbe est comprise entre l'aire du rectangle de hauteur <span class="math">m</span> et celle du rectangle de hauteur <span class="math">M</span>, de même largeur <span class="math">(b − a)</span>.</p>
+        </div>
+      </div>
+
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">🧮 Exemple 1 — encadrer ∫₀¹ e^x dx sans primitive</div>
+        <div class="lecture-example-content">
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Encadrer la fonction.</strong> <span class="math">e^x</span> est croissante sur <span class="math">[0 ; 1]</span>, donc pour tout <span class="math">x</span> : <span class="math">1 = e⁰ ≤ e^x ≤ e¹ = e</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Appliquer le théorème.</strong> Ici <span class="math">m = 1</span>, <span class="math">M = e</span>, <span class="math">b − a = 1</span> : <span class="math">1 ≤ ∫₀¹ e^x dx ≤ e</span>, soit <span class="math">1 ≤ ∫₀¹ e^x dx ≤ 2,718</span> environ.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Vérifier avec la valeur exacte.</strong> <span class="math">∫₀¹ e^x dx = [e^x]₀¹ = e − 1 ≈ 1,718</span> : elle est bien dans l'encadrement ✓.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">🧮 Exemple 2 — encadrer ∫₁² (x² + 1) dx</div>
+        <div class="lecture-example-content">
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Encadrer la fonction.</strong> <span class="math">x² + 1</span> est croissante sur <span class="math">[1 ; 2]</span> : <span class="math">2 = 1² + 1 ≤ x² + 1 ≤ 2² + 1 = 5</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Appliquer le théorème.</strong> <span class="math">b − a = 1</span> : <span class="math">2 ≤ ∫₁² (x² + 1) dx ≤ 5</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Vérifier.</strong> Valeur exacte : <span class="math">[x³/3 + x]₁² = (8/3 + 2) − (1/3 + 1) = 7/3 + 1 = 10/3 ≈ 3,33</span> ✓ — bien entre <span class="math">2</span> et <span class="math">5</span>.</p></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 6 : APPLICATIONS AUX INÉGALITÉS                       -->
+  <section class="lecture-section" id="s6">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">06</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Entraînement</span>
+        <h2 class="lecture-section-title">Applications aux inégalités — exemples complets</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">🧮 Exemple 1 — montrer que ∫₀¹ x² dx ≤ ∫₀¹ x dx</div>
+        <div class="lecture-example-content">
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Comparer les fonctions.</strong> Pour <span class="math">0 ≤ x ≤ 1</span> : <span class="math">x² ≤ x</span> (car <span class="math">x² − x = x(x − 1) ≤ 0</span>).</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Invoquer la croissance.</strong> <span class="math">x² ≤ x</span> sur <span class="math">[0 ; 1]</span> avec <span class="math">0 ≤ 1</span> : donc <span class="math">∫₀¹ x² dx ≤ ∫₀¹ x dx</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Vérifier par le calcul.</strong> <span class="math">∫₀¹ x² dx = 1/3</span> et <span class="math">∫₀¹ x dx = [x²/2]₀¹ = 1/2</span> : on a bien <span class="math">1/3 ≤ 1/2</span> ✓.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">🧮 Exemple 2 — montrer que ∫₀¹ (x − x²) dx ≥ 0 puis la calculer</div>
+        <div class="lecture-example-content">
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Signe de la fonction.</strong> <span class="math">x − x² = x·(1 − x)</span> : pour <span class="math">0 ≤ x ≤ 1</span>, les deux facteurs sont ≥ 0, donc <span class="math">x − x² ≥ 0</span> sur <span class="math">[0 ; 1]</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Positivité.</strong> Donc <span class="math">∫₀¹ (x − x²) dx ≥ 0</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Calculer.</strong> Par linéarité : <span class="math">∫₀¹ x dx − ∫₀¹ x² dx = 1/2 − 1/3 = 1/6</span> ✓ (bien positif).</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Interpréter.</strong> Comme <span class="math">x² ≤ x</span> sur <span class="math">[0 ; 1]</span>, ce nombre mesure l'<strong>aire entre les deux courbes</strong> — notion que la Partie 4 exploitera à fond.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">🧮 Exemple 3 — encadrer ∫₁² dx/x</div>
+        <div class="lecture-example-content">
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Encadrer la fonction.</strong> <span class="math">1/x</span> est décroissante sur <span class="math">[1 ; 2]</span> : <span class="math">1/2 = 1/2 ≤ 1/x ≤ 1/1 = 1</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Appliquer le théorème.</strong> <span class="math">m = 1/2</span>, <span class="math">M = 1</span>, <span class="math">b − a = 1</span> : <span class="math">0,5 ≤ ∫₁² dx/x ≤ 1</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Vérifier.</strong> La valeur exacte est <span class="math">[ln x]₁² = ln 2 ≈ 0,69</span> : bien dans l'encadrement ✓.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ Cite la propriété utilisée</div>
+          <p>Une inégalité d'intégrales sans justification ne rapporte rien : écris explicitement « <strong>d'après la croissance de l'intégrale</strong> », « <strong>par linéarité</strong> », « <strong>d'après le théorème d'encadrement</strong> ». Le correcteur cherche ces mots-clés — ils valent des points.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 7 : BILAN                                             -->
+  <section class="lecture-section" id="s7">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">07</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Bilan</span>
+        <h2 class="lecture-section-title">Les réflexes de calcul</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-label">Les deux règles de calcul de la partie</div>
+        <div class="lecture-formula-hero-main">∫ₐᵇ (α·f + β·g) dx = α·∫ₐᵇ f dx + β·∫ₐᵇ g dx&nbsp; · &nbsp;∫ₐᵇ f dx + ∫ᵇᶜ f dx = ∫ₐᶜ f dx</div>
+        <div class="lecture-formula-hero-desc">Linéarité (constantes et sommes sortent) et relation de Chasles (on découpe l'intervalle en un point de coupe commun). À cela s'ajoutent la borne inversée <span class="math">∫ᵇₐ = −∫ₐᵇ</span> et <span class="math">∫ₐᵃ = 0</span>.</div>
+      </div>
+
+      <ul class="lecture-list-elegant">
+        <li><strong>Linéarité</strong> : <span class="math">∫ (αf + βg) = α∫f + β∫g</span> — les constantes sortent, jamais la variable.</li>
+        <li><strong>Chasles</strong> : <span class="math">∫ₐᵇ + ∫ᵇᶜ = ∫ₐᶜ</span> — même fonction, point de coupe commun.</li>
+        <li><strong>Borne inversée</strong> : <span class="math">∫ᵇₐ f = −∫ₐᵇ f</span> et <span class="math">∫ₐᵃ f = 0</span> — lis toujours les bornes avant de calculer.</li>
+        <li><strong>Ordre</strong> : <span class="math">f ≥ 0</span> sur <span class="math">[a ; b]</span> (avec <span class="math">a ≤ b</span>) ⇒ <span class="math">∫ₐᵇ f ≥ 0</span> ; <span class="math">f ≤ g</span> ⇒ <span class="math">∫f ≤ ∫g</span>.</li>
+        <li><strong>Encadrement</strong> : <span class="math">m ≤ f ≤ M</span> sur <span class="math">[a ; b]</span> ⇒ <span class="math">m·(b − a) ≤ ∫ₐᵇ f dx ≤ M·(b − a)</span> — l'outil « montrer que » de l'examen.</li>
+      </ul>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ Contrôles automatiques avant de rendre la copie</div>
+          <p>Trois vérifications gratuites : le <strong>signe</strong> (si <span class="math">f ≥ 0</span>, l'intégrale doit être ≥ 0), la <strong>cohérence</strong> (l'intégrale doit rester dans l'encadrement <span class="math">m·(b − a)</span> … <span class="math">M·(b − a)</span>) et la <strong>nullité</strong> (une intégrale de <span class="math">a</span> à <span class="math">a</span> vaut <span class="math">0</span>). Si l'une des trois tombe, chercher l'erreur de signe ou de crochet.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== QCM D'ENTRAÎNEMENT ===== -->
+  <div class="lecture-quiz">
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q1 — Pour une fonction f continue sur les intervalles en jeu : ∫₂⁵ f(x) dx + ∫₅⁷ f(x) dx est égal à :</p>
+      <div class="lecture-quiz-options"><span>A) ∫₂⁷ f(x) dx</span><span>B) ∫₅² f(x) dx</span><span>C) ∫₂⁵ f(x) dx</span><span>D) ∫₇² f(x) dx</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><strong>A) ∫₂⁷ f(x) dx.</strong> Relation de Chasles : les morceaux <span class="math">[2 ; 5]</span> et <span class="math">[5 ; 7]</span> se recollent en <span class="math">[2 ; 7]</span>, la borne de coupe commune étant <span class="math">5</span>.</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q2 — ∫₃¹ x² dx est égal à :</p>
+      <div class="lecture-quiz-options"><span>A) 26/3</span><span>B) −26/3</span><span>C) 8</span><span>D) 1/3</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><strong>B) −26/3.</strong> Les bornes sont dans l'ordre décroissant : <span class="math">∫₃¹ x² dx = −∫₁³ x² dx = −[x³/3]₁³ = −(9 − 1/3) = −26/3</span>. L'option A est la réponse si l'on oublie de retourner le signe.</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q3 — f est continue sur [0 ; 3] et 2 ≤ f(x) ≤ 5 pour tout x. Alors :</p>
+      <div class="lecture-quiz-options"><span>A) 0 ≤ ∫₀³ f(x) dx ≤ 15</span><span>B) 6 ≤ ∫₀³ f(x) dx ≤ 15</span><span>C) 2 ≤ ∫₀³ f(x) dx ≤ 5</span><span>D) 5 ≤ ∫₀³ f(x) dx ≤ 6</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><strong>B) 6 ≤ ∫₀³ f(x) dx ≤ 15.</strong> Théorème d'encadrement avec <span class="math">m = 2</span>, <span class="math">M = 5</span> et <span class="math">b − a = 3</span> : <span class="math">2 × 3 = 6</span> et <span class="math">5 × 3 = 15</span>. L'option C oublie de multiplier par la longueur <span class="math">(b − a)</span>.</div></details>
+    </div>
+  </div>
+
+  <!-- ===== RÉCAPITULATIF ===== -->
+  <div class="lecture-recap">
+    <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
+    <ul class="lecture-recap-list">
+      <li><strong>[linearite]</strong> <span class="math">∫ₐᵇ (α·f(x) + β·g(x)) dx = α·∫ₐᵇ f(x) dx + β·∫ₐᵇ g(x) dx</span> — les constantes sortent, la variable jamais</li>
+      <li><strong>[chasles]</strong> <span class="math">∫ₐᵇ f(x) dx + ∫ᵇᶜ f(x) dx = ∫ₐᶜ f(x) dx</span> — même fonction, point de coupe commun ; <span class="math">F(b)</span> s'élimine</li>
+      <li><strong>[chasles]</strong> Borne inversée : <span class="math">∫ᵇₐ f(x) dx = −∫ₐᵇ f(x) dx</span> ; intervalle réduit : <span class="math">∫ₐᵃ f(x) dx = 0</span></li>
+      <li><strong>[ordre]</strong> Positivité : <span class="math">f ≥ 0</span> sur <span class="math">[a ; b]</span> avec <span class="math">a ≤ b</span> ⇒ <span class="math">∫ₐᵇ f(x) dx ≥ 0</span> — contrôle automatique du signe</li>
+      <li><strong>[ordre]</strong> Croissance : <span class="math">f ≤ g</span> sur <span class="math">[a ; b]</span> avec <span class="math">a ≤ b</span> ⇒ <span class="math">∫ₐᵇ f ≤ ∫ₐᵇ g</span></li>
+      <li><strong>[encadrement]</strong> <span class="math">m ≤ f(x) ≤ M</span> sur <span class="math">[a ; b]</span> ⇒ <span class="math">m·(b − a) ≤ ∫ₐᵇ f(x) dx ≤ M·(b − a)</span> — estimer sans primitive</li>
+      <li><strong>[methode]</strong> « Montrer que… » : comparer les fonctions → citer la propriété (positivité, croissance, encadrement) → conclure → vérifier par le calcul si possible</li>
+      <li><strong>[methode]</strong> Contrôles gratuits : signe conforme à <span class="math">f</span>, résultat dans l'encadrement, <span class="math">∫ₐᵃ = 0</span></li>
+    </ul>
+  </div>
+
+  <!-- ===== FIN ===== -->
+  <div class="lecture-end">
+    <span class="lecture-end-icon">🎯</span>
+    <div class="lecture-end-text">Partie 3 terminée !</div>
+    <div class="lecture-end-sub">Passe à la fiche complète : intégration par parties, aires en unités d'aire et valeur moyenne</div>
+    <div class="lecture-end-divider"></div>
+  </div>
+
+</div>

@@ -1,0 +1,439 @@
+<!-- PARTIE 2 : ÉVÉNEMENT CONTRAIRE, RÉUNION & INTERSECTION        -->
+<!-- Notion 1 : événement contraire — P(Ā) = 1 − P(A)              -->
+<!-- Notion 2 : intersection et réunion — P(A ∪ B) = P(A)+P(B)−P(A ∩ B) -->
+<!-- Notion 3 : la technique « au moins un » par l'événement contraire -->
+
+<div class="lecture-container">
+
+  <!-- ===== HERO ===== -->
+  <header class="lecture-hero">
+    <div class="lecture-hero-badge">
+      <span class="lecture-hero-icon">📘</span>
+      <span class="lecture-hero-label">Partie 02 · Calcul de probabilités</span>
+    </div>
+    <h1 class="lecture-hero-title">
+      Événement contraire, <em>réunion &amp; intersection</em>
+    </h1>
+    <p class="lecture-hero-intro">
+      « J'ai lancé le dé deux fois : quelle est la probabilité d'avoir <strong>au moins un 6</strong> ? » La réponse intuitive est presque toujours fausse ! Cette partie te donne <strong>3 outils de calcul</strong> : la formule du <strong>contraire</strong> <span class="math">P(Ā) = 1 − P(A)</span>, la formule de la <strong>réunion</strong> <span class="math">P(A ∪ B) = P(A) + P(B) − P(A ∩ B)</span>, et la technique reine du Bac : passer par le contraire pour traiter les « au moins un ».
+    </p>
+    <div class="lecture-hero-meta">
+      <span class="lecture-hero-meta-item">⏱ 20 min</span> <span class="lecture-hero-meta-item">🧮 3 notions</span> <span class="lecture-hero-meta-item">📊 7 sections</span> <span class="lecture-hero-meta-item">🎓 Terminale D</span>
+    </div>
+  </header>
+
+  <!-- ===== SOMMAIRE ===== -->
+  <nav class="lecture-toc">
+    <div class="lecture-toc-header">
+      <span>Dans cette partie</span>
+      <span class="lecture-toc-count">3 notions · 7 sections</span>
+    </div>
+    <ol class="lecture-toc-list">
+      <li><a href="#s0"><span class="toc-num">00</span><span>Motivation — Le piège du « au moins un »</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>Événement contraire : P(Ā) = 1 − P(A)</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>Probabilité d'une intersection</span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>Probabilité d'une réunion &amp; cas des incompatibles</span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>Technique clé — « au moins un » par le contraire</span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>Exemples complets — dés, cartes, urnes</span></a></li>
+      <li><a href="#s6"><span class="toc-num">06</span><span>Bilan — Erreurs fréquentes au Bac</span></a></li>
+    </ol>
+  </nav>
+
+  <!-- SECTION 0 : MOTIVATION                                        -->
+  <section class="lecture-section" id="s0">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">00</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Motivation</span>
+        <h2 class="lecture-section-title">Le piège du « au moins un »</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Deux amis jouent aux dés au marché de Niamey. L'un parie : « Sur deux lancers, je vais faire <strong>au moins un 6</strong> ». Beaucoup de joueurs raisonnent ainsi : « Un 6 sort avec probabilité <span class="math">1/6</span>, donc en deux lancers, cela fait <span class="math">2/6 = 1/3</span> ». Ce raisonnement est <strong>faux</strong> — et tu sauras bientôt pourquoi.
+      </p>
+
+      <p class="lecture-text">
+        La bonne stratégie n'est pas de compter directement les cas « au moins un 6 » (ils sont nombreux et se recouvrent), mais de retourner la question : <strong>quel est le contraire de « au moins un 6 » ?</strong> Réponse : « <em>aucun</em> 6 ». Et les événements du type « aucun » se calculent souvent très facilement. C'est toute l'idée de cette partie : <em>calculer le contraire quand c'est plus simple</em>.
+      </p>
+
+      <div class="lecture-callout lecture-callout-gold">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Les 3 outils de cette partie</div>
+          <ul class="lecture-list">
+            <li><strong>Le contraire</strong> : <span class="math">P(Ā) = 1 − P(A)</span> — retourner l'événement pour simplifier le calcul.</li>
+            <li><strong>La réunion</strong> : <span class="math">P(A ∪ B) = P(A) + P(B) − P(A ∩ B)</span> — la formule « du ou », avec son cas particulier des incompatibles.</li>
+            <li><strong>La technique « au moins un »</strong> : <span class="math">P</span>(au moins un) <span class="math">= 1 − P</span>(aucun) — l'arme absolue des sujets de Bac.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 1 : ÉVÉNEMENT CONTRAIRE                               -->
+  <section class="lecture-section" id="s1">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">01</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1 · contraire</span>
+        <h2 class="lecture-section-title">Événement contraire : P(Ā) = 1 − P(A)</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Vu en Partie 1 : le contraire de <span class="math">A</span>, noté <span class="math">Ā</span> (lire « A barre », ou « non A »), se réalise chaque fois que <span class="math">A</span> ne se réalise pas. Les deux événements sont incompatibles et leur réunion vaut <span class="math">Ω</span> : d'où la formule la plus utilisée du chapitre.
+      </p>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">P(Ā) = 1 − P(A)</div>
+        <div class="lecture-formula-desc">Pour tout événement A. Équivalent : P(A) = 1 − P(Ā). Le contraire de l'événement certain est l'événement impossible : P(Ω) = 1 − P(∅) = 1 − 0 = 1.</div>
+      </div>
+
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">🧮 Exemple travaillé — le contraire rend le calcul facile</div>
+        <div class="lecture-example-content">
+          <p>On lance un dé cubique équilibré. Quelle est la probabilité d'obtenir un nombre <strong>supérieur ou égal à 2</strong> ?</p>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Poser l'événement.</strong> <span class="math">A</span> : « obtenir un nombre supérieur ou égal à 2 », soit <span class="math">A = {2 ; 3 ; 4 ; 5 ; 6}</span>. On aurait <span class="math">P(A) = 5/6</span> en comptant directement.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Identifier le contraire.</strong> <span class="math">Ā</span> : « obtenir un nombre strictement inférieur à 2 », soit <span class="math">Ā = {1}</span> : un seul cas, donc <span class="math">P(Ā) = 1/6</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Appliquer la formule.</strong> <span class="math">P(A) = 1 − P(Ā) = 1 − 1/6 = 5/6</span>. ✓ On retrouve bien le résultat du comptage direct.</p></div></div>
+          </div>
+          <p>Leçon : quand l'énoncé dit « au moins… », « supérieur à… », « ne pas… », regarde si le <strong>contraire</strong> a moins de cas à compter.</p>
+        </div>
+      </div>
+
+      <ul class="lecture-list-elegant">
+        <li>Dé équilibré : <span class="math">P</span>(« non pair ») <span class="math">= 1 − P</span>(« pair ») <span class="math">= 1 − 1/2 = 1/2</span> ; <span class="math">P</span>(« non multiple de 3 ») <span class="math">= 1 − 1/3 = 2/3</span>.</li>
+        <li>Jeu de 32 cartes : <span class="math">P</span>(« ne pas tirer un cœur ») <span class="math">= 1 − 8/32 = 3/4</span>.</li>
+        <li>Classe : la probabilité qu'un élève choisi au hasard soit demi-pensionnaire vaut <span class="math">0,7</span> ; la probabilité qu'il ne le soit pas vaut <span class="math">1 − 0,7 = 0,3</span>.</li>
+      </ul>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ Réflexe de calcul</div>
+          <p>Dès que <span class="math">P(A) &gt; 1/2</span>, calculer <span class="math">P(Ā)</span> puis soustraire est presque toujours plus rapide et plus sûr que de compter les cas de <span class="math">A</span> un par un. Les sujets de Bac sont <em>construits</em> pour te faire gagner du temps par cette porte.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 2 : INTERSECTION                                      -->
+  <section class="lecture-section" id="s2">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">02</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2 · intersection</span>
+        <h2 class="lecture-section-title">Probabilité d'une intersection</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        L'intersection <span class="math">A ∩ B</span> est l'événement « <span class="math">A</span> <strong>et</strong> <span class="math">B</span> se réalisent en même temps ». En situation d'équiprobabilité, la règle de la Partie 1 s'applique telle quelle, car <span class="math">A ∩ B</span> est un événement comme les autres :
+      </p>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">P(A ∩ B) = card(A ∩ B) / card(Ω)</div>
+        <div class="lecture-formula-desc">En équiprobabilité : on compte les issues qui réalisent A ET B à la fois. Si A et B sont incompatibles, A ∩ B = ∅ et P(A ∩ B) = 0.</div>
+      </div>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">🧮 Exemple — avec le dé</div>
+        <div class="lecture-example-content">
+          <p>On lance un dé équilibré. <span class="math">A</span> : « obtenir un nombre pair » (<span class="math">A = {2 ; 4 ; 6}</span>) et <span class="math">B</span> : « obtenir un multiple de 3 » (<span class="math">B = {3 ; 6}</span>).</p>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Chercher l'intersection.</strong> Les nombres à la fois pairs et multiples de 3 : <span class="math">A ∩ B = {6}</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Compter.</strong> <span class="math">card(A ∩ B) = 1</span> et <span class="math">card(Ω) = 6</span>, donc <span class="math">P(A ∩ B) = 1/6</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Contrôle.</strong> <span class="math">P(A ∩ B) = 1/6</span> est plus petit que <span class="math">P(A) = 1/2</span> et que <span class="math">P(B) = 1/3</span> : normal, exiger « A et B » est plus contraignant que chacun pris seul.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">🧮 Exemple — avec les cartes</div>
+        <div class="lecture-example-content">
+          <p>On tire une carte au hasard dans un jeu de 32 cartes. <span class="math">A</span> : « tirer un as », <span class="math">B</span> : « tirer un cœur ».</p>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Intersection.</strong> Une seule carte est à la fois un as et un cœur : l'as de cœur. Donc <span class="math">P(A ∩ B) = 1/32</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>À comparer.</strong> <span class="math">P(A) = 4/32 = 1/8</span> et <span class="math">P(B) = 8/32 = 1/4</span> : l'intersection est bien plus petite que chacune des probabilités.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ Intersection vide</div>
+          <p>Si <span class="math">A</span> et <span class="math">B</span> sont <strong>incompatibles</strong> (par exemple « obtenir 1 » et « obtenir 6 » avec un dé), alors <span class="math">A ∩ B = ∅</span> et <span class="math">P(A ∩ B) = 0</span>. Ce cas est capital : il donne la formule simplifiée de la section suivante.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 3 : RÉUNION                                           -->
+  <section class="lecture-section" id="s3">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">03</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2 · réunion</span>
+        <h2 class="lecture-section-title">Probabilité d'une réunion &amp; cas des incompatibles</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Pourquoi ne peut-on pas simplement <strong>additionner</strong> <span class="math">P(A)</span> et <span class="math">P(B)</span> pour avoir <span class="math">P(A ∪ B)</span> ? Parce que les issues communes à <span class="math">A</span> et <span class="math">B</span> seraient alors <strong>comptées deux fois</strong>. La formule correcte les retranche une fois :
+      </p>
+
+      <div class="lecture-callout lecture-callout-gold">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">💡 Théorème — Probabilité d'une réunion</div>
+          <p>Pour tous événements <span class="math">A</span> et <span class="math">B</span> d'un même univers : <span class="math">P(A ∪ B) = P(A) + P(B) − P(A ∩ B)</span>.</p>
+          <p><strong>Cas particulier</strong> — si <span class="math">A</span> et <span class="math">B</span> sont <strong>incompatibles</strong> (<span class="math">A ∩ B = ∅</span>) : <span class="math">P(A ∪ B) = P(A) + P(B)</span>.</p>
+        </div>
+      </div>
+
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">🧮 Exemple travaillé — « pair ou multiple de 3 »</div>
+        <div class="lecture-example-content">
+          <p>On lance un dé équilibré. Quelle est la probabilité d'obtenir un nombre pair <strong>ou</strong> un multiple de 3 ?</p>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Probabilités de base.</strong> <span class="math">P(A) = 3/6 = 1/2</span> (pairs) et <span class="math">P(B) = 2/6 = 1/3</span> (multiples de 3).</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Intersection.</strong> <span class="math">A ∩ B = {6}</span>, donc <span class="math">P(A ∩ B) = 1/6</span>. Les événements ne sont <strong>pas</strong> incompatibles : il faut la formule complète.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Appliquer la formule.</strong> <span class="math">P(A ∪ B) = P(A) + P(B) − P(A ∩ B) = 1/2 + 1/3 − 1/6 = 3/6 + 2/6 − 1/6 = 4/6 = 2/3</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Vérifier par comptage.</strong> <span class="math">A ∪ B = {2 ; 3 ; 4 ; 6}</span> : 4 issues sur 6, soit <span class="math">4/6 = 2/3</span> ✓. Sans retrancher <span class="math">1/6</span>, on aurait trouvé <span class="math">5/6</span> : faux !</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">🧮 Exemple — incompatibles : addition directe</div>
+        <div class="lecture-example-content">
+          <p>On lance un dé équilibré. Quelle est la probabilité d'obtenir <span class="math">1</span> <strong>ou</strong> <span class="math">6</span> ?</p>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Vérifier l'incompatibilité.</strong> On ne peut pas obtenir 1 et 6 en même temps : <span class="math">A ∩ B = ∅</span>, donc <span class="math">P(A ∩ B) = 0</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Additionner.</strong> <span class="math">P(A ∪ B) = P(A) + P(B) = 1/6 + 1/6 = 2/6 = 1/3</span>. Par comptage : <span class="math">{1 ; 6}</span>, soit 2 issues sur 6 ✓.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">🧮 Exemple — cartes : « as ou cœur »</div>
+        <div class="lecture-example-content">
+          <p>Jeu de 32 cartes, tirage au hasard d'une carte : <span class="math">P</span>(« as ou cœur ») <span class="math">= P(A) + P(B) − P(A ∩ B) = 4/32 + 8/32 − 1/32 = 11/32</span>. Comptage direct : 4 as + 8 cœurs − 1 as de cœur compté deux fois = 11 cartes, soit <span class="math">11/32</span> ✓. Sans la correction : <span class="math">12/32</span>, résultat faux.</p>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-danger">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Erreur fréquente au Bac</div>
+          <p><strong>Additionner sans retrancher l'intersection.</strong> Écrire <span class="math">P(A ∪ B) = P(A) + P(B)</span> alors que <span class="math">A</span> et <span class="math">B</span> peuvent se réaliser ensemble est <strong>faux</strong> (on compte deux fois les cas communs). Ça peut même donner un résultat supérieur à <span class="math">1</span> — alarme immédiate ! Avant d'utiliser la formule simplifiée, <strong>démontre toujours</strong> l'incompatibilité : « <span class="math">A</span> et <span class="math">B</span> ne peuvent pas se réaliser simultanément, donc <span class="math">A ∩ B = ∅</span> ».</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 4 : TECHNIQUE « AU MOINS UN »                         -->
+  <section class="lecture-section" id="s4">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">04</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 3 · technique clé</span>
+        <h2 class="lecture-section-title">Technique clé — « au moins un » par le contraire</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Voici la technique qui rapporte des points à chaque examen. Elle repose sur une observation simple : le contraire de « <strong>au moins un</strong> succès » est « <strong>aucun</strong> succès ».
+      </p>
+
+      <div class="lecture-rule">
+        <div class="lecture-rule-label">🧠 Règle d'or — « au moins un »</div>
+        <div class="lecture-rule-body">
+          <span class="math">P</span>(« au moins un … ») <span class="math">= 1 − P</span>(« aucun … »). Dès que tu lis « au moins un », « au moins une fois », « l'un au moins » : <strong>retourne l'événement</strong> en son contraire « aucun », calcule-le, puis soustrais de 1.
+        </div>
+      </div>
+
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">🧮 Exemple travaillé — au moins un 6 en deux lancers</div>
+        <div class="lecture-example-content">
+          <p>On lance un dé cubique équilibré deux fois de suite. Quelle est la probabilité d'obtenir <strong>au moins un 6</strong> ?</p>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Décrire l'univers.</strong> Un résultat est un couple (1er lancer ; 2e lancer). Il y a <span class="math">6 × 6 = 36</span> couples possibles, tous de même probabilité (dé équilibré, lancers indépendants) : <span class="math">card(Ω) = 36</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Passer par le contraire.</strong> <span class="math">A</span> : « obtenir au moins un 6 » ; le contraire est <span class="math">Ā</span> : « n'obtenir <strong>aucun</strong> 6 ». Chaque lancer doit donner un nombre de <span class="math">{1 ; 2 ; 3 ; 4 ; 5}</span> : <span class="math">5</span> choix pour le 1er lancer et <span class="math">5</span> pour le 2e, soit <span class="math">5 × 5 = 25</span> couples. Donc <span class="math">P(Ā) = 25/36</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Conclure.</strong> <span class="math">P(A) = 1 − P(Ā) = 1 − 25/36 = 11/36</span>, soit environ <span class="math">0,31</span>.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-danger">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Erreur fréquente au Bac</div>
+          <p>Répondre <span class="math">1/3</span> (en « ajoutant » les deux <span class="math">1/6</span>) ou <span class="math">1/36</span> (en multipliant) : les deux sont <strong>faux</strong>. La bonne réponse est <span class="math">11/36 ≈ 0,31</span>. Remarque au passage : <span class="math">1/3 ≈ 0,33</span> et <span class="math">0,31</span> sont proches — seule la méthode du contraire donne le résultat exact. (La multiplication correcte <span class="math">(5/6) × (5/6) = 25/36</span> sera justifiée en Partie 3 : ici, le comptage sur les 36 couples suffit.)</p>
+        </div>
+      </div>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">🧮 Exemple — au moins une pile en trois lancers</div>
+        <div class="lecture-example-content">
+          <p>On lance une pièce équilibrée 3 fois. Probabilité d'obtenir <strong>au moins une pile</strong> ? Le contraire : « aucune pile », c'est-à-dire trois faces, de probabilité <span class="math">(1/2) × (1/2) × (1/2) = (1/2)³ = 1/8</span>. Donc <span class="math">P</span>(« au moins une pile ») <span class="math">= 1 − 1/8 = 7/8 = 0,875</span>.</p>
+        </div>
+      </div>
+
+      <div class="lecture-aside">
+        <div class="lecture-aside-label">🌍 Petite histoire des sciences</div>
+        <div class="lecture-aside-content">
+          Le chevalier de Méré, joueur du XVIIᵉ siècle, avait remarqué qu'en 4 lancers de dé, obtenir <strong>au moins un 6</strong> rapportait plus souvent qu'à son tour. Avec nos outils : <span class="math">1 − (5/6)⁴ = 1 − 625/1296 ≈ 0,52</span>. C'est ce « pari du chevalier », posé à Pascal, qui a déclenché la naissance du calcul des probabilités en 1654.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 5 : EXEMPLES COMPLETS                                 -->
+  <section class="lecture-section" id="s5">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">05</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Entraînement</span>
+        <h2 class="lecture-section-title">Exemples complets — dés, cartes, urnes</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">🧮 Exemple 1 — au moins un as en deux tirages avec remise</div>
+        <div class="lecture-example-content">
+          <p>On tire une carte dans un jeu de 32 cartes, on la <strong>remet</strong>, puis on en tire une seconde. Quelle est la probabilité de tirer <strong>au moins un as</strong> ?</p>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Remarquer la remise.</strong> La carte est remise : le jeu est reconstitué avant le 2e tirage, donc les deux tirages se font dans les mêmes conditions (<span class="math">32</span> cartes à chaque fois).</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Passer par le contraire.</strong> « Aucun as » : le 1er tirage donne une non-as (31 cartes sur 32, soit <span class="math">31/32</span>) et le 2e aussi (<span class="math">31/32</span>). Comme les tirages se font dans les mêmes conditions, <span class="math">P</span>(« aucun as ») <span class="math">= 31/32 × 31/32 = (31/32)² = 961/1024</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Conclure.</strong> <span class="math">P</span>(« au moins un as ») <span class="math">= 1 − 961/1024 = 63/1024</span>, soit environ <span class="math">0,06</span>.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">🧮 Exemple 2 — urne : au moins une boule bleue</div>
+        <div class="lecture-example-content">
+          <p>Une urne contient 5 boules rouges et 3 boules bleues, indiscernables au toucher. On tire une boule, on la remet, puis on en tire une seconde. Probabilité d'obtenir <strong>au moins une boule bleue</strong> ?</p>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Contraire.</strong> « Aucune bleue » = « deux rouges ». À chaque tirage : <span class="math">P</span>(rouge) <span class="math">= 5/8</span> (remise : mêmes conditions).</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Calculer.</strong> <span class="math">P</span>(« deux rouges ») <span class="math">= (5/8)² = 25/64</span>, donc <span class="math">P</span>(« au moins une bleue ») <span class="math">= 1 − 25/64 = 39/64</span>, soit environ <span class="math">0,61</span>.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">🧮 Exemple 3 — tout combiner : dé et multiples de 3</div>
+        <div class="lecture-example-content">
+          <p>On lance un dé équilibré deux fois de suite. Probabilité d'obtenir <strong>au moins un multiple de 3</strong> ?</p>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Contraire.</strong> « Aucun multiple de 3 » : chaque lancer doit donner un nombre de <span class="math">{1 ; 2 ; 4 ; 5}</span>, soit 4 issues sur 6 : <span class="math">4/6 = 2/3</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Calculer.</strong> <span class="math">P</span>(« aucun multiple de 3 ») <span class="math">= (2/3)² = 4/9</span>, donc <span class="math">P</span>(« au moins un multiple de 3 ») <span class="math">= 1 − 4/9 = 5/9</span>, soit environ <span class="math">0,56</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Contrôle de cohérence.</strong> Par symétrie, obtenir « au moins un 6 » (<span class="math">11/36 ≈ 0,31</span>) doit être moins probable qu'obtenir « au moins un multiple de 3 » (<span class="math">5/9 ≈ 0,56</span>) : l'événement « multiple de 3 » est deux fois plus large que « 6 » ✓.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ Avec ou sans remise ?</div>
+          <p>Tous les exemples de cette section sont <strong>avec remise</strong> : le jeu (ou l'urne) est identique à chaque étape, ce qui permet de réutiliser la même probabilité à chaque tirage. En <strong>sans remise</strong>, la composition change après le premier tirage : les probabilités du second tirage sont différentes — on apprendra à les calculer proprement en <strong>Partie 3</strong> (probabilité conditionnelle).</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 6 : BILAN — ERREURS FRÉQUENTES                        -->
+  <section class="lecture-section" id="s6">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">06</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Bilan</span>
+        <h2 class="lecture-section-title">Erreurs fréquentes au Bac</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <div class="lecture-callout lecture-callout-danger">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Erreur n° 1 — Additionner sans retrancher l'intersection</div>
+          <p><span class="math">P(A ∪ B) ≠ P(A) + P(B)</span> dès que <span class="math">A</span> et <span class="math">B</span> peuvent se réaliser ensemble. La formule complète est <span class="math">P(A ∪ B) = P(A) + P(B) − P(A ∩ B)</span> ; la version simplifiée exige de prouver <span class="math">A ∩ B = ∅</span>.</p>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-danger">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Erreur n° 2 — Traiter « au moins un » en une seule issue</div>
+          <p>« Au moins un 6 en 2 lancers » n'a ni la probabilité <span class="math">1/6</span>, ni <span class="math">1/3</span>, ni <span class="math">1/36</span>, mais <span class="math">11/36</span>. Le réflexe correct : <span class="math">1 − P</span>(« aucun 6 ») <span class="math">= 1 − (5/6)² = 11/36</span>.</p>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-danger">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Erreur n° 3 — Oublier de vérifier la cohérence</div>
+          <p>Toute probabilité calculée doit rester entre <span class="math">0</span> et <span class="math">1</span> ; si <span class="math">A ⊂ B</span> alors <span class="math">P(A) ≤ P(B)</span> ; et des événements contraires vérifient <span class="math">P(A) + P(Ā) = 1</span>. Un résultat qui viole l'une de ces règles signale une erreur de méthode.</p>
+        </div>
+      </div>
+
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-label">Les formules majeures de la partie</div>
+        <div class="lecture-formula-hero-main">P(Ā) = 1 − P(A) &nbsp;·&nbsp; P(A ∪ B) = P(A) + P(B) − P(A ∩ B)</div>
+        <div class="lecture-formula-hero-desc">Et la règle d'or : P(au moins un…) = 1 − P(aucun…). Incompatibles : P(A ∪ B) = P(A) + P(B).</div>
+      </div>
+
+      <ul class="lecture-list-elegant">
+        <li><strong>Contraire</strong> : <span class="math">P(Ā) = 1 − P(A)</span> — à utiliser dès que le contraire est plus simple à compter.</li>
+        <li><strong>Réunion</strong> : <span class="math">P(A ∪ B) = P(A) + P(B) − P(A ∩ B)</span> — ne jamais oublier le terme correctif <span class="math">− P(A ∩ B)</span>.</li>
+        <li><strong>Incompatibles</strong> : <span class="math">A ∩ B = ∅</span> ⇒ <span class="math">P(A ∪ B) = P(A) + P(B)</span> (et <span class="math">P(A ∩ B) = 0</span>).</li>
+        <li><strong>« Au moins un »</strong> : retourner en « aucun », multiplier si les étapes sont dans les mêmes conditions, puis soustraire de 1.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===== QCM D'ENTRAÎNEMENT ===== -->
+  <div class="lecture-quiz">
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q1 — P(A) = 0,4 ; P(B) = 0,5 ; P(A ∩ B) = 0,2. Alors P(A ∪ B) = :</p>
+      <div class="lecture-quiz-options"><span>A) 0,9</span><span>B) 0,7</span><span>C) 0,2</span><span>D) 1,1</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><strong>B) 0,7.</strong> <span class="math">P(A ∪ B) = P(A) + P(B) − P(A ∩ B) = 0,4 + 0,5 − 0,2 = 0,7</span>. Répondre 0,9 (option A) revient à additionner sans retrancher l'intersection — l'erreur n° 1 du Bac.</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q2 — On lance un dé équilibré deux fois de suite. La probabilité d'obtenir au moins un 6 est :</p>
+      <div class="lecture-quiz-options"><span>A) 1/3</span><span>B) 1/36</span><span>C) 11/36</span><span>D) 25/36</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><strong>C) 11/36.</strong> P(« aucun 6 ») <span class="math">= (5/6) × (5/6) = 25/36</span>, donc P(« au moins un 6 ») <span class="math">= 1 − 25/36 = 11/36</span>. L'option D est la probabilité du contraire, l'option B celle de « deux 6 ».</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q3 — A et B sont incompatibles, avec P(A) = 0,3 et P(B) = 0,2. Alors :</p>
+      <div class="lecture-quiz-options"><span>A) P(A ∪ B) = 0,5 et P(A ∩ B) = 0</span><span>B) P(A ∪ B) = 0,44</span><span>C) P(A ∩ B) = 0,06</span><span>D) P(A ∪ B) = 1</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><strong>A) P(A ∪ B) = 0,5 et P(A ∩ B) = 0.</strong> Incompatibles signifie <span class="math">A ∩ B = ∅</span>, donc <span class="math">P(A ∩ B) = 0</span> et <span class="math">P(A ∪ B) = P(A) + P(B) = 0,3 + 0,2 = 0,5</span>. Attention : l'option C (0,3 × 0,2) correspond à la formule de l'indépendance, vue en Partie 4 — ce n'est pas du tout la même chose !</div></details>
+    </div>
+  </div>
+
+  <!-- ===== RÉCAPITULATIF ===== -->
+  <div class="lecture-recap">
+    <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
+    <ul class="lecture-recap-list">
+      <li><strong>[contraire]</strong> <span class="math">P(Ā) = 1 − P(A)</span> pour tout événement <span class="math">A</span> — le contraire se réalise quand <span class="math">A</span> ne se réalise pas</li>
+      <li><strong>[contraire]</strong> Quand <span class="math">P(A) &gt; 1/2</span>, passer par <span class="math">Ā</span> simplifie presque toujours le calcul</li>
+      <li><strong>[intersection]</strong> En équiprobabilité : <span class="math">P(A ∩ B) = card(A ∩ B)/card(Ω)</span> ; incompatibles ⇒ <span class="math">P(A ∩ B) = 0</span></li>
+      <li><strong>[reunion]</strong> <span class="math">P(A ∪ B) = P(A) + P(B) − P(A ∩ B)</span> — le terme correctif retranche les cas comptés deux fois</li>
+      <li><strong>[reunion]</strong> Incompatibles ⇒ <span class="math">P(A ∪ B) = P(A) + P(B)</span> — mais il faut <strong>démontrer</strong> l'incompatibilité avant de l'utiliser</li>
+      <li><strong>[au_moins_un]</strong> <span class="math">P</span>(« au moins un… ») <span class="math">= 1 − P</span>(« aucun… ») — la technique reine des sujets d'examen</li>
+      <li><strong>[au_moins_un]</strong> Au moins un 6 en 2 lancers : <span class="math">1 − (5/6)² = 11/36 ≈ 0,31</span> (ni <span class="math">1/3</span>, ni <span class="math">1/36</span> !)</li>
+      <li><strong>[remise]</strong> Tirages <strong>avec remise</strong> : mêmes conditions à chaque étape. Sans remise : composition qui change → Partie 3</li>
+      <li><strong>[verifications]</strong> Contrôles permanents : résultat entre <span class="math">0</span> et <span class="math">1</span>, <span class="math">P(A) + P(Ā) = 1</span>, <span class="math">P(A ∩ B) ≤ P(A)</span></li>
+    </ul>
+  </div>
+
+  <!-- ===== FIN ===== -->
+  <div class="lecture-end">
+    <span class="lecture-end-icon">🎯</span>
+    <div class="lecture-end-text">Partie 2 terminée !</div>
+    <div class="lecture-end-sub">Passe à la partie suivante : probabilité conditionnelle et probabilités totales</div>
+    <div class="lecture-end-divider"></div>
+  </div>
+
+</div>

@@ -1,0 +1,557 @@
+<!-- ============================================================ -->
+<!-- PARTIE 1 : VARIABLE ALÉATOIRE — DÉFINITION & LOI DE PROBABILITÉ -->
+<!-- Notion 1 : variable_aleatoire — Définition, événements (X = k) -->
+<!-- Notion 2 : loi_probabilite — Tableau des xᵢ et pᵢ, Σpᵢ = 1     -->
+<!-- Notion 3 : fonction_repartition — F(x) = P(X ≤ x)               -->
+<!-- ============================================================ -->
+
+<div class="lecture-container">
+
+  <!-- ===== HERO ===== -->
+  <header class="lecture-hero">
+    <div class="lecture-hero-badge">
+      <span class="lecture-hero-icon">📘</span>
+      <span class="lecture-hero-label">Partie 01 · Variable aléatoire</span>
+    </div>
+    <h1 class="lecture-hero-title">
+      Définition &amp; <em>loi de probabilité</em>
+    </h1>
+    <p class="lecture-hero-intro">
+      Tu lances deux dés : combien vaudra la somme ? Personne ne peut le prédire… et pourtant on peut calculer des probabilités <em>exactes</em> sur ce nombre. Toute l'idée de la variable aléatoire est là : <strong>traduire chaque résultat du hasard en un nombre</strong>, puis décrire avec une <strong>loi de probabilité</strong> comment ce nombre se répartit. Cette partie pose <strong>3 notions</strong> : la définition d'une variable aléatoire <span class="math">X</span>, sa loi de probabilité (avec le piège de la somme des <span class="math">pᵢ</span>), et la fonction de répartition <span class="math">F(x)</span>.
+    </p>
+    <div class="lecture-hero-meta">
+      <span class="lecture-hero-meta-item">⏱ 20 min</span>
+      <span class="lecture-hero-meta-item">🧮 3 notions</span>
+      <span class="lecture-hero-meta-item">📊 8 sections</span>
+      <span class="lecture-hero-meta-item">🎓 Terminale D</span>
+    </div>
+  </header>
+
+  <!-- ===== SOMMAIRE ===== -->
+  <nav class="lecture-toc">
+    <div class="lecture-toc-header">
+      <span>Dans cette partie</span>
+      <span class="lecture-toc-count">3 notions · 8 sections</span>
+    </div>
+    <ol class="lecture-toc-list">
+      <li><a href="#s0"><span class="toc-num">00</span><span>Motivation — Traduire le hasard en nombres</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>Notion 1 · variable_aleatoire — Définir une variable aléatoire</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>Notion 1 · variable_aleatoire — Les événements (X = k), (X ≤ k), (X ≥ k)</span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>Notion 2 · loi_probabilite — La loi de probabilité : tableau et Σpᵢ = 1</span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>Notion 2 · loi_probabilite — Exemple complet : la somme de deux dés</span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>Notion 2 · loi_probabilite — Deux autres lois : piles et boules rouges</span></a></li>
+      <li><a href="#s6"><span class="toc-num">06</span><span>Notion 3 · fonction_repartition — La fonction de répartition F(x)</span></a></li>
+      <li><a href="#s7"><span class="toc-num">07</span><span>Bilan — La méthode d'établissement d'une loi</span></a></li>
+    </ol>
+  </nav>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 0 : MOTIVATION                                       -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s0">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">00</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Motivation</span>
+        <h2 class="lecture-section-title">Traduire le hasard en nombres</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Au chapitre précédent, tu as appris à calculer des probabilités sur des événements décrits avec des <em>mots</em> (« obtenir un six », « tirer une boule rouge »). Or, en assurance, en finance, en contrôle qualité, on veut calculer sur des <strong>nombres</strong> : un gain en francs, un nombre de pièces défectueuses, une somme de deux dés. Le pont entre le hasard et le calcul numérique, c'est la <strong>variable aléatoire</strong> : une fonction qui associe à chaque issue de l'univers un <strong>nombre réel</strong>. Une fois le hasard traduit en nombres, tout devient calculable : la <strong>loi de probabilité</strong> (cette partie), puis la <strong>moyenne</strong> (espérance, partie 2) et la <strong>dispersion</strong> (variance et écart-type, partie 3).
+      </p>
+
+      <div class="lecture-callout lecture-callout-gold">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Les trois questions de cette partie</div>
+          <ul class="lecture-list">
+            <li><strong>Comment définir</strong> une variable aléatoire <span class="math">X</span> et écrire les événements <span class="math">(X = k)</span>, <span class="math">(X ≤ k)</span> ? (Sections 01 et 02)</li>
+            <li><strong>Comment établir</strong> la loi de probabilité de <span class="math">X</span>, sous forme de tableau vérifiant <span class="math">Σpᵢ = 1</span> ? (Sections 03, 04 et 05)</li>
+            <li><strong>Comment cumuler</strong> les probabilités avec la fonction de répartition <span class="math">F(x) = P(X ≤ x)</span> ? (Section 06)</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 1 : DÉFINIR UNE VARIABLE ALÉATOIRE                   -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s1">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">01</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1 · variable_aleatoire</span>
+        <h2 class="lecture-section-title">Définir une variable aléatoire</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Voici la définition officielle, à savoir restituer mot pour mot. Elle dit trois choses : où <span class="math">X</span> est définie (sur <span class="math">Ω</span>), ce qu'elle fait (associer un réel), et ce qu'elle produit (les valeurs possibles).
+      </p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">📗 Définition officielle — Variable aléatoire</div>
+          <p>Une <strong>variable aléatoire</strong> <span class="math">X</span> sur un univers <span class="math">Ω</span> est une <strong>application qui associe à chaque issue</strong> <span class="math">ω</span> de <span class="math">Ω</span> un <strong>nombre réel</strong> unique, noté <span class="math">X(ω)</span>. On écrit <span class="math">X : Ω → ℝ</span>. Les nombres ainsi associés, notés <span class="math">x₁, x₂, …, xₙ</span>, sont les <strong>valeurs possibles</strong> (ou valeurs prises) de <span class="math">X</span>.</p>
+        </div>
+      </div>
+
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">🔍 Exemple — Deux lancers d'une pièce équilibrée</div>
+        <div class="lecture-example-content">
+          <p>On lance deux fois une pièce et on pose <span class="math">X</span> = « nombre de piles obtenus ». L'univers est <span class="math">Ω = {PP ; PF ; FP ; FF}</span> (4 issues). La variable aléatoire associe un nombre à chaque issue :</p>
+          <ul class="lecture-list">
+            <li><span class="math">X(PP) = 2</span> (deux piles), <span class="math">X(PF) = 1</span>, <span class="math">X(FP) = 1</span> (un pile), <span class="math">X(FF) = 0</span> (aucun pile) ;</li>
+            <li>les <strong>valeurs possibles</strong> de <span class="math">X</span> sont donc <span class="math">{0 ; 1 ; 2}</span> : trois nombres au lieu de quatre issues — plusieurs issues donnent la même valeur.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ Ne pas confondre X et xᵢ</div>
+          <p><span class="math">X</span> est la <strong>fonction</strong> (elle « trie » les issues vers des nombres) ; <span class="math">xᵢ</span> est <strong>une valeur prise</strong> par cette fonction, un simple réel. Écrire « <span class="math">X = 2</span> » tout seul n'a pas de sens ; on écrit <span class="math">X(PP) = 2</span> pour une issue, ou l'événement <span class="math">(X = 2)</span> pour l'ensemble des issues qui donnent 2.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 2 : LES ÉVÉNEMENTS (X = k), (X ≤ k), (X ≥ k)         -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s2">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">02</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1 · variable_aleatoire</span>
+        <h2 class="lecture-section-title">Les événements (X = k), (X ≤ k), (X ≥ k)</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Une fois <span class="math">X</span> définie, on s'intéresse à des questions du type « quelle est la chance que <span class="math">X</span> vaille 2 ? » ou « qu'elle ne dépasse pas 4 ? ». Chacune de ces phrases définit un <strong>événement</strong>, c'est-à-dire une partie de <span class="math">Ω</span>.
+      </p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">📗 Définition officielle — Événements liés à X</div>
+          <p>Pour tout réel <span class="math">k</span> :</p>
+          <ul class="lecture-list">
+            <li>l'événement <span class="math">(X = k)</span> est l'ensemble des issues <span class="math">ω</span> telles que <span class="math">X(ω) = k</span> ; sa probabilité se note <span class="math">P(X = k)</span> ;</li>
+            <li>l'événement <span class="math">(X ≤ k)</span> est l'ensemble des issues telles que <span class="math">X(ω) ≤ k</span> ; sa probabilité se note <span class="math">P(X ≤ k)</span> ;</li>
+            <li>de même pour <span class="math">(X ≥ k)</span>, <span class="math">(X &gt; k)</span>, <span class="math">(X &lt; k)</span>…</li>
+          </ul>
+        </div>
+      </div>
+
+      <p class="lecture-text">
+        Le réflexe de calcul est toujours le même : <strong>lister les issues favorables, puis diviser</strong> (ou additionner les probabilités si la loi est déjà connue). Travailtons cela sur l'exemple central de cette partie : deux dés.
+      </p>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">🧮 Exemple — Deux dés équilibrés, X = somme des faces</div>
+        <div class="lecture-example-content">
+          <div class="lecture-steps">
+            <div class="lecture-step">
+              <div class="lecture-step-number">1</div>
+              <div class="lecture-step-content"><p><strong>Univers.</strong> On lance deux dés : chaque issue est un couple <span class="math">(i ; j)</span> où <span class="math">i</span> est le résultat du premier dé, <span class="math">j</span> celui du second. Il y a <span class="math">6 × 6 = 36</span> couples équiprobables.</p></div>
+            </div>
+            <div class="lecture-step">
+              <div class="lecture-step-number">2</div>
+              <div class="lecture-step-content"><p><strong>(X = 7).</strong> Les couples de somme 7 sont <span class="math">(1 ; 6) ; (2 ; 5) ; (3 ; 4) ; (4 ; 3) ; (5 ; 2) ; (6 ; 1)</span> : 6 issues favorables, donc <span class="math">P(X = 7) = 6/36 = 1/6</span>.</p></div>
+            </div>
+            <div class="lecture-step">
+              <div class="lecture-step-number">3</div>
+              <div class="lecture-step-content"><p><strong>(X ≤ 4) et (X ≥ 11).</strong> <span class="math">P(X ≤ 4) = (1 + 2 + 3)/36 = 6/36 = 1/6</span> (sommes 2, 3 et 4) ; <span class="math">P(X ≥ 11) = (2 + 1)/36 = 3/36 = 1/12</span> (issues <span class="math">(5 ; 6) ; (6 ; 5) ; (6 ; 6)</span>).</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-danger">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Erreur fréquente au Bac</div>
+          <p>Les couples <span class="math">(3 ; 4)</span> et <span class="math">(4 ; 3)</span> sont <strong>deux issues distinctes</strong> : le premier dé donne 3 puis le second 4, ou l'inverse. Les compter une seule fois fausse tous les dénombrements (et la somme des probabilités ne vaudra plus <span class="math">1</span>).</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 3 : LOI DE PROBABILITÉ — TABLEAU ET Σpᵢ = 1          -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s3">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">03</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2 · loi_probabilite</span>
+        <h2 class="lecture-section-title">La loi de probabilité : tableau et Σpᵢ = 1</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Définir <span class="math">X</span> ne suffit pas : pour exploiter la variable aléatoire, il faut connaître la <strong>répartition des probabilités</strong> entre ses valeurs possibles. C'est la loi de probabilité.
+      </p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">📗 Définition officielle — Loi de probabilité d'une variable aléatoire</div>
+          <p>La <strong>loi de probabilité</strong> de la variable aléatoire <span class="math">X</span> est la donnée de toutes les valeurs possibles <span class="math">x₁, x₂, …, xₙ</span> et de leurs probabilités <span class="math">pᵢ = P(X = xᵢ)</span>. Elle se présente sous forme d'un tableau :</p>
+        </div>
+      </div>
+
+      <div class="lecture-table">
+        <table>
+          <thead>
+            <tr><th>Valeurs xᵢ</th><th>x₁</th><th>x₂</th><th>…</th><th>xₙ</th><th>Total</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Probabilités pᵢ</td><td>p₁</td><td>p₂</td><td>…</td><td>pₙ</td><td>1</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ Le piège : vérifier que Σpᵢ = 1</div>
+          <p>Les événements <span class="math">(X = x₁)</span>, <span class="math">(X = x₂)</span>, …, <span class="math">(X = xₙ)</span> forment une partition de <span class="math">Ω</span> : chaque issue donne <em>exactement une</em> valeur de <span class="math">X</span>. Donc <strong>la somme des probabilités vaut toujours 1</strong> : <span class="math">p₁ + p₂ + … + pₙ = 1</span>. Si ta somme vaut <span class="math">0,9</span> ou <span class="math">1,1</span>, une probabilité est fausse — reviens au dénombrement. C'est le <strong>contrôle systématique</strong> de ce chapitre.</p>
+        </div>
+      </div>
+
+      <div class="lecture-rule">
+        <div class="lecture-rule-label">🧠 Méthode — Établir la loi de probabilité de X</div>
+        <div class="lecture-rule-body">
+          <strong>(1)</strong> Définir <span class="math">X</span> et <strong>lister toutes ses valeurs possibles</strong> <span class="math">x₁ &lt; x₂ &lt; … &lt; xₙ</span>. <strong>(2)</strong> Calculer <span class="math">P(X = xᵢ)</span> pour chaque valeur (dénombrement des issues favorables). <strong>(3)</strong> <strong>Vérifier</strong> que <span class="math">Σpᵢ = 1</span>. <strong>(4)</strong> Présenter le résultat sous forme de tableau.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 4 : EXEMPLE COMPLET — SOMME DE DEUX DÉS              -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s4">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">04</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2 · loi_probabilite</span>
+        <h2 class="lecture-section-title">Exemple complet : la somme de deux dés</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Appliquons la méthode en 4 étapes au grand classique : <span class="math">X</span> = « somme des faces » de deux dés équilibrés. Les valeurs possibles vont de <span class="math">2</span> (deux « 1 ») à <span class="math">12</span> (deux « 6 »).
+      </p>
+
+      <div class="lecture-steps">
+        <div class="lecture-step">
+          <div class="lecture-step-number">1</div>
+          <div class="lecture-step-content"><p><strong>Valeurs possibles.</strong> <span class="math">x ∈ {2 ; 3 ; 4 ; 5 ; 6 ; 7 ; 8 ; 9 ; 10 ; 11 ; 12}</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">2</div>
+          <div class="lecture-step-content"><p><strong>Dénombrement.</strong> Pour chaque somme, on compte les couples <span class="math">(i ; j)</span> qui la réalisent : la somme 7 a 6 couples (vu en section 02), la somme 2 n'en a qu'un seul <span class="math">(1 ; 1)</span>, la somme 6 en a 5 : <span class="math">(1 ; 5) ; (2 ; 4) ; (3 ; 3) ; (4 ; 2) ; (5 ; 1)</span>. On obtient les effectifs <span class="math">1 ; 2 ; 3 ; 4 ; 5 ; 6 ; 5 ; 4 ; 3 ; 2 ; 1</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">3</div>
+          <div class="lecture-step-content"><p><strong>Probabilités.</strong> Chaque couple ayant la probabilité <span class="math">1/36</span>, on divise chaque effectif par 36.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">4</div>
+          <div class="lecture-step-content"><p><strong>Vérification du total.</strong> <span class="math">1 + 2 + 3 + 4 + 5 + 6 + 5 + 4 + 3 + 2 + 1 = 36</span>, donc la somme des probabilités vaut <span class="math">36/36 = 1</span> ✓.</p></div>
+        </div>
+      </div>
+
+      <div class="lecture-table">
+        <table>
+          <thead>
+            <tr><th>Valeur k de X</th><th>Nombre de couples (i ; j)</th><th>P(X = k)</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>2</td><td>1</td><td>1/36</td></tr>
+            <tr><td>3</td><td>2</td><td>2/36 = 1/18</td></tr>
+            <tr><td>4</td><td>3</td><td>3/36 = 1/12</td></tr>
+            <tr><td>5</td><td>4</td><td>4/36 = 1/9</td></tr>
+            <tr><td>6</td><td>5</td><td>5/36</td></tr>
+            <tr><td>7</td><td>6</td><td>6/36 = 1/6</td></tr>
+            <tr><td>8</td><td>5</td><td>5/36</td></tr>
+            <tr><td>9</td><td>4</td><td>4/36 = 1/9</td></tr>
+            <tr><td>10</td><td>3</td><td>3/36 = 1/12</td></tr>
+            <tr><td>11</td><td>2</td><td>2/36 = 1/18</td></tr>
+            <tr><td>12</td><td>1</td><td>1/36</td></tr>
+            <tr><td><strong>Total</strong></td><td><strong>36</strong></td><td><strong>1</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="lecture-text">
+        Ce tableau permet de calculer <em>directement</em> n'importe quelle probabilité, sans revenir aux 36 couples :
+      </p>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">🔍 Exploitation du tableau</div>
+        <div class="lecture-example-content">
+          <ul class="lecture-list">
+            <li><span class="math">P(5 ≤ X ≤ 9) = (4 + 5 + 6 + 5 + 4)/36 = 24/36 = 2/3</span> — on additionne les probabilités des valeurs <span class="math">5</span> à <span class="math">9</span> ;</li>
+            <li><span class="math">P(X = 7) = 1/6 ≈ 0,167</span> : le 7 est bien la somme la plus probable, comme le confirme la colonne des effectifs (maximum 6).</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 5 : DEUX AUTRES LOIS — PILES ET BOULES ROUGES        -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s5">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">05</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2 · loi_probabilite</span>
+        <h2 class="lecture-section-title">Deux autres lois : piles et boules rouges</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Répétons la méthode sur deux situations types du programme. À toi de vérifier chaque somme : c'est l'entraînement le plus rentable du chapitre.
+      </p>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">🧮 Exemple 1 — Nombre de piles sur 2 lancers d'une pièce</div>
+        <div class="lecture-example-content">
+          <div class="lecture-steps">
+            <div class="lecture-step">
+              <div class="lecture-step-number">1</div>
+              <div class="lecture-step-content"><p><strong>Valeurs possibles.</strong> On reprend la variable <span class="math">X</span> = « nombre de piles » de la section 01 : <span class="math">X ∈ {0 ; 1 ; 2}</span>.</p></div>
+            </div>
+            <div class="lecture-step">
+              <div class="lecture-step-number">2</div>
+              <div class="lecture-step-content"><p><strong>Probabilités.</strong> Les 4 issues <span class="math">PP ; PF ; FP ; FF</span> sont équiprobables : <span class="math">P(X = 0) = 1/4</span>, <span class="math">P(X = 1) = 2/4 = 1/2</span>, <span class="math">P(X = 2) = 1/4</span>.</p></div>
+            </div>
+            <div class="lecture-step">
+              <div class="lecture-step-number">3</div>
+              <div class="lecture-step-content"><p><strong>Vérification.</strong> <span class="math">1/4 + 2/4 + 1/4 = 4/4 = 1</span> ✓.</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">🧮 Exemple 2 — Nombre de boules rouges tirées d'une urne</div>
+        <div class="lecture-example-content">
+          <p>Une urne contient 3 boules rouges <span class="math">R₁, R₂, R₃</span> et 2 boules vertes <span class="math">V₁, V₂</span>, indiscernables au toucher. On tire <strong>simultanément</strong> 2 boules et on note <span class="math">X</span> = « nombre de boules rouges obtenues ».</p>
+          <div class="lecture-steps">
+            <div class="lecture-step">
+              <div class="lecture-step-number">1</div>
+              <div class="lecture-step-content"><p><strong>Univers.</strong> On tire 2 boules parmi 5 : <span class="math">C(5 ; 2) = 10</span> paires équiprobables (tu connais les combinaisons du chapitre Dénombrement).</p></div>
+            </div>
+            <div class="lecture-step">
+              <div class="lecture-step-number">2</div>
+              <div class="lecture-step-content"><p><strong>Valeurs possibles.</strong> <span class="math">X ∈ {0 ; 1 ; 2}</span> : aucune rouge (deux vertes), une seule rouge, ou deux rouges.</p></div>
+            </div>
+            <div class="lecture-step">
+              <div class="lecture-step-number">3</div>
+              <div class="lecture-step-content"><p><strong>Probabilités.</strong> <span class="math">P(X = 0)</span> : la seule paire <span class="math">{V₁ ; V₂}</span> → <span class="math">1/10</span>. <span class="math">P(X = 1)</span> : <span class="math">3 × 2 = 6</span> paires (une rouge et une verte) → <span class="math">6/10</span>. <span class="math">P(X = 2)</span> : <span class="math">C(3 ; 2) = 3</span> paires <span class="math">{R₁ ; R₂}, {R₁ ; R₃}, {R₂ ; R₃}</span> → <span class="math">3/10</span>.</p></div>
+            </div>
+            <div class="lecture-step">
+              <div class="lecture-step-number">4</div>
+              <div class="lecture-step-content"><p><strong>Vérification.</strong> <span class="math">1/10 + 6/10 + 3/10 = 10/10 = 1</span> ✓.</p></div>
+            </div>
+          </div>
+          <div class="lecture-table">
+            <table>
+              <thead>
+                <tr><th>Valeurs xᵢ</th><th>0</th><th>1</th><th>2</th><th>Total</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>P(X = xᵢ)</td><td>1/10</td><td>6/10</td><td>3/10</td><td>1</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-danger">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Erreur fréquente au Bac</div>
+          <p>Dans l'exemple des boules, ne compte pas <span class="math">6</span> paires pour <span class="math">(X = 1)</span> en écrivant « 3 choix de rouge, 2 choix de verte » sans vérifier que ces paires sont <em>toutes différentes</em> de celles de <span class="math">(X = 2)</span>. Le contrôle <span class="math">Σpᵢ = 1</span> t'alerte immédiatement : si tu trouves <span class="math">1/10 + 7/10 + 3/10 = 11/10</span>, c'est qu'une paire a été comptée deux fois.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 6 : FONCTION DE RÉPARTITION                          -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s6">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">06</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 3 · fonction_repartition</span>
+        <h2 class="lecture-section-title">La fonction de répartition F(x)</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        La loi de probabilité répond à « <span class="math">P(X = xᵢ)</span> pour chaque valeur ». On a souvent besoin du <strong>cumul</strong> : « quelle est la probabilité que <span class="math">X</span> ne dépasse pas <span class="math">x</span> ? » — et ce, pour <em>n'importe quel</em> réel <span class="math">x</span>, pas seulement les valeurs possibles. D'où une fonction nouvelle.
+      </p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">📗 Définition officielle — Fonction de répartition</div>
+          <p>La <strong>fonction de répartition</strong> de la variable aléatoire <span class="math">X</span> est la fonction <span class="math">F</span> définie sur <span class="math">ℝ</span> par : <span class="math">F(x) = P(X ≤ x)</span>.</p>
+        </div>
+      </div>
+
+      <ul class="lecture-list-elegant">
+        <li><strong>Premières propriétés</strong> : <span class="math">0 ≤ F(x) ≤ 1</span>, <span class="math">F</span> est <strong>croissante</strong> sur <span class="math">ℝ</span>, <span class="math">F(−∞) = 0</span> et <span class="math">F(+∞) = 1</span>.</li>
+        <li><strong>Pour une variable discrète</strong> (comme les nôtres) : <span class="math">F</span> est <strong>constante par paliers</strong> — elle saute de <span class="math">pᵢ</span> en <span class="math">pᵢ</span> à chaque valeur possible.</li>
+        <li><strong>Formule utile</strong> : pour tous réels <span class="math">a &lt; b</span>, <span class="math">P(a &lt; X ≤ b) = F(b) − F(a)</span>.</li>
+      </ul>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">🧮 Exemple — Fonction de répartition de « nombre de piles »</div>
+        <div class="lecture-example-content">
+          <p>Reprenons <span class="math">X ∈ {0 ; 1 ; 2}</span> avec la loi <span class="math">1/4 ; 1/2 ; 1/4</span>. Pour un réel <span class="math">x</span> quelconque, on cumule toutes les probabilités des valeurs <span class="math">≤ x</span> :</p>
+          <div class="lecture-table">
+            <table>
+              <thead>
+                <tr><th>Intervalle pour x</th><th>x &lt; 0</th><th>0 ≤ x &lt; 1</th><th>1 ≤ x &lt; 2</th><th>x ≥ 2</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>F(x) = P(X ≤ x)</td><td>0</td><td>1/4 = 0,25</td><td>1/4 + 1/2 = 0,75</td><td>1</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>Contrôle avec la formule utile : <span class="math">P(0 &lt; X ≤ 2) = F(2) − F(0) = 1 − 0,25 = 0,75</span>, et en effet <span class="math">P(X = 1) + P(X = 2) = 1/2 + 1/4 = 3/4</span> ✓.</p>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ Attention aux bornes</div>
+          <p><span class="math">F(x) = P(X ≤ x)</span> : l'inégalité est <strong>large</strong>. Pour notre variable, <span class="math">F(1) = 0,75</span> mais <span class="math">P(X &lt; 1) = 0,25</span> seulement : la valeur <span class="math">1</span> compte dans <span class="math">F(1)</span>. Sur les bornes, écris toujours l'événement en clair avant de conclure.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 7 : BILAN — MÉTHODE                                  -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s7">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">07</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Bilan</span>
+        <h2 class="lecture-section-title">La méthode d'établissement d'une loi</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Toute cette partie tient dans une démarche unique, à appliquer à chaque exercice de variable aléatoire discrète.
+      </p>
+
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-label">La démarche complète de la partie</div>
+        <div class="lecture-formula-hero-main">Définir X → lister les xᵢ → calculer les pᵢ → vérifier Σpᵢ = 1 → présenter le tableau</div>
+        <div class="lecture-formula-hero-desc">Et pour cumuler : <span class="math">F(x) = P(X ≤ x)</span>, fonction croissante allant de <span class="math">0</span> à <span class="math">1</span>.</div>
+      </div>
+
+      <ul class="lecture-list-elegant">
+        <li>Une <strong>variable aléatoire</strong> est une application <span class="math">X : Ω → ℝ</span> : chaque issue <span class="math">ω</span> reçoit un nombre <span class="math">X(ω)</span>.</li>
+        <li><span class="math">(X = k)</span>, <span class="math">(X ≤ k)</span>, <span class="math">(X ≥ k)</span> sont des <strong>événements</strong> : on les traite comme au chapitre précédent, par dénombrement.</li>
+        <li>La <strong>loi de probabilité</strong> est le tableau des valeurs <span class="math">xᵢ</span> et des <span class="math">pᵢ = P(X = xᵢ)</span>, avec <strong>Σpᵢ = 1</strong> : le contrôle obligatoire.</li>
+        <li>Deux dés (somme) : 11 valeurs de <span class="math">2</span> à <span class="math">12</span>, probabilités de <span class="math">1/36</span> à <span class="math">6/36 = 1/6</span>.</li>
+        <li>Piles sur 2 lancers : <span class="math">1/4 ; 1/2 ; 1/4</span> · Boules rouges (3 rouges, 2 vertes, tirage de 2) : <span class="math">1/10 ; 6/10 ; 3/10</span>.</li>
+        <li>La <strong>fonction de répartition</strong> <span class="math">F(x) = P(X ≤ x)</span> cumule : <span class="math">P(a &lt; X ≤ b) = F(b) − F(a)</span>.</li>
+      </ul>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ Rédaction type pour l'examen</div>
+          <p>Une question « déterminer la loi de X » rapporte des points seulement si les quatre ingrédients sont là : <strong>valeurs possibles</strong>, <strong>probabilité de chaque valeur justifiée</strong> (dénombrement), <strong>vérification Σpᵢ = 1</strong>, <strong>tableau final</strong>. Un tableau posé sans justification ne vaut rien ; une liste de probabilités sans vérification de la somme passe pour du hasard.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== QCM D'ENTRAÎNEMENT ===== -->
+  <div class="lecture-quiz">
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q1 — Dans le tableau d'une loi de probabilité, on doit toujours vérifier que :</p>
+      <div class="lecture-quiz-options">
+        <span>A) p₁ = p₂ = … = pₙ</span>
+        <span>B) p₁ + p₂ + … + pₙ = 1</span>
+        <span>C) x₁ + x₂ + … + xₙ = 1</span>
+        <span>D) chaque pᵢ vaut 1/n</span>
+      </div>
+      <details>
+        <summary>Voir la réponse</summary>
+        <div class="lecture-quiz-answer"><strong>B) la somme des probabilités vaut 1.</strong> Les événements <span class="math">(X = xᵢ)</span> forment une partition de <span class="math">Ω</span>, donc <span class="math">Σpᵢ = 1</span>. Les probabilités ne sont en général <em>pas</em> égales (options A et D) et ce sont les <span class="math">pᵢ</span>, pas les <span class="math">xᵢ</span>, qui se somment (option C).</div>
+      </details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q2 — Deux dés équilibrés ; X = somme des faces. La probabilité P(X = 7) vaut :</p>
+      <div class="lecture-quiz-options">
+        <span>A) 1/12</span>
+        <span>B) 1/6</span>
+        <span>C) 1/36</span>
+        <span>D) 7/36</span>
+      </div>
+      <details>
+        <summary>Voir la réponse</summary>
+        <div class="lecture-quiz-answer"><strong>B) 1/6.</strong> Six couples donnent 7 : <span class="math">(1 ; 6) ; (2 ; 5) ; (3 ; 4) ; (4 ; 3) ; (5 ; 2) ; (6 ; 1)</span>. Donc <span class="math">P(X = 7) = 6/36 = 1/6 ≈ 0,167</span>. L'option D) 7/36 provient de la confusion entre la <em>valeur</em> 7 et le <em>nombre d'issues favorables</em>.</div>
+      </details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q3 — Nombre de piles X sur 2 lancers ; la fonction de répartition vérifie F(1) = P(X ≤ 1) = :</p>
+      <div class="lecture-quiz-options">
+        <span>A) 0,25</span>
+        <span>B) 0,5</span>
+        <span>C) 0,75</span>
+        <span>D) 1</span>
+      </div>
+      <details>
+        <summary>Voir la réponse</summary>
+        <div class="lecture-quiz-answer"><strong>C) 0,75.</strong> <span class="math">F(1) = P(X = 0) + P(X = 1) = 1/4 + 1/2 = 3/4 = 0,75</span>. L'inégalité <span class="math">≤</span> est large : la valeur <span class="math">1</span> est incluse, d'où <span class="math">0,75</span> et non <span class="math">0,25</span> (qui est <span class="math">P(X &lt; 1)</span>).</div>
+      </details>
+    </div>
+  </div>
+
+  <!-- ===== RÉCAPITULATIF ===== -->
+  <div class="lecture-recap">
+    <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
+    <ul class="lecture-recap-list">
+      <li><strong>[variable_aleatoire]</strong> Une variable aléatoire <span class="math">X</span> est une application <span class="math">X : Ω → ℝ</span> qui associe à chaque issue un nombre réel ; les <span class="math">x₁, x₂, …, xₙ</span> sont ses valeurs possibles</li>
+      <li><strong>[variable_aleatoire]</strong> <span class="math">(X = k)</span>, <span class="math">(X ≤ k)</span>, <span class="math">(X ≥ k)</span> sont des événements : on les calcule par dénombrement des issues favorables</li>
+      <li><strong>[variable_aleatoire]</strong> <span class="math">X</span> est la fonction, <span class="math">xᵢ</span> est une valeur prise : ne pas les confondre</li>
+      <li><strong>[loi_probabilite]</strong> La loi de probabilité de <span class="math">X</span> est le tableau des valeurs <span class="math">xᵢ</span> et des probabilités <span class="math">pᵢ = P(X = xᵢ)</span></li>
+      <li><strong>[loi_probabilite]</strong> Contrôle obligatoire : <span class="math">p₁ + p₂ + … + pₙ = 1</span> — sinon, une probabilité est fausse</li>
+      <li><strong>[loi_probabilite]</strong> Somme de deux dés : 36 couples, probabilités de <span class="math">1/36</span> (pour 2 et 12) à <span class="math">6/36 = 1/6</span> (pour 7)</li>
+      <li><strong>[loi_probabilite]</strong> Piles sur 2 lancers : <span class="math">1/4 ; 1/2 ; 1/4</span> · Boules rouges (3 rouges, 2 vertes, tirage de 2) : <span class="math">1/10 ; 6/10 ; 3/10</span></li>
+      <li><strong>[fonction_repartition]</strong> <span class="math">F(x) = P(X ≤ x)</span> : croissante, de <span class="math">0</span> à <span class="math">1</span>, en escalier pour une variable discrète</li>
+      <li><strong>[fonction_repartition]</strong> Formule utile : <span class="math">P(a &lt; X ≤ b) = F(b) − F(a)</span></li>
+      <li><strong>[methode]</strong> Démarche : définir <span class="math">X</span> → lister les <span class="math">xᵢ</span> → calculer les <span class="math">pᵢ</span> → vérifier <span class="math">Σpᵢ = 1</span> → tableau</li>
+    </ul>
+  </div>
+
+  <!-- ===== FIN ===== -->
+  <div class="lecture-end">
+    <span class="lecture-end-icon">🎯</span>
+    <div class="lecture-end-text">Partie 1 terminée !</div>
+    <div class="lecture-end-sub">Passe à la partie suivante : l'espérance mathématique E(X), la valeur moyenne du hasard</div>
+    <div class="lecture-end-divider"></div>
+  </div>
+
+</div>

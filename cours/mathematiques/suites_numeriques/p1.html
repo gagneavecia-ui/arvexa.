@@ -1,0 +1,567 @@
+<!-- ============================================================ -->
+<!-- PARTIE 1 : DÉFINITION D'UNE SUITE & SUITE ARITHMÉTIQUE        -->
+<!-- Chapitre : Suites numériques — Terminale D                    -->
+<!-- Notion 1 : definition_suite — Suite numérique, indices, rang  -->
+<!-- Notion 2 : generation — Forme explicite uₙ = f(n) et          -->
+<!--            définition par récurrence uₙ₊₁ = f(uₙ)             -->
+<!-- Notion 3 : monotonie — Croissante, décroissante, constante    -->
+<!-- Notion 4 : arithmetique — Suite arithmétique, terme général,  -->
+<!--            somme des n premiers termes                        -->
+<!-- ============================================================ -->
+
+<div class="lecture-container">
+
+  <!-- ===== HERO ===== -->
+  <header class="lecture-hero">
+    <div class="lecture-hero-badge">
+      <span class="lecture-hero-icon">📘</span>
+      <span class="lecture-hero-label">Partie 01 · Suites numériques</span>
+    </div>
+    <h1 class="lecture-hero-title">
+      Définition &amp; <em>Suite arithmétique</em>
+    </h1>
+    <p class="lecture-hero-intro">
+      Chaque semaine, tu déposes la même somme dans ton épargne : le capital forme, semaine après semaine, ce qu'on appelle une <strong>suite numérique</strong>. Ce chapitre apprend à <strong>décrire</strong> de telles listes de nombres, à les <strong>calculer vite</strong> et à les <strong>comparer</strong>. Cette partie installe <strong>4 notions</strong> : la <strong>définition d'une suite</strong> et son vocabulaire, les deux <strong>modes de génération</strong> (forme explicite et récurrence), la <strong>monotonie</strong> (croissante, décroissante, constante), puis la <strong>suite arithmétique</strong> avec son terme général et sa somme.
+    </p>
+    <div class="lecture-hero-meta">
+      <span class="lecture-hero-meta-item">⏱ 20 min</span>
+      <span class="lecture-hero-meta-item">🧮 4 notions</span>
+      <span class="lecture-hero-meta-item">📊 8 sections</span>
+      <span class="lecture-hero-meta-item">🎓 Terminale D</span>
+    </div>
+  </header>
+
+  <!-- ===== SOMMAIRE ===== -->
+  <nav class="lecture-toc">
+    <div class="lecture-toc-header">
+      <span>Dans cette partie</span>
+      <span class="lecture-toc-count">4 notions · 8 sections</span>
+    </div>
+    <ol class="lecture-toc-list">
+      <li><a href="#s0"><span class="toc-num">00</span><span>Motivation — Épargner semaine après semaine</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>Notion 1 · definition_suite — Qu'est-ce qu'une suite numérique ?</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>Notion 2 · generation — Forme explicite : uₙ = f(n)</span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>Notion 2 · generation — Définition par récurrence : uₙ₊₁ = f(uₙ)</span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>Notion 3 · monotonie — Croissante, décroissante, constante</span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>Notion 4 · arithmetique — Suite arithmétique et terme général</span></a></li>
+      <li><a href="#s6"><span class="toc-num">06</span><span>Notion 4 · arithmetique — Somme des n premiers termes</span></a></li>
+      <li><a href="#s7"><span class="toc-num">07</span><span>Bilan — Une épargne, une suite arithmétique</span></a></li>
+    </ol>
+  </nav>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 0 : MOTIVATION                                        -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s0">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">00</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Motivation</span>
+        <h2 class="lecture-section-title">Épargner semaine après semaine</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Au Niger comme partout en Afrique de l'Ouest, beaucoup de familles participent à une <strong>tontine</strong> ou tiennent un compte d'épargne : une mise de départ, puis <em>la même somme</em> chaque semaine. Le capital vaut alors 5 000 ; 7 000 ; 9 000 ; 11 000 F… des nombres liés par le même geste : <strong>ajouter encore 2 000 F</strong>. Une liste de nombres fabriquée par une règle fixe s'appelle une <strong>suite numérique</strong>.
+      </p>
+      <p class="lecture-text">
+        Le mathématicien ne se contente pas de lister : il veut <strong>définir</strong> la liste (que vaut le terme numéro 100 ?), la <strong>décrire</strong> (monte-t-elle ? descend-elle ?) et la <strong>calculer vite</strong> (somme des 50 premiers termes, sans tout additionner). C'est le programme de cette partie — tout en <strong>calculs purs</strong>.
+      </p>
+
+      <div class="lecture-callout lecture-callout-gold">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Les quatre questions de cette partie</div>
+          <ul class="lecture-list">
+            <li><strong>Qu'est-ce qu'une suite ?</strong> Définition, indices, notations (Notion 1)</li>
+            <li><strong>Comment la génère-t-on ?</strong> Forme explicite <span class="math">uₙ = f(n)</span> ou récurrence <span class="math">uₙ₊₁ = f(uₙ)</span> (Notion 2)</li>
+            <li><strong>Comment varie-t-elle ?</strong> Croissante, décroissante, constante (Notion 3)</li>
+            <li><strong>Comment calculer vite ?</strong> Suite arithmétique : terme général et somme (Notion 4)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 1 : NOTION 1 · definition_suite — DÉFINITION          -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s1">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">01</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1 · definition_suite</span>
+        <h2 class="lecture-section-title">Qu'est-ce qu'une suite numérique ?</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Commençons par la définition officielle, celle qu'il faut savoir restituer <em>mot pour mot</em> à l'examen. Elle contient deux idées : une <strong>fonction</strong>, et des <strong>entiers</strong>.
+      </p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">📗 Définition officielle — Suite numérique</div>
+          <p><strong>Une suite numérique est une fonction de ℕ dans ℝ</strong> : à chaque entier naturel <span class="math">n</span> (appelé <strong>indice</strong> ou <strong>rang</strong>), elle associe un unique nombre réel noté <span class="math">uₙ</span>, appelé <strong>terme d'indice n</strong> (ou terme de rang n). La suite elle-même se note <span class="math">(uₙ)</span>.</p>
+        </div>
+      </div>
+
+      <p class="lecture-text">
+        Une suite est une « machine » qui prend un entier <span class="math">n</span> et rend un nombre <span class="math">uₙ</span> — la différence avec les fonctions <span class="math">f(x)</span> du chapitre précédent, c'est que la variable est un <strong>entier naturel</strong> (0, 1, 2, 3…), pas un réel quelconque. Les indices servent d'<strong>adresse</strong> : <span class="math">u₀</span> est le premier terme (rang 0), <span class="math">u₁</span> le deuxième, <span class="math">u₇</span> le terme de rang 7 — comme le numéro sur une maison.
+      </p>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">🧮 Exemple — lire les indices</div>
+        <div class="lecture-example-content"><p>Soit la suite définie par <span class="math">uₙ = 2n + 3</span>. Alors <span class="math">u₀ = 2 × 0 + 3 = 3</span>, <span class="math">u₃ = 2 × 3 + 3 = 9</span> et <span class="math">u₁₀ = 2 × 10 + 3 = 23</span>. Remarque : l'indice 3 de <span class="math">u₃</span> est une <em>adresse</em>, pas une puissance.</p></div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ uₙ et (uₙ) : deux choses différentes</div>
+          <p><span class="math">uₙ</span> (sans parenthèses) désigne <strong>un nombre</strong> : le terme de rang <span class="math">n</span>. <span class="math">(uₙ)</span> (avec parenthèses) désigne <strong>la suite tout entière</strong> — écrire « <span class="math">uₙ</span> est croissante » est une faute. Et l'indice <span class="math">n</span> est toujours un <strong>entier naturel</strong> : on ne demande jamais « <span class="math">u₂,5</span> ».</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 2 : NOTION 2 · generation — FORME EXPLICITE           -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s2">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">02</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2 · generation</span>
+        <h2 class="lecture-section-title">Forme explicite : uₙ = f(n)</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Il y a deux façons de « fabriquer » une suite. La première : donner une formule qui calcule chaque terme <strong>directement à partir de son rang</strong>. On dit que la suite est définie <strong>de façon explicite</strong> : on connaît <span class="math">uₙ = f(n)</span>, et chaque terme s'obtient en remplaçant <span class="math">n</span> par son rang, sans connaître les termes précédents.
+      </p>
+
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">🧮 Exemple — la suite uₙ = n² − 1</div>
+        <div class="lecture-example-content"><p>Calculons les premiers termes en remplaçant <span class="math">n</span> par 0, 1, 2, 3, 4, 5 :</p></div>
+      </div>
+
+      <div class="lecture-table">
+        <table>
+          <thead>
+            <tr><th>Rang n</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Terme uₙ = n² − 1</td><td><span class="math">−1</span></td><td><span class="math">0</span></td><td><span class="math">3</span></td><td><span class="math">8</span></td><td><span class="math">15</span></td><td><span class="math">24</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="lecture-steps">
+        <div class="lecture-step">
+          <div class="lecture-step-number">1</div>
+          <div class="lecture-step-content"><p><strong>Un terme de rang modéré</strong> : <span class="math">u₇ = 7² − 1 = 49 − 1 = 48</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">2</div>
+          <div class="lecture-step-content"><p><strong>Un terme lointain</strong> : <span class="math">u₁₀₀ = 100² − 1 = 10 000 − 1 = 9 999</span>. Aucun autre terme n'a été nécessaire : c'est <strong>la force de la forme explicite</strong>.</p></div>
+        </div>
+      </div>
+
+      <p class="lecture-text">
+        Autre exemple : la suite <span class="math">vₙ = 3 × 2ⁿ</span> donne <span class="math">3 ; 6 ; 12 ; 24…</span> — chaque terme s'obtient en <strong>multipliant</strong> le précédent par 2. On pressent ici une autre grande famille (les suites <em>géométriques</em>, objet de la partie 2).
+      </p>
+
+      <div class="lecture-callout lecture-callout-danger">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Erreur fréquente au Bac — le terme suivant</div>
+          <p>Pour <span class="math">uₙ = n² − 1</span>, écrire <span class="math">uₙ₊₁ = n² − 1</span> est <strong>faux</strong> : le terme suivant s'obtient en remplaçant <span class="math">n</span> par <span class="math">n + 1</span>, donc <span class="math">uₙ₊₁ = (n + 1)² − 1 = n² + 2n</span>. Chaque « n » de la formule devient « n + 1 » — pas seulement le dernier !</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 3 : NOTION 2 · generation — RÉCURRENCE                -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s3">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">03</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2 · generation</span>
+        <h2 class="lecture-section-title">Définition par récurrence : uₙ₊₁ = f(uₙ)</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Deuxième mode de génération : au lieu d'une formule en fonction de <span class="math">n</span>, on donne un <strong>point de départ</strong> et une <strong>règle de passage</strong> d'un terme au suivant. Très naturel : « je pars de 3, et pour avoir le suivant, je double et j'ajoute 1 ».
+      </p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">📗 Définition — Suite définie par récurrence</div>
+          <p>La suite <span class="math">(uₙ)</span> est définie <strong>par récurrence</strong> lorsqu'on donne son <strong>premier terme</strong> <span class="math">u₀</span> et une <strong>relation de récurrence</strong> <span class="math">uₙ₊₁ = f(uₙ)</span> valable pour tout <span class="math">n</span> : chaque terme se calcule <strong>à partir du terme précédent</strong>.</p>
+        </div>
+      </div>
+
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">🧮 Exemple résolu — u₀ = 3 et uₙ₊₁ = 2uₙ + 1</div>
+        <div class="lecture-example-content"><p>Calculons les premiers termes en appliquant la règle, terme après terme.</p></div>
+      </div>
+
+      <div class="lecture-steps">
+        <div class="lecture-step">
+          <div class="lecture-step-number">1</div>
+          <div class="lecture-step-content"><p><strong>Rang 1</strong> : on remplace <span class="math">n</span> par 0 dans la relation : <span class="math">u₁ = 2u₀ + 1 = 2 × 3 + 1 = 7</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">2</div>
+          <div class="lecture-step-content"><p><strong>Rang 2</strong> : on remplace <span class="math">n</span> par 1 : <span class="math">u₂ = 2u₁ + 1 = 2 × 7 + 1 = 15</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">3</div>
+          <div class="lecture-step-content"><p><strong>Rangs 3 et 4</strong> : <span class="math">u₃ = 2u₂ + 1 = 2 × 15 + 1 = 31</span> puis <span class="math">u₄ = 2u₃ + 1 = 2 × 31 + 1 = 63</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">4</div>
+          <div class="lecture-step-content"><p><strong>Bilan</strong> : <span class="math">3 ; 7 ; 15 ; 31 ; 63…</span> Pour connaître <span class="math">u₁₀₀</span>, il faudrait dérouler 100 calculs ! D'où l'intérêt, quand c'est possible, de trouver une <strong>forme explicite</strong> (méthode au programme de la partie 2).</p></div>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-danger">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Erreur fréquente au Bac — le décalage d'indice</div>
+          <p>Pour obtenir <span class="math">u₁</span>, on remplace <span class="math">n</span> par <strong>0</strong> dans <span class="math">uₙ₊₁ = 2uₙ + 1</span> (ce qui donne <span class="math">u₁ = 2u₀ + 1</span>). Écrire <span class="math">u₁ = 2u₁ + 1</span> pour « retrouver u₁ » n'a <strong>aucun sens</strong> : à gauche c'est le terme de rang <span class="math">n + 1</span>, à droite celui de rang <span class="math">n</span>. Toujours vérifier : <em>quel rang vais-je calculer, et avec quel terme ?</em></p>
+        </div>
+      </div>
+
+      <div class="lecture-rule">
+        <div class="lecture-rule-label">🧠 Méthode à retenir</div>
+        <div class="lecture-rule-body">
+          Bien distinguer <span class="math">uₙ = f(n)</span> (explicite : <span class="math">f</span> agit sur <strong>le rang n</strong>) et <span class="math">uₙ₊₁ = f(uₙ)</span> (récurrence : <span class="math">f</span> agit sur <strong>le terme précédent</strong>). Dans le doute, regarde ce qui est à l'intérieur de <span class="math">f</span> : un <span class="math">n</span> tout seul, ou un <span class="math">u</span> avec un indice ?
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 4 : NOTION 3 · monotonie — CROISSANTE, DÉCROISSANTE   -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s4">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">04</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 3 · monotonie</span>
+        <h2 class="lecture-section-title">Croissante, décroissante, constante</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Décrire une suite, c'est aussi dire si elle <strong>monte</strong>, <strong>descend</strong> ou <strong>reste immobile</strong>. Voici les définitions officielles — les inégalités doivent être vraies <strong>pour tout entier n</strong>.
+      </p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">📗 Définitions — Monotonie</div>
+          <ul class="lecture-list">
+            <li><span class="math">(uₙ)</span> est <strong>croissante</strong> si pour tout <span class="math">n</span> : <span class="math">uₙ₊₁ ≥ uₙ</span> (strictement croissante si <span class="math">uₙ₊₁ &gt; uₙ</span>).</li>
+            <li><span class="math">(uₙ)</span> est <strong>décroissante</strong> si pour tout <span class="math">n</span> : <span class="math">uₙ₊₁ ≤ uₙ</span> (strictement décroissante si <span class="math">uₙ₊₁ &lt; uₙ</span>).</li>
+            <li><span class="math">(uₙ)</span> est <strong>constante</strong> si pour tout <span class="math">n</span> : <span class="math">uₙ₊₁ = uₙ</span>. Croissante ou décroissante : la suite est dite <strong>monotone</strong>.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">Méthode : étudier le signe de uₙ₊₁ − uₙ</div>
+        <div class="lecture-formula-desc">Si <span class="math">uₙ₊₁ − uₙ ≥ 0</span> pour tout n, la suite est croissante ; si <span class="math">uₙ₊₁ − uₙ ≤ 0</span>, elle est décroissante ; si <span class="math">uₙ₊₁ − uₙ = 0</span>, elle est constante. On calcule la différence, on étudie son signe, on conclut.</div>
+      </div>
+
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">🧮 Exemple résolu 1 — la suite uₙ = n² − 1</div>
+        <div class="lecture-example-content"><p>Étudier la monotonie de la suite définie par <span class="math">uₙ = n² − 1</span>.</p></div>
+      </div>
+
+      <div class="lecture-steps">
+        <div class="lecture-step">
+          <div class="lecture-step-number">1</div>
+          <div class="lecture-step-content"><p><strong>Terme suivant</strong> : <span class="math">uₙ₊₁ = (n + 1)² − 1</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">2</div>
+          <div class="lecture-step-content"><p><strong>Différence</strong> : <span class="math">uₙ₊₁ − uₙ = (n + 1)² − 1 − (n² − 1) = n² + 2n + 1 − 1 − n² + 1 = 2n + 1</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">3</div>
+          <div class="lecture-step-content"><p><strong>Signe</strong> : pour tout <span class="math">n ∈ ℕ</span>, <span class="math">2n + 1 ≥ 1 &gt; 0</span>, donc <span class="math">uₙ₊₁ &gt; uₙ</span> : la suite est <strong>strictement croissante</strong>.</p></div>
+        </div>
+      </div>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">🧮 Exemple résolu 2 — la suite vₙ = 1/(n + 1)</div>
+        <div class="lecture-example-content"><p><strong>Différence</strong> : <span class="math">vₙ₊₁ − vₙ = 1/(n + 2) − 1/(n + 1) = (n + 1 − n − 2)/((n + 2)(n + 1)) = −1/((n + 1)(n + 2))</span>. Comme <span class="math">(n + 1)(n + 2) &gt; 0</span> pour tout <span class="math">n</span>, cette différence est strictement négative : la suite est <strong>strictement décroissante</strong>.</p></div>
+      </div>
+
+      <div class="lecture-rule">
+        <div class="lecture-rule-label">🧠 Autre outil (pour les termes positifs)</div>
+        <div class="lecture-rule-body">
+          Si tous les termes sont <strong>strictement positifs</strong>, on peut comparer <span class="math">uₙ₊₁/uₙ</span> à 1 : <span class="math">uₙ₊₁/uₙ ≥ 1</span> pour tout n signifie croissante, <span class="math">uₙ₊₁/uₙ ≤ 1</span> signifie décroissante. Ce rapport sera l'outil roi des <strong>suites géométriques</strong> (partie 2).
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ Une suite peut ne pas être monotone</div>
+          <p>La suite définie par <span class="math">uₙ = (−1)ⁿ</span> vaut <span class="math">1 ; −1 ; 1 ; −1…</span> : on a <span class="math">u₁ &lt; u₀</span> mais <span class="math">u₂ &gt; u₁</span>. Elle n'est <strong>ni croissante ni décroissante</strong> — une montée et une descente suffisent à le prouver.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 5 : NOTION 4 · arithmetique — SUITE ARITHMÉTIQUE      -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s5">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">05</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 4 · arithmetique</span>
+        <h2 class="lecture-section-title">Suite arithmétique et terme général</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Voici la première grande famille du programme : celle où l'on <strong>ajoute toujours le même nombre</strong> — la suite de l'épargne hebdomadaire de l'introduction, et le modèle de tout ce qui avance « à pas constant ».
+      </p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">📗 Définition officielle — Suite arithmétique</div>
+          <p><strong>Une suite <span class="math">(uₙ)</span> est arithmétique s'il existe un réel r tel que, pour tout entier n : <span class="math">uₙ₊₁ = uₙ + r</span>.</strong> Le réel <span class="math">r</span> s'appelle la <strong>raison</strong> de la suite. Autrement dit : <span class="math">uₙ₊₁ − uₙ = r</span> est <em>constant</em>.</p>
+        </div>
+      </div>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">🧮 Exemple — pas de 3</div>
+        <div class="lecture-example-content"><p>Avec <span class="math">u₀ = 5</span> et raison <span class="math">r = 3</span> : <span class="math">5 ; 8 ; 11 ; 14 ; 17…</span> On part de <span class="math">u₀ = 5</span>, puis on ajoute 3 à chaque étape : les écarts entre termes consécutifs valent tous 3. Sur un axe, les termes sont <strong>régulièrement espacés</strong> — c'est la signature d'une suite arithmétique.</p></div>
+      </div>
+
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-label">Terme général d'une suite arithmétique</div>
+        <div class="lecture-formula-hero-main">uₙ = u₀ + n × r = u₁ + (n − 1) × r</div>
+        <div class="lecture-formula-hero-desc">Plus généralement, pour tous rangs p et k : <span class="math">uₙ = uₚ + (n − p) × r</span>. Le terme de rang n = terme initial + raison × nombre de pas (pour aller de <span class="math">u₀</span> à <span class="math">uₙ</span>, on fait n pas de longueur r).</div>
+      </div>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">🧮 Exemple résolu — trois calculs classiques</div>
+        <div class="lecture-example-content"><p>Trois questions types, trois calculs purs.</p></div>
+      </div>
+
+      <div class="lecture-steps">
+        <div class="lecture-step">
+          <div class="lecture-step-number">1</div>
+          <div class="lecture-step-content"><p><strong>Terme lointain, départ en u₀</strong> : <span class="math">u₀ = 5</span>, <span class="math">r = 3</span>. Formule : <span class="math">uₙ = u₀ + n × r = 5 + 3n</span>. Donc <span class="math">u₁₀ = 5 + 3 × 10 = 35</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">2</div>
+          <div class="lecture-step-content"><p><strong>Terme lointain, départ en u₁</strong> : <span class="math">u₁ = 12</span>, <span class="math">r = 4</span>. Formule : <span class="math">uₙ = u₁ + (n − 1) × r = 12 + 4(n − 1)</span>. Donc <span class="math">u₁₅ = 12 + 4 × 14 = 12 + 56 = 68</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">3</div>
+          <div class="lecture-step-content"><p><strong>Retrouver la raison</strong> : on sait que <span class="math">u₅ = 14</span> et <span class="math">u₁₂ = 35</span>. Entre les rangs 5 et 12, on fait <span class="math">12 − 5 = 7</span> pas, donc <span class="math">r = (u₁₂ − u₅)/(12 − 5) = (35 − 14)/7 = 21/7 = 3</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">4</div>
+          <div class="lecture-step-content"><p><strong>Retrouver le premier terme</strong> : <span class="math">u₁ = u₅ − 4r = 14 − 4 × 3 = 2</span>. D'où <span class="math">uₙ = 2 + 3(n − 1) = 3n − 1</span>. Vérification : <span class="math">u₅ = 15 − 1 = 14</span> ✓ et <span class="math">u₁₂ = 36 − 1 = 35</span> ✓.</p></div>
+        </div>
+      </div>
+
+      <div class="lecture-rule">
+        <div class="lecture-rule-label">🧠 Méthode à retenir</div>
+        <div class="lecture-rule-body">
+          <strong>Prouver qu'une suite est arithmétique</strong> : calculer <span class="math">uₙ₊₁ − uₙ</span> et montrer que le résultat est une <strong>constante indépendante de n</strong> — cette constante est la raison. <strong>Trouver la raison à partir de deux termes</strong> : <span class="math">r = (uₖ − uₚ)/(k − p)</span> pour des rangs <span class="math">p &lt; k</span> (écart des termes ÷ écart des rangs).
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 6 : NOTION 4 · arithmetique — SOMME                   -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s6">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">06</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 4 · arithmetique</span>
+        <h2 class="lecture-section-title">Somme des n premiers termes</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Additionner 50 termes un par un est long — et source d'erreurs. Pour une suite <strong>arithmétique</strong>, les termes sont régulièrement espacés : le <strong>premier</strong> et le <strong>dernier</strong> suffisent à tout connaître.
+      </p>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">Sₙ = u₁ + u₂ + ⋯ + uₙ = n × (u₁ + uₙ)/2</div>
+        <div class="lecture-formula-desc">Somme = (nombre de termes) × (premier terme + dernier terme)/2 — autrement dit, nombre de termes × moyenne des extrêmes. Si la somme commence à <span class="math">u₀</span> : <span class="math">u₀ + u₁ + ⋯ + uₙ = (n + 1) × (u₀ + uₙ)/2</span> (il y a alors <span class="math">n + 1</span> termes).</div>
+      </div>
+
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">🧮 Exemple résolu — de 7 à 102, de raison 5</div>
+        <div class="lecture-example-content"><p>Calculer <span class="math">S = 7 + 12 + 17 + ⋯ + 102</span>, où <span class="math">(uₙ)</span> est arithmétique de premier terme <span class="math">u₁ = 7</span> et de raison <span class="math">r = 5</span>.</p></div>
+      </div>
+
+      <div class="lecture-steps">
+        <div class="lecture-step">
+          <div class="lecture-step-number">1</div>
+          <div class="lecture-step-content"><p><strong>Compter les termes</strong> : <span class="math">n = (102 − 7)/5 + 1 = 95/5 + 1 = 19 + 1 = 20</span>. Il y a <strong>20 termes</strong>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">2</div>
+          <div class="lecture-step-content"><p><strong>Appliquer la formule</strong> : <span class="math">S = 20 × (7 + 102)/2 = 20 × 109/2 = 10 × 109 = 1090</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">3</div>
+          <div class="lecture-step-content"><p><strong>Contrôle de cohérence</strong> : la moyenne des extrêmes vaut <span class="math">(7 + 102)/2 = 54,5</span>, et <span class="math">20 × 54,5 = 1090</span> ✓.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">4</div>
+          <div class="lecture-step-content"><p><strong>Autre classique</strong> : <span class="math">1 + 2 + 3 + ⋯ + 100 = 100 × (1 + 100)/2 = 100 × 101/2 = 50 × 101 = 5050</span> — deux données (1 et 100) ont suffi, pas besoin de 100 additions.</p></div>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ Piège — compter les termes</div>
+          <p>De <span class="math">u₃</span> à <span class="math">u₁₅</span>, il y a <span class="math">15 − 3 + 1 = 13</span> termes (et non 12 !). Formule : <strong>nombre de termes = (dernier rang − premier rang) + 1</strong>. Comme les étages d'un immeuble : du 3ᵉ au 15ᵉ étage, il y a 13 niveaux.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 7 : BILAN — ÉPARGNE & SYNTHÈSE                        -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s7">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">07</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Bilan</span>
+        <h2 class="lecture-section-title">Une épargne, une suite arithmétique</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Réunissons tout : définition, terme général, somme — appliqués à une situation d'épargne, la seule incursion « concrète » de cette partie. Le reste, ce sont des calculs.
+      </p>
+
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">🏦 Exemple complet — le compte d'épargne</div>
+        <div class="lecture-example-content"><p>Aïcha ouvre un compte avec <strong>5 000 F</strong>, puis y dépose <strong>2 000 F chaque semaine</strong>. On note <span class="math">uₙ</span> le capital (en F) après <span class="math">n</span> semaines.</p></div>
+      </div>
+
+      <div class="lecture-steps">
+        <div class="lecture-step">
+          <div class="lecture-step-number">1</div>
+          <div class="lecture-step-content"><p><strong>Modéliser</strong> : <span class="math">u₀ = 5 000</span> et <span class="math">uₙ₊₁ = uₙ + 2 000</span>. La suite est <strong>arithmétique de raison r = 2 000</strong>, de terme général <span class="math">uₙ = 5 000 + 2 000n</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">2</div>
+          <div class="lecture-step-content"><p><strong>Capital après 12 semaines</strong> : <span class="math">u₁₂ = 5 000 + 2 000 × 12 = 5 000 + 24 000 = 29 000 F</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">3</div>
+          <div class="lecture-step-content"><p><strong>Objectif 50 000 F</strong> : <span class="math">5 000 + 2 000n ≥ 50 000</span> donne <span class="math">2 000n ≥ 45 000</span>, soit <span class="math">n ≥ 22,5</span>. Comme <span class="math">n</span> est un entier, il faut <strong>23 semaines</strong> : <span class="math">u₂₃ = 5 000 + 46 000 = 51 000 F</span> (alors que <span class="math">u₂₂ = 49 000 &lt; 50 000</span>).</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">4</div>
+          <div class="lecture-step-content"><p><strong>Total déposé en 52 semaines</strong> (hors mise de départ) : 52 dépôts de 2 000 F, soit <span class="math">52 × 2 000 = 104 000 F</span> — les dépôts forment une suite constante, cas particulier d'une suite arithmétique de raison <span class="math">r = 0</span>.</p></div>
+        </div>
+      </div>
+
+      <ul class="lecture-list-elegant">
+        <li><strong>Définition</strong> : <span class="math">uₙ₊₁ = uₙ + r</span> — la raison <span class="math">r = uₙ₊₁ − uₙ</span> est constante.</li>
+        <li><strong>Terme général</strong> : <span class="math">uₙ = u₀ + n × r = u₁ + (n − 1) × r</span>.</li>
+        <li><strong>Somme</strong> : <span class="math">u₁ + ⋯ + uₙ = n × (u₁ + uₙ)/2</span>.</li>
+        <li><strong>Monotonie</strong> : <span class="math">r &gt; 0</span> → croissante ; <span class="math">r &lt; 0</span> → décroissante ; <span class="math">r = 0</span> → constante.</li>
+      </ul>
+
+      <p class="lecture-text">
+        Dans la partie suivante, on change un seul mot : au lieu d'<strong>ajouter</strong> toujours la même quantité, on <strong>multiplie</strong> toujours par le même nombre. Le changement est minuscule… les comportements, eux, deviennent spectaculaires.
+      </p>
+    </div>
+  </section>
+
+  <!-- ===== QCM D'ENTRAÎNEMENT ===== -->
+  <div class="lecture-quiz">
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q1 — <span class="math">(uₙ)</span> est arithmétique de raison 3 avec <span class="math">u₁ = 7</span>. Que vaut <span class="math">u₁₀</span> ?</p>
+      <div class="lecture-quiz-options">
+        <span>A) 30</span>
+        <span>B) 34</span>
+        <span>C) 37</span>
+        <span>D) 27</span>
+      </div>
+      <details>
+        <summary>Voir la réponse</summary>
+        <div class="lecture-quiz-answer"><strong>B) 34.</strong> De <span class="math">u₁</span> à <span class="math">u₁₀</span>, on fait <span class="math">10 − 1 = 9</span> pas de raison 3 : <span class="math">u₁₀ = 7 + 9 × 3 = 7 + 27 = 34</span>. L'erreur classique (réponse C) consiste à multiplier par 10 au lieu de 9.</div>
+      </details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q2 — La suite définie par <span class="math">uₙ = 5 − 2n</span> est :</p>
+      <div class="lecture-quiz-options">
+        <span>A) croissante</span>
+        <span>B) décroissante</span>
+        <span>C) constante</span>
+        <span>D) ni croissante ni décroissante</span>
+      </div>
+      <details>
+        <summary>Voir la réponse</summary>
+        <div class="lecture-quiz-answer"><strong>B) décroissante.</strong> <span class="math">uₙ₊₁ − uₙ = (5 − 2(n + 1)) − (5 − 2n) = −2</span> : différence constante et négative. C'est une suite arithmétique de raison <span class="math">−2</span>.</div>
+      </details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q3 — La somme <span class="math">5 + 8 + 11 + ⋯ + 32</span> (suite arithmétique de raison 3) vaut :</p>
+      <div class="lecture-quiz-options">
+        <span>A) 185</span>
+        <span>B) 166,5</span>
+        <span>C) 222</span>
+        <span>D) 154</span>
+      </div>
+      <details>
+        <summary>Voir la réponse</summary>
+        <div class="lecture-quiz-answer"><strong>A) 185.</strong> Nombre de termes : <span class="math">(32 − 5)/3 + 1 = 9 + 1 = 10</span>. Somme : <span class="math">10 × (5 + 32)/2 = 10 × 37/2 = 185</span>. (La réponse B vient de l'erreur « 9 termes » : de 5 à 32, il y a bien 10 termes.)</div>
+      </details>
+    </div>
+  </div>
+
+  <!-- ===== RÉCAPITULATIF ===== -->
+  <div class="lecture-recap">
+    <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
+    <ul class="lecture-recap-list">
+      <li><strong>[definition_suite]</strong> Une suite numérique est une <strong>fonction de ℕ dans ℝ</strong> : à l'entier n (le rang), elle associe le réel <span class="math">uₙ</span> (le terme)</li>
+      <li><strong>[definition_suite]</strong> <span class="math">uₙ</span> (un nombre) ≠ <span class="math">(uₙ)</span> (la suite) ; l'indice est toujours un entier naturel</li>
+      <li><strong>[generation]</strong> Forme explicite : <span class="math">uₙ = f(n)</span> — on remplace n par son rang (calcul direct de <span class="math">u₁₀₀</span>)</li>
+      <li><strong>[generation]</strong> Récurrence : <span class="math">u₀</span> donné + <span class="math">uₙ₊₁ = f(uₙ)</span> — on calcule les termes l'un après l'autre ; <span class="math">uₙ₊₁</span> s'obtient en remplaçant <strong>tous</strong> les n par (n + 1)</li>
+      <li><strong>[monotonie]</strong> Croissante : <span class="math">uₙ₊₁ ≥ uₙ</span> pour tout n ; décroissante : <span class="math">uₙ₊₁ ≤ uₙ</span> ; constante : <span class="math">uₙ₊₁ = uₙ</span></li>
+      <li><strong>[monotonie]</strong> Méthode : étudier le <strong>signe de <span class="math">uₙ₊₁ − uₙ</span></strong> (ou le rapport <span class="math">uₙ₊₁/uₙ</span> si les termes sont positifs)</li>
+      <li><strong>[arithmetique]</strong> Suite arithmétique : <span class="math">uₙ₊₁ = uₙ + r</span> (raison r constante) — on <strong>ajoute</strong> toujours le même nombre</li>
+      <li><strong>[arithmetique]</strong> Terme général : <span class="math">uₙ = u₀ + n × r = u₁ + (n − 1) × r</span> — et <span class="math">r = (uₖ − uₚ)/(k − p)</span></li>
+      <li><strong>[arithmetique]</strong> Somme : <span class="math">u₁ + ⋯ + uₙ = n × (u₁ + uₙ)/2</span> — nombre de termes = (dernier rang − premier rang) + 1</li>
+    </ul>
+  </div>
+
+  <!-- ===== FIN ===== -->
+  <div class="lecture-end">
+    <span class="lecture-end-icon">🎯</span>
+    <div class="lecture-end-text">Partie 1 terminée !</div>
+    <div class="lecture-end-sub">Passe à la partie 2 : suite géométrique et sens de variation</div>
+    <div class="lecture-end-divider"></div>
+  </div>
+
+</div>

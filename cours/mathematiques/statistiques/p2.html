@@ -1,0 +1,514 @@
+<!-- ============================================================ -->
+<!-- PARTIE 2 : ÉCART-TYPE & AJUSTEMENT LINÉAIRE                   -->
+<!-- Notion 1 : variance — La variance V(x)                        -->
+<!-- Notion 2 : ecart_type — L'écart-type σ                        -->
+<!-- Notion 3 : nuage_point_moyen — Série double, nuage, point G   -->
+<!-- Notion 4 : mayer — La droite de Mayer (points moyens)         -->
+<!-- Notion 5 : moindres_carres — Droite des moindres carrés, cov  -->
+<!-- ============================================================ -->
+
+<div class="lecture-container">
+
+  <!-- ===== HERO ===== -->
+  <header class="lecture-hero">
+    <div class="lecture-hero-badge">
+      <span class="lecture-hero-icon">📘</span>
+      <span class="lecture-hero-label">Partie 02 · Statistiques</span>
+    </div>
+    <h1 class="lecture-hero-title">
+      Écart-type &amp; <em>ajustement linéaire</em>
+    </h1>
+    <p class="lecture-hero-intro">
+      Deux classes peuvent avoir la même moyenne et être pourtant très différentes : l'une serrée autour de 12, l'autre écartelée entre 6 et 18. Il faut mesurer la <strong>dispersion</strong> — c'est le rôle de la variance et de l'écart-type. Puis on change d'objectif : relier <strong>deux caractères</strong> mesurés ensemble (dose d'engrais et rendement) par un nuage de points, un point moyen et une <strong>droite d'ajustement</strong> capable de prévoir.
+    </p>
+    <div class="lecture-hero-meta">
+      <span class="lecture-hero-meta-item">⏱ 25 min</span>
+      <span class="lecture-hero-meta-item">🧮 5 notions</span>
+      <span class="lecture-hero-meta-item">📊 8 sections</span>
+      <span class="lecture-hero-meta-item">🎓 Terminale D</span>
+    </div>
+  </header>
+
+  <!-- ===== SOMMAIRE ===== -->
+  <nav class="lecture-toc">
+    <div class="lecture-toc-header">
+      <span>Dans cette partie</span>
+      <span class="lecture-toc-count">5 notions · 8 sections</span>
+    </div>
+    <ol class="lecture-toc-list">
+      <li><a href="#s0"><span class="toc-num">00</span><span>Motivation — Deux classes à la même moyenne</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>Notion 1 · variance — La variance V(x)</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>Notion 2 · ecart_type — L'écart-type σ</span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>Notion 3 · nuage_point_moyen — Série double, nuage, point moyen</span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>Notion 4 · mayer — L'ajustement : la droite de Mayer</span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>Notion 5 · moindres_carres — La droite des moindres carrés</span></a></li>
+      <li><a href="#s6"><span class="toc-num">06</span><span>Exemple complet — a, b, D et une prévision</span></a></li>
+      <li><a href="#s7"><span class="toc-num">07</span><span>Bilan — Formules à retenir et pièges</span></a></li>
+    </ol>
+  </nav>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 0 : MOTIVATION -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s0">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">00</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Motivation</span>
+        <h2 class="lecture-section-title">Deux classes à la même moyenne</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Deux classes de Terminale D obtiennent la même moyenne en mathématiques : <span class="math">12</span>. Mais regarde les notes de cinq élèves tirés de chaque classe :
+      </p>
+
+      <ul class="lecture-list">
+        <li>Classe A : <span class="math">11 ; 12 ; 12 ; 12 ; 13</span> — des notes <strong>serrées</strong> autour de 12.</li>
+        <li>Classe B : <span class="math">6 ; 8 ; 12 ; 16 ; 18</span> — des notes <strong>étalées</strong> de 6 à 18.</li>
+      </ul>
+
+      <p class="lecture-text">
+        Les deux séries ont la même moyenne, mais un professeur ne les gère pas de la même façon : la classe A est homogène, la classe B exige un soutien pour les uns et un approfondissement pour les autres. La moyenne seule ne suffit donc pas : il faut un nombre qui mesure <strong>à quel point les valeurs s'écartent de la moyenne</strong>. C'est exactement la variance et l'écart-type, notions 1 et 2.
+      </p>
+
+      <div class="lecture-callout lecture-callout-gold">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Le double programme de cette partie</div>
+          <ul class="lecture-list">
+            <li><strong>Résumer une série</strong> par sa dispersion : variance <span class="math">V(x)</span>, écart-type <span class="math">σ</span> (sections 01 et 02).</li>
+            <li><strong>Relier deux séries</strong> mesurées ensemble : nuage de points, point moyen, droite d'ajustement (sections 03 à 06) — le tremplin vers la corrélation de la Partie 3.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 1 : NOTION 1 · variance — LA VARIANCE -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s1">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">01</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1 · variance</span>
+        <h2 class="lecture-section-title">La variance V(x)</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        L'idée la plus naturelle serait de moyenner les écarts à la moyenne, c'est-à-dire les quantités <span class="math">xᵢ − x̄</span>. Malheureusement, ils s'annulent toujours :
+      </p>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">Σ nᵢ·(xᵢ − x̄) = 0   toujours !</div>
+        <div class="lecture-formula-desc">Les écarts au-dessus de la moyenne compensent exactement les écarts en dessous (définition même de x̄). Pour éviter cette compensation, on élève chaque écart au carré avant de moyenner.</div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">📗 Définition officielle — Variance</div>
+          <p>La <strong>variance</strong> d'une série statistique de moyenne <span class="math">x̄</span> et d'effectif total <span class="math">N</span> est la moyenne des carrés des écarts à la moyenne : <span class="math">V(x) = (n₁(x₁ − x̄)² + n₂(x₂ − x̄)² + … + nₖ(xₖ − x̄)²)/N</span>, c'est-à-dire <span class="math">V(x) = (Σ nᵢ·(xᵢ − x̄)²)/N</span>.</p>
+        </div>
+      </div>
+
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-label">Les deux formules de la variance — même résultat</div>
+        <div class="lecture-formula-hero-main">V(x) = (Σ nᵢ·(xᵢ − x̄)²)/N = Σ fᵢ·xᵢ² − x̄²</div>
+        <div class="lecture-formula-hero-desc">La première est la définition ; la seconde est la formule « développée ». Conseil de Bac : la seconde est presque toujours plus rapide — une seule colonne de xᵢ², sans recalculer les écarts.</div>
+      </div>
+
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">🧮 Exemple — les deux classes de la motivation</div>
+        <div class="lecture-example-content"><p>Classe A (<span class="math">x̄ = 12</span>) : <span class="math">V(A) = ((−1)² + 0² + 0² + 0² + 1²)/5 = 2/5 = 0,4</span>. Classe B (<span class="math">x̄ = 12</span>) : <span class="math">V(B) = ((−6)² + (−4)² + 0² + 4² + 6²)/5 = (36 + 16 + 0 + 16 + 36)/5 = 104/5 = 20,8</span>. Même moyenne, mais <span class="math">V(B)</span> est 52 fois plus grande que <span class="math">V(A)</span> : la variance mesure bien ce que la moyenne ignore.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 2 : NOTION 2 · ecart_type — L'ÉCART-TYPE -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s2">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">02</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2 · ecart_type</span>
+        <h2 class="lecture-section-title">L'écart-type σ</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        La variance a un défaut : comme elle moyenne des <strong>carrés</strong>, elle s'exprime en « points² » si les données sont en points. Pour retrouver l'unité des données, on prend la racine carrée.
+      </p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">📗 Définition officielle — Écart-type</div>
+          <p>L'<strong>écart-type</strong> d'une série statistique est <span class="math">σ = √(V(x))</span> : la racine carrée de la variance. Il s'exprime dans la <strong>même unité que les données</strong> (points, millimètres, kilogrammes par hectare…), ce qui le rend directement interprétable.</p>
+        </div>
+      </div>
+
+      <ul class="lecture-list-elegant">
+        <li><strong>σ petit</strong> : les valeurs sont concentrées autour de <span class="math">x̄</span> — série <strong>homogène</strong> (classe A : <span class="math">σ = √0,4 ≈ 0,63</span> point).</li>
+        <li><strong>σ grand</strong> : les valeurs sont dispersées autour de <span class="math">x̄</span> — série <strong>hétérogène</strong> (classe B : <span class="math">σ = √20,8 ≈ 4,56</span> points).</li>
+        <li>Comparer deux <span class="math">σ</span> sur des séries de même nature, c'est comparer leur <strong>régularité</strong> : deux parcelles, deux saisons de pluie, deux méthodes de semis…</li>
+      </ul>
+
+      <h3 class="lecture-subtitle">Exemple complet — variance et écart-type des 20 notes (Partie 1)</h3>
+
+      <p class="lecture-text">
+        Reprenons la série des <strong>20 notes</strong> de la Partie 1 (<span class="math">x̄ = 12</span>, <span class="math">N = 20</span>) et calculons sa variance par la formule développée, la plus économique :
+      </p>
+
+      <div class="lecture-table">
+        <table>
+          <thead>
+            <tr><th>xᵢ</th><th>nᵢ</th><th>xᵢ²</th><th>nᵢ·xᵢ²</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>8</td><td>2</td><td>64</td><td>128</td></tr>
+            <tr><td>10</td><td>3</td><td>100</td><td>300</td></tr>
+            <tr><td>11</td><td>4</td><td>121</td><td>484</td></tr>
+            <tr><td>12</td><td>5</td><td>144</td><td>720</td></tr>
+            <tr><td>13</td><td>2</td><td>169</td><td>338</td></tr>
+            <tr><td>15</td><td>2</td><td>225</td><td>450</td></tr>
+            <tr><td>16</td><td>1</td><td>256</td><td>256</td></tr>
+            <tr><td>18</td><td>1</td><td>324</td><td>324</td></tr>
+            <tr><td><strong>Total</strong></td><td><strong>20</strong></td><td>—</td><td><strong>3 000</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="lecture-steps">
+        <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Formule développée.</strong> <span class="math">Σ fᵢ·xᵢ² = (Σ nᵢ·xᵢ²)/N = 3 000/20 = 150</span>, donc <span class="math">V(x) = 150 − x̄² = 150 − 144 = 6</span> (points²).</p></div></div>
+        <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Vérification par la définition.</strong> <span class="math">V(x) = (2×(−4)² + 3×(−2)² + 4×(−1)² + 5×0² + 2×1² + 2×3² + 1×4² + 1×6²)/20 = (32 + 12 + 4 + 0 + 2 + 18 + 16 + 36)/20 = 120/20 = 6</span> ✓.</p></div></div>
+        <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Écart-type.</strong> <span class="math">σ = √6 ≈ 2,45</span> points. Interprétation : les notes s'écartent en moyenne d'environ 2 à 3 points de la moyenne 12 — une classe assez homogène, plus proche du profil de la classe A que de la classe B.</p></div></div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ Unités : points² contre points</div>
+          <p>La variance <span class="math">V(x)</span> est en unités <strong>au carré</strong> (points², mm², (kg/ha)²), l'écart-type <span class="math">σ</span> est dans l'<strong>unité des données</strong>. Ne jamais dire « la variance est 2,45 points » ni « l'écart-type est 6 points² » — les rôles s'inversent, le correcteur sanctionne.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 3 : NOTION 3 · nuage_point_moyen — SÉRIE DOUBLE -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s3">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">03</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 3 · nuage_point_moyen</span>
+        <h2 class="lecture-section-title">Série double, nuage de points, point moyen</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Jusqu'ici, un seul caractère à la fois. Mais les questions intéressantes relient souvent <strong>deux</strong> caractères : la dose d'engrais et le rendement, la pluie et la récolte, la taille et le poids. On mesure alors les deux caractères sur les <strong>mêmes individus</strong> : c'est une <strong>série statistique double</strong>.
+      </p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">📗 Vocabulaire — série double</div>
+          <p>Pour chaque individu i, on note le couple <span class="math">(xᵢ ; yᵢ)</span> : <span class="math">xᵢ</span> est la valeur du premier caractère (souvent la variable <em>explicative</em>, portée en abscisse) et <span class="math">yᵢ</span> celle du second (la variable <em>expliquée</em>, portée en ordonnée). Chaque individu devient un point <span class="math">Mᵢ(xᵢ ; yᵢ)</span> du plan : l'ensemble de ces points est le <strong>nuage de points</strong> de la série double.</p>
+        </div>
+      </div>
+
+      <p class="lecture-text">
+        Exemple filé pour toute cette partie : un agent agricole essaie <strong>5 doses d'engrais</strong> sur 5 parcelles identiques de mil et note le rendement en sacs :
+      </p>
+
+      <div class="lecture-table">
+        <table>
+          <thead>
+            <tr><th>Dose d'engrais xᵢ (kg)</th><th>10</th><th>20</th><th>30</th><th>40</th><th>50</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Rendement yᵢ (sacs)</td><td>8</td><td>11</td><td>12</td><td>16</td><td>18</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">📗 Définition officielle — Point moyen</div>
+          <p>Le <strong>point moyen</strong> <span class="math">G(x̄ ; ȳ)</span> du nuage est le point dont l'abscisse est la moyenne des <span class="math">xᵢ</span> et l'ordonnée la moyenne des <span class="math">yᵢ</span> : <span class="math">x̄ = (Σ nᵢ·xᵢ)/N</span> et <span class="math">ȳ = (Σ nᵢ·yᵢ)/N</span>. C'est le « centre de gravité » du nuage.</p>
+        </div>
+      </div>
+
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">🧮 Calcul du point moyen</div>
+        <div class="lecture-example-content"><p>Ici chaque valeur apparaît une fois (<span class="math">N = 5</span>) : <span class="math">x̄ = (10 + 20 + 30 + 40 + 50)/5 = 150/5 = 30</span> et <span class="math">ȳ = (8 + 11 + 12 + 16 + 18)/5 = 65/5 = 13</span>. D'où <span class="math">G(30 ; 13)</span>.</p></div>
+      </div>
+
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 520 335" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Nuage de points de la série double : cinq points M₁ à M₅ et le point moyen G(30 ; 13)">
+          <text x="270" y="20" style="fill:var(--accent-bright)" font-size="11" font-weight="700" font-family="Inter" text-anchor="middle" letter-spacing="2">NUAGE DE POINTS ET POINT MOYEN</text>
+          <line x1="50" y1="285" x2="490" y2="285" style="stroke:var(--text-dim)" stroke-width="2"/>
+          <line x1="50" y1="285" x2="50" y2="35" style="stroke:var(--text-dim)" stroke-width="2"/>
+          <g font-family="Inter" font-size="10" style="fill:var(--text-dim)" text-anchor="middle">
+            <text x="120" y="300">10</text>
+            <text x="190" y="300">20</text>
+            <text x="260" y="300">30</text>
+            <text x="330" y="300">40</text>
+            <text x="400" y="300">50</text>
+            <text x="38" y="229" text-anchor="end">5</text>
+            <text x="38" y="169" text-anchor="end">10</text>
+            <text x="38" y="109" text-anchor="end">15</text>
+            <text x="38" y="49" text-anchor="end">20</text>
+            <text x="482" y="300" font-weight="700">x</text>
+            <text x="62" y="45" font-weight="700">y</text>
+          </g>
+          <g font-family="Inter" font-size="11" font-weight="700" style="fill:var(--info)">
+            <circle cx="120" cy="189" r="5"/>
+            <circle cx="190" cy="153" r="5"/>
+            <circle cx="260" cy="141" r="5"/>
+            <circle cx="330" cy="93" r="5"/>
+            <circle cx="400" cy="69" r="5"/>
+            <text x="112" y="207">M₁</text>
+            <text x="182" y="171">M₂</text>
+            <text x="252" y="159">M₃</text>
+            <text x="322" y="111">M₄</text>
+            <text x="392" y="87">M₅</text>
+          </g>
+          <circle cx="260" cy="129" r="7" style="fill:var(--accent-bright)"/>
+          <text x="274" y="127" style="fill:var(--accent-bright)" font-family="Inter" font-size="12" font-weight="700">G(30 ; 13)</text>
+        </svg>
+        <figcaption class="lecture-figure-caption">Les cinq parcelles deviennent cinq points Mᵢ(xᵢ ; yᵢ) ; le point moyen G(x̄ ; ȳ) est le centre de gravité du nuage. Ici le nuage est « allongé et montante » : une droite peut le résumer.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 4 : NOTION 4 · mayer — L'AJUSTEMENT, DROITE DE MAYER -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s4">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">04</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 4 · mayer</span>
+        <h2 class="lecture-section-title">L'ajustement linéaire : la droite de Mayer</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Quand le nuage est <strong>allongé</strong>, on le résume par une droite : c'est un <strong>ajustement linéaire</strong>. Intérêt pratique : une droite se manipule facilement, et permet surtout de <strong>prévoir</strong> — par exemple le rendement pour une dose d'engrais non testée. Comment choisir la droite ? Deux méthodes au programme : celle de <strong>Mayer</strong> (simple, géométrique) et celle des <strong>moindres carrés</strong> (la référence, section suivante).
+      </p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">📗 Méthode de Mayer — méthode des points moyens</div>
+          <p>On <strong>partage le nuage en deux groupes</strong> de points (premiers points / derniers points, selon les x croissants), on calcule le <strong>point moyen G₁</strong> du premier groupe et le <strong>point moyen G₂</strong> du second, et on prend pour droite d'ajustement la <strong>droite (G₁G₂)</strong> passant par ces deux points moyens.</p>
+        </div>
+      </div>
+
+      <h3 class="lecture-subtitle">Exemple complet — droite de Mayer sur les 5 parcelles</h3>
+
+      <div class="lecture-steps">
+        <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Partager le nuage.</strong> Groupe 1 : les deux premiers points <span class="math">(10 ; 8)</span> et <span class="math">(20 ; 11)</span>. Groupe 2 : les deux derniers <span class="math">(40 ; 16)</span> et <span class="math">(50 ; 18)</span>. (Le point du milieu peut rejoindre l'un ou l'autre groupe selon l'énoncé.)</p></div></div>
+        <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Point moyen de chaque groupe.</strong> <span class="math">G₁((10 + 20)/2 ; (8 + 11)/2) = G₁(15 ; 9,5)</span> et <span class="math">G₂((40 + 50)/2 ; (16 + 18)/2) = G₂(45 ; 17)</span>.</p></div></div>
+        <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Équation de (G₁G₂).</strong> Coefficient directeur : <span class="math">a = (17 − 9,5)/(45 − 15) = 7,5/30 = 0,25</span>. Puis <span class="math">b = 9,5 − 0,25×15 = 9,5 − 3,75 = 5,75</span>. Droite de Mayer : <span class="math">y = 0,25·x + 5,75</span>.</p></div></div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ La droite de Mayer dépend du découpage</div>
+          <p>Change le partage en deux groupes, et la droite change (un peu). C'est une méthode simple mais <strong>approximative</strong> : elle « voit » seulement les deux points moyens, pas les cinq points individuels. D'où l'idée de la méthode des moindres carrés, qui tient compte de <em>tous</em> les points — et qui est <strong>unique</strong>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 5 : NOTION 5 · moindres_carres — MOINDRES CARRÉS -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s5">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">05</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 5 · moindres_carres</span>
+        <h2 class="lecture-section-title">La droite des moindres carrés</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Parmi toutes les droites possibles, la méthode des <strong>moindres carrés</strong> choisit celle qui rend <strong>minimale la somme des carrés des écarts verticaux</strong> entre les points <span class="math">Mᵢ</span> et la droite. On admet ici la formule de cette droite — l'essentiel est de savoir la <strong>calculer</strong> sans erreur.
+      </p>
+
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-label">La droite des moindres carrés — à connaître par cœur</div>
+        <div class="lecture-formula-hero-main">D : y = a·x + b   avec   a = cov(x ; y)/V(x)   et   b = ȳ − a·x̄</div>
+        <div class="lecture-formula-hero-desc">a est le coefficient directeur (la pente), b l'ordonnée à l'origine. Cette droite passe TOUJOURS par le point moyen G(x̄ ; ȳ) — contrôle systématique de tes calculs.</div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">📗 Définition officielle — Covariance</div>
+          <p>La <strong>covariance</strong> de <span class="math">x</span> et <span class="math">y</span> est <span class="math">cov(x ; y) = (Σ nᵢ·xᵢ·yᵢ)/N − x̄·ȳ</span>. Elle se calcule avec une colonne supplémentaire <span class="math">xᵢ·yᵢ</span> dans le tableau, à côté de la colonne <span class="math">xᵢ²</span> qui sert à <span class="math">V(x) = (Σ nᵢ·xᵢ²)/N − x̄²</span>.</p>
+        </div>
+      </div>
+
+      <ul class="lecture-list-elegant">
+        <li><strong>cov(x ; y) &gt; 0</strong> : <span class="math">x</span> et <span class="math">y</span> varient « dans le même sens » (plus d'engrais → plus de rendement) ; la droite est <strong>croissante</strong> (<span class="math">a &gt; 0</span>).</li>
+        <li><strong>cov(x ; y) &lt; 0</strong> : les deux caractères varient « en sens opposés » ; la droite est <strong>décroissante</strong> (<span class="math">a &lt; 0</span>).</li>
+        <li>La droite des moindres carrés passe toujours par <span class="math">G(x̄ ; ȳ)</span> : c'est LA vérification de fin de calcul — remplacer <span class="math">x</span> par <span class="math">x̄</span> doit redonner <span class="math">ȳ</span>.</li>
+      </ul>
+
+      <div class="lecture-rule">
+        <div class="lecture-rule-label">🧮 À la calculatrice</div>
+        <div class="lecture-rule-body">
+          Les calculatrices scientifiques usuelles font tout ce travail : menu <strong>STAT / Édition</strong> pour saisir les listes <span class="math">xᵢ</span> (liste 1) et <span class="math">yᵢ</span> (liste 2), puis menu <strong>STAT / CALC / Régression linéaire</strong> (souvent notée « ax + b » ou « LinReg »). La machine affiche directement <span class="math">a</span>, <span class="math">b</span> — et souvent le coefficient <span class="math">r</span> de la Partie 3. À l'examen, écris quand même les formules et les valeurs intermédiaires : c'est elles qui rapportent les points.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 6 : EXEMPLE COMPLET — A, B, D, PRÉVISION -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s6">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">06</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Exemple complet</span>
+        <h2 class="lecture-section-title">De la série double à la prévision</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Reprenons les <strong>5 parcelles</strong> (dose d'engrais <span class="math">xᵢ</span> en kg, rendement <span class="math">yᵢ</span> en sacs) et construisons la droite des moindres carrés de bout en bout. Premier réflexe : <strong>un tableau unique</strong>, complété au fur et à mesure.
+      </p>
+
+      <div class="lecture-table">
+        <table>
+          <thead>
+            <tr><th>xᵢ</th><th>yᵢ</th><th>xᵢ²</th><th>xᵢ·yᵢ</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>10</td><td>8</td><td>100</td><td>80</td></tr>
+            <tr><td>20</td><td>11</td><td>400</td><td>220</td></tr>
+            <tr><td>30</td><td>12</td><td>900</td><td>360</td></tr>
+            <tr><td>40</td><td>16</td><td>1 600</td><td>640</td></tr>
+            <tr><td>50</td><td>18</td><td>2 500</td><td>900</td></tr>
+            <tr><td><strong>Σ = 150</strong></td><td><strong>Σ = 65</strong></td><td><strong>Σ = 5 500</strong></td><td><strong>Σ = 2 200</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="lecture-steps">
+        <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Moyennes et point moyen.</strong> <span class="math">x̄ = 150/5 = 30</span> ; <span class="math">ȳ = 65/5 = 13</span> ; donc <span class="math">G(30 ; 13)</span>.</p></div></div>
+        <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Variance de x.</strong> <span class="math">V(x) = (Σ xᵢ²)/5 − x̄² = 5 500/5 − 900 = 1 100 − 900 = 200</span>.</p></div></div>
+        <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Covariance.</strong> <span class="math">cov(x ; y) = (Σ xᵢ·yᵢ)/5 − x̄·ȳ = 2 200/5 − 30×13 = 440 − 390 = 50</span>. Elle est positive : la droite sera croissante.</p></div></div>
+        <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Pente.</strong> <span class="math">a = cov(x ; y)/V(x) = 50/200 = 0,25</span>.</p></div></div>
+        <div class="lecture-step"><div class="lecture-step-number">5</div><div class="lecture-step-content"><p><strong>Ordonnée à l'origine.</strong> <span class="math">b = ȳ − a·x̄ = 13 − 0,25×30 = 13 − 7,5 = 5,5</span>. D'où la droite <span class="math">D : y = 0,25·x + 5,5</span>.</p></div></div>
+        <div class="lecture-step"><div class="lecture-step-number">6</div><div class="lecture-step-content"><p><strong>Contrôle systématique.</strong> <span class="math">G ∈ D</span> ? <span class="math">0,25×30 + 5,5 = 7,5 + 5,5 = 13 = ȳ</span> ✓. La droite passe bien par le point moyen.</p></div></div>
+        <div class="lecture-step"><div class="lecture-step-number">7</div><div class="lecture-step-content"><p><strong>Prévision (interpolation).</strong> Pour <span class="math">x = 35</span> kg d'engrais, valeur <strong>dans</strong> le domaine observé [10 ; 50] : <span class="math">y = 0,25×35 + 5,5 = 8,75 + 5,5 = 14,25</span>. On prévoit environ <strong>14,25 sacs</strong> par parcelle.</p></div></div>
+      </div>
+
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">🔍 Comparaison avec la droite de Mayer</div>
+        <div class="lecture-example-content"><p>Sur les mêmes données, Mayer donnait <span class="math">y = 0,25·x + 5,75</span> et les moindres carrés donnent <span class="math">y = 0,25·x + 5,5</span> : même pente ici, ordonnées à l'origine voisines. Les deux droites sont proches — mais seule celle des moindres carrés est <strong>unique</strong> et tient compte des cinq points. C'est elle qu'on utilise pour les prévisions.</p></div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-danger">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Erreur fréquente au Bac — l'extrapolation</div>
+          <p>Prévoir pour <span class="math">x = 70</span> kg donnerait <span class="math">y = 0,25×70 + 5,5 = 23</span> sacs : c'est une <strong>extrapolation</strong>, en dehors du domaine observé [10 ; 50]. Rien ne garantit que la tendance continue (un excès d'engrais peut même brûler les plants et faire <em>baisser</em> le rendement). Une prévision hors domaine doit toujours être donnée avec prudence, et signalée comme telle.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 7 : BILAN -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s7">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">07</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Bilan</span>
+        <h2 class="lecture-section-title">Formules à retenir et pièges</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Toute la partie tient en une chaîne : <strong>tableau → moyennes → variance et covariance → a et b → droite D → contrôle avec G → prévision</strong>. Chaque maillon a sa formule :
+      </p>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">V(x) = (Σ nᵢ·(xᵢ − x̄)²)/N = (Σ nᵢ·xᵢ²)/N − x̄²   ·   σ = √(V(x))   ·   cov(x ; y) = (Σ nᵢ·xᵢ·yᵢ)/N − x̄·ȳ</div>
+        <div class="lecture-formula-desc">Variance (deux écritures), écart-type, covariance : les trois briques de calcul. Ensuite a = cov(x ; y)/V(x) et b = ȳ − a·x̄ donnent la droite.</div>
+      </div>
+
+      <ul class="lecture-list">
+        <li><strong>Variance et écart-type</strong> mesurent la dispersion d'une série seule ; <span class="math">σ</span> est dans l'unité des données.</li>
+        <li><strong>Point moyen</strong> <span class="math">G(x̄ ; ȳ)</span> : centre de gravité du nuage, toujours sur la droite d'ajustement.</li>
+        <li><strong>Deux droites possibles</strong> : Mayer (G₁G₂, dépend du découpage) et moindres carrés (unique, référence).</li>
+        <li><strong>Prévision</strong> : interpolation dans le domaine observé = légitime ; extrapolation au-dehors = à signaler, avec prudence.</li>
+      </ul>
+
+      <div class="lecture-callout lecture-callout-danger">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Les trois erreurs qui coûtent le plus</div>
+          <p><strong>1)</strong> Oublier de diviser par N dans la variance ou la covariance (sommes brutes <span class="math">5 500</span> ou <span class="math">2 200</span> utilisées telles quelles). <strong>2)</strong> Confondre les colonnes : <span class="math">V(x)</span> se calcule avec <span class="math">xᵢ²</span>, la covariance avec <span class="math">xᵢ·yᵢ</span>. <strong>3)</strong> Calculer <span class="math">b</span> avec un <span class="math">a</span> arrondi trop tôt — garde la valeur exacte jusqu'au bout, comme on le verra en Partie 4.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== QCM D'ENTRAÎNEMENT ===== -->
+  <div class="lecture-quiz">
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q1 — Une série a un écart-type σ = 2. Sa variance vaut :</p>
+      <div class="lecture-quiz-options"><span>A) √2</span> <span>B) 4</span> <span>C) 2</span> <span>D) 1/2</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><strong>B) 4.</strong> Par définition σ = √(V(x)), donc V(x) = σ² = 2² = 4. Ne pas confondre le sens de la formule : la variance est le carré de l'écart-type, pas l'inverse.</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q2 — La droite des moindres carrés d'un nuage de points :</p>
+      <div class="lecture-quiz-options"><span>A) passe toujours par le point moyen G(x̄ ; ȳ)</span> <span>B) ne passe jamais par G</span> <span>C) ne passe par G que si r = 1</span> <span>D) passe par G seulement quand a &gt; 0</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><strong>A) passe toujours par G(x̄ ; ȳ).</strong> C'est une propriété générale de la droite des moindres carrés, indépendante de la valeur de a, b ou r. D'où le contrôle systématique : remplacer x par x̄ doit redonner ȳ.</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q3 — On donne cov(x ; y) = 30, V(x) = 12, x̄ = 4, ȳ = 7. La droite des moindres carrés est :</p>
+      <div class="lecture-quiz-options"><span>A) y = 2,5·x − 3</span> <span>B) y = 0,4·x + 5,4</span> <span>C) y = 42·x + 7</span> <span>D) y = 2,5·x + 3</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><strong>A) y = 2,5·x − 3.</strong> a = cov(x ; y)/V(x) = 30/12 = 2,5 et b = ȳ − a·x̄ = 7 − 2,5×4 = 7 − 10 = −3. Contrôle : G(4 ; 7) est sur la droite car 2,5×4 − 3 = 7 ✓. (B utilise l'inverse 12/30, C multiplie au lieu de diviser, D se trompe de signe.)</div></details>
+    </div>
+  </div>
+
+  <!-- ===== RÉCAPITULATIF ===== -->
+  <div class="lecture-recap">
+    <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
+    <ul class="lecture-recap-list">
+      <li><strong>[variance]</strong> <span class="math">V(x) = (Σ nᵢ·(xᵢ − x̄)²)/N = (Σ nᵢ·xᵢ²)/N − x̄²</span> — la seconde formule est plus rapide au calcul</li>
+      <li><strong>[ecart_type]</strong> <span class="math">σ = √(V(x))</span>, même unité que les données ; σ petit → série homogène, σ grand → série dispersée</li>
+      <li><strong>[nuage_point_moyen]</strong> Série double : chaque individu devient <span class="math">Mᵢ(xᵢ ; yᵢ)</span> ; le point moyen est <span class="math">G(x̄ ; ȳ)</span></li>
+      <li><strong>[mayer]</strong> Droite de Mayer : deux groupes → deux points moyens <span class="math">G₁</span> et <span class="math">G₂</span> → droite (G₁G₂) ; méthode simple mais dépendante du découpage</li>
+      <li><strong>[moindres_carres]</strong> <span class="math">cov(x ; y) = (Σ nᵢ·xᵢ·yᵢ)/N − x̄·ȳ</span>, puis <span class="math">a = cov(x ; y)/V(x)</span> et <span class="math">b = ȳ − a·x̄</span></li>
+      <li><strong>[moindres_carres]</strong> La droite <span class="math">D : y = a·x + b</span> des moindres carrés passe toujours par <span class="math">G(x̄ ; ȳ)</span> — contrôle systématique</li>
+      <li><strong>[moindres_carres]</strong> cov &gt; 0 ↔ droite croissante ; cov &lt; 0 ↔ droite décroissante</li>
+      <li><strong>[nuage_point_moyen]</strong> Prévision par interpolation (dans le domaine observé) ; extrapolation signalée avec prudence</li>
+      <li><strong>[variance]</strong> Colonnes du tableau : xᵢ² pour V(x), xᵢ·yᵢ pour cov(x ; y) — ne jamais les mélanger</li>
+      <li><strong>[moindres_carres]</strong> Calculatrice : menu STAT / CALC / régression linéaire donne a et b — mais écrire les formules sur la copie</li>
+    </ul>
+  </div>
+
+  <!-- ===== FIN ===== -->
+  <div class="lecture-end">
+    <span class="lecture-end-icon">🎯</span>
+    <div class="lecture-end-text">Partie 2 terminée !</div>
+    <div class="lecture-end-sub">Passe à la partie suivante : le coefficient de corrélation linéaire r</div>
+    <div class="lecture-end-divider"></div>
+  </div>
+
+</div>

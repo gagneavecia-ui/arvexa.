@@ -1,0 +1,547 @@
+<!-- ============================================================ -->
+<!-- PARTIE 1 : L'ÉQUATION y' = ay                                 -->
+<!-- Notion 1 : definition_ed — Qu'est-ce qu'une équation          -->
+<!--            différentielle ? Modélisation                      -->
+<!-- Notion 2 : eq_y_ay — Solution générale de y' = ay, infinité   -->
+<!--            de solutions, existence-unicité, condition         -->
+<!--            initiale, calculs purs                             -->
+<!-- ============================================================ -->
+
+<div class="lecture-container">
+
+  <!-- ===== HERO ===== -->
+  <header class="lecture-hero">
+    <div class="lecture-hero-badge">
+      <span class="lecture-hero-icon">📘</span>
+      <span class="lecture-hero-label">Partie 01 · Équations différentielles</span>
+    </div>
+    <h1 class="lecture-hero-title">
+      L'équation <em><span class="math">y' = ay</span></em>
+    </h1>
+    <p class="lecture-hero-intro">
+      Et si l'inconnue d'une équation n'était plus un nombre, mais une <strong>fonction</strong> ? Cette partie introduit les <strong>équations différentielles</strong> — des équations qui relient une fonction <span class="math">y</span> à sa dérivée <span class="math">y'</span> — puis résout la plus simple d'entre elles : <span class="math">y' = ay</span>. Tu apprendras la <strong>définition</strong>, la <strong>forme générale des solutions</strong>, pourquoi il en existe une <strong>infinité</strong>, et le <strong>théorème d'existence-unicité</strong> qui en sélectionne exactement une grâce à une condition initiale.
+    </p>
+    <div class="lecture-hero-meta">
+      <span class="lecture-hero-meta-item">⏱ 20 min</span>
+      <span class="lecture-hero-meta-item">🧮 2 notions</span>
+      <span class="lecture-hero-meta-item">📊 8 sections</span>
+      <span class="lecture-hero-meta-item">🎓 Terminale D</span>
+    </div>
+  </header>
+
+  <!-- ===== SOMMAIRE ===== -->
+  <nav class="lecture-toc">
+    <div class="lecture-toc-header">
+      <span>Dans cette partie</span>
+      <span class="lecture-toc-count">2 notions · 8 sections</span>
+    </div>
+    <ol class="lecture-toc-list">
+      <li><a href="#s0"><span class="toc-num">00</span><span>Motivation — Une grandeur qui grandit comme elle est grande</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>Notion 1 · definition_ed — Définir une équation différentielle</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>Notion 1 · definition_ed — Modéliser : la vitesse proportionnelle à la grandeur</span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>Notion 1 · definition_ed — Vérifier qu'une fonction est solution</span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>Notion 2 · eq_y_ay — La solution générale de y' = ay</span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>Notion 2 · eq_y_ay — Une infinité de solutions : une famille de courbes</span></a></li>
+      <li><a href="#s6"><span class="toc-num">06</span><span>Notion 2 · eq_y_ay — Existence-unicité et condition initiale</span></a></li>
+      <li><a href="#s7"><span class="toc-num">07</span><span>Notion 2 · eq_y_ay — Exemples de calculs purs &amp; bilan</span></a></li>
+    </ol>
+  </nav>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 0 : MOTIVATION -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s0">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">00</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Motivation</span>
+        <h2 class="lecture-section-title">Une grandeur qui grandit comme elle est grande</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Dans un fermenteur d'un laboratoire de Niamey, une population de bactéries grossit — et plus elle est nombreuse, plus elle grossit vite. Cette situation, banale en apparence, cache une idée mathématique puissante : la <strong>vitesse de variation</strong> de la grandeur est <strong>proportionnelle à la grandeur elle-même</strong>. Traduit en langage de dérivées : si <span class="math">N(t)</span> désigne l'effectif à l'instant <span class="math">t</span>, alors <span class="math">N'(t) = a·N(t)</span> pour un certain réel <span class="math">a</span>.
+      </p>
+
+      <p class="lecture-text">
+        Mais ici, l'inconnue n'est pas un nombre : c'est la <strong>fonction</strong> <span class="math">N</span> tout entière. Trouver toutes les fonctions qui vérifient une telle relation, c'est <strong>résoudre une équation différentielle</strong> — l'un des outils les plus utilisés des sciences (physique, chimie, SVT, économie). Ce chapitre t'apprend à résoudre les trois formes au programme de Terminale D, en commençant par la plus simple.
+      </p>
+
+      <div class="lecture-callout lecture-callout-gold">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Les trois questions de ce chapitre</div>
+          <ul class="lecture-list">
+            <li><strong>Partie 1</strong> : comment résoudre <span class="math">y' = ay</span>, et comment choisir LA bonne solution ?</li>
+            <li><strong>Partie 2</strong> : et si l'équation était <span class="math">y' = ay + b</span> ? (un apport constant s'ajoute)</li>
+            <li><strong>Parties 3 et 4</strong> : le cas général <span class="math">y' = ay + f(x)</span>, puis la fiche complète avec les applications (radioactivité, populations).</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 1 : NOTION 1 · definition_ed — DÉFINITION -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s1">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">01</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1 · definition_ed</span>
+        <h2 class="lecture-section-title">Définir une équation différentielle</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Commençons par la définition officielle, celle qu'il faut savoir restituer <em>mot pour mot</em> à l'examen.
+      </p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">📗 Définition officielle — Équation différentielle</div>
+          <p>Une <strong>équation différentielle</strong> est une équation dont l'<strong>inconnue est une fonction</strong> <span class="math">y</span>, supposée <strong>dérivable sur un intervalle</strong> (dans tout ce chapitre : sur <span class="math">ℝ</span>), et qui <strong>relie cette fonction à sa dérivée</strong> <span class="math">y'</span>.</p>
+          <p><strong>Résoudre</strong> l'équation, c'est trouver <strong>toutes</strong> les fonctions dérivables qui la vérifient : chacune d'elles est appelée une <strong>solution</strong> de l'équation différentielle.</p>
+        </div>
+      </div>
+
+      <p class="lecture-text">
+        Trois idées essentielles se cachent dans cette définition :
+      </p>
+
+      <ul class="lecture-list-elegant">
+        <li><strong>« L'inconnue est une fonction »</strong> : dans <span class="math">x + 2 = 5</span>, on cherche un <em>nombre</em> <span class="math">x</span> ; dans <span class="math">y' = 3y</span>, on cherche une <em>fonction</em> <span class="math">y</span>, c'est-à-dire une règle qui, à chaque réel, associe une valeur.</li>
+        <li><strong>« Relie la fonction à sa dérivée »</strong> : l'équation contient <span class="math">y</span> et <span class="math">y'</span> (parfois <span class="math">x</span>). C'est ce mélange qui la rend spéciale.</li>
+        <li><strong>« Toutes les fonctions »</strong> : résoudre, ce n'est pas trouver UNE fonction, c'est décrire la <strong>famille complète</strong> des solutions — souvent une famille infinie, paramétrée par une constante.</li>
+      </ul>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main"><span class="math">y' = dy/dx</span> : deux écritures de la même dérivée</div>
+        <div class="lecture-formula-desc">La notation <span class="math">dy/dx</span> (dite « dé de y sur dé de x ») est la notation de Leibniz ; nous utilisons dans tout le chapitre la notation <span class="math">y'</span>, plus courte. Les deux désignent exactement la même chose.</div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ L'inconnue est une fonction, pas un nombre</div>
+          <p>Erreur de lecture fréquente : <span class="math">y' = 3y</span> ne veut PAS dire « le nombre <span class="math">y'</span> égale trois fois le nombre <span class="math">y</span> ». Cela veut dire : <strong>pour chaque réel <span class="math">x</span></strong>, la valeur de la fonction dérivée en <span class="math">x</span> vaut trois fois la valeur de la fonction en <span class="math">x</span>. L'égalité doit être vraie <strong>pour tout <span class="math">x</span></strong> de <span class="math">ℝ</span>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 2 : NOTION 1 · definition_ed — MODÉLISATION -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s2">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">02</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1 · definition_ed</span>
+        <h2 class="lecture-section-title">Modéliser : la vitesse proportionnelle à la grandeur</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        D'où viennent les équations différentielles ? De la traduction d'une phrase très naturelle : <strong>« la grandeur varie à une vitesse proportionnelle à elle-même »</strong>. Trois exemples de modélisation, très brèvement :
+      </p>
+
+      <ul class="lecture-list">
+        <li><strong>Une population</strong> <span class="math">N(t)</span> qui grossit d'autant plus vite qu'elle est nombreuse : sa vitesse de variation est proportionnelle à <span class="math">N</span>, d'où <span class="math">N' = a·N</span> avec <span class="math">a &gt; 0</span>.</li>
+        <li><strong>Une matière radioactive</strong> <span class="math">N(t)</span> qui diminue d'autant plus vite qu'il en reste : <span class="math">N' = −λ·N</span> avec <span class="math">λ &gt; 0</span> (modèle détaillé en Partie 4, lien avec le cours de SVT).</li>
+        <li><strong>Un capital placé</strong> à taux d'intérêt constant <span class="math">t</span> (intérêts composés) : il grossit proportionnellement à lui-même, d'où <span class="math">C' = t·C</span>.</li>
+      </ul>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">Vitesse de variation proportionnelle à la grandeur ⟺ <span class="math">y' = a·y</span></div>
+        <div class="lecture-formula-desc">Le réel <span class="math">a</span> s'appelle le coefficient (ou le taux) de proportionnalité. Son signe décide de tout : <span class="math">a &gt; 0</span> → croissance ; <span class="math">a &lt; 0</span> → décroissance. Résoudre l'équation, c'est prévoir l'évolution complète de la grandeur.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 3 : NOTION 1 · definition_ed — VÉRIFIER UNE SOLUTION -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s3">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">03</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1 · definition_ed</span>
+        <h2 class="lecture-section-title">Vérifier qu'une fonction est solution</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Avant d'apprendre à résoudre, apprenons le geste le plus rentable du chapitre : <strong>contrôler qu'une fonction proposée est bien solution</strong>. La méthode tient en deux gestes : <strong>dériver</strong>, puis <strong>substituer</strong>.
+      </p>
+
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">🧮 Exemple — Montrer que y(x) = e^(2x) est solution de y' = 2y</div>
+        <div class="lecture-example-content">
+          <div class="lecture-steps">
+            <div class="lecture-step">
+              <div class="lecture-step-number">1</div>
+              <div class="lecture-step-content"><p><strong>Dériver</strong> : <span class="math">y(x) = e^(2x)</span> est de la forme <span class="math">e^(k·x)</span>, donc <span class="math">y' = 2·e^(2x)</span>.</p></div>
+            </div>
+            <div class="lecture-step">
+              <div class="lecture-step-number">2</div>
+              <div class="lecture-step-content"><p><strong>Substituer</strong> : calculons séparément le second membre : <span class="math">2·y = 2·e^(2x)</span>.</p></div>
+            </div>
+            <div class="lecture-step">
+              <div class="lecture-step-number">3</div>
+              <div class="lecture-step-content"><p><strong>Comparer</strong> : on obtient <span class="math">y' = 2·e^(2x) = 2·y</span> pour tout réel <span class="math">x</span> ✅ Donc <span class="math">y(x) = e^(2x)</span> est bien une solution de <span class="math">y' = 2y</span>.</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-danger">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Erreur fréquente au Bac — et le réflexe qui rapporte des points</div>
+          <p>Beaucoup d'élèves « devinent » une solution sans la contrôler. À l'examen, une question du type <strong>« vérifier que la fonction g définie par g(x) = … est solution de … »</strong> se traite toujours ainsi : <strong>dériver g, calculer le second membre, conclure que les deux sont égaux</strong>. Deux lignes de calcul, des points garantis — même si tu ne sais pas résoudre l'équation !</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 4 : NOTION 2 · eq_y_ay — SOLUTION GÉNÉRALE -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s4">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">04</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2 · eq_y_ay</span>
+        <h2 class="lecture-section-title">La solution générale de y' = ay</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Nous y voilà. On se donne un réel <span class="math">a</span> <strong>non nul</strong>, et on résout <span class="math">y' = ay</span>. Le résultat central du chapitre (admis — la démonstration dépasse le programme) est le suivant :
+      </p>
+
+      <div class="lecture-callout lecture-callout-gold">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">📐 Théorème (admis) — Solutions de y' = ay</div>
+          <p>Soit <span class="math">a</span> un réel non nul. <strong>Les solutions de l'équation différentielle y' = ay sont exactement les fonctions</strong> définies sur <span class="math">ℝ</span> par :</p>
+          <p><span class="math">y(x) = C·e^(a·x)</span>, où <span class="math">C</span> est un réel quelconque.</p>
+        </div>
+      </div>
+
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-label">LA formule de la partie</div>
+        <div class="lecture-formula-hero-main"><span class="math">y' = ay&nbsp;&nbsp;⇔&nbsp;&nbsp;y(x) = C·e^(a·x), C ∈ ℝ</span></div>
+        <div class="lecture-formula-hero-desc">On reconnaît la forme <span class="math">e^(a·x)</span> : c'est la seule fonction dont la dérivée est proportionnelle à elle-même, car <span class="math">(e^(a·x))' = a·e^(a·x)</span>.</div>
+      </div>
+
+      <div class="lecture-steps">
+        <div class="lecture-step">
+          <div class="lecture-step-number">1</div>
+          <div class="lecture-step-content"><p><strong>Dériver</strong> la fonction proposée : pour <span class="math">y(x) = C·e^(a·x)</span> (avec <span class="math">C</span> constante), on obtient <span class="math">y' = C·a·e^(a·x) = a·C·e^(a·x)</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">2</div>
+          <div class="lecture-step-content"><p><strong>Calculer le second membre</strong> : <span class="math">a·y = a·C·e^(a·x)</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">3</div>
+          <div class="lecture-step-content"><p><strong>Comparer</strong> : <span class="math">y' = a·C·e^(a·x) = a·y</span> pour tout réel <span class="math">x</span> ✅ L'égalité est vraie quelle que soit la valeur de <span class="math">C</span> : toute fonction de cette forme est solution.</p></div>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ Le rôle de la constante C</div>
+          <p><span class="math">C</span> n'est PAS l'exposant et n'est PAS multiplié dans l'exposant : <span class="math">C·e^(a·x)</span> = « C fois l'exponentielle ». Écrire <span class="math">e^(a·x) + C</span> ou <span class="math">e^(a·x + C)</span> est <strong>faux</strong> — vérifie vite fait : la dérivée de <span class="math">e^(a·x) + C</span> vaut <span class="math">a·e^(a·x)</span>, qui n'est pas proportionnelle à <span class="math">e^(a·x) + C</span>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 5 : NOTION 2 · eq_y_ay — FAMILLE DE COURBES -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s5">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">05</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2 · eq_y_ay</span>
+        <h2 class="lecture-section-title">Une infinité de solutions : une famille de courbes</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Regarde bien la formule : <span class="math">C</span> est un réel <strong>quelconque</strong>. Il y a donc <strong>une infinité de solutions</strong> — une par valeur de <span class="math">C</span> : <span class="math">y = 1·e^(a·x)</span>, <span class="math">y = 2·e^(a·x)</span>, <span class="math">y = 0,5·e^(a·x)</span>, <span class="math">y = −3·e^(a·x)</span>… Graphiquement, les solutions forment une <strong>famille de courbes</strong> qui se déduisent les unes des autres par un étirement vertical (et un retournement si <span class="math">C &lt; 0</span>).
+      </p>
+
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 520 340" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Famille de courbes solutions de y' = y : les courbes d'équation y = C·e^x pour plusieurs valeurs de C">
+          <text x="260" y="22" style="fill:var(--accent-bright)" font-size="11" font-weight="700" font-family="Inter" text-anchor="middle" letter-spacing="2">FAMILLE DE SOLUTIONS DE y' = y</text>
+
+          <line x1="50" y1="250" x2="490" y2="250" style="stroke:var(--text-dim)" stroke-width="1.5"/>
+          <line x1="90" y1="40" x2="90" y2="325" style="stroke:var(--text-dim)" stroke-width="1.5"/>
+          <text x="494" y="266" style="fill:var(--text-dim)" font-size="12" font-family="Inter">x</text>
+          <text x="72" y="36" style="fill:var(--text-dim)" font-size="12" font-family="Inter">y</text>
+
+          <g font-family="Inter" font-size="11" style="fill:var(--text-dim)">
+            <circle cx="90" cy="90" r="3.5" style="fill:var(--accent-bright)"/>
+            <text x="32" y="94">C = 4</text>
+            <circle cx="90" cy="170" r="3.5" style="fill:var(--green-bright)"/>
+            <text x="32" y="174">C = 2</text>
+            <circle cx="90" cy="210" r="3.5" style="fill:var(--info)"/>
+            <text x="28" y="214">C = 1</text>
+            <circle cx="90" cy="290" r="3.5" style="fill:var(--info)"/>
+            <text x="22" y="294">C = −1</text>
+          </g>
+
+          <path d="M 50 244 C 72 232, 84 170, 90 90 C 93 62, 96 48, 98 40" style="fill:none;stroke:var(--accent-bright)" stroke-width="2.5"/>
+          <path d="M 50 246 C 92 238, 150 208, 214 172 C 290 128, 380 88, 470 54" style="fill:none;stroke:var(--green-bright)" stroke-width="2.5"/>
+          <path d="M 50 248 C 104 243, 174 224, 244 200 C 326 172, 404 142, 470 114" style="fill:none;stroke:var(--info)" stroke-width="2.5"/>
+          <path d="M 50 249 C 116 247, 196 236, 274 222 C 352 208, 424 194, 470 184" style="fill:none;stroke:var(--info)" stroke-width="2" stroke-dasharray="5 4"/>
+          <path d="M 50 252 C 84 258, 122 272, 158 292 C 190 310, 210 322, 222 334" style="fill:none;stroke:var(--text-dim)" stroke-width="2" stroke-dasharray="5 4"/>
+        </svg>
+        <figcaption class="lecture-figure-caption">Chaque valeur de <span class="math">C</span> donne une courbe distincte : les solutions de <span class="math">y' = y</span> sont les courbes d'équation <span class="math">y = C·e^x</span>. Elles passent toutes par l'ordonnée <span class="math">C</span> sur l'axe des ordonnées. Imposer une condition initiale revient à sélectionner <strong>une seule</strong> courbe de la famille.</figcaption>
+      </figure>
+
+      <p class="lecture-text">
+        Deux observations utiles pour l'examen. D'abord, comme <span class="math">e^(a·x) &gt; 0</span> pour tout <span class="math">x</span>, le <strong>signe de <span class="math">y(x)</span></strong> est toujours le signe de <span class="math">C</span> : si <span class="math">C &lt; 0</span>, la solution est négative partout. Ensuite, deux valeurs différentes de <span class="math">C</span> donnent deux fonctions <strong>différentes</strong> (elles diffèrent déjà en <span class="math">x = 0</span>) : il n'y a pas de doublons dans la famille.
+      </p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">📗 Notion clé — Solution générale</div>
+          <p>La formule <span class="math">y(x) = C·e^(a·x)</span> avec <span class="math">C ∈ ℝ</span> s'appelle la <strong>solution générale</strong> de <span class="math">y' = ay</span> : elle décrit, d'un seul coup, <strong>toutes</strong> les solutions. Choisir une valeur précise de <span class="math">C</span> donne <strong>une</strong> solution particulière.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 6 : NOTION 2 · eq_y_ay — EXISTENCE-UNICITÉ -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s6">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">06</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2 · eq_y_ay</span>
+        <h2 class="lecture-section-title">Existence-unicité et condition initiale</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Une infinité de solutions, très bien — mais en pratique, on veut souvent <strong>LA</strong> bonne : celle qui passe par une valeur imposée. Par exemple, si on connaît l'effectif initial d'une population, on connaît <span class="math">y(0)</span>. Imposer <span class="math">y(x₀) = y₀</span> s'appelle fixer une <strong>condition initiale</strong>.
+      </p>
+
+      <div class="lecture-callout lecture-callout-gold">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">📐 Théorème d'existence et d'unicité</div>
+          <p>Soit <span class="math">a</span> un réel donné. Pour <strong>tous</strong> réels <span class="math">x₀</span> et <span class="math">y₀</span>, il existe une <strong>unique</strong> fonction <span class="math">y</span> solution de <span class="math">y' = ay</span> qui vérifie la condition initiale <span class="math">y(x₀) = y₀</span>.</p>
+        </div>
+      </div>
+
+      <p class="lecture-text">
+        Concrètement : parmi la famille des courbes, <strong>exactement une</strong> passe par le point de coordonnées <span class="math">(x₀ ; y₀)</span>. Ce théorème justifie que la méthode ci-dessous ne peut ni échouer, ni donner deux réponses.
+      </p>
+
+      <div class="lecture-rule">
+        <div class="lecture-rule-label">🧠 Méthode — Déterminer C à partir de la condition initiale</div>
+        <div class="lecture-rule-body">
+          <p>1. Écrire la <strong>solution générale</strong> : <span class="math">y(x) = C·e^(a·x)</span>.<br/>
+          2. <strong>Substituer</strong> la condition : <span class="math">y(x₀) = C·e^(a·x₀) = y₀</span>.<br/>
+          3. <strong>Isoler C</strong> (en divisant par <span class="math">e^(a·x₀) ≠ 0</span>) : <span class="math">C = y₀·e^(−a·x₀)</span>.<br/>
+          4. <strong>Conclure</strong> en remplaçant <span class="math">C</span> dans la solution générale.</p>
+        </div>
+      </div>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main"><span class="math">C = y₀·e^(−a·x₀)</span>&nbsp;&nbsp;et, dans le cas le plus fréquent&nbsp;&nbsp;<span class="math">x₀ = 0</span>&nbsp;:&nbsp;<span class="math">C = y₀</span></div>
+        <div class="lecture-formula-desc">Quand la condition est donnée en <span class="math">0</span> (cas de loin le plus courant au Bac), <span class="math">e^(a·0) = e^0 = 1</span>, donc la constante <span class="math">C</span> est tout simplement la valeur initiale <span class="math">y₀</span>.</div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-danger">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Erreur fréquente au Bac</div>
+          <p>Trouver <span class="math">C</span> mais oublier de <strong>réécrire la solution finale</strong> avec sa valeur : l'énoncé demande une fonction, pas une constante ! Et si la condition est donnée en <span class="math">x₀ ≠ 0</span>, ne conclus pas <span class="math">C = y₀</span> trop vite : le facteur <span class="math">e^(−a·x₀)</span> compte.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 7 : NOTION 2 · eq_y_ay — EXEMPLES & BILAN -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s7">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">07</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2 · eq_y_ay</span>
+        <h2 class="lecture-section-title">Exemples de calculs purs &amp; bilan</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">🧮 Exemple 1 — Résoudre y' = 3y</div>
+        <div class="lecture-example-content">
+          <div class="lecture-steps">
+            <div class="lecture-step">
+              <div class="lecture-step-number">1</div>
+              <div class="lecture-step-content"><p>Ici <span class="math">a = 3</span>. Solution générale : <span class="math">y(x) = C·e^(3x)</span>, <span class="math">C ∈ ℝ</span>.</p></div>
+            </div>
+            <div class="lecture-step">
+              <div class="lecture-step-number">2</div>
+              <div class="lecture-step-content"><p><strong>Vérification</strong> : <span class="math">y' = 3·C·e^(3x)</span> et <span class="math">3·y = 3·C·e^(3x)</span> ✅ Donc <span class="math">y' = 3y</span>.</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">🧮 Exemple 2 — Résoudre y' = −2y</div>
+        <div class="lecture-example-content">
+          <div class="lecture-steps">
+            <div class="lecture-step">
+              <div class="lecture-step-number">1</div>
+              <div class="lecture-step-content"><p>Ici <span class="math">a = −2</span>. Solution générale : <span class="math">y(x) = C·e^(−2x)</span>, <span class="math">C ∈ ℝ</span>.</p></div>
+            </div>
+            <div class="lecture-step">
+              <div class="lecture-step-number">2</div>
+              <div class="lecture-step-content"><p><strong>Vérification</strong> : <span class="math">y' = −2·C·e^(−2x)</span> et <span class="math">−2·y = −2·C·e^(−2x)</span> ✅ Donc <span class="math">y' = −2y</span>. (Avec <span class="math">a &lt; 0</span>, toutes les solutions de signe donné décroissent vers 0.)</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">🧮 Exemple 3 — y' = 3y avec la condition initiale y(0) = 2</div>
+        <div class="lecture-example-content">
+          <div class="lecture-steps">
+            <div class="lecture-step">
+              <div class="lecture-step-number">1</div>
+              <div class="lecture-step-content"><p>Solution générale : <span class="math">y(x) = C·e^(3x)</span>.</p></div>
+            </div>
+            <div class="lecture-step">
+              <div class="lecture-step-number">2</div>
+              <div class="lecture-step-content"><p><strong>Condition</strong> : <span class="math">y(0) = C·e^(3·0) = C·e^0 = C = 2</span>, donc <span class="math">C = 2</span>.</p></div>
+            </div>
+            <div class="lecture-step">
+              <div class="lecture-step-number">3</div>
+              <div class="lecture-step-content"><p><strong>Conclusion</strong> : <span class="math">y(x) = 2·e^(3x)</span>.</p></div>
+            </div>
+            <div class="lecture-step">
+              <div class="lecture-step-number">4</div>
+              <div class="lecture-step-content"><p><strong>Double vérification</strong> : <span class="math">y(0) = 2·e^0 = 2</span> ✅ ; et <span class="math">y' = 6·e^(3x) = 3·(2·e^(3x)) = 3·y</span> ✅</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">🧮 Exemple 4 — y' = −2y avec la condition initiale y(1) = 5</div>
+        <div class="lecture-example-content">
+          <div class="lecture-steps">
+            <div class="lecture-step">
+              <div class="lecture-step-number">1</div>
+              <div class="lecture-step-content"><p>Solution générale : <span class="math">y(x) = C·e^(−2x)</span>.</p></div>
+            </div>
+            <div class="lecture-step">
+              <div class="lecture-step-number">2</div>
+              <div class="lecture-step-content"><p><strong>Condition</strong> : <span class="math">y(1) = C·e^(−2·1) = C·e^(−2) = 5</span>, donc <span class="math">C = 5·e^(2)</span> (on multiplie les deux membres par <span class="math">e^(2)</span>).</p></div>
+            </div>
+            <div class="lecture-step">
+              <div class="lecture-step-number">3</div>
+              <div class="lecture-step-content"><p><strong>Conclusion</strong> : <span class="math">y(x) = 5·e^(2)·e^(−2x) = 5·e^(2−2x)</span> (produit d'exponentielles : <span class="math">e^(2)·e^(−2x) = e^(2−2x)</span>).</p></div>
+            </div>
+            <div class="lecture-step">
+              <div class="lecture-step-number">4</div>
+              <div class="lecture-step-content"><p><strong>Double vérification</strong> : <span class="math">y(1) = 5·e^(2−2) = 5·e^0 = 5</span> ✅ ; et <span class="math">y' = 5·(−2)·e^(2−2x) = −2·y</span> ✅ (On retrouve la formule <span class="math">C = y₀·e^(−a·x₀) = 5·e^(−(−2)·1) = 5·e^(2)</span>.)</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">Bilan : <span class="math">y' = ay</span> ⟹ <span class="math">y(x) = C·e^(a·x)</span> ; la condition <span class="math">y(x₀) = y₀</span> donne <span class="math">C = y₀·e^(−a·x₀)</span></div>
+        <div class="lecture-formula-desc">Rédaction type Bac : « Les solutions de y' = ay sont les fonctions y(x) = C·e^(a·x), C ∈ ℝ. Or y(x₀) = y₀, donc C = … D'où y(x) = … » — puis vérification en dérivant.</div>
+      </div>
+
+      <ul class="lecture-list-elegant">
+        <li>Les solutions de <span class="math">y' = ay</span> sont <strong>exactement</strong> les fonctions <span class="math">y(x) = C·e^(a·x)</span> avec <span class="math">C ∈ ℝ</span>.</li>
+        <li>Il y a une <strong>infinité</strong> de solutions : une par valeur de <span class="math">C</span> — une famille de courbes.</li>
+        <li>La condition initiale <span class="math">y(x₀) = y₀</span> sélectionne une <strong>unique</strong> solution (théorème d'existence-unicité) : <span class="math">C = y₀·e^(−a·x₀)</span>.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===== QCM D'ENTRAÎNEMENT ===== -->
+  <div class="lecture-quiz">
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q1 — La solution générale de l'équation différentielle y' = 5y est :</p>
+      <div class="lecture-quiz-options">
+        <span>A) y(x) = 5·e^(x)</span>
+        <span>B) y(x) = C·e^(5x)</span>
+        <span>C) y(x) = e^(5x) + C</span>
+        <span>D) y(x) = C·e^(x/5)</span>
+      </div>
+      <details>
+        <summary>Voir la réponse</summary>
+        <div class="lecture-quiz-answer"><strong>B) y(x) = C·e^(5x).</strong> On applique y(x) = C·e^(a·x) avec a = 5. Vérification : y' = 5·C·e^(5x) = 5·y ✅ (Les formes A et C ont une dérivée qui ne convient pas : par exemple (e^(5x) + C)' = 5·e^(5x) ≠ 5·(e^(5x) + C).)</div>
+      </details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q2 — La solution de y' = −y qui vérifie y(0) = 3 est :</p>
+      <div class="lecture-quiz-options">
+        <span>A) y(x) = 3·e^(−x)</span>
+        <span>B) y(x) = −3·e^(x)</span>
+        <span>C) y(x) = e^(−x) + 3</span>
+        <span>D) y(x) = 3·e^(x)</span>
+      </div>
+      <details>
+        <summary>Voir la réponse</summary>
+        <div class="lecture-quiz-answer"><strong>A) y(x) = 3·e^(−x).</strong> Solution générale y = C·e^(−x) ; y(0) = C = 3. Vérification : y(0) = 3 ✅ et y' = −3·e^(−x) = −y ✅ (B vérifie l'équation mais pas la condition : −3·e^0 = −3 ≠ 3 ; C ne vérifie même pas l'équation.)</div>
+      </details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q3 — Combien de solutions de y' = ay vérifient la condition initiale y(x₀) = y₀ (x₀ et y₀ donnés) ?</p>
+      <div class="lecture-quiz-options">
+        <span>A) aucune</span>
+        <span>B) une seule</span>
+        <span>C) une infinité</span>
+        <span>D) cela dépend des valeurs de x₀ et y₀</span>
+      </div>
+      <details>
+        <summary>Voir la réponse</summary>
+        <div class="lecture-quiz-answer"><strong>B) une seule.</strong> C'est le théorème d'existence et d'unicité : la constante C est déterminée sans ambiguïté par C = y₀·e^(−a·x₀). L'infinité de solutions (C) est la réponse à « résoudre », pas à « résoudre avec condition initiale ».</div>
+      </details>
+    </div>
+  </div>
+
+  <!-- ===== RÉCAPITULATIF ===== -->
+  <div class="lecture-recap">
+    <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
+    <ul class="lecture-recap-list">
+      <li><strong>[definition_ed]</strong> Une <strong>équation différentielle</strong> est une équation dont l'inconnue est une <strong>fonction y dérivable sur ℝ</strong>, reliée à sa dérivée y' (noté aussi dy/dx)</li>
+      <li><strong>[definition_ed]</strong> Résoudre = trouver <strong>toutes</strong> les fonctions solutions ; vérifier une solution = <strong>dériver, substituer, comparer</strong></li>
+      <li><strong>[definition_ed]</strong> Modélisation type : une grandeur dont la vitesse de variation est <strong>proportionnelle à elle-même</strong> vérifie y' = a·y</li>
+      <li><strong>[eq_y_ay]</strong> Les solutions de <span class="math">y' = ay</span> (a réel non nul) sont <strong>exactement</strong> <span class="math">y(x) = C·e^(a·x)</span>, C ∈ ℝ</li>
+      <li><strong>[eq_y_ay]</strong> Vérification : y' = a·C·e^(a·x) = a·y ✅ — à refaire à chaque exercice</li>
+      <li><strong>[eq_y_ay]</strong> Une <strong>infinité</strong> de solutions : une famille de courbes, une par valeur de C</li>
+      <li><strong>[eq_y_ay]</strong> Théorème d'existence-unicité : il existe une <strong>unique</strong> solution vérifiant <span class="math">y(x₀) = y₀</span>, avec <span class="math">C = y₀·e^(−a·x₀)</span> (et C = y₀ si x₀ = 0)</li>
+      <li><strong>[eq_y_ay]</strong> Le signe de y(x) est le signe de C, car e^(a·x) &gt; 0 pour tout x</li>
+    </ul>
+  </div>
+
+  <!-- ===== FIN ===== -->
+  <div class="lecture-end">
+    <span class="lecture-end-icon">🎯</span>
+    <div class="lecture-end-text">Partie 1 terminée !</div>
+    <div class="lecture-end-sub">Passe à la partie suivante : y' = ay + b — quand la grandeur reçoit un apport constant</div>
+    <div class="lecture-end-divider"></div>
+  </div>
+
+</div>

@@ -1,0 +1,515 @@
+<!-- ============================================================ -->
+<!-- PARTIE 2 : L'ÉQUATION y' = ay + b                             -->
+<!-- Notion 3 : solution_particuliere — Chercher une solution      -->
+<!--            particulière constante                             -->
+<!-- Notion 4 : eq_y_ayb — Solution générale de y' = ay + b,       -->
+<!--            démonstration, condition initiale, erreurs         -->
+<!-- ============================================================ -->
+
+<div class="lecture-container">
+
+  <!-- ===== HERO ===== -->
+  <header class="lecture-hero">
+    <div class="lecture-hero-badge">
+      <span class="lecture-hero-icon">📘</span>
+      <span class="lecture-hero-label">Partie 02 · Équations différentielles</span>
+    </div>
+    <h1 class="lecture-hero-title">
+      L'équation <em><span class="math">y' = ay + b</span></em>
+    </h1>
+    <p class="lecture-hero-intro">
+      Dans la partie 1, tu sais résoudre <span class="math">y' = ay</span>. Mais que se passe-t-il si une <strong>constante</strong> <span class="math">b</span> s'ajoute ? Cette partie montre la stratégie universelle : trouver <strong>une solution particulière</strong>, puis lui ajouter les solutions de l'équation homogène. Tu apprendras la <strong>solution particulière constante</strong>, la <strong>solution générale</strong>, sa <strong>démonstration complète</strong>, et tu enchaîneras des <strong>calculs purs</strong> avec condition initiale.
+    </p>
+    <div class="lecture-hero-meta">
+      <span class="lecture-hero-meta-item">⏱ 20 min</span>
+      <span class="lecture-hero-meta-item">🧮 2 notions</span>
+      <span class="lecture-hero-meta-item">📊 8 sections</span>
+      <span class="lecture-hero-meta-item">🎓 Terminale D</span>
+    </div>
+  </header>
+
+  <!-- ===== SOMMAIRE ===== -->
+  <nav class="lecture-toc">
+    <div class="lecture-toc-header">
+      <span>Dans cette partie</span>
+      <span class="lecture-toc-count">2 notions · 8 sections</span>
+    </div>
+    <ol class="lecture-toc-list">
+      <li><a href="#s0"><span class="toc-num">00</span><span>Motivation — Quand un apport constant s'invite</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>Notion 3 · eq_y_ayb — La forme y' = ay + b et l'équation homogène</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>Notion 3 · solution_particuliere — La solution particulière constante</span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>Notion 4 · eq_y_ayb — La solution générale</span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>Notion 4 · eq_y_ayb — Démonstration : le changement v = y + b/a</span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>Notion 4 · eq_y_ayb — Exemples de calculs purs</span></a></li>
+      <li><a href="#s6"><span class="toc-num">06</span><span>Notion 4 · eq_y_ayb — Méthode rédigée et erreurs fréquentes</span></a></li>
+      <li><a href="#s7"><span class="toc-num">07</span><span>Bilan — La recette complète</span></a></li>
+    </ol>
+  </nav>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 0 : MOTIVATION -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s0">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">00</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Motivation</span>
+        <h2 class="lecture-section-title">Quand un apport constant s'invite</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Imagine un réservoir d'eau d'un forage villageois : l'eau s'évapore à un rythme proportionnel au volume présent, mais une pompe ajoute en même temps un <strong>débit constant</strong>. La vitesse de variation n'est plus simplement proportionnelle au volume : un terme constant est venu s'ajouter. Mathématiquement, on obtient une équation de la forme <span class="math">y' = ay + b</span> — et tu vas voir qu'elle se ramène <em>toute entière</em> à la partie 1.
+      </p>
+
+      <div class="lecture-callout lecture-callout-gold">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">L'idée de la partie en une phrase</div>
+          <p><strong>Solution générale = solution particulière + solutions de l'équation homogène.</strong> Ce principe structure toute la suite du chapitre : apprends-le avec cette équation, et la partie 3 deviendra évidente.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 1 : NOTION 3 · eq_y_ayb — LA FORME -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s1">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">01</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 3 · eq_y_ayb</span>
+        <h2 class="lecture-section-title">La forme y' = ay + b et l'équation homogène</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        On se donne deux réels <span class="math">a</span> et <span class="math">b</span> avec <span class="math">a ≠ 0</span>, et on cherche toutes les fonctions dérivables sur <span class="math">ℝ</span> telles que, pour tout <span class="math">x</span> :
+      </p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">📗 Définition — L'équation et son équation homogène</div>
+          <p>L'équation <strong><span class="math">y' = ay + b</span></strong> (avec <span class="math">a ≠ 0</span> et <span class="math">b</span> deux réels donnés) est dite <strong>avec second membre constant</strong>. L'équation <strong><span class="math">y' = ay</span></strong>, obtenue en enlevant le terme <span class="math">b</span>, s'appelle <strong>l'équation homogène</strong> associée (ou « équation sans second membre »).</p>
+        </div>
+      </div>
+
+      <p class="lecture-text">
+        Tu connais déjà les solutions de l'homogène : <span class="math">y_h(x) = C·e^(a·x)</span>. Est-ce que <span class="math">C·e^(a·x)</span> résout encore <span class="math">y' = ay + b</span> ? Non : en substituant, on trouve <span class="math">y' = a·C·e^(a·x)</span> mais <span class="math">ay + b = a·C·e^(a·x) + b</span> — il manque le <span class="math">b</span>. Il faut donc <strong>ajouter quelque chose</strong> : une <strong>solution particulière</strong> de l'équation complète.
+      </p>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main"><span class="math">y' = ay + b = a·(y + b/a)</span>&nbsp;&nbsp;(valable car <span class="math">a ≠ 0</span>)</div>
+        <div class="lecture-formula-desc">Cette réécriture, anodine en apparence, contient toute la démonstration : la quantité <span class="math">y + b/a</span> suit, elle, une équation homogène. On l'exploite en section 04.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 2 : NOTION 3 · solution_particuliere — SOLUTION CONSTANTE -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s2">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">02</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 3 · solution_particuliere</span>
+        <h2 class="lecture-section-title">La solution particulière constante</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Une <strong>solution particulière</strong> est simplement <em>une</em> solution de l'équation complète — n'importe laquelle, sans constante libre. Pour <span class="math">y' = ay + b</span>, on la trouve en essayant le plus simple possible : une <strong>fonction constante</strong>.
+      </p>
+
+      <div class="lecture-steps">
+        <div class="lecture-step">
+          <div class="lecture-step-number">1</div>
+          <div class="lecture-step-content"><p><strong>Hypothèse</strong> : cherchons <span class="math">yₚ</span> constante : <span class="math">yₚ(x) = c</span> pour un certain réel <span class="math">c</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">2</div>
+          <div class="lecture-step-content"><p><strong>Dériver</strong> : une fonction constante a une dérivée nulle, donc <span class="math">yₚ' = 0</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">3</div>
+          <div class="lecture-step-content"><p><strong>Substituer</strong> dans <span class="math">y' = ay + b</span> : l'équation devient <span class="math">0 = a·c + b</span>, donc <span class="math">a·c = −b</span>, d'où <span class="math">c = −b/a</span> (possible car <span class="math">a ≠ 0</span>).</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">4</div>
+          <div class="lecture-step-content"><p><strong>Vérification</strong> : pour <span class="math">yₚ = −b/a</span> : <span class="math">yₚ' = 0</span> et <span class="math">a·(−b/a) + b = −b + b = 0</span> ✅ Les deux membres sont égaux : c'est bien une solution.</p></div>
+        </div>
+      </div>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">Solution particulière constante de <span class="math">y' = ay + b</span> :&nbsp;&nbsp;<span class="math">yₚ = −b/a</span></div>
+        <div class="lecture-formula-desc">La droite horizontale d'ordonnée <span class="math">−b/a</span> est une solution de l'équation. C'est aussi le niveau « d'équilibre » vers lequel les autres solutions convergent quand <span class="math">a &lt; 0</span>.</div>
+      </div>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">🧮 Mini-exemple — y' = 2y + 4</div>
+        <div class="lecture-example-content"><p>Ici <span class="math">a = 2</span> et <span class="math">b = 4</span>, donc <span class="math">yₚ = −b/a = −4/2 = −2</span>. <strong>Vérification</strong> : <span class="math">yₚ' = 0</span> et <span class="math">2·(−2) + 4 = −4 + 4 = 0</span> ✅ La fonction constante <span class="math">y = −2</span> est bien une solution de <span class="math">y' = 2y + 4</span>.</p></div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-danger">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Erreur fréquente au Bac — le signe de −b/a</div>
+          <p>La solution particulière vaut <span class="math">−b/a</span>, <strong>pas</strong> <span class="math">b/a</span> ! Pour <span class="math">y' = 2y + 4</span>, c'est <span class="math">yₚ = −2</span> (et non <span class="math">+2</span>). Et si <span class="math">b</span> est négatif, le double signe se transforme : pour <span class="math">y' = −3y + 6</span>, on trouve <span class="math">yₚ = −6/(−3) = +2</span>. Écris toujours le calcul <span class="math">0 = a·c + b</span> avant de conclure : deux secondes qui sauvent deux points.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 3 : NOTION 4 · eq_y_ayb — SOLUTION GÉNÉRALE -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s3">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">03</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 4 · eq_y_ayb</span>
+        <h2 class="lecture-section-title">La solution générale</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Additionnons maintenant les deux ingrédients : la solution particulière constante <span class="math">yₚ = −b/a</span> et les solutions homogènes <span class="math">C·e^(a·x)</span>. Le résultat est le théorème central de la partie :
+      </p>
+
+      <div class="lecture-callout lecture-callout-gold">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">📐 Théorème — Solutions de y' = ay + b (a ≠ 0)</div>
+          <p><strong>Les solutions de y' = ay + b sont exactement les fonctions</strong> définies sur <span class="math">ℝ</span> par <span class="math">y(x) = C·e^(a·x) − b/a</span>, où <span class="math">C</span> est un réel quelconque.</p>
+        </div>
+      </div>
+
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-label">LA formule de la partie</div>
+        <div class="lecture-formula-hero-main"><span class="math">y' = ay + b&nbsp;&nbsp;⇔&nbsp;&nbsp;y(x) = C·e^(a·x) − b/a, C ∈ ℝ</span></div>
+        <div class="lecture-formula-hero-desc">Structure : <strong>solution homogène</strong> <span class="math">C·e^(a·x)</span> + <strong>solution particulière</strong> <span class="math">−b/a</span>. Un seul réel <span class="math">C</span> libre, comme en partie 1.</div>
+      </div>
+
+      <p class="lecture-text">
+        Pourquoi l'addition fonctionne-t-elle ? Vérifions-le sur place, sans attendre la démonstration : si <span class="math">y_h</span> résout l'homogène (<span class="math">y_h' = a·y_h</span>) et si <span class="math">yₚ</span> résout la complète (<span class="math">yₚ' = a·yₚ + b</span>), alors la somme <span class="math">y = y_h + yₚ</span> vérifie :
+      </p>
+
+      <p class="lecture-text">
+        <span class="math">y' = y_h' + yₚ' = a·y_h + (a·yₚ + b) = a·(y_h + yₚ) + b = a·y + b</span> ✅
+      </p>
+
+      <p class="lecture-text">
+        La somme d'une solution homogène et d'une solution particulière est donc encore une solution de l'équation complète. C'est ce qu'on appelle le <strong>principe de superposition</strong> — il généralisera parfaitement en partie 3.
+      </p>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ L'ordre des termes</div>
+          <p>Écrire <span class="math">−b/a + C·e^(a·x)</span> au lieu de <span class="math">C·e^(a·x) − b/a</span> est parfaitement correct (l'addition commute). Ce qui n'est PAS correct : oublier le terme <span class="math">−b/a</span>, ou l'écrire <span class="math">+b/a</span>. Le correcteur cherche la constante <span class="math">−b/a</span> : elle doit être visible et exacte.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 4 : NOTION 4 · eq_y_ayb — DÉMONSTRATION -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s4">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">04</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 4 · eq_y_ayb</span>
+        <h2 class="lecture-section-title">Démonstration : le changement v = y + b/a</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        On veut montrer que <strong>toutes</strong> les solutions de <span class="math">y' = ay + b</span> s'écrivent <span class="math">C·e^(a·x) − b/a</span>. L'astuce : transformer l'inconnue pour retomber sur la partie 1.
+      </p>
+
+      <div class="lecture-callout lecture-callout-gold">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">💡 Démonstration complète</div>
+          <p>Soit <span class="math">y</span> une solution de <span class="math">y' = ay + b</span> sur <span class="math">ℝ</span> (avec <span class="math">a ≠ 0</span>).</p>
+        </div>
+      </div>
+
+      <div class="lecture-steps">
+        <div class="lecture-step">
+          <div class="lecture-step-number">1</div>
+          <div class="lecture-step-content"><p><strong>Changement de fonction inconnue</strong> : posons <span class="math">v = y + b/a</span>, c'est-à-dire <span class="math">y = v − b/a</span>. La fonction <span class="math">v</span> est dérivable sur <span class="math">ℝ</span> comme <span class="math">y</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">2</div>
+          <div class="lecture-step-content"><p><strong>Dériver</strong> : <span class="math">v' = y' − 0 = y'</span> (la dérivée de la constante <span class="math">b/a</span> est nulle).</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">3</div>
+          <div class="lecture-step-content"><p><strong>Réécrire l'équation</strong> : puisque <span class="math">a ≠ 0</span>, on a <span class="math">ay + b = a·(y + b/a) = a·v</span>. Donc <span class="math">y' = ay + b</span> se réécrit <span class="math">v' = a·v</span> : une équation homogène !</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">4</div>
+          <div class="lecture-step-content"><p><strong>Résoudre</strong> (partie 1) : les solutions de <span class="math">v' = a·v</span> sont <span class="math">v(x) = C·e^(a·x)</span>, <span class="math">C ∈ ℝ</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">5</div>
+          <div class="lecture-step-content"><p><strong>Revenir à y</strong> : <span class="math">y = v − b/a = C·e^(a·x) − b/a</span>. Réciproquement, chaque fonction de cette forme est solution (vérification en dérivant, comme en partie 1). ∎</p></div>
+        </div>
+      </div>
+
+      <div class="lecture-rule">
+        <div class="lecture-rule-label">🧠 Technique à retenir</div>
+        <div class="lecture-rule-body">
+          Le changement <span class="math">v = y + b/a</span> « élimine » le second membre constant en le déplaçant dans l'inconnue. C'est un réflexe général en mathématiques : <strong>transformer un problème nouveau en un problème déjà résolu</strong>. Tu le reverras (dans l'autre sens) avec les suites auxiliaires géométriques.
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ Où le a ≠ 0 est utilisé</div>
+          <p>Le réel <span class="math">b/a</span> n'existe que si <span class="math">a ≠ 0</span> : c'est l'hypothèse indispensable de tout ce qui précède. (Si <span class="math">a = 0</span>, l'équation devient <span class="math">y' = b</span>, dont les solutions sont les fonctions affines <span class="math">y = b·x + C</span> — cas à part, hors cœur du programme.)</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 5 : NOTION 4 · eq_y_ayb — EXEMPLES -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s5">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">05</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 4 · eq_y_ayb</span>
+        <h2 class="lecture-section-title">Exemples de calculs purs</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Trois calculs complets : deux résolutions, puis une résolution avec condition initiale. Le schéma est toujours le même : <strong>identifier a et b → solution particulière −b/a → solution générale → vérification</strong>.
+      </p>
+
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">🧮 Exemple 1 — Résoudre y' = 2y + 4</div>
+        <div class="lecture-example-content">
+          <div class="lecture-steps">
+            <div class="lecture-step">
+              <div class="lecture-step-number">1</div>
+              <div class="lecture-step-content"><p><strong>Identifier</strong> : <span class="math">a = 2</span>, <span class="math">b = 4</span>. Solution particulière constante : <span class="math">yₚ = −b/a = −4/2 = −2</span>.</p></div>
+            </div>
+            <div class="lecture-step">
+              <div class="lecture-step-number">2</div>
+              <div class="lecture-step-content"><p><strong>Solution générale</strong> : <span class="math">y(x) = C·e^(2x) − 2</span>, <span class="math">C ∈ ℝ</span>.</p></div>
+            </div>
+            <div class="lecture-step">
+              <div class="lecture-step-number">3</div>
+              <div class="lecture-step-content"><p><strong>Vérification</strong> : <span class="math">y' = 2·C·e^(2x)</span> ; d'autre part <span class="math">2·y + 4 = 2·(C·e^(2x) − 2) + 4 = 2·C·e^(2x) − 4 + 4 = 2·C·e^(2x)</span> ✅ Les deux membres coïncident.</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">🧮 Exemple 2 — Résoudre y' = −3y + 6</div>
+        <div class="lecture-example-content">
+          <div class="lecture-steps">
+            <div class="lecture-step">
+              <div class="lecture-step-number">1</div>
+              <div class="lecture-step-content"><p><strong>Identifier</strong> : <span class="math">a = −3</span>, <span class="math">b = 6</span>. Solution particulière constante : <span class="math">yₚ = −b/a = −6/(−3) = 2</span>.</p></div>
+            </div>
+            <div class="lecture-step">
+              <div class="lecture-step-number">2</div>
+              <div class="lecture-step-content"><p><strong>Solution générale</strong> : <span class="math">y(x) = C·e^(−3x) + 2</span>, <span class="math">C ∈ ℝ</span>.</p></div>
+            </div>
+            <div class="lecture-step">
+              <div class="lecture-step-number">3</div>
+              <div class="lecture-step-content"><p><strong>Vérification</strong> : <span class="math">y' = −3·C·e^(−3x)</span> ; d'autre part <span class="math">−3·y + 6 = −3·(C·e^(−3x) + 2) + 6 = −3·C·e^(−3x) − 6 + 6 = −3·C·e^(−3x)</span> ✅</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">🧮 Exemple 3 — y' = 2y + 4 avec la condition initiale y(0) = 1</div>
+        <div class="lecture-example-content">
+          <div class="lecture-steps">
+            <div class="lecture-step">
+              <div class="lecture-step-number">1</div>
+              <div class="lecture-step-content"><p><strong>Solution générale</strong> (exemple 1) : <span class="math">y(x) = C·e^(2x) − 2</span>.</p></div>
+            </div>
+            <div class="lecture-step">
+              <div class="lecture-step-number">2</div>
+              <div class="lecture-step-content"><p><strong>Condition</strong> : <span class="math">y(0) = C·e^(2·0) − 2 = C − 2 = 1</span>, donc <span class="math">C = 3</span>.</p></div>
+            </div>
+            <div class="lecture-step">
+              <div class="lecture-step-number">3</div>
+              <div class="lecture-step-content"><p><strong>Conclusion</strong> : <span class="math">y(x) = 3·e^(2x) − 2</span>.</p></div>
+            </div>
+            <div class="lecture-step">
+              <div class="lecture-step-number">4</div>
+              <div class="lecture-step-content"><p><strong>Double vérification</strong> : <span class="math">y(0) = 3·e^0 − 2 = 3 − 2 = 1</span> ✅ ; et <span class="math">y' = 6·e^(2x)</span> tandis que <span class="math">2·y + 4 = 6·e^(2x) − 4 + 4 = 6·e^(2x)</span> ✅</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ Piège de la condition initiale</div>
+          <p>Avec un second membre, la constante ne vaut <strong>pas</strong> <span class="math">y₀</span> même quand <span class="math">x₀ = 0</span> ! On a ici <span class="math">y(0) = C − 2</span>, pas <span class="math">C</span> : le terme <span class="math">−b/a</span> participe au calcul. C'est précisément l'oubli qui coûte le plus de points dans ce type de question.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 6 : NOTION 4 · eq_y_ayb — MÉTHODE & ERREURS -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s6">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">06</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 4 · eq_y_ayb</span>
+        <h2 class="lecture-section-title">Méthode rédigée et erreurs fréquentes</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <div class="lecture-rule">
+        <div class="lecture-rule-label">🧠 Méthode à retenir — Résoudre y' = ay + b</div>
+        <div class="lecture-rule-body">
+          <p>1. <strong>Identifier</strong> les réels <span class="math">a</span> et <span class="math">b</span> (et vérifier <span class="math">a ≠ 0</span>).<br/>
+          2. <strong>Solution particulière constante</strong> : <span class="math">yₚ = −b/a</span>.<br/>
+          3. <strong>Solution générale</strong> : <span class="math">y(x) = C·e^(a·x) − b/a</span>, <span class="math">C ∈ ℝ</span>.<br/>
+          4. Si une condition initiale <span class="math">y(x₀) = y₀</span> est donnée : substituer, <strong>isoler C</strong>, puis réécrire la solution unique.<br/>
+          5. <strong>Vérifier</strong> en dérivant et en substituant.</p>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-danger">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Erreur fréquente au Bac — les trois classiques</div>
+          <ul class="lecture-list">
+            <li><strong>Oublier le − b/a</strong> : écrire <span class="math">y = C·e^(a·x)</span> comme réponse de <span class="math">y' = ay + b</span> — c'est la solution de l'homogène, pas de la complète (substitution : il manque <span class="math">b</span>).</li>
+            <li><strong>Se tromper de signe</strong> : mettre <span class="math">+b/a</span> au lieu de <span class="math">−b/a</span>, ou rater le double signe quand <span class="math">b &lt; 0</span> ou <span class="math">a &lt; 0</span>.</li>
+            <li><strong>Se tromper d'exposant</strong> : pour <span class="math">y' = −3y + 6</span>, l'exponentielle est <span class="math">e^(−3x)</span> (exposant = coefficient <span class="math">a</span> de <span class="math">y</span>), pas <span class="math">e^(3x)</span>.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">🔍 Contrôle express — comment le correcteur vérifie en 10 secondes</div>
+        <div class="lecture-example-content"><p>Ta réponse à <span class="math">y' = −3y + 6</span> doit vérifier trois signaux : l'exposant <span class="math">−3x</span> (coefficient de <span class="math">y</span>), le terme constant <span class="math">+2 = −b/a</span>, et une constante <span class="math">C</span> multipliant l'exponentielle. Si l'un des trois manque, la solution est fausse — d'où l'intérêt de la vérification par dérivation, qui les teste tous d'un coup.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 7 : BILAN -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s7">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">07</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Bilan</span>
+        <h2 class="lecture-section-title">La recette complète</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Réunissons les fils de la partie. L'équation <span class="math">y' = ay + b</span> se résout en deux ingrédients : une solution particulière constante, trouvée par un calcul de trois lignes, et les solutions homogènes de la partie 1.
+      </p>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main"><span class="math">y' = ay + b</span> (a ≠ 0)&nbsp;&nbsp;⟹&nbsp;&nbsp;<span class="math">y(x) = C·e^(a·x) − b/a</span>, C ∈ ℝ</div>
+        <div class="lecture-formula-desc">Particulière : <span class="math">yₚ = −b/a</span> (constante) · Homogène : <span class="math">C·e^(a·x)</span> · Condition initiale <span class="math">y(x₀) = y₀</span> : substituer puis isoler C.</div>
+      </div>
+
+      <ul class="lecture-list-elegant">
+        <li><strong>Équation homogène</strong> <span class="math">y' = ay</span> : solutions <span class="math">C·e^(a·x)</span> (partie 1).</li>
+        <li><strong>Solution particulière constante</strong> : <span class="math">yₚ = −b/a</span>, vérifiée par <span class="math">yₚ' = 0 = a·(−b/a) + b</span>.</li>
+        <li><strong>Solution générale</strong> : <span class="math">y(x) = C·e^(a·x) − b/a</span> — démontrée par le changement <span class="math">v = y + b/a</span>.</li>
+        <li><strong>Condition initiale</strong> : la substituer dans la forme générale (attention : <span class="math">y(0) = C − b/a</span>, pas <span class="math">C</span>).</li>
+        <li><strong>Toujours vérifier</strong> : dériver, substituer, comparer ✅</li>
+      </ul>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">📗 Notion clé — Ce qu'il faut dire à l'examen</div>
+          <p>« Les solutions de l'équation homogène <span class="math">y' = ay</span> sont <span class="math">C·e^(a·x)</span>. La fonction constante <span class="math">yₚ = −b/a</span> est solution particulière de <span class="math">y' = ay + b</span>. Donc la solution générale est <span class="math">y(x) = C·e^(a·x) − b/a</span>, <span class="math">C ∈ ℝ</span>. » — puis la condition initiale, puis la vérification. Cette structure rapporte tous les points de la question.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== QCM D'ENTRAÎNEMENT ===== -->
+  <div class="lecture-quiz">
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q1 — Une solution particulière constante de y' = 3y − 6 est :</p>
+      <div class="lecture-quiz-options">
+        <span>A) y = 2</span>
+        <span>B) y = −2</span>
+        <span>C) y = 6</span>
+        <span>D) y = −6</span>
+      </div>
+      <details>
+        <summary>Voir la réponse</summary>
+        <div class="lecture-quiz-answer"><strong>A) y = 2.</strong> yₚ = −b/a = −(−6)/3 = 2. Vérification : y' = 0 et 3·2 − 6 = 0 ✅ (Attention au double signe : b = −6, donc −b = +6.)</div>
+      </details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q2 — La solution générale de y' = −2y + 8 est :</p>
+      <div class="lecture-quiz-options">
+        <span>A) y(x) = C·e^(−2x) + 8</span>
+        <span>B) y(x) = C·e^(−2x) − 4</span>
+        <span>C) y(x) = C·e^(−2x) + 4</span>
+        <span>D) y(x) = C·e^(2x) + 4</span>
+      </div>
+      <details>
+        <summary>Voir la réponse</summary>
+        <div class="lecture-quiz-answer"><strong>C) y(x) = C·e^(−2x) + 4.</strong> yₚ = −b/a = −8/(−2) = 4 et l'exposant est −2x (coefficient de y). Vérification : y' = −2·C·e^(−2x) et −2·y + 8 = −2·C·e^(−2x) − 8 + 8 = −2·C·e^(−2x) ✅</div>
+      </details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q3 — La solution de y' = 2y + 4 vérifiant y(0) = 1 est :</p>
+      <div class="lecture-quiz-options">
+        <span>A) y(x) = e^(2x) − 2</span>
+        <span>B) y(x) = 3·e^(2x) − 2</span>
+        <span>C) y(x) = 3·e^(2x) + 2</span>
+        <span>D) y(x) = e^(2x) + 1</span>
+      </div>
+      <details>
+        <summary>Voir la réponse</summary>
+        <div class="lecture-quiz-answer"><strong>B) y(x) = 3·e^(2x) − 2.</strong> Solution générale y = C·e^(2x) − 2 ; la condition donne C − 2 = 1, donc C = 3 (et non C = 1 : le −2 compte !). Vérification : y(0) = 3 − 2 = 1 ✅ et y' = 6·e^(2x) = 2·y + 4 ✅</div>
+      </details>
+    </div>
+  </div>
+
+  <!-- ===== RÉCAPITULATIF ===== -->
+  <div class="lecture-recap">
+    <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
+    <ul class="lecture-recap-list">
+      <li><strong>[eq_y_ayb]</strong> L'équation <span class="math">y' = ay + b</span> (a ≠ 0) possède une <strong>solution particulière constante</strong> : <span class="math">yₚ = −b/a</span></li>
+      <li><strong>[solution_particuliere]</strong> On la trouve en résolvant <span class="math">0 = a·c + b</span> ; vérification : <span class="math">yₚ' = 0 = a·(−b/a) + b</span> ✅</li>
+      <li><strong>[eq_y_ayb]</strong> Solution générale : <span class="math">y(x) = C·e^(a·x) − b/a</span>, C ∈ ℝ — homogène + particulière</li>
+      <li><strong>[eq_y_ayb]</strong> Démonstration : poser <span class="math">v = y + b/a</span> → <span class="math">v' = a·v</span> (équation homogène) → <span class="math">v = C·e^(a·x)</span></li>
+      <li><strong>[eq_y_ayb]</strong> Condition initiale : substituer <span class="math">y(x₀) = y₀</span> dans la forme générale puis isoler C — attention, <span class="math">y(0) = C − b/a</span></li>
+      <li><strong>[eq_y_ayb]</strong> Erreurs à bannir : oublier <span class="math">−b/a</span>, erreur de signe, mauvais exposant (<span class="math">e^(a·x)</span> avec a = coefficient de y)</li>
+      <li><strong>[solution_particuliere]</strong> Principe de superposition : particulière + homogène = solution générale (valable aussi en partie 3)</li>
+    </ul>
+  </div>
+
+  <!-- ===== FIN ===== -->
+  <div class="lecture-end">
+    <span class="lecture-end-icon">🎯</span>
+    <div class="lecture-end-text">Partie 2 terminée !</div>
+    <div class="lecture-end-sub">Passe à la partie suivante : y' = ay + f(x) — le second membre devient une fonction</div>
+    <div class="lecture-end-divider"></div>
+  </div>
+
+</div>

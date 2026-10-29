@@ -1,0 +1,431 @@
+<!-- ============================================================ -->
+<!-- PARTIE 4 : FICHE COMPLÈTE — SUITES BORNÉES & APPLICATIONS     -->
+<!-- Chapitre : Suites numériques — Terminale D                    -->
+<!-- Bloc 1 : bornees — Majorée, minorée, bornée                   -->
+<!-- Bloc 2 : monotone_converge — Croissante et majorée converge   -->
+<!-- Bloc 3 : point_fixe — Limite d'une suite récurrente           -->
+<!-- Bloc 4 : synthese — Tableau de synthèse du chapitre           -->
+<!-- Bloc 5 : reflexes — Réflexes Bac et erreurs à éviter          -->
+<!-- ============================================================ -->
+
+<div class="lecture-container">
+
+  <!-- ===== HERO ===== -->
+  <header class="lecture-hero">
+    <div class="lecture-hero-badge">
+      <span class="lecture-hero-icon">📘</span>
+      <span class="lecture-hero-label">Partie 04 · Suites numériques</span>
+    </div>
+    <h1 class="lecture-hero-title">
+      Fiche complète — <em>Suites bornées &amp; Applications</em>
+    </h1>
+    <p class="lecture-hero-intro">
+      Dernière partie du chapitre : une <strong>fiche de révision condensée</strong>, à relire la veille du devoir. Elle complète la boîte à outils avec les <strong>suites bornées</strong>, le <strong>théorème de convergence monotone</strong> et la <strong>méthode du point fixe</strong>, puis rassemble tout le chapitre dans un <strong>tableau de synthèse</strong> et une liste de <strong>réflexes Bac</strong>. Chaque énoncé renvoie aux parties 1 à 3, où il est démontré et appliqué.
+    </p>
+    <div class="lecture-hero-meta">
+      <span class="lecture-hero-meta-item">⏱ 20 min</span>
+      <span class="lecture-hero-meta-item">🧮 5 blocs</span>
+      <span class="lecture-hero-meta-item">📊 6 sections</span>
+      <span class="lecture-hero-meta-item">🎓 Terminale D</span>
+    </div>
+  </header>
+
+  <!-- ===== SOMMAIRE ===== -->
+  <nav class="lecture-toc">
+    <div class="lecture-toc-header">
+      <span>Dans cette partie</span>
+      <span class="lecture-toc-count">5 blocs · 6 sections</span>
+    </div>
+    <ol class="lecture-toc-list">
+      <li><a href="#s0"><span class="toc-num">00</span><span>Motivation — Comment utiliser cette fiche</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>Bloc 1 · bornees — Majorée, minorée, bornée</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>Bloc 2 · monotone_converge — Croissante + majorée = convergente</span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>Bloc 3 · point_fixe — La méthode du point fixe</span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>Bloc 4 · synthese — Tableau de synthèse du chapitre</span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>Bloc 5 · reflexes — Réflexes Bac et erreurs à éviter</span></a></li>
+    </ol>
+  </nav>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 0 : MOTIVATION                                        -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s0">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">00</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Motivation</span>
+        <h2 class="lecture-section-title">Comment utiliser cette fiche</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Les parties 1 à 3 t'ont donné les <strong>définitions</strong>, les <strong>méthodes</strong> et les <strong>démonstrations</strong>. Cette fiche fait le travail inverse : elle comprime tout le chapitre en repères rapides, pour réviser en 20 minutes la veille d'un contrôle. Trois conseils d'utilisation :
+      </p>
+
+      <ul class="lecture-list-elegant">
+        <li><strong>Refais les calculs à la main</strong> : une fiche se lit avec un crayon. Recalcule <span class="math">u₃</span> par la récurrence, revérifie une somme, rejoue une récurrence — c'est le seul moyen de fixer les réflexes.</li>
+        <li><strong>Cherche le type de suite AVANT tout calcul</strong> : c'est le réflexe n° 1 du chapitre, il structure toutes les questions.</li>
+        <li><strong>Mémorise le tableau de synthèse</strong> (section 04) : il contient 90 % de ce qu'on te demandera.</li>
+      </ul>
+
+      <div class="lecture-callout lecture-callout-gold">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Ce que cette fiche ajoute aux parties 1 à 3</div>
+          <ul class="lecture-list">
+            <li>Le vocabulaire des <strong>suites bornées</strong> (majorée, minorée) et sa mise en garde (Bloc 1)</li>
+            <li>Le <strong>théorème de convergence monotone</strong>, qui conclut à la convergence sans calculer la limite (Bloc 2)</li>
+            <li>La <strong>méthode du point fixe</strong>, qui calcule la valeur de la limite (Bloc 3)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 1 : BLOC 1 · bornees                                  -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s1">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">01</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Bloc 1 · bornees</span>
+        <h2 class="lecture-section-title">Majorée, minorée, bornée</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Trois mots de vocabulaire, une seule idée : est-ce que tous les termes de la suite restent <strong>sous un plafond</strong>, <strong>au-dessus d'un plancher</strong>, ou <strong>les deux</strong> ?
+      </p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">📗 Définitions officielles</div>
+          <ul class="lecture-list">
+            <li><span class="math">(uₙ)</span> est <strong>majorée</strong> s'il existe un réel M tel que, pour tout <span class="math">n</span> : <span class="math">uₙ ≤ M</span> (M est un <strong>majorant</strong>).</li>
+            <li><span class="math">(uₙ)</span> est <strong>minorée</strong> s'il existe un réel m tel que, pour tout <span class="math">n</span> : <span class="math">uₙ ≥ m</span> (m est un <strong>minorant</strong>).</li>
+            <li><span class="math">(uₙ)</span> est <strong>bornée</strong> si elle est <strong>minorée et majorée</strong> : il existe <span class="math">m</span> et <span class="math">M</span> tels que, pour tout <span class="math">n</span> : <span class="math">m ≤ uₙ ≤ M</span>.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">🧮 Exemples — les trois situations</div>
+        <div class="lecture-example-content">
+          <p><strong>Bornée</strong> : <span class="math">uₙ = 1/(n + 1)</span> vérifie <span class="math">0 &lt; uₙ ≤ 1</span> pour tout <span class="math">n</span> (le plus grand terme est <span class="math">u₀ = 1</span>, et les termes restent positifs) : minorée par 0, majorée par 1.</p>
+          <p><strong>Minorée seulement</strong> : <span class="math">uₙ = n²</span> vérifie <span class="math">uₙ ≥ 0</span>, mais aucun nombre ne dépasse <strong>tous</strong> les termes (ils grandissent sans fin) : minorée, non majorée.</p>
+          <p><strong>Bornée mais agitée</strong> : <span class="math">uₙ = (−1)ⁿ</span> vérifie <span class="math">−1 ≤ uₙ ≤ 1</span> : bornée ! Pourtant, on sait (partie 3) qu'elle est divergente.</p>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-danger">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Erreur fréquente au Bac — « bornée donc convergente »</div>
+          <p>Être bornée ne suffit <strong>jamais</strong> à conclure à la convergence : <span class="math">(−1)ⁿ</span> est bornée et divergente. Il faut un ingrédient supplémentaire — la <strong>monotonie</strong> — c'est exactement le théorème du bloc suivant.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 2 : BLOC 2 · monotone_converge                        -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s2">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">02</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Bloc 2 · monotone_converge</span>
+        <h2 class="lecture-section-title">Croissante + majorée = convergente</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Voici le théorème qui permet de <strong>conclure à la convergence sans connaître la limite</strong> — l'entrée officielle du programme, à énoncer avec ses hypothèses au complet.
+      </p>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">Toute suite croissante et majorée converge. Toute suite décroissante et minorée converge.</div>
+        <div class="lecture-formula-desc">Théorème <strong>admis</strong> (on ne le démontre pas en Terminale). Les deux hypothèses sont indispensables : croissante seule (<span class="math">uₙ = n</span> diverge) ou majorée seule (<span class="math">(−1)ⁿ</span> diverge) ne suffisent pas.</div>
+      </div>
+
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">🧮 Application complète — u₀ = 1 et uₙ₊₁ = (uₙ + 3)/2</div>
+        <div class="lecture-example-content"><p>Montrons que la suite de la partie 3 converge, puis calculerons sa limite au bloc suivant.</p></div>
+      </div>
+
+      <div class="lecture-steps">
+        <div class="lecture-step">
+          <div class="lecture-step-number">1</div>
+          <div class="lecture-step-content"><p><strong>Bornée</strong> : on a démontré par récurrence (partie 3) que <span class="math">0 ≤ uₙ ≤ 3</span> pour tout <span class="math">n</span>. La suite est donc <strong>majorée par 3</strong> (et minorée par 0).</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">2</div>
+          <div class="lecture-step-content"><p><strong>Croissante</strong> : <span class="math">uₙ₊₁ − uₙ = (uₙ + 3)/2 − uₙ = (uₙ + 3 − 2uₙ)/2 = (3 − uₙ)/2</span>. Or <span class="math">uₙ ≤ 3</span>, donc <span class="math">3 − uₙ ≥ 0</span> et <span class="math">uₙ₊₁ − uₙ ≥ 0</span> : la suite est <strong>croissante</strong>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">3</div>
+          <div class="lecture-step-content"><p><strong>Conclusion</strong> : croissante et majorée, la suite <span class="math">(uₙ)</span> <strong>converge</strong> vers une limite <span class="math">ℓ</span> — dont on ne connaît pas encore la valeur… mais le bloc suivant s'en charge.</p></div>
+        </div>
+      </div>
+
+      <div class="lecture-rule">
+        <div class="lecture-rule-label">🧠 Méthode à retenir</div>
+        <div class="lecture-rule-body">
+          Pour une suite définie par <span class="math">uₙ₊₁ = f(uₙ)</span>, le trio gagnant est : <strong>(1)</strong> encadrement par récurrence (partie 3), <strong>(2)</strong> monotonie par le signe de <span class="math">uₙ₊₁ − uₙ</span> (partie 1), <strong>(3)</strong> convergence par le théorème ci-dessus. La limite elle-même attendra le point fixe.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 3 : BLOC 3 · point_fixe                               -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s3">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">03</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Bloc 3 · point_fixe</span>
+        <h2 class="lecture-section-title">La méthode du point fixe</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Une suite <span class="math">(uₙ)</span> définie par <span class="math">uₙ₊₁ = f(uₙ)</span> converge vers <span class="math">ℓ</span> : que vaut <span class="math">ℓ</span> ? L'idée est d'une simplicité désarmante — si les termes s'immobilisent en <span class="math">ℓ</span>, alors <span class="math">f</span> doit laisser <span class="math">ℓ</span> immobile aussi.
+      </p>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">Si lim(n→+∞) uₙ = ℓ et si f est continue en ℓ, alors f(ℓ) = ℓ.</div>
+        <div class="lecture-formula-desc">La limite <span class="math">ℓ</span> est un <strong>point fixe</strong> de <span class="math">f</span> : on la trouve en <strong>résolvant l'équation f(ℓ) = ℓ</strong>. Si plusieurs solutions, on garde celle compatible avec l'encadrement des termes.</div>
+      </div>
+
+      <div class="lecture-rule">
+        <div class="lecture-rule-label">🧠 Méthode en 4 étapes</div>
+        <div class="lecture-rule-body">
+          <ul class="lecture-list">
+            <li><strong>1. Prouver la convergence</strong> (théorème du bloc 2, ou forme explicite) — on ne cherche jamais une limite dont l'existence n'est pas établie.</li>
+            <li><strong>2. Écrire f(ℓ) = ℓ</strong> en remplaçant dans la relation de récurrence.</li>
+            <li><strong>3. Résoudre l'équation</strong> en <span class="math">ℓ</span> (souvent du 1ᵉʳ ou 2ᵈ degré).</li>
+            <li><strong>4. Choisir la solution compatible</strong> avec l'encadrement des termes (signe, minorant, majorant).</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">🧮 Exemple résolu 1 — la limite de la suite du bloc 2</div>
+        <div class="lecture-example-content"><p><span class="math">u₀ = 1</span>, <span class="math">uₙ₊₁ = (uₙ + 3)/2 = f(uₙ)</span> avec <span class="math">f(x) = (x + 3)/2</span>, suite convergente (bloc 2).</p></div>
+      </div>
+
+      <div class="lecture-steps">
+        <div class="lecture-step">
+          <div class="lecture-step-number">1</div>
+          <div class="lecture-step-content"><p><strong>Équation au point fixe</strong> : <span class="math">ℓ = (ℓ + 3)/2</span>, soit <span class="math">2ℓ = ℓ + 3</span>, soit <span class="math">ℓ = 3</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">2</div>
+          <div class="lecture-step-content"><p><strong>Conclusion</strong> : <span class="math">lim(n→+∞) uₙ = 3</span>. Tout se tient : la récurrence avait prouvé <span class="math">0 ≤ uₙ ≤ 3</span>, le théorème avait prouvé la convergence, et le point fixe livre la valeur — exactement la « porte de 3 » observée en partie 3.</p></div>
+        </div>
+      </div>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">🧮 Exemple résolu 2 — avec une racine carrée</div>
+        <div class="lecture-example-content"><p><span class="math">u₀ = 0</span>, <span class="math">uₙ₊₁ = √(2uₙ + 3)</span>. Les premiers termes : <span class="math">u₁ = √3 ≈ 1,73</span> ; <span class="math">u₂ = √(2 × 1,73 + 3) = √6,46 ≈ 2,54</span> ; <span class="math">u₃ ≈ 2,84</span> ; <span class="math">u₄ ≈ 2,95</span>. La suite, croissante et majorée par 3 (on le démontre par récurrence, comme en partie 3), converge. Que vaut sa limite ?</p></div>
+      </div>
+
+      <div class="lecture-steps">
+        <div class="lecture-step">
+          <div class="lecture-step-number">1</div>
+          <div class="lecture-step-content"><p><strong>Point fixe</strong> : <span class="math">ℓ = √(2ℓ + 3)</span>. Les deux membres sont positifs, on peut élever au carré : <span class="math">ℓ² = 2ℓ + 3</span>, soit <span class="math">ℓ² − 2ℓ − 3 = 0</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">2</div>
+          <div class="lecture-step-content"><p><strong>Résoudre</strong> : <span class="math">ℓ² − 2ℓ − 3 = (ℓ − 3)(ℓ + 1)</span>, donc <span class="math">ℓ = 3</span> ou <span class="math">ℓ = −1</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">3</div>
+          <div class="lecture-step-content"><p><strong>Choisir la bonne solution</strong> : <span class="math">u₀ = 0</span> et chaque terme est une racine carrée, donc <span class="math">uₙ ≥ 0</span> pour tout <span class="math">n</span>. Par passage à la limite, <span class="math">ℓ ≥ 0</span> : la solution <span class="math">−1</span> est <strong>rejetée</strong>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">4</div>
+          <div class="lecture-step-content"><p><strong>Conclusion</strong> : <span class="math">lim(n→+∞) uₙ = 3</span> — cohérent avec les termes calculés (<span class="math">2,84 ; 2,95…</span> s'approchent bien de 3).</p></div>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ Deux garde-fous</div>
+          <p>(1) <strong>Ordre des étapes</strong> : d'abord la convergence (bloc 2), ensuite seulement l'équation — résoudre <span class="math">f(ℓ) = ℓ</span> ne prouve rien si la suite diverge. (2) <strong>Filtre final</strong> : quand l'équation donne plusieurs solutions, c'est l'<strong>encadrement des termes</strong> (récurrence de la partie 3) qui tranche.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 4 : BLOC 4 · synthese                                 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s4">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">04</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Bloc 4 · synthese</span>
+        <h2 class="lecture-section-title">Tableau de synthèse du chapitre</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Voici le condensé de tout le chapitre : les trois grandes familles de suites, côte à côte. À connaître par cœur — colonne par colonne.
+      </p>
+
+      <div class="lecture-table">
+        <table>
+          <thead>
+            <tr><th></th><th>Arithmétique</th><th>Géométrique</th><th>Arithmético-géométrique</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Définition</strong></td>
+              <td><span class="math">uₙ₊₁ = uₙ + r</span></td>
+              <td><span class="math">uₙ₊₁ = q × uₙ</span> (<span class="math">u₀ ≠ 0</span>)</td>
+              <td><span class="math">uₙ₊₁ = a × uₙ + b</span> (<span class="math">a ≠ 1</span>)</td>
+            </tr>
+            <tr>
+              <td><strong>Terme général</strong></td>
+              <td><span class="math">uₙ = u₀ + n × r</span> = <span class="math">u₁ + (n − 1) × r</span></td>
+              <td><span class="math">uₙ = u₀ × qⁿ</span> = <span class="math">u₁ × q^(n − 1)</span></td>
+              <td><span class="math">uₙ = ℓ + (u₀ − ℓ) × aⁿ</span> avec <span class="math">ℓ = b/(1 − a)</span></td>
+            </tr>
+            <tr>
+              <td><strong>Somme des n premiers termes</strong></td>
+              <td><span class="math">u₁ + ⋯ + uₙ = n × (u₁ + uₙ)/2</span></td>
+              <td><span class="math">u₁ + ⋯ + uₙ = u₁ × (1 − qⁿ)/(1 − q)</span> (<span class="math">q ≠ 1</span>)</td>
+              <td>— (hors programme)</td>
+            </tr>
+            <tr>
+              <td><strong>Limite en +∞</strong></td>
+              <td><span class="math">+∞</span> si <span class="math">r &gt; 0</span> ; <span class="math">−∞</span> si <span class="math">r &lt; 0</span> ; constante si <span class="math">r = 0</span></td>
+              <td><span class="math">0</span> si <span class="math">|q| &lt; 1</span> ; <span class="math">±∞</span> si <span class="math">q &gt; 1</span> (signe de <span class="math">u₀</span>) ; pas de limite si <span class="math">q ≤ −1</span></td>
+              <td><span class="math">ℓ</span> si <span class="math">|a| &lt; 1</span> ; diverge en général si <span class="math">|a| &gt; 1</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-label">La clé de tout le chapitre</div>
+        <div class="lecture-formula-hero-main">Reconnaître le type de suite → écrire uₙ en fonction de n → passer à la limite</div>
+        <div class="lecture-formula-hero-desc">Les trois formes explicites à connaître : <span class="math">u₀ + n × r</span> · <span class="math">u₀ × qⁿ</span> · <span class="math">ℓ + (u₀ − ℓ) × aⁿ</span>. Avec <span class="math">uₙ</span> en fonction de <span class="math">n</span>, les limites deviennent des substitutions.</div>
+      </div>
+
+      <div class="lecture-rule">
+        <div class="lecture-rule-label">🧠 Reconnaître le type en deux gestes</div>
+        <div class="lecture-rule-body">
+          Calcule <span class="math">uₙ₊₁ − uₙ</span> : constant ⇒ <strong>arithmétique</strong> (raison = cette constante). Sinon, si les termes sont non nuls, calcule <span class="math">uₙ₊₁/uₙ</span> : constant ⇒ <strong>géométrique</strong> (raison = ce rapport). Sinon, si l'écriture est <span class="math">a × uₙ + b</span> ⇒ <strong>arithmético-géométrique</strong> (point fixe). Ne jamais « foncer » dans une formule avant ce diagnostic.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 5 : BLOC 5 · reflexes                                 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s5">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">05</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Bloc 5 · reflexes</span>
+        <h2 class="lecture-section-title">Réflexes Bac et erreurs à éviter</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Un sujet sur les suites se lit comme une check-list. Voici l'ordre d'attaque qui rapporte des points, puis la liste des pièges qui en coûtent.
+      </p>
+
+      <ul class="lecture-list-elegant">
+        <li><strong>Reconnaître le type de suite AVANT de foncer</strong> : <span class="math">uₙ₊₁ − uₙ</span> constant ? <span class="math">uₙ₊₁/uₙ</span> constant ? ou <span class="math">a × uₙ + b</span> ? Le diagnostic dicte la méthode.</li>
+        <li><strong>Chercher l'expression de uₙ en fonction de n</strong> : c'est la clé des limites, des encadrements et des questions de rang (« à partir de quel n a-t-on <span class="math">uₙ &gt; 1 000</span> ? » se résout avec la forme explicite, jamais terme par terme).</li>
+        <li><strong>Rédiger une récurrence en trois temps nommés</strong> : Initialisation, Hérédité (avec hypothèse « pour un entier n fixé » et démonstration complète), Conclusion.</li>
+        <li><strong>Vérifier chaque formule explicite</strong> sur <span class="math">u₀</span>, <span class="math">u₁</span>, <span class="math">u₂</span> : si <span class="math">n = 0</span> ne redonne pas <span class="math">u₀</span>, il y a une erreur d'exposant ou de signe.</li>
+        <li><strong>Conclure proprement sur une convergence</strong> : encadrement (récurrence) + monotonie (signe de <span class="math">uₙ₊₁ − uₙ</span>) + théorème, puis limite par point fixe — dans cet ordre.</li>
+      </ul>
+
+      <div class="lecture-callout lecture-callout-danger">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Les 6 erreurs qui coûtent le plus de points</div>
+          <ul class="lecture-list">
+            <li><strong>Conclure l'hérédité sans la démontrer</strong> (« c'est évident ») : 0 point sur la récurrence.</li>
+            <li><strong>Confondre uₙ et n</strong> : <span class="math">uₙ</span> est le terme (un nombre), <span class="math">n</span> est le rang (un entier) — « <span class="math">uₙ → +∞</span> » ne signifie pas « <span class="math">n → +∞</span> ».</li>
+            <li><strong>Croire que « bornée » suffit à converger</strong> : <span class="math">(−1)ⁿ</span> est bornée et divergente — il faut la monotonie.</li>
+            <li><strong>Écrire une limite pour <span class="math">(−1)ⁿ</span></strong> ou <span class="math">qⁿ</span> avec <span class="math">q ≤ −1</span> : ces suites divergent <em>sans limite</em> (elles oscillent).</li>
+            <li><strong>Appliquer la formule de la somme géométrique avec q = 1</strong> : division par 0 — dans ce cas <span class="math">Sₙ = n × u₁</span>.</li>
+            <li><strong>Oublier le point fixe</strong> dans <span class="math">uₙ = ℓ + (u₀ − ℓ) × aⁿ</span>, ou prendre une solution impossible de <span class="math">f(ℓ) = ℓ</span> sans vérifier l'encadrement.</li>
+          </ul>
+        </div>
+      </div>
+
+      <p class="lecture-text">
+        Chapitre bouclé ! Tu sais maintenant définir, générer, comparer, encadrer, limiter et prouver. Il ne reste qu'à t'entraîner : refais les exemples de chaque partie <strong>sans regarder les corrections</strong>, puis compare ligne à ligne.
+      </p>
+    </div>
+  </section>
+
+  <!-- ===== QCM D'ENTRAÎNEMENT ===== -->
+  <div class="lecture-quiz">
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q1 — Une suite croissante et majorée par 5 est :</p>
+      <div class="lecture-quiz-options">
+        <span>A) divergente</span>
+        <span>B) convergente</span>
+        <span>C) constante égale à 5</span>
+        <span>D) décroissante à partir d'un certain rang</span>
+      </div>
+      <details>
+        <summary>Voir la réponse</summary>
+        <div class="lecture-quiz-answer"><strong>B) convergente.</strong> C'est exactement le théorème de convergence monotone : croissante <em>et</em> majorée ⇒ convergence (vers une limite ≤ 5, dont la valeur demande un autre outil — le point fixe).</div>
+      </details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q2 — La suite définie par <span class="math">uₙ₊₁ = √(2uₙ + 3)</span> converge. Sa limite <span class="math">ℓ</span> vérifie :</p>
+      <div class="lecture-quiz-options">
+        <span>A) ℓ = 2ℓ + 3</span>
+        <span>B) ℓ² = 2ℓ + 3</span>
+        <span>C) ℓ = √3</span>
+        <span>D) ℓ² = 3</span>
+      </div>
+      <details>
+        <summary>Voir la réponse</summary>
+        <div class="lecture-quiz-answer"><strong>B) ℓ² = 2ℓ + 3.</strong> Point fixe : <span class="math">ℓ = √(2ℓ + 3)</span> donne, après élévation au carré, <span class="math">ℓ² = 2ℓ + 3</span>, soit <span class="math">ℓ² − 2ℓ − 3 = 0</span> : <span class="math">ℓ = 3</span> ou <span class="math">ℓ = −1</span>. La suite étant positive, la limite est <span class="math">ℓ = 3</span>.</div>
+      </details>
+    </div>
+  </div>
+
+  <!-- ===== RÉCAPITULATIF ===== -->
+  <div class="lecture-recap">
+    <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
+    <ul class="lecture-recap-list">
+      <li><strong>[bornees]</strong> Majorée : <span class="math">uₙ ≤ M</span> pour tout n ; minorée : <span class="math">uₙ ≥ m</span> ; bornée : <span class="math">m ≤ uₙ ≤ M</span> (les deux)</li>
+      <li><strong>[bornees]</strong> Exemples : <span class="math">1/(n + 1)</span> bornée (<span class="math">0 &lt; uₙ ≤ 1</span>) ; <span class="math">n²</span> minorée non majorée ; <span class="math">(−1)ⁿ</span> bornée mais divergente</li>
+      <li><strong>[monotone_converge]</strong> Théorème (admis) : toute suite <strong>croissante et majorée</strong> converge ; toute suite <strong>décroissante et minorée</strong> converge — les deux hypothèses sont indispensables</li>
+      <li><strong>[monotone_converge]</strong> Recette : encadrement par récurrence + monotonie par signe de <span class="math">uₙ₊₁ − uₙ</span> + théorème ⇒ convergence</li>
+      <li><strong>[point_fixe]</strong> Si <span class="math">uₙ₊₁ = f(uₙ)</span> converge vers <span class="math">ℓ</span> et f est continue, alors <span class="math">f(ℓ) = ℓ</span> : résoudre l'équation, puis filtrer par l'encadrement</li>
+      <li><strong>[point_fixe]</strong> <span class="math">(uₙ + 3)/2</span> → <span class="math">ℓ = 3</span> ; <span class="math">√(2uₙ + 3)</span> → <span class="math">ℓ² − 2ℓ − 3 = 0</span> → <span class="math">ℓ = 3</span> (le <span class="math">−1</span> est rejeté, suite positive)</li>
+      <li><strong>[synthese]</strong> Arithmétique : <span class="math">uₙ = u₀ + n × r</span> ; somme <span class="math">n × (u₁ + uₙ)/2</span> ; limite <span class="math">±∞</span> selon le signe de r</li>
+      <li><strong>[synthese]</strong> Géométrique : <span class="math">uₙ = u₀ × qⁿ</span> ; somme <span class="math">u₁(1 − qⁿ)/(1 − q)</span> ; limite <span class="math">0</span> si <span class="math">|q| &lt; 1</span>, <span class="math">±∞</span> si <span class="math">q &gt; 1</span>, rien si <span class="math">q ≤ −1</span></li>
+      <li><strong>[synthese]</strong> Arithmético-géométrique : point fixe <span class="math">ℓ = b/(1 − a)</span> ; <span class="math">uₙ = ℓ + (u₀ − ℓ) × aⁿ</span> ; limite <span class="math">ℓ</span> si <span class="math">|a| &lt; 1</span></li>
+      <li><strong>[reflexes]</strong> Diagnostic AVANT calcul, forme explicite = clé des limites, récurrence en 3 temps nommés, contrôle systématique sur <span class="math">u₀</span>, <span class="math">u₁</span>, <span class="math">u₂</span></li>
+    </ul>
+  </div>
+
+  <!-- ===== FIN ===== -->
+  <div class="lecture-end">
+    <span class="lecture-end-icon">🎯</span>
+    <div class="lecture-end-text">Chapitre terminé !</div>
+    <div class="lecture-end-sub">Refais les exemples sans regarder les corrections, puis passe au chapitre suivant</div>
+    <div class="lecture-end-divider"></div>
+  </div>
+
+</div>

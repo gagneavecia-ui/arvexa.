@@ -1,0 +1,401 @@
+<!-- ============================================================ -->
+<!-- PARTIE 4 : FICHE COMPLÈTE — CONDITIONS INITIALES &            -->
+<!--            APPLICATIONS                                       -->
+<!-- Contenu : méthode complète en 4 étapes, tableau de synthèse   -->
+<!-- des 3 types d'équations, radioactivité et demi-vie (lien SVT),-->
+<!-- croissance bactérienne, exercice type Bac corrigé, réflexes.  -->
+<!-- ============================================================ -->
+
+<div class="lecture-container">
+
+  <!-- ===== HERO ===== -->
+  <header class="lecture-hero">
+    <div class="lecture-hero-badge">
+      <span class="lecture-hero-icon">📘</span>
+      <span class="lecture-hero-label">Partie 04 · Équations différentielles</span>
+    </div>
+    <h1 class="lecture-hero-title">
+      Fiche complète — <em>conditions initiales</em> &amp; applications
+    </h1>
+    <p class="lecture-hero-intro">
+      Voici la fiche de révision du chapitre : la <strong>méthode complète de résolution avec conditions initiales</strong> en 4 étapes, le <strong>tableau de synthèse</strong> des trois types d'équations, deux <strong>applications</strong> majeures (désintégration radioactive avec la demi-vie — le lien direct avec ton cours de SVT — et croissance d'une population bactérienne), un <strong>exercice type Bac corrigé</strong> et les <strong>réflexes</strong> qui rapportent des points.
+    </p>
+    <div class="lecture-hero-meta">
+      <span class="lecture-hero-meta-item">⏱ 25 min</span>
+      <span class="lecture-hero-meta-item">🧮 5 notions</span>
+      <span class="lecture-hero-meta-item">📊 6 sections</span>
+      <span class="lecture-hero-meta-item">🎓 Terminale D</span>
+    </div>
+  </header>
+
+  <!-- ===== SOMMAIRE ===== -->
+  <nav class="lecture-toc">
+    <div class="lecture-toc-header">
+      <span>Dans cette fiche</span>
+      <span class="lecture-toc-count">5 notions · 6 sections</span>
+    </div>
+    <ol class="lecture-toc-list">
+      <li><a href="#s0"><span class="toc-num">00</span><span>Accroche — Ta feuille de route</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>Fiche · methode_ci — La méthode complète en 4 étapes</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>Fiche · synthese_ed — Tableau de synthèse des 3 types d'équations</span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>Fiche · applications_ed — Radioactivité, demi-vie et croissance bactérienne</span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>Fiche · exo_bac — Exercice type Bac corrigé</span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>Fiche · reflexes_bac — Réflexes Bac et erreurs à éviter</span></a></li>
+    </ol>
+  </nav>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 0 : ACCROCHE -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s0">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">00</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Accroche</span>
+        <h2 class="lecture-section-title">Ta feuille de route</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Les parties 1 à 3 t'ont donné les briques : <span class="math">y' = ay</span> (partie 1), <span class="math">y' = ay + b</span> (partie 2), <span class="math">y' = ay + f(x)</span> (partie 3). Cette fiche les assemble en une <strong>procédure unique</strong> — celle que tu dérouleras le jour de l'examen — puis la met au service des <strong>applications</strong> : la radioactivité (dont la demi-vie, déjà croisée en SVT avec le cycle cellulaire) et la croissance des populations.
+      </p>
+
+      <div class="lecture-callout lecture-callout-gold">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Ce que tu dois savoir faire à la fin de ce chapitre</div>
+          <ul class="lecture-list">
+            <li>Résoudre l'un des 3 types d'équations (tableau de synthèse, section 02).</li>
+            <li>Déterminer la constante <span class="math">C</span> grâce à une condition initiale (section 01).</li>
+            <li>Exploiter un modèle : demi-vie, temps de doublement, comportement à long terme (sections 03 et 04).</li>
+            <li>Vérifier une solution en dérivant et substituant (section 05 — le réflexe qui sauve).</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 1 : FICHE · methode_ci — MÉTHODE EN 4 ÉTAPES -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s1">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">01</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Fiche · methode_ci</span>
+        <h2 class="lecture-section-title">La méthode complète en 4 étapes</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Toute question du type « déterminer la solution qui vérifie y(x₀) = y₀ » se traite avec la même procédure, quel que soit le type d'équation :
+      </p>
+
+      <div class="lecture-steps">
+        <div class="lecture-step">
+          <div class="lecture-step-number">1</div>
+          <div class="lecture-step-content"><p><strong>Forme générale</strong> : résoudre l'équation différentielle — la solution contient une constante <span class="math">C</span> (selon le type : <span class="math">C·e^(a·x)</span>, <span class="math">C·e^(a·x) − b/a</span> ou <span class="math">yₚ(x) + C·e^(a·x)</span>).</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">2</div>
+          <div class="lecture-step-content"><p><strong>Condition</strong> : écrire la condition initiale <span class="math">y(x₀) = y₀</span> telle quelle, sans la réinterpréter.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">3</div>
+          <div class="lecture-step-content"><p><strong>Constante C</strong> : substituer <span class="math">x₀</span> dans la forme générale, obtenir une équation en <span class="math">C</span>, la résoudre.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">4</div>
+          <div class="lecture-step-content"><p><strong>Solution unique</strong> : remplacer <span class="math">C</span> par sa valeur et énoncer la solution — puis la <strong>vérifier</strong> (condition initiale ET équation, en dérivant).</p></div>
+        </div>
+      </div>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">Forme générale → Condition y(x₀) = y₀ → Constante C → Solution unique</div>
+        <div class="lecture-formula-desc">Le théorème d'existence-unicité garantit que cette procédure donne exactement une réponse : ni échec, ni doublon. Dans le cas <span class="math">y' = ay</span> avec <span class="math">x₀ = 0</span>, on a directement <span class="math">C = y₀</span>.</div>
+      </div>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">🧮 Exemple éclair — y' = 2y avec y(0) = 5</div>
+        <div class="lecture-example-content">
+          <div class="lecture-steps">
+            <div class="lecture-step">
+              <div class="lecture-step-number">1</div>
+              <div class="lecture-step-content"><p>Forme générale : <span class="math">y(x) = C·e^(2x)</span> (partie 1, avec <span class="math">a = 2</span>).</p></div>
+            </div>
+            <div class="lecture-step">
+              <div class="lecture-step-number">2</div>
+              <div class="lecture-step-content"><p>Condition : <span class="math">y(0) = 5</span>.</p></div>
+            </div>
+            <div class="lecture-step">
+              <div class="lecture-step-number">3</div>
+              <div class="lecture-step-content"><p><span class="math">y(0) = C·e^0 = C = 5</span>, donc <span class="math">C = 5</span>.</p></div>
+            </div>
+            <div class="lecture-step">
+              <div class="lecture-step-number">4</div>
+              <div class="lecture-step-content"><p>Solution unique : <span class="math">y(x) = 5·e^(2x)</span>. <strong>Vérification</strong> : <span class="math">y(0) = 5·e^0 = 5</span> ✅ et <span class="math">y' = 10·e^(2x) = 2·(5·e^(2x)) = 2·y</span> ✅</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 2 : FICHE · synthese_ed — TABLEAU DE SYNTHÈSE -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s2">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">02</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Fiche · synthese_ed</span>
+        <h2 class="lecture-section-title">Tableau de synthèse des 3 types d'équations</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Le tableau à connaître par cœur — ou mieux, à savoir <strong>reconstruire</strong> en comprenant d'où vient chaque ligne :
+      </p>
+
+      <div class="lecture-table">
+        <table>
+          <thead>
+            <tr><th>Équation</th><th>Solution générale (C ∈ ℝ)</th><th>Clé de résolution</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="math">y' = ay</span> (a ≠ 0)</td>
+              <td><span class="math">y(x) = C·e^(a·x)</span></td>
+              <td>directe (partie 1) ; C = y₀ si y(0) = y₀</td>
+            </tr>
+            <tr>
+              <td><span class="math">y' = ay + b</span> (a ≠ 0)</td>
+              <td><span class="math">y(x) = C·e^(a·x) − b/a</span></td>
+              <td>particulière constante <span class="math">yₚ = −b/a</span> (partie 2)</td>
+            </tr>
+            <tr>
+              <td><span class="math">y' = ay + f(x)</span></td>
+              <td><span class="math">y(x) = yₚ(x) + C·e^(a·x)</span></td>
+              <td>yₚ par identification (partie 3)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <ul class="lecture-list-elegant">
+        <li>Les trois solutions contiennent <strong>une seule constante libre</strong> <span class="math">C</span> multipliant <span class="math">e^(a·x)</span>.</li>
+        <li>Le second membre n'apparaît jamais multiplié par <span class="math">C</span> : il est <strong>entièrement absorbé</strong> par la solution particulière.</li>
+        <li>Les deux premières lignes sont des cas particuliers de la troisième (<span class="math">f = 0</span>, puis <span class="math">f = b</span>).</li>
+        <li>Dans tous les cas, la condition initiale se traite <strong>après</strong> l'écriture de la forme générale.</li>
+      </ul>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ Auto-test en 30 secondes</div>
+          <p>Sans regarder le tableau : quelle est la solution générale de <span class="math">y' = 4y − 3</span> ? Réponse attendue : <span class="math">y(x) = C·e^(4x) + 3/4</span> (car <span class="math">yₚ = −b/a = 3/4</span>). Si tu as écrit <span class="math">−3/4</span> ou oublié le terme constant, retourne à la partie 2, section 02.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 3 : FICHE · applications_ed — APPLICATIONS -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s3">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">03</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Fiche · applications_ed</span>
+        <h2 class="lecture-section-title">Radioactivité, demi-vie et croissance bactérienne</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        <strong>Application 1 — La désintégration radioactive.</strong> Un échantillon radioactif contient <span class="math">N(t)</span> noyaux instables à l'instant <span class="math">t</span>. Chaque noyau se désintègre indépendamment des autres : la vitesse de disparition est proportionnelle au nombre de noyaux présents. Le modèle s'écrit <span class="math">N'(t) = −λ·N(t)</span>, où <span class="math">λ &gt; 0</span> est la <strong>constante radioactive</strong> (propre à chaque élément). C'est l'équation <span class="math">y' = ay</span> avec <span class="math">a = −λ &lt; 0</span>, donc :
+      </p>
+
+      <p class="lecture-text">
+        <span class="math">N(t) = N₀·e^(−λ·t)</span>, où <span class="math">N₀ = N(0)</span> est le nombre initial de noyaux. <strong>Vérification</strong> : <span class="math">N'(t) = N₀·(−λ)·e^(−λ·t) = −λ·N(t)</span> ✅
+      </p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">📗 Définition — Demi-vie t½</div>
+          <p>La <strong>demi-vie</strong>, notée <span class="math">t½</span>, est la durée au bout de laquelle <strong>la moitié</strong> des noyaux initialement présents s'est désintégrée : <span class="math">N(t½) = N₀/2</span>. Elle caractérise l'élément radioactif — comme en SVT, où tu l'as rencontrée pour la datation et la radioactivité.</p>
+        </div>
+      </div>
+
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">🧮 Calcul de la demi-vie</div>
+        <div class="lecture-example-content">
+          <div class="lecture-steps">
+            <div class="lecture-step">
+              <div class="lecture-step-number">1</div>
+              <div class="lecture-step-content"><p><strong>Équation</strong> : <span class="math">N(t½) = N₀/2</span> devient, avec <span class="math">N(t) = N₀·e^(−λ·t)</span> : <span class="math">N₀·e^(−λ·t½) = N₀/2</span>.</p></div>
+            </div>
+            <div class="lecture-step">
+              <div class="lecture-step-number">2</div>
+              <div class="lecture-step-content"><p><strong>Simplifier</strong> (division par <span class="math">N₀ &gt; 0</span>) : <span class="math">e^(−λ·t½) = 1/2</span>.</p></div>
+            </div>
+            <div class="lecture-step">
+              <div class="lecture-step-number">3</div>
+              <div class="lecture-step-content"><p><strong>Passer au logarithme</strong> : <span class="math">−λ·t½ = ln(1/2) = −ln 2</span>, d'où <span class="math">t½ = (ln 2)/λ</span>.</p></div>
+            </div>
+            <div class="lecture-step">
+              <div class="lecture-step-number">4</div>
+              <div class="lecture-step-content"><p><strong>Vérification</strong> : <span class="math">N((ln 2)/λ) = N₀·e^(−λ·(ln 2)/λ) = N₀·e^(−ln 2) = N₀·(1/2) = N₀/2</span> ✅</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-label">Le duo à connaître (maths + SVT)</div>
+        <div class="lecture-formula-hero-main"><span class="math">N(t) = N₀·e^(−λ·t)&nbsp;&nbsp;·&nbsp;&nbsp;t½ = (ln 2)/λ</span></div>
+        <div class="lecture-formula-hero-desc">Lien SVT : la décroissance exponentielle par demi-vies est le même modèle mathématique que la radioactivité (datation au carbone 14, demi-vie ≈ 5 730 ans) et rythme les divisions du cycle cellulaire — une division, une division des effectifs par 2.</div>
+      </div>
+
+      <p class="lecture-text">
+        <strong>Application 2 — Croissance d'une population bactérienne.</strong> Dans un milieu favorable, chaque bactérie se divise indépendamment : la vitesse de croissance est proportionnelle à l'effectif. Le modèle s'écrit <span class="math">N'(t) = k·N(t)</span> avec <span class="math">k &gt; 0</span>, d'où <span class="math">N(t) = N₀·e^(k·t)</span> (vérification identique à celle ci-dessus, au signe près). On définit le <strong>temps de doublement</strong> <span class="math">τ</span> par <span class="math">N(τ) = 2·N₀</span> :
+      </p>
+
+      <p class="lecture-text">
+        <span class="math">N₀·e^(k·τ) = 2·N₀</span> ⟹ <span class="math">e^(k·τ) = 2</span> ⟹ <span class="math">k·τ = ln 2</span> ⟹ <span class="math">τ = (ln 2)/k</span>.
+      </p>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">Temps de doublement : <span class="math">τ = (ln 2)/k</span>&nbsp;&nbsp;·&nbsp;&nbsp;Exemple : k = 0,04 par heure ⟹ τ ≈ 17,3 h</div>
+        <div class="lecture-formula-desc">Même formule que la demi-vie, au signe près : <span class="math">k &gt; 0</span> pour une croissance, <span class="math">−λ &lt; 0</span> pour une décroissance. Le logarithme népérien de 2 est LA constante des phénomènes exponentiels.</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 4 : FICHE · exo_bac — EXERCICE TYPE BAC -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s4">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">04</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Fiche · exo_bac</span>
+        <h2 class="lecture-section-title">Exercice type Bac corrigé</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">📝 Énoncé — Population et prélèvements</div>
+        <div class="lecture-example-content"><p>Soit <span class="math">P</span> la fonction, définie et dérivable sur <span class="math">[0 ; +∞)</span>, qui à l'instant <span class="math">t</span> (en années) associe l'effectif, en milliers d'individus, d'une population d'un bassin du fleuve Niger. On admet que <span class="math">P</span> vérifie : <span class="math">P'(t) = 0,05·P(t) − 20</span> et <span class="math">P(0) = 1000</span>.</p>
+        <p><strong>1.</strong> Résoudre l'équation différentielle <span class="math">y' = 0,05·y − 20</span>. <strong>2.</strong> En déduire l'expression de <span class="math">P(t)</span>. <strong>3.</strong> Vérifier que <span class="math">P</span> convient. <strong>4.</strong> Déterminer <span class="math">lim (t→+∞) P(t)</span> et interpréter. <strong>5.</strong> Au bout de combien d'années l'effectif atteint-il 2000 milliers d'individus ?</p></div>
+      </div>
+
+      <div class="lecture-steps">
+        <div class="lecture-step">
+          <div class="lecture-step-number">1</div>
+          <div class="lecture-step-content"><p><strong>Résolution</strong> (partie 2) : <span class="math">a = 0,05 ≠ 0</span> et <span class="math">b = −20</span>. Solution particulière constante : <span class="math">yₚ = −b/a = 20/0,05 = 400</span>. Solution générale : <span class="math">y(t) = C·e^(0,05t) + 400</span>, <span class="math">C ∈ ℝ</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">2</div>
+          <div class="lecture-step-content"><p><strong>Condition initiale</strong> : <span class="math">P(0) = C·e^0 + 400 = C + 400 = 1000</span>, donc <span class="math">C = 600</span>. D'où <span class="math">P(t) = 600·e^(0,05t) + 400</span>.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">3</div>
+          <div class="lecture-step-content"><p><strong>Vérification</strong> : <span class="math">P'(t) = 600·0,05·e^(0,05t) = 30·e^(0,05t)</span> ; d'autre part <span class="math">0,05·P(t) − 20 = 0,05·(600·e^(0,05t) + 400) − 20 = 30·e^(0,05t) + 20 − 20 = 30·e^(0,05t)</span> ✅ Et <span class="math">P(0) = 600 + 400 = 1000</span> ✅</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">4</div>
+          <div class="lecture-step-content"><p><strong>Limite</strong> : comme <span class="math">0,05 &gt; 0</span>, <span class="math">lim (t→+∞) e^(0,05t) = +∞</span>, donc <span class="math">lim (t→+∞) P(t) = +∞</span>. <strong>Interprétation</strong> : la population croît sans borne — la croissance exponentielle (5 % par an, environ) l'emporte sur le prélèvement fixe de 20 ; le niveau 400 n'est pas un équilibre atteint, c'est un simple décalage.</p></div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">5</div>
+          <div class="lecture-step-content"><p><strong>Instant cherché</strong> : <span class="math">600·e^(0,05t) + 400 = 2000</span> ⟹ <span class="math">e^(0,05t) = 1600/600 = 8/3</span> ⟹ <span class="math">0,05t = ln(8/3)</span> ⟹ <span class="math">t = 20·ln(8/3) ≈ 19,6</span>. L'effectif de 2000 milliers d'individus est atteint au bout d'environ 19,6 années (donc durant la 20ᵉ année).</p></div>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ Ce que le correcteur attend à chaque question</div>
+          <p><strong>Q1</strong> : la forme générale avec <span class="math">C</span> et le terme <span class="math">+400</span> (ou <span class="math">−b/a</span> bien signé). <strong>Q2</strong> : le calcul de <span class="math">C</span> visible (<span class="math">C + 400 = 1000</span>). <strong>Q3</strong> : la dérivation ET la substitution — deux lignes. <strong>Q4</strong> : la limite justifiée par <span class="math">0,05 &gt; 0</span> puis une phrase d'interprétation. <strong>Q5</strong> : le passage au logarithme avec le résultat exact <span class="math">20·ln(8/3)</span> avant la valeur approchée. Chaque maillon manquant coûte des points.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 5 : FICHE · reflexes_bac — RÉFLEXES & ERREURS -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s5">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">05</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Fiche · reflexes_bac</span>
+        <h2 class="lecture-section-title">Réflexes Bac et erreurs à éviter</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <div class="lecture-rule">
+        <div class="lecture-rule-label">🧠 Le réflexe n° 1 — Vérifier en dérivant et substituant</div>
+        <div class="lecture-rule-body">
+          Face à une question « vérifier que la fonction g définie par g(x) = … est solution de … », ne cherche jamais à résoudre : <strong>dérive g</strong>, <strong>calcule le second membre</strong> (a·g + b ou a·g + f(x)), <strong>compare</strong>. Si les deux expressions coïncident, g est solution. Cette technique rapporte des points <strong>même sans savoir résoudre l'équation</strong> — et elle sert aussi à contrôler ta propre résolution en fin de question. Deux lignes, zéro risque.
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-danger">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Erreur fréquente au Bac — les quatre péchés capitaux</div>
+          <ul class="lecture-list">
+            <li><strong>La constante oubliée</strong> : écrire <span class="math">y = e^(a·x)</span> comme solution générale. Sans <span class="math">C</span>, ce n'est qu'une solution parmi une infinité — la question « résoudre » est perdue d'avance.</li>
+            <li><strong>L'identification bâclée</strong> : identifier seulement le coefficient de <span class="math">x</span> et oublier la constante (ou l'inverse) quand <span class="math">f</span> est affine. Les DEUX coefficients doivent être exploités.</li>
+            <li><strong>Le signe de −b/a</strong> : poser <span class="math">yₚ = b/a</span>, ou rater le double signe quand <span class="math">a</span> ou <span class="math">b</span> est négatif. Écrire <span class="math">0 = a·c + b</span> avant de conclure.</li>
+            <li><strong>La condition initiale sur la mauvaise forme</strong> : substituer <span class="math">y(x₀) = y₀</span> dans une forme générale déjà fausse, ou oublier que <span class="math">y(0) = C − b/a</span> (et non <span class="math">C</span>) quand il y a un second membre.</li>
+          </ul>
+        </div>
+      </div>
+
+      <ul class="lecture-list-elegant">
+        <li><strong>Lire le type d'équation</strong> : second membre absent, constant, ou fonction ? → choisir la ligne du tableau de synthèse.</li>
+        <li><strong>Écrire la forme générale avec C</strong> avant toute condition initiale.</li>
+        <li><strong>Traiter la condition</strong> : substituer, isoler <span class="math">C</span>, réécrire la solution unique.</li>
+        <li><strong>Vérifier</strong> : condition initiale ✅ puis équation par dérivation ✅ — si l'une des deux échoue, chercher l'erreur avant d'aller plus loin.</li>
+        <li><strong>Justifier les valeurs approchées</strong> : donner d'abord la valeur exacte (<span class="math">20·ln(8/3)</span>), puis l'arrondi (<span class="math">≈ 19,6</span>).</li>
+      </ul>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">📗 La checklist finale du chapitre</div>
+          <p>Solutions de <span class="math">y' = ay</span> : <span class="math">C·e^(a·x)</span> · de <span class="math">y' = ay + b</span> : <span class="math">C·e^(a·x) − b/a</span> · de <span class="math">y' = ay + f(x)</span> : <span class="math">yₚ(x) + C·e^(a·x)</span> · demi-vie : <span class="math">t½ = (ln 2)/λ</span> · temps de doublement : <span class="math">τ = (ln 2)/k</span> · et partout : la vérification par dérivation. Si ces six lignes sont automatiques, tu es prêt.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== RÉCAPITULATIF ===== -->
+  <div class="lecture-recap">
+    <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
+    <ul class="lecture-recap-list">
+      <li><strong>[methode_ci]</strong> Méthode en 4 étapes : forme générale → condition <span class="math">y(x₀) = y₀</span> → constante C → solution unique, puis vérification</li>
+      <li><strong>[methode_ci]</strong> L'existence-unicité garantit une réponse unique : ni échec, ni doublon</li>
+      <li><strong>[synthese_ed]</strong> <span class="math">y' = ay</span> → <span class="math">C·e^(a·x)</span> · <span class="math">y' = ay + b</span> → <span class="math">C·e^(a·x) − b/a</span> · <span class="math">y' = ay + f(x)</span> → <span class="math">yₚ(x) + C·e^(a·x)</span></li>
+      <li><strong>[applications_ed]</strong> Radioactivité : <span class="math">N'(t) = −λ·N(t)</span> ⟹ <span class="math">N(t) = N₀·e^(−λ·t)</span></li>
+      <li><strong>[applications_ed]</strong> Demi-vie : <span class="math">N(t½) = N₀/2</span> ⟹ <span class="math">t½ = (ln 2)/λ</span> — même modèle que le cycle cellulaire en SVT</li>
+      <li><strong>[applications_ed]</strong> Croissance bactérienne : <span class="math">N'(t) = k·N(t)</span> ⟹ <span class="math">N(t) = N₀·e^(k·t)</span> ; temps de doublement <span class="math">τ = (ln 2)/k</span></li>
+      <li><strong>[exo_bac]</strong> <span class="math">P' = 0,05·P − 20</span>, <span class="math">P(0) = 1000</span> ⟹ <span class="math">P(t) = 600·e^(0,05t) + 400</span> et <span class="math">lim (t→+∞) P(t) = +∞</span> : croissance exponentielle non freinée par le prélèvement</li>
+      <li><strong>[reflexes_bac]</strong> Le réflexe qui rapporte des points même sans résoudre : <strong>vérifier en dérivant et substituant</strong></li>
+      <li><strong>[reflexes_bac]</strong> Erreurs à bannir : constante C oubliée, identification bâclée, signe de −b/a, condition appliquée à une forme fausse</li>
+    </ul>
+  </div>
+
+  <!-- ===== FIN ===== -->
+  <div class="lecture-end">
+    <span class="lecture-end-icon">🎯</span>
+    <div class="lecture-end-text">Chapitre terminé !</div>
+    <div class="lecture-end-sub">Équations différentielles maîtrisées — direction le prochain chapitre de mathématiques</div>
+    <div class="lecture-end-divider"></div>
+  </div>
+
+</div>

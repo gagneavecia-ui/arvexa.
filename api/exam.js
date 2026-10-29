@@ -1,20 +1,25 @@
 // ================================================================
-// API EXAM v6.2 — ARVEXA School
-// Corrections : Cas B, Notes strictes, Niveau BAC, Schémas Physique
-// v4.15 : heavy 3→5/min, 429+retryAfter (re-essai auto côté client), contrat de
-// complétion IA (30/30 questions non vides), gradation Sujet 1→2, validation
-// stricte des énoncés + rattrapage "presque complet" depuis le pool d'exercices
-// v4.16 : VARIATION TOTALE — temperature 1.0 en génération, tirage aléatoire
-// (contexte nigérien + approche + contrainte numérique) à CHAQUE appel, liste
-// des énoncés déjà servis (avoidStatements client) interdits de recyclage,
-// tirage ALÉATOIRE dans le pool de rattrapage (fini candidates[0])
-// v4.17 : DES CALCULS, PAS DES HISTOIRES (référence fiches Pascal Lainé) — les
-// matières scientifiques livrent des exercices de CALCUL PUR (expression /
-// équation / données techniques à transformer) : au minimum 2 sur 3 par sujet,
-// situation réelle devenue FACULTATIVE (max 1/sujet) ; tirage de TECHNIQUES de
-// calcul (VARIATION_CALC_DRILLS) + angles de calcul (VARIATION_CALC_ANGLES) ;
-// difficultés calibrées en exemples de calculs (easy (3+6i)/(-3-4i) → bac
-// z^4+(3-6i)z^2-8-6i=0) ; matières littéraires inchangées (contexte imposé)
+// API EXAM v5.0 — ARVEXA School
+// ✅ v5.0 : TRIPARTITION STRICTE DES MATIÈRES — le souci majeur corrigé :
+//   • calcul      (mathematiques, physique, chimie) : exercices de CALCUL ; en
+//                   maths VALEURS EXACTES obligatoires (zéro virgule, surtout
+//                   en Nombres complexes — les décimales y rendaient le calcul
+//                   impossible).
+//   • svt         : QUESTIONNAIRE + ANALYSE BAC SVT (restitution, exploitation
+//                   de documents, QCM, vrai/faux justifiés, conclusions) —
+//                   calculs UNIQUEMENT en génétique/données chiffrées.
+//   • litteraire  (histoire, geographie, philosophie) : QUESTIONNAIRE —
+//                   STRICTEMENT ZÉRO calcul, zéro LaTeX mathématique.
+// ✅ v5.0 : PROTOCOLE DE RÉSOLUTION PRÉALABLE — l'IA TRAITE chaque exercice
+//   AVANT de le livrer : (1) prompt « traite d'abord » + (2) PASSE DE
+//   VÉRIFICATION par un 2e appel IA qui résout chaque question, remplace les
+//   questions défectueuses et attache les réponses vérifiées (utilisées par la
+//   correction) + (3) VALIDEURS DÉTERMINISTES qui rejettent tout examen hors
+//   régime (décimales en complexes, calculs en littéraire...), pool compris.
+// Historique : v4.15 heavy 3→5/min, 429+retryAfter, contrat de complétion
+//   (30/30 questions), gradation Sujet 1→2 ; v4.16 variation totale (temp 1.0,
+//   anti-récyclage avoidStatements) ; v4.17 calculs purs type Pascal Lainé ;
+//   v4.19 pool restreint au régime calcul.
 // ================================================================
 
 
@@ -53,7 +58,44 @@ const SUBJECT_LABELS = {
   geographie: 'Géographie'
 };
 
-const CHOICE_SUBJECTS = new Set(['mathematiques', 'physique', 'chimie']);
+// ✅ v5.0 — QCM autorisés aussi en SVT (questionnaires BAC SVT : QCM, vrai/faux).
+const CHOICE_SUBJECTS = new Set(['mathematiques', 'physique', 'chimie', 'svt']);
+
+// ═════════════════════════════════════════════════════════════
+// ✅ v5.0 — TRIPARTITION STRICTE DES MATIÈRES
+// Le v4.x appliquait « 100% CALCULS » à toutes les matières (SVT inclus) et
+// n'imposait AUCUN questionnaire aux littéraires — d'où : des décimales
+// impossibles en Nombres complexes, des calculs en Histoire, des exercices de
+// maths purs en SVT. Désormais 3 régimes ÉTANCHES :
+//   • calcul      (mathematiques, physique, chimie) : exercices de CALCUL, mais
+//                   avec VALEURS EXACTES en maths (zéro virgule, surtout en
+//                   complexes) ; décimales réalistes réservées à physique/chimie.
+//   • svt         : QUESTIONNAIRE + ANALYSE BAC SVT (restitution, exploitation de
+//                   documents, QCM, vrai/faux justifiés, conclusions) ; calculs
+//                   UNIQUEMENT en génétique/données chiffrées du chapitre.
+//   • litteraire  (histoire, geographie, philosophie) : QUESTIONS uniquement —
+//                   STRICTEMENT ZÉRO calcul, zéro LaTeX mathématique.
+// ═════════════════════════════════════════════════════════════
+const SUBJECT_CATEGORY = {
+  mathematiques: 'calcul',
+  physique: 'calcul',
+  chimie: 'calcul',
+  svt: 'svt',
+  histoire: 'litteraire',
+  geographie: 'litteraire',
+  philosophie: 'litteraire'
+};
+const CATEGORY_LABELS = {
+  calcul: 'scientifique à CALCULS (exercices de calcul pur)',
+  svt: 'SVT — QUESTIONNAIRE + ANALYSE (PAS un exercice de maths)',
+  litteraire: 'LITTÉRAIRE — QUESTIONNAIRE SANS AUCUN CALCUL'
+};
+function subjectCategory(subjectName) {
+  return SUBJECT_CATEGORY[subjectName] || 'litteraire';
+}
+// Sciences à calculs purs (pool « calc ») — SVT n'en fait PLUS partie.
+const CALC_SUBJECTS = new Set(['mathematiques', 'physique', 'chimie']);
+const LITTERAIRE_SUBJECTS = new Set(['histoire', 'geographie', 'philosophie']);
 
 let adminServices = null;
 
@@ -268,6 +310,9 @@ function escapeHtmlOutsideLatex(text) {
 
 function cleanText(text) {
   if (!text || typeof text !== 'string') return text;
+  // ✅ v5.1 — purger les caractères de contrôle résiduels (\frac mal échappé
+  // déjà corrompu en form-feed par un parse antérieur, etc.).
+  text = text.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '');
   let r = normalizeLatexDelimiters(text);
   // Pipeline segment-aware : les maths $…$ / $$…$$ restent INTACTES,
   // la prose ne reçoit jamais de \commande LaTeX brute.
@@ -351,6 +396,21 @@ function getProviders() {
   return providers;
 }
 
+// ✅ v5.1 — double les backslashes LaTeX simples DANS les $...$ : $\Delta$ →
+// $\\Delta$, $\\frac{a}{b}$ → $\\\\frac{a}{b}$ (les séquences déjà doublées sont
+// intactes grâce au lookbehind). Hors maths, rien n'est touché (les \n de mise
+// en forme restent des retours à la ligne).
+function repairMathEscapes(raw) {
+  return String(raw).replace(/\$\$[^$]{0,2000}\$\$|\$[^$\n]{0,500}\$/g, (span) =>
+    span.replace(/(?<!\\)\\(?=[A-Za-z])/g, '\\\\'));
+}
+
+// ✅ v5.1 — dernier recours : échappe tout backslash non suivi d'un caractère
+// d'échappement JSON valide (corrige \Delta, \pi, \sqrt... hors $...$).
+function repairAllEscapes(raw) {
+  return String(raw).replace(/(?<!\\)\\(?!["\\/bfnrtu])/g, '\\\\');
+}
+
 async function callProvider(provider, prompt, maxTokens, temperature) {
   if (!maxTokens) maxTokens = MAX_TOKENS.PROVIDER_DEFAULT;
   const controller = new AbortController();
@@ -396,14 +456,37 @@ async function callProvider(provider, prompt, maxTokens, temperature) {
 
     const cleaned = String(content).replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
 
-    try { return JSON.parse(cleaned); }
-    catch (e) {
-      console.warn(`[AI] ${provider.name} — JSON invalide. Début: ${cleaned.slice(0, 200)}`);
-      throw new Error(provider.name + ': JSON invalide');
+    // ✅ v5.1 — RÉPARATION DES ÉCHAPPEMENTS LaTeX : un LLM qui écrit $\Delta$
+    // (backslash simple) dans du JSON produit soit un JSON invalide (crash
+    // « Bad escaped character »), soit des caractères de contrôle silencieux
+    // (\frac → form-feed, \tan → tabulation). On double les backslashes LaTeX
+    // à l'intérieur des $...$ AVANT le parse, puis on retente globalement.
+    const candidates = [repairMathEscapes(cleaned), cleaned, repairAllEscapes(cleaned)];
+    for (let ci = 0; ci < candidates.length; ci++) {
+      try { return JSON.parse(candidates[ci]); }
+      catch (e) {
+        if (ci === candidates.length - 1) {
+          console.warn(`[AI] ${provider.name} — JSON invalide même réparé. Début: ${cleaned.slice(0, 200)}`);
+          const err = new Error(provider.name + ': JSON invalide');
+          // ✅ v5.2 — le texte brut accompagne l'erreur : la passe de vérification
+          // peut ainsi RÉCUPÉRER les solutions complètes d'une réponse tronquée.
+          err.raw = cleaned;
+          throw err;
+        }
+      }
     }
   } finally {
     clearTimeout(timeout);
   }
+}
+
+// ✅ v5.0 — genStyle PAR CATÉGORIE : calcul (maths/PC/chimie), svt, recit
+// (littéraires). Le pool conserve le régime de l'exercice archivé.
+function poolGenStyle(subject) {
+  const category = subjectCategory(subject);
+  if (category === 'calcul') return 'calc';
+  if (category === 'svt') return 'svt';
+  return 'recit';
 }
 
 async function saveExercisesToPool(exam, subject, difficulty, uid) {
@@ -426,7 +509,7 @@ async function saveExercisesToPool(exam, subject, difficulty, uid) {
           statement: exercise.statement || '',
           questions: exercise.questions || [],
           source: 'ai',
-          genStyle: VARIATION_SCIENCES.has(subject) ? 'calc' : 'recit',
+          genStyle: poolGenStyle(subject),
           generatedBy: uid,
           createdAt: FieldValue.serverTimestamp(),
           usedCount: 0
@@ -456,12 +539,17 @@ async function buildExamFromPool(config) {
 
     const allEx = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
 
-    // ✅ v4.19 — sciences : la reconstruction ne puise QUE dans le régime
-    // « calcul pur » (genStyle='calc') ; aucun exercice narratif d'avant
-    // v4.19 ne peut reconstruire un examen. Littéraires : inchangé.
-    const eligible = VARIATION_SCIENCES.has(config.subject)
-      ? allEx.filter((e) => e.genStyle === 'calc')
-      : allEx;
+    // ✅ v5.0 — la reconstruction ne puise que dans le RÉGIME de la matière
+    // (calcul pur pour maths/PC/chimie ; questionnaire SVT pour svt) et dans
+    // les exercices CONFORMES (valideurs v5.0 : zéro décimale en complexes,
+    // zéro calcul en littéraire...).
+    const category = subjectCategory(config.subject);
+    const wantedStyles = category === 'calcul' ? ['calc']
+      : category === 'svt' ? ['svt', 'calc']
+      : ['recit'];
+    const eligible = allEx.filter((e) =>
+      wantedStyles.indexOf(e.genStyle || 'recit') !== -1 &&
+      exerciseCompliant(e, config.subject, config.chapter));
     if (!eligible.length) return null;
 
     let poolEx = eligible;
@@ -567,9 +655,12 @@ RÈGLES LATEX — OBLIGATOIRES
 5. Unités avec petit espace : $9{,}81\\,\\text{m/s}^2$.
 `;
 
-const PEDAGOGY_RULES = `
+// ✅ v5.0 — une pédagogie PAR CATÉGORIE : la règle « 100% calculs » ne s'applique
+// PLUS aux littéraires ni à la SVT (elle provoquait des calculs en Histoire et
+// des maths purs en SVT).
+const PEDAGOGY_RULES_CALC = `
 ═══════════════════════════════════════════════════════════════
-MISSION PÉDAGOGIQUE (NIVEAU BAC NIGER)
+MISSION PÉDAGOGIQUE — MATIÈRE SCIENTIFIQUE À CALCULS (NIVEAU BAC NIGER)
 ═══════════════════════════════════════════════════════════════
 Tu prépares un élève de Terminale D au Niger pour le BAC.
 Les exercices doivent être :
@@ -577,20 +668,112 @@ Les exercices doivent être :
 - Progressifs (facile → difficile au sein du même exercice)
 - Chaque question teste UNE notion précise, mais peut nécessiter plusieurs étapes.
 - Les points sont FIXES : Exercice = 6.67 pts, Question = 1.33 pts.
-- STYLE DE RÉFÉRENCE OBLIGATOIRE (matières scientifiques) — 100% CALCULS type "Pascal Lainé" : chaque énoncé DONNE une expression, une équation, une fonction ou un bloc "Données :", et l'élève calcule, transforme, résout. AUCUN récit, AUCUNE histoire, AUCUNE situation vécue. La difficulté vient UNIQUEMENT des calculs.
+- STYLE DE RÉFÉRENCE OBLIGATOIRE — 100% CALCULS type "Pascal Lainé" : chaque énoncé DONNE une expression, une équation, une fonction ou un bloc "Données :", et l'élève calcule, transforme, résout. AUCUN récit, AUCUNE histoire, AUCUNE situation vécue. La difficulté vient UNIQUEMENT des calculs.
 - INTERDIT de générer une question sans travail réel (simple recopie du cours) comme de noyer un calcul dans un long récit. L'élève doit réfléchir sur des CALCULS.
 `;
 
-const DIFFICULTY_RULES = {
-  easy: `Niveau FACILE : Calculs directs en 1 ou 2 étapes. Application immédiate du cours. Pas de mélange de notions. (Ex. Maths : mettre sous la forme algébrique z = (3+6i)/(-3-4i) ; calculer (3+2i)(1-3i).)`,
-  medium: `Niveau MOYEN : Calculs en 3 ou 4 étapes. Application du cours avec une petite réflexion. (Ex. Maths : écrire sous forme algébrique 2e^{2iπ/3} et ((1+i)/(2-i))² ; module et argument de (1+i)^9/(1-i)^7.)`,
-  hard: `Niveau DIFFICILE : Calculs longs à plusieurs étapes. L'élève doit mobiliser plusieurs notions du chapitre. (Ex. Maths : module et argument de a = 3i(2+i)(4+2i)(1+i) en fonction de θ₀ ; calcul de ((1+i√3)/2)^{2010}.)`,
-  bac: `Niveau BAC (TRÈS DIFFICILE) : Exercices de synthèse type "Pascal Lainé" ou "Salissou Nazifi". 
+const PEDAGOGY_RULES_SVT = `
+═══════════════════════════════════════════════════════════════
+MISSION PÉDAGOGIQUE — SVT (NIVEAU BAC NIGER) — RÉGIME SPÉCIFIQUE
+═══════════════════════════════════════════════════════════════
+⚠️ LA SVT N'EST NI LES MATHS NI LA PHYSIQUE : c'est une matière à QUESTIONNAIRE + ANALYSE.
+Tu prépares un élève de Terminale D au Niger pour le BAC.
+Les exercices doivent être :
+- Fidèles au programme officiel (niveau BAC) et au format des sujets BAC SVT.
+- Progressifs (restitution → analyse → synthèse au sein du même exercice).
+- Les points sont FIXES : Exercice = 6.67 pts, Question = 1.33 pts.
+COMPOSITION OBLIGATOIRE D'UN EXERCICE SVT (mélanger ces familles de questions) :
+1. Restitution des connaissances : définir, citer, compléter, nommer, décrire (type "text", réponses courtes).
+2. ANALYSE de documents/données : graphique, tableau, expérience, résultat d'observation → exploiter, interpréter, expliquer, comparer (type "text"). Les données (courbes, valeurs) sont données DANS l'énoncé et servent à RAISONNER, pas à calculer.
+3. QCM (type "choice", 4 options, une seule juste) : 1 à 2 par exercice maximum.
+4. VRAI/FAUX avec JUSTIFICATION OBLIGATOIRE : en type "text" (« Réponds par VRAI ou FAUX et justifie »).
+5. CONCLUSION / synthèse rédigée (type "text") : mobiliser les réponses précédentes.
+CALCULS EN SVT — UNIQUEMENT si le chapitre s'y prête (génétique : croisements, échiquiers, proportions ; ou une donnée chiffrée du chapitre) — jamais de calcul pur type maths.
+⚠️ DOCUMENTS : si une question renvoie à un document, tableau, graphique ou résultats d'expérience, son contenu DOIT être intégralement recopié DANS le statement de l'exercice (l'élève ne voit QUE le texte de l'énoncé — jamais de « document ci-dessous » absent).
+- INTERDIT : transformer un chapitre SVT non chiffré en exercices de calcul ; interdit les récits de marché ; interdit les questions sans travail réel.
+`;
+
+const PEDAGOGY_RULES_LITTERAIRE = `
+═══════════════════════════════════════════════════════════════
+MISSION PÉDAGOGIQUE — MATIÈRE LITTÉRAIRE (NIVEAU BAC NIGER)
+═══════════════════════════════════════════════════════════════
+⚠️ MATIÈRE LITTÉRAIRE : QUESTIONNAIRE UNIQUEMENT — STRICTEMENT ZÉRO CALCUL.
+Tu prépares un élève de Terminale D au Niger pour le BAC.
+Les questions doivent être :
+- Fidèles au programme officiel (niveau BAC) et aux attentes réelles de l'épreuve.
+- Progressives : connaissance → analyse → mise en relation → jugement argumenté.
+- Les points sont FIXES : Exercice = 6.67 pts, Question = 1.33 pts.
+COMPOSITION OBLIGATOIRE (mélanger ces familles de questions) :
+1. Questions de connaissances : citer, définir, situer, nommer, caractériser (type "text").
+2. Analyse : expliquer un fait, un document, une notion, un extrait (type "text").
+3. Mise en relation : comparer deux faits/notions/périodes (type "text").
+4. Jugement argumenté ou question de réflexion (type "text").
+5. Un QCM éventuel (type "choice", 4 options) OU un VRAI/FAUX justifié en type "text".
+⚠️ COHÉRENCE TYPE : si tu écris « Parmi les propositions/affirmations suivantes », la question DOIT être de type "choice" avec 4 options et un correctAnswer — sinon reformule en question ouverte (type "text").
+STRICTEMENT INTERDIT :
+- Tout exercice de calcul, toute donnée numérique à calculer, tout pourcentage à calculer, toute opération arithmétique.
+- Tout LaTeX mathématique ($...$), toute équation, toute expression mathématique.
+- Les chiffres peuvent FIGURER comme données à COMMENTER (ex. un taux, une date), mais la réponse attendue est TOUJOURS rédigée, JAMAIS calculée. Une question dont la réponse exige une opération arithmétique = ÉCHEC de ta mission.
+`;
+
+const PEDAGOGY_RULES_BY_CATEGORY = {
+  calcul: PEDAGOGY_RULES_CALC,
+  svt: PEDAGOGY_RULES_SVT,
+  litteraire: PEDAGOGY_RULES_LITTERAIRE
+};
+
+// ✅ v5.0 — PROTOCOLE DE RÉSOLUTION PRÉALABLE (exigence produit) : l'IA doit
+// TRAITER chaque exercice AVANT de le livrer, et ne livrer que des questions
+// qu'elle a résolues elle-même, sans erreur.
+const SOLVE_FIRST_PROTOCOL = `
+═══════════════════════════════════════════════════════════════
+PROTOCOLE DE RÉSOLUTION PRÉALABLE — OBLIGATOIRE, AVANT D'ÉCRIRE LE JSON
+═══════════════════════════════════════════════════════════════
+ÉTAPE 1 — TRAITE D'ABORD : pour CHAQUE exercice, résous INTÉGRALEMENT chaque question sur ton brouillon interne (tous les calculs étape par étape, toutes les réponses rédigées).
+ÉTAPE 2 — VÉRIFIE chaque résultat : la réponse EXISTE, est JUSTE, est PROPRE (valeur exacte ou arrondi convenu, jamais un résultat absurde) et les données de l'énoncé SUFFISENT pour y répondre.
+ÉTAPE 3 — CORRIGE ou REMPLACE toute question que tu n'arrives pas à résoudre proprement AVANT de livrer l'examen.
+RÈGLE ABSOLUE : tu ne livres QUE des exercices que tu as toi-même résolus en entier, SANS ERREUR. Un exercice impossible, mal calibré ou dont les données ne suffisent pas = ÉCHEC de ta mission.
+Pour les questions "choice" : la bonne réponse (correctAnswer) est celle que TU as calculée/vérifiée ; les 3 autres propositions sont plausibles mais FAUSSES.
+`;
+
+// ✅ v5.0 — pédagogie de CORRECTION (neutre, toutes matières) : la correction
+// s'appuie sur les réponses vérifiées par la passe de résolution (solution).
+const CORRECTION_PEDAGOGY = `
+═══════════════════════════════════════════════════════════════
+PÉDAGOGIE DE CORRECTION (NIVEAU BAC NIGER)
+═══════════════════════════════════════════════════════════════
+Tu corriges un élève de Terminale D au Niger (épreuve de BAC).
+- Note avec une BONTÉ EXIGEANTE : valorise toute démarche juste, sanctionne nettement les erreurs de fond.
+- Explications conformes au régime de la matière : calcul étape par étape en maths/physique/chimie ; raisonnement biologique argumenté en SVT ; argumentation rédigée en histoire/géographie/philosophie.
+- Si une réponse "correctAnswer" ou "solution" est fournie dans les données, c'est LA référence VALIDÉE par un professeur vérificateur : corrige par rapport à elle sans la remettre en cause.
+`;
+
+// ✅ v5.0 — règles de difficulté PAR CATÉGORIE : avant, les exemples « Ex. Maths »
+// s'affichaient pour Histoire/Philo/SVT et poussaient l'IA vers des calculs.
+const DIFFICULTY_RULES_BY_CATEGORY = {
+  calcul: {
+    easy: `Niveau FACILE : Calculs directs en 1 ou 2 étapes. Application immédiate du cours. Pas de mélange de notions. (Ex. Maths : mettre sous la forme algébrique z = (3+6i)/(-3-4i) ; calculer (3+2i)(1-3i).)`,
+    medium: `Niveau MOYEN : Calculs en 3 ou 4 étapes. Application du cours avec une petite réflexion. (Ex. Maths : écrire sous forme algébrique 2e^{2iπ/3} et ((1+i)/(2-i))² ; module et argument de (1+i)^9/(1-i)^7.)`,
+    hard: `Niveau DIFFICILE : Calculs longs à plusieurs étapes. L'élève doit mobiliser plusieurs notions du chapitre. (Ex. Maths : module et argument de a = 3i(2+i)(4+2i)(1+i) ; calcul de ((1+i√3)/2)^{2010}.)`,
+    bac: `Niveau BAC (TRÈS DIFFICILE) : Exercices de synthèse type "Pascal Lainé" ou "Salissou Nazifi".
   - Les calculs doivent être longs (équations du 3ème/4ème degré, changements de variable, trigonométrie inverse).
   - Enchaîner plusieurs phases de calcul (mouvements composés, réactions successives).
   - L'élève doit utiliser un cahier de brouillon pour réussir.
   - Exemple Maths : "Résoudre z^4 + (3-6i)z^2 - 8 - 6i = 0".
   - Exemple Physique : "Un mobile M a pour équation horaire x_M(t) = -30t + 0,3t² et un mobile C : x_C(t) = 20t + 40 ; calculer l'instant et la position de rencontre, puis les vitesses à cet instant."`
+  },
+  svt: {
+    easy: `Niveau FACILE (SVT) : restitution et lecture directes — définir, citer, compléter un texte, QCM évidents, VRAI/FAUX simples avec justification brève. Aucun calcul.`,
+    medium: `Niveau MOYEN (SVT) : exploitation d'un document simple (graphique, tableau, expérience) — décrire, interpréter, expliquer un mécanisme ; QCM ; VRAI/FAUX justifié ; conclusion brève. Calculs seulement si le chapitre est génétique (proportions simples).`,
+    hard: `Niveau DIFFICILE (SVT) : exploitation croisée de deux documents/données — mettre en relation des résultats d'expériences, expliquer un mécanisme complet, construire une argumentation biologique aboutissant à une conclusion. Génétique : échiquiers complets, proportions phénotypiques.`,
+    bac: `Niveau BAC (TRÈS DIFFICILE — SVT) : problème scientifique complet type BAC — restitution ciblée + exploitation rigoureuse de documents + déduction en chaîne + synthèse/conclusion rédigée. Génétique : croisements complexes (di/trihybridisme, linkage) avec échiquiers et proportions exactes.`
+  },
+  litteraire: {
+    easy: `Niveau FACILE (matière littéraire) : questions de connaissance directes — citer, définir, situer dans le temps/l'espace, compléter. Réponses courtes attendues. AUCUN calcul.`,
+    medium: `Niveau MOYEN (matière littéraire) : analyse — expliquer un fait/notion/document, dégager des causes ou des conséquences, caractériser. AUCUN calcul.`,
+    hard: `Niveau DIFFICILE (matière littéraire) : mise en relation — comparer deux situations/notions/périodes, croiser des documents, construire une démonstration organisée. AUCUN calcul.`,
+    bac: `Niveau BAC (TRÈS DIFFICILE — matière littéraire) : dissertation/problème complet — analyse du sujet, mobilisation précise de connaissances, argumentation organisée, jugement critique personnelle. Philosophie : problématiser (thèse/antithèse/synthèse). AUCUN calcul.`
+  }
 };
 
 const PHYSICS_RULES = `
@@ -647,7 +830,6 @@ CONTRAT DE COMPLÉTION — ABSOLUMENT OBLIGATOIRE :
 // énoncés déjà servis à cet élève (interdits de recyclage).
 // ═════════════════════════════════════════════════════════════
 const GEN_TEMPERATURE = 1.0;
-const VARIATION_SCIENCES = new Set(['mathematiques', 'physique', 'chimie', 'svt']);
 
 function sanitizeAvoidList(input) {
   if (!Array.isArray(input)) return [];
@@ -708,6 +890,21 @@ const VARIATION_CONTEXTS = {
     'le cycle de l\'eau observé pendant l\'hivernage',
     'un foyer qui s\'éclaire au biogaz'
   ],
+  // ✅ v5.1 — contextes STRICTEMENT littéraires (histoire/géo/philo) : les
+  // contextes scientifiques de « commun » (centre de santé, forage, champ...)
+  // faisaient DÉRIVER un sujet d'histoire vers la santé.
+  commun_lit: [
+    'le grand marché de Niamey un jour de forte affluence',
+    'un trajet en car entre Niamey et Zinder',
+    'une salle de classe lors de la rentrée scolaire',
+    'un club de jeunes et un tournoi de football inter-quartiers',
+    'une tontine (gada) entre commerçantes',
+    'un petit atelier de couture qui reçoit des commandes',
+    'une cérémonie traditionnelle au village',
+    'un groupe de discussion sur les réseaux sociaux',
+    'un débat radiophonique en langue locale',
+    'une exposition culturelle sur l\'histoire du Niger'
+  ],
   philosophie: [
     'un débat de jeunes sur le travail et la réussite',
     'un dialogue sur la liberté et la tradition',
@@ -742,12 +939,20 @@ const VARIATION_ANGLES = [
   'terminer l\'exercice par une question de synthèse ouverte'
 ];
 
+// ✅ v5.0 — VARIATION_NUMERIC réservée à PHYSIQUE/CHIMIE (valeurs réalistes).
+// C'était LA cause des nombres à virgule en Nombres complexes : cette liste
+// était tirée pour TOUTES les matières scientifiques, maths incluses.
 const VARIATION_NUMERIC = [
   'impose-toi des valeurs NON RONDES et inédites (ex. 7,5 ; 12,3 ; 17,25 ; 3/8 ; 2,4×10^3)',
   'impose-toi au moins deux valeurs décimales et une fraction dans chaque exercice',
   'impose-toi au moins une valeur en notation scientifique et une valeur impaire',
   'impose-toi des grandeurs réalistes (masses, distances, durées crédibles au Niger) différentes des valeurs habituelles'
 ];
+
+// ✅ v5.0 — MATHS : VALEURS EXACTES OBLIGATOIRES. En mathématiques (surtout en
+// Nombres complexes) les données et résultats doivent rester EXACTS : entiers,
+// fractions simples, racines exactes — JAMAIS de nombres à virgule.
+const MATH_EXACT_VALUES = 'Contrainte numérique MATHÉMATIQUES — VALEURS EXACTES OBLIGATOIRES : toutes les données sont des ENTIERS, des FRACTIONS SIMPLES ou des RACINES EXACTES ; AUCUN nombre à virgule dans les énoncés, les données, les réponses attendues ; pour les NOMBRES COMPLEXES : parties réelles et imaginaires ENTIÈRES ou fractions simples (ex. z = (3+6i)/(-3-4i) ; z = 2e^{iπ/3}) — JAMAIS 3,5i ni 2,75+1,5i ; les résultats sont EXACTS et PROPRES (entiers, fractions simples, valeurs remarquables de cos/sin, angles en radians simples).';
 
 const VARIATION_TEXT = [
   'appuie chaque argument sur un exemple précis, daté ou localisé',
@@ -791,6 +996,18 @@ const VARIATION_CALC_DRILLS = {
   ]
 };
 
+// ✅ v5.0 — angles de variation SVT : questionnaires, analyses, conclusions —
+// PAS des calculs type maths.
+const VARIATION_SVT_ANGLES = [
+  'construire la chaîne complète document → exploitation → déduction → conclusion rédigée',
+  'glisser deux QCM et un VRAI/FAUX justifié au milieu des questions d\'analyse',
+  'faire décrire puis interpréter un graphique ou un tableau de résultats fourni dans l\'énoncé',
+  'demander la mise en relation de deux documents ou de deux résultats expérimentaux',
+  'terminer par une synthèse/conclusion qui mobilise les réponses précédentes',
+  'demander de schématiser ou légender une structure (réponse décrite en texte)',
+  'faire formuler une hypothèse puis la valider à partir des données fournies'
+];
+
 // ✅ v4.17 — angles de variante 100% CALCUL (remplacent les angles narratifs
 // pour les matières scientifiques ; les littéraires gardent VARIATION_ANGLES).
 const VARIATION_CALC_ANGLES = [
@@ -804,8 +1021,14 @@ const VARIATION_CALC_ANGLES = [
 ];
 
 function buildVariationBlock(subject, avoidStatements) {
-  const isScience = VARIATION_SCIENCES.has(subject);
-  const pool = (VARIATION_CONTEXTS[subject] || []).concat(VARIATION_CONTEXTS.commun);
+  const category = subjectCategory(subject);
+  const isCalc = category === 'calcul';
+  const isSvt = category === 'svt';
+  const isScience = isCalc; // compat pool/rattrapage : seules maths/PC/chimie sont « calc »
+  // ✅ v5.1 — les littéraires ne tirent que des contextes STRICTEMENT
+  // littéraires (commun_lit) — aucune contamination par un contexte scientifique.
+  const pool = (VARIATION_CONTEXTS[subject] || [])
+    .concat(category === 'litteraire' ? VARIATION_CONTEXTS.commun_lit : VARIATION_CONTEXTS.commun);
   const pick = (arr) => (arr && arr.length ? arr[Math.floor(Math.random() * arr.length)] : '');
   let c1 = pick(pool);
   let c2 = pick(pool);
@@ -813,9 +1036,15 @@ function buildVariationBlock(subject, avoidStatements) {
   const d1 = pick(VARIATION_CALC_DRILLS[subject]);
   let d2 = pick(VARIATION_CALC_DRILLS[subject]);
   for (let guard = 0; d2 === d1 && guard < 8; guard += 1) d2 = pick(VARIATION_CALC_DRILLS[subject]);
-  const angle = isScience ? pick(VARIATION_CALC_ANGLES) : pick(VARIATION_ANGLES);
-  const constraint = isScience
-    ? 'Contrainte numérique : ' + pick(VARIATION_NUMERIC)
+  const angle = isCalc ? pick(VARIATION_CALC_ANGLES)
+    : isSvt ? pick(VARIATION_SVT_ANGLES)
+    : pick(VARIATION_ANGLES);
+  // ✅ v5.0 — contrainte numérique PAR CATÉGORIE :
+  //   maths  → valeurs EXACTES (MATH_EXACT_VALUES) — zéro virgule ;
+  //   PC     → décimales réalistes (VARIATION_NUMERIC) ;
+  //   svt/lit → contrainte rédactionnelle.
+  const constraint = subject === 'mathematiques' ? MATH_EXACT_VALUES
+    : isCalc ? 'Contrainte numérique : ' + pick(VARIATION_NUMERIC)
     : 'Contrainte rédactionnelle : ' + pick(VARIATION_TEXT);
   const avoid = sanitizeAvoidList(avoidStatements);
   const avoidBlock = avoid.length
@@ -823,11 +1052,9 @@ function buildVariationBlock(subject, avoidStatements) {
       avoid.map((s) => '  • ' + s).join('\n')
     : '';
 
-  // ✅ v4.19 — sciences : 100% CALCULS PURS (3/3 par sujet), AUCUNE situation
-  // réelle proposée (l'offre facultative v4.17 était systématiquement prise à
-  // température 1.0) + exemples few-shot Pascal Lainé + anti-exemple explicite.
-  // Littéraires : contexte imposé conservé (inchangé).
-  const styleBlock = isScience
+  // ✅ v5.0 — styleBlock : 100% CALCULS PURS UNIQUEMENT pour maths/physique/chimie.
+  // SVT reçoit son propre bloc QUESTIONNAIRE + ANALYSE ; littéraires : contexte imposé.
+  const styleBlock = isCalc
     ? '- STYLE OBLIGATOIRE — 100% DES CALCULS, ZÉRO HISTOIRE (fiches d\'entraînement type "Pascal Lainé") :\n' +
       '  • TOUS les exercices (3 sur 3 PAR SUJET) sont des CALCULS PURS : l\'énoncé DONNE une expression, une équation, une fonction ou un bloc « Données : », et l\'élève calcule, transforme, résout.\n' +
       '  • STRICTEMENT INTERDIT : récit, histoire, situation vécue, personnages, achat au marché, trajet, forage, tontine — AUCUNE mise en scène, même en 1 phrase.\n' +
@@ -839,9 +1066,17 @@ function buildVariationBlock(subject, avoidStatements) {
       '  • EXEMPLE DE STYLE ATTENDU — respecte EXACTEMENT cette forme, adaptée au chapitre exigé :\n' +
       '    Maths : Énoncé « On considère z = (3+6i)/(-3-4i). 1.a) Mettre z sous forme algébrique. b) En déduire le module et un argument. » — ET PAS « Aïcha achète au marché... »\n' +
       '    Physique : Énoncé « Un mobile M a pour équation horaire x_M(t) = 40 - 4t et un mobile C : x_C(t) = 10 + t² (t en s, x en m). 1.a) Placer le repère et tracer les vecteurs vitesse. b) Calculer l\'instant de rencontre. »\n'
+    : isSvt
+    ? '- STYLE OBLIGATOIRE — QUESTIONNAIRE + ANALYSE BAC SVT (PAS un exercice de maths) :\n' +
+      '  • Chaque exercice mélange : restitution de connaissances, exploitation d\'un document/donnée fourni dans l\'énoncé, QCM (max 2), VRAI/FAUX justifié, conclusion rédigée.\n' +
+      '  • INTERDIT : exercice de calcul pur, données à calculer, format type maths (« mettre sous forme », « résoudre l\'équation »...).\n' +
+      '  • Calculs UNIQUEMENT si le chapitre est génétique/données chiffrées du chapitre — sinon ZÉRO calcul.\n' +
+      '  • Angle imposé Sujet 1 : ' + angle + '\n' +
+      '  • Angle imposé Sujet 2 : ' + pick(VARIATION_SVT_ANGLES) + '\n'
     : '';
-  // ✅ v4.19 — sciences : AUCUNE situation réelle proposée (100% calculs purs).
-  const contextLines = isScience
+  // ✅ v5.0 — sciences à calculs : AUCUNE situation réelle proposée ; SVT et
+  // littéraires : contexte imposé conservé.
+  const contextLines = isCalc
     ? ''
     : '- Contexte imposé Sujet 1 (si compatible avec le contenu exigé) : ' + c1 + '\n' +
       '- Contexte imposé Sujet 2 (si compatible avec le contenu exigé) : ' + c2;
@@ -859,18 +1094,23 @@ ${avoidBlock}`;
 
 function generationPrompt(config, avoidStatements) {
   const subjectLabel = SUBJECT_LABELS[config.subject] || config.subject;
-  
+  const category = subjectCategory(config.subject);
+
   let specificRules = '';
   if (config.subject === 'physique') specificRules = PHYSICS_RULES;
   else if (config.subject === 'chimie') specificRules = CHEMISTRY_RULES;
-  
-  const diffRules = DIFFICULTY_RULES[config.difficulty] || DIFFICULTY_RULES.medium;
+
+  const diffRulesByCat = DIFFICULTY_RULES_BY_CATEGORY[category] || DIFFICULTY_RULES_BY_CATEGORY.calcul;
+  const diffRules = diffRulesByCat[config.difficulty] || diffRulesByCat.medium;
   const variationBlock = buildVariationBlock(config.subject, avoidStatements);
 
   return `Tu es un professeur expert du BAC au Niger.
 
-${PEDAGOGY_RULES}
+${PEDAGOGY_RULES_BY_CATEGORY[category] || PEDAGOGY_RULES_CALC}
 ${specificRules}
+
+NATURE DE CETTE MATIÈRE : ${CATEGORY_LABELS[category] || ''}. Respecte STRICTEMENT ce régime.
+ADHÉRENCE MATIÈRE ABSOLUE : tous les exercices portent UNIQUEMENT sur ${subjectLabel} et le chapitre exigé — tout contenu appartenant à une autre matière ou à un autre domaine = échec.
 
 MISSION : Génère DEUX sujets d'examen complets.
 
@@ -888,6 +1128,8 @@ GRADATION OBLIGATOIRE : le Sujet 2 doit être VISIBLEMENT plus difficile que le 
 ${variationBlock}
 
 ${LATEX_RULES}
+
+${SOLVE_FIRST_PROTOCOL}
 
 FORMAT JSON :
 {
@@ -909,18 +1151,23 @@ Réponds UNIQUEMENT avec le JSON complet et valide.`;
 
 function generationPromptFromNotebook(config, notebookContext, avoidStatements) {
   const subjectLabel = SUBJECT_LABELS[config.subject] || config.subject;
-  
+  const category = subjectCategory(config.subject);
+
   let specificRules = '';
   if (config.subject === 'physique') specificRules = PHYSICS_RULES;
   else if (config.subject === 'chimie') specificRules = CHEMISTRY_RULES;
-  
-  const diffRules = DIFFICULTY_RULES[config.difficulty] || DIFFICULTY_RULES.medium;
+
+  const diffRulesByCat = DIFFICULTY_RULES_BY_CATEGORY[category] || DIFFICULTY_RULES_BY_CATEGORY.calcul;
+  const diffRules = diffRulesByCat[config.difficulty] || diffRulesByCat.medium;
   const variationBlock = buildVariationBlock(config.subject, avoidStatements);
 
   return `Tu es un professeur expert du BAC au Niger.
 
-${PEDAGOGY_RULES}
+${PEDAGOGY_RULES_BY_CATEGORY[category] || PEDAGOGY_RULES_CALC}
 ${specificRules}
+
+NATURE DE CETTE MATIÈRE : ${CATEGORY_LABELS[category] || ''}. Respecte STRICTEMENT ce régime.
+ADHÉRENCE MATIÈRE ABSOLUE : tous les exercices portent UNIQUEMENT sur ${subjectLabel} et le contenu du cahier exigé — tout contenu appartenant à une autre matière ou à un autre domaine = échec.
 
 L'élève a étudié un chapitre dans son cahier. Génère DEUX sujets basés STRICTEMENT sur ce contenu.
 
@@ -940,6 +1187,8 @@ RÈGLE ABSOLUE : génère UNIQUEMENT à partir du contenu ci-dessus.
 ${variationBlock}
 
 ${LATEX_RULES}
+
+${SOLVE_FIRST_PROTOCOL}
 
 FORMAT JSON :
 {
@@ -976,7 +1225,9 @@ function correctionPrompt(body) {
         type: question.type || 'text',
         options: question.options || null,
         points: Number(question.points) || 1.33,
-        correctAnswer: question.correctAnswer || null,
+        // ✅ v5.0 — la réponse vérifiée par la passe de résolution (q.solution)
+        // renforce la correction : le correcteur part d'une réponse déjà validée.
+        correctAnswer: question.correctAnswer || question.solution || null,
         studentAnswer: body.answers[key] || null,
         answered: body.answers[key] !== null && body.answers[key] !== ''
       });
@@ -985,7 +1236,7 @@ function correctionPrompt(body) {
 
   return `Tu es un professeur correcteur expert du BAC au Niger. Ton rôle : corriger CHAQUE question avec une PÉDAGOGIE MAXIMALE, en attribuant une NOTE et une EXPLICATION à chaque question, sans exception.
 
-${PEDAGOGY_RULES}
+${CORRECTION_PEDAGOGY}
 
 MISSION DE CORRECTION :
 Pour CHAQUE question, tu dois produire une analyse pédagogique complète ET une note.
@@ -1179,6 +1430,11 @@ function validateGeneratedExam(exam, subjectName) {
     if (subjectName === 'physique' && q.number && q.number.endsWith('a')) {
       return q.type === 'drawing';
     }
+    // ✅ v5.2 — « Parmi les propositions/affirmations suivantes » SANS options :
+    // la question est intraitable pour l'élève → invalide (le fournisseur
+    // suivant reprend la main).
+    if (/parmi\s+(les\s+)?(propositions|affirmations|assertions|énonc[eé]s|enonc[eé]s|repons(es|e))\s+(suivantes?|propos[eé]es?)/i.test(q.text) &&
+        !(Array.isArray(q.options) && q.options.length === 4)) return false;
     if (!supportsChoices || q.type !== 'choice') return ['text', 'number', 'formula', 'choice', 'drawing'].indexOf(q.type) !== -1;
     return Array.isArray(q.options) && q.options.length === 4 && ['A', 'B', 'C', 'D'].indexOf(q.correctAnswer) !== -1;
   };
@@ -1223,19 +1479,22 @@ function isNearMiss(exam, subjectName) {
   return validateGeneratedExam(lenient, subjectName);
 }
 
-function patchExamFromPoolQuestions(exam, subjectName, poolExercises) {
+function patchExamFromPoolQuestions(exam, subjectName, poolExercises, chapter) {
   if (!exam || !Array.isArray(poolExercises) || !poolExercises.length) return null;
   const seen = new Set();
   exam.subjects.forEach((s) => (s.exercises || []).forEach((ex) => {
     seen.add(String(ex.title || '') + '|' + String(ex.statement || '').slice(0, 40));
   }));
 
-  // ✅ v4.19 — sciences : seuls les exercices du régime « calcul pur »
-  // (genStyle='calc', archivés v4.19+) servent au rattrapage ; les anciens
-  // exercices narratifs ne peuvent plus ressurgir. Littéraires : inchangé.
-  const science = VARIATION_SCIENCES.has(subjectName);
+  // ✅ v5.0 — rattrapage : seuls les exercices du régime de la matière ET
+  // conformes (valideurs v5.0) servent au remplacement.
+  const category = subjectCategory(subjectName);
+  const wantedStyles = category === 'calcul' ? ['calc']
+    : category === 'svt' ? ['svt', 'calc']
+    : ['recit'];
   const pool = poolExercises.filter((p) =>
-    p && (!science || p.genStyle === 'calc') &&
+    p && wantedStyles.indexOf(p.genStyle || 'recit') !== -1 &&
+    exerciseCompliant(p, subjectName, chapter) &&
     Array.isArray(p.questions) && p.questions.length >= QUESTIONS_PER_EXERCISE &&
     p.questions.every((q) => String(q.text || '').trim())
   );
@@ -1269,7 +1528,344 @@ function patchExamFromPoolQuestions(exam, subjectName, poolExercises) {
   return repairExamStructure(exam, subjectName);
 }
 
-async function generateWithFallback(prompt, subjectName, poolLoader) {
+// ═════════════════════════════════════════════════════════════
+// ✅ v5.0 — CONFORMITÉ DE CONTENU PAR CATÉGORIE (valideurs déterministes)
+// Filet de sécurité CODE en plus du prompt : un examen qui viole son régime
+// (décimales en Nombres complexes, calcul en Histoire...) est REJETÉ.
+// ═════════════════════════════════════════════════════════════
+
+// Détecte un nombre décimal (3,5 / 3.5 / 0{,}25...) dans un texte.
+const DECIMAL_RE = /(?:^|[^\w\d.])\d{1,6}[.,]\d+/;
+
+function hasDecimalNumber(text) {
+  return DECIMAL_RE.test(String(text || '').replace(/\{,\}/g, ','));
+}
+
+// Exercice lié aux nombres complexes (utile en tirage « tous les chapitres »).
+const COMPLEX_RE = /complex|module|argument|affixe|forme\s+(alg[eé]brique|trigonom[eé]trique|exponentielle)|z\s*=|z[_{^]|\bRe\b|\bIm\b|partie\s+(r[eé]elle|imaginaire)/i;
+
+function exerciseIsComplexRelated(exercise) {
+  const texts = [exercise.statement].concat((exercise.questions || []).map((q) => q && q.text));
+  return texts.some((t) => COMPLEX_RE.test(String(t || '')));
+}
+
+// Tâche de calcul dans une matière littéraire (interdite).
+function isCalculationTask(text) {
+  const t = String(text || '');
+  if (/\$[^$]+\$/.test(t)) return true; // LaTeX mathématique interdit en littéraire
+  return /\bcalcul/i.test(t); // « Calculer », « Calcule », « calcul de la valeur »…
+}
+
+function collectExerciseTexts(exercise) {
+  const texts = [String(exercise.statement || '')];
+  (exercise.questions || []).forEach((q) => {
+    if (!q) return;
+    texts.push(String(q.text || ''));
+    (Array.isArray(q.options) ? q.options : []).forEach((o) =>
+      texts.push(String((o && o.text) || o || '')));
+  });
+  return texts;
+}
+
+function exerciseCompliant(exercise, subjectName, chapter) {
+  if (!exercise) return false;
+  const category = subjectCategory(subjectName);
+  const texts = collectExerciseTexts(exercise);
+
+  // 1) Littéraires : ZÉRO calcul, ZÉRO LaTeX mathématique.
+  if (category === 'litteraire' && texts.some(isCalculationTask)) return false;
+
+  // 2) Maths : zéro décimale dès que l'exercice touche aux nombres complexes
+  //    (chapitre « Nombres complexes », ou exercice identifié complexe en
+  //    tirage « tous les chapitres »).
+  if (subjectName === 'mathematiques') {
+    const complexChapter = /complex/i.test(String(chapter || ''));
+    if (complexChapter || exerciseIsComplexRelated(exercise)) {
+      if (texts.some(hasDecimalNumber)) return false;
+    }
+  }
+  return true;
+}
+
+function validateContentCompliance(exam, subjectName, chapter) {
+  if (!exam || !Array.isArray(exam.subjects)) return false;
+  return exam.subjects.every((s) =>
+    (s.exercises || []).every((ex) => exerciseCompliant(ex, subjectName, chapter)));
+}
+
+// ═════════════════════════════════════════════════════════════
+// ✅ v5.0 — PASSE DE RÉSOLUTION PRÉALABLE (exigence : « il traite d'abord, il
+// fournit ensuite »). Après la génération, un 2e appel IA RÉSOUT chaque
+// question. Les réponses vérifiées sont attachées à l'examen (et réutilisées
+// par la correction) ; les questions défectueuses sont REMPLACÉES.
+// ═════════════════════════════════════════════════════════════
+
+// ✅ v5.0b — normalisation pour le contrôle d'alignement des solutions.
+function normPrefix(text, n) {
+  return String(text || '').toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, ' ').trim().slice(0, n);
+}
+
+// ✅ v5.1 — les questions d'un même format commencent toutes pareil (« Réponds
+// par VRAI ou FAUX et justifie », « QCM », « Sélectionnez la bonne réponse »...) :
+// ce préfixe GÉNÉRIQUE est retiré avant comparaison, sinon toutes les questions
+// VF se ressemblent et de mauvaises solutions passent l'alignement.
+function stripGenericPrefix(s) {
+  return String(s || '')
+    .replace(/^(reponds? par|repondre par)?\s*(vrai ou faux|qcm|selectionnez la bonne reponse|choisissez la bonne reponse|choisis la bonne reponse|jugez|justifie[z]?|citez|definissez|expliquez|analyserez?|analysez)/, '')
+    .replace(/^\s*(le|la|les|l|de la|du|des|d)\s+/, '')
+    .trim();
+}
+
+// L'écho du vérificateur correspond-t-il à la vraie question ? Comparaison de
+// JACCARD (≥ 0,5) sur les 8 premiers mots normalisés OU préfixe commun ≥ 14 car.
+function echoFits(echo, actual) {
+  if (!echo || !actual) return true;
+  const e = stripGenericPrefix(echo);
+  const a = stripGenericPrefix(actual);
+  if (!e || !a) return true;
+  if (e === a) return true;
+  const we = e.split(' ').filter(Boolean).slice(0, 8);
+  const wa = a.split(' ').filter(Boolean).slice(0, 8);
+  const setA = new Set(wa);
+  let inter = 0;
+  we.forEach((w) => { if (setA.has(w)) inter += 1; });
+  const union = new Set(we.concat(wa)).size;
+  if (union && inter / union >= 0.5) return true;
+  const short = Math.min(e.length, a.length);
+  if (short >= 14 && e.slice(0, 14) === a.slice(0, 14)) return true;
+  return false;
+}
+
+// ✅ v5.1 — CLÉS UNIQUES : les deux sujets utilisent tous les deux « 1.a »…
+// « 3.e » ; s'en remettre au numéro seul écrasait les solutions du Sujet 1 par
+// celles du Sujet 2 (30 % de réponses fausses lors des tests live). Chaque
+// question reçoit une clé « s1.2.c » / « s2.3.e » utilisée partout.
+function questionKey(subjectIdx, qNumber) {
+  return 's' + (subjectIdx + 1) + '.' + String(qNumber || '');
+}
+
+function compactExamForVerification(exam) {
+  return (exam.subjects || []).map((s, sIdx) => ({
+    level: s.level,
+    exercises: (s.exercises || []).map((ex) => ({
+      number: ex.number,
+      statement: ex.statement,
+      questions: (ex.questions || []).map((q) => ({
+        key: questionKey(sIdx, q.number),
+        number: q.number,
+        text: q.text,
+        type: q.type,
+        options: Array.isArray(q.options) ? q.options.map((o) => (o && o.text) || '') : undefined,
+        correctAnswer: q.correctAnswer || undefined
+      }))
+    }))
+  }));
+}
+
+function verificationPrompt(exam, subjectName, chapter) {
+  const subjectLabel = SUBJECT_LABELS[subjectName] || subjectName;
+  const category = subjectCategory(subjectName);
+  const chapterLabel = chapter === 'all' ? 'tous les chapitres' : chapter;
+  return `Tu es un professeur VÉRIFICATEUR du BAC au Niger. On te donne un examen de ${subjectLabel} (chapitre : ${chapterLabel}) DÉJÀ rédigé par un autre professeur. Ton rôle : TRAITER toi-même CHAQUE question (tous les calculs, toutes les réponses rédigées), PUIS déclarer si la question est fiable.
+
+⚠️ ALIGNEMENT STRICT : chaque réponse doit répondre à LA question dont tu recopies le début ET dont tu reprends la "key" — jamais à une autre question de l'examen. Traite les questions DANS L'ORDRE, une par une (les clés s1.* = Sujet 1, s2.* = Sujet 2 : NE LES CONFONDS PAS).
+
+⚠️ AUTO-CONTRÔLE PAR SUBSTITUTION (obligatoire pour tout calcul) : après avoir calculé un résultat, REMPLACE-le dans l'expression de départ et vérifie que l'égalité est vraie (ex. une racine d'équation doit ANNULER l'équation ; une forme algébrique doit redonner l'original quand on redivise). Si la substitution échoue, RECOMMENCE le calcul avant de livrer la réponse.
+
+⚠️ CONTRÔLE FACTUEL (histoire, géographie, philosophie, SVT) : vérifie chaque DATE, ACTEUR, LIEU, ÉVÉNEMENT, mécanisme biologique cité dans tes réponses. Un fait faux ou une question dont l'énoncé suppose un fait CONTREFAITUAL = verdict "defaut" avec fix.
+
+NATURE DE LA MATIÈRE : ${CATEGORY_LABELS[category] || ''}.
+DÉFAUTS À SIGNALER (verdict "defaut" + fix obligatoire) :
+- question IMPOSSIBLE, ambiguë, ou dont les données de l'énoncé ne suffisent pas ;
+- INCOHÉRENCE INTERNE dans l'énoncé (données contradictoires entre elles, tableau qui contredit le texte) ;
+- résultat INEXISTANT, absurde, ou mal calibré pour le niveau BAC ;
+- en Mathématiques : valeur décimale non exacte là où des valeurs EXACTES sont attendues (surtout Nombres complexes : jamais 3,5i, jamais 2,75+1,5i) ;
+- matière littéraire : question qui exige un CALCUL ou une opération arithmétique ;
+- SVT : question de calcul pur dans un chapitre non chiffré ;
+- question "choice" dont la bonne réponse (correctAnswer) est FAUSSE ou douteuse ;
+- tout fait historique/géographique/biologique FAUX dans l'énoncé ou dans la réponse attendue.
+
+EXAMEN À VÉRIFIER (JSON) :
+${JSON.stringify({ subjects: compactExamForVerification(exam) })}
+
+FORMAT DE TA RÉPONSE — UNIQUEMENT ce JSON :
+{
+  "solutions": [ { "key": "s1.1.a", "question": "REPRODUIS les 6 premiers mots de la question à laquelle TU réponds", "answer": "réponse finale concise (1-2 phrases) qui répond EXACTEMENT à CETTE question", "verdict": "ok" ou "defaut" } ],
+  "fixes": [ { "key": "s2.2.c", "problem": "le défaut constaté", "newQuestion": { "key": "s2.2.c", "text": "question CORRIGÉE, même clé, même type, cohérente avec l'énoncé de l'exercice", "options": [ {"id": "A", "text": "..."}, {"id": "B", "text": "..."}, {"id": "C", "text": "..."}, {"id": "D", "text": "..."} ], "correctAnswer": "B" }, "newAnswer": "réponse corrigée que TU as vérifiée" } ]
+}
+CONTRAT :
+- "solutions" : UNE entrée par question (même "key" que dans l'examen : "s1.1.a", "s1.1.b"... puis "s2.1.a"...), AUCUNE exception, DANS L'ORDRE de l'examen.
+- Pour une question « Vrai ou Faux », la réponse COMMENCE par « Vrai » ou « Faux » puis justifie.
+- Pour une question à options, la réponse commence par la LETTRE de la bonne option (ex. « B. ... »).
+- verdict "defaut" → tu DOIS fournir le fix correspondant (même "key") avec la question corrigée que TU as résolue.
+- Si tout est fiable : "fixes" = [].
+- Réponds UNIQUEMENT avec le JSON valide.`;
+}
+
+// ✅ v5.2 — RÉCUPÉRATION D'UNE RÉPONSE TRONQUÉE : la passe de vérification
+// produit 30 solutions longues ; si la sortie est coupée en plein milieu, on
+// extrait quand même les entrées complètes du tableau "solutions" (mieux vaut
+// 27/30 solutions vérifiées que 0).
+// Parse une entrée extraite d'un JSON tronqué : tente brut, puis échappements
+// globaux, puis doublement de tout backslash lettre. Si le parse brut réussit
+// MAIS contient des caractères de contrôle (\f, \t, \b — signature d'un \frac
+// mal échappé), on retente les candidats réparés.
+// Signature d'une corruption de type backslash-frac / backslash-tan mal échappé :
+// caractères de contrôle form-feed/tab/backspace DANS LES VALEURS parsées
+// (JSON.stringify les ré-échapperait, il faut donc tester les valeurs brutes).
+function hasControlChars(o) {
+  if (typeof o === 'string') return /[\u0008\u000C\u0009]/.test(o);
+  if (Array.isArray(o)) return o.some(hasControlChars);
+  if (o && typeof o === 'object') return Object.values(o).some(hasControlChars);
+  return false;
+}
+
+function salvageEntryParse(str) {
+  const candidates = [str,
+    repairAllEscapes(str),
+    String(str).replace(/(?<!\\)\\(?=[A-Za-z])/g, '\\\\')];
+  let firstOk = null;
+  for (let k = 0; k < candidates.length; k++) {
+    try {
+      const o = JSON.parse(candidates[k]);
+      if (hasControlChars(o)) {
+        if (!firstOk) firstOk = o; // corruption probable → on tente mieux
+        continue;
+      }
+      return o;
+    } catch (_) {}
+  }
+  return firstOk;
+}
+
+function salvageSolutions(raw) {
+  const s = String(raw || '');
+  const idx = s.indexOf('"solutions"');
+  if (idx === -1) return [];
+  let i = s.indexOf('[', idx);
+  if (i === -1) return [];
+  i += 1;
+  const out = [];
+  while (i < s.length) {
+    while (i < s.length && /\s/.test(s[i])) i += 1;
+    if (s[i] !== '{') break;
+    let depth = 0, inStr = false, esc = false, j = i;
+    for (; j < s.length; j += 1) {
+      const c = s[j];
+      if (esc) { esc = false; continue; }
+      if (c === '\\') { esc = true; continue; }
+      if (c === '"') { inStr = !inStr; continue; }
+      if (inStr) continue;
+      if (c === '{') depth += 1;
+      else if (c === '}') {
+        depth -= 1;
+        if (depth === 0) break;
+      }
+    }
+    if (depth !== 0) break; // objet incomplet (tronqué) → on s'arrête
+    const entry = salvageEntryParse(s.slice(i, j + 1));
+    if (entry && (entry.key || entry.number)) out.push(entry);
+    i = j + 1;
+    while (i < s.length && s[i] !== ',' && s[i] !== ']') i += 1;
+    if (s[i] === ']') break;
+    i += 1;
+  }
+  return out;
+}
+
+async function verifyWithFallback(exam, subjectName, chapter) {
+  const providers = getProviders();
+  for (const provider of providers) {
+    try {
+      console.log('[VERIFY] Tentative ' + provider.name + '...');
+      const result = await callProvider(provider, verificationPrompt(exam, subjectName, chapter), MAX_TOKENS.CORRECT, 0.2);
+      if (result && Array.isArray(result.solutions) && result.solutions.length) return result;
+      console.warn('[VERIFY] ' + provider.name + ': format invalide');
+    } catch (e) {
+      // ✅ v5.2 — récupération des solutions complètes d'une sortie tronquée
+      if (e && e.raw) {
+        const salvaged = salvageSolutions(e.raw);
+        if (salvaged.length) {
+          console.warn('[VERIFY] ' + provider.name + ' tronqué — ' + salvaged.length + ' solutions complètes récupérées');
+          return { solutions: salvaged, fixes: [], _salvaged: true };
+        }
+      }
+      console.warn('[VERIFY] ' + provider.name + ' échec: ' + e.message);
+    }
+  }
+  return null;
+}
+
+function applyVerification(exam, verification) {
+  if (!verification || !Array.isArray(verification.solutions)) return exam;
+
+  // ✅ v5.1 — indexation par position réelle : la clé sX. est recalculée depuis
+  // la POSITION de la question (sujet/exercice/numéro) et croisée avec la clé
+  // annoncée par le vérificateur. Fini l'écrasement Sujet 2 → Sujet 1.
+  const questionByKey = new Map();
+  (exam.subjects || []).forEach((s, sIdx) => (s.exercises || []).forEach((ex) =>
+    (ex.questions || []).forEach((q) => {
+      questionByKey.set(questionKey(sIdx, q.number), q);
+    })));
+
+  const solList = verification.solutions.filter((s) => s && (s.key || s.number) !== undefined);
+  solList.forEach((s) => {
+    const key = String(s.key !== undefined ? s.key : s.number);
+    const q = questionByKey.get(key);
+    if (!q) {
+      console.warn('[VERIFY] Clé de solution inconnue ignorée : ' + key);
+      return;
+    }
+    if (typeof s.answer !== 'string' || !s.answer.trim()) return;
+    const answer = s.answer.trim();
+    const echo = normPrefix(s.question || '', 30);
+    const actual = normPrefix(q.text || '', 30);
+    if (echo && actual && !echoFits(echo, actual)) {
+      console.warn('[VERIFY] Solution ' + key + ' écartée : désalignement (« ' + echo.slice(0, 24) + '… » ≠ « ' + actual.slice(0, 24) + '… »)');
+      return;
+    }
+    // Garde VRAI/FAUX : une question VF exige une réponse qui tranche d'abord.
+    if (/vrai\s*(ou|\/)\s*faux/i.test(String(q.text || '')) &&
+        !/^(vrai|faux|c'est\s+(vrai|faux))/i.test(answer)) {
+      console.warn('[VERIFY] Solution ' + key + ' écartée : VRAI/FAUX non tranché.');
+      return;
+    }
+    q.solution = answer.slice(0, 600);
+  });
+
+  // 2) Questions défectueuses → remplacées par la version corrigée (déjà résolue).
+  const fixes = Array.isArray(verification.fixes) ? verification.fixes : [];
+  fixes.forEach((f) => {
+    if (!f) return;
+    const key = String(f.key !== undefined ? f.key : (f.number !== undefined ? f.number : ''));
+    const q = questionByKey.get(key);
+    if (!q) {
+      console.warn('[VERIFY] Clé de fix inconnue ignorée : ' + key);
+      return;
+    }
+    const nq = f.newQuestion;
+    if (nq && typeof nq.text === 'string' && nq.text.trim()) q.text = nq.text.trim();
+    if (nq && Array.isArray(nq.options) && nq.options.length === 4 &&
+        /^[A-D]$/.test(String(nq.correctAnswer || ''))) {
+      const letters = ['A', 'B', 'C', 'D'];
+      q.type = 'choice';
+      q.options = nq.options.map((opt, oi) => {
+        const text = typeof opt === 'string' ? opt : (opt && opt.text) || '';
+        return { id: letters[oi], text: String(text || '').trim() || ('Option ' + letters[oi]) };
+      });
+      q.correctAnswer = String(nq.correctAnswer).toUpperCase();
+    }
+    if (typeof f.newAnswer === 'string' && f.newAnswer.trim()) {
+      q.solution = f.newAnswer.trim().slice(0, 600);
+    }
+  });
+
+  return exam;
+}
+
+async function generateWithFallback(prompt, subjectName, poolLoader, chapter) {
   const providers = getProviders();
   if (!providers.length) throw new Error('provider_missing');
 
@@ -1290,24 +1886,44 @@ async function generateWithFallback(prompt, subjectName, poolLoader) {
       let rawExam = await callProvider(provider, prompt, MAX_TOKENS.GENERATE, GEN_TEMPERATURE);
       rawExam = repairExamStructure(rawExam, subjectName);
 
-      if (validateGeneratedExam(rawExam, subjectName)) {
-        console.log('[AI] OK ' + provider.name);
-        return { exam: rawExam, provider: provider.name };
+      // ✅ v5.0 — validité structurelle + CONFORMITÉ DE RÉGIME (valideurs v5.0)
+      if (validateGeneratedExam(rawExam, subjectName) &&
+          validateContentCompliance(rawExam, subjectName, chapter)) {
+
+        // ✅ v5.0 — PASSE DE RÉSOLUTION : l'IA traite l'examen AVANT livraison.
+        // Budget : on ne lance la vérification que si ≥ 30 s de marge restent.
+        if (Date.now() - startTime < TIME_BUDGET_MS - 30000) {
+          const verification = await verifyWithFallback(rawExam, subjectName, chapter);
+          if (verification) {
+            rawExam = applyVerification(rawExam, verification);
+            rawExam = repairExamStructure(rawExam, subjectName);
+          }
+        }
+
+        // Re-validation après vérification ; si la passe a dégradé l'examen,
+        // le fournisseur suivant reprend la main.
+        if (validateGeneratedExam(rawExam, subjectName) &&
+            validateContentCompliance(rawExam, subjectName, chapter)) {
+          console.log('[AI] OK ' + provider.name + ' (vérifié)');
+          return { exam: rawExam, provider: provider.name };
+        }
+        errors.push(provider.name + ': vérification dégradée');
       }
 
       // ✅ v4.15 — rattrapage "presque complet" via le pool avant de rejeter
       if (isNearMiss(rawExam, subjectName) && typeof poolLoader === 'function') {
         const pool = await poolLoader().catch(() => null);
         if (pool && pool.length) {
-          const patched = patchExamFromPoolQuestions(rawExam, subjectName, pool);
-          if (patched && validateGeneratedExam(patched, subjectName)) {
+          const patched = patchExamFromPoolQuestions(rawExam, subjectName, pool, chapter);
+          if (patched && validateGeneratedExam(patched, subjectName) &&
+              validateContentCompliance(patched, subjectName, chapter)) {
             console.log('[AI] OK ' + provider.name + ' (+rattrapage pool)');
             return { exam: patched, provider: provider.name + '+pool' };
           }
         }
       }
 
-      errors.push(provider.name + ': structure invalide');
+      errors.push(provider.name + ': structure/conformité invalide');
     } catch (error) {
       errors.push(provider.name + ': ' + error.message);
       console.warn('[AI] FAIL ' + provider.name + ': ' + error.message);
@@ -2187,7 +2803,7 @@ module.exports = async function handler(request, response) {
           .where('subject', '==', body.subject).limit(80).get();
         return snap.docs.map((d) => d.data() || {});
       };
-      const genResult = await generateWithFallback(prompt, body.subject, poolLoader);
+      const genResult = await generateWithFallback(prompt, body.subject, poolLoader, body.chapter);
       let exam = genResult.exam;
 
       exam = deepClean(exam);
@@ -2257,3 +2873,29 @@ module.exports = async function handler(request, response) {
 
 // ✅ Config assignée APRÈS module.exports — visible par Vercel AU BUILD (pas seulement au runtime).
 module.exports.config = { maxDuration: 90 };
+
+// ✅ v5.0 — exports internes (tests automatisés uniquement ; inutilisés par Vercel).
+module.exports._internal = {
+  subjectCategory,
+  CATEGORY_LABELS,
+  buildVariationBlock,
+  generationPrompt,
+  generationPromptFromNotebook,
+  verificationPrompt,
+  repairExamStructure,
+  validateGeneratedExam,
+  validateContentCompliance,
+  exerciseCompliant,
+  hasDecimalNumber,
+  isCalculationTask,
+  exerciseIsComplexRelated,
+  applyVerification,
+  questionKey,
+  normPrefix,
+  echoFits,
+  stripGenericPrefix,
+  repairMathEscapes,
+  repairAllEscapes,
+  salvageSolutions,
+  poolGenStyle
+};

@@ -1794,6 +1794,42 @@
       transition: var(--transition);
     }
     .arv-pdf-status-btn:active { transform: scale(0.97); }
+    /* ✅ v5.3 — SKELETON de chargement du cours : 3 feuilles A4 scintillantes
+       à la place du simple spinner (l'utilisateur voit la forme de ce qui
+       arrive, plus aucun « panneau vide »). */
+    .arv-pdf-skel {
+      display: flex; gap: 12px;
+      align-items: center; justify-content: center;
+    }
+    .arv-pdf-skel-page {
+      position: relative; width: 88px; height: 118px;
+      border-radius: 6px; overflow: hidden;
+      background: var(--bg-surface);
+      border: 1px solid var(--card-border);
+    }
+    .arv-pdf-skel-page:nth-child(2) { transform: scale(1.14); }
+    .arv-pdf-skel-page::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(100deg, transparent 32%, rgba(224, 184, 74, 0.14) 50%, transparent 68%);
+      transform: translateX(-100%);
+      animation: arvSkelShimmer 1.5s ease-in-out infinite;
+    }
+    .arv-pdf-skel-page:nth-child(2)::after { animation-delay: 0.18s; }
+    .arv-pdf-skel-page:nth-child(3)::after { animation-delay: 0.36s; }
+    @keyframes arvSkelShimmer { to { transform: translateX(100%); } }
+    .arv-pdf-skel-line {
+      position: absolute; left: 11px; right: 11px; height: 6px;
+      border-radius: 3px; background: var(--card-border);
+    }
+    .arv-pdf-skel-line.t { top: 13px; left: 11px; right: auto; width: 52%; height: 8px; background: var(--border-gold); opacity: 0.75; }
+    .arv-pdf-skel-line.l1 { top: 33px; }
+    .arv-pdf-skel-line.l2 { top: 47px; right: 24px; }
+    .arv-pdf-skel-line.l3 { top: 61px; }
+    .arv-pdf-skel-line.l4 { top: 75px; right: 19px; }
+    .arv-pdf-skel-line.l5 { top: 89px; }
+    @media (prefers-reduced-motion: reduce) {
+      .arv-pdf-skel-page::after { animation: none; }
+    }
 
     /* ============================================================
        RESPONSIVE
@@ -2748,6 +2784,9 @@ function renderPart() {
   // corrections : pas de PDF sans abonnement.
   const pdfPath = toLocalPdfPath(filePath);
   if (pdfPath && (tab !== 'corrections' || getPremiumNow())) {
+    // ✅ v5.3 — pdf.js se PRÉCHARGE pendant la sonde HEAD (avant : chargé
+    // après, en série → 0,3 à 1 s perdus à chaque ouverture froide)
+    loadArvPdfJs().catch(() => {});
     probeLocalPdf(pdfPath)
       .then((available) => {
         if (available) renderPdfReader(pdfPath);
@@ -2822,8 +2861,12 @@ function renderPdfReader(pdfPath) {
       <div class="arv-pdf-viewport" id="arvPdfViewport">
         <div class="arv-pdf-pages" id="arvPdfPages">
           <div class="arv-pdf-status" id="arvPdfStatus">
-            <div class="spinner"></div>
-            <p>Chargement du PDF…</p>
+            <div class="arv-pdf-skel" aria-hidden="true">
+              <div class="arv-pdf-skel-page"><span class="arv-pdf-skel-line t"></span><span class="arv-pdf-skel-line l1"></span><span class="arv-pdf-skel-line l3"></span><span class="arv-pdf-skel-line l5"></span></div>
+              <div class="arv-pdf-skel-page"><span class="arv-pdf-skel-line t"></span><span class="arv-pdf-skel-line l1"></span><span class="arv-pdf-skel-line l2"></span><span class="arv-pdf-skel-line l4"></span><span class="arv-pdf-skel-line l5"></span></div>
+              <div class="arv-pdf-skel-page"><span class="arv-pdf-skel-line t"></span><span class="arv-pdf-skel-line l2"></span><span class="arv-pdf-skel-line l3"></span><span class="arv-pdf-skel-line l5"></span></div>
+            </div>
+            <p>Chargement du cours…</p>
           </div>
         </div>
       </div>
@@ -2832,10 +2875,13 @@ function renderPdfReader(pdfPath) {
 
   markPartAsRead();
 
-  // préchauffage hors-ligne : le PDF consulté est mis en cache par le SW
+  // préchauffage hors-ligne : le PDF consulté est mis en cache par le SW.
+  // ✅ v5.3 — DIFFÉRÉ côté SW (6 s) : le téléchargement complet du PDF ne
+  // concurrence plus les Range requests de la 1ʳᵉ page sur réseau lent.
+  // La bibliothèque pdf.js, elle, reste précachée immédiatement.
   try {
     if (navigator.serviceWorker && navigator.serviceWorker.controller) {
-      navigator.serviceWorker.controller.postMessage({ type: 'CACHE_URL', url: pdfPath });
+      navigator.serviceWorker.controller.postMessage({ type: 'CACHE_URL', url: pdfPath, delay: 6000 });
       navigator.serviceWorker.controller.postMessage({ type: 'CACHE_URL', url: 'assets/pdfjs/pdf.min.js' });
       navigator.serviceWorker.controller.postMessage({ type: 'CACHE_URL', url: 'assets/pdfjs/pdf.worker.min.js' });
     }
@@ -2845,7 +2891,15 @@ function renderPdfReader(pdfPath) {
 }
 
 // ================================================================
-// ✅ v5.2 — VISIONNEUSE PDF ARVEXA (canvas pdf.js, maison)
+// ✅ v5.3 — VISIONNEUSE PDF ARVEXA (canvas pdf.js, maison)
+// v5.3 : OUVERTURE < 5 s + FINI LES PAGES BLANCHES (« crash d'images ») :
+// (1) pdf.js préchargé en parallèle de la sonde HEAD ; (2) métrage des pages
+// non plus séquentiel (44 aller-retours !) : page 1 mesurée seule, placeholders
+// posés, page 1 RENDUE IMMÉDIATEMENT, les autres formats mesurés en fond
+// (8 en parallèle) ; (3) file de rendu (3 canvas max en vol) + annulation des
+// rendus obsolètes + re-rendu de TOUTES les pages visibles après un
+// recadrage — les canvases vidés pendant le scroll/zoom/rotation sont
+// repeints au lieu de rester blancs.
 // Zéro lecteur système : les pages A4 sont rendues en canvas,
 // empilées dans le flux (la barre de progression de l'app suit le
 // scroll normalement). Rendu paresseux ±1 écran, nettoyage mémoire
@@ -2869,6 +2923,13 @@ let arvPdfSeq = 0;        // anti-course (changement rapide de partie)
 function destroyArvPdf() {
   if (!arvPdfState) return;
   try { if (arvPdfState.observer) arvPdfState.observer.disconnect(); } catch (e) {}
+  // ✅ v5.3 — annule tout rendu en vol : un task pdf.js qui survit au
+  // démontage repeignait un canvas déjà libéré
+  try {
+    (arvPdfState.renderTasks || []).forEach((t) => {
+      try { if (t) t.cancel(); } catch (e) {}
+    });
+  } catch (e) {}
   try { if (arvPdfState.doc) arvPdfState.doc.destroy(); } catch (e) {}
   try {
     if (arvPdfState.vvHook && window.visualViewport) {
@@ -2879,15 +2940,19 @@ function destroyArvPdf() {
   arvPdfState = null;
 }
 
-function loadArvPdfJs() {
+let arvPdfJsPromise = null; // ✅ v5.3 — promesse mémoïsée : jamais 2 <script>
+function loadArvPdfJs() {   // pdf.min.js injectés en parallèle
   if (window.pdfjsLib) return Promise.resolve();
-  return new Promise((resolve, reject) => {
-    const s = document.createElement('script');
-    s.src = ARV_PDF_JS;
-    s.onload = () => resolve();
-    s.onerror = () => reject(new Error('pdf.js indisponible'));
-    document.head.appendChild(s);
-  });
+  if (!arvPdfJsPromise) {
+    arvPdfJsPromise = new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = ARV_PDF_JS;
+      s.onload = () => resolve();
+      s.onerror = () => { arvPdfJsPromise = null; reject(new Error('pdf.js indisponible')); };
+      document.head.appendChild(s);
+    });
+  }
+  return arvPdfJsPromise;
 }
 
 // ── Netteté (v5.2) ────────────────────────────────────────────
@@ -2929,11 +2994,9 @@ function wireArvVvZoom(state) {
       if (!st || !st.pageCount) return;
       const cur = Math.max(0, (st.currentPage || 1) - 1);
       for (let k = Math.max(0, cur - 1); k <= Math.min(st.pageCount - 1, cur + 1); k++) {
-        if (st.rendered[k]) {
-          st.rendered[k] = false;
-          st.wraps[k].classList.remove('rendered');
-        }
-        renderArvPdfPage(k);
+        // ✅ v5.3 — clearArvPdfCanvas annule le rendu en vol, la file repeint
+        if (st.rendered[k] || st.rendering[k]) clearArvPdfCanvas(st, k);
+        queueArvPdfRender(k);
       }
     }, 240);
   };
@@ -2945,8 +3008,11 @@ function openArvPdf(pdfPath, downloadRef) {
   destroyArvPdf();
   const token = ++arvPdfSeq;
   arvPdfState = { token, doc: null, pagesMeta: [], wraps: [], canvases: [],
-                  rendered: [], rendering: [], zoomIdx: 2, observer: null,
-                  pageCount: 0, path: pdfPath, vvHook: null };
+                  rendered: [], rendering: [], renderTasks: [],
+                  queue: [], queued: [], active: 0, visible: new Set(),
+                  zoomIdx: 2, observer: null,
+                  pageCount: 0, path: pdfPath, vvHook: null,
+                  tStart: (window.performance && performance.now()) || 0 };
   // défini AVANT toute utilisation (buildArvPdfPages s'en sert)
   arvPdfState.zoomFactor = () => ARV_PDF_ZOOMS[arvPdfState.zoomIdx] || 1;
 
@@ -2954,14 +3020,18 @@ function openArvPdf(pdfPath, downloadRef) {
     .then(() => {
       if (token !== arvPdfSeq) return;
       window.pdfjsLib.GlobalWorkerOptions.workerSrc = ARV_PDF_WORKER;
-      const task = window.pdfjsLib.getDocument({ url: pdfPath });
+      // ✅ v5.3 — disableAutoFetch : sur réseau lent, pdf.js ne récupère que
+      // les morceaux (Range) utiles aux pages affichées → 1ʳᵉ page en ~2 s au
+      // lieu d'attendre le PDF entier (~7 s à 200 Ko/s). Le téléchargement
+      // complet pour le hors-ligne est assuré côté SW (CACHE_URL différé).
+      const task = window.pdfjsLib.getDocument({ url: pdfPath, disableAutoFetch: true });
       task.onProgress = (d) => {
         if (token !== arvPdfSeq || !d || !d.total) return;
         const pct = Math.round((d.loaded / d.total) * 100);
         const st = document.getElementById('arvPdfStatus');
         if (st && pct > 4) {
           const p = st.querySelector('p');
-          if (p) p.textContent = `Chargement du PDF… ${Math.min(99, pct)} %`;
+          if (p) p.textContent = `Chargement du cours… ${Math.min(99, pct)} %`;
         }
       };
       return task.promise;
@@ -2986,19 +3056,24 @@ async function buildArvPdfPages(doc, token) {
   if (!state || !pagesWrap) return;
   pagesWrap.innerHTML = '';
 
-  // Métrage exact de chaque page (placeholders à la bonne hauteur :
-  // zéro saut de scroll quand le canvas arrive).
-  for (let i = 0; i < doc.numPages; i++) {
-    const page = await doc.getPage(i + 1);
-    if (token !== arvPdfSeq) return;
-    const vp = page.getViewport({ scale: 1 });
-    state.pagesMeta.push({ w: vp.width, h: vp.height });
-  }
+  // ✅ v5.3 — AVANT : await doc.getPage(i+1) SÉQUENTIELLEMENT pour les ~44
+  // pages avant d'afficher quoi que ce soit (1 à 2 s perdues).
+  // MAINTENANT : la page 1 est mesurée seule (toutes les feuilles du cours
+  // partagent le format A4), les placeholders sont posés à la bonne hauteur
+  // (zéro saut de scroll), la page 1 se PEINT IMMÉDIATEMENT, et les rares
+  // formats différents sont mesurés en arrière-plan (8 en parallèle).
+  const first = await doc.getPage(1);
+  if (token !== arvPdfSeq) return;
+  const vp0 = first.getViewport({ scale: 1 });
 
   const viewport = document.getElementById('arvPdfViewport');
   state.containerW = Math.max(240, (viewport ? viewport.clientWidth : 320));
 
-  for (let i = 0; i < doc.numPages; i++) {
+  const n = doc.numPages;
+  state.pagesMeta = new Array(n);
+  for (let i = 0; i < n; i++) state.pagesMeta[i] = { w: vp0.width, h: vp0.height };
+
+  for (let i = 0; i < n; i++) {
     const meta = state.pagesMeta[i];
     const cssW = state.containerW * state.zoomFactor();
     const cssH = cssW * (meta.h / meta.w);
@@ -3016,23 +3091,124 @@ async function buildArvPdfPages(doc, token) {
     state.rendering.push(false);
   }
 
-  // Rendu paresseux : ±1,5 écran autour du viewport
+  // Rendu paresseux : ±1,5 écran autour du viewport.
+  // ✅ v5.3 — les index visibles sont tracés : après un recadrage (rotation,
+  // scrollbar, zoom, pinch), TOUTES les pages visibles sont repeintes et non
+  // plus seulement la courante → fini les pages blanches qui restaient vides
+  // jusqu'à sortir de l'écran (« crash d'images »).
   state.observer = new IntersectionObserver((entries) => {
     entries.forEach((en) => {
       const idx = state.wraps.indexOf(en.target);
       if (idx < 0) return;
-      if (en.isIntersecting) renderArvPdfPage(idx);
-      else scheduleArvPdfCleanup(idx);
+      if (en.isIntersecting) {
+        state.visible.add(idx);
+        queueArvPdfRender(idx);
+      } else {
+        state.visible.delete(idx);
+        scheduleArvPdfCleanup(idx);
+      }
     });
   }, { rootMargin: '160% 0px 160% 0px' });
   state.wraps.forEach((w) => state.observer.observe(w));
   updateArvPdfCurrent();
 
-  // Resynchronisation après pose des 41 pages : la barre de défilement
+  // Resynchronisation après pose des pages : la barre de défilement
   // verticale qui vient d'apparaître réduit la largeur utile (desktop,
   // rotation…). Sans recadrage, les feuilles A4 débordent de l'écran.
   syncArvPdfWidth();
   requestAnimationFrame(() => requestAnimationFrame(syncArvPdfWidth));
+
+  // ✅ v5.3 — la 1ʳᵉ page (et la suivante) se peignent TOUT DE SUITE,
+  // sans attendre le premier tick de l'observer : c'est ça qui fait
+  // passer l'ouverture sous les 5 secondes.
+  queueArvPdfRender(0);
+  if (n > 1) queueArvPdfRender(1);
+
+  // ✅ v5.3 — mesure des pages restantes en arrière-plan (8 en parallèle) :
+  // seules celles dont le format diffère de la page 1 sont recadrées.
+  for (let start = 1; start < n; start += 8) {
+    const batch = [];
+    for (let i = start; i < Math.min(n, start + 8); i++) batch.push(i);
+    const metas = await Promise.all(batch.map(async (i) => {
+      try {
+        const pg = await doc.getPage(i + 1);
+        const vp = pg.getViewport({ scale: 1 });
+        return { i, w: vp.width, h: vp.height };
+      } catch (e) { return null; }
+    }));
+    if (token !== arvPdfSeq) return;
+    const changed = [];
+    metas.forEach((m) => {
+      if (!m) return;
+      const prev = state.pagesMeta[m.i];
+      if (prev && Math.abs(prev.w - m.w) < 0.5 && Math.abs(prev.h - m.h) < 0.5) return;
+      state.pagesMeta[m.i] = { w: m.w, h: m.h };
+      changed.push(m.i);
+    });
+    if (!changed.length) continue;
+    const z = state.zoomFactor();
+    changed.forEach((i) => {
+      const meta = state.pagesMeta[i];
+      const cssW = Math.round(state.containerW * z);
+      const cssH = Math.round(cssW * (meta.h / meta.w));
+      state.wraps[i].style.width = cssW + 'px';
+      state.wraps[i].style.height = cssH + 'px';
+      if (state.rendered[i] || state.rendering[i]) clearArvPdfCanvas(state, i);
+    });
+    changed.forEach((i) => { if (state.visible.has(i)) queueArvPdfRender(i); });
+  }
+}
+
+// ── ✅ v5.3 — FILE DE RENDU + ANNULATION (anti « pages blanches ») ──
+// Les rafales de scroll ne lancent plus 10 rendus canvas en même temps
+// (la mémoire canvas explose → le navigateur bride/efface les canvases →
+// pages blanches). File avec priorité : la page la plus proche de celle
+// qu'on lit est peinte en premier. MAX 3 rendus simultanés.
+const ARV_PDF_MAX_ACTIVE = 3;
+
+function clearArvPdfCanvas(state, i) {
+  const t = state.renderTasks[i];
+  if (t) {
+    state.renderTasks[i] = null;
+    try { t.cancel(); } catch (e) {}
+  }
+  const c = state.canvases[i];
+  c.width = 0; c.height = 0;
+  state.rendered[i] = false;
+  state.rendering[i] = false;
+  state.wraps[i].classList.remove('rendered');
+}
+
+function queueArvPdfRender(i) {
+  const state = arvPdfState;
+  if (!state || !state.doc) return;
+  if (state.rendered[i] || state.rendering[i] || state.queued[i]) return;
+  state.queued[i] = true;
+  state.queue.push(i);
+  pumpArvPdfQueue();
+}
+
+function pumpArvPdfQueue() {
+  const state = arvPdfState;
+  if (!state) return;
+  while (state.active < ARV_PDF_MAX_ACTIVE && state.queue.length) {
+    // priorité : page la plus proche de celle en cours de lecture
+    let best = 0, bd = Infinity;
+    for (let k = 0; k < state.queue.length; k++) {
+      const d = Math.abs(state.queue[k] - ((state.currentPage || 1) - 1));
+      if (d < bd) { bd = d; best = k; }
+    }
+    const i = state.queue.splice(best, 1)[0];
+    state.queued[i] = false;
+    if (state.rendered[i] || state.rendering[i]) continue;
+    state.active++;
+    Promise.resolve(renderArvPdfPage(i))
+      .catch(() => {})
+      .finally(() => {
+        state.active--;
+        pumpArvPdfQueue();
+      });
+  }
 }
 
 // Recadre toutes les pages sur la largeur réelle du conteneur.
@@ -3052,45 +3228,64 @@ function syncArvPdfWidth() {
     const cssH = Math.round(cssW * (meta.h / meta.w));
     state.wraps[i].style.width = cssW + 'px';
     state.wraps[i].style.height = cssH + 'px';
-    if (state.rendered[i]) {
-      const c = state.canvases[i];
-      c.width = 0; c.height = 0;
-      state.rendered[i] = false;
-      state.wraps[i].classList.remove('rendered');
+    if (state.rendered[i] || state.rendering[i]) {
+      // ✅ v5.3 — clearArvPdfCanvas annule le rendu en vol (avant : le rendu
+      // se terminait sur un canvas vidé et la page restait blanche)
+      clearArvPdfCanvas(state, i);
     }
   }
+  // ✅ v5.3 — re-rend TOUTES les pages visibles (avant : cur et cur+1
+  // seulement → les autres pages à l'écran restaient blanches)
+  state.visible.forEach((i) => queueArvPdfRender(i));
   const cur = Math.max(0, (state.currentPage || 1) - 1);
-  renderArvPdfPage(cur);
-  renderArvPdfPage(Math.min(state.pageCount - 1, cur + 1));
+  queueArvPdfRender(cur);
+  queueArvPdfRender(Math.min(state.pageCount - 1, cur + 1));
   return true;
 }
 
 function renderArvPdfPage(i) {
   const state = arvPdfState;
-  if (!state || !state.doc || state.rendered[i] || state.rendering[i]) return;
+  if (!state || !state.doc || state.rendered[i] || state.rendering[i]) return Promise.resolve();
   state.rendering[i] = true;
   const token = state.token;
-  state.doc.getPage(i + 1).then((page) => {
+  const canvas = state.canvases[i];
+  return state.doc.getPage(i + 1).then((page) => {
     if (token !== arvPdfSeq) return;
     const meta = state.pagesMeta[i];
     const cssW = state.containerW * state.zoomFactor();
     const cssScale = cssW / meta.w;
     const dpr = arvPdfDpr(cssScale, meta.w, meta.h);
     const viewport = page.getViewport({ scale: cssScale * dpr });
-    const canvas = state.canvases[i];
     canvas.width = Math.floor(viewport.width);
     canvas.height = Math.floor(viewport.height);
     canvas.style.width = Math.round(cssW) + 'px';
     canvas.style.height = Math.round(cssW * (meta.h / meta.w)) + 'px';
     const ctx = canvas.getContext('2d', { alpha: false });
-    return page.render({ canvasContext: ctx, viewport }).promise.then(() => {
+    const task = page.render({ canvasContext: ctx, viewport });
+    state.renderTasks[i] = task;
+    return task.promise.then(() => {
+      state.renderTasks[i] = null;
       if (token !== arvPdfSeq) return;
+      // ✅ v5.3 — le canvas a pu être vidé entre-temps (resync, zoom,
+      // nettoyage) : on ne marque PAS la page comme rendue, la file la
+      // repeindra. Avant, la page restait blanche avec son placeholder
+      // masqué → « crash d'images ».
+      if (!canvas.width) { state.rendering[i] = false; return; }
       state.rendered[i] = true;
       state.rendering[i] = false;
       state.wraps[i].classList.add('rendered');
+      if (i === 0 && !state.firstPageDone) {
+        state.firstPageDone = true;
+        try {
+          console.info(`[ARV-PDF] 1re page affichée en ${Math.round(performance.now() - state.tStart)} ms`);
+        } catch (e) {}
+      }
     });
-  }).catch(() => {
+  }).catch((err) => {
+    if (state.renderTasks) state.renderTasks[i] = null;
     if (state) state.rendering[i] = false;
+    // ✅ v5.3 — annulation volontaire (clear/canvas 0) : silencieux
+    if (err && (err.name === 'RenderingCancelledException' || /cancel/i.test(String(err.message || '')))) return;
   });
 }
 
@@ -3102,12 +3297,9 @@ function scheduleArvPdfCleanup(idx) {
     state.cleanupTimer = null;
     if (!arvPdfState) return;
     const cur = arvPdfState.currentPage || 0;
-    if (Math.abs(idx - cur) > 4 && arvPdfState.rendered[idx]) {
-      const c = arvPdfState.canvases[idx];
-      c.width = 0; c.height = 0;
-      c.removeAttribute('style');
-      arvPdfState.rendered[idx] = false;
-      arvPdfState.wraps[idx].classList.remove('rendered');
+    if (Math.abs(idx - cur) > 4 && (arvPdfState.rendered[idx] || arvPdfState.rendering[idx])) {
+      // ✅ v5.3 — clearArvPdfCanvas annule aussi le rendu en vol
+      clearArvPdfCanvas(arvPdfState, idx);
     }
   }, 400);
 }
@@ -3124,16 +3316,15 @@ function rerenderArvPdf() {
     const cssH = Math.round(cssW * (meta.h / meta.w));
     state.wraps[i].style.width = cssW + 'px';
     state.wraps[i].style.height = cssH + 'px';
-    if (state.rendered[i]) {
-      const c = state.canvases[i];
-      c.width = 0; c.height = 0;
-      state.rendered[i] = false;
-      state.wraps[i].classList.remove('rendered');
+    if (state.rendered[i] || state.rendering[i]) {
+      // ✅ v5.3 — annulation du rendu en vol + re-rendu des visibles
+      clearArvPdfCanvas(state, i);
     }
   }
+  state.visible.forEach((i) => queueArvPdfRender(i));
   const cur = Math.max(0, (state.currentPage || 1) - 1);
-  renderArvPdfPage(cur);
-  renderArvPdfPage(Math.min(state.pageCount - 1, cur + 1));
+  queueArvPdfRender(cur);
+  queueArvPdfRender(Math.min(state.pageCount - 1, cur + 1));
   updateArvPdfZoomLabel();
 }
 
@@ -3240,7 +3431,15 @@ function showArvPdfError(pdfPath) {
   `;
   const retry = document.getElementById('arvPdfRetry');
   if (retry) retry.addEventListener('click', () => {
-    status.innerHTML = `<div class="spinner"></div><p>Chargement du PDF…</p>`;
+    // ✅ v5.3 — skeleton + libellé « cours » (plus de spinner « PDF »)
+    status.innerHTML = `
+      <div class="arv-pdf-skel" aria-hidden="true">
+        <div class="arv-pdf-skel-page"><span class="arv-pdf-skel-line t"></span><span class="arv-pdf-skel-line l1"></span><span class="arv-pdf-skel-line l3"></span><span class="arv-pdf-skel-line l5"></span></div>
+        <div class="arv-pdf-skel-page"><span class="arv-pdf-skel-line t"></span><span class="arv-pdf-skel-line l1"></span><span class="arv-pdf-skel-line l2"></span><span class="arv-pdf-skel-line l4"></span><span class="arv-pdf-skel-line l5"></span></div>
+        <div class="arv-pdf-skel-page"><span class="arv-pdf-skel-line t"></span><span class="arv-pdf-skel-line l2"></span><span class="arv-pdf-skel-line l3"></span><span class="arv-pdf-skel-line l5"></span></div>
+      </div>
+      <p>Chargement du cours…</p>
+    `;
     openArvPdf(pdfPath, pdfPath);
   });
 }

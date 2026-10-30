@@ -1,7 +1,17 @@
 // ================================================================
 // OFFLINE.JS — ARVEXA School
-// Version : v6.1 — Offline complet (appli + cours)
-// Corrections appliquées :
+// Version : v6.2 — Offline instantané + téléchargement annulable
+// Nouveautés v6.2 :
+//  - Affichage INSTANTANÉ : les fichiers déjà en cache sont détectés sans
+//    réseau (CHECK_CACHED) et jamais retéléchargés — 2e visite = quelques
+//    secondes, l'ouverture des cours déjà téléchargés est immédiate.
+//  - Bouton « Annuler » dans le pop-up de téléchargement (demande du
+//    propriétaire) : coupe le téléchargement proprement à tout moment.
+//  - État persistant « contenu prêt hors ligne » (arvexa_offline_ready).
+//  - Bannière hors ligne SURIMPOSÉE (plus aucun décalage de mise en page)
+//    + hystérésis 2,5 s : plus aucun clignotement quand le réseau 2G
+//    tremble (cause d'instabilité signalée par le propriétaire).
+// Corrections conservées :
 //  - C1 : retrait des pages protégées de appPages (cohérence avec service-worker.js C2)
 //  - C2 : console.warn sur catch silencieux (observabilité)
 // ================================================================
@@ -13,11 +23,54 @@
   window.__arvexaOfflineInit = true;
 
   const STORAGE_KEY = 'arvexa_pending_sync';
+  const READY_KEY = 'arvexa_offline_ready';
+  const OFFLINE_HYSTERESIS_MS = 2500;
 
   let isOnline = navigator.onLine;
+  let offlineSince = null;      // ✅ v6.2 — hystérésis anti-clignotement
+  let offlineTimer = null;
   let pendingSync = [];
   let bannerEl = null;
   let modalEl = null;
+  let downloadCancelled = false;
+
+  // ═══ ÉTAT « CONTENU PRÊT HORS LIGNE » ═══
+  function markOfflineReady(stats) {
+    try {
+      localStorage.setItem(READY_KEY, JSON.stringify(Object.assign({ ts: Date.now() }, stats || {})));
+    } catch (e) {}
+  }
+
+  function isOfflineReady() {
+    try { return !!localStorage.getItem(READY_KEY); } catch (e) { return false; }
+  }
+
+  // ═══ MÉMOIRE DES 404 (v6.2) ═══
+  // Les parties sans PDF / sans corrections renvoient 404 de façon STABLE.
+  // On les mémorise (TTL 7 jours) pour que la vérification du 2e passage ne
+  // re-interroge plus 1 200 fichiers fantômes → chemins réellement instantanés.
+  const MISSING_KEY = 'arvexa_offline_missing';
+  const MISSING_TTL = 7 * 24 * 60 * 60 * 1000;
+
+  function loadKnownMissing() {
+    try {
+      const raw = JSON.parse(localStorage.getItem(MISSING_KEY) || 'null');
+      if (raw && Array.isArray(raw.files) && (Date.now() - (raw.ts || 0)) < MISSING_TTL) {
+        return new Set(raw.files);
+      }
+    } catch (e) {}
+    return new Set();
+  }
+
+  function saveKnownMissing(files) {
+    try {
+      // Fonctionne en ajout : on conserve les 404 déjà connus (même TTL remis à zéro)
+      const prev = loadKnownMissing();
+      files.forEach((f) => prev.add(f));
+      const arr = Array.from(prev).slice(-4000); // garde-fou de taille
+      localStorage.setItem(MISSING_KEY, JSON.stringify({ ts: Date.now(), files: arr }));
+    } catch (e) {}
+  }
 
   // ═══ DONNÉES EN ATTENTE ═══
   function loadPendingData() {
@@ -66,9 +119,14 @@
   }
 
   // ═══ UI ═══
+  // ✅ v6.2 — la bannière ne s'affiche qu'après 2,5 s de coupure CONTINUE
+  // (hystérésis) : les micro-coupures 2G ne font plus apparaître/disparaître
+  // le bandeau et ne font plus bouger la mise en page.
   function updateUI() {
+    const stableOffline = !isOnline && offlineSince !== null &&
+      (Date.now() - offlineSince) >= OFFLINE_HYSTERESIS_MS;
     if (bannerEl) {
-      bannerEl.classList.toggle('show', !isOnline);
+      bannerEl.classList.toggle('show', stableOffline);
     }
     document.documentElement.setAttribute(
       'data-online',
@@ -100,6 +158,8 @@
   function bindNetworkEvents() {
     window.addEventListener('online', () => {
       isOnline = true;
+      offlineSince = null;
+      if (offlineTimer) { clearTimeout(offlineTimer); offlineTimer = null; }
       updateUI();
       showToast('✅ Connexion rétablie', 'success');
       setTimeout(syncPendingData, 500);
@@ -107,8 +167,14 @@
 
     window.addEventListener('offline', () => {
       isOnline = false;
+      if (offlineSince === null) offlineSince = Date.now();
+      if (offlineTimer) clearTimeout(offlineTimer);
+      // Hystérésis : la bannière ne monte que si toujours hors ligne après 2,5 s
+      offlineTimer = setTimeout(() => {
+        offlineTimer = null;
+        if (!navigator.onLine) updateUI();
+      }, OFFLINE_HYSTERESIS_MS);
       updateUI();
-      showToast('📶 Mode hors ligne activé', 'info');
     });
   }
 
@@ -158,6 +224,8 @@
   // TÉLÉCHARGEMENT COMPLET (appli + cours)
   // ═══════════════════════════════════════════════════════════════
   async function downloadAllForOffline() {
+    downloadCancelled = false;
+
     if (!isOnline) {
       showToast('📶 Connecte-toi pour télécharger', 'error');
       return;
@@ -237,20 +305,73 @@
         if (/^cours\/.+\.html$/i.test(f)) candidateFiles.add(f.replace(/\.html$/i, '.pdf'));
       });
 
-      // ═══ ÉTAPE 3 : vérifier ce qui existe ═══
-      showToast('🔍 Vérification des fichiers...', 'info');
-
-      const allCandidates = [
+      // ═══ ÉTAPE 2b : v6.2 — ce qui est DÉJÀ en cache est éliminé SANS
+      // réseau (CHECK_CACHED côté SW). 2e visite = vérification instantanée,
+      // rien n'est retéléchargé (fini « il faut que je les retélécharge »).
+      // Les manifestes JSON des matières sont inclus : s'ils sont déjà en
+      // cache, le passage suivant est 100 % instantané (aucune modale).
+      const allCandidatesSet = new Set([
+        ...subjectFiles,
         ...appPages,
         ...readerAssets,
         ...Array.from(candidateFiles)
-      ];
+      ]);
+
+      let alreadyCached = new Set();
+      try {
+        alreadyCached = await new Promise((resolve) => {
+          if (!navigator.serviceWorker.controller) { resolve(new Set()); return; }
+          const ch = new MessageChannel();
+          // ✅ v6.2 — 12 s : la vérification peut demander quelques secondes
+          // sur un téléphone lent avec ~1 400 candidats (mesuré : ~2 s).
+          const timeout = setTimeout(() => resolve(new Set()), 12000);
+          ch.port1.onmessage = (ev) => {
+            const d = ev.data || {};
+            if (d.type === 'CHECK_CACHED_RESULT') {
+              clearTimeout(timeout);
+              resolve(new Set(d.cached || []));
+            }
+          };
+          navigator.serviceWorker.controller.postMessage(
+            { type: 'CHECK_CACHED', files: Array.from(allCandidatesSet) },
+            [ch.port2]
+          );
+        });
+      } catch (e) {
+        alreadyCached = new Set();
+      }
+
+      // Fichiers déjà prêts : on ne les vérifie même pas en HEAD (0 réseau).
+      // ✅ v6.2 — les 404 CONNUS (parties sans PDF/corrections, stables) sont
+      // mémorisés localement : les passages suivants ne les re-interrogent
+      // plus → la vérification complète devient quasi instantanée.
+      const knownMissing = loadKnownMissing();
+      const toVerify = Array.from(allCandidatesSet).filter((f) =>
+        !alreadyCached.has(f) && !knownMissing.has(f));
+
+      // Si TOUT est déjà en cache (ou ne peut exister) : affichage instantané
+      if (toVerify.length === 0 && allCandidatesSet.size > 0) {
+        const cachedJson = subjectFiles.every((j) => alreadyCached.has(j));
+        markOfflineReady({ total: alreadyCached.size, failed: 0, instant: true });
+        showToast('✅ Tout le contenu est déjà prêt hors ligne', 'success');
+        if (cachedJson) {
+          // Mise à jour du bouton profil s'il existe
+          const txt = document.getElementById('downloadOfflineText');
+          if (txt) txt.textContent = 'Contenu prêt hors ligne ✅';
+        }
+        return;
+      }
+
+      // ═══ ÉTAPE 3 : vérifier ce qui existe (uniquement les manquants) ═══
+      showToast('🔍 Vérification des fichiers...', 'info');
 
       const existingFiles = [];
+      const missingNow = [];
       const BATCH = 25;
 
-      for (let i = 0; i < allCandidates.length; i += BATCH) {
-        const batch = allCandidates.slice(i, i + BATCH);
+      for (let i = 0; i < toVerify.length; i += BATCH) {
+        if (downloadCancelled) break;
+        const batch = toVerify.slice(i, i + BATCH);
         const results = await Promise.allSettled(
           batch.map(async (file) => {
             try {
@@ -261,20 +382,38 @@
             }
           })
         );
-        results.forEach((r) => {
+        results.forEach((r, idx) => {
           if (r.status === 'fulfilled' && r.value) existingFiles.push(r.value);
+          else missingNow.push(batch[idx]);
         });
       }
 
-      if (existingFiles.length === 0) {
+      // ✅ v6.2 — mémoire des 404 : la prochaine vérification sera instantanée
+      if (missingNow.length > 0) saveKnownMissing(missingNow);
+
+      if (existingFiles.length === 0 && alreadyCached.size === 0) {
         showToast('ℹ️ Aucun fichier disponible pour le moment', 'info');
         return;
       }
 
-      // ═══ ÉTAPE 4 : télécharger ═══
-      const allFiles = [...validJsonFiles, ...existingFiles];
+      // ✅ v6.2 — RIEN de nouveau à télécharger (tout ce qui existe est déjà
+      // sur l'appareil, le reste est 404 stable) : succès instantané, sans
+      // modale ni « téléchargement » fantôme à 0 fichier.
+      const pendingJson = validJsonFiles.filter((j) => !alreadyCached.has(j));
+      if (existingFiles.length === 0 && pendingJson.length === 0) {
+        markOfflineReady({ total: alreadyCached.size, failed: 0, instant: true });
+        showToast('✅ Tout le contenu est déjà prêt hors ligne', 'success');
+        const txt = document.getElementById('downloadOfflineText');
+        if (txt) txt.textContent = 'Contenu prêt hors ligne ✅';
+        return;
+      }
 
-      openDownloadModal(allFiles.length);
+      // ═══ ÉTAPE 4 : télécharger UNIQUEMENT ce qui manque ═══
+      // Les manifestes JSON des matières sont toujours nécessaires (sans eux,
+      // la liste des cours ne s'affiche pas hors ligne).
+      const allFiles = [...pendingJson, ...existingFiles];
+
+      openDownloadModal(alreadyCached.size + allFiles.length, alreadyCached.size);
 
       const channel = new MessageChannel();
       channel.port1.onmessage = (event) => {
@@ -284,10 +423,14 @@
         } else if (data.type === 'DOWNLOAD_COMPLETE') {
           // ✅ v5.4 — le nombre d'échecs réel est transmis (avant : forcé à 0)
           completeDownload({
-            done: data.done,
+            done: data.done || 0,
             failed: data.failed || 0,
-            total: data.total || data.done
+            skipped: data.skipped || 0,
+            total: data.total || (data.done || 0)
           });
+        } else if (data.type === 'DOWNLOAD_CANCELLED') {
+          // ✅ v6.2 — téléchargement annulé par l'élève
+          handleDownloadCancelled(data || {});
         } else if (data.type === 'DOWNLOAD_ERROR') {
           // ✅ C2 — gestion de l'erreur SW (offline ou autre)
           showToast(data.message || 'Erreur de téléchargement', 'error');
@@ -308,8 +451,14 @@
   }
 
   // ═══ MODALE DE PROGRESSION ═══
-  function openDownloadModal(total) {
+  // ✅ v6.2 — bouton « Annuler » visible pendant tout le téléchargement
+  // (demande du propriétaire) + comptage des fichiers déjà en cache.
+  function openDownloadModal(total, alreadyCached) {
     if (modalEl) return;
+
+    const cachedNote = (alreadyCached || 0) > 0
+      ? `<span style="color:#3AB67E">✔ ${alreadyCached} déjà prêt${alreadyCached > 1 ? 's' : ''} sur l'appareil</span>`
+      : '';
 
     modalEl = document.createElement('div');
     modalEl.className = 'arvexa-download-overlay';
@@ -320,7 +469,7 @@
         </div>
         <h3 class="arvexa-download-title">Téléchargement hors ligne</h3>
         <p class="arvexa-download-sub">
-          Téléchargement du contenu pour accès hors ligne...
+          Téléchargement du contenu pour accès hors ligne...<br>${cachedNote}
         </p>
 
         <div class="arvexa-download-progress">
@@ -337,14 +486,51 @@
           Préparation...
         </div>
 
-        <button class="arvexa-download-close" id="arvexaDlClose" style="display:none">
-          Fermer
-        </button>
+        <div class="arvexa-download-actions">
+          <button class="arvexa-download-cancel" id="arvexaDlCancel" type="button">
+            Annuler
+          </button>
+          <button class="arvexa-download-close" id="arvexaDlClose" style="display:none">
+            Fermer
+          </button>
+        </div>
       </div>
     `;
 
     document.body.appendChild(modalEl);
     document.getElementById('arvexaDlClose').addEventListener('click', closeDownloadModal);
+    document.getElementById('arvexaDlCancel').addEventListener('click', cancelDownload);
+  }
+
+  // ✅ v6.2 — « Annuler » : coupe le téléchargement côté SW, immédiatement
+  function cancelDownload() {
+    downloadCancelled = true;
+    try {
+      if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({ type: 'DOWNLOAD_CANCEL' });
+      }
+    } catch (e) {}
+    const btn = document.getElementById('arvexaDlCancel');
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = 'Annulation...';
+    }
+    const info = document.getElementById('arvexaDlInfo');
+    if (info) info.textContent = 'Annulation du téléchargement...';
+  }
+
+  function handleDownloadCancelled(data) {
+    const done = data.done || 0;
+    const skipped = data.skipped || 0;
+    const kept = done + skipped;
+    if (kept > 0) markOfflineReady({ total: kept, failed: data.failed || 0, cancelled: true });
+    showToast(
+      kept > 0
+        ? `⏹ Téléchargement annulé — ${kept} fichier${kept > 1 ? 's' : ''} déjà prêt${kept > 1 ? 's' : ''} hors ligne`
+        : '⏹ Téléchargement annulé',
+      'info'
+    );
+    closeDownloadModal();
   }
 
   function updateDownloadProgress(data) {
@@ -355,31 +541,49 @@
     const info = document.getElementById('arvexaDlInfo');
 
     if (fill) fill.style.width = data.percent + '%';
-    if (done) done.textContent = data.done;
+    if (done) done.textContent = (data.done || 0) + (data.skipped || 0);
     if (total) total.textContent = data.total;
     if (percent) percent.textContent = data.percent + '%';
     if (info) {
-      info.textContent = `${data.done} fichier${data.done > 1 ? 's' : ''} téléchargé${data.done > 1 ? 's' : ''}`;
+      const skippedTxt = (data.skipped || 0) > 0 ? ` · ${data.skipped} déjà en cache` : '';
+      info.textContent = `${data.done || 0} fichier${(data.done || 0) > 1 ? 's' : ''} téléchargé${(data.done || 0) > 1 ? 's' : ''}${skippedTxt}`;
     }
   }
 
   function completeDownload(data) {
     const info = document.getElementById('arvexaDlInfo');
     const close = document.getElementById('arvexaDlClose');
+    const cancel = document.getElementById('arvexaDlCancel');
+
+    // ✅ v6.2 — l'état « prêt hors ligne » est mémorisé de façon persistante
+    const readyCount = (data.done || 0) + (data.skipped || 0);
+    if (readyCount > 0) {
+      markOfflineReady({ total: readyCount, failed: data.failed || 0 });
+    }
 
     if (info) {
       const warn = data.failed > 0
         ? `<br>⚠️ ${data.failed} fichier${data.failed > 1 ? 's' : ''} en échec — réessaie plus tard`
         : '';
-      info.innerHTML = `✅ <strong>${data.done}</strong> fichier${data.done > 1 ? 's' : ''} prêt${data.done > 1 ? 's' : ''} hors ligne${warn}`;
+      const skippedTxt = (data.skipped || 0) > 0
+        ? `<br>✔ ${data.skipped} déjà présent${data.skipped > 1 ? 's' : ''} sur l'appareil`
+        : '';
+      info.innerHTML = `✅ <strong>${readyCount}</strong> fichier${readyCount > 1 ? 's' : ''} prêt${readyCount > 1 ? 's' : ''} hors ligne${skippedTxt}${warn}`;
     }
 
+    if (cancel) cancel.style.display = 'none';
     if (close) close.style.display = 'block';
 
-    showToast(data.failed > 0
-      ? `✅ ${data.done} fichiers prêts · ⚠️ ${data.failed} en échec`
-      : `✅ ${data.done} fichier${data.done > 1 ? 's' : ''} prêt${data.done > 1 ? 's' : ''} pour hors ligne`,
-      data.failed > 0 ? 'info' : 'success');
+    // ✅ v6.2 — jamais de « 0 fichier prêt » trompeur : si rien n'était à
+    // télécharger, c'est que tout était déjà à jour.
+    if (readyCount === 0 && (data.failed || 0) === 0) {
+      showToast('✅ Contenu déjà à jour hors ligne', 'success');
+    } else {
+      showToast(data.failed > 0
+        ? `✅ ${readyCount} fichiers prêts · ⚠️ ${data.failed} en échec`
+        : `✅ ${readyCount} fichier${readyCount > 1 ? 's' : ''} prêt${readyCount > 1 ? 's' : ''} pour hors ligne`,
+        data.failed > 0 ? 'info' : 'success');
+    }
 
     setTimeout(() => closeDownloadModal(), 2500);
   }
@@ -405,8 +609,10 @@
     style.textContent = `
       .arvexa-offline-banner {
         display: none;
-        position: sticky;
-        top: 0;
+        /* ✅ v6.2 — SURIMPOSÉ (fixed) : la bannière ne décale PLUS le contenu
+           de la page quand elle apparaît/disparaît (fini le site « instable ») */
+        position: fixed;
+        top: 0; left: 0; right: 0;
         z-index: 999;
         align-items: center;
         gap: 10px;
@@ -420,6 +626,7 @@
         font-size: 12.5px;
         font-weight: 600;
         animation: arvexaBannerIn 0.3s cubic-bezier(0.25,1,0.5,1);
+        pointer-events: auto;
       }
       .arvexa-offline-banner.show { display: flex; }
       .arvexa-offline-banner .arvexa-offline-dot {
@@ -541,6 +748,28 @@
         transform: translateY(-2px);
         box-shadow: 0 6px 20px rgba(184,134,11,.3);
       }
+      /* ✅ v6.2 — bouton « Annuler » + rangée d'actions de la modale */
+      .arvexa-download-actions {
+        display: flex; align-items: center; justify-content: center;
+        gap: 12px; min-height: 44px;
+      }
+      .arvexa-download-cancel {
+        padding: 11px 28px; border-radius: 30px;
+        border: 1px solid rgba(255,184,160,.35);
+        background: transparent;
+        color: #FFB8A0;
+        font-family: 'Inter', sans-serif;
+        font-size: 13px; font-weight: 600;
+        cursor: pointer;
+        transition: all 0.25s ease;
+      }
+      .arvexa-download-cancel:hover {
+        background: rgba(255,184,160,.12);
+        border-color: rgba(255,184,160,.6);
+      }
+      .arvexa-download-cancel:disabled {
+        opacity: .55; cursor: default;
+      }
 
       @keyframes arvexaBannerIn {
         from { opacity: 0; transform: translateY(-100%); }
@@ -586,6 +815,12 @@
   function init() {
     injectStyles();
     loadPendingData();
+
+    // ✅ v6.2 — page ouverte alors qu'on est déjà hors ligne (démarrage à
+    // froid sans réseau) : la bannière peut s'afficher immédiatement.
+    if (!isOnline && offlineSince === null) {
+      offlineSince = Date.now() - (OFFLINE_HYSTERESIS_MS + 1000);
+    }
 
     const boot = () => {
       createBanner();
@@ -639,6 +874,9 @@
 
     downloadAll: downloadAllForOffline,
 
+    // ✅ v6.2 — l'application peut savoir si le contenu hors ligne est prêt
+    isOfflineReady: isOfflineReady,
+
     cacheUrl: function (url) {
       if (!navigator.serviceWorker || !navigator.serviceWorker.controller) return;
       navigator.serviceWorker.controller.postMessage({
@@ -670,5 +908,5 @@
 
   init();
 
-  console.log('✅ ARVEXA — Mode hors ligne v6.1 (offline complet) prêt');
+  console.log('✅ ARVEXA — Mode hors ligne v6.2 (instantané + annulable) prêt');
 })();

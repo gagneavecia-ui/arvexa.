@@ -2126,6 +2126,15 @@ const downloadText = document.getElementById('downloadOfflineText');
 const downloadSpinner = document.getElementById('downloadSpinner');
 
 if (downloadBtn) {
+  // ✅ v6.2 — si le contenu est déjà prêt hors ligne (téléchargement
+  // précédent réussi), le bouton le montre : la 2e visite ne retélécharge
+  // RIEN (vérification instantanée côté cache).
+  try {
+    if (localStorage.getItem('arvexa_offline_ready') && downloadText) {
+      downloadText.textContent = 'Mettre à jour le contenu hors ligne';
+    }
+  } catch (e) {}
+
   downloadBtn.addEventListener('click', async () => {
     // Vérifier que offline.js est chargé
     if (typeof window.arvexaOffline === 'undefined' || typeof window.arvexaOffline.downloadAll !== 'function') {

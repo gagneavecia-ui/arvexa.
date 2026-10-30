@@ -2700,17 +2700,68 @@ function loadContent() {
       }
 
       if (currentIndex >= parts.length) currentIndex = 0;
-      // ✅ v4.31 — préchauffage silencieux des AUTRES parties du chapitre :
-      // le Service Worker les met en cache (network-first) → le chapitre
-      // entier devient consultable hors-ligne et la navigation instantanée.
-      // ⚠ on attend que le SW CONTRÔLE la page : avant clients.claim()
-      // (premier chargement), les fetch contournent le SW et ne cachent RIEN
-      // (constaté en test réel hors-ligne v4.30).
+      // ✅ v5.8 — préchauffage des AUTRES parties du chapitre SANS AFFAMER
+      // le PDF en cours (cause racine des « 4 minutes » : 3 PDF de plus
+      // (~4 Mo) téléchargés en parallèle de celui qu'on essaie d'ouvrir).
+      // DÉSORMAIS :
+      //   1. démarrage APRÈS le téléchargement complet du PDF affiché
+      //      (événement 'arvexa-pdf-ready' envoyé par openArvPdf) — ou 20 s
+      //      de garde-fou pour les parties HTML ;
+      //   2. connexion lente (2G / slow-2g / économiseur de données) → pas
+      //      de préchauffage du tout : la 1ʳᵉ lecture prime ;
+      //   3. fichiers déjà en cache sautés (CHECK_CACHED, zéro réseau) ;
+      //   4. UN SEUL fichier à la fois, et mis en pause si l'élève ouvre
+      //      entre-temps un autre PDF (__arvPdfLoading).
+      // ⚠ on attend toujours que le SW CONTRÔLE la page (v4.31) : avant
+      // clients.claim() (premier chargement), les fetch contournent le SW
+      // et ne cachent rien (constaté en test réel hors-ligne v4.30).
       const prefetchParts = () => {
-        parts.forEach((p, i) => {
-          if (i === currentIndex || !p.file) return;
-          setTimeout(() => { fetch(p.file).catch(() => {}); }, 350 * i);
-        });
+        const key = subject + '/' + chapter + '/' + tab;
+        if (window.__arvPrefetchKey === key) return;
+        window.__arvPrefetchKey = key;
+        const current = parts[currentIndex] ? parts[currentIndex].file : '';
+        const others = parts.map((p) => p.file).filter((f) => f && f !== current);
+        if (!others.length) return;
+        const conn = navigator.connection || {};
+        if (conn.saveData || conn.effectiveType === 'slow-2g' || conn.effectiveType === '2g') return;
+        if (!navigator.onLine) return;
+        let cachedSet = new Set();
+        const run = async () => {
+          for (const f of others) {
+            if (cachedSet.has(f)) continue;           // déjà sur l'appareil
+            if (window.__arvPrefetchKey !== key) return; // chapitre changé
+            while (window.__arvPdfLoading && window.__arvPrefetchKey === key) {
+              await new Promise((r) => setTimeout(r, 900)); // une lecture prime
+            }
+            if (window.__arvPrefetchKey !== key) return;
+            try { await fetch(f, { cache: 'reload' }); } catch (e) {}
+            await new Promise((r) => setTimeout(r, 400)); // respiration réseau
+          }
+        };
+        const curIsPdf = /\.pdf$/i.test(current);
+        if (curIsPdf) {
+          let kicked = false;
+          const kick = () => { if (kicked) return; kicked = true; run(); };
+          window.addEventListener('arvexa-pdf-ready', kick, { once: true });
+          setTimeout(kick, 20000); // garde-fou (partie HTML, erreur réseau…)
+          // ✅ v5.8 — PDF déjà chargé (ouverture < 1,2 s) : l'événement a pu
+          // être émis AVANT l'inscription de ce listener → on démarre tout de suite.
+          if (!window.__arvPdfLoading && document.querySelector('.arv-pdf-page.rendered')) kick();
+        } else {
+          setTimeout(run, 5000);
+        }
+        // Liste des fichiers déjà en cache (réponse du SW, zéro réseau)
+        try {
+          if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+            const ch = new MessageChannel();
+            ch.port1.onmessage = (e) => {
+              if (e.data && e.data.type === 'CHECK_CACHED_RESULT' && Array.isArray(e.data.cached)) {
+                cachedSet = new Set(e.data.cached);
+              }
+            };
+            navigator.serviceWorker.controller.postMessage({ type: 'CHECK_CACHED', files: others }, [ch.port2]);
+          }
+        } catch (e) {}
       };
       if (!navigator.serviceWorker) {
         setTimeout(prefetchParts, 1200);
@@ -2819,21 +2870,21 @@ function toLocalPdfPath(htmlPath) {
 }
 
 function probeLocalPdf(url) {
-  // HEAD léger : détection sans télécharger le PDF.
-  // ✅ v5.4 — le SW n'intercepte PAS les HEAD (garde method !== 'GET') :
-  // hors ligne la sonde réseau échoue, on interroge alors DIRECTEMENT le
-  // Cache Storage depuis la page — un PDF téléchargé pour hors ligne
-  // (offline.js) ou déjà consulté est retrouvé → le lecteur PDF s'ouvre.
-  return fetch(url, { method: 'HEAD' })
-    .then((r) => !!r && r.ok)
-    .catch(() => false)
-    .then((ok) => {
-      if (ok) return true;
-      if (!window.caches || typeof caches.match !== 'function') return false;
-      return caches.match(url, { ignoreSearch: true })
-        .then((hit) => !!hit)
-        .catch(() => false);
-    });
+  // ✅ v5.8 — le CACHE D'ABORD : un PDF déjà consulté/téléchargé est
+  // détecté immédiatement (0 aller-retour réseau), même hors ligne —
+  // l'ouverture d'un cours déjà vu ne dépend plus de la latence réseau.
+  // La sonde HEAD réseau ne sert que si le PDF n'est pas en cache.
+  // (Le SW n'intercepte pas les HEAD — garde method !== 'GET' — d'où la
+  // lecture directe du Cache Storage depuis la page.)
+  const fromCache = (window.caches && typeof caches.match === 'function')
+    ? caches.match(url, { ignoreSearch: true }).then((hit) => !!hit).catch(() => false)
+    : Promise.resolve(false);
+  return fromCache.then((hit) => {
+    if (hit) return true;
+    return fetch(url, { method: 'HEAD' })
+      .then((r) => !!r && r.ok)
+      .catch(() => false);
+  });
 }
 
 function renderPdfReader(pdfPath) {
@@ -2937,7 +2988,8 @@ let arvPdfState = null;   // état de la visionneuse courante
 let arvPdfSeq = 0;        // anti-course (changement rapide de partie)
 
 function destroyArvPdf() {
-  if (!arvPdfState) return;
+  if (!arvPdfState) { window.__arvPdfLoading = false; return; }
+  window.__arvPdfLoading = false;
   try { if (arvPdfState.observer) arvPdfState.observer.disconnect(); } catch (e) {}
   // ✅ v5.3 — annule tout rendu en vol : un task pdf.js qui survit au
   // démontage repeignait un canvas déjà libéré
@@ -3029,6 +3081,10 @@ function wireArvVvZoom(state) {
 
 function openArvPdf(pdfPath, downloadRef) {
   destroyArvPdf();
+  // ✅ v5.8 — signal « une lecture est en cours » : le préchauffage des
+  // autres parties se met en pause pour laisser toute la bande passante
+  // au PDF que l'élève ouvre.
+  window.__arvPdfLoading = true;
   const token = ++arvPdfSeq;
   arvPdfState = { token, doc: null, pagesMeta: [], wraps: [], canvases: [],
                   rendered: [], rendering: [], renderTasks: [], dirty: [],
@@ -3063,11 +3119,19 @@ function openArvPdf(pdfPath, downloadRef) {
       if (token !== arvPdfSeq) return;
       arvPdfState.doc = doc;
       arvPdfState.pageCount = doc.numPages;
+      // ✅ v5.8 — à ce stade le PDF est ENTIÈREMENT téléchargé et déjà en
+      // cache (la passerelle SW ne résout qu'après cache.put) : on lève le
+      // signal pour que le préchauffage des autres parties puisse démarrer
+      // SANS concurrence sur la bande passante.
+      window.__arvPdfLoading = false;
+      try { window.dispatchEvent(new Event('arvexa-pdf-ready')); } catch (e) {}
       return buildArvPdfPages(doc, token);
     })
     .then(() => { if (token === arvPdfSeq) wireArvPdf(pdfPath); })
     .catch((err) => {
       if (token !== arvPdfSeq) return;
+      window.__arvPdfLoading = false;
+      try { window.dispatchEvent(new Event('arvexa-pdf-ready')); } catch (e) {}
       console.warn('[ARV-PDF] échec :', err);
       showArvPdfError(pdfPath);
     });

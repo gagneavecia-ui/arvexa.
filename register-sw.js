@@ -1,6 +1,6 @@
 // ================================================================
 // REGISTER SERVICE WORKER — ARVEXA School
-// Version : OFFLINE v1.3 — Sans reload brutal + barrière d'installation
+// Version : OFFLINE v1.4 — Toast unique par version + préchargement fluide
 // ================================================================
 
 (function () {
@@ -108,8 +108,18 @@
   }
 
   // ═══ 1b. TOAST « NOUVELLE VERSION » ═══
+  // ✅ v1.4 — affiché UNE SEULE FOIS par version (persisté) : plus aucun
+  // bandeau qui apparaît/disparaît en boucle (cause d'instabilité signalée).
+  // Positionné EN HAUT : il ne se superpose plus à la bannière d'installation
+  // ni aux boutons de navigation du bas.
   function showUpdateToast() {
     if (document.getElementById('arvexaUpdateToast')) return;
+    let version = 'inconnue';
+    try { version = localStorage.getItem('arvexa-sw-version') || 'inconnue'; } catch (e) {}
+    try {
+      if (localStorage.getItem('arvexa-sw-version-toast') === version) return;
+      localStorage.setItem('arvexa-sw-version-toast', version);
+    } catch (e) {}
     try {
       const lang = (localStorage.getItem('arvexa-lang') || 'fr').startsWith('en') ? 'en' : 'fr';
       const pill = document.createElement('div');
@@ -122,7 +132,7 @@
         'position:fixed',
         'left:50%',
         'transform:translateX(-50%)',
-        'bottom:calc(18px + env(safe-area-inset-bottom, 0px))',
+        'top:calc(14px + env(safe-area-inset-top, 0px))',
         'z-index:99999',
         'background:#141412',
         'color:#E0B84A',
@@ -143,8 +153,8 @@
       setTimeout(() => {
         pill.style.opacity = '0';
         setTimeout(() => { try { pill.remove(); } catch (e) {} }, 400);
-      }, 12000);
-      console.log('[SW] Toast nouvelle version affiché');
+      }, 8000);
+      console.log('[SW] Toast nouvelle version affiché (', version, ')');
     } catch (e) {}
   }
 
@@ -196,12 +206,71 @@
     document.head.appendChild(script);
   }
 
+  // ═══ 2c. PRÉCHARGEMENT FLUIDE (v1.4) ═══
+  // Dès que l'élève presse un lien (pointerdown ≈ 100 ms AVANT la navigation),
+  // la page suivante commence à se charger en tâche de fond → la transition
+  // entre les pages devient quasi instantanée, même en 2G. Desktop : survol.
+  function injectPrefetch() {
+    if (window.__arvexaPrefetchInit) return;
+    window.__arvexaPrefetchInit = true;
+
+    let saveData = false;
+    try {
+      const c = navigator.connection;
+      if (c && (c.saveData || c.effectiveType === 'slow-2g')) saveData = true;
+    } catch (e) {}
+    if (saveData) return;
+
+    const seen = new Set();
+    const isPrefetchable = (a) => {
+      try {
+        if (!a || a.target === '_blank' || a.hasAttribute('download')) return false;
+        if (a.hasAttribute('data-no-prefetch')) return false;
+        const href = a.getAttribute('href') || '';
+        if (!href || href.startsWith('#') || href.startsWith('javascript:')) return false;
+        const u = new URL(a.href, location.href);
+        if (u.origin !== location.origin) return false;
+        if (!/\.html?$/i.test(u.pathname) && u.pathname !== '/') return false;
+        if (/admin|logout|conditions|confidentialite/i.test(u.pathname)) return false;
+        return true;
+      } catch (e) { return false; }
+    };
+
+    const prefetch = (a) => {
+      try {
+        const href = a.href;
+        if (seen.has(href)) return;
+        seen.add(href);
+        const link = document.createElement('link');
+        link.rel = 'prefetch';
+        link.href = href;
+        link.as = 'document';
+        document.head.appendChild(link);
+      } catch (e) {}
+    };
+
+    // Mobile : pointerdown (le doigt touche ≈ 80-120 ms avant le tap)
+    document.addEventListener('pointerdown', (e) => {
+      const a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
+      if (isPrefetchable(a)) prefetch(a);
+    }, { capture: true, passive: true });
+
+    // Desktop : survol (120 ms de délai anti-fausse-maneuvre)
+    document.addEventListener('mouseover', (e) => {
+      const a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
+      if (isPrefetchable(a)) {
+        setTimeout(() => { if (a.isConnected && isPrefetchable(a)) prefetch(a); }, 120);
+      }
+    }, { capture: true, passive: true });
+  }
+
   // ═══ 4. LANCEMENT ═══
   function boot() {
     injectOffline();
     injectInstallBanner();
     injectAnalytics();
     injectTour();
+    injectPrefetch();
   }
 
   // ═══ INJECTION DU TUTORIEL ═══

@@ -1,10 +1,23 @@
 // ================================================================
 // REGISTER SERVICE WORKER — ARVEXA School
-// Version : OFFLINE v1.2 — Sans reload brutal
+// Version : OFFLINE v1.3 — Sans reload brutal + barrière d'installation
 // ================================================================
 
 (function () {
   'use strict';
+
+  // ═══ 0. BARRIÈRE D'INSTALLATION PWA (v5.6) — capture TÔT du prompt natif ═══
+  // Chrome émet beforeinstallprompt tôt : on le capture ici (avant tout le
+  // reste) pour que install-banner.js puisse l'utiliser quel que soit son
+  // moment de chargement. preventDefault = on remplace la mini-infobar
+  // Chrome par notre bannière ARVEXA.
+  try {
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      window.__arvexaBIP = e;
+      try { document.dispatchEvent(new CustomEvent('arvexa-bip')); } catch (err) {}
+    });
+  } catch (e) {}
 
   // ═══ 1. ENREGISTREMENT SW ═══
   if ('serviceWorker' in navigator) {
@@ -151,6 +164,24 @@
     document.head.appendChild(script);
   }
 
+  // ═══ 2b. INJECTION barrière d'installation PWA (v5.6) ═══
+  // Affiche « Installe ARVEXA sur ton écran d'accueil » tant que l'app est
+  // consultée dans Chrome ; disparaît uniquement une fois installée.
+  function injectInstallBanner() {
+    if (document.getElementById('arvexaInstallBannerScript')) return;
+
+    const path = window.location.pathname.toLowerCase();
+    const SKIP = ['offline', '404', 'admin'];
+    if (SKIP.some((p) => path.includes(p))) return;
+
+    const script = document.createElement('script');
+    script.id = 'arvexaInstallBannerScript';
+    script.src = 'install-banner.js';
+    script.defer = true;
+    script.onerror = () => console.warn('[InstallBanner] non chargé');
+    document.head.appendChild(script);
+  }
+
   // ═══ 3. INJECTION analytics.js ═══
   function injectAnalytics() {
     if (document.getElementById('arvexaAnalyticsScript')) return;
@@ -168,6 +199,7 @@
   // ═══ 4. LANCEMENT ═══
   function boot() {
     injectOffline();
+    injectInstallBanner();
     injectAnalytics();
     injectTour();
   }

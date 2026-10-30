@@ -1255,8 +1255,8 @@
 
     /* ============================================================
        SPLASH — écran de chargement lié à l'index uniquement.
-       Affiché au 1er chargement de la session ; sur les retours
-       il est retiré du DOM avant la première peinture.
+       ✅ v5.6 — affiché à CHAQUE ouverture (y compris hors ligne) ;
+       le contenu se restaure derrière lui, puis il se dissipe.
        ============================================================ */
     #appSplash {
       position: fixed; inset: 0; z-index: 20000;
@@ -1319,10 +1319,32 @@
     </div>
   </div>
   <script>
-  /* Porte du splash : snapshot de session valide → retour instantané
-     (splash retiré avant peinture) ; sinon → 1er chargement, l'écran
-     d'attente reste visible jusqu'à ce que les données soient prêtes. */
+  /* Porte du splash : snapshot de session valide → retour instantané :
+     le contenu est restauré DERRIÈRE le splash pendant qu'il joue son
+     animation ; sinon → 1er chargement, l'écran d'attente reste visible
+     jusqu'à ce que les données soient prêtes.
+     ✅ v5.6 — ÉCRAN DE CHARGEMENT RÉTABLI : il s'affiche à CHAQUE
+     ouverture (y compris HORS LIGNE) mais ne bloque JAMAIS l'entrée :
+     il se dissipe dès que sa durée minimale est jouée (contenu déjà
+     peint derrière) — plus jamais de suppression avant peinture. */
   (function () {
+    var MIN_SPLASH_MS = 1200; // durée de branding jouée à chaque ouverture
+    /* Helper GLOBAL : dissipe le splash en respectant la durée minimale.
+       Idempotent — appelé par la restauration instantanée, par le module
+       (hideSplash) et par le filet anti-blocage. */
+    window.__arvexaSplashOut = function () {
+      var sp = document.getElementById('appSplash');
+      if (!sp || sp.__arvexaOut) return;
+      sp.__arvexaOut = true;
+      var elapsed = Date.now() - (window.__ARVEXA_SPLASH_TS__ || Date.now());
+      var wait = Math.max(0, MIN_SPLASH_MS - elapsed);
+      setTimeout(function () {
+        var s2 = document.getElementById('appSplash');
+        if (!s2) return;
+        s2.classList.add('hide');
+        setTimeout(function () { if (s2.parentNode) s2.parentNode.removeChild(s2); }, 600);
+      }, wait);
+    };
     var snap = null;
     try {
       var raw = sessionStorage.getItem('arvexa_index_snapshot');
@@ -1352,15 +1374,22 @@
         }
       } catch (e) {}
     }
+    window.__ARVEXA_SPLASH_TS__ = Date.now();
     if (snap) {
       document.documentElement.classList.add('instant');
       window.__ARVEXA_INSTANT__ = snap;
-      var sp = document.getElementById('appSplash');
-      if (sp && sp.parentNode) sp.parentNode.removeChild(sp);
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          var sp = document.getElementById('appSplash');
+          if (sp) sp.classList.add('on');
+        });
+      });
       /* Filet de sécurité : jamais de contenu masqué plus de 600 ms */
-      setTimeout(function () { document.documentElement.classList.add('ready'); }, 600);
+      setTimeout(function () {
+        document.documentElement.classList.add('ready');
+        window.__arvexaSplashOut();
+      }, 600);
     } else {
-      window.__ARVEXA_SPLASH_TS__ = Date.now();
       requestAnimationFrame(function () {
         requestAnimationFrame(function () {
           var sp2 = document.getElementById('appSplash');
@@ -1370,6 +1399,7 @@
     }
   })();
   </script>
+
 
   <!-- ===== BACKGROUND ===== -->
   <div class="gradient-bg"></div>
@@ -1926,6 +1956,8 @@
 
     /* Tout est peint depuis le cache : révéler le contenu */
     document.documentElement.classList.add('ready');
+    /* ✅ v5.6 — contenu prêt derrière le splash : le laisser se dissiper */
+    if (typeof window.__arvexaSplashOut === 'function') window.__arvexaSplashOut();
   };
   window.__arvexaApplyInstant();
   </script>
@@ -2167,6 +2199,13 @@
   }
 
   function hideSplash() {
+    /* ✅ v5.6 — le splash est un écran de chargement à part entière :
+       même durée minimale (branding) sur le 1er chargement comme sur les
+       retours, via le helper global posé par la porte du splash. */
+    if (typeof window.__arvexaSplashOut === 'function') {
+      window.__arvexaSplashOut();
+      return;
+    }
     const sp = document.getElementById('appSplash');
     if (!sp || sp.classList.contains('hide')) return;
     const startedAt = window.__ARVEXA_SPLASH_TS__ || 0;

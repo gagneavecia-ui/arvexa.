@@ -2900,6 +2900,13 @@ function renderPdfReader(pdfPath) {
 }
 
 // ================================================================
+// ✅ v5.5 — ZOOM 100 % STABLE (fini les « coupures » au zoom) :
+// Avant, chaque zoom/pinch/rotation VIDAIT les canvases affichés avant de
+// re-rendre → la page lue disparaissait 1 à 3 s (rendu haute résolution)
+// puis réapparaissait. MAINTENANT (double-buffer) : l'ancien bitmap RESTE
+// AFFICHÉ (étiré en CSS), le nouveau se dessine dans un tampon hors écran,
+// bascule instantanée par drawImage. + anti-rebond zoom (taps rapides
+// fusionnés), file 2 rendus max, plafond 10 Mpx, pages hors écran libérées.
 // ✅ v5.3 — VISIONNEUSE PDF ARVEXA (canvas pdf.js, maison)
 // v5.3 : OUVERTURE < 5 s + FINI LES PAGES BLANCHES (« crash d'images ») :
 // (1) pdf.js préchargé en parallèle de la sonde HEAD ; (2) métrage des pages
@@ -2924,7 +2931,7 @@ function renderPdfReader(pdfPath) {
 const ARV_PDF_ZOOMS = [0.6, 0.8, 1, 1.25, 1.5, 2, 2.5, 3];
 const ARV_PDF_JS = 'assets/pdfjs/pdf.min.js';
 const ARV_PDF_WORKER = 'assets/pdfjs/pdf.worker.min.js';
-const ARV_PDF_MAX_CANVAS_PX = 12 * 1024 * 1024;   // ~12 Mpx (limite iOS safe)
+const ARV_PDF_MAX_CANVAS_PX = 10 * 1024 * 1024;   // ~10 Mpx (v5.5 : marge mémoire — un zoom garde 2 bitmaps par page active)
 const ARV_PDF_MAX_CANVAS_DIM = 4096;              // largeur max par canvas
 let arvPdfState = null;   // état de la visionneuse courante
 let arvPdfSeq = 0;        // anti-course (changement rapide de partie)
@@ -2940,6 +2947,7 @@ function destroyArvPdf() {
     });
   } catch (e) {}
   try { if (arvPdfState.doc) arvPdfState.doc.destroy(); } catch (e) {}
+  try { if (arvPdfState.zoomTimer) clearTimeout(arvPdfState.zoomTimer); } catch (e) {}
   try {
     if (arvPdfState.vvHook && window.visualViewport) {
       window.visualViewport.removeEventListener('resize', arvPdfState.vvHook);
@@ -2964,13 +2972,16 @@ function loadArvPdfJs() {   // pdf.min.js injectés en parallèle
   return arvPdfJsPromise;
 }
 
-// ── Netteté (v5.2) ────────────────────────────────────────────
-// Échelle interne visée = cssScale × max(dpr, 2) × pinch-zoom.
-// Le plancher 2 garantit un texte net même sur les écrans déclarés
-// dpr 1 ; le pinch-zoom (visualViewport.scale) est intégré pour que
-// zoomer avec les doigts ne dégrade jamais la netteté. Garde-fou :
-// le canvas final reste ≤ ~12 Mpx et ≤ 4096 px par côté (au-delà,
-// les navigateurs mobiles brident le canvas EN SILENCE → flou).
+// ── Netteté (v5.2, plafond ajusté v5.5) ──────────────────────
+// Échelle interne visée = cssScale × max(dpr, 2) × pinch-zoom,
+// PLAFONNÉE à 3,5× au total (v5.5) : au-delà, le gain visuel est
+// imperceptible sur les écrans ≤ dpr 3 mais le temps de rendu et la
+// mémoire explosent (c'est ça qui rendait le zoom lent et figeait
+// l'écran). Garde-fous mémoire : canvas ≤ ~10 Mpx et ≤ 4096 px par
+// côté (au-delà, les navigateurs mobiles brident le canvas EN
+// SILENCE → flou).
+const ARV_PDF_MAX_TOTAL_SCALE = 3.5;
+
 function arvVvScale() {
   try {
     const s = (window.visualViewport && window.visualViewport.scale) || 1;
@@ -2981,7 +2992,9 @@ function arvVvScale() {
 function arvPdfDpr(cssScale, pageW, pageH) {
   if (!(cssScale > 0) || !(pageW > 0) || !(pageH > 0)) return 2;
   const base = Math.max(window.devicePixelRatio || 1, 2);
-  const want = cssScale * base * arvVvScale();
+  // ✅ v5.5 — plafond de résolution TOTALE (css × dpr) : rendus de zoom
+  // ~40 % plus rapides et ~40 % plus légers, netteté inchangée à l'écran
+  const want = Math.min(cssScale * base * arvVvScale(), ARV_PDF_MAX_TOTAL_SCALE);
   const maxTotal = Math.sqrt(ARV_PDF_MAX_CANVAS_PX / (pageW * pageH));
   const maxDim = ARV_PDF_MAX_CANVAS_DIM / pageW;
   const s = Math.max(1, Math.min(want, maxTotal, maxDim));
@@ -3003,8 +3016,9 @@ function wireArvVvZoom(state) {
       if (!st || !st.pageCount) return;
       const cur = Math.max(0, (st.currentPage || 1) - 1);
       for (let k = Math.max(0, cur - 1); k <= Math.min(st.pageCount - 1, cur + 1); k++) {
-        // ✅ v5.3 — clearArvPdfCanvas annule le rendu en vol, la file repeint
-        if (st.rendered[k] || st.rendering[k]) clearArvPdfCanvas(st, k);
+        // ✅ v5.5 — pinch SANS coupure : l'ancien bitmap reste affiché
+        // (double-buffer) pendant le re-rendu à la nouvelle résolution
+        if (st.rendered[k] || st.rendering[k]) invalidateArvPdf(st, k, true);
         queueArvPdfRender(k);
       }
     }, 240);
@@ -3017,9 +3031,9 @@ function openArvPdf(pdfPath, downloadRef) {
   destroyArvPdf();
   const token = ++arvPdfSeq;
   arvPdfState = { token, doc: null, pagesMeta: [], wraps: [], canvases: [],
-                  rendered: [], rendering: [], renderTasks: [],
+                  rendered: [], rendering: [], renderTasks: [], dirty: [],
                   queue: [], queued: [], active: 0, visible: new Set(),
-                  zoomIdx: 2, observer: null,
+                  zoomIdx: 2, observer: null, zoomTimer: null,
                   pageCount: 0, path: pdfPath, vvHook: null,
                   tStart: (window.performance && performance.now()) || 0 };
   // défini AVANT toute utilisation (buildArvPdfPages s'en sert)
@@ -3168,30 +3182,47 @@ async function buildArvPdfPages(doc, token) {
   }
 }
 
-// ── ✅ v5.3 — FILE DE RENDU + ANNULATION (anti « pages blanches ») ──
-// Les rafales de scroll ne lancent plus 10 rendus canvas en même temps
-// (la mémoire canvas explose → le navigateur bride/efface les canvases →
-// pages blanches). File avec priorité : la page la plus proche de celle
-// qu'on lit est peinte en premier. MAX 3 rendus simultanés.
-const ARV_PDF_MAX_ACTIVE = 3;
+// ── ✅ v5.5 — FILE DE RENDU + DOUBLE-BUFFER (zoom SANS coupure) ──
+// Avant v5.5, chaque zoom/pinch/rotation VIDAIT les canvases affichés
+// (clearArvPdfCanvas) AVANT de re-rendre → la page lue devenait blanche
+// 1 à 3 s (le temps du rendu haute résolution) puis réapparaissait :
+// les « coupures » signalées par l'utilisateur.
+// DÉSORMAIS : invalidateArvPdf(i, true) garde l'ancien bitmap AFFICHÉ
+// (étiré en CSS pendant un instant) ; le nouveau rendu se prépare dans un
+// tampon hors écran et la bascule ancien→nouveau est instantanée.
+// Seules les pages HORS ÉCRAN sont vidées (libération mémoire).
+// File avec priorité (la page lue d'abord), 2 rendus max en vol.
+const ARV_PDF_MAX_ACTIVE = 2;
 
-function clearArvPdfCanvas(state, i) {
+// Invalide une page pour re-rendu.
+// keepOld=true  → l'ancien bitmap reste affiché (double-buffer, page à l'écran)
+// keepOld=false → canvas libéré immédiatement (page hors écran)
+function invalidateArvPdf(state, i, keepOld) {
   const t = state.renderTasks[i];
   if (t) {
     state.renderTasks[i] = null;
     try { t.cancel(); } catch (e) {}
   }
-  const c = state.canvases[i];
-  c.width = 0; c.height = 0;
-  state.rendered[i] = false;
+  if (keepOld) {
+    state.dirty[i] = true;   // le canvas garde son bitmap visible
+  } else {
+    const c = state.canvases[i];
+    c.width = 0; c.height = 0;
+    state.rendered[i] = false;
+    state.wraps[i].classList.remove('rendered');
+  }
+  // le catch du rendu annulé est idempotent ; on remet déjà le drapeau ici
+  // pour que la file puisse relancer un rendu immédiatement
   state.rendering[i] = false;
-  state.wraps[i].classList.remove('rendered');
 }
+
+function clearArvPdfCanvas(state, i) { invalidateArvPdf(state, i, false); }
 
 function queueArvPdfRender(i) {
   const state = arvPdfState;
   if (!state || !state.doc) return;
-  if (state.rendered[i] || state.rendering[i] || state.queued[i]) return;
+  if (state.queued[i] || state.rendering[i]) return;
+  if (state.rendered[i] && !state.dirty[i]) return;
   state.queued[i] = true;
   state.queue.push(i);
   pumpArvPdfQueue();
@@ -3209,7 +3240,7 @@ function pumpArvPdfQueue() {
     }
     const i = state.queue.splice(best, 1)[0];
     state.queued[i] = false;
-    if (state.rendered[i] || state.rendering[i]) continue;
+    if (state.rendering[i] || (state.rendered[i] && !state.dirty[i])) continue;
     state.active++;
     Promise.resolve(renderArvPdfPage(i))
       .catch(() => {})
@@ -3218,6 +3249,36 @@ function pumpArvPdfQueue() {
         pumpArvPdfQueue();
       });
   }
+}
+
+// ✅ v5.5 — recadrage COMMUN (zoom, rotation, scrollbar) SANS vider les
+// pages affichées : pages à l'écran (±40 % de marge) → double-buffer,
+// pages hors écran → libérées (mémoire). Priorité de file : page lue.
+function resizeArvPdfPages(state) {
+  const vh = window.innerHeight || 800;
+  const z = state.zoomFactor();
+  const onscreen = new Array(state.pageCount);
+  for (let i = 0; i < state.pageCount; i++) {
+    const r = state.wraps[i].getBoundingClientRect();
+    onscreen[i] = r.bottom > -vh * 0.4 && r.top < vh * 1.4;
+  }
+  for (let i = 0; i < state.pageCount; i++) {
+    const meta = state.pagesMeta[i];
+    const cssW = Math.round(state.containerW * z);
+    const cssH = Math.round(cssW * (meta.h / meta.w));
+    state.wraps[i].style.width = cssW + 'px';
+    state.wraps[i].style.height = cssH + 'px';
+    if (state.rendered[i] || state.rendering[i]) {
+      // ✅ v5.5 — à l'écran : l'ancien bitmap RESTE affiché (aucune coupure)
+      invalidateArvPdf(state, i, onscreen[i]);
+    }
+  }
+  // re-rendu : toutes les pages visibles (observer ±160 %) + courante +
+  // suivante ; la priorité de file peint d'abord la page en cours de lecture
+  state.visible.forEach((i) => queueArvPdfRender(i));
+  const cur = Math.max(0, (state.currentPage || 1) - 1);
+  queueArvPdfRender(cur);
+  queueArvPdfRender(Math.min(state.pageCount - 1, cur + 1));
 }
 
 // Recadre toutes les pages sur la largeur réelle du conteneur.
@@ -3230,56 +3291,75 @@ function syncArvPdfWidth() {
   const w = Math.max(240, vp.clientWidth);
   if (Math.abs(w - state.containerW) <= 2) return false;
   state.containerW = w;
-  const z = state.zoomFactor();
-  for (let i = 0; i < state.pageCount; i++) {
-    const meta = state.pagesMeta[i];
-    const cssW = Math.round(w * z);
-    const cssH = Math.round(cssW * (meta.h / meta.w));
-    state.wraps[i].style.width = cssW + 'px';
-    state.wraps[i].style.height = cssH + 'px';
-    if (state.rendered[i] || state.rendering[i]) {
-      // ✅ v5.3 — clearArvPdfCanvas annule le rendu en vol (avant : le rendu
-      // se terminait sur un canvas vidé et la page restait blanche)
-      clearArvPdfCanvas(state, i);
-    }
-  }
-  // ✅ v5.3 — re-rend TOUTES les pages visibles (avant : cur et cur+1
-  // seulement → les autres pages à l'écran restaient blanches)
-  state.visible.forEach((i) => queueArvPdfRender(i));
-  const cur = Math.max(0, (state.currentPage || 1) - 1);
-  queueArvPdfRender(cur);
-  queueArvPdfRender(Math.min(state.pageCount - 1, cur + 1));
+  resizeArvPdfPages(state);
   return true;
 }
 
 function renderArvPdfPage(i) {
   const state = arvPdfState;
-  if (!state || !state.doc || state.rendered[i] || state.rendering[i]) return Promise.resolve();
+  if (!state || !state.doc || state.rendering[i]) return Promise.resolve();
+  if (state.rendered[i] && !state.dirty[i]) return Promise.resolve();
   state.rendering[i] = true;
+  state.dirty[i] = false;
   const token = state.token;
   const canvas = state.canvases[i];
+  const meta = state.pagesMeta[i];
+  const cssW = Math.round(state.containerW * state.zoomFactor());
+  const cssH = Math.round(cssW * (meta.h / meta.w));
+  // ✅ v5.5 — DOUBLE-BUFFER : si la page affiche déjà un bitmap, il reste
+  // VISIBLE (étiré à la nouvelle taille CSS) pendant tout le re-rendu ;
+  // le nouveau se dessine dans un tampon hors écran. Aucune coupure blanche,
+  // la bascule ancien→nouveau est un simple drawImage (< 30 ms).
+  const hasOld = !!(state.rendered[i] || canvas.width > 0);
+  canvas.style.width = cssW + 'px';
+  canvas.style.height = cssH + 'px';
+  const target = hasOld ? document.createElement('canvas') : canvas;
+  let myTask = null;
   return state.doc.getPage(i + 1).then((page) => {
     if (token !== arvPdfSeq) return;
-    const meta = state.pagesMeta[i];
-    const cssW = state.containerW * state.zoomFactor();
     const cssScale = cssW / meta.w;
     const dpr = arvPdfDpr(cssScale, meta.w, meta.h);
     const viewport = page.getViewport({ scale: cssScale * dpr });
-    canvas.width = Math.floor(viewport.width);
-    canvas.height = Math.floor(viewport.height);
-    canvas.style.width = Math.round(cssW) + 'px';
-    canvas.style.height = Math.round(cssW * (meta.h / meta.w)) + 'px';
-    const ctx = canvas.getContext('2d', { alpha: false });
+    // ✅ v5.5 — le plafond 3,5× est déjà atteint et le bitmap affiché a la
+    // MÊME résolution que la cible (ex. zoom 150→200 % sur écran dpr 3) :
+    // seul la taille CSS a changé (déjà appliquée) → AUCUN re-rendu, zéro
+    // CPU/GPU, le zoom est instantané. Avant, on re-rendait quand même
+    // 6-10 Mpx pour produire EXACTEMENT le même bitmap.
+    if (hasOld && canvas.width === Math.floor(viewport.width) &&
+        canvas.height === Math.floor(viewport.height)) {
+      state.rendered[i] = true;
+      state.rendering[i] = false;
+      state.wraps[i].classList.add('rendered');
+      return;
+    }
+    target.width = Math.floor(viewport.width);
+    target.height = Math.floor(viewport.height);
+    const ctx = target.getContext('2d', { alpha: false });
     const task = page.render({ canvasContext: ctx, viewport });
+    myTask = task;
     state.renderTasks[i] = task;
     return task.promise.then(() => {
+      // un rendu plus récent a pris le relais (zoom rapide) : on s'efface
+      if (state.renderTasks[i] !== myTask) return;
       state.renderTasks[i] = null;
-      if (token !== arvPdfSeq) return;
-      // ✅ v5.3 — le canvas a pu être vidé entre-temps (resync, zoom,
-      // nettoyage) : on ne marque PAS la page comme rendue, la file la
-      // repeindra. Avant, la page restait blanche avec son placeholder
-      // masqué → « crash d'images ».
-      if (!canvas.width) { state.rendering[i] = false; return; }
+      if (token !== arvPdfSeq) {
+        if (hasOld) { target.width = 0; target.height = 0; }
+        return;
+      }
+      // ✅ v5.3 — le canvas visible a été vidé entre-temps (nettoyage hors
+      // écran) : on abandonne le tampon, la file repeindra la page.
+      if (!canvas.width) {
+        if (hasOld) { target.width = 0; target.height = 0; }
+        state.rendering[i] = false;
+        return;
+      }
+      // ✅ v5.5 — bascule instantanée ancien → nouveau bitmap
+      if (hasOld) {
+        canvas.width = target.width;
+        canvas.height = target.height;
+        canvas.getContext('2d', { alpha: false }).drawImage(target, 0, 0);
+        target.width = 0; target.height = 0;   // tampon libéré immédiatement
+      }
       state.rendered[i] = true;
       state.rendering[i] = false;
       state.wraps[i].classList.add('rendered');
@@ -3291,10 +3371,11 @@ function renderArvPdfPage(i) {
       }
     });
   }).catch((err) => {
-    if (state.renderTasks) state.renderTasks[i] = null;
-    if (state) state.rendering[i] = false;
+    if (myTask && state.renderTasks[i] === myTask) state.renderTasks[i] = null;
+    if (!state.renderTasks[i] && state.rendering[i]) state.rendering[i] = false;
     // ✅ v5.3 — annulation volontaire (clear/canvas 0) : silencieux
     if (err && (err.name === 'RenderingCancelledException' || /cancel/i.test(String(err.message || '')))) return;
+    console.warn('[ARV-PDF] rendu page', i + 1, err);
   });
 }
 
@@ -3313,28 +3394,27 @@ function scheduleArvPdfCleanup(idx) {
   }, 400);
 }
 
+// ✅ v5.5 — ZOOM SANS COUPURE : plus aucun clear des pages affichées.
+// L'ancien bitmap reste visible (étiré en CSS) pendant le re-rendu en
+// double-buffer ; bascule instantanée dès que la nouvelle résolution est
+// prête. Anti-rebond : des taps rapides sur zoom +/− fusionnent en UN
+// re-rendu (avant : 1 re-rendu complet par tap → écran figé).
 function rerenderArvPdf() {
   const state = arvPdfState;
   if (!state) return;
   const viewport = document.getElementById('arvPdfViewport');
   if (viewport) state.containerW = Math.max(240, viewport.clientWidth);
-  const z = state.zoomFactor();
-  for (let i = 0; i < state.pageCount; i++) {
-    const meta = state.pagesMeta[i];
-    const cssW = Math.round(state.containerW * z);
-    const cssH = Math.round(cssW * (meta.h / meta.w));
-    state.wraps[i].style.width = cssW + 'px';
-    state.wraps[i].style.height = cssH + 'px';
-    if (state.rendered[i] || state.rendering[i]) {
-      // ✅ v5.3 — annulation du rendu en vol + re-rendu des visibles
-      clearArvPdfCanvas(state, i);
-    }
-  }
-  state.visible.forEach((i) => queueArvPdfRender(i));
-  const cur = Math.max(0, (state.currentPage || 1) - 1);
-  queueArvPdfRender(cur);
-  queueArvPdfRender(Math.min(state.pageCount - 1, cur + 1));
+  resizeArvPdfPages(state);
   updateArvPdfZoomLabel();
+}
+
+function scheduleArvZoomRerender() {
+  const state = arvPdfState;
+  if (!state) return;
+  clearTimeout(state.zoomTimer);
+  state.zoomTimer = setTimeout(() => {
+    if (arvPdfState) { arvPdfState.zoomTimer = null; rerenderArvPdf(); }
+  }, 160);
 }
 
 // suivi continu du conteneur (rotation, barres latérales, split-screen)
@@ -3393,10 +3473,18 @@ function wireArvPdf(pdfPath) {
   on('arvPdfPrev', () => scrollToArvPdfPage(Math.max(0, (state.currentPage || 1) - 2)));
   on('arvPdfNext', () => scrollToArvPdfPage(Math.min(state.pageCount - 1, (state.currentPage || 1))));
   on('arvPdfZoomIn', () => {
-    if (state.zoomIdx < ARV_PDF_ZOOMS.length - 1) { state.zoomIdx++; rerenderArvPdf(); }
+    if (state.zoomIdx < ARV_PDF_ZOOMS.length - 1) {
+      state.zoomIdx++;
+      updateArvPdfZoomLabel();     // retour visuel immédiat
+      scheduleArvZoomRerender();   // ✅ v5.5 — fusion des taps rapides
+    }
   });
   on('arvPdfZoomOut', () => {
-    if (state.zoomIdx > 0) { state.zoomIdx--; rerenderArvPdf(); }
+    if (state.zoomIdx > 0) {
+      state.zoomIdx--;
+      updateArvPdfZoomLabel();
+      scheduleArvZoomRerender();
+    }
   });
 
   if (!state.scrollHook) {

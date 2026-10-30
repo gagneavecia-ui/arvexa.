@@ -2820,11 +2820,20 @@ function toLocalPdfPath(htmlPath) {
 
 function probeLocalPdf(url) {
   // HEAD léger : détection sans télécharger le PDF.
-  // Hors ligne, le SW retrouve l'entrée en cache par URL (méthode ignorée)
-  // → un PDF déjà consulté reste détecté comme disponible.
+  // ✅ v5.4 — le SW n'intercepte PAS les HEAD (garde method !== 'GET') :
+  // hors ligne la sonde réseau échoue, on interroge alors DIRECTEMENT le
+  // Cache Storage depuis la page — un PDF téléchargé pour hors ligne
+  // (offline.js) ou déjà consulté est retrouvé → le lecteur PDF s'ouvre.
   return fetch(url, { method: 'HEAD' })
     .then((r) => !!r && r.ok)
-    .catch(() => false);
+    .catch(() => false)
+    .then((ok) => {
+      if (ok) return true;
+      if (!window.caches || typeof caches.match !== 'function') return false;
+      return caches.match(url, { ignoreSearch: true })
+        .then((hit) => !!hit)
+        .catch(() => false);
+    });
 }
 
 function renderPdfReader(pdfPath) {

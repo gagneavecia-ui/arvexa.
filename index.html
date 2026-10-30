@@ -1355,6 +1355,11 @@
         if (parsed && parsed.userData && parsed.uid === sess.uid &&
             (Date.now() - (parsed.savedAt || 0)) < 43200000) {
           snap = parsed;
+          /* ✅ v5.9 — origine de la snapshot : « session » = retour dans la
+             MÊME session (sessionStorage). Seul ce cas peut réafficher la
+             pastille « mise à jour en arrière-plan » — plus jamais un simple
+             rafraîchissement (F5), qui réutilise aussi sessionStorage. */
+          snap.__src = 'session';
         }
       }
     } catch (e) {}
@@ -1371,6 +1376,9 @@
           if (parsedLs && parsedLs.userData && parsedLs.uid === sessLs.uid &&
               (Date.now() - (parsedLs.savedAt || 0)) < 43200000) {
             snap = parsedLs;
+            /* ✅ v5.9 — « persist » = démarrage à froid (app fermée puis
+               rouverte) : affichage instantané OUI, pastille NON. */
+            snap.__src = 'persist';
           }
         }
       } catch (e) {}
@@ -1982,7 +1990,7 @@
       try { sess = JSON.parse(localStorage.getItem('arvexa_session') || 'null'); } catch (e) {}
       try { data = JSON.parse(localStorage.getItem('arvexa_user_data') || 'null'); } catch (e) {}
       if (sess && sess.uid && data && (!data._uid || data._uid === sess.uid)) {
-        window.__ARVEXA_INSTANT__ = { uid: sess.uid, userData: data, notifUnread: false, savedAt: Date.now() };
+        window.__ARVEXA_INSTANT__ = { uid: sess.uid, userData: data, notifUnread: false, savedAt: Date.now(), __src: 'persist' }; /* ✅ v5.9 */
         if (typeof window.__arvexaApplyInstant === 'function') window.__arvexaApplyInstant();
         if (sp.parentNode) sp.parentNode.removeChild(sp);
         document.documentElement.classList.add('instant');
@@ -3482,7 +3490,22 @@
     renderProgress();
 
     // Retour instantané : signal discret « mise à jour en arrière-plan »
-    if (instant) showSyncPill();
+    // ✅ v5.9 — PLUS JAMAIS À CHAQUE RAFRAÎCHISSEMENT. La snapshot miroir
+    // localStorage (v5.4) rendait __ARVEXA_INSTANT__ vrai à CHAQUE
+    // chargement → la pastille s'affichait à chaque F5 et à chaque
+    // ouverture de l'app, comme si l'app se mettait à jour sans fin.
+    // Désormais elle n'apparaît QUE sur un vrai retour dans la même
+    // session (lien interne vers l'accueil) : origine « session » ET
+    // navigation de type « navigate » (pas reload, pas back_forward,
+    // pas démarrage à froid). Firestore actualise toujours en silence.
+    if (instant && window.__ARVEXA_INSTANT__ && window.__ARVEXA_INSTANT__.__src === 'session') {
+      let navType = 'navigate';
+      try {
+        const navEntries = performance.getEntriesByType && performance.getEntriesByType('navigation');
+        if (navEntries && navEntries[0] && navEntries[0].type) navType = navEntries[0].type;
+      } catch (e) {}
+      if (navType === 'navigate') showSyncPill();
+    }
 
     setupFcmForeground();
     installFcmRecurring();

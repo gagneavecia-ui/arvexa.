@@ -183,6 +183,18 @@
         '404.html'
       ];
 
+      // ✅ v5.4 — assets du LECTEUR : sans eux, la lecture hors ligne d'un
+      // PDF fraîchement téléchargé échoue si le lecteur n'a jamais encore
+      // été ouvert en ligne (pdf.js n'est plus précaché à l'install depuis v5.3).
+      const readerAssets = [
+        'assets/pdfjs/pdf.min.js',
+        'assets/pdfjs/pdf.worker.min.js',
+        'katex-utils.js',
+        'katex/katex.min.css',
+        'katex/katex.min.js',
+        'katex/contrib/auto-render.min.js'
+      ];
+
       // ═══ ÉTAPE 2 : contenu des cours via JSON ═══
       const subjectFiles = [
         'cours/mathematiques.json',
@@ -217,11 +229,20 @@
         }
       }
 
+      // ✅ v5.4 — le lecteur affiche les parties de cours en PDF : dériver
+      // le jumeau .pdf de chaque fichier .html de cours (même chemin).
+      // Les éventuels 404 (parties sans PDF) sont éliminés par la
+      // vérification HEAD ci-dessous — aucune erreur visible pour l'élève.
+      Array.from(candidateFiles).forEach((f) => {
+        if (/^cours\/.+\.html$/i.test(f)) candidateFiles.add(f.replace(/\.html$/i, '.pdf'));
+      });
+
       // ═══ ÉTAPE 3 : vérifier ce qui existe ═══
       showToast('🔍 Vérification des fichiers...', 'info');
 
       const allCandidates = [
         ...appPages,
+        ...readerAssets,
         ...Array.from(candidateFiles)
       ];
 
@@ -261,10 +282,11 @@
         if (data.type === 'DOWNLOAD_PROGRESS') {
           updateDownloadProgress(data);
         } else if (data.type === 'DOWNLOAD_COMPLETE') {
+          // ✅ v5.4 — le nombre d'échecs réel est transmis (avant : forcé à 0)
           completeDownload({
             done: data.done,
-            failed: 0,
-            total: data.done
+            failed: data.failed || 0,
+            total: data.total || data.done
           });
         } else if (data.type === 'DOWNLOAD_ERROR') {
           // ✅ C2 — gestion de l'erreur SW (offline ou autre)
@@ -346,12 +368,18 @@
     const close = document.getElementById('arvexaDlClose');
 
     if (info) {
-      info.innerHTML = `✅ <strong>${data.done}</strong> fichier${data.done > 1 ? 's' : ''} prêt${data.done > 1 ? 's' : ''} hors ligne`;
+      const warn = data.failed > 0
+        ? `<br>⚠️ ${data.failed} fichier${data.failed > 1 ? 's' : ''} en échec — réessaie plus tard`
+        : '';
+      info.innerHTML = `✅ <strong>${data.done}</strong> fichier${data.done > 1 ? 's' : ''} prêt${data.done > 1 ? 's' : ''} hors ligne${warn}`;
     }
 
     if (close) close.style.display = 'block';
 
-    showToast(`✅ ${data.done} fichier${data.done > 1 ? 's' : ''} prêt${data.done > 1 ? 's' : ''} pour hors ligne`, 'success');
+    showToast(data.failed > 0
+      ? `✅ ${data.done} fichiers prêts · ⚠️ ${data.failed} en échec`
+      : `✅ ${data.done} fichier${data.done > 1 ? 's' : ''} prêt${data.done > 1 ? 's' : ''} pour hors ligne`,
+      data.failed > 0 ? 'info' : 'success');
 
     setTimeout(() => closeDownloadModal(), 2500);
   }

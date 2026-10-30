@@ -1335,6 +1335,23 @@
         }
       }
     } catch (e) {}
+    /* ✅ v5.4 — repli localStorage : au démarrage à froid (app fermée puis
+       rouverte, sessionStorage vidé), la dernière snapshot PERSISTÉE rend
+       l'accueil immédiatement — y compris hors ligne. L'uid est re-vérifié
+       contre la session locale pour ne jamais peindre le mauvais élève. */
+    if (!snap) {
+      try {
+        var rawLs = localStorage.getItem('arvexa_index_snapshot_persist');
+        var sessLs = JSON.parse(localStorage.getItem('arvexa_session') || 'null');
+        if (rawLs && sessLs && sessLs.uid) {
+          var parsedLs = JSON.parse(rawLs);
+          if (parsedLs && parsedLs.userData && parsedLs.uid === sessLs.uid &&
+              (Date.now() - (parsedLs.savedAt || 0)) < 43200000) {
+            snap = parsedLs;
+          }
+        }
+      } catch (e) {}
+    }
     if (snap) {
       document.documentElement.classList.add('instant');
       window.__ARVEXA_INSTANT__ = snap;
@@ -1694,7 +1711,7 @@
   /* RESTAURATION INSTANTE — réapplique la snapshot de session sur le DOM
      avant même le chargement des modules Firebase (CDN). Le module
      re-validera ensuite discrètement via Firestore (onSnapshot). */
-  (function () {
+  window.__arvexaApplyInstant = function () {
     var snap = window.__ARVEXA_INSTANT__;
     if (!snap || !snap.userData) return;
     var d = snap.userData;
@@ -1908,7 +1925,51 @@
     } catch (e) {}
 
     /* Tout est peint depuis le cache : révéler le contenu */
-    document.documentElement.classList.add('ready');
+    document.documentElement.classList.add('ready');
+  };
+  window.__arvexaApplyInstant();
+  </script>
+
+  <script>
+  /* ================================================================
+     ✅ v5.4 — FILET ANTI-SPLASH INFINI : le « chargement du tout début »
+     ne peut plus rester bloqué. Si le module principal n'a pas démarré
+     (window.__ARVEXA_BOOTED__ absent = imports Firebase inaccessibles :
+     hors ligne avant la mise en cache du SDK, ou réseau très lent),
+     après 7 s le splash laisse place au contenu en cache (peinture
+     optimiste depuis localStorage) ou à un panneau « Réessayer » honnête.
+     Si le module finit par charger, il prend la main normalement.
+     ================================================================ */
+  (function () {
+    setTimeout(function () {
+      if (window.__ARVEXA_BOOTED__) return;
+      var sp = document.getElementById('appSplash');
+      if (!sp) return; /* déjà retiré par la porte instantanée */
+      var sess = null, data = null;
+      try { sess = JSON.parse(localStorage.getItem('arvexa_session') || 'null'); } catch (e) {}
+      try { data = JSON.parse(localStorage.getItem('arvexa_user_data') || 'null'); } catch (e) {}
+      if (sess && sess.uid && data && (!data._uid || data._uid === sess.uid)) {
+        window.__ARVEXA_INSTANT__ = { uid: sess.uid, userData: data, notifUnread: false, savedAt: Date.now() };
+        if (typeof window.__arvexaApplyInstant === 'function') window.__arvexaApplyInstant();
+        if (sp.parentNode) sp.parentNode.removeChild(sp);
+        document.documentElement.classList.add('instant');
+        requestAnimationFrame(function () { document.documentElement.classList.add('ready'); });
+      } else {
+        var offline = !navigator.onLine;
+        sp.innerHTML = '<div class="splash-inner">' +
+          '<span style="font-size:40px">' + (offline ? '📶' : '⏳') + '</span>' +
+          '<div class="splash-word">' + (offline ? 'Mode hors ligne' : 'Connexion lente') + '</div>' +
+          '<div style="font-size:13px;color:rgba(245,240,232,.75);max-width:300px;text-align:center;line-height:1.6">' +
+          (offline
+            ? "Ta connexion est coupée. Si tu as déjà utilisé ARVEXA avec Internet, réessaie dans quelques secondes — le contenu revient dès que le réseau s'affiche."
+            : "Le chargement prend plus de temps que prévu. Tu peux attendre encore un peu ou réessayer.") +
+          '</div>' +
+          '<button id="arvexaSplashRetry" style="margin-top:6px;padding:10px 26px;border-radius:999px;border:none;background:linear-gradient(135deg,#E0B84A,#B8860B);color:#0A0A0A;font-family:Inter,sans-serif;font-size:13px;font-weight:700;cursor:pointer">Réessayer</button>' +
+          '</div>';
+        var rb = document.getElementById('arvexaSplashRetry');
+        if (rb) rb.addEventListener('click', function () { window.location.reload(); });
+      }
+    }, 7000);
   })();
   </script>
 
@@ -1926,6 +1987,10 @@
   }
   </script>
     <script type="module">
+  // ✅ v5.4 — drapeau posé DÈS QUE le module s'exécute (donc après la
+  // réussite de TOUS ses imports) : le filet anti-splash infini vérifie
+  // ce drapeau pour savoir si l'app a réellement démarré.
+  window.__ARVEXA_BOOTED__ = true;
   // ================================================================
   // INDEX — Version refondue (progression prioritaire, action intelligente)
   // Corrections conservées de la version précédente + ajouts :
@@ -2026,6 +2091,7 @@
       localStorage.removeItem(SESSION_KEY);
       localStorage.removeItem(USER_DATA_KEY);
       localStorage.removeItem(LAST_UID_KEY);
+      localStorage.removeItem('arvexa_index_snapshot_persist'); /* ✅ v5.4 */
       sessionStorage.removeItem(SESSION_KEY);
       sessionStorage.removeItem('redirectAfterLogin');
       sessionStorage.removeItem(INDEX_SNAPSHOT_KEY);
@@ -2086,13 +2152,17 @@
   function saveIndexSnapshot() {
     try {
       if (!currentUid || !userData) return;
-      sessionStorage.setItem(INDEX_SNAPSHOT_KEY, JSON.stringify({
+      const payload = JSON.stringify({
         uid: currentUid,
         userData: userData,
         notifUnread: lastNotifUnread,
         sub: readSubStateFromDOM(),
         savedAt: Date.now()
-      }));
+      });
+      sessionStorage.setItem(INDEX_SNAPSHOT_KEY, payload);
+      // ✅ v5.4 — miroir localStorage : survit à la fermeture de l'app
+      // (sessionStorage est vidé) → démarrage à froid hors ligne instantané
+      try { localStorage.setItem('arvexa_index_snapshot_persist', payload); } catch (e) {}
     } catch (e) {}
   }
 
@@ -3311,6 +3381,23 @@
         authGraceTimer = setTimeout(() => {
           authGraceTimer = null;
           if (auth.currentUser) return;
+          // ✅ v5.4 — Hors ligne + session locale : on ne détruit RIEN et on
+          // ne jette pas l'élève dehors. Firebase peut mettre > 1,2 s à
+          // restaurer la session depuis IndexedDB (2G, appareil modeste) ;
+          // en attendant, l'accueil s'affiche depuis le cache local. Au
+          // retour du réseau, onAuthStateChanged tranche proprement
+          // (user → tableau de bord, null → déconnexion).
+          if (!navigator.onLine) {
+            let offUid = null;
+            try { offUid = (JSON.parse(localStorage.getItem('arvexa_session') || 'null') || {}).uid || null; } catch (e) {}
+            if (offUid) {
+              const cachedOffline = getCachedUserData(offUid);
+              isAuthResolved = true;
+              if (cachedOffline) { userData = cachedOffline; renderUserData(cachedOffline); }
+              showDashboard();
+              return;
+            }
+          }
           if (authUnsubscribe) { try { authUnsubscribe(); } catch (e) {} authUnsubscribe = null; }
           isAuthResolved = true;
           currentUid = null;

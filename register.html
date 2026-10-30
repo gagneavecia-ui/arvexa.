@@ -1623,6 +1623,14 @@ try {
           lastActive: Date.now()
         }));
         localStorage.setItem('arvexa_last_uid', user.uid);
+        } catch (e) {}
+
+      // ✅ v6.3 — signal « nouvelle inscription » : la première page ARVEXA
+      // (onboarding ou accueil) proposera le téléchargement hors ligne en
+      // ARRIÈRE-PLAN (pop-up montré une seule fois, navigation libre).
+      try {
+        localStorage.setItem('arvexa_new_registration', '1');
+        localStorage.removeItem('arvexa_bgdl_choice');
       } catch (e) {}
 
       // 4. Nettoyer le draft

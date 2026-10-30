@@ -1,6 +1,22 @@
 // ================================================================
 // OFFLINE.JS — ARVEXA School
-// Version : v6.2 — Offline instantané + téléchargement annulable
+// Version : v6.3 — Pop-up post-inscription + téléchargement EN ARRIÈRE-PLAN
+// Nouveautés v6.3 (consigne du propriétaire : « après inscription, un pop-up
+//  propose de télécharger toutes les données en arrière-plan — il peut
+//  naviguer tranquillement pendant que les données se téléchargent ») :
+//  - Pop-up « Bienvenue sur ARVEXA » posé après INSCRIPTION (flag
+//    arvexa_new_registration écrit par register.html) : bouton
+//    « Télécharger en arrière-plan » ou « Plus tard », montré UNE SEULE
+//    FOIS (choix persisté dans arvexa_bgdl_choice).
+//  - Mode ARRIÈRE-PLAN : pastille compacte (barre de progression, %,
+//    ✕ annuler) qui ne bloque PAS la navigation. Le job vit dans le
+//    Service Worker et SURVIT aux changements de page : la pastille se
+//    rattache sur la page suivante (DOWNLOAD_STATUS) et l'état
+//    « prêt hors ligne » est posé même si la page d'origine a fermé.
+//  - offline.js est désormais inclus sur onboarding/index/profil (il
+//    n'était inclus NULLE PART : le bouton « Télécharger tout hors ligne »
+//    du profil affichait toujours « module non chargé » — bug réparé).
+// v6.2 — Offline instantané + téléchargement annulable
 // Nouveautés v6.2 :
 //  - Affichage INSTANTANÉ : les fichiers déjà en cache sont détectés sans
 //    réseau (CHECK_CACHED) et jamais retéléchargés — 2e visite = quelques
@@ -33,6 +49,13 @@
   let bannerEl = null;
   let modalEl = null;
   let downloadCancelled = false;
+
+  // ✅ v6.3 — téléchargement EN ARRIÈRE-PLAN + pop-up post-inscription
+  let downloadMode = 'modal';   // 'modal' (bouton profil) | 'bg' (arrière-plan)
+  let bgPillEl = null;          // pastille compacte non bloquante
+  let bgPollTimer = null;       // polling DOWNLOAD_STATUS (re-rattachement)
+  const NEWREG_KEY = 'arvexa_new_registration';
+  const BGDL_CHOICE_KEY = 'arvexa_bgdl_choice';
 
   // ═══ ÉTAT « CONTENU PRÊT HORS LIGNE » ═══
   function markOfflineReady(stats) {
@@ -223,8 +246,13 @@
   // ═══════════════════════════════════════════════════════════════
   // TÉLÉCHARGEMENT COMPLET (appli + cours)
   // ═══════════════════════════════════════════════════════════════
-  async function downloadAllForOffline() {
+  async function downloadAllForOffline(backgroundMode) {
     downloadCancelled = false;
+
+    // ✅ v6.3 — même pipeline de fichiers, deux affichages : modale
+    // bloquante (bouton du profil) ou pastille d'arrière-plan (pop-up
+    // post-inscription — l'élève navigue pendant le téléchargement).
+    downloadMode = backgroundMode ? 'bg' : 'modal';
 
     if (!isOnline) {
       showToast('📶 Connecte-toi pour télécharger', 'error');
@@ -413,7 +441,7 @@
       // la liste des cours ne s'affiche pas hors ligne).
       const allFiles = [...pendingJson, ...existingFiles];
 
-      openDownloadModal(alreadyCached.size + allFiles.length, alreadyCached.size);
+      openDownloadUI(alreadyCached.size + allFiles.length, alreadyCached.size);
 
       const channel = new MessageChannel();
       channel.port1.onmessage = (event) => {
@@ -435,6 +463,7 @@
           // ✅ C2 — gestion de l'erreur SW (offline ou autre)
           showToast(data.message || 'Erreur de téléchargement', 'error');
           closeDownloadModal();
+          hideBgPill();
         }
       };
 
@@ -513,7 +542,8 @@
     const btn = document.getElementById('arvexaDlCancel');
     if (btn) {
       btn.disabled = true;
-      btn.textContent = 'Annulation...';
+      // ✅ v6.3 — la pastille a un bouton ROND : pas de texte long dedans
+      if (downloadMode !== 'bg') btn.textContent = 'Annulation...';
     }
     const info = document.getElementById('arvexaDlInfo');
     if (info) info.textContent = 'Annulation du téléchargement...';
@@ -531,6 +561,7 @@
       'info'
     );
     closeDownloadModal();
+    hideBgPill();
   }
 
   function updateDownloadProgress(data) {
@@ -586,6 +617,9 @@
     }
 
     setTimeout(() => closeDownloadModal(), 2500);
+
+    // ✅ v6.3 — en mode arrière-plan : la pastille se ferme toute seule
+    if (downloadMode === 'bg') setTimeout(hideBgPill, 2600);
   }
 
   function closeDownloadModal() {
@@ -598,6 +632,194 @@
         }
       }, 300);
     }
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // ✅ v6.3 — TÉLÉCHARGEMENT EN ARRIÈRE-PLAN
+  // La pastille ne bloque RIEN : l'élève navigue, le job vit dans le SW,
+  // la pastille se rattache sur chaque page qui inclut offline.js.
+  // ═══════════════════════════════════════════════════════════════
+  function openDownloadUI(total, alreadyCached) {
+    if (downloadMode === 'bg') openBgPill(total, alreadyCached);
+    else openDownloadModal(total, alreadyCached);
+  }
+
+  function openBgPill(total, alreadyCached) {
+    if (bgPillEl) return;
+
+    bgPillEl = document.createElement('div');
+    bgPillEl.className = 'arvexa-bg-pill';
+    bgPillEl.id = 'arvexaBgPill';
+    bgPillEl.innerHTML = [
+      '<span class="arvexa-bg-pill-ico" style="flex:none">📥</span>',
+      '<span class="arvexa-bg-pill-bar"><span class="arvexa-bg-pill-fill" id="arvexaDlFill"></span></span>',
+      '<span id="arvexaDlPercent" style="flex:none;">0%</span>',
+      '<span id="arvexaDlInfo">en arrière-plan…</span>',
+      '<button class="arvexa-bg-pill-cancel" id="arvexaDlCancel" type="button" title="Annuler le téléchargement" aria-label="Annuler le téléchargement">✕</button>'
+    ].join('');
+    document.body.appendChild(bgPillEl);
+
+    const cancelBtn = document.getElementById('arvexaDlCancel');
+    if (cancelBtn) cancelBtn.addEventListener('click', cancelDownload);
+  }
+
+  function hideBgPill() {
+    if (!bgPillEl) return;
+    const el = bgPillEl;
+    bgPillEl = null;
+    el.style.opacity = '0';
+    setTimeout(() => { try { el.remove(); } catch (e) {} }, 300);
+  }
+
+  function queryDownloadState(cb) {
+    try {
+      if (!navigator.serviceWorker || !navigator.serviceWorker.controller) { cb(null); return; }
+      const ch = new MessageChannel();
+      const timer = setTimeout(() => { cb(null); try { ch.port1.close(); } catch (e) {} }, 4000);
+      ch.port1.onmessage = (ev) => {
+        clearTimeout(timer);
+        cb(ev.data || {});
+        try { ch.port1.close(); } catch (e) {}
+      };
+      navigator.serviceWorker.controller.postMessage({ type: 'DOWNLOAD_STATUS' }, [ch.port2]);
+    } catch (e) { cb(null); }
+  }
+
+  function startBgPolling() {
+    if (bgPollTimer) clearInterval(bgPollTimer);
+    bgPollTimer = setInterval(() => {
+      if (!bgPillEl) { clearInterval(bgPollTimer); bgPollTimer = null; return; }
+      queryDownloadState((res) => {
+        if (!bgPillEl) return;
+        const st = res && res.state;
+        if (st && st.running) {
+          updateDownloadProgress({
+            done: st.done || 0, failed: st.failed || 0,
+            skipped: st.skipped || 0, total: st.total, percent: st.percent || 0
+          });
+        } else {
+          clearInterval(bgPollTimer); bgPollTimer = null;
+          const last = res && res.last;
+          const ready = last ? (last.done || 0) + (last.skipped || 0) : 0;
+          if (ready > 0) markOfflineReady({ total: ready, failed: (last && last.failed) || 0 });
+          showToast(ready > 0
+            ? ((last && last.ok)
+              ? '✅ ' + ready + ' fichier' + (ready > 1 ? 's' : '') + ' prêt' + (ready > 1 ? 's' : '') + ' hors ligne'
+              : '⏹ Téléchargement arrêté — ' + ready + ' fichier' + (ready > 1 ? 's' : '') + ' déjà prêt' + (ready > 1 ? 's' : ''))
+            : '⏹ Téléchargement arrêté',
+            last && last.ok ? 'success' : 'info');
+          const txt = document.getElementById('downloadOfflineText');
+          if (txt && ready > 0) txt.textContent = 'Mettre à jour le contenu hors ligne';
+          hideBgPill();
+        }
+      });
+    }, 1500);
+  }
+
+  function reattachBgDownload() {
+    if (modalEl || bgPillEl) return;
+    queryDownloadState((res) => {
+      if (modalEl || bgPillEl) return;
+      const st = res && res.state;
+      if (st && st.running) {
+        // ✅ v6.3 — un téléchargement d'arrière-plan est EN COURS (la page
+        // d'origine a pu être fermée) : on rattache la pastille.
+        downloadMode = 'bg';
+        openBgPill(st.total, st.skipped || 0);
+        updateDownloadProgress({
+          done: st.done || 0, failed: st.failed || 0,
+          skipped: st.skipped || 0, total: st.total, percent: st.percent || 0
+        });
+        startBgPolling();
+      } else {
+        const last = res && res.last;
+        if (last && last.finished && (Date.now() - (last.ts || 0) < 15000)) {
+          const ready = (last.done || 0) + (last.skipped || 0);
+          if (ready > 0) markOfflineReady({ total: ready, failed: last.failed || 0 });
+          showToast(ready > 0
+            ? '✅ ' + ready + ' fichier' + (ready > 1 ? 's' : '') + ' prêt' + (ready > 1 ? 's' : '') + ' hors ligne'
+            : '✅ Contenu à jour hors ligne',
+            'success');
+          const txt = document.getElementById('downloadOfflineText');
+          if (txt && ready > 0) txt.textContent = 'Mettre à jour le contenu hors ligne';
+        }
+      }
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // ✅ v6.3 — POP-UP POST-INSCRIPTION
+  // register.html pose arvexa_new_registration=1 → la première page
+  // ARVEXA (onboarding ou accueil) propose le téléchargement en
+  // arrière-plan. Une seule fois (choix persisté), jamais pour les
+  // anciens élèves ni si le contenu est déjà prêt.
+  // ═══════════════════════════════════════════════════════════════
+  function maybeShowWelcomeDownload() {
+    try {
+      if (localStorage.getItem(NEWREG_KEY) !== '1') return;
+      if (localStorage.getItem(BGDL_CHOICE_KEY)) {
+        // Décision déjà prise (ou pop-up déjà montré) → nettoyage du flag
+        localStorage.removeItem(NEWREG_KEY);
+        return;
+      }
+    } catch (e) { return; }
+
+    // Pas de réseau / SW pas prêt → la page suivante réessaiera
+    if (!isOnline || !navigator.serviceWorker || !navigator.serviceWorker.controller) return;
+
+    // Déjà prêt hors ligne (autre appareil déjà configuré) → ne pas déranger
+    if (isOfflineReady() || bgPillEl) {
+      try { localStorage.removeItem(NEWREG_KEY); } catch (e) {}
+      return;
+    }
+
+    try { localStorage.setItem(BGDL_CHOICE_KEY, 'shown'); } catch (e) {}
+    showWelcomePopup();
+  }
+
+  function showWelcomePopup() {
+    if (document.getElementById('arvexaWelcomeDl')) return;
+
+    const ov = document.createElement('div');
+    ov.className = 'arvexa-welcome-overlay';
+    ov.id = 'arvexaWelcomeDl';
+    ov.innerHTML = [
+      '<div class="arvexa-welcome-card">',
+      '  <div class="arvexa-welcome-icon">📥</div>',
+      '  <h3 class="arvexa-welcome-title">Bienvenue sur ARVEXA 🎉</h3>',
+      '  <p class="arvexa-welcome-sub">Télécharge tout ton contenu (cours, PDF, exercices) pour le lire même <strong>sans Internet</strong>.',
+      '  <br><span style="opacity:.78">Le téléchargement se fait en arrière-plan — tu peux continuer à utiliser l\'app normalement.</span></p>',
+      '  <div class="arvexa-welcome-actions">',
+      '    <button class="arvexa-welcome-ok" type="button">Télécharger en arrière-plan</button>',
+      '    <button class="arvexa-welcome-later" type="button">Plus tard</button>',
+      '  </div>',
+      '</div>'
+    ].join('');
+    document.body.appendChild(ov);
+
+    ov.querySelector('.arvexa-welcome-ok').addEventListener('click', () => {
+      try {
+        localStorage.setItem(BGDL_CHOICE_KEY, 'auto');
+        localStorage.removeItem(NEWREG_KEY);
+      } catch (e) {}
+      hideWelcomePopup();
+      downloadAllForOffline(true);
+    });
+
+    ov.querySelector('.arvexa-welcome-later').addEventListener('click', () => {
+      try {
+        localStorage.setItem(BGDL_CHOICE_KEY, 'later');
+        localStorage.removeItem(NEWREG_KEY);
+      } catch (e) {}
+      hideWelcomePopup();
+    });
+  }
+
+  function hideWelcomePopup() {
+    const ov = document.getElementById('arvexaWelcomeDl');
+    if (!ov) return;
+    ov.style.opacity = '0';
+    setTimeout(() => { try { ov.remove(); } catch (e) {} }, 300);
   }
 
   // ═══ STYLES ═══
@@ -804,6 +1026,112 @@
 
       @media (max-width: 480px) {
         .arvexa-offline-banner { font-size: 11.5px; padding: 7px 10px; }
+
+      /* ═══ ✅ v6.3 — PASTILLE D'ARRIÈRE-PLAN (non bloquante) ═══ */
+      .arvexa-bg-pill {
+        position: fixed;
+        top: calc(10px + env(safe-area-inset-top, 0px));
+        left: 10px;
+        z-index: 9300;
+        display: flex; align-items: center; gap: 7px;
+        padding: 7px 9px 7px 11px;
+        background: linear-gradient(145deg, #141414, #0A0A0A);
+        border: 1px solid rgba(184,134,11,.4);
+        border-radius: 999px;
+        color: #F5F0E8;
+        font-family: 'Inter', sans-serif;
+        font-size: 11.5px; font-weight: 600;
+        box-shadow: 0 8px 24px rgba(0,0,0,.45);
+        max-width: calc(100vw - 24px);
+        animation: arvexaFadeIn .3s ease;
+        transition: opacity .3s ease;
+      }
+      .arvexa-bg-pill .arvexa-bg-pill-bar {
+        width: 64px; height: 5px; border-radius: 999px;
+        background: rgba(255,255,255,.12);
+        overflow: hidden; flex: none;
+      }
+      .arvexa-bg-pill .arvexa-bg-pill-fill {
+        display: block; height: 100%; width: 0%;
+        background: linear-gradient(90deg, #B8860B, #E0B84A);
+        border-radius: 999px;
+        transition: width .4s ease;
+      }
+      .arvexa-bg-pill #arvexaDlInfo {
+        opacity: .72; font-weight: 500;
+        overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        min-width: 0;
+      }
+      .arvexa-bg-pill-cancel {
+        border: none; cursor: pointer; flex: none;
+        width: 20px; height: 20px; border-radius: 50%;
+        background: rgba(255,255,255,.1);
+        color: #F5F0E8; font-size: 10.5px; line-height: 1;
+        display: flex; align-items: center; justify-content: center;
+        padding: 0;
+      }
+      .arvexa-bg-pill-cancel:active { background: rgba(231,76,60,.5); }
+      @media (max-width: 420px) {
+        .arvexa-bg-pill #arvexaDlInfo { max-width: 74px; }
+      }
+
+      /* ═══ ✅ v6.3 — POP-UP POST-INSCRIPTION ═══ */
+      .arvexa-welcome-overlay {
+        position: fixed; inset: 0;
+        background: rgba(0,0,0,.55);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        z-index: 9500;
+        display: flex; align-items: center; justify-content: center;
+        padding: 20px;
+        animation: arvexaFadeIn 0.3s ease;
+        transition: opacity 0.3s ease;
+      }
+      .arvexa-welcome-card {
+        background: linear-gradient(145deg, #141414, #0A0A0A);
+        border: 1px solid rgba(184,134,11,.3);
+        border-radius: 20px;
+        padding: 26px 22px 20px;
+        max-width: 420px; width: 100%;
+        text-align: center;
+        color: #F5F0E8;
+        font-family: 'Inter', sans-serif;
+        box-shadow: 0 20px 60px rgba(0,0,0,.6);
+        animation: arvexaSlideUp 0.4s cubic-bezier(0.34,1.56,0.64,1);
+      }
+      .arvexa-welcome-icon {
+        width: 54px; height: 54px; margin: 0 auto 12px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, rgba(184,134,11,.25), rgba(184,134,11,.08));
+        border: 1px solid rgba(184,134,11,.35);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 24px;
+      }
+      .arvexa-welcome-title {
+        margin: 0 0 8px; font-size: 17px; font-weight: 800;
+        color: #F5F0E8; letter-spacing: .2px;
+      }
+      .arvexa-welcome-sub {
+        margin: 0; font-size: 12.5px; line-height: 1.6; opacity: .92;
+      }
+      .arvexa-welcome-actions {
+        display: flex; flex-direction: column; gap: 10px; margin-top: 18px;
+      }
+      .arvexa-welcome-ok {
+        border: none; cursor: pointer; border-radius: 12px;
+        padding: 13px 16px; font-weight: 800; font-size: 13.5px;
+        color: #0A0A0A;
+        background: linear-gradient(135deg, #E0B84A, #B8860B);
+        box-shadow: 0 6px 18px rgba(184,134,11,.3);
+        font-family: 'Inter', sans-serif;
+      }
+      .arvexa-welcome-later {
+        border: 1px solid rgba(245,240,232,.22);
+        background: transparent; color: #F5F0E8;
+        border-radius: 12px; padding: 11px 16px;
+        font-weight: 600; font-size: 13px; cursor: pointer;
+        font-family: 'Inter', sans-serif;
+      }
         .arvexa-download-modal { padding: 22px 18px 18px; }
         .arvexa-download-title { font-size: 18px; }
       }
@@ -826,6 +1154,13 @@
       createBanner();
       bindNetworkEvents();
       updateUI();
+
+      // ✅ v6.3 — rattacher la pastille d'arrière-plan (téléchargement en
+      // cours venu d'une page précédente) + pop-up post-inscription.
+      setTimeout(() => {
+        reattachBgDownload();
+        maybeShowWelcomeDownload();
+      }, 1800);
 
       if (isOnline && pendingSync.length > 0) {
         setTimeout(syncPendingData, 1500);
@@ -873,6 +1208,9 @@
     },
 
     downloadAll: downloadAllForOffline,
+
+    // ✅ v6.3 — téléchargement en arrière-plan (pastille, non bloquant)
+    downloadInBackground: function () { return downloadAllForOffline(true); },
 
     // ✅ v6.2 — l'application peut savoir si le contenu hors ligne est prêt
     isOfflineReady: isOfflineReady,

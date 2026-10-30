@@ -3,8 +3,17 @@
 // Version : OFFLINE v2.2 — Navigation instantanée
 // ================================================================
 
-let SW_VERSION = 'arvexa-offline-v5.8'; //
-// ✅ v5.8 — PASSERELLE PDF : les 4 minutes d'attente signalées venaient de
+let SW_VERSION = 'arvexa-offline-v5.9'; //
+// ✅ v5.9 — TÉLÉCHARGEMENT EN ARRIÈRE-PLAN (consigne du propriétaire :
+// « après inscription, un pop-up propose de télécharger toutes les données
+// en arrière-plan — il peut naviguer tranquillement pendant que les données
+// se téléchargent »). Le job vit déjà dans le SW (waitUntil) et SURVIT aux
+// navigations : il manquait juste un moyen pour la page SUIVANTE de savoir
+// où le téléchargement en est. DÉSORMAIS le SW expose l'état du job courant
+// (DOWNLOAD_STATUS) : la pastille ARVEXA se rattache sur n'importe quelle
+// page, la barre de progression continue, et l'état « prêt hors ligne » est
+// posé même si la page qui avait lancé le téléchargement a été fermée.
+// v5.8 — PASSERELLE PDF : les 4 minutes d'attente signalées venaient de
 // 3 défauts en chaîne. (1) Quand le PDF était DÉJÀ en cache, le SW répondait
 // « 200 complet » aux requêtes Range (bytes=X-Y) de pdf.js — qui EXIGE un
 // 206 pour un morceau : pdf.js repartait en échec/relances → un PDF déjà vu
@@ -574,6 +583,11 @@ async function handlePdf(req, event) {
 // ✅ v5.7 — drapeau d'annulation partagé par le téléchargement en cours
 let downloadAborted = false;
 
+// ✅ v5.9 — état du téléchargement consultable par N'IMPORTE QUELLE page
+let downloadInflight = new Set(); // ✅ v5.9 — fetch en vol du job courant (annulation immédiate)
+let currentDownload = null; // job en cours { running, done, failed, skipped, total, percent, ts }
+let lastDownload = null;    // dernier résultat (consultable ~15 s) { finished, ok, done, failed, skipped, total, ts }
+
 self.addEventListener('message', (event) => {
   const data = event.data || {};
   const port = event.ports && event.ports[0];
@@ -594,6 +608,10 @@ self.addEventListener('message', (event) => {
   // ✅ v5.7 — bouton « Annuler » du pop-up de téléchargement
   if (data.type === 'DOWNLOAD_CANCEL') {
     downloadAborted = true;
+    // ✅ v5.9 — annulation IMMÉDIATE : on coupe aussi les fetch en vol du job
+    // (les HTML/JSON s'arrêtent instantanément ; un PDF déjà en vol se termine,
+    // les workers s'arrêtent juste après — jamais plus de 30 s d'attente).
+    for (const c of downloadInflight) { try { c.abort(); } catch (e) {} }
     return;
   }
 
@@ -612,6 +630,13 @@ self.addEventListener('message', (event) => {
         port.postMessage({ type: 'CHECK_CACHED_RESULT', cached: [], total: data.files.length });
       }
     })());
+    return;
+  }
+
+  // ✅ v5.9 — où en est le téléchargement en arrière-plan ? (rattachement
+  // de la pastille après une navigation ; le job vit dans le SW)
+  if (data.type === 'DOWNLOAD_STATUS' && port) {
+    port.postMessage({ type: 'DOWNLOAD_STATUS', state: currentDownload, last: lastDownload });
     return;
   }
 
@@ -666,9 +691,15 @@ async function downloadAllFiles(files, port) {
 
   const cache = await caches.open(CACHE_DATA);
 
+  // ✅ v5.9 — le job devient visible pour toutes les pages (DOWNLOAD_STATUS)
+  downloadInflight.clear();
+  currentDownload = { running: true, done: 0, failed: 0, skipped: 0, total, percent: 0, ts: Date.now() };
+
   const postProgress = () => {
     const finished = done + failed + skipped;
     const percent = total ? Math.round((finished / total) * 100) : 100;
+    // ✅ v5.9 — l'état global suit la progression (pages suivantes = pastille à jour)
+    currentDownload = { running: true, done, failed, skipped, total, percent, ts: Date.now() };
     try {
       port.postMessage({ type: 'DOWNLOAD_PROGRESS', done, failed, skipped, total, percent });
     } catch (e) {}
@@ -705,6 +736,7 @@ async function downloadAllFiles(files, port) {
         continue;
       }
       const ctl = new AbortController();
+      downloadInflight.add(ctl); // ✅ v5.9 — annulable immédiatement
       const timer = setTimeout(() => { try { ctl.abort(); } catch (e) {} }, 30000);
       try {
         const response = await fetch(url, { cache: 'reload', signal: ctl.signal });
@@ -718,6 +750,7 @@ async function downloadAllFiles(files, port) {
         failed++;
       } finally {
         clearTimeout(timer);
+        downloadInflight.delete(ctl);
       }
       postProgress();
     }
@@ -731,6 +764,12 @@ async function downloadAllFiles(files, port) {
       port.postMessage({ type: 'DOWNLOAD_COMPLETE', done, failed, skipped, total });
     }
   } catch (e) {}
+
+  // ✅ v5.9 — résultat consultable 15 s : la page suivante peut afficher
+  // « ✅ N fichiers prêts hors ligne » et poser l'état persistant même si
+  // la page d'origine a été fermée entre-temps.
+  lastDownload = { finished: true, ok: !downloadAborted, done, failed, skipped, total, ts: Date.now() };
+  currentDownload = null;
 }
 
 async function cacheUrl(url) {

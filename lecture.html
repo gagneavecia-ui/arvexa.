@@ -3006,6 +3006,14 @@ function destroyArvPdf() {
       window.visualViewport.removeEventListener('scroll', arvPdfState.vvHook);
     }
   } catch (e) {}
+  // ✅ v6.5 — retire aussi les hooks window (scroll/resize) posés par
+  // wireArvPdf : sans ça, chaque changement de partie en RAJOUTAIT un
+  // (10 parties lues = 10 listeners → updateArvPdfCurrent 10× par tick
+  // de scroll → lectures offsetTop répétées → jank sur mobiles modestes).
+  try {
+    if (arvPdfState.scrollHook) window.removeEventListener('scroll', arvPdfState.scrollHook);
+    if (arvPdfState.resizeHook) window.removeEventListener('resize', arvPdfState.resizeHook);
+  } catch (e) {}
   arvPdfState = null;
 }
 

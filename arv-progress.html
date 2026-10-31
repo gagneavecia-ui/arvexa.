@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
 <meta name="theme-color" content="#0A0A0A">
 <script>(function(){try{if(localStorage.getItem('arvexa-theme')==='light')document.documentElement.setAttribute('data-theme','light')}catch(e){}})();</script>
 <script src="theme.js"></script><script src="wake-lock.js"></script><script src="arvexa-i18n.js" defer></script>
@@ -1473,10 +1473,11 @@ main {
   text-align: right; font-size: 11px;
   color: var(--text-muted); margin-top: 6px;
 }
+.char-counter.limit { color: var(--danger-light); font-weight: 700; }
 
 /* ── Flux d'ajout de section : 2 étapes scrollables (texte → dictée vocale) ── */
 .dicta-modal {
-  height: 92vh; display: flex; flex-direction: column;
+  height: 88vh; display: flex; flex-direction: column;
   overflow: hidden; padding-top: 18px;
 }
 .dicta-modal .modal-head { flex: 0 0 auto; margin-bottom: 12px; padding: 0 6px; }
@@ -1490,17 +1491,25 @@ main {
 
 .dicta-stages {
   flex: 1 1 auto; overflow-y: auto;
-  scroll-snap-type: y mandatory;
+  /* proximity (et plus mandatory) : le navigateur peut remonter la zone de
+     saisie au-dessus du clavier sans se battre avec l'aimantation. */
+  scroll-snap-type: y proximity;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }
 .dicta-stages::-webkit-scrollbar { display: none; }
 .dicta-stage {
   min-height: 100%;
-  scroll-snap-align: start; scroll-snap-stop: always;
-  display: flex; flex-direction: column; justify-content: center;
+  scroll-snap-align: start;
+  display: flex; flex-direction: column; justify-content: flex-start;
+  padding-top: 4px;
 }
+/* Étape 2 (dictée) : contenu compact, centré verticalement. */
+.dicta-stage:last-child { justify-content: center; }
 .dicta-stage-inner { width: 100%; }
+/* La zone de texte grandit avec le contenu (hauteur pilotée en JS) —
+   plus de grande espace morte dans la modale. */
+.dicta-modal .form-textarea { resize: none; overflow-y: auto; }
 .dicta-stage .btn-full + .btn-full { margin-top: 10px; }
 .dicta-step-tag {
   display: inline-flex; align-items: center; gap: 8px;
@@ -1577,10 +1586,22 @@ main {
   border-radius: 14px;
   padding: 12px 14px; margin-bottom: 14px;
 }
+/* v7.5 : le texte vivant devient une VRAIE zone d'édition — l'élève touche le
+   texte pour corriger les fautes de dictée au clavier, la dictée se met en pause. */
 .voice-live {
-  max-height: 130px; overflow-y: auto;
+  display: block; width: 100%;
+  min-height: 76px; max-height: 150px; overflow-y: auto;
   text-align: left; font-size: 13.5px; line-height: 1.6;
   color: var(--text-light); word-break: break-word;
+  background: transparent; border: none; outline: none;
+  resize: none; font-family: inherit;
+  -webkit-appearance: none; appearance: none;
+}
+.voice-live::placeholder { color: var(--text-muted); }
+.voice-live-wrap.editing { border-color: rgba(224, 184, 74, 0.45); }
+.voice-edit-hint {
+  font-size: 11.5px; color: var(--text-dim);
+  margin: 0 0 12px; text-align: center; line-height: 1.5;
 }
 .voice-counter {
   text-align: right; font-size: 11.5px;
@@ -3795,10 +3816,11 @@ function openAddSectionModal(subject, chapterId) {
                 </span>
               </button>
               <p class="voice-hint" id="voiceHint">Appuie et parle — durée illimitée</p>
-              <div class="voice-live-wrap">
-                <div class="voice-live" id="voiceLive">Ton texte apparaîtra ici en direct…</div>
+              <div class="voice-live-wrap" id="voiceLiveWrap">
+                <textarea class="voice-live" id="voiceLive" placeholder="Ton texte apparaîtra ici en direct…" maxlength="${MAX_CONTENT_LENGTH}" rows="3"></textarea>
                 <div class="voice-counter" id="voiceCounter">0 / ${MAX_CONTENT_LENGTH}</div>
               </div>
+              <p class="voice-edit-hint">✏️ Touche ton texte pour corriger les fautes au clavier</p>
               <div class="voice-actions">
                 <button type="button" class="btn-full secondary" id="backToTextBtn">
                   <span class="btn-icon">←</span>
@@ -3836,6 +3858,7 @@ function openAddSectionModal(subject, chapterId) {
 
   const submitBtns = [$('sectionSubmitBtn'), $('sectionSubmitBtn2')];
   let stopDictation = () => {};  // défini dans le bloc dictée ci-dessous (si supporté)
+  let updateLive = () => {};     // idem : affecté dans le bloc dictée (sync éditeur vocal)
 
   const DRAFT_KEY = 'arvexa_section_draft_' + subject + '_' + chapterId;
   const saveDraft = () => {
@@ -3847,7 +3870,7 @@ function openAddSectionModal(subject, chapterId) {
   try {
     const saved = localStorage.getItem(DRAFT_KEY);
     if (saved && saved.trim().length > 0) {
-      body.value = saved;
+      body.value = saved.slice(0, MAX_CONTENT_LENGTH); // blocage dur 2 500
       // ⚠️ updateReady() et non dispatch('input') : à ce stade aucun listener
       // n'est encore attaché → le bouton « Analyser » resterait désactivé.
       updateReady();
@@ -3867,11 +3890,32 @@ function openAddSectionModal(subject, chapterId) {
   $('modalBackdrop')?.querySelector('.modal-close')?.addEventListener('click', releaseGarde);
 
   function updateReady() {
+    if (body.value.length > MAX_CONTENT_LENGTH) body.value = body.value.slice(0, MAX_CONTENT_LENGTH);
     const len = body.value.trim().length;
     submitBtns.forEach((b) => { b.disabled = len < MIN_CONTENT_LENGTH; });
     counter.textContent = `${body.value.length} / ${MAX_CONTENT_LENGTH}`;
+    counter.classList.toggle('limit', body.value.length >= MAX_CONTENT_LENGTH);
   }
   body.addEventListener('input', updateReady);
+
+  // ── v7.5 · Confort de saisie ──
+  // (1) Le textarea grandit avec le texte : plus de grande espace morte.
+  const autoGrow = () => {
+    body.style.height = 'auto';
+    const cap = Math.round(window.innerHeight * 0.38);
+    body.style.height = Math.min(body.scrollHeight, cap) + 'px';
+  };
+  body.addEventListener('input', autoGrow);
+  // (2) Au focus, on laisse le clavier redimensionner le viewport
+  // (interactive-widget=resizes-content) puis on recadre la hauteur.
+  body.addEventListener('focus', () => setTimeout(() => {
+    try { body.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (e) {}
+    try { autoGrow(); } catch (e) {}
+  }, 320));
+  if (window.__dictaResizeHandler) window.removeEventListener('resize', window.__dictaResizeHandler);
+  window.__dictaResizeHandler = () => { try { autoGrow(); } catch (e) {} };
+  window.addEventListener('resize', window.__dictaResizeHandler);
+  autoGrow();
 
   toggle.addEventListener('click', () => {
     panel.classList.toggle('open');
@@ -3893,19 +3937,30 @@ function openAddSectionModal(subject, chapterId) {
     btn.addEventListener('click', (e) => {
       e.preventDefault();
       const symbol = btn.dataset.symbol;
+      const value = body.value;
+      // Blocage dur 2 500 : un symbole ne rentre que s'il a la place.
+      if (value.length + symbol.length > MAX_CONTENT_LENGTH) {
+        showToast('Limite de 2 500 caractères atteinte', 'error');
+        updateReady();
+        return;
+      }
       const start = body.selectionStart || 0;
       const end = body.selectionEnd || 0;
-      const value = body.value;
       body.value = value.slice(0, start) + symbol + value.slice(end);
       const newPos = start + symbol.length;
       body.setSelectionRange(newPos, newPos);
       body.focus();
+      saveDraft(); // l'affectation .value ne déclenche pas 'input'
       updateReady();
     });
   });
 
   // ── Navigation entre les 2 étapes (scroll : texte ⇄ dictée vocale) ──
   const goToStage = (n) => {
+    if (n === 2) {
+      // L'éditeur vocal reflète toujours le texte à jour (s'il est éditable).
+      try { updateLive(); } catch (e) {}
+    }
     stages.scrollTo({ top: (n - 1) * stages.clientHeight, behavior: 'smooth' });
   };
   goDictBtn.addEventListener('click', () => goToStage(2));
@@ -3925,6 +3980,7 @@ function openAddSectionModal(subject, chapterId) {
   } else {
     let recognition = null;
     let isRecording = false;
+    let editMode = false;      // v7.5 : correction clavier en cours (dictée en pause)
     let savedBaseValue = '';   // texte présent AVANT la dictée + finales validées des sessions précédentes
     let sessionFinals = '';    // finales de la session courante (reconstruites à chaque event)
     let timerInt = null;
@@ -4047,10 +4103,13 @@ function openAddSectionModal(subject, chapterId) {
       voiceHint.textContent = recording ? 'J\'écoute… Appuie pour arrêter' : 'Appuie et parle — durée illimitée';
     };
 
-    const updateLive = () => {
+    updateLive = () => {
       const val = body.value;
-      voiceLive.textContent = val || 'Ton texte apparaîtra ici en direct…';
-      voiceLive.scrollTop = voiceLive.scrollHeight;
+      if (document.activeElement !== voiceLive) {
+        // On n'écrase JAMAIS le texte pendant que l'élève le corrige au clavier.
+        voiceLive.value = val;
+        voiceLive.scrollTop = voiceLive.scrollHeight;
+      }
       voiceCounter.textContent = `${val.length} / ${MAX_CONTENT_LENGTH}`;
       voiceCounter.classList.toggle('limit', val.length >= MAX_CONTENT_LENGTH);
       // ✅ Le brouillon suit la dictée en continu : rien n'est perdu si l'app est tuée.
@@ -4067,8 +4126,51 @@ function openAddSectionModal(subject, chapterId) {
       updateLive();
     };
 
+    // ── v7.5 · Correction au clavier PENDANT la note vocale ──
+    // L'élève touche son texte → la dictée se met en pause, le clavier
+    // s'ouvre, il répare les fautes de transcription, puis appuie sur 🎤
+    // pour reprendre exactement là où il en était (aucun mot perdu).
+    const voiceLiveWrap = $('voiceLiveWrap');
+    const pauseForEdit = () => {
+      voiceLiveWrap.classList.add('editing');
+      if (isRecording) {
+        // Le texte affiché (finales + brouillon en cours) devient LA vérité :
+        // même les mots pas encore validés par le moteur sont conservés.
+        body.value = (voiceLive.value || '').slice(0, MAX_CONTENT_LENGTH);
+        savedBaseValue = body.value;
+        sessionFinals = '';
+        isRecording = false;
+        try { if (recognition) recognition.abort(); } catch (e) {}
+        stopTimer();
+        releaseWakeLock();
+        setVoiceUI(false);
+        voiceHint.textContent = 'Dictée en pause — corrige ton texte, puis 🎤 pour reprendre';
+        showToast('Dictée en pause — corrige au clavier, puis appuie sur 🎤', 'info');
+        updateReady();
+      }
+      editMode = true;
+    };
+    voiceLive.addEventListener('focus', pauseForEdit);
+    voiceLive.addEventListener('blur', () => voiceLiveWrap.classList.remove('editing'));
+    // Chaque frappe au clavier est répercutée dans body.value (source de vérité).
+    voiceLive.addEventListener('input', () => {
+      if (voiceLive.value.length > MAX_CONTENT_LENGTH) voiceLive.value = voiceLive.value.slice(0, MAX_CONTENT_LENGTH);
+      body.value = voiceLive.value;
+      saveDraft();
+      updateReady();
+      voiceCounter.textContent = `${body.value.length} / ${MAX_CONTENT_LENGTH}`;
+      voiceCounter.classList.toggle('limit', body.value.length >= MAX_CONTENT_LENGTH);
+    });
+
     voiceRecBtn.addEventListener('click', () => {
       if (isRecording) { stopDictation(); return; }
+      if (editMode) {
+        // Reprendre après correction clavier : le texte corrigé devient la base.
+        body.value = (voiceLive.value || '').slice(0, MAX_CONTENT_LENGTH);
+        editMode = false;
+        voiceLiveWrap.classList.remove('editing');
+        updateReady();
+      }
       if (!recognition) {
         recognition = new SpeechRecognition();
         try {
@@ -4080,6 +4182,7 @@ function openAddSectionModal(subject, chapterId) {
         recognition.maxAlternatives = 1;
 
         recognition.onresult = (event) => {
+          if (editMode || !isRecording) return; // correction clavier en cours : ignorer
           // ✅ Reconstruction complète à CHAQUE event + FUSION anti-chevauchement :
           // après une relance auto, le moteur re-transcrit la fin de l'audio déjà
           // validé → chaque segment est fusionné (mergeNoOverlap) au lieu d'être
@@ -4137,6 +4240,7 @@ function openAddSectionModal(subject, chapterId) {
           // CETTE session sont validées UNE seule fois, puis relance automatique
           // tant que l'utilisateur n'a pas arrêté → durée réellement illimitée.
           flushSessionFinals();
+          if (editMode) return; // correction clavier : on ne touche à rien
           body.value = savedBaseValue;
           updateReady();
           updateLive();
@@ -4175,6 +4279,13 @@ function openAddSectionModal(subject, chapterId) {
     const rawInput = body.value.trim();
     if (rawInput.length < MIN_CONTENT_LENGTH) {
       showToast(`Contenu trop court (min ${MIN_CONTENT_LENGTH} caractères)`, 'error');
+      return;
+    }
+    if (body.value.length > MAX_CONTENT_LENGTH) {
+      // Blocage dur 2 500 : filet de sécurité, on ne soumet jamais plus.
+      body.value = body.value.slice(0, MAX_CONTENT_LENGTH);
+      updateReady();
+      showToast('Texte ramené à la limite de 2 500 caractères', 'info');
       return;
     }
 

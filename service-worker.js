@@ -64,6 +64,7 @@ const PRECACHE = [
   './perf.css',
   './arvexa-ui.css',
   './theme.js',
+  './arvexa-contact.js', // v6.6 source unique du numéro de contact
   './arvexa-i18n.js',
   './arvexa-cache.js',
   './register-sw.js',

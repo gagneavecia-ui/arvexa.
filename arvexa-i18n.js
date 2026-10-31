@@ -508,6 +508,7 @@
     "Jours": "Days",
     "Heures": "Hours",
     "Minutes": "Minutes",
+    "Secondes": "Seconds",
     "minutes": "minutes",
     "Min": "Min",
     "1 heure": "1 hour",

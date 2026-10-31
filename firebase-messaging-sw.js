@@ -1,19 +1,20 @@
 // ================================================================
 // FIREBASE MESSAGING SERVICE WORKER — ARVEXA School
-// Version : 1.3.0
+// Version : 1.4.0
 // Corrections appliquées :
 //  - C1 : client.navigate() avec fallback openWindow (navigation fiable)
 //  - C2 : try/catch sur showNotification (évite les rejets silencieux)
 //  - C3 : handler pushsubscriptionchange (robustesse FCM)
 //  - C4 : anti-doublon — payload notification natif = affiché par le SDK,
 //         le handler ne traite plus que les messages data-only
-//  - C5 (v1.3.0, choix propriétaire « Notif 4 ») : BRANDING DES
-//         NOTIFICATIONS — l'ancien icon.png (« PRÉPARATION BAC », fond
-//         chargé) s'affichait en carré blanc / logo « d'une autre app »
-//         sur Android. Désormais : badge = notif-icon.png (atome blanc
-//         monochrome sur transparent, exigence Android pour la barre
-//         d'état / la petite icône de gauche) et icône grande =
-//         notif-logo.png (variante 4 « A » & atome, or sur noir).
+//  - C5 (v1.3.0) : badge monochrome blanc notif-icon.png (atome, variante 4)
+//         — exigence Android pour la barre d'état
+//  - C6 (v1.4.0, retour propriétaire sur capture d'écran) — PLUS DE GRANDE
+//         ICÔNE : « je ne veux pas que le logo de droite s'affiche,
+//         uniquement celui de l'application ». La bannière n'affiche que le
+//         logo de l'app (lanceur, à gauche) + titre + message ; AUCUN champ
+//         `icon` → rien à droite. Le badge atome (variante 4) reste l'icône
+//         de la barre d'état.
 // ================================================================
 
 // ⚡ Imports FCM (version compat, obligatoire pour Service Worker)
@@ -92,8 +93,8 @@ messaging.onBackgroundMessage((payload) => {
 
   const notificationOptions = {
     body: notificationBody,
-    // ✅ C5 — badge MONOCHROME blanc (obligatoire Android) + grande icône couleur
-    icon: 'notif-logo.png',
+    // ✅ C6 — PAS de champ `icon` : aucune grande icône à droite ; le badge
+    // MONOCHROME blanc (variante 4 « atome ») reste l'icône de la barre d'état.
     badge: 'notif-icon.png',
     vibrate: [200, 100, 200],
     tag: 'arvexa-notification-' + Date.now(),
@@ -188,4 +189,4 @@ self.addEventListener('pushsubscriptionchange', (event) => {
   event.waitUntil(Promise.resolve());
 });
 
-console.log('[FCM-SW] Firebase Messaging Service Worker chargé (v1.3.0).');
+console.log('[FCM-SW] Firebase Messaging Service Worker chargé (v1.4.0).');

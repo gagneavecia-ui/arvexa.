@@ -832,7 +832,7 @@
     "pour identifier ce qu’il reste à retravailler.": "to identify what still needs work.",
     "un seul espace": "one single space",
     "Entraînement": "Training",
-    "Quelle est la dérivée de f(x) = e^(2x) ?": "What is the derivative of f(x) = e^(2x)?",
+    "Quelle est la dérivée de f(x) = e": "What is the derivative of f(x) = e",
     "« Explique-moi la différence entre limite et continuité en une phrase. »": "“Explain the difference between limits and continuity in one sentence.”",
     "Suivre ses progrès": "Track your progress",
     "La plateforme se prend en main simplement : un compte, un tour d’horizon des outils, puis un travail régulier.": "The platform is simple to get started with: one account, a quick tour of the tools, then regular work.",

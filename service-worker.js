@@ -3,7 +3,7 @@
 // Version : OFFLINE v2.2 — Navigation instantanée
 // ================================================================
 
-let SW_VERSION = 'arvexa-offline-v6.0'; // ✅ v6.0 — mode arrière-plan : 2 fichiers en parallèle (navigation fluide pendant le téléchargement)
+let SW_VERSION = 'arvexa-offline-v6.1'; // ✅ v6.1 — renouvellement du précache (correctif aperçu quiz auth-choice : bonne réponse A + écriture mathématique en exposant) · v6.0 — mode arrière-plan : 2 fichiers en parallèle (navigation fluide pendant le téléchargement)
 // ✅ v5.9 — TÉLÉCHARGEMENT EN ARRIÈRE-PLAN (consigne du propriétaire :
 // « après inscription, un pop-up propose de télécharger toutes les données
 // en arrière-plan — il peut naviguer tranquillement pendant que les données

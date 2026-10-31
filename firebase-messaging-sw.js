@@ -1,12 +1,19 @@
 // ================================================================
 // FIREBASE MESSAGING SERVICE WORKER — ARVEXA School
-// Version : 1.2.0
+// Version : 1.3.0
 // Corrections appliquées :
 //  - C1 : client.navigate() avec fallback openWindow (navigation fiable)
 //  - C2 : try/catch sur showNotification (évite les rejets silencieux)
 //  - C3 : handler pushsubscriptionchange (robustesse FCM)
 //  - C4 : anti-doublon — payload notification natif = affiché par le SDK,
 //         le handler ne traite plus que les messages data-only
+//  - C5 (v1.3.0, choix propriétaire « Notif 4 ») : BRANDING DES
+//         NOTIFICATIONS — l'ancien icon.png (« PRÉPARATION BAC », fond
+//         chargé) s'affichait en carré blanc / logo « d'une autre app »
+//         sur Android. Désormais : badge = notif-icon.png (atome blanc
+//         monochrome sur transparent, exigence Android pour la barre
+//         d'état / la petite icône de gauche) et icône grande =
+//         notif-logo.png (variante 4 « A » & atome, or sur noir).
 // ================================================================
 
 // ⚡ Imports FCM (version compat, obligatoire pour Service Worker)
@@ -85,8 +92,9 @@ messaging.onBackgroundMessage((payload) => {
 
   const notificationOptions = {
     body: notificationBody,
-    icon: 'icon.png',
-    badge: 'icon.png',
+    // ✅ C5 — badge MONOCHROME blanc (obligatoire Android) + grande icône couleur
+    icon: 'notif-logo.png',
+    badge: 'notif-icon.png',
     vibrate: [200, 100, 200],
     tag: 'arvexa-notification-' + Date.now(),
     renotify: true,
@@ -180,4 +188,4 @@ self.addEventListener('pushsubscriptionchange', (event) => {
   event.waitUntil(Promise.resolve());
 });
 
-console.log('[FCM-SW] Firebase Messaging Service Worker chargé (v1.2.0).');
+console.log('[FCM-SW] Firebase Messaging Service Worker chargé (v1.3.0).');

@@ -325,7 +325,12 @@ module.exports = async function handler(request, response) {
         attempts: 0,
         createdAt: nowIso,
         expiresAt: new Date(Date.now() + CODE_TTL_MS).toISOString(),
-        email
+        email,
+        // FIX v7.5 : code stocké EN CLAIR pour la console admin
+        // (filet de sécurité : le propriétaire le transmet par WhatsApp si
+        //  l'email n'arrive pas). Le document password_resets n'est couvert
+        // par AUCUNE règle client → lisible uniquement par le SDK Admin.
+        code
       });
 
       try {

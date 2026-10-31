@@ -7,6 +7,7 @@
   <meta name="theme-color" content="#0A0A0A">
 <script>(function(){try{if(localStorage.getItem('arvexa-theme')==='light')document.documentElement.setAttribute('data-theme','light')}catch(e){}})();</script>
 <script src="theme.js"></script><script src="arvexa-i18n.js" defer></script>
+<script src="arvexa-sync.js" defer></script><!-- ✅ v8.0 sync Firebase des progressions (par compte) -->
   <meta name="description" content="ARVEXA School - Chapitre">
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon.png">
@@ -1224,6 +1225,12 @@
   function openPart(index) {
     window.location.href = `lecture.html?subject=${subjectKey}&chapter=${chapIdx}&tab=${currentTab}&part=${index}`;
   }
+
+  // ✅ v8.0 — SYNC FIREBASE : re-rendu quand la progression fusionne/arrive du cloud
+  window.addEventListener('arvexa-progress-updated', () => {
+    if (!currentParts || currentParts.length === 0) return; // pas encore chargé
+    try { renderCards(); } catch (e) {}
+  });
 
   function showPremiumPopup() {
     const popup = document.getElementById('premiumPopup');

@@ -123,6 +123,30 @@ service cloud.firestore {
         allow read, write: if isOwner(userId);
       }
 
+      // ─── progression (v8.0) ─────────────────────────────────────
+      // Sync Firebase des progressions de cours (demande propriétaire :
+      // « chaque compte doit avoir ses propres données »). Doc unique
+      // « course » : readParts (sections lues) + notes + dailyActivity
+      // + stats (le CALCUL de progression par chapitre/matière/global).
+      // Écritures bornées (anti-abus) ; lecture réservée au propriétaire
+      // et à l'admin (console). Suppression : jamais via le client.
+      match /progression/{docId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow create, update: if isOwner(userId)
+          && (!('readParts' in request.resource.data)
+              || (request.resource.data.readParts is list
+                  && request.resource.data.readParts.size() <= 8000))
+          && (!('notes' in request.resource.data)
+              || (request.resource.data.notes is map
+                  && request.resource.data.notes.size() <= 800))
+          && (!('dailyActivity' in request.resource.data)
+              || (request.resource.data.dailyActivity is map
+                  && request.resource.data.dailyActivity.size() <= 60))
+          && (!('stats' in request.resource.data)
+              || request.resource.data.stats is map);
+        allow delete: if false;
+      }
+
       // ─── favorites ──────────────────────────────────────────────
       match /favorites/{docId} {
         allow read, write: if isOwner(userId);

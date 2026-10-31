@@ -7,6 +7,8 @@
   <meta name="theme-color" content="#0A0A0A">
 <script>(function(){try{if(localStorage.getItem('arvexa-theme')==='light')document.documentElement.setAttribute('data-theme','light')}catch(e){}})();</script>
 <script src="theme.js"></script><script src="arvexa-i18n.js" defer></script>
+<script src="arvexa-sync.js" defer></script><!-- ✅ v8.0 sync Firebase des progressions (par compte) -->
+<script src="arvexa-sync.js" defer></script><!-- ✅ v8.0 sync Firebase des progressions (par compte) -->
   <meta name="description" content="ARVEXA School - Matière">
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon.png">
@@ -1520,7 +1522,15 @@ const DEFAULT_CHAPTERS = {
   // ================================================================
   function getChapterStatus(chapterIndex, chapterData) {
     const readCount = getReadPartsForChapter(chapterIndex);
-    const totalParts = chapterData.totalParts || 0;
+    // ✅ v8.0 — FIX « le calcul de section et de la progression » : totalParts
+    // valait TOUJOURS 0 (jamais présent dans les JSON ni dans les chapitres
+    // Firestore) → « Terminé » et le % du chapitre n'apparaissaient jamais.
+    // Source de vérité : progress-totals.json (généré depuis cours/*.json),
+    // total sur les 3 onglets (cours + exercices + corrections).
+    let totalParts = chapterData.totalParts || 0;
+    if (!totalParts && window.ArvexaProgress) {
+      try { totalParts = window.ArvexaProgress.chapterTotal(subjectKey, chapterIndex) || 0; } catch (e) {}
+    }
 
     if (readCount === 0) return { status: 'not-opened', readCount, totalParts };
     if (totalParts > 0 && readCount >= totalParts) {
@@ -1535,6 +1545,12 @@ const DEFAULT_CHAPTERS = {
   function navigateToChapter(chapterIndex) {
     window.location.href = `chapitre.html?subject=${subjectKey}&chapter=${chapterIndex}`;
   }
+
+  // ✅ v8.0 — SYNC FIREBASE : re-rendu quand la progression fusionne/arrive du cloud
+  window.addEventListener('arvexa-progress-updated', () => {
+    if (chapters.length === 0) return; // chapitres pas encore chargés (anti-flash)
+    try { renderProgress(); renderChapters(); } catch (e) {}
+  });
 
   function showPremiumPopup() {
     const popup = document.getElementById('premiumPopup');

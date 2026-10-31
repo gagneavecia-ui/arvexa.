@@ -7,6 +7,7 @@
   <meta name="theme-color" content="#0A0A0A">
 <script>(function(){try{if(localStorage.getItem('arvexa-theme')==='light')document.documentElement.setAttribute('data-theme','light')}catch(e){}})();</script>
 <script src="theme.js"></script><script src="arvexa-i18n.js" defer></script>
+<script src="arvexa-sync.js" defer></script><!-- ✅ v8.0 sync Firebase des progressions (par compte) -->
   <meta name="description" content="ARVEXA School - Lecture">
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon.png">
@@ -2001,7 +2002,7 @@
       <button class="modal-close" id="modalClose"><i class="fas fa-times"></i></button>
       <div class="modal-title">📝 Mes <span>notes</span></div>
       <div class="modal-sub" id="modalSub">Partie 1</div>
-      <textarea id="notesTextarea" placeholder="Écris ici ce que tu as compris, des points importants, des questions..."></textarea>
+      <textarea id="notesTextarea" maxlength="5000" placeholder="Écris ici ce que tu as compris, des points importants, des questions..."></textarea>
       <div class="note-saved" id="noteSaved"><i class="fas fa-check-circle"></i> Notes enregistrées !</div>
       <div class="modal-actions">
         <button class="btn-cancel" id="modalCancel">Annuler</button>
@@ -2270,6 +2271,8 @@ function markPartAsRead() {
     readParts.push(key);
     try { localStorage.setItem(READ_KEY, JSON.stringify(readParts)); } catch (e) {}
     bumpDailyActivity();
+    // ✅ v8.0 — SYNC FIREBASE : la section lue part dans le compte (arrayUnion)
+    if (window.ArvexaProgress) window.ArvexaProgress.notifyChange('read', key);
   }
 }
 
@@ -2319,6 +2322,13 @@ function saveNotes() {
       notesDot.classList.remove('show');
     }
     localStorage.setItem(NOTES_KEY, JSON.stringify(notes));
+    // ✅ v8.0 — horodatage de l'édition (fusion cloud « dernier gagnant ») + sync Firebase
+    try {
+      const meta = JSON.parse(localStorage.getItem('arvexa_notes_meta') || '{}');
+      if (text) meta[key] = Date.now(); else delete meta[key];
+      localStorage.setItem('arvexa_notes_meta', JSON.stringify(meta));
+    } catch (e2) {}
+    if (window.ArvexaProgress) window.ArvexaProgress.notifyChange('note', key);
     noteSaved.classList.add('show');
     setTimeout(() => noteSaved.classList.remove('show'), 2000);
   } catch (e) {}

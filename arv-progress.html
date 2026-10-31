@@ -6,6 +6,7 @@
 <meta name="theme-color" content="#0A0A0A">
 <script>(function(){try{if(localStorage.getItem('arvexa-theme')==='light')document.documentElement.setAttribute('data-theme','light')}catch(e){}})();</script>
 <script src="theme.js"></script><script src="wake-lock.js"></script><script src="arvexa-i18n.js" defer></script>
+<script src="arvexa-sync.js" defer></script><!-- ✅ v8.0 sync Firebase des progressions (par compte) -->
 <title>ARVEXA — Mon cahier</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.png" type="image/png">
@@ -4477,6 +4478,13 @@ function isPremiumUser(data) {
 }
 
 console.log('🚀 ARVEXA — Mon cahier — serveur progress v8.5 (11 actions stables)');
+
+// ✅ v8.0 — SYNC FIREBASE : la carte « Ma progression — révisions officielles »
+// se recalcule quand la progression fusionne/arrive du cloud (autre appareil).
+window.addEventListener('arvexa-progress-updated', () => {
+  if (state.view !== 'notebooks') return; // ne pas yanker l'élève hors de son cahier
+  try { renderNotebooksView(); } catch (e) {}
+});
 </script>
 </body>
 </html>

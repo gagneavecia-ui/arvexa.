@@ -13,7 +13,8 @@
 'use strict';
 var CONTACT = {
   phoneDisplay: '+227 74 87 20 82',  /* ← numéro affiché aux élèves */
-  phoneRaw: '22774872082'            /* ← numéro brut (liens wa.me / tel:) */
+  phoneRaw: '22774872082',           /* ← numéro brut (liens wa.me / tel:) */
+  whatsappGroupUrl: ''               /* ← lien d'invitation du GROUPE WhatsApp (chat.whatsapp.com/…). Vide = le bouton « Rejoindre le groupe » ouvre la discussion support. */
 };
 window.ARVEXA_CONTACT = CONTACT;
 

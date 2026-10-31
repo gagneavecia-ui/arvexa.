@@ -3,7 +3,7 @@
 // Version : OFFLINE v2.2 — Navigation instantanée
 // ================================================================
 
-let SW_VERSION = 'arvexa-offline-v6.1'; // ✅ v6.1 — renouvellement du précache (correctif aperçu quiz auth-choice : bonne réponse A + écriture mathématique en exposant) · v6.0 — mode arrière-plan : 2 fichiers en parallèle (navigation fluide pendant le téléchargement)
+let SW_VERSION = 'arvexa-offline-v7.0'; // ✅ v7.0 — NOUVELLE ÉTAPE POST-INSCRIPTION : whatsapp.html (numéro WhatsApp + bouton « Rejoindre le groupe WhatsApp » + Valider → onboarding) ajoutée au flux register et au précache ; aperçu quiz auth-choice en VRAI rendu mathématique KaTeX (rendu exact demandé par le propriétaire) · v6.1 — renouvellement du précache (correctif aperçu quiz auth-choice : bonne réponse A + écriture mathématique en exposant) · v6.0 — mode arrière-plan : 2 fichiers en parallèle (navigation fluide pendant le téléchargement)
 // ✅ v5.9 — TÉLÉCHARGEMENT EN ARRIÈRE-PLAN (consigne du propriétaire :
 // « après inscription, un pop-up propose de télécharger toutes les données
 // en arrière-plan — il peut naviguer tranquillement pendant que les données
@@ -82,6 +82,7 @@ const PRECACHE = [
   './register-fcm-sw.js',
   './firebase-messaging-sw.js',
   './auth-choice.html',
+  './whatsapp.html',
   './login.html',
   './404.html',
   // ✅ v5.3 — pdf.min.js / pdf.worker.min.js SORTIS du précachage d'install :

@@ -21,8 +21,12 @@
 //  - revokeRefreshTokens() : toute session ouverte est déconnectée.
 //
 // Configuration (collection Firestore `config`, doc `email`) :
-//  { resendApiKey, fromAddress, fromName, replyTo }
-//  → lue uniquement côté serveur (Admin SDK). Repli : env RESEND_API_KEY.
+//  { smtpUser, smtpPass }        → Gmail SMTP (GRATUIT, 500/jour, AUCUN
+//                                  domaine requis — mot de passe d'application
+//                                  Google). PRIORITAIRE s'il est présent.
+//  { resendApiKey, fromAddress, fromName, replyTo } → Resend (repli,
+//                                  utile une fois un domaine vérifié).
+//  → lues uniquement côté serveur (Admin SDK). Repli clé : env RESEND_API_KEY.
 // ================================================================
 
 const crypto = require('crypto');
@@ -115,6 +119,31 @@ async function getEmailConfig() {
 
 async function sendEmail({ to, subject, html }) {
   const config = await getEmailConfig();
+  if (config && config.smtpPass && config.smtpUser) {
+    // ── Gmail SMTP (gratuit, 500/jour, expéditeur = smtpUser) ──
+    // Aucun domaine requis : mot de passe d'application Google.
+    try {
+      const nodemailer = require('nodemailer');
+      const transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true,
+        auth: { user: config.smtpUser, pass: String(config.smtpPass).replace(/\s+/g, '') }
+      });
+      await transporter.sendMail({
+        from: `"${config.fromName || 'ARVEXA School'}" <${config.smtpUser}>`,
+        to,
+        subject,
+        html,
+        ...(config.replyTo ? { replyTo: config.replyTo } : {})
+      });
+      return { provider: 'gmail' };
+    } catch (smtpError) {
+      console.error('ARV-RESET gmail smtp failed:', smtpError.message);
+      throw new Error(`resend_error:smtp_gmail_${smtpError.message}`.slice(0, 200));
+    }
+  }
+  // ── Resend (repli / domaine vérifié) ──
   if (!config || !config.resendApiKey) {
     throw new Error('service_email_non_configure');
   }

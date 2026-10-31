@@ -3,7 +3,7 @@
 // Version : OFFLINE v2.2 — Navigation instantanée
 // ================================================================
 
-let SW_VERSION = 'arvexa-offline-v5.9'; //
+let SW_VERSION = 'arvexa-offline-v6.0'; // ✅ v6.0 — mode arrière-plan : 2 fichiers en parallèle (navigation fluide pendant le téléchargement)
 // ✅ v5.9 — TÉLÉCHARGEMENT EN ARRIÈRE-PLAN (consigne du propriétaire :
 // « après inscription, un pop-up propose de télécharger toutes les données
 // en arrière-plan — il peut naviguer tranquillement pendant que les données
@@ -601,7 +601,9 @@ self.addEventListener('message', (event) => {
     // ✅ v5.7 — waitUntil GARANTIT la survie du SW pendant TOUT le
     // téléchargement (avant : travail asynchrone non protégé — Chrome pouvait
     // tuer le SW en plein téléchargement → reprise impossible, retéléchargement).
-    event.waitUntil(downloadAllFiles(data.files, port));
+    // ✅ v6.0 — background=true (téléchargement en arrière-plan) : 2 fichiers
+    // en parallèle au lieu de 3 → la navigation de l'élève reste fluide.
+    event.waitUntil(downloadAllFiles(data.files, port, data.background === true));
     return;
   }
 
@@ -682,7 +684,7 @@ async function isFileCached(url) {
 //   • timeout 30 s par fichier (plus jamais de boucle qui pend) ;
 //   • annulable à tout moment (bouton « Annuler ») ;
 //   • tout est rangé dans CACHE_DATA (persistant entre les mises à jour).
-async function downloadAllFiles(files, port) {
+async function downloadAllFiles(files, port, backgroundMode) {
   downloadAborted = false;
   const total = files.length;
   let done = 0;
@@ -755,7 +757,13 @@ async function downloadAllFiles(files, port) {
       postProgress();
     }
   };
-  await Promise.all([worker(), worker(), worker()]);
+  // ✅ v6.0 — 3 fichiers en parallèle en mode MODALE (l'élève attend devant
+  // la barre, on va vite) ; 2 en mode ARRIÈRE-PLAN (il navigue en même
+  // temps : sa navigation ne doit pas être affamée).
+  const PARALLEL = backgroundMode ? 2 : 3;
+  const workers = [];
+  for (let i = 0; i < PARALLEL; i++) workers.push(worker());
+  await Promise.all(workers);
 
   try {
     if (downloadAborted) {

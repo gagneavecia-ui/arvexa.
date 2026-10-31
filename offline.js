@@ -1,7 +1,23 @@
 // ================================================================
 // OFFLINE.JS — ARVEXA School
-// Version : v6.3 — Pop-up post-inscription + téléchargement EN ARRIÈRE-PLAN
-// Nouveautés v6.3 (consigne du propriétaire : « après inscription, un pop-up
+// Version : v6.4 — Pastille d'arrière-plan REPLACÉE + STYLÉE, modale NON BLOQUANTE
+// Nouveautés v6.4 (consigne du propriétaire : « le téléchargement en
+//  arrière-plan n'est pas bien placé, 0 css — revois avec celui du profil ;
+//  ça bloque trop pendant le téléchargement ») :
+//  - BUG CSS RÉPARÉ : les styles v6.3 (pastille + pop-up) étaient PIÉGÉS
+//    dans le @media (max-width: 480px) → pastille totalement SANS STYLE
+//    (« 0 css ») sur grand écran. Styles désormais posés à TOUTES les tailles.
+//  - PASTILLE REPLACÉE : bas-DROITE (elle couvrait le bouton menu en
+//    haut-gauche → la page semblait bloquée) et se hisse AUTOMATIQUEMENT
+//    AU-DESSUS de la bannière d'installation si celle-ci est visible.
+//  - PASTILLE REDÉSIGNÉE « façon modale du profil » : carte sombre, liseré
+//    et barre de progression dorés, icône, titre, %, info, bouton ✕ rond.
+//  - MODALE DU PROFIL NON BLOQUANTE : bouton « Réduire » → le téléchargement
+//    continue en arrière-plan (pastille), l'élève navigue normalement.
+//  - SW : en mode arrière-plan 2 fichiers en parallèle (au lieu de 3) pour
+//    que la navigation reste fluide pendant le téléchargement.
+// v6.3 — Pop-up post-inscription + téléchargement EN ARRIÈRE-PLAN
+// (consigne du propriétaire : « après inscription, un pop-up
 //  propose de télécharger toutes les données en arrière-plan — il peut
 //  naviguer tranquillement pendant que les données se téléchargent ») :
 //  - Pop-up « Bienvenue sur ARVEXA » posé après INSCRIPTION (flag
@@ -54,6 +70,8 @@
   let downloadMode = 'modal';   // 'modal' (bouton profil) | 'bg' (arrière-plan)
   let bgPillEl = null;          // pastille compacte non bloquante
   let bgPollTimer = null;       // polling DOWNLOAD_STATUS (re-rattachement)
+  let lastProgressData = null;  // ✅ v6.4 — dernière progression (bouton « Réduire »)
+  let bgPillOffsetTimer = null; // ✅ v6.4 — suivi de la bannière d'installation
   const NEWREG_KEY = 'arvexa_new_registration';
   const BGDL_CHOICE_KEY = 'arvexa_bgdl_choice';
 
@@ -441,6 +459,12 @@
       // la liste des cours ne s'affiche pas hors ligne).
       const allFiles = [...pendingJson, ...existingFiles];
 
+      // ✅ v6.4 — état initial mémorisé : « Réduire » peut basculer vers la
+      // pastille dès la 1ʳᵉ seconde, avant le premier DOWNLOAD_PROGRESS.
+      lastProgressData = {
+        done: 0, failed: 0, skipped: alreadyCached.size,
+        total: alreadyCached.size + allFiles.length, percent: 0
+      };
       openDownloadUI(alreadyCached.size + allFiles.length, alreadyCached.size);
 
       const channel = new MessageChannel();
@@ -467,8 +491,10 @@
         }
       };
 
+      // ✅ v6.4 — background:true → le SW télécharge à 2 fichiers en
+      // parallèle (au lieu de 3) : la navigation de l'élève reste fluide.
       navigator.serviceWorker.controller.postMessage(
-        { type: 'DOWNLOAD_ALL', files: allFiles },
+        { type: 'DOWNLOAD_ALL', files: allFiles, background: downloadMode === 'bg' },
         [channel.port2]
       );
 
@@ -519,16 +545,22 @@
           <button class="arvexa-download-cancel" id="arvexaDlCancel" type="button">
             Annuler
           </button>
+          <button class="arvexa-download-min" id="arvexaDlMin" type="button" title="Le téléchargement continue en arrière-plan pendant que tu navigues">
+            Réduire
+          </button>
           <button class="arvexa-download-close" id="arvexaDlClose" style="display:none">
             Fermer
           </button>
         </div>
+        <div class="arvexa-download-hint">💡 Réduis la fenêtre ou change de page : le téléchargement continue tout seul en arrière-plan.</div>
       </div>
     `;
 
     document.body.appendChild(modalEl);
     document.getElementById('arvexaDlClose').addEventListener('click', closeDownloadModal);
     document.getElementById('arvexaDlCancel').addEventListener('click', cancelDownload);
+    // ✅ v6.4 — « Réduire » : la modale se replie en pastille d'arrière-plan
+    document.getElementById('arvexaDlMin').addEventListener('click', minimizeDownloadModal);
   }
 
   // ✅ v6.2 — « Annuler » : coupe le téléchargement côté SW, immédiatement
@@ -565,6 +597,12 @@
   }
 
   function updateDownloadProgress(data) {
+    // ✅ v6.4 — mémoire de la dernière progression (bouton « Réduire »)
+    lastProgressData = {
+      done: data.done || 0, failed: data.failed || 0,
+      skipped: data.skipped || 0, total: data.total || 0,
+      percent: data.percent || 0
+    };
     const fill = document.getElementById('arvexaDlFill');
     const done = document.getElementById('arvexaDlDone');
     const total = document.getElementById('arvexaDlTotal');
@@ -603,6 +641,8 @@
     }
 
     if (cancel) cancel.style.display = 'none';
+    const minBtn = document.getElementById('arvexaDlMin');
+    if (minBtn) minBtn.style.display = 'none'; /* ✅ v6.4 */
     if (close) close.style.display = 'block';
 
     // ✅ v6.2 — jamais de « 0 fichier prêt » trompeur : si rien n'était à
@@ -634,6 +674,19 @@
     }
   }
 
+  // ✅ v6.4 — la modale du profil ne bloque PLUS la page : elle se replie
+  // en pastille d'arrière-plan et le téléchargement continue (job SW).
+  function minimizeDownloadModal() {
+    const last = lastProgressData || { done: 0, failed: 0, skipped: 0, total: 0, percent: 0 };
+    downloadMode = 'bg';
+    closeDownloadModal();
+    if ((last.total || 0) > 0) {
+      openBgPill(last.total, last.skipped || 0);
+      updateDownloadProgress(last);
+      startBgPolling();
+    }
+  }
+
   // ═══════════════════════════════════════════════════════════════
   // ✅ v6.3 — TÉLÉCHARGEMENT EN ARRIÈRE-PLAN
   // La pastille ne bloque RIEN : l'élève navigue, le job vit dans le SW,
@@ -650,23 +703,54 @@
     bgPillEl = document.createElement('div');
     bgPillEl.className = 'arvexa-bg-pill';
     bgPillEl.id = 'arvexaBgPill';
+    // ✅ v6.4 — mini-carte « façon modale du profil » : icône dorée, titre,
+    // %, barre de progression dorée, info, ✕. Bas-droite, NON bloquante.
     bgPillEl.innerHTML = [
-      '<span class="arvexa-bg-pill-ico" style="flex:none">📥</span>',
-      '<span class="arvexa-bg-pill-bar"><span class="arvexa-bg-pill-fill" id="arvexaDlFill"></span></span>',
-      '<span id="arvexaDlPercent" style="flex:none;">0%</span>',
-      '<span id="arvexaDlInfo">en arrière-plan…</span>',
+      '<span class="arvexa-bg-pill-ico">📥</span>',
+      '<span class="arvexa-bg-pill-body">',
+      '  <span class="arvexa-bg-pill-top">',
+      '    <span class="arvexa-bg-pill-title">Téléchargement hors ligne</span>',
+      '    <span id="arvexaDlPercent">0%</span>',
+      '  </span>',
+      '  <span class="arvexa-bg-pill-bar"><span class="arvexa-bg-pill-fill" id="arvexaDlFill"></span></span>',
+      '  <span class="arvexa-bg-pill-sub" id="arvexaDlInfo">en arrière-plan…</span>',
+      '</span>',
       '<button class="arvexa-bg-pill-cancel" id="arvexaDlCancel" type="button" title="Annuler le téléchargement" aria-label="Annuler le téléchargement">✕</button>'
     ].join('');
     document.body.appendChild(bgPillEl);
 
     const cancelBtn = document.getElementById('arvexaDlCancel');
     if (cancelBtn) cancelBtn.addEventListener('click', cancelDownload);
+
+    // ✅ v6.4 — se hisse AU-DESSUS de la bannière d'installation si elle est
+    // visible (et la suit si elle apparaît/disparaît pendant le job).
+    updatePillOffset();
+    if (bgPillOffsetTimer) clearInterval(bgPillOffsetTimer);
+    bgPillOffsetTimer = setInterval(updatePillOffset, 1500);
+  }
+
+  // ✅ v6.4 — place la pastille au-dessus de la bannière d'installation
+  // (#arvexaInstallBanner, bas-centre) : zéro chevauchement, rien de caché.
+  function updatePillOffset() {
+    if (!bgPillEl) return;
+    let bottomPx = null;
+    try {
+      const banner = document.getElementById('arvexaInstallBanner');
+      if (banner) {
+        const r = banner.getBoundingClientRect();
+        if (r.height > 4 && r.bottom > 0 && r.top < window.innerHeight) {
+          bottomPx = Math.round(window.innerHeight - r.top + 10);
+        }
+      }
+    } catch (e) {}
+    bgPillEl.style.bottom = (bottomPx != null) ? bottomPx + 'px' : '';
   }
 
   function hideBgPill() {
     if (!bgPillEl) return;
     const el = bgPillEl;
     bgPillEl = null;
+    if (bgPillOffsetTimer) { clearInterval(bgPillOffsetTimer); bgPillOffsetTimer = null; } /* ✅ v6.4 */
     el.style.opacity = '0';
     setTimeout(() => { try { el.remove(); } catch (e) {} }, 300);
   }
@@ -1026,29 +1110,81 @@
 
       @media (max-width: 480px) {
         .arvexa-offline-banner { font-size: 11.5px; padding: 7px 10px; }
+        .arvexa-download-modal { padding: 22px 18px 18px; }
+        .arvexa-download-title { font-size: 18px; }
+      }
 
-      /* ═══ ✅ v6.3 — PASTILLE D'ARRIÈRE-PLAN (non bloquante) ═══ */
+      /* ═══ ✅ v6.4 — bouton « Réduire » (modale du profil NON bloquante) ═══ */
+      .arvexa-download-min {
+        padding: 11px 22px; border-radius: 30px;
+        border: 1px solid rgba(224,184,74,.5);
+        background: transparent;
+        color: #E0B84A;
+        font-family: 'Inter', sans-serif;
+        font-size: 13px; font-weight: 700;
+        cursor: pointer;
+        transition: all 0.25s ease;
+      }
+      .arvexa-download-min:hover {
+        background: rgba(224,184,74,.12);
+        border-color: rgba(224,184,74,.85);
+      }
+      .arvexa-download-hint {
+        margin-top: 12px;
+        font-size: 11px; line-height: 1.5;
+        color: #8A8A7A;
+      }
+
+      /* ═══ ✅ v6.4 — PASTILLE D'ARRIÈRE-PLAN, redesign « façon modale profil » ═══
+         ✅ CORRECTION v6.4 : ces styles étaient PIÉGÉS dans le @media
+         (max-width: 480px) → pastille SANS AUCUN STYLE au-delà de 480 px
+         (« 0 css »). Posés désormais à TOUTES les tailles d'écran.
+         Position : bas-DROITE — elle ne couvre plus le bouton menu
+         (haut-gauche) ; updatePillOffset() la hisse au-dessus de la
+         bannière d'installation quand celle-ci est visible. */
       .arvexa-bg-pill {
         position: fixed;
-        top: calc(10px + env(safe-area-inset-top, 0px));
-        left: 10px;
+        right: 12px;
+        bottom: calc(14px + env(safe-area-inset-bottom, 0px));
         z-index: 9300;
-        display: flex; align-items: center; gap: 7px;
-        padding: 7px 9px 7px 11px;
+        display: flex; align-items: center; gap: 9px;
+        padding: 10px;
         background: linear-gradient(145deg, #141414, #0A0A0A);
-        border: 1px solid rgba(184,134,11,.4);
-        border-radius: 999px;
+        border: 1px solid rgba(184,134,11,.35);
+        border-radius: 16px;
         color: #F5F0E8;
         font-family: 'Inter', sans-serif;
         font-size: 11.5px; font-weight: 600;
-        box-shadow: 0 8px 24px rgba(0,0,0,.45);
-        max-width: calc(100vw - 24px);
-        animation: arvexaFadeIn .3s ease;
-        transition: opacity .3s ease;
+        box-shadow: 0 14px 40px rgba(0,0,0,.55);
+        max-width: min(290px, calc(100vw - 24px));
+        animation: arvexaSlideUp .35s cubic-bezier(0.34,1.56,0.64,1);
+        transition: opacity .3s ease, bottom .25s ease;
+      }
+      .arvexa-bg-pill-ico {
+        flex: none; width: 32px; height: 32px; border-radius: 50%;
+        background: linear-gradient(135deg, rgba(184,134,11,.28), rgba(184,134,11,.08));
+        border: 1px solid rgba(184,134,11,.4);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 15px;
+      }
+      .arvexa-bg-pill-body {
+        display: flex; flex-direction: column; gap: 3px;
+        min-width: 0; flex: 1;
+      }
+      .arvexa-bg-pill-top {
+        display: flex; align-items: baseline; justify-content: space-between;
+        gap: 8px;
+      }
+      .arvexa-bg-pill-title {
+        font-weight: 700; font-size: 11.5px; color: #F5F0E8;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      }
+      .arvexa-bg-pill-top #arvexaDlPercent {
+        flex: none; font-weight: 800; font-size: 11.5px; color: #E0B84A;
       }
       .arvexa-bg-pill .arvexa-bg-pill-bar {
-        width: 64px; height: 5px; border-radius: 999px;
-        background: rgba(255,255,255,.12);
+        display: block; width: 100%; height: 5px; border-radius: 999px;
+        background: rgba(255,255,255,.10);
         overflow: hidden; flex: none;
       }
       .arvexa-bg-pill .arvexa-bg-pill-fill {
@@ -1056,26 +1192,29 @@
         background: linear-gradient(90deg, #B8860B, #E0B84A);
         border-radius: 999px;
         transition: width .4s ease;
+        box-shadow: 0 0 10px rgba(224,184,74,.45);
       }
-      .arvexa-bg-pill #arvexaDlInfo {
-        opacity: .72; font-weight: 500;
+      .arvexa-bg-pill .arvexa-bg-pill-sub {
+        font-weight: 500; font-size: 10.5px; color: rgba(245,240,232,.72);
         overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
         min-width: 0;
       }
       .arvexa-bg-pill-cancel {
         border: none; cursor: pointer; flex: none;
-        width: 20px; height: 20px; border-radius: 50%;
+        width: 24px; height: 24px; border-radius: 50%;
         background: rgba(255,255,255,.1);
-        color: #F5F0E8; font-size: 10.5px; line-height: 1;
+        color: #F5F0E8; font-size: 11px; line-height: 1;
         display: flex; align-items: center; justify-content: center;
-        padding: 0;
+        padding: 0; transition: background .2s ease;
       }
-      .arvexa-bg-pill-cancel:active { background: rgba(231,76,60,.5); }
-      @media (max-width: 420px) {
-        .arvexa-bg-pill #arvexaDlInfo { max-width: 74px; }
+      .arvexa-bg-pill-cancel:hover { background: rgba(231,76,60,.45); }
+      .arvexa-bg-pill-cancel:active { background: rgba(231,76,60,.65); }
+      @media (max-width: 360px) {
+        .arvexa-bg-pill { right: 8px; max-width: calc(100vw - 16px); }
       }
 
-      /* ═══ ✅ v6.3 — POP-UP POST-INSCRIPTION ═══ */
+      /* ═══ ✅ v6.3 — POP-UP POST-INSCRIPTION (✅ v6.4 : sorti du @media 480px
+         — styles appliqués à toutes les tailles d'écran) ═══ */
       .arvexa-welcome-overlay {
         position: fixed; inset: 0;
         background: rgba(0,0,0,.55);
@@ -1131,9 +1270,6 @@
         border-radius: 12px; padding: 11px 16px;
         font-weight: 600; font-size: 13px; cursor: pointer;
         font-family: 'Inter', sans-serif;
-      }
-        .arvexa-download-modal { padding: 22px 18px 18px; }
-        .arvexa-download-title { font-size: 18px; }
       }
     `;
     document.head.appendChild(style);
@@ -1246,5 +1382,5 @@
 
   init();
 
-  console.log('✅ ARVEXA — Mode hors ligne v6.2 (instantané + annulable) prêt');
+  console.log('✅ ARVEXA — Mode hors ligne v6.4 (arrière-plan non bloquant) prêt');
 })();

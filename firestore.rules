@@ -5,8 +5,13 @@ service cloud.firestore {
 
     // ═══════════════════════════════════════════════════════════════
     // RÈGLES ARVEXA SCHOOL
-    // Version : 2026-10-26 (v2 sécurisée)
+    // Version : 2026-11-02 (v3 — verrou pays + curricula durcis)
     // Changements majeurs :
+    //  - users/{uid}.country : format ISO-2 + VERROU (posé une seule fois,
+    //    plus jamais modifiable ni supprimable via le client) — le pop-up
+    //    de pays est lié au COMPTE, pas à l'appareil
+    //  - curricula : pays imposé = préfixe du document, auteur obligatoirement
+    //    l'utilisateur connecté, horodatage serveur (anti-falsification)
     //  - Création de compte : champs sensibles verrouillés (premium/role)
     //  - Update user : tous les champs d'abonnement/paiement protégés
     //  - Groupes : validation stricte des messages (anti-XSS/spam)
@@ -64,7 +69,26 @@ service cloud.firestore {
                 'saspayCheckoutReference',
                 'saspayCheckoutSessionId',
                 'saspayCheckoutStartedAt'
-              ]));
+              ]))
+
+      // ✅ v3 — PAYS VERROUILLÉ (choix forcé dans exam/reviseur) :
+      //  - format ISO-2 imposé (« NE », « ML », « SN », …)
+      //  - posé UNE SEULE fois par le compte ; ensuite, plus AUCUNE
+      //    modification ni suppression possible via le client : le garde-fou
+      //    serveur garantit « une fois confirmé, c'est fixe à vie » et le
+      //    pop-up est bien lié au COMPTE (un nouveau compte sur le même
+      //    appareil repasse par le choix de pays).
+      //  - countryConfirmedAt devient immuable dès qu'il existe.
+        && (!('country' in request.resource.data)
+            || (request.resource.data.country is string
+                && request.resource.data.country.size() == 2
+                && request.resource.data.country.matches('^[A-Z]{2}$')))
+        && (!('country' in resource.data)
+            || (('country' in request.resource.data)
+                && request.resource.data.country == resource.data.country))
+        && (!('countryConfirmedAt' in resource.data)
+            || (('countryConfirmedAt' in request.resource.data)
+                && request.resource.data.countryConfirmedAt == resource.data.countryConfirmedAt));
 
       // ─── Suppression : admin uniquement ─────────────────────────
       allow delete: if isAdmin();
@@ -170,7 +194,7 @@ service cloud.firestore {
       allow write: if false;
     }
 
-    // ─── Programmes communautaires par pays (v8.9) ────────────────
+    // ─── Programmes communautaires par pays (v8.9, durcis v3) ─────
     // Demande propriétaire : pour les MATIÈRES LITTÉRAIRES (philosophie,
     // histoire, géographie) qui changent d'un pays à l'autre, les élèves
     // d'un même pays remplissent progressivement leurs chapitres. Chaque
@@ -180,16 +204,21 @@ service cloud.firestore {
     // curricula/{ISO}_{matiere}/chapters/{slug}       = chapitre
     match /curricula/{key} {
       allow read: if request.auth != null;
-      // Méta : 4 champs exactement, pays ISO-2 + matière bornée
+      // Méta : 4 champs exactement, pays ISO-2 = préfixe du document,
+      // auteur = utilisateur connecté, date = horloge du serveur (v3).
       allow create, update: if request.auth != null
         && key is string
         && key.size() <= 60
         && request.resource.data.keys().hasOnly(['country', 'subject', 'updatedAt', 'updatedBy'])
         && request.resource.data.country is string
         && request.resource.data.country.size() == 2
+        && request.resource.data.country.matches('^[A-Z]{2}$')
+        && key.split('_')[0] == request.resource.data.country
         && request.resource.data.subject is string
         && request.resource.data.subject.size() > 0
-        && request.resource.data.subject.size() <= 40;
+        && request.resource.data.subject.size() <= 40
+        && request.resource.data.updatedBy == request.auth.uid
+        && request.resource.data.updatedAt == request.time;
       allow delete: if false;
 
       match /chapters/{chapterId} {

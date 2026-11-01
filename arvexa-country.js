@@ -1,6 +1,7 @@
 /* ═══════════════════════════════════════════════════════════════════
    ARVEXA SCHOOL — ARVEXA-COUNTRY.JS
-   ✅ v8.9 — CHOIX DE PAYS FORCÉ + PROGRAMMES COMMUNAUTAIRES PAR PAYS
+   ✅ v8.10 — PAYS LIÉ AU COMPTE (zéro cache d'appareil) + VERROU SERVEUR
+   (base v8.9 : choix de pays forcé + programmes communautaires par pays)
    ═══════════════════════════════════════════════════════════════════
    Demande propriétaire (récapitulée) :
    « Il faut que j'utilise l'intelligence artificielle. La modification ne
@@ -21,8 +22,9 @@
       croix, sans Échap, sans clic extérieur) demande le pays (recherche
       insensible aux accents, Niger en premier avec « Programme intégré »).
       La sélection exige une CONFIRMATION explicite → le pays est alors
-      VERROUILLÉ définitivement (localStorage + users/{uid}.country +
-      users/{uid}.countryConfirmedAt). Le pop-up ne réapparaît jamais.
+      VERROUILLÉ définitivement dans le COMPTE (users/{uid}.country +
+      users/{uid}.countryConfirmedAt, verrou garanti aussi par les règles
+      Firestore). Le pop-up ne réapparaît jamais POUR CE COMPTE.
    2. PROGRAMME INTÉGRÉ — le Niger (défaut) garde exactement l'expérience
       actuelle : les chapitres préprogrammés restent servis à l'identique.
    3. MATIÈRES SCIENTIFIQUES (maths, physique, chimie, svt) — identiques
@@ -34,9 +36,11 @@
       chapitre »). Chaque chapitre est stocké dans Firestore en mentionnant
       le pays (curricula/{PAYS}_{matiere}/chapters/{slug} avec addedBy) →
       tout élève du MÊME pays voit directement les chapitres déjà listés et
-      la liste se complète au fur et à mesure. Cache localStorage pour
+      la liste se complète au fur et à mesure. Cache local des CHAPITRES
+      communautaires uniquement (donc publics, pas personnels) pour
       l'offline ; si Firestore refuse (règles pas encore déployées / hors
       ligne), le chapitre reste utilisable localement sur l'appareil.
+      ✅ v8.10 — le CHOIX DE PAYS, lui, n'est JAMAIS mis en cache d'appareil.
    5. Design 100 % tokens du site (arvexa-ui.css) → thèmes sombre ET clair
       automatiques. i18n EN via window.ARVEXA_LANG quand disponible.
 
@@ -122,8 +126,9 @@ const AFRIQUE = [
 console.assert(AFRIQUE.length === 54, '[Country] 54 pays attendus, trouvé :', AFRIQUE.length);
 
 const NIGER_ISO = 'NE';
-const LS_KEY = 'arvexa-country';            // {code, confirmed, at}
 const LS_CURR_PREFIX = 'arvexa-curricula-'; // + {ISO}_{subject} → {chapters, at}
+// (Cache CURRICULA uniquement : chapitres publics de la communauté, jamais
+// le choix de pays — supprimé en v8.10, voir « ÉTAT » ci-dessous.)
 const MAX_CHAPTERS = 80;
 const TITLE_MAX = 120;
 
@@ -145,6 +150,10 @@ function tr(s) {
 }
 
 // ─── ÉTAT ───────────────────────────────────────────────────────────
+// ✅ v8.10 — ZÉRO cache d'appareil pour le choix de pays : `state` vit en
+// mémoire le temps de la page et sa source de vérité est users/{uid}
+// (Firestore). Conséquence voulue : sur le MÊME appareil, un NOUVEAU
+// compte repasse par le pop-up de choix de pays, exactement comme demandé.
 let state = { code: NIGER_ISO, confirmed: false, at: 0 };
 let currentUser = null;
 let readyPromise = null;
@@ -152,19 +161,9 @@ let readyResolved = false;
 const curriculaCache = new Map();   // subject → [{slug,title,addedBy,local}]
 const currUnsubs = new Map();       // subject → unsubscribe()
 
-try {
-  const raw = localStorage.getItem(LS_KEY);
-  if (raw) {
-    const parsed = JSON.parse(raw);
-    if (parsed && typeof parsed.code === 'string' && parsed.code.length === 2) {
-      state = { code: parsed.code, confirmed: parsed.confirmed === true, at: parsed.at || 0 };
-    }
-  }
-} catch (e) {}
-
-function persistLocal() {
-  try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch (e) {}
-}
+// ✅ v8.10 — purge de l'ancien cache d'appareil (v8.9) : le choix de pays
+// ne doit jamais survivre au compte, même sur un vieil appareil déjà v8.9.
+try { localStorage.removeItem('arvexa-country'); } catch (e) {}
 
 function emit(name, detail) {
   try { window.dispatchEvent(new CustomEvent(name, { detail: detail || {} })); } catch (e) {}
@@ -204,16 +203,18 @@ function ready() {
       onAuthStateChanged(auth, (user) => {
         currentUser = user;
         if (!user) { clearTimeout(timer); return finish(); }
+        // ✅ v8.10 — la SEULE source du pays est le compte Firestore.
+        // Plus aucune adoption depuis un cache d'appareil et PLUS AUCUN
+        // push automatique : l'ancien code poussait le pays lu en local
+        // dans le profil — un nouveau compte sur le même appareil héritait
+        // donc du pays de l'ancien compte (fuite corrigée). Profil sans
+        // pays → needsCountryPopup() reste vrai → pop-up forcé.
         getDoc(doc(db, 'users', user.uid)).then((snap) => {
-          if (snap && snap.exists()) {
+          if (currentUser === user && snap && snap.exists() && !state.confirmed) {
             const d = snap.data();
-            if (d.country && d.countryConfirmedAt && !state.confirmed) {
+            if (d.country && d.countryConfirmedAt) {
               state = { code: d.country, confirmed: true, at: Date.now() };
-              persistLocal();
               emit('arvexa-country-change', { code: state.code, confirmed: true, fromProfile: true });
-            } else if (state.confirmed && d.country !== state.code) {
-              // Le choix local n'est pas encore au profil → pousser (best effort)
-              pushProfile(user.uid);
             }
           }
           clearTimeout(timer);
@@ -241,7 +242,7 @@ function confirmCountry(code) {
   const info = countryInfo(code);
   if (!info) return;
   state = { code: info.iso, confirmed: true, at: Date.now() };
-  persistLocal();
+  // ✅ v8.10 — aucune écriture locale : le verrou ne vit que dans le compte.
   try {
     const { auth } = fb();
     if (auth && auth.currentUser) pushProfile(auth.currentUser.uid);
@@ -399,7 +400,7 @@ async function addChapter(subject, rawTitle) {
       country: state.code,
       subject: String(subject).slice(0, 40),
       updatedAt: serverTimestamp(),
-      updatedBy: uid || 'anonyme'
+      updatedBy: uid // ✅ v8.10 — doit être l'utilisateur connecté (règle Firestore)
     });
     // C'est parti pour le temps réel : la copie distante remplace le marqueur local
     try {

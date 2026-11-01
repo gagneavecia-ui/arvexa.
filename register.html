@@ -1626,12 +1626,31 @@ try {
         localStorage.setItem('arvexa_last_uid', user.uid);
         } catch (e) {}
 
-      // ✅ v8.3 — ISOLATION STRICTE : un compte TOUT NEUF démarre à zéro.
-      // Les clés de progression locales appartiennent forcément à un AUTRE
-      // compte (ou à un usage non connecté) → purge immédiate, AVANT la
-      // première page. La progression personnelle reviendra du cloud via
-      // arvexa-sync.js (users/{uid}/progression/course) si elle existe.
+      // ✅ v8.5 — ISOLATION STRICTE + COFFRE : un compte TOUT NEUF démarre
+      // à zéro. Les clés de progression locales appartiennent forcément à un
+      // AUTRE compte (ou à un usage non connecté) → elles sont ARCHIVÉES au
+      // « coffre de l'appareil » (arvexa_sync_legacy) puis purgées, AVANT la
+      // première page. Le coffre sera PROPOSÉ (confirmation unique) à un
+      // futur compte sans données cloud — jamais mélangé sans accord.
+      // La progression personnelle revient du cloud via arvexa-sync.js
+      // (users/{uid}/progression/course) si elle existe.
       try {
+        const read = JSON.parse(localStorage.getItem('arvexa_read_parts') || '[]');
+        const notes = JSON.parse(localStorage.getItem('arvexa_notes') || '{}');
+        const act = JSON.parse(localStorage.getItem('arvexa_daily_activity') || '{}');
+        const hasData = (Array.isArray(read) && read.length > 0) ||
+          (notes && Object.keys(notes).length > 0) ||
+          (act && Object.keys(act).length > 0);
+        if (hasData) {
+          localStorage.setItem('arvexa_sync_legacy', JSON.stringify({
+            read, notes,
+            meta: JSON.parse(localStorage.getItem('arvexa_notes_meta') || '{}'),
+            act,
+            snap: JSON.parse(localStorage.getItem('arvexa_daily_snap') || '{}'),
+            at: Date.now(),
+            rejectedBy: []
+          }));
+        }
         const PROGRESS_KEYS = [
           'arvexa_read_parts', 'arvexa_notes', 'arvexa_notes_meta',
           'arvexa_daily_activity', 'arvexa_daily_snap',

@@ -1,6 +1,6 @@
-/*! arvexa-sync.js — v1.1 — ARVEXA School
+/*! arvexa-sync.js — v1.2 — ARVEXA School
 ================================================================
-SYNCHRONISATION FIREBASE DES PROGRESSIONS (v8.3 — demande propriétaire :
+SYNCHRONISATION FIREBASE DES PROGRESSIONS (v8.5 — demande propriétaire :
 « j'ai créé un tout nouveau compte et je vois les progressions de mon
 autre compte sur le nouveau » → ISOLATION STRICTE par compte :
 « les progressions sont enregistrées en local… chaque compte doit avoir
@@ -16,15 +16,26 @@ users/{uid}/progression/course) :
                      calculé depuis progress-totals.json — structure officielle des cours)
 
 GARANTIES :
-  1. ISOLATION PAR COMPTE (v1.1, renforcée) : les données locales sont
+  1. ISOLATION PAR COMPTE (v1.1/v1.2, renforcée) : les données locales sont
      archivées (« stash ») par uid. Un changement de compte restaure LE stash
-     du compte entrant ; sinon → données locales VIDÉES (aucune adoption).
-     La progression ne revient QUE depuis le document cloud du compte entrant.
+     du compte entrant s'il en a un ; sinon → données locales VIDÉES (aucune
+     adoption silencieuse). La progression ne revient QUE depuis le document
+     cloud du compte entrant.
      v1.1 : l'« adoption intelligente » v8.0 est SUPPRIMÉE — c'est elle qui
      faisait fuiter la progression d'un compte vers un compte tout neuf.
   1b. GARDE ANTI-COURSE : push() et syncDown() capturent l'uid au départ et
      annulent leur écriture si le compte actif a changé entre-temps (switch
      de compte pendant un aller-retour réseau → jamais de croisement).
+  1c. COFFRE DE L'APPAREIL + CONFIRMATION UNIQUE (v1.2) : la sync v8.0 n'a
+     JAMAIS tourné (bug authMod) → les progressions de tous les élèves ne
+     vivent qu'en local. Pour ne rien détruire sans sacrifier l'isolation :
+     les données locales inattendues d'un compte entrant sont mises au
+     « coffre » (arvexa_sync_legacy) et PROPOSÉES via une confirmation
+     unique « Ces données sont-elles les tiennes ? » — Oui → adoptées et
+     uploadées dans CE compte ; Non → ce compte démarre à zéro, le coffre
+     reste disponible pour un autre compte de l'appareil. Chaque compte
+     n'est interrogé qu'UNE fois (marqueur par uid). Aucun mélange jamais
+     effectué sans accord explicite.
   2. RESET COMPLET : resetLive() vide TOUTES les clés de progression
      (read/notes/meta/activité + snapshot accueil session et persist).
   3. CONCURRENCE SÛRE (même compte sur 2 appareils ouverts) : écriture en
@@ -53,6 +64,8 @@ API : window.ArvexaProgress.{notifyChange, chapterTotal, subjectTotals, getStats
   var K_OWNER = 'arvexa_sync_owner';         // uid propriétaire de l'appareil
   var K_ACTIVE = 'arvexa_sync_active_uid';   // uid actif courant
   var STASH_PFX = 'arvexa_sync_u_';          // + uid + '_read' / '_notes' / '_meta' / '_act'
+  var K_LEGACY = 'arvexa_sync_legacy';       // ✅ v1.2 coffre de l'appareil
+  var K_ASKED = 'arvexa_sync_asked_';        // ✅ v1.2 + uid = déjà interrogé
 
   var MAX_NOTE_LEN = 5000;   // aligné maxlength textarea lecture.html
   var PUSH_DELAY_NOTES = 2000; // debounce notes
@@ -260,7 +273,8 @@ API : window.ArvexaProgress.{notifyChange, chapterTotal, subjectTotals, getStats
     totals: null, totalsPromise: null, hasCloudDoc: false, authAttached: false,
     knownRead: Object.create(null),     // sections déjà connues du cloud/local (anti double arrayUnion)
     pushTimer: null, pushInFlight: false, pushQueued: false, pushFailed: false,
-    lastStats: null, booted: false, lastLoginPushMs: 0
+    lastStats: null, booted: false, lastLoginPushMs: 0,
+    pendingAdoption: false, legacyPending: null  // ✅ v1.2 coffre de l'appareil
   };
 
   function stashKey(uid, suffix) { return STASH_PFX + uid + suffix; }
@@ -294,6 +308,124 @@ API : window.ArvexaProgress.{notifyChange, chapterTotal, subjectTotals, getStats
     LS.set(K_SNAP, {});
     try { root.localStorage.removeItem('arvexa_index_snapshot_persist'); } catch (e) {}
     try { root.sessionStorage.removeItem('arvexa_index_snapshot'); } catch (e) {}
+  }
+
+  // ── ✅ v1.2 — COFFRE DE L'APPAREIL + CONFIRMATION UNIQUE ──────────
+  // La sync v8.0 n'a jamais tourné : les progressions des élèves actuels
+  // ne vivent qu'en local. Quand un compte entrant trouve des données
+  // locales qui ne sont PAS les siennes (pas de stash, pas de session
+  // connue), elles sont mises au coffre PUIS proposées — jamais mélangées
+  // sans accord. Le coffre reste disponible pour un autre compte.
+
+  // Snapshot des clés live ; null si tout est vide (rien à protéger)
+  function snapshotLive() {
+    var read = LS.get(K_READ, []);
+    var notes = LS.get(K_NOTES, {});
+    var act = LS.get(K_ACT, {});
+    var hasRead = Array.isArray(read) && read.length > 0;
+    var hasNotes = notes && typeof notes === 'object' && Object.keys(notes).length > 0;
+    var hasAct = act && typeof act === 'object' && Object.keys(act).length > 0;
+    if (!hasRead && !hasNotes && !hasAct) return null;
+    return {
+      read: hasRead ? read : [],
+      notes: hasNotes ? notes : {},
+      meta: LS.get(K_NOTES_META, {}),
+      act: hasAct ? act : {},
+      snap: LS.get(K_SNAP, {})
+    };
+  }
+
+  // Archive un snapshot dans le coffre (conserve les refus existants)
+  function archiveToSlot(snapObj, freshRejections) {
+    if (!snapObj) return;
+    var prev = LS.get(K_LEGACY, null);
+    LS.set(K_LEGACY, {
+      read: snapObj.read || [], notes: snapObj.notes || {},
+      meta: snapObj.meta || {}, act: snapObj.act || {}, snap: snapObj.snap || {},
+      at: Date.now(),
+      rejectedBy: freshRejections ? [] : ((prev && prev.rejectedBy) || [])
+    });
+  }
+
+  function restoreSnapshot(s) {
+    if (!s) return;
+    LS.set(K_READ, Array.isArray(s.read) ? s.read : []);
+    LS.set(K_NOTES, s.notes || {});
+    LS.set(K_NOTES_META, s.meta || {});
+    LS.set(K_ACT, s.act || {});
+    LS.set(K_SNAP, s.snap || {});
+  }
+
+  /* Demande unique : « ces données sont-elles les tiennes ? »
+     Résout true (garder) / false (à zéro). Repli sûr hors modale : false
+     (isolation d'abord — le coffre reste disponible pour un autre compte). */
+  function askLegacy(uid) {
+    return new Promise(function (resolve) {
+      var done = false;
+      function finish(keep) {
+        if (done) return;
+        done = true;
+        LS.set(K_ASKED + uid, true); // une seule question par compte
+        resolve(keep);
+      }
+      try {
+        if (typeof window === 'undefined' || typeof window.arvexaConfirm !== 'function') { finish(false); return; }
+        window.arvexaConfirm({
+          title: 'Progression trouvée',
+          message: "Des données de progression existent déjà sur cet appareil. Sont-elles <strong>les tiennes</strong> ? « Garder » les transfère dans ce compte. « Non » démarre ce compte à zéro — elles restent récupérables par un autre compte de cet appareil.",
+          icon: '☁️',
+          confirmText: 'Oui, garder',
+          cancelText: 'Non, à zéro',
+          variant: 'primary',
+          onConfirm: function () { finish(true); },
+          onCancel: function () { finish(false); }
+        });
+      } catch (e) { finish(false); }
+    });
+  }
+
+  /* Arbitrage v1.2 (dans syncDown, compte entrant sans données cloud) :
+     candidate = legacyPending (live inattendu) OU coffre de l'appareil.
+     → confirmation unique ; Oui = adoption + upload ; Non = coffre gardé,
+       compte à zéro. Renvoie true si l'arbitrage a TOUT pris en charge
+       (le merge normal est court-circuité). */
+  function arbitrateLegacy(myUid, snapExists, cloudEmpty) {
+    var candidate = state.legacyPending || null;
+    state.legacyPending = null;
+    var slot = LS.get(K_LEGACY, null);
+    var slotUsable = !!(slot && Array.isArray(slot.read) && slot.read.length &&
+                        (slot.rejectedBy || []).indexOf(myUid) === -1);
+    if (candidate) archiveToSlot(candidate, false);   // le live inattendu rejoint le coffre
+    var usable = !!candidate || slotUsable;
+
+    // Compte déjà peuplé côté cloud → le cloud fait foi, jamais de question
+    if (snapExists && !cloudEmpty) return Promise.resolve(false);
+    if (!usable) return Promise.resolve(false);
+    if (LS.get(K_ASKED + myUid, false)) return Promise.resolve(false); // déjà interrogé
+
+    return askLegacy(myUid).then(function (keep) {
+      if (state.uid !== myUid) return true; // compte changé pendant la question
+      if (keep) {
+        restoreSnapshot(candidate || slot);
+        LS.set(K_LEGACY, { read: [], notes: {}, meta: {}, act: {}, snap: {}, at: Date.now(), rejectedBy: [] }); // coffre vidé (revendiqué)
+        push({ full: true }).then(function () {
+          emit({ phase: 'synced', merged: true, adopted: true, stats: state.lastStats });
+        });
+      } else {
+        var s2 = LS.get(K_LEGACY, null);
+        var rej = s2 && s2.rejectedBy ? s2.rejectedBy : [];
+        if (rej.indexOf(myUid) === -1) rej.push(myUid);
+        if (rej.length >= 3) { // 3 refus = données ambiguës → on nettoie
+          LS.set(K_LEGACY, { read: [], notes: {}, meta: {}, act: {}, snap: {}, at: Date.now(), rejectedBy: [] });
+        } else {
+          LS.set(K_LEGACY, { read: (s2 && s2.read) || [], notes: (s2 && s2.notes) || {}, meta: (s2 && s2.meta) || {}, act: (s2 && s2.act) || {}, snap: (s2 && s2.snap) || {}, at: (s2 && s2.at) || Date.now(), rejectedBy: rej });
+        }
+        push({ full: true }).then(function () {
+          emit({ phase: 'synced', merged: false, adopted: false });
+        });
+      }
+      return true;
+    });
   }
 
   function emit(detail) {
@@ -428,46 +560,66 @@ API : window.ArvexaProgress.{notifyChange, chapterTotal, subjectTotals, getStats
     if (!ref) return Promise.resolve(false);
     return state.fsMod.getDoc(ref).then(function (snap) {
       if (!state.uid || state.uid !== myUid) return false; // compte changé/déco
-      var today = CORE.dayStr(new Date());
-      var mergedSomething = false;
 
-      if (snap.exists()) {
-        state.hasCloudDoc = true;
-        var cloud = snap.data() || {};
-
-        // 1. sections lues (union)
-        var localRead = LS.get(K_READ, []);
-        var mergedRead = CORE.mergeReadParts(localRead, cloud.readParts);
-        if (mergedRead.length !== localRead.length) {
-          var added = mergedRead.length - localRead.length;
-          var snapAdj = CORE.adjustSnapForMerge(LS.get(K_SNAP, {}), added, today);
-          if (snapAdj) LS.set(K_SNAP, snapAdj);
-          LS.set(K_READ, mergedRead);
-          mergedSomething = true;
-        }
-        mergedRead.forEach(function (k) { state.knownRead[k] = 1; });
-
-        // 2. notes (par clé, édition la plus récente gagne)
-        var mn = CORE.mergeNotes(LS.get(K_NOTES, {}), LS.get(K_NOTES_META, {}), cloud.notes);
-        if (mn.changed) {
-          LS.set(K_NOTES, mn.notes);
-          LS.set(K_NOTES_META, mn.meta);
-          mergedSomething = true;
-        }
-
-        // 3. activité quotidienne (max par jour)
-        var ma = CORE.mergeActivity(LS.get(K_ACT, {}), cloud.dailyActivity);
-        if (ma.changed) { LS.set(K_ACT, ma.activity); mergedSomething = true; }
+      // ✅ v1.2 — arbitrage du coffre de l'appareil AVANT toute fusion :
+      // un compte entrant sans données cloud réelles se voit PROPOSER les
+      // données locales inattendues (jamais mélangées sans son accord).
+      var cloudData = snap.exists() ? (snap.data() || {}) : null;
+      var cloudEmpty = !cloudData || !(cloudData.readParts || []).length;
+      if (state.pendingAdoption || LS.get(K_LEGACY, null)) {
+        return arbitrateLegacy(myUid, !!snap.exists(), cloudEmpty)
+          .then(function (handled) {
+            if (handled) return true;
+            if (state.uid !== myUid) return false;
+            return finishSyncDown(myUid, snap);
+          });
       }
-
-      return push({ full: !snap.exists() || mergedSomething }).then(function () {
-        emit({ phase: 'synced', merged: mergedSomething, stats: state.lastStats });
-        return mergedSomething;
-      });
+      return finishSyncDown(myUid, snap);
     }).catch(function (e) {
       try { console.warn('[ArvexaSync] syncDown différé:', e && (e.code || e.message)); } catch (e2) {}
       emit({ phase: 'offline' });
       return false;
+    });
+  }
+
+  // Fusion normale (exécutée après l'arbitrage éventuel) — même garde uid.
+  function finishSyncDown(myUid, snap) {
+    if (!state.uid || state.uid !== myUid) return Promise.resolve(false);
+    var today = CORE.dayStr(new Date());
+    var mergedSomething = false;
+
+    if (snap.exists()) {
+      state.hasCloudDoc = true;
+      var cloud = snap.data() || {};
+
+      // 1. sections lues (union)
+      var localRead = LS.get(K_READ, []);
+      var mergedRead = CORE.mergeReadParts(localRead, cloud.readParts);
+      if (mergedRead.length !== localRead.length) {
+        var added = mergedRead.length - localRead.length;
+        var snapAdj = CORE.adjustSnapForMerge(LS.get(K_SNAP, {}), added, today);
+        if (snapAdj) LS.set(K_SNAP, snapAdj);
+        LS.set(K_READ, mergedRead);
+        mergedSomething = true;
+      }
+      mergedRead.forEach(function (k) { state.knownRead[k] = 1; });
+
+      // 2. notes (par clé, édition la plus récente gagne)
+      var mn = CORE.mergeNotes(LS.get(K_NOTES, {}), LS.get(K_NOTES_META, {}), cloud.notes);
+      if (mn.changed) {
+        LS.set(K_NOTES, mn.notes);
+        LS.set(K_NOTES_META, mn.meta);
+        mergedSomething = true;
+      }
+
+      // 3. activité quotidienne (max par jour)
+      var ma = CORE.mergeActivity(LS.get(K_ACT, {}), cloud.dailyActivity);
+      if (ma.changed) { LS.set(K_ACT, ma.activity); mergedSomething = true; }
+    }
+
+    return push({ full: !snap.exists() || mergedSomething }).then(function () {
+      emit({ phase: 'synced', merged: mergedSomething, stats: state.lastStats });
+      return mergedSomething;
     });
   }
 
@@ -485,6 +637,8 @@ API : window.ArvexaProgress.{notifyChange, chapterTotal, subjectTotals, getStats
     var uid = user.uid;
     var prevActive = LS.get(K_ACTIVE, null);
     var prevOwner = LS.get(K_OWNER, null);
+    state.pendingAdoption = false;   // ✅ v1.2
+    state.legacyPending = null;
 
     if (prevActive && prevActive !== uid) {
       saveStash(prevActive); // l'ancien compte actif repart dans son stash
@@ -495,7 +649,13 @@ API : window.ArvexaProgress.{notifyChange, chapterTotal, subjectTotals, getStats
     var sameAccount = (prevOwner === uid) || (prevActive === uid);
     var hadStash = restoreStash(uid); // SON stash s'il existe (multi-comptes)
     if (!hadStash && !sameAccount) {
-      resetLive(); // compte inconnu sans stash → JAMAIS de données héritées
+      // ✅ v1.2 — compte inconnu sans stash : JAMAIS de données héritées
+      // silencieusement. Le live inattendu part au COFFRE de l'appareil et
+      // sera PROPOSÉ au compte entrant (confirmation unique) après lecture
+      // de son document cloud (syncDown → arbitrateLegacy).
+      state.legacyPending = snapshotLive();
+      resetLive();
+      state.pendingAdoption = true;
     }
 
     LS.set(K_OWNER, uid);
@@ -514,6 +674,8 @@ API : window.ArvexaProgress.{notifyChange, chapterTotal, subjectTotals, getStats
     LS.set(K_ACTIVE, null);
     state.uid = null;
     state.knownRead = Object.create(null);
+    state.pendingAdoption = false; // ✅ v1.2
+    state.legacyPending = null;
   }
 
   // ── API PUBLIQUE (lecture.html et les pages) ──
@@ -582,7 +744,7 @@ API : window.ArvexaProgress.{notifyChange, chapterTotal, subjectTotals, getStats
     subjectTotals: subjectTotals,
     getStats: getStats,
     loadTotals: loadTotals,
-    version: '1.0'
+    version: '1.2'
   };
 
   if (root.document.readyState === 'complete') {

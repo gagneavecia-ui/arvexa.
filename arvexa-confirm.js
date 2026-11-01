@@ -293,6 +293,8 @@
     const closeBtn = overlay.querySelector('#arvexaConfirmClose');
 
     let confirmCallback = null;
+    let cancelCallback = null;
+    let confirmed = false;
 
     window.arvexaConfirm = function (options) {
       options = options || {};
@@ -306,6 +308,8 @@
       iconBox.className = 'arvexa-confirm-icon-box ' + (variant === 'primary' ? '' : 'danger');
       okBtn.className = 'arvexa-confirm-btn ' + variant;
       confirmCallback = options.onConfirm || null;
+      cancelCallback = options.onCancel || null;  // ✅ v8.5 — Annuler/Échap/extérieur
+      confirmed = false;
       overlay.classList.add('show');
       document.body.style.overflow = 'hidden';
     };
@@ -313,13 +317,17 @@
     function closeArvexaConfirm() {
       overlay.classList.remove('show');
       document.body.style.overflow = '';
+      const cb = cancelCallback;
       confirmCallback = null;
+      cancelCallback = null;
+      if (!confirmed && typeof cb === 'function') cb(); // ✅ v8.5 — fermeture sans confirmation
     }
 
     cancelBtn.addEventListener('click', closeArvexaConfirm);
     closeBtn.addEventListener('click', closeArvexaConfirm);
     okBtn.addEventListener('click', () => {
       const cb = confirmCallback;
+      confirmed = true;
       closeArvexaConfirm();
       if (typeof cb === 'function') cb();
     });

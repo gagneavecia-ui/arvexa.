@@ -1900,6 +1900,8 @@
   const confirmClose = document.getElementById('arvexaConfirmClose');
 
   let confirmCallback = null;
+  let confirmCancelCb = null;   // ✅ v8.5 — Annuler/Échap/extérieur
+  let confirmedFlag = false;
 
   window.arvexaConfirm = function(options) {
     confirmTitle.textContent = options.title || 'Confirmation';
@@ -1912,6 +1914,8 @@
     confirmOk.className = 'arvexa-confirm-btn ' + (options.variant === 'primary' ? 'primary' : 'danger');
 
     confirmCallback = options.onConfirm || null;
+    confirmCancelCb = options.onCancel || null;  // ✅ v8.5
+    confirmedFlag = false;
 
     confirmModal.classList.add('show');
     document.body.style.overflow = 'hidden';
@@ -1920,7 +1924,10 @@
   function closeArvexaConfirm() {
     confirmModal.classList.remove('show');
     document.body.style.overflow = '';
+    const ccb = confirmCancelCb;
     confirmCallback = null;
+    confirmCancelCb = null;
+    if (!confirmedFlag && typeof ccb === 'function') ccb(); // ✅ v8.5 — fermée sans confirmer
   }
 
   confirmCancel.addEventListener('click', closeArvexaConfirm);
@@ -1928,6 +1935,7 @@
 
   confirmOk.addEventListener('click', () => {
     const cb = confirmCallback;
+    confirmedFlag = true;
     closeArvexaConfirm();
     if (typeof cb === 'function') cb();
   });

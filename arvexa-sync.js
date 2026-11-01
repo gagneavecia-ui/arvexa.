@@ -1,6 +1,8 @@
-/*! arvexa-sync.js — v1.0 — ARVEXA School
+/*! arvexa-sync.js — v1.1 — ARVEXA School
 ================================================================
-SYNCHRONISATION FIREBASE DES PROGRESSIONS (v8.0 — demande propriétaire :
+SYNCHRONISATION FIREBASE DES PROGRESSIONS (v8.3 — demande propriétaire :
+« j'ai créé un tout nouveau compte et je vois les progressions de mon
+autre compte sur le nouveau » → ISOLATION STRICTE par compte :
 « les progressions sont enregistrées en local… chaque compte doit avoir
 ses propres données… tout sauvegardé dans Firebase : progressions,
 chapitres, nombre de sections, et le calcul de la progression »).
@@ -14,13 +16,17 @@ users/{uid}/progression/course) :
                      calculé depuis progress-totals.json — structure officielle des cours)
 
 GARANTIES :
-  1. ISOLATION PAR COMPTE : les données locales sont archivées (« stash ») par uid.
-     Un changement de compte sur l'appareil restaure LE stash du compte entrant ;
-     jamais de mélange entre deux comptes (appareils partagés).
-  2. ADOPTION INTELLIGENTE : 1ʳᵉ connexion d'un compte déjà utilisateur de
-     l'appareil (mise à jour v8.0) → la progression locale existante est ADOPTÉE
-     et uploadée (aucune perte pour les élèves actuels). Sauf si l'appareil
-     appartient déjà à un AUTRE compte → on repart des données cloud.
+  1. ISOLATION PAR COMPTE (v1.1, renforcée) : les données locales sont
+     archivées (« stash ») par uid. Un changement de compte restaure LE stash
+     du compte entrant ; sinon → données locales VIDÉES (aucune adoption).
+     La progression ne revient QUE depuis le document cloud du compte entrant.
+     v1.1 : l'« adoption intelligente » v8.0 est SUPPRIMÉE — c'est elle qui
+     faisait fuiter la progression d'un compte vers un compte tout neuf.
+  1b. GARDE ANTI-COURSE : push() et syncDown() capturent l'uid au départ et
+     annulent leur écriture si le compte actif a changé entre-temps (switch
+     de compte pendant un aller-retour réseau → jamais de croisement).
+  2. RESET COMPLET : resetLive() vide TOUTES les clés de progression
+     (read/notes/meta/activité + snapshot accueil session et persist).
   3. CONCURRENCE SÛRE (même compte sur 2 appareils ouverts) : écriture en
      setDoc(merge:true) + arrayUnion pour readParts + champs par clé pour
      notes/dailyActivity → aucune écriture n'écrase une autre.
@@ -278,11 +284,16 @@ API : window.ArvexaProgress.{notifyChange, chapterTotal, subjectTotals, getStats
     return true;
   }
 
+  // v1.1 — reset COMPLET des clés de progression « live » : plus la snapshot
+  // de l'accueil (session + persist) qui survivait au changement de compte.
   function resetLive() {
     LS.set(K_READ, []);
     LS.set(K_NOTES, {});
     LS.set(K_NOTES_META, {});
     LS.set(K_ACT, {});
+    LS.set(K_SNAP, {});
+    try { root.localStorage.removeItem('arvexa_index_snapshot_persist'); } catch (e) {}
+    try { root.sessionStorage.removeItem('arvexa_index_snapshot'); } catch (e) {}
   }
 
   function emit(detail) {
@@ -317,7 +328,12 @@ API : window.ArvexaProgress.{notifyChange, chapterTotal, subjectTotals, getStats
       try { app = appMod.getApps().find(function (a) { return a.name === '[DEFAULT]'; }) || null; } catch (e) {}
       if (!app) app = appMod.initializeApp(FIREBASE_CONFIG);
       state.app = app; state.authMod = authMod; state.fsMod = fsMod;
-      return { app: app, auth: authMod.getAuth(app), fsMod: fsMod };
+      // ✅ v1.1 — BUG BLOQUANT CORRIGÉ : « authMod » manquait dans l'objet
+      // renvoyé → attachAuth() plantait sur r.authMod.onAuthStateChanged
+      // (TypeError silencieux) → AUCUN handleLogin n'a jamais tourné en
+      // production : ni synchronisation, ni purge de données entre comptes.
+      // C'est la cause racine de la fuite de progression signalée.
+      return { app: app, auth: authMod.getAuth(app), fsMod: fsMod, authMod: authMod };
     }).catch(function (e) {
       fbPromise = null; // permettra de re-tenter (réseau)
       throw e;
@@ -334,6 +350,8 @@ API : window.ArvexaProgress.{notifyChange, chapterTotal, subjectTotals, getStats
   }
 
   // ── ÉCRITURE (concurrente-sûre : merge + arrayUnion + champs par clé) ──
+  // v1.1 : garde anti-course — si le compte actif change pendant le
+  // aller-retour réseau, l'écriture est ANNULÉE (aucun croisement).
   function buildCloudNotes() {
     var notes = LS.get(K_NOTES, {});
     var meta = LS.get(K_NOTES_META, {});
@@ -352,10 +370,12 @@ API : window.ArvexaProgress.{notifyChange, chapterTotal, subjectTotals, getStats
     if (!state.uid) return Promise.resolve(false);
     if (state.pushInFlight) { state.pushQueued = true; return Promise.resolve(false); }
     state.pushInFlight = true;
+    var myUid = state.uid;             // ✅ v1.1 anti-course
     var ref = cloudRef();
     if (!ref) { state.pushInFlight = false; return Promise.resolve(false); }
 
     return loadTotals().then(function (totals) {
+      if (state.uid !== myUid) return false; // compte changé → on n'écrit RIEN
       var read = LS.get(K_READ, []);
       // nouvelles clés uniquement (arrayUnion) — sauf adoption initiale (full)
       var newKeys = opts.full ? read.slice() : read.filter(function (k) { return !state.knownRead[k]; });
@@ -392,17 +412,22 @@ API : window.ArvexaProgress.{notifyChange, chapterTotal, subjectTotals, getStats
       return false;
     }).then(function (ok) {
       state.pushInFlight = false;
-      if (state.pushQueued) { state.pushQueued = false; push(); }
+      if (state.pushQueued && state.uid === myUid) { state.pushQueued = false; push(); }
+      else if (state.pushQueued) { state.pushQueued = false; }
       return ok;
     });
   }
 
   // ── LECTURE + FUSION (à la connexion) ──
+  // v1.1 : garde anti-course — un syncDown lancé pour le compte A et qui se
+  // résout APRÈS un passage au compte B n'écrit plus les données de A en
+  // local ni dans le doc de B (l'ancien garde « !state.uid » laissait passer).
   function syncDown() {
+    var myUid = state.uid;             // ✅ v1.1 anti-course
     var ref = cloudRef();
     if (!ref) return Promise.resolve(false);
     return state.fsMod.getDoc(ref).then(function (snap) {
-      if (!state.uid) return false; // déconnecté entre-temps
+      if (!state.uid || state.uid !== myUid) return false; // compte changé/déco
       var today = CORE.dayStr(new Date());
       var mergedSomething = false;
 
@@ -447,20 +472,30 @@ API : window.ArvexaProgress.{notifyChange, chapterTotal, subjectTotals, getStats
   }
 
   // ── CYCLE DE VIE COMPTE ──
+  // ✅ v1.1 — ISOLATION STRICTE (signalement propriétaire : un compte tout
+  // neuf affichait la progression de l'autre compte). Règles :
+  //   • le compte entrant a UN STASH (il est déjà venu sur cet appareil) →
+  //     on restaure SON stash : c'est LE sien, jamais celui d'un autre ;
+  //   • pas de stash et même compte (refresh) → le live est déjà le sien ;
+  //   • pas de stash et compte DIFFÉRENT/inconnu → données locales VIDÉES
+  //     (l'ancienne « adoption » v8.0 — qui transférait le local au nouveau
+  //     compte — est supprimée : c'est elle qui faisait fuiter), puis
+  //     syncDown() rapatrie UNIQUEMENT le doc cloud de CE compte.
   function handleLogin(user) {
     var uid = user.uid;
+    var prevActive = LS.get(K_ACTIVE, null);
     var prevOwner = LS.get(K_OWNER, null);
-    var hadStash = false;
 
-    if (LS.get(K_ACTIVE, null) && LS.get(K_ACTIVE, null) !== uid) {
-      saveStash(LS.get(K_ACTIVE, null)); // l'ancien compte actif repart dans son stash
+    if (prevActive && prevActive !== uid) {
+      saveStash(prevActive); // l'ancien compte actif repart dans son stash
+    } else if (prevOwner && prevOwner !== uid && prevActive === uid) {
+      saveStash(uid); // filet : live = owner sortant sans marque active
     }
 
-    if (prevOwner && prevOwner !== uid) {
-      // Appareil déjà lié à un AUTRE compte → ne JAMAIS adopter ses données locales
-      resetLive();
-    } else {
-      hadStash = restoreStash(uid); // même compte : reprend son stash ; 1ʳᵉ fois → ADOpte le local (upgrade v8.0)
+    var sameAccount = (prevOwner === uid) || (prevActive === uid);
+    var hadStash = restoreStash(uid); // SON stash s'il existe (multi-comptes)
+    if (!hadStash && !sameAccount) {
+      resetLive(); // compte inconnu sans stash → JAMAIS de données héritées
     }
 
     LS.set(K_OWNER, uid);
@@ -469,7 +504,7 @@ API : window.ArvexaProgress.{notifyChange, chapterTotal, subjectTotals, getStats
     state.knownRead = Object.create(null);
     LS.get(K_READ, []).forEach(function (k) { state.knownRead[k] = 1; });
 
-    emit({ phase: 'login', adopted: !hadStash }); // les pages re-rendent avec les données du bon compte
+    emit({ phase: 'login', fresh: !sameAccount }); // les pages re-rendent avec les données du bon compte
     syncDown();
   }
 
@@ -525,8 +560,10 @@ API : window.ArvexaProgress.{notifyChange, chapterTotal, subjectTotals, getStats
     if (state.booted) return;
     state.booted = true;
     loadTotals();
-    attachAuth().catch(function () { /* hors-ligne au démarrage : local tel quel,
-      attachAuth() est re-tenté à l'événement 'online' */ });
+    attachAuth().catch(function (e) { /* hors-ligne au démarrage : local tel quel,
+      attachAuth() est re-tenté à l'événement 'online' */
+      try { console.warn('[ArvexaSync] attach auth différé:', e && (e.code || e.message || e)); } catch (e2) {}
+    });
 
     root.addEventListener('online', function () {
       if (!state.authAttached) { attachAuth().catch(function () {}); return; }

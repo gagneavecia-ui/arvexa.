@@ -1263,9 +1263,7 @@
       .selector-trigger { padding: 11px 13px; font-size: 13px; }
       .selector-icon { width: 26px; height: 26px; font-size: 12px; }
       .notion-detail-title { font-size: 20px; }
-      .arvexa-popup { padding: 26px 22px 20px; }
-      .arvexa-popup-title { font-size: 19px; }
-      .arvexa-popup-message { font-size: 13px; }
+      /* modale premium → composant uniforme arvexa-confirm (v8.4) */
     }
 
     @media (max-width: 360px) {
@@ -1293,152 +1291,9 @@
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: rgba(184, 134, 11, 0.25); border-radius: 10px; }
 
-    .arvexa-popup-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 9999;
-      display: grid;
-      place-items: center;
-      padding: 18px;
-      background: rgba(0, 0, 0, 0.82);
-      backdrop-filter: blur(16px) saturate(120%);
-      -webkit-backdrop-filter: blur(16px) saturate(120%);
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.30s cubic-bezier(0.4, 0, 0.2, 1),
-                  visibility 0.30s cubic-bezier(0.4, 0, 0.2, 1);
-      overflow-y: auto;
-      overscroll-behavior: contain;
-      -webkit-overflow-scrolling: touch;
-    }
-    .arvexa-popup-overlay.show {
-      opacity: 1;
-      visibility: visible;
-    }
-    .arvexa-popup {
-      position: relative;
-      width: 100%;
-      max-width: 360px;
-      margin: auto;
-      padding: 30px 26px 22px;
-      border: 1px solid rgba(224, 184, 74, 0.20);
-      border-radius: 20px;
-      background:
-        radial-gradient(ellipse 120% 70% at 50% -10%, rgba(224, 184, 74, 0.10) 0%, transparent 65%),
-        radial-gradient(ellipse 100% 50% at 50% 110%, rgba(184, 134, 11, 0.05) 0%, transparent 60%),
-        linear-gradient(165deg, var(--bg-surface) 0%, var(--bg-deep) 100%);
-      box-shadow:
-        0 0 0 1px rgba(var(--rgb-soft), 0.02),
-        0 0 60px rgba(224, 184, 74, 0.08),
-        0 24px 60px rgba(0, 0, 0, 0.70);
-      transform: scale(0.94) translateY(20px);
-      transition: transform 0.42s cubic-bezier(0.34, 1.56, 0.64, 1);
-      text-align: center;
-      overflow: hidden;
-    }
-    .arvexa-popup-overlay.show .arvexa-popup {
-      transform: scale(1) translateY(0);
-    }
-    .arvexa-popup::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 20%;
-      right: 20%;
-      height: 2px;
-      background: linear-gradient(90deg,
-        transparent 0%,
-        rgba(224, 184, 74, 0.4) 20%,
-        var(--accent-bright) 50%,
-        rgba(224, 184, 74, 0.4) 80%,
-        transparent 100%);
-    }
-    .arvexa-popup-close {
-      position: absolute;
-      top: 13px;
-      right: 13px;
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      border: none;
-      background: rgba(var(--rgb-soft), 0.03);
-      color: var(--text-muted);
-      font-size: 12px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: var(--transition);
-    }
-    .arvexa-popup-close:hover {
-      background: rgba(224, 184, 74, 0.12);
-      color: var(--accent-bright);
-      transform: rotate(90deg);
-    }
-    .arvexa-popup-icon {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, rgba(224, 184, 74, 0.22), rgba(184, 134, 11, 0.08) 70%);
-      border: 1px solid rgba(224, 184, 74, 0.28);
-      color: var(--accent-bright);
-      font-size: 26px;
-      margin: 0 auto 16px;
-      animation: crownPulse 3s ease-in-out infinite;
-    }
-    @keyframes crownPulse {
-      0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(224, 184, 74, 0.15); }
-      50% { transform: scale(1.04); box-shadow: 0 0 34px rgba(224, 184, 74, 0.32); }
-    }
-    .arvexa-popup-title {
-      font-family: var(--font-serif);
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--text-light);
-      line-height: 1.25;
-      margin: 0 0 10px;
-    }
-    .arvexa-popup-title em { color: var(--accent-bright); font-style: italic; }
-    .arvexa-popup-message {
-      font-size: 13.5px;
-      color: var(--text-dim);
-      line-height: 1.6;
-      margin: 0 auto 20px;
-      max-width: 280px;
-    }
-    .arvexa-popup-message strong { color: var(--accent-bright); font-weight: 700; }
-    .arvexa-popup-actions {
-      display: flex;
-    }
-    .arvexa-popup-btn {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 7px;
-      padding: 13px 18px;
-      min-height: 48px;
-      border-radius: 100px;
-      border: none;
-      font-family: inherit;
-      font-size: 13.5px;
-      font-weight: 700;
-      text-decoration: none;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-    .arvexa-popup-btn.primary {
-      background: linear-gradient(135deg, var(--accent-bright), var(--accent));
-      color: var(--on-gold);
-      box-shadow: 0 4px 16px rgba(224, 184, 74, 0.28);
-    }
-    .arvexa-popup-btn.primary:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 8px 26px rgba(224, 184, 74, 0.45);
-    }
+    /* ✅ v8.4 — le pop-up « Limite atteinte » utilise le composant
+       UNIFORME du site (arvexa-confirm.js) : mêmes couleurs et mêmes
+       boutons que index/profil/abonnement. */
       /* ⚡ Anti-flash restauration en dur (pré-CDN, pattern accueil v4.2) */
     html.instant .shell { visibility: hidden; }
     html.instant.ready .shell { visibility: visible; }
@@ -1653,34 +1508,8 @@
 
   </main>
 
-  <!-- POP-UP PREMIUM -->
-  <div class="arvexa-popup-overlay" id="premiumOverlay">
-    <div class="arvexa-popup" role="dialog" aria-modal="true">
-
-      <button class="arvexa-popup-close" id="premiumClose" aria-label="Fermer">
-        <i class="fas fa-times"></i>
-      </button>
-
-      <i class="fas fa-crown arvexa-popup-icon"></i>
-
-      <h2 class="arvexa-popup-title" id="premiumPopupTitle">
-        Limite <em>atteinte</em>
-      </h2>
-
-      <p class="arvexa-popup-message" id="premiumMessage">
-        Tu as utilisé tes <strong>3 générations gratuites</strong> aujourd'hui.
-        Passe à Premium pour réviser sans limite.
-      </p>
-
-      <div class="arvexa-popup-actions">
-        <a href="abonnement.html" class="arvexa-popup-btn primary">
-          <i class="fas fa-crown"></i>
-          Découvrir Premium
-        </a>
-      </div>
-
-    </div>
-  </div>
+  <!-- ✅ v8.4 — pop-up Premium retiré : window.arvexaConfirm() (composant
+       uniforme du site) est ouverte par showPremiumPopup(). -->
 
   <div class="toast-container" id="toastContainer"></div>
   
@@ -3076,13 +2905,19 @@ function validateQuiz() {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// PREMIUM POPUP
+// PREMIUM POPUP — ✅ v8.4 modale UNIFORME (arvexa-confirm.js)
 // ═══════════════════════════════════════════════════════════════
 function showPremiumPopup() {
-  $('premiumOverlay').classList.add('show');
-}
-function hidePremiumPopup() {
-  $('premiumOverlay').classList.remove('show');
+  if (typeof window.arvexaConfirm !== 'function') { window.location.assign('abonnement.html'); return; }
+  window.arvexaConfirm({
+    title: 'Limite atteinte',
+    message: "Tu as utilisé tes <strong>3 générations gratuites</strong> aujourd'hui. Passe à Premium pour réviser sans limite.",
+    icon: '👑',
+    confirmText: 'Découvrir Premium',
+    cancelText: 'Plus tard',
+    variant: 'primary',
+    onConfirm: () => window.location.assign('abonnement.html')
+  });
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -3111,16 +2946,7 @@ $('btnValidateQuiz').addEventListener('click', validateQuiz);
 $('btnNewQuiz').addEventListener('click', () => generateQuiz());
 $('btnBackHomeFromResults').addEventListener('click', () => goBack());
 
-$('premiumClose').addEventListener('click', hidePremiumPopup);
-$('premiumOverlay').addEventListener('click', (e) => {
-  if (e.target === $('premiumOverlay')) hidePremiumPopup();
-});
-
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && $('premiumOverlay').classList.contains('show')) {
-    hidePremiumPopup();
-  }
-});
+// ✅ v8.4 — fermeture gérée par arvexa-confirm.js (Échap/clic extérieur)
 
 // ═══════════════════════════════════════════════════════════════
 // PRÉREMPLISSAGE

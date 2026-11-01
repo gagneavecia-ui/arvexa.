@@ -1626,6 +1626,21 @@ try {
         localStorage.setItem('arvexa_last_uid', user.uid);
         } catch (e) {}
 
+      // ✅ v8.3 — ISOLATION STRICTE : un compte TOUT NEUF démarre à zéro.
+      // Les clés de progression locales appartiennent forcément à un AUTRE
+      // compte (ou à un usage non connecté) → purge immédiate, AVANT la
+      // première page. La progression personnelle reviendra du cloud via
+      // arvexa-sync.js (users/{uid}/progression/course) si elle existe.
+      try {
+        const PROGRESS_KEYS = [
+          'arvexa_read_parts', 'arvexa_notes', 'arvexa_notes_meta',
+          'arvexa_daily_activity', 'arvexa_daily_snap',
+          'arvexa_index_snapshot_persist'
+        ];
+        PROGRESS_KEYS.forEach((k) => localStorage.removeItem(k));
+        sessionStorage.removeItem('arvexa_index_snapshot');
+      } catch (e) {}
+
       // ✅ v6.3 — signal « nouvelle inscription » : la première page ARVEXA
       // (onboarding ou accueil) proposera le téléchargement hors ligne en
       // ARRIÈRE-PLAN (pop-up montré une seule fois, navigation libre).

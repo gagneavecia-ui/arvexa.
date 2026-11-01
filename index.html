@@ -1258,8 +1258,10 @@
 
     /* ============================================================
        SPLASH — écran de chargement lié à l'index uniquement.
-       ✅ v5.6 — affiché à CHAQUE ouverture (y compris hors ligne) ;
-       le contenu se restaure derrière lui, puis il se dissipe.
+       ✅ v8.3 — affiché UNIQUEMENT au premier chargement de la session ;
+       les retours (navigation interne) ne le rejouent plus : il est
+       retiré avant la première peinture, le contenu se restaure
+       derrière lui puis il se dissipe.
        ============================================================ */
     #appSplash {
       position: fixed; inset: 0; z-index: 20000;
@@ -1312,7 +1314,8 @@
 
   <!-- ============================================================
        SPLASH — écran de chargement lié à l'index uniquement.
-       1er chargement de la session : affiché ; retours ensuite :
+       ✅ v8.3 — 1er chargement de la session uniquement (marqueur
+       sessionStorage « arvexa_splash_seen ») ; retours ensuite :
        supprimé avant la première peinture (zéro flash).
        ============================================================ -->
   <div id="appSplash" aria-hidden="true">
@@ -1331,22 +1334,33 @@
      il se dissipe dès que sa durée minimale est jouée (contenu déjà
      peint derrière) — plus jamais de suppression avant peinture. */
   (function () {
-    var MIN_SPLASH_MS = 1200; // durée de branding jouée à chaque ouverture
-    /* Helper GLOBAL : dissipe le splash en respectant la durée minimale.
-       Idempotent — appelé par la restauration instantanée, par le module
-       (hideSplash) et par le filet anti-blocage. */
+    var MIN_SPLASH_MS = 1200; // durée de branding — 1er chargement uniquement
+    /* ✅ v8.3 — « écran de chargement uniquement au PREMIER chargement ».
+       Un marqueur de SESSION décide : présent → retour dans la session,
+       le splash est retiré AVANT la première peinture (zéro flash). */
+    var firstLoad = true;
+    try {
+      firstLoad = sessionStorage.getItem('arvexa_splash_seen') !== '1';
+      sessionStorage.setItem('arvexa_splash_seen', '1');
+    } catch (e) {}
+    window.__ARVEXA_SPLASH_FIRST__ = firstLoad;
+    function removeSplash(sp) {
+      if (!sp) return;
+      sp.classList.add('hide');
+      setTimeout(function () { if (sp.parentNode) sp.parentNode.removeChild(sp); }, 600);
+    }
+    /* Helper GLOBAL : dissipe le splash en respectant la durée minimale
+       (1er chargement) ou immédiatement (retours, v8.3). Idempotent —
+       appelé par la restauration instantanée, par le module (hideSplash)
+       et par le filet anti-blocage. */
     window.__arvexaSplashOut = function () {
       var sp = document.getElementById('appSplash');
       if (!sp || sp.__arvexaOut) return;
       sp.__arvexaOut = true;
+      if (!firstLoad) { removeSplash(sp); return; }
       var elapsed = Date.now() - (window.__ARVEXA_SPLASH_TS__ || Date.now());
       var wait = Math.max(0, MIN_SPLASH_MS - elapsed);
-      setTimeout(function () {
-        var s2 = document.getElementById('appSplash');
-        if (!s2) return;
-        s2.classList.add('hide');
-        setTimeout(function () { if (s2.parentNode) s2.parentNode.removeChild(s2); }, 600);
-      }, wait);
+      setTimeout(function () { removeSplash(document.getElementById('appSplash')); }, wait);
     };
     var snap = null;
     try {
@@ -1386,6 +1400,18 @@
       } catch (e) {}
     }
     window.__ARVEXA_SPLASH_TS__ = Date.now();
+    if (!firstLoad) {
+      /* ✅ v8.3 — RETOUR dans la session : splash supprimé avant la
+         1ʳᵉ peinture ; si une snapshot est dispo, accueil instantané. */
+      var sp0 = document.getElementById('appSplash');
+      if (sp0 && sp0.parentNode) sp0.parentNode.removeChild(sp0);
+      if (snap) {
+        document.documentElement.classList.add('instant');
+        document.documentElement.classList.add('ready');
+        window.__ARVEXA_INSTANT__ = snap;
+      }
+      return;
+    }
     if (snap) {
       document.documentElement.classList.add('instant');
       window.__ARVEXA_INSTANT__ = snap;

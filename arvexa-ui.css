@@ -6,6 +6,9 @@
         sur chaque page, même si la page ne les définit pas.
      2. Donner une base commune (focus, sélection, scrollbars, tap,
         autofill) pour un rendu "app native" identique partout.
+     3. Anti-débordement universel (v8.2) : texte toujours replié à
+        la ligne + verrou du défilement horizontal — MODALES exclues
+        (consigne propriétaire), bloc en fin de fichier.
    Garantie de non-casse :
      - Ce fichier est chargé AVANT le <style> interne de chaque page.
      - Les composants utilisent :where() (spécificité zéro) : le style
@@ -333,6 +336,80 @@ select:-webkit-autofill {
 /* Liens : pas de saut de couleur brutal */
 :where(a) {
   transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   ANTI-DÉBORDEMENT UNIVERSEL (v8.2)
+   Consigne propriétaire : « mets en blocage contre les débordements
+   qui ne reviennent pas à la ligne — règles partout SAUF pour les
+   modales ». Trois verrous à spécificité zéro (:where) : une page
+   qui définit son propre style gagne toujours.
+
+     1. CÉSURE — le texte revient TOUJOURS à la ligne (mots longs,
+        URLs, titres) au lieu de déborder. `anywhere` réduit aussi le
+        min-content : les enfants flex/grid se compriment enfin.
+     2. COMPRESSION — min-width:0 : fini les lignes flex/grid qui
+        refusent de rétrécir et poussent la page en largeur.
+     3. VERROU PAGE — aucun défilement horizontal au niveau du
+        document (overflow-x: clip sur html : n'interrompt PAS
+        position:sticky, ne crée pas de conteneur de défilement).
+        Les carrousels internes (overflow-x:auto) et les formules
+        larges (.katex-display) gardent leur propre défilement.
+
+   EXCEPTION DEMANDÉE — MODALES INTACTES : tout l'arbre des modales,
+   popups, overlays, backdrops, sheets et dialogues (attributs de
+   classe contenant modal/popup/overlay/backdrop/dialog/lightbox/
+   sheet + élément <dialog>) est RÉTABLI AU COMPORTEMENT D'ORIGINE
+   (min-width:auto, overflow-wrap:normal) : leur mise en page actuelle
+   n'est pas touchée. Les toasts/bannières NE SONT PAS des modales et
+   restent couverts par les règles (leurs messages longs se replient).
+   PROTECTION MATHS — .katex n'est jamais coupé (une formule brisée
+   = rendu détruit) ; une formule posée plus large que l'écran
+   défile localement au lieu de déborder.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* 1 — Le texte peut toujours revenir à la ligne */
+:where(body, main, header, footer, section, article, aside, nav, div, p, span, a,
+       li, ul, ol, dt, dd, figcaption, blockquote, label, summary, td, th,
+       h1, h2, h3, h4, h5, h6, small, strong, em, b, i, u, code, pre, kbd, samp) {
+  overflow-wrap: break-word; /* repli anciens navigateurs */
+  overflow-wrap: anywhere;   /* moderne : vaut aussi pour min-content (flex/grid) */
+}
+
+/* 2 — Les enfants flex/grid acceptent de se comprimer */
+:where(*) { min-width: 0; }
+
+/* 3 — Verrou anti-débordement au niveau du document (sticky intact) */
+html { overflow-x: clip; }
+@supports not (overflow-x: clip) {
+  html { overflow-x: hidden; }
+}
+
+/* ── EXCEPTION : MODALES INTACTES (consigne « sauf pour les modales ») ── */
+[class*="modal"], [class*="modal"] *,
+[class*="popup"], [class*="popup"] *,
+[class*="overlay"], [class*="overlay"] *,
+[class*="backdrop"], [class*="backdrop"] *,
+[class*="dialog"], [class*="dialog"] *,
+[class*="lightbox"], [class*="lightbox"] *,
+[class*="sheet"], [class*="sheet"] *,
+dialog, dialog * {
+  min-width: auto;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+/* ── PROTECTION MATHS : jamais de coupure dans une formule ── */
+.katex, .katex *, .katex-display, .katex-display * {
+  overflow-wrap: normal;
+  word-break: normal;
+  min-width: auto;
+}
+/* Formule posée plus large que l'écran : défilement LOCAL (pas de débordement) */
+.katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
 }
 
 /* ═══════════════════════════════════════════════════════════════════

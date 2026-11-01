@@ -3111,6 +3111,8 @@ function answerKey(exerciseIndex, questionIndex) {
 
 function saveAnswer(key, value) {
   state.answers[key] = value;
+    /* v1.0-BROUILLON : son de sélection */
+    try { document.dispatchEvent(new CustomEvent('arvexa-exam-select')); } catch (e) {}
   debouncedSaveSession();
 }
 
@@ -3355,6 +3357,8 @@ function showResults(result) {
   var score = Math.max(0, Math.min(20, Number((result && result.score) || 0)));
   var percentage = Number((result && result.percentage) || Math.round((score / 20) * 100));
   var grade = (result && result.grade) || getGrade(percentage);
+  /* v1.0-BROUILLON : fanfare / encouragement + réaction d'Arvy */
+  try { document.dispatchEvent(new CustomEvent('arvexa-exam-result', { detail: { percentage: percentage } })); } catch (e) {}
 
   $('resultScore').textContent = score.toFixed(2) + ' / 20';
   $('resultPercent').textContent = percentage + ' %';
@@ -3785,5 +3789,6 @@ requireAuth({
 console.log('ARVEXA — Mode examen v6.2 — Corrections C1-C5 appliquées');
 </script>
 <script type="module" src="./arvexa-confirm.js"></script>
+<script src="arvexa-vivant.js"></script>
 </body>
 </html>

@@ -273,7 +273,7 @@ async function buildStudentContext(uid) {
 function buildSystemPrompt(context) {
   const lines = [];
   lines.push('Tu es ARV Assistant, le tuteur personnel IA d\'ARVEXA School.');
-  lines.push('Tu aides des élèves de Terminale D au Niger à préparer le BAC.');
+  lines.push('Tu aides des élèves de Terminale D en Afrique francophone à préparer le BAC.');
   lines.push('');
   lines.push('═══ TON RÔLE ═══');
   lines.push('- Expliquer clairement, avec pédagogie, sans jargon inutile');

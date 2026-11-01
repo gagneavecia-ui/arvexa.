@@ -395,7 +395,7 @@ function plannerPrompt(aggregated) {
     chapitres_forts: s.strongChapters.map((c) => `Ex${c.number}`)
   }));
 
-  return `Tu es un coach pédagogique expert du BAC au Niger (Terminale D).
+  return `Tu es un coach pédagogique expert du BAC en Afrique francophone (Terminale D).
 Ta mission : générer un PLAN DE RÉVISION HEBDOMADAIRE COMPLET ET ACTIONNABLE pour un élève.
 
 ═══════════════════════════════════════════════════════════════

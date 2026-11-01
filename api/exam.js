@@ -660,9 +660,9 @@ RÈGLES LATEX — OBLIGATOIRES
 // des maths purs en SVT).
 const PEDAGOGY_RULES_CALC = `
 ═══════════════════════════════════════════════════════════════
-MISSION PÉDAGOGIQUE — MATIÈRE SCIENTIFIQUE À CALCULS (NIVEAU BAC NIGER)
+MISSION PÉDAGOGIQUE — MATIÈRE SCIENTIFIQUE À CALCULS (NIVEAU BAC AFRIQUE FRANCOPHONE)
 ═══════════════════════════════════════════════════════════════
-Tu prépares un élève de Terminale D au Niger pour le BAC.
+Tu prépares un élève de Terminale D en Afrique francophone pour le BAC.
 Les exercices doivent être :
 - Fidèles au programme officiel (niveau BAC)
 - Progressifs (facile → difficile au sein du même exercice)
@@ -674,10 +674,10 @@ Les exercices doivent être :
 
 const PEDAGOGY_RULES_SVT = `
 ═══════════════════════════════════════════════════════════════
-MISSION PÉDAGOGIQUE — SVT (NIVEAU BAC NIGER) — RÉGIME SPÉCIFIQUE
+MISSION PÉDAGOGIQUE — SVT (NIVEAU BAC AFRIQUE FRANCOPHONE) — RÉGIME SPÉCIFIQUE
 ═══════════════════════════════════════════════════════════════
 ⚠️ LA SVT N'EST NI LES MATHS NI LA PHYSIQUE : c'est une matière à QUESTIONNAIRE + ANALYSE.
-Tu prépares un élève de Terminale D au Niger pour le BAC.
+Tu prépares un élève de Terminale D en Afrique francophone pour le BAC.
 Les exercices doivent être :
 - Fidèles au programme officiel (niveau BAC) et au format des sujets BAC SVT.
 - Progressifs (restitution → analyse → synthèse au sein du même exercice).
@@ -695,10 +695,10 @@ CALCULS EN SVT — UNIQUEMENT si le chapitre s'y prête (génétique : croisemen
 
 const PEDAGOGY_RULES_LITTERAIRE = `
 ═══════════════════════════════════════════════════════════════
-MISSION PÉDAGOGIQUE — MATIÈRE LITTÉRAIRE (NIVEAU BAC NIGER)
+MISSION PÉDAGOGIQUE — MATIÈRE LITTÉRAIRE (NIVEAU BAC AFRIQUE FRANCOPHONE)
 ═══════════════════════════════════════════════════════════════
 ⚠️ MATIÈRE LITTÉRAIRE : QUESTIONNAIRE UNIQUEMENT — STRICTEMENT ZÉRO CALCUL.
-Tu prépares un élève de Terminale D au Niger pour le BAC.
+Tu prépares un élève de Terminale D en Afrique francophone pour le BAC.
 Les questions doivent être :
 - Fidèles au programme officiel (niveau BAC) et aux attentes réelles de l'épreuve.
 - Progressives : connaissance → analyse → mise en relation → jugement argumenté.
@@ -740,9 +740,9 @@ Pour les questions "choice" : la bonne réponse (correctAnswer) est celle que TU
 // s'appuie sur les réponses vérifiées par la passe de résolution (solution).
 const CORRECTION_PEDAGOGY = `
 ═══════════════════════════════════════════════════════════════
-PÉDAGOGIE DE CORRECTION (NIVEAU BAC NIGER)
+PÉDAGOGIE DE CORRECTION (NIVEAU BAC AFRIQUE FRANCOPHONE)
 ═══════════════════════════════════════════════════════════════
-Tu corriges un élève de Terminale D au Niger (épreuve de BAC).
+Tu corriges un élève de Terminale D en Afrique francophone (épreuve de BAC).
 - Note avec une BONTÉ EXIGEANTE : valorise toute démarche juste, sanctionne nettement les erreurs de fond.
 - Explications conformes au régime de la matière : calcul étape par étape en maths/physique/chimie ; raisonnement biologique argumenté en SVT ; argumentation rédigée en histoire/géographie/philosophie.
 - Si une réponse "correctAnswer" ou "solution" est fournie dans les données, c'est LA référence VALIDÉE par un professeur vérificateur : corrige par rapport à elle sans la remettre en cause.
@@ -825,7 +825,7 @@ CONTRAT DE COMPLÉTION — ABSOLUMENT OBLIGATOIRE :
 // ✅ v4.16 — VARIATION TOTALE À CHAQUE RELANCE
 // Avant : temperature 0.3 + prompt strictement identique ⇒ l'IA resservait
 // presque les mêmes exercices à chaque génération. Désormais : température
-// créative (1.0) + tirage aléatoire d'un contexte nigérien, d'une approche
+// créative (1.0) + tirage aléatoire d'un contexte africain, d'une approche
 // pédagogique et d'une contrainte numérique à CHAQUE appel + liste des
 // énoncés déjà servis à cet élève (interdits de recyclage).
 // ═════════════════════════════════════════════════════════════
@@ -842,17 +842,17 @@ function sanitizeAvoidList(input) {
 
 const VARIATION_CONTEXTS = {
   commun: [
-    'le grand marché de Niamey un jour de forte affluence',
+    'le grand marché de la capitale un jour de forte affluence',
     'une coopérative maraîchère le long du fleuve',
     'un chantier de construction dans un nouveau quartier',
-    'un trajet en car entre Niamey et Zinder',
+    'un trajet en car entre deux grandes villes du pays',
     'un centre de santé intégré en zone rurale',
     'un forage et le ravitaillement en eau d\'un village',
     'une boutique multi services de quartier',
     'un champ de mil pendant l\'hivernage',
     'un club de jeunes et un tournoi de football inter-quartiers',
     'une station de recharge de téléphones à énergie solaire',
-    'une tontine (gada) entre commerçantes',
+    'une tontine entre commerçantes',
     'un élevage de volailles familial',
     'un quai de chargement de marchandises au bord du fleuve',
     'une salle de classe lors de la rentrée scolaire',
@@ -883,7 +883,7 @@ const VARIATION_CONTEXTS = {
     'une analyse d\'eau de forage'
   ],
   svt: [
-    'une enquête sur la transmission d\'un caractère dans une famille nigérienne',
+    'une enquête sur la transmission d\'un caractère dans une famille d\'Afrique francophone',
     'une mare temporaire et sa vie pendant la saison des pluies',
     'la fermentation d\'un lait local',
     'une fleur disséquée en travaux pratiques',
@@ -894,16 +894,16 @@ const VARIATION_CONTEXTS = {
   // contextes scientifiques de « commun » (centre de santé, forage, champ...)
   // faisaient DÉRIVER un sujet d'histoire vers la santé.
   commun_lit: [
-    'le grand marché de Niamey un jour de forte affluence',
-    'un trajet en car entre Niamey et Zinder',
+    'le grand marché de la capitale un jour de forte affluence',
+    'un trajet en car entre deux grandes villes du pays',
     'une salle de classe lors de la rentrée scolaire',
     'un club de jeunes et un tournoi de football inter-quartiers',
-    'une tontine (gada) entre commerçantes',
+    'une tontine entre commerçantes',
     'un petit atelier de couture qui reçoit des commandes',
     'une cérémonie traditionnelle au village',
     'un groupe de discussion sur les réseaux sociaux',
     'un débat radiophonique en langue locale',
-    'une exposition culturelle sur l\'histoire du Niger'
+    'une exposition culturelle sur l\'histoire du continent'
   ],
   philosophie: [
     'un débat de jeunes sur le travail et la réussite',
@@ -914,15 +914,15 @@ const VARIATION_CONTEXTS = {
   ],
   histoire: [
     'les résistances à la pénétration coloniale au Sahel',
-    'les grands empires et royaumes de l\'espace nigérien',
-    'la marche du Niger vers l\'indépendance',
-    'les institutions de la République nigérienne',
-    'les routes transsahariennes et le commerce ancien'
+    'les grands empires et royaumes du Sahel et de l\'Afrique de l\'Ouest',
+    'la marche des pays d\'Afrique francophone vers l\'indépendance',
+    'les institutions de la République après l\'indépendance',
+    'les routes caravanières transsahariennes et le commerce ancien'
   ],
   geographie: [
-    'l\'exode rural et la croissance des villes du Niger',
-    'une région du Niger face à la sécheresse',
-    'l\'exploitation de l\'uranium et ses enjeux',
+    'l\'exode rural et la croissance des villes d\'Afrique de l\'Ouest',
+    'une région du Sahel face à la sécheresse',
+    'l\'exploitation des ressources minières et leurs enjeux',
     'les échanges commerciaux transfrontaliers',
     'la mobilité des pasteurs et le peuplement'
   ]
@@ -946,7 +946,7 @@ const VARIATION_NUMERIC = [
   'impose-toi des valeurs NON RONDES et inédites (ex. 7,5 ; 12,3 ; 17,25 ; 3/8 ; 2,4×10^3)',
   'impose-toi au moins deux valeurs décimales et une fraction dans chaque exercice',
   'impose-toi au moins une valeur en notation scientifique et une valeur impaire',
-  'impose-toi des grandeurs réalistes (masses, distances, durées crédibles au Niger) différentes des valeurs habituelles'
+  'impose-toi des grandeurs réalistes (masses, distances, durées crédibles) différentes des valeurs habituelles'
 ];
 
 // ✅ v5.0 — MATHS : VALEURS EXACTES OBLIGATOIRES. En mathématiques (surtout en
@@ -957,7 +957,7 @@ const MATH_EXACT_VALUES = 'Contrainte numérique MATHÉMATIQUES — VALEURS EXAC
 const VARIATION_TEXT = [
   'appuie chaque argument sur un exemple précis, daté ou localisé',
   'impose-toi un vocabulaire technique du programme',
-  'fais référence à une situation nigérienne concrète dans au moins une question',
+  'fais référence à une situation africaine concrète dans au moins une question',
   'varie les types de questions : une analyse, une mise en relation, un jugement argumenté'
 ];
 
@@ -1104,7 +1104,7 @@ function generationPrompt(config, avoidStatements) {
   const diffRules = diffRulesByCat[config.difficulty] || diffRulesByCat.medium;
   const variationBlock = buildVariationBlock(config.subject, avoidStatements);
 
-  return `Tu es un professeur expert du BAC au Niger.
+  return `Tu es un professeur expert du BAC en Afrique francophone.
 
 ${PEDAGOGY_RULES_BY_CATEGORY[category] || PEDAGOGY_RULES_CALC}
 ${specificRules}
@@ -1161,7 +1161,7 @@ function generationPromptFromNotebook(config, notebookContext, avoidStatements) 
   const diffRules = diffRulesByCat[config.difficulty] || diffRulesByCat.medium;
   const variationBlock = buildVariationBlock(config.subject, avoidStatements);
 
-  return `Tu es un professeur expert du BAC au Niger.
+  return `Tu es un professeur expert du BAC en Afrique francophone.
 
 ${PEDAGOGY_RULES_BY_CATEGORY[category] || PEDAGOGY_RULES_CALC}
 ${specificRules}
@@ -1234,7 +1234,7 @@ function correctionPrompt(body) {
     });
   });
 
-  return `Tu es un professeur correcteur expert du BAC au Niger. Ton rôle : corriger CHAQUE question avec une PÉDAGOGIE MAXIMALE, en attribuant une NOTE et une EXPLICATION à chaque question, sans exception.
+  return `Tu es un professeur correcteur expert du BAC en Afrique francophone. Ton rôle : corriger CHAQUE question avec une PÉDAGOGIE MAXIMALE, en attribuant une NOTE et une EXPLICATION à chaque question, sans exception.
 
 ${CORRECTION_PEDAGOGY}
 
@@ -1668,7 +1668,7 @@ function verificationPrompt(exam, subjectName, chapter) {
   const subjectLabel = SUBJECT_LABELS[subjectName] || subjectName;
   const category = subjectCategory(subjectName);
   const chapterLabel = chapter === 'all' ? 'tous les chapitres' : chapter;
-  return `Tu es un professeur VÉRIFICATEUR du BAC au Niger. On te donne un examen de ${subjectLabel} (chapitre : ${chapterLabel}) DÉJÀ rédigé par un autre professeur. Ton rôle : TRAITER toi-même CHAQUE question (tous les calculs, toutes les réponses rédigées), PUIS déclarer si la question est fiable.
+  return `Tu es un professeur VÉRIFICATEUR du BAC en Afrique francophone. On te donne un examen de ${subjectLabel} (chapitre : ${chapterLabel}) DÉJÀ rédigé par un autre professeur. Ton rôle : TRAITER toi-même CHAQUE question (tous les calculs, toutes les réponses rédigées), PUIS déclarer si la question est fiable.
 
 ⚠️ ALIGNEMENT STRICT : chaque réponse doit répondre à LA question dont tu recopies le début ET dont tu reprends la "key" — jamais à une autre question de l'examen. Traite les questions DANS L'ORDRE, une par une (les clés s1.* = Sujet 1, s2.* = Sujet 2 : NE LES CONFONDS PAS).
 

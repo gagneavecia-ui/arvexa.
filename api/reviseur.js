@@ -577,7 +577,7 @@ RÈGLES LATEX :
 `;
 
 const PEDAGOGY_RULES = `
-MISSION : Tu prépares un élève de Terminale D au Niger au BAC.
+MISSION : Tu prépares un élève de Terminale D en Afrique francophone au BAC.
 Contenu clair, précis, mémorisable.
 `;
 

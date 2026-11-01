@@ -2626,10 +2626,13 @@ function axUpdateExtra(subject, chapters) {
     var info = c.info || {};
     $('axcCountryHint').textContent = (info.flag ? info.flag + ' ' + info.fr : '') +
       ' · Chapitres de ton pays';
-    if (!ArvexaCountry.getCurriculum(subject) || !(ArvexaCountry.getCurriculum(subject) || []).length) {
-      // Programme encore vide : lecture distante + temps réel
-      ArvexaCountry.watchCurriculum(subject);
-    }
+    // ✅ v8.12 — listener TOUJOURS attaché (l'anti-doublon interne du
+    // module garantit 1 seul temps réel + 1 lecture initiale). Avant :
+    // il n'était attaché que si la liste était VIDE, donc un chapitre
+    // resté « local » (écriture manquée pendant une coupure réseau)
+    // n'était JAMAIS re-synchronisé vers Firestore — les autres élèves
+    // du pays ne le voyaient jamais (cas « Le relief »).
+    ArvexaCountry.watchCurriculum(subject);
   } catch (e) { console.warn('[EXAM] axUpdateExtra:', e); }
 }
 

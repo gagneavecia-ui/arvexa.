@@ -1,8 +1,23 @@
 /* ═══════════════════════════════════════════════════════════════════
    ARVEXA SCHOOL — ARVEXA-COUNTRY.JS
-   ✅ v8.10 — PAYS LIÉ AU COMPTE (zéro cache d'appareil) + VERROU SERVEUR
-   (base v8.9 : choix de pays forcé + programmes communautaires par pays)
+   ✅ v8.11 — FIABILITÉ : « Pays confirmé » n'est affiché QU'APRÈS une
+   écriture Firestore VÉRIFIÉE (base v8.10 : pays lié au compte + verrou)
    ═══════════════════════════════════════════════════════════════════
+   Correctif v8.11 (bug signalé : le pop-up réapparaissait à chaque
+   rechargement alors que le pays avait été « confirmé ») :
+   - pushProfile → persistCountry : setDoc (merge) si le profil n'existe
+     pas (l'ancien updateDoc échouait en « not-found »), 3 tentatives sur
+     erreur réseau, puis RELECTURE de preuve avant tout succès annoncé ;
+   - confirmCountry devient async : attend l'authentification (l'ancienne
+     version n'écrivait RIEN si auth.currentUser n'était pas encore
+     restauré) et ne retourne { ok:true } qu'avec preuve serveur ;
+   - la modale affiche un état « Enregistrement… », puis en cas d'échec
+     un message d'erreur HONNÊTE + Réessayer + option « Continuer sur
+     cet appareil » (synchro automatique dès le retour du réseau) ;
+   - ready() attend la vraie lecture du profil quand un utilisateur est
+     connecté (7 s au lieu de 1,6 s) : plus de pop-up qui réapparaît sur
+     un réseau lent pour un compte DÉJÀ confirmé (fermeture auto si
+     l'adoption du profil arrive après l'ouverture de la modale).
    Demande propriétaire (récapitulée) :
    « Il faut que j'utilise l'intelligence artificielle. La modification ne
      touche AUCUNE page à part le réviseur et exam. La matière scientifique
@@ -50,6 +65,8 @@
 
 import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+// ✅ v8.12 — getApp importé : le module partage l'app [DEFAULT] de la
+// page hôte (session Auth commune — voir note au-dessus de fb()).
 import {
   getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc,
   collection, query, orderBy, getDocs, onSnapshot, serverTimestamp
@@ -158,6 +175,8 @@ let state = { code: NIGER_ISO, confirmed: false, at: 0 };
 let currentUser = null;
 let readyPromise = null;
 let readyResolved = false;
+let pendingPersist = false;   // ✅ v8.11 — confirmé sur l'appareil, synchro compte en attente
+let pendingFatalCode = null;  // ✅ v8.11 — 'permission-denied' : retenté seulement à la main
 const curriculaCache = new Map();   // subject → [{slug,title,addedBy,local}]
 const currUnsubs = new Map();       // subject → unsubscribe()
 
@@ -173,13 +192,26 @@ function countryInfo(code) {
   return AFRIQUE.find((c) => c.iso === code) || null;
 }
 
-// ─── FIREBASE — instance DÉDIÉE (jamais de conflit d'initialisation) ─
+// ─── FIREBASE — SESSION PARTAGÉE AVEC LA PAGE HÔTE (✅ v8.12) ───────
+// 🔴 CAUSE RACINE du « pop-up qui revient toujours » : l'ancien code
+// créait une instance d'app DÉDIÉE « arvexa-country ». Or Firebase Auth
+// persiste la session PAR NOM D'APPLICATION (clé IndexedDB
+// « firebase:authUser<apiKey>[nom-app] ») : l'instance dédiée lisait sa
+// propre clé, JAMAIS celle de la connexion faite sur l'app [DEFAULT]
+// des pages. auth.currentUser restait donc null à vie sur cette
+// instance → aucune écriture du pays n'a jamais été tentée (et les
+// erreurs étaient avalées en silence). Correction : réutiliser l'app
+// [DEFAULT] initialisée par la page hôte (même config) — session
+// partagée — avec création de secours si aucune app n'existe.
 let _app = null, _auth = null, _db = null;
 function fb() {
   if (_db) return { auth: _auth, db: _db };
   try {
-    _app = getApps().find((a) => a.name === 'arvexa-country') || null;
-    if (!_app) _app = initializeApp(FIREBASE_CONFIG, 'arvexa-country');
+    try { _app = getApp(); } catch (e) { _app = null; } // app [DEFAULT] de la page hôte
+    if (!_app) {
+      _app = getApps().find((a) => a.options && a.options.projectId === FIREBASE_CONFIG.projectId) || null;
+    }
+    if (!_app) _app = initializeApp(FIREBASE_CONFIG); // secours : [DEFAULT] à nous
     _auth = getAuth(_app);
     _db = getFirestore(_app);
   } catch (e) {
@@ -196,13 +228,20 @@ function ready() {
   if (readyPromise) return readyPromise;
   readyPromise = new Promise((resolve) => {
     const finish = () => { if (!readyResolved) { readyResolved = true; resolve(getCountry()); } };
-    const timer = setTimeout(finish, 1600); // ne jamais bloquer la page
+    // ✅ v8.11 — délai différencié : 1,6 s sans utilisateur (page visiteur),
+    // mais 7 s avec un utilisateur CONNECTÉ : la lecture de son profil doit
+    // avoir une vraie chance, sinon le pop-up réapparaissait à tort sur un
+    // réseau lent pour un compte DÉJÀ confirmé (et la confirmation était
+    // proposée pendant que l'auth n'était pas prête → écriture sautée).
+    let timer = setTimeout(finish, 1600);
+    const arm = (ms) => { clearTimeout(timer); timer = setTimeout(finish, ms); };
     try {
       const { auth, db } = fb();
       if (!auth || !db) { clearTimeout(timer); return finish(); }
       onAuthStateChanged(auth, (user) => {
         currentUser = user;
         if (!user) { clearTimeout(timer); return finish(); }
+        arm(7000);
         // ✅ v8.10 — la SEULE source du pays est le compte Firestore.
         // Plus aucune adoption depuis un cache d'appareil et PLUS AUCUN
         // push automatique : l'ancien code poussait le pays lu en local
@@ -217,6 +256,9 @@ function ready() {
               emit('arvexa-country-change', { code: state.code, confirmed: true, fromProfile: true });
             }
           }
+          // ✅ v8.11 — profil sans pays mais confirmé « sur l'appareil »
+          // pendant une coupure : retenter la synchro vers le compte.
+          if (pendingPersist) retryPendingPersist();
           clearTimeout(timer);
           finish();
         }).catch(() => { clearTimeout(timer); finish(); });
@@ -226,27 +268,156 @@ function ready() {
   return readyPromise;
 }
 
-function pushProfile(uid) {
-  try {
-    const { db } = fb();
-    if (!db || !uid) return;
-    updateDoc(doc(db, 'users', uid), {
-      country: state.code,
-      countryConfirmedAt: new Date().toISOString()
-    }).catch(() => {});
-  } catch (e) {}
+// ─── ÉCRITURE SERVEUR DU PAYS (✅ v8.11, remplace pushProfile) ──────
+// Écrit users/{uid}.country + countryConfirmedAt de façon ROBUSTE et
+// vérifiée :
+//  1. le document profil est créé au besoin (setDoc merge conforme aux
+//     règles Firestore v3) — l'ancien updateDoc échouait en « not-found »
+//     quand le profil n'existait pas encore, en silence ;
+//  2. les erreurs réseau sont retentées (3 essais) ;
+//  3. une relecture FINALE confirme que le serveur a bien enregistré le
+//     pays — plus jamais de « Pays confirmé » sans preuve.
+// Retour : { ok:true } ou { ok:false, code } — JAMAIS d'erreur avalée.
+// ✅ v8.12 — chaque tentative est BORNÉE à 10 s : hors ligne, le SDK
+// Firestore peut rester suspendu ~30-60 s par appel ; sans cette borne,
+// l'élève restait bloqué des MINUTES sur « Enregistrement… » (découvert
+// en test). Au délai dépassé → panneau d'erreur + « Continuer sur cet
+// appareil » tout de suite.
+const PERSIST_ATTEMPT_TIMEOUT = 10000;
+function withTimeout(promise, ms, code) {
+  return Promise.race([
+    promise,
+    new Promise((resolve) => setTimeout(() => resolve({ _timeout: true, code }), ms))
+  ]);
+}
+async function persistCountry(uid, iso) {
+  const code = iso || state.code; // ✅ v8.12 — le code CONFIRMÉ est passé explicitement
+  const { db } = fb();
+  if (!db || !uid) return { ok: false, code: 'no-db' };
+  const payload = {
+    country: code,
+    countryConfirmedAt: new Date().toISOString()
+  };
+  const TRANSIENT = new Set(['unavailable', 'deadline-exceeded', 'aborted', 'cancelled', 'network-request-failed', 'internal']);
+  const tryWrite = async () => {
+    const ref = doc(db, 'users', uid);
+    const snap = await getDoc(ref);
+    if (snap && snap.exists()) {
+      await updateDoc(ref, payload);
+    } else {
+      // Profil absent : création conforme aux règles v3 (champs imposés).
+      await setDoc(ref, {
+        uid: uid,
+        role: 'student',
+        premium: false,
+        isUnlocked: false,
+        hasDeposited: false,
+        accountStatus: 'active',
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+        country: payload.country,
+        countryConfirmedAt: payload.countryConfirmedAt
+      }, { merge: true });
+    }
+    // ✅ Preuve serveur : relire AVANT d'annoncer le succès.
+    const check = await getDoc(ref);
+    const d = (check && check.exists()) ? check.data() : null;
+    if (d && d.country === code && d.countryConfirmedAt) return { ok: true };
+    return { code: 'verification-echouee' };
+  };
+  let lastCode = 'inconnu';
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    const outcome = await withTimeout(tryWrite(), PERSIST_ATTEMPT_TIMEOUT, 'delai-depasse');
+    if (outcome && outcome._timeout) {
+      lastCode = outcome.code;
+      console.warn(`[Country] Écriture du pays (${attempt}/3) : délai dépassé (${PERSIST_ATTEMPT_TIMEOUT} ms)`);
+      break; // réseau mort : les retries n'accélèrent rien, l'utilisateur décide
+    }
+    if (outcome.ok) return { ok: true };
+    lastCode = outcome.code || 'inconnu';
+    console.warn(`[Country] Écriture du pays (${attempt}/3) :`, lastCode);
+    if (!TRANSIENT.has(lastCode)) break; // permission-denied etc. : inutile de retenter
+    await new Promise((r) => setTimeout(r, attempt * 600));
+  }
+  return { ok: false, code: lastCode };
 }
 
-// ─── CONFIRMATION DU PAYS (verrou définitif) ────────────────────────
-function confirmCountry(code) {
+// ✅ v8.11 — synchro différée : si le pays a été confirmé « sur l'appareil »
+// pendant une coupure réseau, on retente dès que la connexion revient.
+async function retryPendingPersist() {
+  try {
+    if (!pendingPersist || !state.confirmed) return;
+    if (pendingFatalCode === 'permission-denied') return; // retente seulement via le bouton
+    const { auth } = fb();
+    const uid = (auth && auth.currentUser && auth.currentUser.uid) || null;
+    if (!uid) return;
+    const res = await persistCountry(uid, state.code);
+    if (res && res.ok) {
+      pendingPersist = false;
+      pendingFatalCode = null;
+      toast(tr('Pays synchronisé avec ton compte') + ' ✨');
+    }
+  } catch (e) {}
+}
+window.addEventListener('online', () => { setTimeout(retryPendingPersist, 1500); });
+document.addEventListener('visibilitychange', () => { if (!document.hidden) retryPendingPersist(); });
+
+// ─── CONFIRMATION DU PAYS (verrou définitif, écriture VÉRIFIÉE) ─────
+// ✅ v8.11 — la fonction est maintenant ASYNCHRONE et attend la vraie
+// écriture Firestore (attente de l'authentification, retries, relecture
+// de preuve). Résultat : { ok:true } ou { ok:false, code }. L'ancienne
+// version modifiait l'état local PUIS poussait en silence : si l'écriture
+// échouait (profil absent, règles refusées, auth pas encore restaurée),
+// le pop-up se fermait sur « Pays confirmé »… et réapparaissait à chaque
+// rechargement.
+async function confirmCountry(code) {
+  const info = countryInfo(code);
+  if (!info) return { ok: false, code: 'invalide' };
+
+  // 1. Attendre l'authentification (la restauration de session peut être
+  //    asynchrone — sans ça, aucune écriture n'était tentée). On ignore
+  //    les états null : on ne résout qu'avec un UTILISATEUR ou au timeout.
+  const { auth } = fb();
+  let user = (auth && auth.currentUser) || currentUser;
+  if (!user && auth) {
+    user = await new Promise((resolve) => {
+      let done = false;
+      const t = setTimeout(() => { done = true; resolve(null); }, 8000);
+      try {
+        onAuthStateChanged(auth, (u) => { if (u && !done) { done = true; clearTimeout(t); resolve(u); } });
+      } catch (e) { if (!done) { done = true; clearTimeout(t); resolve(null); } }
+    });
+  }
+  if (!user) return { ok: false, code: 'non-authentifie' };
+
+  // 2. Écriture serveur vérifiée (le pays confirmé est passé EXPLICITEMENT —
+  //    l'ancien code lisait state.code AVANT la mise à jour de l'état : le
+  //    défaut « NE » partait en base au lieu du pays choisi !).
+  const res = await persistCountry(user.uid, info.iso);
+  state = { code: info.iso, confirmed: true, at: Date.now() };
+  if (res.ok) {
+    pendingPersist = false;
+    pendingFatalCode = null;
+    emit('arvexa-country-change', { code: info.iso, confirmed: true });
+    return { ok: true };
+  }
+
+  // 3. Échec : le pays vaut pour la session (l'élève n'est pas bloqué) mais
+  //    le pop-up reviendra au prochain chargement tant que la synchro n'a
+  //    pas réussi — et l'interface le dit clairement.
+  pendingPersist = true;
+  pendingFatalCode = res.code === 'permission-denied' ? 'permission-denied' : null;
+  emit('arvexa-country-change', { code: info.iso, confirmed: true });
+  return { ok: false, code: res.code };
+}
+
+// ✅ v8.11 — confirmation locale « hors ligne » demandée explicitement :
+// le pays vaut pour la session, la synchro repartira toute seule.
+function confirmCountryLocal(code) {
   const info = countryInfo(code);
   if (!info) return;
   state = { code: info.iso, confirmed: true, at: Date.now() };
-  // ✅ v8.10 — aucune écriture locale : le verrou ne vit que dans le compte.
-  try {
-    const { auth } = fb();
-    if (auth && auth.currentUser) pushProfile(auth.currentUser.uid);
-  } catch (e) {}
+  pendingPersist = true;
   emit('arvexa-country-change', { code: info.iso, confirmed: true });
 }
 
@@ -300,6 +471,18 @@ function mergeChapters(a, b) {
   return [...seen.values()].sort((x, y) => x.title.localeCompare(y.title, 'fr'));
 }
 
+// ✅ v8.12 — compare deux listes de chapitres (ordre des slugs + marque
+// local) : sert à n'émettre 'arvexa-curricula-change' QUE si la liste a
+// réellement changé (participe à l'anti-boucle).
+function listsDiffer(a, b) {
+  a = a || []; b = b || [];
+  if (a.length !== b.length) return true;
+  for (let i = 0; i < a.length; i++) {
+    if (!a[i] || !b[i] || a[i].slug !== b[i].slug || !!a[i].local !== !!b[i].local) return true;
+  }
+  return false;
+}
+
 // ─── API PUBLIQUE — curriculum communautaire ────────────────────────
 function useCommunity(subject) {
   return !isNiger() && LITERARY_SUBJECTS.has(subject);
@@ -319,6 +502,56 @@ function setCurriculumCache(subject, chapters, emitEvent) {
   if (emitEvent) emit('arvexa-curricula-change', { subject, count: chapters.length });
 }
 
+// ✅ v8.11 — SYNCHRO DIFFÉRÉE DES CHAPITRES LOCAUX : un chapitre ajouté
+// pendant une coupure réseau (ou quand une écriture a échoué en silence)
+// reste marqué « local » dans le cache de l'appareil. À chaque ouverture
+// de la matière, on retente le partage — exactement comme
+// retryPendingPersist() le fait pour le pays. Sans ça, un chapitre manqué
+// restait local POUR TOUJOURS et les autres élèves du pays ne le voyaient
+// jamais (cas « Le relief » signalé par le propriétaire).
+async function syncLocalChapters(subject) {
+  if (!useCommunity(subject)) return;
+  const { db, auth } = fb();
+  if (!db) return;
+  const uid = (auth && auth.currentUser && auth.currentUser.uid)
+    || (currentUser && currentUser.uid) || null;
+  if (!uid) return;
+  const list = curriculaCache.get(subject) || [];
+  const locals = list.filter((c) => c.local && c.slug && (!c.addedBy || c.addedBy === uid));
+  if (!locals.length) return;
+  const written = new Set();
+  for (const ch of locals) {
+    try {
+      await setDoc(doc(db, 'curricula', currKey(subject), 'chapters', ch.slug), {
+        title: String(ch.title).slice(0, TITLE_MAX),
+        order: String(ch.title).toLowerCase(),
+        addedBy: uid,
+        addedAt: serverTimestamp()
+      });
+      written.add(ch.slug);
+    } catch (e) {
+      // Slug déjà posé par un autre élève (update interdit) ? → le chapitre
+      // existe déjà en ligne : on peut dé-tager notre copie locale.
+      try {
+        const snap = await getDoc(doc(db, 'curricula', currKey(subject), 'chapters', ch.slug));
+        if (snap && snap.exists()) written.add(ch.slug);
+      } catch (e2) {}
+    }
+  }
+  if (!written.size) return;
+  try {
+    await setDoc(doc(db, 'curricula', currKey(subject)), {
+      country: state.code,
+      subject: String(subject).slice(0, 40),
+      updatedAt: serverTimestamp(),
+      updatedBy: uid
+    });
+  } catch (e) {}
+  const fresh = (curriculaCache.get(subject) || []).map((c) =>
+    (written.has(c.slug) ? { ...c, local: false } : c));
+  setCurriculumCache(subject, fresh, true);
+}
+
 // Lecture Firestore + fusion cache (le cache reste utile hors ligne).
 async function loadCurriculum(subject) {
   if (!useCommunity(subject)) return null;
@@ -335,7 +568,11 @@ async function loadCurriculum(subject) {
       }
     });
     const merged = mergeChapters(cached, remote);
-    setCurriculumCache(subject, merged, true);
+    // ✅ v8.12 — n'émet que si la liste A CHANGÉ (anti-boucle).
+    setCurriculumCache(subject, merged, listsDiffer(cached, merged));
+    // ✅ v8.11 — retenter le partage des chapitres restés locaux (sans
+    // bloquer l'affichage).
+    syncLocalChapters(subject);
     return merged;
   } catch (e) {
     console.warn('[Country] Lecture programme :', e && e.code);
@@ -346,12 +583,18 @@ async function loadCurriculum(subject) {
 // Temps réel (matière ouverte) : les ajouts des autres élèves arrivent vite.
 function watchCurriculum(subject, callback) {
   if (!useCommunity(subject)) return () => {};
-  loadCurriculum(subject);
   const { db } = fb();
   if (!db) return () => {};
   // Anti-doublon : un seul listener par matière (updateChapters peut être
   // rappelé à chaque changement de matière / re-render de la page hôte).
+  // ✅ v8.12 — le check AVANT loadCurriculum() : l'ancien ordre relançait
+  // un getDocs Firestore À CHAQUE appel, et comme loadCurriculum émet
+  // 'arvexa-curricula-change' → updateChapters → watchCurriculum →
+  // loadCurriculum… ça formait une BOUCLE INFINIE (~1 requête/s en
+  // permanence, constatée au trace) qui écrasait aussi tout passage par
+  // localStorage en moins d'une seconde.
   if (currUnsubs.has(subject)) return currUnsubs.get(subject);
+  loadCurriculum(subject);
   try {
     const unsub = onSnapshot(query(collection(db, 'curricula', currKey(subject), 'chapters'), orderBy('order', 'asc')),
       (snap) => {
@@ -363,7 +606,8 @@ function watchCurriculum(subject, callback) {
           }
         });
         const merged = mergeChapters(readCache(subject) || [], remote);
-        setCurriculumCache(subject, merged, true);
+        // ✅ v8.12 — n'émet que si la liste A CHANGÉ (anti-boucle supplémentaire).
+        setCurriculumCache(subject, merged, listsDiffer(readCache(subject) || [], merged));
         if (typeof callback === 'function') callback(merged);
       },
       (err) => { console.warn('[Country] Snapshot programme :', err && err.code); });
@@ -492,6 +736,12 @@ function injectCss() {
     .axc-note{font-size:12.5px;line-height:1.55;color:var(--text-dim,#8A8A7A);background:var(--accent-dim,rgba(184,134,11,.07));
       border:1px solid rgba(184,134,11,.22);border-radius:var(--radius-sm,10px);padding:10px 12px}
     .axc-note b{color:var(--accent-bright,#E0B84A)}
+    .axc-error{display:none;font-size:12.5px;line-height:1.55;color:#FFD9C9;
+      background:rgba(184,92,58,.16);border:1px solid rgba(184,92,58,.45);
+      border-radius:var(--radius-sm,10px);padding:10px 12px}
+    .axc-continue{display:none;margin:0 auto;padding:0;font-size:12px;font-weight:600;cursor:pointer;
+      background:none;border:none;color:var(--text-dim,#8A8A7A);text-decoration:underline;text-underline-offset:3px}
+    .axc-continue:hover{color:var(--accent-bright,#E0B84A)}
     .axc-actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
     .axc-btn{flex:1 1 auto;min-width:fit-content;padding:12px 18px;border-radius:var(--radius-pill,999px);font-size:14px;font-weight:600;
       cursor:pointer;border:none;transition:transform .15s,box-shadow .15s,opacity .15s;display:inline-flex;align-items:center;justify-content:center;gap:8px}
@@ -568,10 +818,12 @@ function maybeShowForcedModal(onDone) {
         <div class="axc-confirm" id="axcConfirmStep">
           <div class="axc-confirm-country" id="axcConfirmCountry"></div>
           <div class="axc-note" id="axcConfirmNote"></div>
+          <div class="axc-error" id="axcError" style="display:none"></div>
           <div class="axc-actions">
             <button type="button" class="axc-btn axc-btn-ghost" id="axcBack">${tr('Retour')}</button>
             <button type="button" class="axc-btn axc-btn-gold" id="axcConfirmBtn"><i class="fas fa-check"></i> ${tr('Oui, c’est mon pays')}</button>
           </div>
+          <button type="button" class="axc-continue" id="axcContinueLocal">${tr('Continuer sur cet appareil (synchronisation plus tard)')}</button>
         </div>
       </div>
       <div class="axc-foot">${tr('Matières scientifiques : programme commun à toute l’Afrique francophone · Matières littéraires : chapitres de ton pays')}</div>
@@ -585,6 +837,32 @@ function maybeShowForcedModal(onDone) {
   const confirmStep = overlay.querySelector('#axcConfirmStep');
   const confirmCountryEl = overlay.querySelector('#axcConfirmCountry');
   const confirmNoteEl = overlay.querySelector('#axcConfirmNote');
+  const confirmBtn = overlay.querySelector('#axcConfirmBtn');
+  const errorEl = overlay.querySelector('#axcError');
+  const continueLocalBtn = overlay.querySelector('#axcContinueLocal');
+  let confirmBusy = false;
+  let modalDone = false;
+
+  // ✅ v8.11 — messages d'échec HONNÊTES : le pop-up ne se ferme plus sur
+  // un faux « Pays confirmé » quand Firestore n'a rien enregistré.
+  function showErrorCode(code) {
+    let msg;
+    if (code === 'permission-denied') {
+      msg = tr('Arvexa n’a pas pu enregistrer ton pays dans ton compte (règles de sécurité). Vérifie ta connexion puis réessaie.');
+    } else if (code === 'unavailable' || code === 'deadline-exceeded' || code === 'network-request-failed'
+            || code === 'aborted' || code === 'cancelled' || code === 'internal' || code === 'delai-depasse') {
+      msg = tr('Connexion insuffisante pour enregistrer ton pays. Réessaie — ou continue sur cet appareil : il se synchronisera dès que tu auras du réseau.');
+    } else if (code === 'non-authentifie') {
+      msg = tr('Ta session a expiré. Recharge la page, reconnecte-toi, puis confirme à nouveau ton pays.');
+    } else {
+      msg = tr('L’enregistrement du pays a échoué') + ' (' + (code || tr('erreur inconnue')) + '). '
+          + tr('Réessaie — ou continue sur cet appareil.');
+    }
+    errorEl.textContent = '⚠️ ' + msg;
+    errorEl.style.display = 'block';
+    continueLocalBtn.style.display = code === 'non-authentifie' ? 'none' : 'inline-block';
+  }
+  function hideError() { errorEl.style.display = 'none'; }
 
   const norm = (s) => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/['’]/g, '');
 
@@ -631,6 +909,9 @@ function maybeShowForcedModal(onDone) {
   }
 
   function finish() {
+    if (modalDone) return; // ✅ v8.11 — jamais deux fermetures (succès + adoption tardive)
+    modalDone = true;
+    window.removeEventListener('arvexa-country-change', onAdopt);
     overlay.classList.remove('show');
     document.body.style.overflow = '';
     setTimeout(() => overlay.remove(), 260);
@@ -638,11 +919,41 @@ function maybeShowForcedModal(onDone) {
     if (typeof onDone === 'function') onDone(getCountry());
   }
 
-  overlay.querySelector('#axcConfirmBtn').addEventListener('click', () => {
+  // ✅ v8.11 — si l'adoption du profil (compte DÉJÀ confirmé, réseau lent)
+  // arrive APRÈS l'ouverture de la modale : refermer automatiquement.
+  function onAdopt(e) {
+    if (e && e.detail && e.detail.fromProfile && state.confirmed) finish();
+  }
+  window.addEventListener('arvexa-country-change', onAdopt);
+
+  // ✅ v8.11 — le bouton attend la VRAIE écriture (avec preuve serveur) :
+  // plus jamais de « Pays confirmé » si Firestore n'a pas enregistré.
+  confirmBtn.addEventListener('click', async () => {
+    if (!pendingCode || confirmBusy) return;
+    const info = countryInfo(pendingCode);
+    confirmBusy = true;
+    confirmBtn.disabled = true;
+    confirmBtn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> ${tr('Enregistrement…')}`;
+    hideError();
+    const res = await confirmCountry(pendingCode);
+    if (res && res.ok) {
+      toast(`${tr('Pays confirmé')} : ${info.flag} ${info.fr}`);
+      finish();
+      return;
+    }
+    confirmBusy = false;
+    confirmBtn.disabled = false;
+    confirmBtn.innerHTML = `<i class="fas fa-rotate-right"></i> ${tr('Réessayer')}`;
+    showErrorCode(res ? res.code : 'erreur');
+  });
+
+  // ✅ v8.11 — option de survie hors ligne : le pays vaut pour la session,
+  // la synchro vers le compte repartira toute seule (event « online »).
+  continueLocalBtn.addEventListener('click', () => {
     if (!pendingCode) return;
     const info = countryInfo(pendingCode);
-    confirmCountry(pendingCode);
-    toast(`${tr('Pays confirmé')} : ${info.flag} ${info.fr}`);
+    confirmCountryLocal(pendingCode);
+    toast(tr('Pays utilisé sur cet appareil — synchronisation dès le retour du réseau'));
     finish();
   });
   overlay.querySelector('#axcBack').addEventListener('click', unpick);
@@ -751,7 +1062,7 @@ function openChapterEntry(subject, subjectLabel, opts) {
 // ─── API EXPORTÉE ───────────────────────────────────────────────────
 const ArvexaCountry = {
   countries: AFRIQUE,
-  ready, getCountry, isNiger, isConfirmed, needsCountryPopup, confirmCountry,
+  ready, getCountry, isNiger, isConfirmed, needsCountryPopup, confirmCountry, confirmCountryLocal,
   useCommunity, getCurriculum, loadCurriculum, watchCurriculum,
   addChapter, removeChapter, slugify, maybeShowForcedModal, openChapterEntry, toast,
   LITERARY_SUBJECTS

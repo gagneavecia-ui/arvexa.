@@ -20,15 +20,16 @@
   window.__arvexaConfirmLoaded = true;
 
   // ── CSS ALIGNÉ SUR profil.html (référence officielle votée utilisateur)
+  //    ✅ v8.6 — TOUTES les couleurs passent sur les TOKENS du site
+  //    (arvexa-ui.css) avec valeurs sombres en repli : en mode sombre le
+  //    rendu est strictement identique à avant ( mêmes hexadécimaux que
+  //    profil/index ), et en MODE CLAIR (html[data-theme="light"]) la
+  //    modale devient papier/encre comme les autres modales du site au
+  //    lieu de rester noire (signalement : « le pop-up ne ressemble pas
+  //    à celui des autres et n'a pas le mode clair »).
   //    + anti-retour-à-la-ligne : le texte des boutons reste sur UNE ligne.
   const CSS = `
     .arvexa-confirm-overlay {
-      --axc-accent: #B8860B;
-      --axc-accent-bright: #E0B84A;
-      --axc-danger: #B85C3A;
-      --axc-text-light: #F5F0E8;
-      --axc-text-dim: #8A8A7A;
-      --axc-text-muted: #5A5A4A;
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0, 0, 0, 0.85);
@@ -48,7 +49,7 @@
       visibility: visible;
     }
     .arvexa-confirm-modal {
-      background: linear-gradient(145deg, #141414 0%, #0A0A0A 100%);
+      background: linear-gradient(145deg, var(--bg-surface, #141414) 0%, var(--bg-dark, #0A0A0A) 100%);
       border: 1px solid rgba(184, 134, 11, 0.25);
       border-radius: 20px;
       padding: 32px 28px 24px;
@@ -68,7 +69,7 @@
       position: absolute;
       top: 0; left: 0; right: 0;
       height: 2px;
-      background: linear-gradient(90deg, transparent, var(--axc-accent-bright), transparent);
+      background: linear-gradient(90deg, transparent, var(--accent-bright, #E0B84A), transparent);
       opacity: 0.9;
     }
     .arvexa-confirm-modal::after {
@@ -106,7 +107,7 @@
       font-size: 22px;
       font-weight: 700;
       font-family: 'Playfair Display', Georgia, serif;
-      color: var(--axc-text-light);
+      color: var(--text-light, #F5F0E8);
       text-align: center;
       margin-bottom: 8px;
       line-height: 1.25;
@@ -117,25 +118,26 @@
       width: 40px;
       height: 2px;
       margin: 0 auto 16px;
-      background: linear-gradient(90deg, transparent, var(--axc-accent), transparent);
+      background: linear-gradient(90deg, transparent, var(--accent, #B8860B), transparent);
       position: relative;
       z-index: 1;
     }
     .arvexa-confirm-message {
       font-size: 14.5px;
       line-height: 1.65;
-      color: var(--axc-text-dim);
+      color: var(--text-dim, #8A8A7A);
       text-align: center;
       margin-bottom: 24px;
       position: relative;
       z-index: 1;
     }
     .arvexa-confirm-message strong {
-      color: var(--axc-text-light);
+      color: var(--text-light, #F5F0E8);
       font-weight: 600;
     }
     .arvexa-confirm-actions {
       display: flex;
+      flex-wrap: wrap;   /* ✅ v8.6 — libellé long (ex. « S'abonner maintenant ») : le bouton passe sur sa propre ligne au lieu de déborder */
       gap: 10px;
       position: relative;
       z-index: 1;
@@ -156,17 +158,17 @@
       gap: 8px;
       letter-spacing: 0.2px;
       white-space: nowrap;
-      min-width: 0;
+      min-width: fit-content;  /* ✅ v8.6 — plancher naturel : déclenche le wrap ci-dessus, sinon largeurs égales (comme avant) */
     }
     .arvexa-confirm-btn.cancel {
-      background: rgba(255, 255, 255, 0.05);
-      color: var(--axc-text-dim);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(var(--rgb-soft, 255, 255, 255), 0.05);
+      color: var(--text-dim, #8A8A7A);
+      border: 1px solid rgba(var(--rgb-soft, 255, 255, 255), 0.08);
     }
     .arvexa-confirm-btn.cancel:hover {
-      background: rgba(255, 255, 255, 0.09);
-      color: var(--axc-text-light);
-      border-color: rgba(255, 255, 255, 0.12);
+      background: rgba(var(--rgb-soft, 255, 255, 255), 0.09);
+      color: var(--text-light, #F5F0E8);
+      border-color: rgba(var(--rgb-soft, 255, 255, 255), 0.12);
     }
     .arvexa-confirm-btn.cancel:active { transform: scale(0.97); }
     .arvexa-confirm-btn.danger {
@@ -180,8 +182,8 @@
     }
     .arvexa-confirm-btn.danger:active { transform: scale(0.97); }
     .arvexa-confirm-btn.primary {
-      background: linear-gradient(135deg, var(--axc-accent-bright), var(--axc-accent));
-      color: #0A0A0A;
+      background: linear-gradient(135deg, var(--accent-bright, #E0B84A), var(--accent, #B8860B));
+      color: var(--on-gold, #0A0A0A);
       box-shadow: 0 4px 16px rgba(184, 134, 11, 0.25);
     }
     .arvexa-confirm-btn.primary:hover {
@@ -198,8 +200,8 @@
       height: 32px;
       border-radius: 50%;
       border: none;
-      background: rgba(255, 255, 255, 0.03);
-      color: var(--axc-text-muted);
+      background: rgba(var(--rgb-soft, 255, 255, 255), 0.03);
+      color: var(--text-muted, #5A5A4A);
       cursor: pointer;
       font-size: 14px;
       display: flex;
@@ -209,8 +211,14 @@
       z-index: 2;
     }
     .arvexa-confirm-close:hover {
-      background: rgba(255, 255, 255, 0.08);
-      color: var(--axc-text-light);
+      background: rgba(var(--rgb-soft, 255, 255, 255), 0.08);
+      color: var(--text-light, #F5F0E8);
+    }
+    /* ── MODE CLAIR : finitions qui n'existent qu'en version papier ──
+       (le reste suit déjà les tokens : surfaces blanches, encre chaude,
+       or foncé --accent-bright #9A7209, --on-gold #141210…) */
+    html[data-theme="light"] .arvexa-confirm-modal {
+      box-shadow: 0 20px 60px rgba(74, 58, 24, 0.18), 0 0 40px rgba(184, 134, 11, 0.10);
     }
     /* ── Responsive : identique aux 3 points de rupture de profil.html ── */
     @media (max-width: 640px) {

@@ -1996,6 +1996,12 @@
               </button>
               <div class="custom-select-options" role="listbox" id="chapterOptions"></div>
             </div>
+            <!-- ✅ v8.9 — matières littéraires + pays ≠ Niger : chapitres du pays
+                 (remplis progressivement par les élèves). Scientifiques : caché. -->
+            <div class="axc-exam-extra" id="axcExamExtra" style="display:none;">
+              <span class="axc-country-hint" id="axcCountryHint"></span>
+              <button type="button" class="axc-add-inline" id="axcAddChapterExamBtn"><i class="fas fa-plus"></i> Ajouter un chapitre</button>
+            </div>
           </div>
 
           <div class="field">
@@ -2260,6 +2266,13 @@ import {
 } from 'firebase/firestore';
 import { readCacheDoc, docSWR } from './arvexa-cache.js';
 import { requireAuth } from './auth-guard.js';
+// ✅ v8.9 — CHOIX DE PAYS (pop-up forcé au 1ᵉʳ passage, verrou définitif) +
+// PROGRAMMES COMMUNAUTAIRES par pays, UNIQUEMENT pour les matières
+// littéraires (philosophie, histoire, géographie) qui changent d'un pays à
+// l'autre. Les matières scientifiques restent identiques partout (programme
+// intégré servi à tous). matiere.html / chapitre.html ne chargent PAS ce
+// module : aucune autre page n'est touchée.
+import ArvexaCountry from './arvexa-country.js';
 
 var firebaseConfig = {
   apiKey: 'AIzaSyDHscOXw3rLuhV6z1Cny-bdYCumqpnG7QE',
@@ -2578,15 +2591,58 @@ function initSelects() {
   selects.duration.select('60', true);
 
   updateChapters();
+  axBindExamAdd();
   selects.subject.element.addEventListener('change', updateChapters);
 }
 
 function updateChapters() {
   var subject = selects.subject.getValue();
-  var chapters = CHAPTERS[subject] || [];
+  // ✅ v8.9 — littéraire + pays ≠ Niger → chapitres remplis progressivement
+  // par les élèves du pays ; sinon programme intégré (toutes scientifiques).
+  var chapters = axChaptersFor(subject);
   var opts = [{ value: 'all', label: 'Tous les chapitres', prefix: '📚' }];
   chapters.forEach(function (ch) { opts.push({ value: ch, label: ch, prefix: '📖' }); });
   selects.chapter.setOptions(opts);
+  axUpdateExtra(subject, chapters);
+}
+
+// ✅ v8.9 — chapitres de la matière selon le pays confirmé
+function axChaptersFor(subject) {
+  if (ArvexaCountry.useCommunity(subject)) {
+    return (ArvexaCountry.getCurriculum(subject) || []).map(function (c) { return c.title; });
+  }
+  return CHAPTERS[subject] || [];
+}
+
+// ✅ v8.9 — ligne « hint pays + ajouter un chapitre » (littéraires seulement)
+function axUpdateExtra(subject, chapters) {
+  try {
+    var extra = $('axcExamExtra');
+    if (!extra) return;
+    var community = ArvexaCountry.useCommunity(subject);
+    extra.style.display = community ? 'flex' : 'none';
+    if (!community) return;
+    var c = ArvexaCountry.getCountry();
+    var info = c.info || {};
+    $('axcCountryHint').textContent = (info.flag ? info.flag + ' ' + info.fr : '') +
+      ' · Chapitres de ton pays';
+    if (!ArvexaCountry.getCurriculum(subject) || !(ArvexaCountry.getCurriculum(subject) || []).length) {
+      // Programme encore vide : lecture distante + temps réel
+      ArvexaCountry.watchCurriculum(subject);
+    }
+  } catch (e) { console.warn('[EXAM] axUpdateExtra:', e); }
+}
+
+var axcExamAddBound = false;
+function axBindExamAdd() {
+  if (axcExamAddBound) return;
+  var btn = $('axcAddChapterExamBtn');
+  if (!btn) return;
+  axcExamAddBound = true;
+  btn.addEventListener('click', function () {
+    var subject = selects.subject.getValue();
+    ArvexaCountry.openChapterEntry(subject, SUBJECT_LABELS[subject] || subject);
+  });
 }
 
 function readConfig() {
@@ -3693,6 +3749,21 @@ requireAuth({
     $('connectionState').classList.add('online');
     prefillFromUrl();
     await checkActiveSession();
+
+    // ✅ v8.9 — POP-UP FORCÉ du choix de pays (nouvel utilisateur seulement) :
+    // bloquant jusqu'à confirmation, puis VERROUILLÉ pour toujours. Les pays
+    // déjà confirmés (y compris depuis un autre appareil) ne le voient jamais.
+    try {
+      ArvexaCountry.ready().then(function () {
+        ArvexaCountry.maybeShowForcedModal(function () { updateChapters(); });
+        updateChapters();
+      });
+    } catch (e) { console.warn('[EXAM] Country module :', e); }
+
+    // ✅ v8.9 — re-remplir les chapitres quand le programme du pays arrive /
+    // se complète (ajouts des autres élèves du même pays en temps réel).
+    window.addEventListener('arvexa-curricula-change', function () { updateChapters(); });
+    window.addEventListener('arvexa-country-change', function () { updateChapters(); });
   },
   onNoUser: () => {
     // ✅ C3 — préserver l'URL de retour après login

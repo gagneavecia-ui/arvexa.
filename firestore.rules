@@ -170,6 +170,50 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // ─── Programmes communautaires par pays (v8.9) ────────────────
+    // Demande propriétaire : pour les MATIÈRES LITTÉRAIRES (philosophie,
+    // histoire, géographie) qui changent d'un pays à l'autre, les élèves
+    // d'un même pays remplissent progressivement leurs chapitres. Chaque
+    // chapitre est stocké en mentionnant le pays → tout élève du même
+    // pays voit les chapitres déjà listés et la liste se complète.
+    // curricula/{ISO}_{matiere}                       = méta
+    // curricula/{ISO}_{matiere}/chapters/{slug}       = chapitre
+    match /curricula/{key} {
+      allow read: if request.auth != null;
+      // Méta : 4 champs exactement, pays ISO-2 + matière bornée
+      allow create, update: if request.auth != null
+        && key is string
+        && key.size() <= 60
+        && request.resource.data.keys().hasOnly(['country', 'subject', 'updatedAt', 'updatedBy'])
+        && request.resource.data.country is string
+        && request.resource.data.country.size() == 2
+        && request.resource.data.subject is string
+        && request.resource.data.subject.size() > 0
+        && request.resource.data.subject.size() <= 40;
+      allow delete: if false;
+
+      match /chapters/{chapterId} {
+        allow read: if request.auth != null;
+        // Chapitre : titre borné, auteur = lui-même (anti-usurpation)
+        allow create: if request.auth != null
+          && chapterId is string
+          && chapterId.size() >= 1
+          && chapterId.size() <= 100
+          && request.resource.data.keys().hasOnly(['title', 'order', 'addedBy', 'addedAt'])
+          && request.resource.data.title is string
+          && request.resource.data.title.size() > 0
+          && request.resource.data.title.size() <= 120
+          && request.resource.data.order is string
+          && request.resource.data.order.size() <= 120
+          && request.resource.data.addedBy == request.auth.uid;
+        // Immuables : on ne réécrit pas le chapitre d'un autre
+        allow update: if false;
+        // Retrait : uniquement ses propres ajouts
+        allow delete: if request.auth != null
+          && resource.data.addedBy == request.auth.uid;
+      }
+    }
+
     // ─── Avis utilisateurs ────────────────────────────────────────
     match /avis/{docId} {
       allow read: if request.auth != null;

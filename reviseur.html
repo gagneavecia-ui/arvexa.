@@ -1953,7 +1953,7 @@
     el = g('subjectEmoji'); if (el) el.textContent = EMO[subject] || '📖';
     el = g('subjectLabel'); if (el) el.textContent = label;
     el = g('chapterTitle'); if (el) el.textContent = snap.chapter || chapter;
-    el = g('chapterSelectorValue'); if (el) el.textContent = snap.chapter || chapter;
+    el = g('chapterSelectorValue'); if (el) el.textContent = snap.chapter || chapter || axTriggerText();
     el = g('subjectSelectorValue'); if (el) el.textContent = label;
     var total = snap.totalAvailable | 0, gen = snap.generatedCount | 0;
     var pct = total > 0 ? Math.round((gen / total) * 100) : 0;
@@ -2025,6 +2025,13 @@ import {
   serverTimestamp
 } from 'firebase/firestore';
 import { docSWR } from './arvexa-cache.js';
+// ✅ v8.9 — CHOIX DE PAYS (pop-up forcé au 1ᵉʳ passage, verrou définitif) +
+// PROGRAMMES COMMUNAUTAIRES par pays, UNIQUEMENT pour les matières
+// littéraires (philosophie, histoire, géographie) qui changent d'un pays à
+// l'autre. Les matières scientifiques restent identiques partout (programme
+// intégré servi à tous). matiere.html / chapitre.html ne chargent PAS ce
+// module : aucune autre page n'est touchée.
+import ArvexaCountry from './arvexa-country.js';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyDHscOXw3rLuhV6z1Cny-bdYCumqpnG7QE',
@@ -2396,7 +2403,8 @@ function initSubjectSelector() {
         }
 
         state.subject = newSubject;
-        state.chapter = CHAPTERS[newSubject]?.[0] || '';
+        // ✅ v8.9 — littéraire + pays ≠ Niger → programme communautaire du pays
+        state.chapter = axChaptersFor(newSubject)[0] || '';
         state.subjectType = SCIENTIFIC_SUBJECTS.has(newSubject) ? 'scientific' : 'lesson';
         saveSelection();
 
@@ -2435,16 +2443,27 @@ function initChapterSelector() {
 function renderChapterOptions() {
   const valueEl = document.getElementById('chapterSelectorValue');
   const optionsEl = document.getElementById('chapterSelectorOptions');
-  const chapters = CHAPTERS[state.subject] || [];
+  // ✅ v8.9 — littéraire + pays ≠ Niger → chapitres remplis progressivement
+  // par les élèves du pays (programme communautaire) ; sinon programme intégré.
+  const chapters = axChaptersFor(state.subject);
+  const community = ArvexaCountry.useCommunity(state.subject);
 
-  valueEl.textContent = state.chapter || 'Choisir un chapitre';
+  valueEl.textContent = state.chapter || (community
+    ? 'Choisis ou ajoute un chapitre'
+    : 'Choisir un chapitre');
 
   optionsEl.innerHTML = chapters.map((ch) => `
     <div class="selector-option ${ch === state.chapter ? 'selected' : ''}" data-value="${escapeHtml(ch)}">
       <span class="option-emoji">📖</span>
       <span>${escapeHtml(ch)}</span>
     </div>
-  `).join('');
+  `).join('')
+  + (community
+    ? `<div class="axc-add-option" id="axcAddChapterBtn" role="button" tabindex="0">
+         <i class="fas fa-plus"></i> <span>${(ArvexaCountry.getCurriculum(state.subject) || []).length
+           ? 'Ajouter un chapitre…' : 'Ajouter ton premier chapitre…'}</span>
+       </div>`
+    : '');
 
   optionsEl.querySelectorAll('.selector-option').forEach((opt) => {
     opt.addEventListener('click', (e) => {
@@ -2461,7 +2480,54 @@ function renderChapterOptions() {
       loadCahier();
     });
   });
+
+  const addBtn = optionsEl.querySelector('#axcAddChapterBtn');
+  if (addBtn) {
+    const openEntry = (e) => {
+      e.stopPropagation();
+      ArvexaCountry.openChapterEntry(state.subject, SUBJECTS[state.subject] || state.subject);
+    };
+    addBtn.addEventListener('click', openEntry);
+    addBtn.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') openEntry(e); });
+  }
 }
+
+// ✅ v8.9 — chapitres de la matière selon le pays confirmé :
+// littéraire + pays ≠ Niger → programme communautaire ; sinon programme intégré.
+function axChaptersFor(subject) {
+  if (ArvexaCountry.useCommunity(subject)) {
+    return (ArvexaCountry.getCurriculum(subject) || []).map((c) => c.title);
+  }
+  return CHAPTERS[subject] || [];
+}
+
+// ✅ v8.9 — texte du trigger du sélecteur de chapitre (jamais vide) :
+// chapitre choisi, ou invitation à choisir/ajouter en mode communautaire.
+function axTriggerText() {
+  return state.chapter || (ArvexaCountry.useCommunity(state.subject)
+    ? 'Choisis ou ajoute un chapitre'
+    : 'Choisir un chapitre');
+}
+
+// ✅ v8.9 — re-rendu quand le programme du pays arrive / se complète
+// (ajout d'un autre élève, retrait du chapitre sélectionné, etc.)
+window.addEventListener('arvexa-curricula-change', (e) => {
+  if (e.detail && e.detail.subject && e.detail.subject !== state.subject) return;
+  try {
+    const axList = axChaptersFor(state.subject);
+    if (state.chapter && axList.length && !axList.includes(state.chapter)) {
+      state.chapter = axList[0];
+      saveSelection();
+    } else if (state.chapter && !axList.length && ArvexaCountry.useCommunity(state.subject)) {
+      state.chapter = '';
+      saveSelection();
+    } else if (!state.chapter && axList.length) {
+      state.chapter = axList[0];
+      saveSelection();
+    }
+    renderChapterOptions();
+  } catch (err) {}
+});
 
 function resetChapterSelector() {
   renderChapterOptions();
@@ -2641,7 +2707,7 @@ function updateHomeUI() {
   $('chapterTitle').textContent = state.chapter;
 
   const chapterValueEl = document.getElementById('chapterSelectorValue');
-  if (chapterValueEl) chapterValueEl.textContent = state.chapter;
+  if (chapterValueEl) chapterValueEl.textContent = axTriggerText();
 
   const subjectValueEl = document.getElementById('subjectSelectorValue');
   if (subjectValueEl) subjectValueEl.textContent = SUBJECTS[state.subject] || state.subject;
@@ -3366,10 +3432,11 @@ function prefillFromUrl() {
 
     if (urlSubject && SUBJECTS[urlSubject]) {
       state.subject = urlSubject;
-      if (urlChapter && CHAPTERS[state.subject]?.includes(urlChapter)) {
+      if (urlChapter && axChaptersFor(state.subject).includes(urlChapter)) {
         state.chapter = urlChapter;
       } else {
-        state.chapter = CHAPTERS[state.subject]?.[0] || 'Nombres complexes';
+        // ✅ v8.9 — programme selon le pays (communauté vide → « Choisir »)
+        state.chapter = axChaptersFor(state.subject)[0] || '';
       }
       state.subjectType = SCIENTIFIC_SUBJECTS.has(urlSubject) ? 'scientific' : 'lesson';
       return;
@@ -3381,7 +3448,7 @@ function prefillFromUrl() {
 
       if (savedSubject && SUBJECTS[savedSubject]) {
         state.subject = savedSubject;
-        if (savedChapter && CHAPTERS[state.subject]?.includes(savedChapter)) {
+        if (savedChapter && axChaptersFor(state.subject).includes(savedChapter)) {
           state.chapter = savedChapter;
           state.subjectType = SCIENTIFIC_SUBJECTS.has(savedSubject) ? 'scientific' : 'lesson';
           return;
@@ -3538,6 +3605,40 @@ initAuthGuard(async (user) => {
   hydrateFromSnapshot();
   initSubjectSelector();
   initChapterSelector();
+
+  // ✅ v8.9 — POP-UP FORCÉ du choix de pays (nouvel utilisateur seulement) :
+  // bloquant jusqu'à confirmation, puis VERROUILLÉ pour toujours. Les pays
+  // déjà confirmés (y compris depuis un autre appareil via users/{uid}) ne
+  // le voient jamais. Scientifiques : aucun changement. Littéraires +
+  // pays ≠ Niger : chapitres communautaires en temps réel.
+  try {
+    ArvexaCountry.ready().then(() => {
+      ArvexaCountry.maybeShowForcedModal(() => {
+        state.chapter = axChaptersFor(state.subject)[0] || '';
+        saveSelection();
+        renderChapterOptions();
+        loadCahier();
+        if (ArvexaCountry.useCommunity(state.subject)) {
+          ArvexaCountry.watchCurriculum(state.subject);
+        }
+      });
+      if (ArvexaCountry.useCommunity(state.subject)) {
+        ArvexaCountry.watchCurriculum(state.subject);
+      }
+    });
+  } catch (e) { console.warn('[Réviseur] Country module :', e); }
+
+  // ✅ v8.9 — pays confirmé plus tard ou changé de matière : suivre le bon programme
+  window.addEventListener('arvexa-country-change', () => {
+    try {
+      state.chapter = axChaptersFor(state.subject)[0] || '';
+      saveSelection();
+      renderChapterOptions();
+      if (ArvexaCountry.useCommunity(state.subject)) {
+        ArvexaCountry.watchCurriculum(state.subject);
+      }
+    } catch (err) {}
+  });
 
   try {
     window.history.replaceState(

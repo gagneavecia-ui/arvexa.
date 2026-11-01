@@ -739,7 +739,383 @@
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: rgba(224, 184, 74, 0.25); border-radius: 10px; }
     ::-webkit-scrollbar-thumb:hover { background: rgba(224, 184, 74, 0.45); }
-  </style>
+      /* ═══════════════════════════════════════════════════════════════════
+       ARVEXA — POP-UP PREMIUM UNIVERSEL
+       ⚠️ NE PAS MODIFIER — réutilisé par d'autres pages
+       ═══════════════════════════════════════════════════════════════════ */
+
+    .arvexa-popup-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      background: rgba(0, 0, 0, 0.82);
+      backdrop-filter: blur(16px) saturate(120%);
+      -webkit-backdrop-filter: blur(16px) saturate(120%);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.30s cubic-bezier(0.4, 0, 0.2, 1),
+                  visibility 0.30s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+    }
+    .arvexa-popup-overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .arvexa-popup {
+      position: relative;
+      width: 100%;
+      max-width: 360px;
+      margin: auto;
+      padding: 30px 26px 22px;
+      border: 1px solid rgba(224, 184, 74, 0.20);
+      border-radius: 20px;
+      background:
+        radial-gradient(ellipse 120% 70% at 50% -10%, rgba(224, 184, 74, 0.10) 0%, transparent 65%),
+        radial-gradient(ellipse 100% 50% at 50% 110%, rgba(184, 134, 11, 0.05) 0%, transparent 60%),
+        linear-gradient(165deg, var(--bg-surface) 0%, var(--bg-deep) 100%);
+      box-shadow:
+        0 0 0 1px rgba(var(--rgb-soft), 0.02),
+        0 0 60px rgba(224, 184, 74, 0.08),
+        0 24px 60px rgba(0, 0, 0, 0.70),
+        inset 0 1px 0 rgba(var(--rgb-soft), 0.05);
+      transform: scale(0.94) translateY(20px);
+      transition: transform 0.42s cubic-bezier(0.34, 1.56, 0.64, 1);
+      text-align: center;
+      overflow: hidden;
+      isolation: isolate;
+    }
+    .arvexa-popup-overlay.show .arvexa-popup {
+      transform: scale(1) translateY(0);
+    }
+
+    .arvexa-popup::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 20%;
+      right: 20%;
+      height: 2px;
+      border-radius: 0 0 8px 8px;
+      background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(224, 184, 74, 0.4) 20%,
+        var(--accent-bright) 50%,
+        rgba(224, 184, 74, 0.4) 80%,
+        transparent 100%);
+      opacity: 0.9;
+      z-index: 2;
+    }
+
+    .arvexa-popup::after {
+      content: '';
+      position: absolute;
+      top: -50px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 160px;
+      height: 100px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(224, 184, 74, 0.18) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+      filter: blur(6px);
+    }
+
+    .arvexa-popup-close {
+      position: absolute;
+      top: 13px;
+      right: 13px;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(var(--rgb-soft), 0.03);
+      color: var(--text-muted);
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+      z-index: 4;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .arvexa-popup-close:hover {
+      background: rgba(224, 184, 74, 0.12);
+      color: var(--accent-bright);
+      transform: rotate(90deg) scale(1.05);
+    }
+    .arvexa-popup-close:active {
+      transform: rotate(90deg) scale(0.95);
+    }
+
+    .arvexa-popup-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 30% 30%, rgba(224, 184, 74, 0.22), rgba(184, 134, 11, 0.08) 70%);
+      border: 1px solid rgba(224, 184, 74, 0.28);
+      color: var(--accent-bright);
+      font-size: 26px;
+      margin: 0 auto 16px;
+      position: relative;
+      z-index: 1;
+      animation: arvexaCrownPulse 3s ease-in-out infinite;
+      box-shadow:
+        0 0 20px rgba(224, 184, 74, 0.15),
+        inset 0 1px 0 rgba(var(--rgb-soft), 0.08);
+    }
+    @keyframes arvexaCrownPulse {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow:
+          0 0 20px rgba(224, 184, 74, 0.15),
+          inset 0 1px 0 rgba(var(--rgb-soft), 0.08);
+      }
+      50% {
+        transform: scale(1.04);
+        box-shadow:
+          0 0 34px rgba(224, 184, 74, 0.32),
+          inset 0 1px 0 rgba(var(--rgb-soft), 0.08);
+      }
+    }
+
+    .arvexa-popup-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-light);
+      line-height: 1.25;
+      margin: 0 0 10px;
+      letter-spacing: -0.015em;
+      position: relative;
+      z-index: 1;
+    }
+    .arvexa-popup-title em {
+      color: var(--accent-bright);
+      font-style: italic;
+      font-weight: 700;
+    }
+
+    .arvexa-popup-message {
+      font-size: 13.5px;
+      color: var(--text-dim);
+      line-height: 1.6;
+      margin: 0 auto 20px;
+      max-width: 280px;
+      position: relative;
+      z-index: 1;
+    }
+    .arvexa-popup-message strong {
+      color: var(--accent-bright);
+      font-weight: 700;
+    }
+
+    .arvexa-popup-benefits {
+      display: none;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 22px;
+      padding: 14px 0;
+      border-top: 1px solid rgba(var(--rgb-soft), 0.05);
+      border-bottom: 1px solid rgba(var(--rgb-soft), 0.05);
+      position: relative;
+      z-index: 1;
+    }
+    .arvexa-popup-benefits span {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--text-dim);
+      line-height: 1.35;
+      text-align: center;
+      font-weight: 500;
+    }
+    .arvexa-popup-benefits span::before {
+      content: '✓';
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: rgba(224, 184, 74, 0.10);
+      border: 1px solid rgba(224, 184, 74, 0.22);
+      color: var(--accent-bright);
+      font-weight: 800;
+      font-size: 11px;
+      line-height: 1;
+    }
+
+    @media (min-width: 600px) {
+      .arvexa-popup-benefits {
+        display: grid;
+      }
+    }
+
+    .arvexa-popup-actions {
+      display: flex;
+      position: relative;
+      z-index: 1;
+    }
+    .arvexa-popup-actions .arvexa-popup-btn {
+      flex: 1;
+      width: 100%;
+    }
+
+    .arvexa-popup-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 13px 18px;
+      min-height: 48px;
+      border-radius: 100px;
+      border: none;
+      font-family: inherit;
+      font-size: 13.5px;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.28s cubic-bezier(0.25, 1, 0.5, 1);
+      letter-spacing: 0.01em;
+      white-space: nowrap;
+      overflow: hidden;
+      position: relative;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .arvexa-popup-btn.primary {
+      background: linear-gradient(135deg, var(--accent-bright) 0%, #B8860B 100%);
+      color: var(--on-gold);
+      box-shadow: 0 4px 16px rgba(224, 184, 74, 0.28);
+    }
+    .arvexa-popup-btn.primary::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -120%;
+      width: 60%;
+      height: 100%;
+      background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.30) 50%,
+        transparent 100%);
+      transform: skewX(-20deg);
+      transition: left 0.7s cubic-bezier(0.25, 1, 0.5, 1);
+      pointer-events: none;
+    }
+    .arvexa-popup-btn.primary:hover::before {
+      left: 130%;
+    }
+    .arvexa-popup-btn.primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 26px rgba(224, 184, 74, 0.45);
+    }
+    .arvexa-popup-btn.primary:active {
+      transform: translateY(0) scale(0.97);
+    }
+    .arvexa-popup-btn.primary i {
+      font-size: 12px;
+    }
+
+    @media (max-width: 599px) {
+      .arvexa-popup-overlay {
+        padding: 16px;
+      }
+      .arvexa-popup {
+        max-width: 100%;
+        padding: 28px 22px 20px;
+        border-radius: 20px;
+      }
+      .arvexa-popup-icon {
+        width: 56px;
+        height: 56px;
+        font-size: 24px;
+        margin-bottom: 14px;
+      }
+      .arvexa-popup-title {
+        font-size: 21px;
+      }
+      .arvexa-popup-message {
+        font-size: 13.5px;
+        margin-bottom: 18px;
+      }
+      .arvexa-popup-btn {
+        min-height: 46px;
+        font-size: 13.5px;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .arvexa-popup-overlay {
+        padding: 12px;
+      }
+      .arvexa-popup {
+        padding: 24px 18px 16px;
+        border-radius: 20px;
+      }
+      .arvexa-popup::before {
+        left: 24%;
+        right: 24%;
+      }
+      .arvexa-popup-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 21px;
+        margin-bottom: 12px;
+      }
+      .arvexa-popup-title {
+        font-size: 19px;
+      }
+      .arvexa-popup-message {
+        font-size: 13px;
+        margin-bottom: 16px;
+      }
+      .arvexa-popup-btn {
+        min-height: 44px;
+        font-size: 13px;
+        padding: 12px 14px;
+      }
+      .arvexa-popup-close {
+        width: 28px;
+        height: 28px;
+        top: 10px;
+        right: 10px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .arvexa-popup,
+      .arvexa-popup-overlay,
+      .arvexa-popup-icon,
+      .arvexa-popup-btn {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    .arvexa-popup-btn:focus-visible,
+    .arvexa-popup-close:focus-visible {
+      outline: 2px solid var(--accent-bright);
+      outline-offset: 3px;
+    }
+
+    </style>
 </head>
 <body>
 
@@ -816,8 +1192,37 @@
 
   </main>
 
-  <!-- ✅ v8.4 — pop-up Premium retiré : window.arvexaConfirm() (composant
-       uniforme du site) est ouverte par showPremiumPopup(). -->
+<!-- ===== POP-UP PREMIUM UNIVERSEL (✅ v8.7 — rétabli, design d'origine) ===== -->
+<div class="arvexa-popup-overlay" id="premiumPopup">
+  <div class="arvexa-popup" role="dialog" aria-modal="true">
+
+    <button class="arvexa-popup-close" id="popupCloseBtn" aria-label="Fermer">
+      <i class="fas fa-times"></i>
+    </button>
+
+    <i class="fas fa-crown arvexa-popup-icon"></i>
+
+    <h2 class="arvexa-popup-title">Ce chapitre est <em>réservé</em></h2>
+
+    <p class="arvexa-popup-message">
+      Passe à Premium pour débloquer tous les chapitres, exercices et corrections de cette matière.
+    </p>
+
+    <div class="arvexa-popup-benefits">
+      <span>Tous les chapitres</span>
+      <span>Toutes les corrections</span>
+      <span>Tous les outils</span>
+    </div>
+
+    <div class="arvexa-popup-actions">
+      <a href="abonnement.html" class="arvexa-popup-btn primary">
+        <i class="fas fa-crown"></i>
+        Découvrir Premium
+      </a>
+    </div>
+
+  </div>
+</div>
 
   <!-- ============================================================ -->
   <!-- SCRIPTS                                                       -->
@@ -1150,24 +1555,37 @@ const DEFAULT_CHAPTERS = {
     try { renderProgress(); renderChapters(); } catch (e) {}
   });
 
-  // ✅ v8.4 — modale UNIFORME du site (arvexa-confirm.js) : mêmes
-  // couleurs et mêmes boutons que index/profil/abonnement.
+  // ✅ v8.7 — pop-up Premium UNIVERSEL rétabli (design d'origine du site :
+  // couronne, titre em doré, bouton or — capture propriétaire). La logique
+  // premium (statut, isolation v8.4/v8.5) est inchangée.
   function showPremiumPopup() {
-    if (typeof window.arvexaConfirm !== 'function') { window.location.assign('abonnement.html'); return; }
-    window.arvexaConfirm({
-      title: 'Ce chapitre est réservé',
-      message: 'Passe à Premium pour débloquer tous les chapitres, exercices et corrections de cette matière.',
-      icon: '👑',
-      confirmText: 'Découvrir Premium',
-      cancelText: 'Plus tard',
-      variant: 'primary',
-      onConfirm: () => window.location.assign('abonnement.html')
-    });
+    const popup = document.getElementById('premiumPopup');
+    if (!popup) { window.location.assign('abonnement.html'); return; }
+    popup.classList.remove('hide');
+    popup.classList.add('show');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function hidePremiumPopup() {
+    const popup = document.getElementById('premiumPopup');
+    if (!popup) return;
+    popup.classList.remove('show');
+    popup.classList.add('hide');
+    document.body.style.overflow = '';
   }
 
   window.navigateToChapter = navigateToChapter;
   window.showPremiumPopup = showPremiumPopup;
-  // ✅ v8.4 — fermeture gérée par arvexa-confirm.js (Échap/clic extérieur)
+  window.hidePremiumPopup = hidePremiumPopup;
+
+  // Fermeture : croix / clic extérieur / Échap (comme avant v8.4)
+  document.getElementById('popupCloseBtn')?.addEventListener('click', hidePremiumPopup);
+  document.getElementById('premiumPopup')?.addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) hidePremiumPopup();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') hidePremiumPopup();
+  });
 
   // ================================================================
   // RENDU HERO

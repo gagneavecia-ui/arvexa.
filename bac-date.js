@@ -1,6 +1,6 @@
 // ================================================================
 // BAC-DATE.JS — ARVEXA School
-// Date officielle du BAC D au Niger
+// Date de l'épreuve de BAC (générique — label « BAC » ; à décliner par pays si besoin)
 // ⚡ Modifier UNIQUEMENT ce fichier chaque année
 // ================================================================
 

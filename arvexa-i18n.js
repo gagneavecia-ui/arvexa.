@@ -13,7 +13,7 @@
    « fr » le DOM reste intact ; en mode « en » les textes traduits
    conservent leur original (__arvexaOrig) pour un retour FR fidèle.
    Le contenu pédagogique (cours, chapitres) et le texte légal restent
-   en français : le BAC du Niger se passe en français.
+   en français : le site sert l'Afrique francophone (BAC francophone).
    ═══════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
@@ -387,7 +387,7 @@
     "Commencer un examen": "Start an exam",
     "Préparation du BAC": "BAC preparation",
     "Une plateforme éducative": "An educational platform",
-    "Plateforme éducative · Niger": "Educational platform · Niger",
+    "Plateforme éducative panafricaine": "Pan-African learning platform",
     "Une aide intelligente": "Smart assistance",
     "Propulsé par IA": "Powered by AI",
     "Pose 3 questions/jour à l'IA": "Ask the AI 3 questions a day",
@@ -1268,7 +1268,7 @@
     "Cours & fiches": "Lessons & sheets",
     "Assistance": "Support",
     "Le parcours": "The journey",
-    "Terminale D au Niger": "Terminale D in Niger",
+    "Terminale D en Afrique francophone": "Terminale D in French-speaking Africa",
     "La": "The",
     ", puis": ", then",
     "d'ARVEXA School.": "of ARVEXA School.",

@@ -797,6 +797,135 @@
     ::-webkit-scrollbar-thumb:hover {
       background: rgba(184, 134, 11, 0.4);
     }
+
+    /* ============================================================
+       SÉLECTEUR D'INDICATIF (v8.3) — 54 pays d'Afrique, défaut Niger.
+       Bouton à GAUCHE du champ (consigne propriétaire), design
+       cohérent : mêmes tokens que le formulaire (input-bg, radius,
+       or ARVEXA). Panneau ancré SOUS le champ (hors overflow:hidden
+       du wrap), recherche FR/EN, thème clair automatique via tokens.
+       ============================================================ */
+    .dial-anchor { position: relative; }
+
+    .dial-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 13px 10px 13px 16px;
+      background: transparent;
+      border: none;
+      border-right: 1px solid var(--input-border);
+      color: var(--text-light);
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      flex-shrink: 0;
+      cursor: pointer;
+      transition: var(--transition-fast);
+      white-space: nowrap;
+    }
+    .dial-btn:hover { color: var(--accent-bright); }
+    .dial-btn:focus-visible {
+      outline: 2px solid var(--accent-bright);
+      outline-offset: -2px;
+      border-radius: var(--radius);
+    }
+    .dial-flag { font-size: 18px; line-height: 1; }
+    .dial-code { letter-spacing: 0.2px; }
+    .dial-chevron {
+      font-size: 10px;
+      color: var(--text-muted);
+      transition: transform 0.2s ease;
+    }
+    .dial-btn[aria-expanded="true"] .dial-chevron { transform: rotate(180deg); }
+    .dial-btn.is-error { color: var(--danger); }
+    .field-input-wrap.is-error .dial-btn { color: var(--danger); }
+    .field-input-wrap:focus-within .dial-btn { color: var(--accent-bright); }
+
+    .dial-panel {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      right: 0;
+      z-index: 70;
+      background: var(--bg-elev);
+      border: 1px solid var(--input-border-focus);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(-6px) scale(0.99);
+      pointer-events: none;
+      transition: opacity 0.18s ease, transform 0.18s ease;
+    }
+    .dial-panel.open {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+
+    .dial-search {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--input-border);
+      position: sticky;
+      top: 0;
+      background: var(--bg-elev);
+      z-index: 2;
+    }
+    .dial-search i { color: var(--text-muted); font-size: 13px; }
+    .dial-search input {
+      flex: 1;
+      min-width: 0;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text-light);
+      font-family: inherit;
+      font-size: 14px;
+    }
+    .dial-search input::placeholder { color: var(--text-muted); }
+
+    .dial-list {
+      list-style: none;
+      margin: 0;
+      padding: 6px;
+      max-height: min(46vh, 300px);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+    }
+    .dial-list li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      color: var(--text-light);
+      font-size: 14px;
+      transition: background 0.12s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .dial-list li:hover, .dial-list li:active { background: var(--accent-dim); }
+    .dial-list li[aria-selected="true"] { background: var(--accent-dim); }
+    .dial-list .lg-flag { font-size: 18px; flex-shrink: 0; }
+    .dial-list .lg-name {
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .dial-list .lg-dial { color: var(--text-dim); font-size: 13px; flex-shrink: 0; }
+    .dial-list .lg-check { color: var(--accent-bright); font-size: 12px; flex-shrink: 0; }
+    .dial-empty {
+      padding: 18px 16px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
   </style>
 </head>
 <body>
@@ -846,19 +975,35 @@
         </div>
       </div>
 
-      <!-- NUMÉRO WHATSAPP -->
+      <!-- NUMÉRO WHATSAPP — indicatif pays (v8.3) : sélecteur à GAUCHE,
+           54 pays d'Afrique, défaut Niger (+227) -->
       <div class="field">
         <label class="field-label" for="phoneInput">Numéro WhatsApp</label>
-        <div class="field-input-wrap" id="phoneWrap">
-          <span class="icon"><i class="fas fa-phone"></i></span>
-          <input
-            type="tel"
-            id="phoneInput"
-            placeholder="+227 74 87 20 82"
-            autocomplete="tel"
-            inputmode="tel"
-          >
-          <span class="field-status" id="phoneStatus"></span>
+        <div class="dial-anchor">
+          <div class="field-input-wrap" id="phoneWrap">
+            <button type="button" class="dial-btn" id="dialBtn"
+                    aria-haspopup="listbox" aria-expanded="false"
+                    aria-label="Choisir l’indicatif du pays">
+              <span class="dial-flag" id="dialFlag">🇳🇪</span>
+              <span class="dial-code" id="dialCode">+227</span>
+              <i class="fas fa-chevron-down dial-chevron"></i>
+            </button>
+            <input
+              type="tel"
+              id="phoneInput"
+              placeholder="+227 70 12 34 56"
+              autocomplete="tel"
+              inputmode="tel"
+            >
+            <span class="field-status" id="phoneStatus"></span>
+          </div>
+          <div class="dial-panel" id="dialPanel" role="listbox" aria-label="Pays">
+            <div class="dial-search">
+              <i class="fas fa-magnifying-glass"></i>
+              <input type="text" id="dialSearch" placeholder="Rechercher un pays…" autocomplete="off">
+            </div>
+            <ul class="dial-list" id="dialList"></ul>
+          </div>
         </div>
         <div class="field-help" id="phoneHelp"></div>
       </div>
@@ -943,14 +1088,22 @@ const STR = {
     invalid: 'Numéro invalide. Vérifie et réessaie.',
     errNet: 'Connexion instable — on continue, ton numéro se synchronisera.',
     helpOk: 'Numéro valide.',
-    helpBad: '8 à 15 chiffres, ex. : +227 74 87 20 82.'
+    helpBad: '6 à 12 chiffres après l’indicatif, ex. : +227 74 87 20 82.',
+    dialSearch: 'Rechercher un pays…',
+    dialAria: 'Choisir l’indicatif du pays',
+    dialEmpty: 'Aucun pays trouvé',
+    dialListAria: 'Pays'
   },
   en: {
     saved: 'Number saved, welcome!',
     invalid: 'Invalid number. Check it and try again.',
     errNet: 'Unstable connection — moving on, your number will sync later.',
     helpOk: 'Looks good.',
-    helpBad: '8 to 15 digits, e.g. +227 74 87 20 82.'
+    helpBad: '6 to 12 digits after the dial code, e.g. +227 74 87 20 82.',
+    dialSearch: 'Search a country…',
+    dialAria: 'Choose the country dial code',
+    dialEmpty: 'No country found',
+    dialListAria: 'Countries'
   }
 };
 const LANG = (() => {
@@ -958,6 +1111,160 @@ const LANG = (() => {
   catch (e) { return 'fr'; }
 })();
 const t = STR[LANG];
+
+// ══════════════════════════════════════════════════════════════
+// INDICATIFS — LES 54 PAYS D'AFRIQUE (v8.3, consigne propriétaire :
+// « liste tous les pays d'Afrique, pas de défaut : c'est le Niger »)
+// [iso, drapeau, indicatif, nom FR, nom EN] — tri alphabétique FR.
+// Défaut : NIGER (+227 🇳🇪), mémorisé dans localStorage 'arvexa-dial'.
+// ══════════════════════════════════════════════════════════════
+const AFRIQUE = [
+  ['ZA','🇿🇦','+27','Afrique du Sud','South Africa'],
+  ['DZ','🇩🇿','+213','Algérie','Algeria'],
+  ['AO','🇦🇴','+244','Angola','Angola'],
+  ['BJ','🇧🇯','+229','Bénin','Benin'],
+  ['BW','🇧🇼','+267','Botswana','Botswana'],
+  ['BF','🇧🇫','+226','Burkina Faso','Burkina Faso'],
+  ['BI','🇧🇮','+257','Burundi','Burundi'],
+  ['CM','🇨🇲','+237','Cameroun','Cameroon'],
+  ['CV','🇨🇻','+238','Cap-Vert','Cape Verde'],
+  ['KM','🇰🇲','+269','Comores','Comoros'],
+  ['CG','🇨🇬','+242','Congo-Brazzaville','Republic of the Congo'],
+  ['CI','🇨🇮','+225','Côte d’Ivoire','Ivory Coast'],
+  ['DJ','🇩🇯','+253','Djibouti','Djibouti'],
+  ['EG','🇪🇬','+20','Égypte','Egypt'],
+  ['ER','🇪🇷','+291','Érythrée','Eritrea'],
+  ['SZ','🇸🇿','+268','Eswatini','Eswatini'],
+  ['ET','🇪🇹','+251','Éthiopie','Ethiopia'],
+  ['GA','🇬🇦','+241','Gabon','Gabon'],
+  ['GM','🇬🇲','+220','Gambie','Gambia'],
+  ['GH','🇬🇭','+233','Ghana','Ghana'],
+  ['GN','🇬🇳','+224','Guinée','Guinea'],
+  ['GW','🇬🇼','+245','Guinée-Bissau','Guinea-Bissau'],
+  ['GQ','🇬🇶','+240','Guinée équatoriale','Equatorial Guinea'],
+  ['KE','🇰🇪','+254','Kenya','Kenya'],
+  ['LS','🇱🇸','+266','Lesotho','Lesotho'],
+  ['LR','🇱🇷','+231','Liberia','Liberia'],
+  ['LY','🇱🇾','+218','Libye','Libya'],
+  ['MG','🇲🇬','+261','Madagascar','Madagascar'],
+  ['MW','🇲🇼','+265','Malawi','Malawi'],
+  ['ML','🇲🇱','+223','Mali','Mali'],
+  ['MA','🇲🇦','+212','Maroc','Morocco'],
+  ['MR','🇲🇷','+222','Mauritanie','Mauritania'],
+  ['MU','🇲🇺','+230','Maurice','Mauritius'],
+  ['MZ','🇲🇿','+258','Mozambique','Mozambique'],
+  ['NA','🇳🇦','+264','Namibie','Namibia'],
+  ['NE','🇳🇪','+227','Niger','Niger'],
+  ['NG','🇳🇬','+234','Nigéria','Nigeria'],
+  ['UG','🇺🇬','+256','Ouganda','Uganda'],
+  ['CF','🇨🇫','+236','République centrafricaine','Central African Republic'],
+  ['CD','🇨🇩','+243','République démocratique du Congo','DR Congo'],
+  ['RW','🇷🇼','+250','Rwanda','Rwanda'],
+  ['ST','🇸🇹','+239','São Tomé-et-Príncipe','São Tomé and Príncipe'],
+  ['SN','🇸🇳','+221','Sénégal','Senegal'],
+  ['SC','🇸🇨','+248','Seychelles','Seychelles'],
+  ['SL','🇸🇱','+232','Sierra Leone','Sierra Leone'],
+  ['SO','🇸🇴','+252','Somalie','Somalia'],
+  ['SD','🇸🇩','+249','Soudan','Sudan'],
+  ['SS','🇸🇸','+211','Soudan du Sud','South Sudan'],
+  ['TZ','🇹🇿','+255','Tanzanie','Tanzania'],
+  ['TD','🇹🇩','+235','Tchad','Chad'],
+  ['TG','🇹🇬','+228','Togo','Togo'],
+  ['TN','🇹🇳','+216','Tunisie','Tunisia'],
+  ['ZM','🇿🇲','+260','Zambie','Zambia'],
+  ['ZW','🇿🇼','+263','Zimbabwe','Zimbabwe']
+].map(([iso, flag, dial, fr, en]) => ({ iso, flag, dial, fr, en }));
+console.assert(AFRIQUE.length === 54, '[WhatsApp] 54 pays attendus, trouvé :', AFRIQUE.length);
+
+const DIAL_DEFAULT = AFRIQUE.find((c) => c.iso === 'NE'); // Niger par défaut
+let COUNTRY = DIAL_DEFAULT;
+try {
+  const savedIso = localStorage.getItem('arvexa-dial');
+  const found = savedIso && AFRIQUE.find((c) => c.iso === savedIso);
+  if (found) COUNTRY = found;
+} catch (e) { /* localStorage indisponible → Niger */ }
+
+const normSearch = (s) => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/['’`]/g, '').toLowerCase();
+
+function countryByName(iso) { return AFRIQUE.find((c) => c.iso === iso) || null; }
+
+// Détecte le pays d'un numéro E.164 existant (ex. "+22374872082" → Mali)
+// par préfixe d'indicatif LE PLUS LONG (les indicatifs sont uniques).
+function detectCountryFromE164(e164) {
+  const digits = String(e164 || '').replace(/\D/g, '');
+  if (!digits) return null;
+  let best = null;
+  for (const c of AFRIQUE) {
+    const d = c.dial.replace(/\D/g, '');
+    if (digits.startsWith(d) && (!best || d.length > best.dial.replace(/\D/g, '').length)) best = c;
+  }
+  return best;
+}
+
+function renderDialButton() {
+  $('dialFlag').textContent = COUNTRY.flag;
+  $('dialCode').textContent = COUNTRY.dial;
+  $('dialBtn').setAttribute('aria-label', t.dialAria + ' — ' + COUNTRY[LANG === 'en' ? 'en' : 'fr'] + ' ' + COUNTRY.dial);
+  const input = $('phoneInput');
+  input.placeholder = COUNTRY.dial + ' 70 12 34 56';
+}
+
+function renderDialList(filter) {
+  const list = $('dialList');
+  const f = normSearch(filter);
+  const items = AFRIQUE.filter((c) =>
+    !f || normSearch(c.fr).includes(f) || normSearch(c.en).includes(f) || c.dial.includes(f)
+  );
+  list.innerHTML = '';
+  if (!items.length) {
+    const li = document.createElement('li');
+    li.className = 'dial-empty';
+    li.textContent = t.dialEmpty;
+    list.appendChild(li);
+    return;
+  }
+  for (const c of items) {
+    const li = document.createElement('li');
+    li.setAttribute('role', 'option');
+    li.setAttribute('aria-selected', c.iso === COUNTRY.iso ? 'true' : 'false');
+    li.dataset.iso = c.iso;
+    const name = c[LANG === 'en' ? 'en' : 'fr'];
+    li.innerHTML =
+      '<span class="lg-flag"></span><span class="lg-name"></span>' +
+      '<span class="lg-dial"></span>' +
+      (c.iso === COUNTRY.iso ? '<i class="fas fa-check lg-check"></i>' : '');
+    li.querySelector('.lg-flag').textContent = c.flag;
+    li.querySelector('.lg-name').textContent = name;
+    li.querySelector('.lg-dial').textContent = c.dial;
+    list.appendChild(li);
+  }
+}
+
+function openDialPanel() {
+  const panel = $('dialPanel'), btn = $('dialBtn'), search = $('dialSearch');
+  renderDialList('');
+  $('dialSearch').placeholder = t.dialSearch;
+  $('dialPanel').setAttribute('aria-label', t.dialListAria);
+  panel.classList.add('open');
+  btn.setAttribute('aria-expanded', 'true');
+  try { search.value = ''; search.focus({ preventScroll: true }); } catch (e) { /* ancien navigateur */ }
+}
+
+function closeDialPanel() {
+  $('dialPanel').classList.remove('open');
+  $('dialBtn').setAttribute('aria-expanded', 'false');
+}
+
+function isDialPanelOpen() { return $('dialPanel').classList.contains('open'); }
+
+function selectCountry(c) {
+  COUNTRY = c;
+  try { localStorage.setItem('arvexa-dial', c.iso); } catch (e) { /* private mode */ }
+  renderDialButton();
+  closeDialPanel();
+  const input = $('phoneInput');
+  if (input.value.trim()) validatePhone(input);   // revalide avec le nouvel indicatif
+}
 
 function toast(msg, type) {
   const c = $('toastContainer');
@@ -978,9 +1285,22 @@ function toast(msg, type) {
 }
 
 function normalizePhone(raw) {
+  // v8.3 — indicatif choisi dans le sélecteur (défaut Niger +227).
+  //  - « + » tapé devant → numéro international COMPLET accepté tel quel
+  //  - sinon → E.164 = indicatif du pays choisi + chiffres locaux
+  //    (les espaces/tirets/parenthèses sont ignorés, un 0 initial est retiré)
   const cleaned = String(raw || '').replace(/[\s\-().\u00A0]/g, '').trim();
-  if (!/^\+?\d{8,15}$/.test(cleaned)) return null;
-  return cleaned.startsWith('+') ? cleaned : '+' + cleaned;
+  if (!cleaned) return null;
+  if (cleaned.startsWith('+')) {
+    return /^\+\d{8,15}$/.test(cleaned) ? cleaned : null;
+  }
+  const digits = cleaned.replace(/\D/g, '');
+  if (!digits) return null;
+  const local = digits.replace(/^0+/, '');
+  if (local.length < 6 || local.length > 12) return null;
+  const dialDigits = String(COUNTRY.dial).replace(/\D/g, '');
+  const e164 = '+' + dialDigits + local;
+  return (e164.length - 1) <= 15 ? e164 : null;
 }
 
 function joinUrl() {
@@ -1026,17 +1346,78 @@ function validatePhone(input) {
   return norm;
 }
 
+function initDialPanel() {
+  const btn = $('dialBtn'), panel = $('dialPanel'),
+        search = $('dialSearch'), list = $('dialList');
+
+  renderDialButton();
+
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    isDialPanelOpen() ? closeDialPanel() : openDialPanel();
+  });
+
+  search.addEventListener('input', () => renderDialList(search.value));
+  search.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { closeDialPanel(); btn.focus(); }
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const opt = list.querySelector('li[data-iso]');
+      if (opt) {
+        const c = AFRIQUE.find((x) => x.iso === opt.dataset.iso);
+        if (c) selectCountry(c);
+      }
+    }
+  });
+
+  list.addEventListener('click', (e) => {
+    const li = e.target.closest('li[data-iso]');
+    if (!li) return;
+    const c = AFRIQUE.find((x) => x.iso === li.dataset.iso);
+    if (c) selectCountry(c);
+  });
+
+  // Fermeture : clic extérieur ou Échap
+  document.addEventListener('click', (e) => {
+    if (isDialPanelOpen() && !panel.contains(e.target) && e.target !== btn) closeDialPanel();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && isDialPanelOpen()) { closeDialPanel(); btn.focus(); }
+  });
+}
+
 async function initPage(user) {
   const input = $('phoneInput');
   $('joinBtn').href = joinUrl();
 
+  initDialPanel();
   input.addEventListener('input', () => validatePhone(input));
 
-  // Pré-remplissage si le numéro existe déjà
+  // Pré-remplissage si le numéro existe déjà : le pays est restauré
+  // (champ whatsappCountry) ou détecté par préfixe d'indicatif ; le
+  // champ affiche le numéro LOCAL (l'indicatif vit dans le sélecteur).
   try {
     const snap = await getDoc(doc(db, 'users', user.uid));
     if (snap.exists() && snap.data().whatsapp) {
-      input.value = snap.data().whatsapp;
+      const saved = String(snap.data().whatsapp);
+      const savedIso = snap.data().whatsappCountry;
+      const byIso = savedIso && countryByName(String(savedIso));
+      const detected = byIso || detectCountryFromE164(saved);
+      if (saved.startsWith('+') && detected) {
+        COUNTRY = detected;
+        try { localStorage.setItem('arvexa-dial', COUNTRY.iso); } catch (e) { /* ok */ }
+        const dial = COUNTRY.dial.replace(/\D/g, '');
+        const digits = saved.replace(/\D/g, '');
+        const local = digits.startsWith(dial) ? digits.slice(dial.length).replace(/^0+/, '') : '';
+        if (local) {
+          input.value = local;              // numéro local sans l'indicatif
+          renderDialButton();
+        } else {
+          input.value = saved;              // format inconnu → international complet
+        }
+      } else {
+        input.value = saved;
+      }
       validatePhone(input);
     }
   } catch (e) {
@@ -1058,6 +1439,8 @@ async function initPage(user) {
       await Promise.race([
         setDoc(doc(db, 'users', user.uid), {
           whatsapp: norm,
+          whatsappCountry: COUNTRY.iso,
+          whatsappDial: COUNTRY.dial,
           whatsappUpdatedAt: serverTimestamp(),
           updatedAt: serverTimestamp()
         }, { merge: true }),

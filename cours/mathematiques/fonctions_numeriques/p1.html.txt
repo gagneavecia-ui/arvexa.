@@ -1,0 +1,273 @@
+ 
+ 📘 
+ Partie 01 · Fonctions numériques 
+ Limites & Croissances comparées 
+ Vers quelle valeur se dirige une fonction quand sa variable devient immense, ou quand elle s'approche d'un point précis ? La limite répond à cette question — c'est le socle de tout le chapitre : continuité, dérivées et études de fonctions s'appuieront dessus. Cette partie installe 4 notions : la limite en un point et à l'infini (avec les limites à droite et à gauche), les opérations sur les limites et leurs formes indéterminées, les croissances comparées , puis le théorème des gendarmes et les asymptotes .
+ ⏱ 25 min 
+ 🧮 4 notions 
+ 📊 8 sections 
+ 🎓 Terminale D 
+ Dans cette partie 
+ 4 notions · 8 sections 
+ 00 Motivation — La pirogue qui s'approche de la rive 
+ 01 Notion 1 · limite_point — Limite en un point et à l'infini 
+ 02 Notion 1 · limite_point — Limites à droite et à gauche 
+ 03 Notion 2 · operations_limites — Opérations sur les limites 
+ 04 Notion 2 · operations_limites — Formes indéterminées : deux techniques 
+ 05 Notion 3 · croissances_comparees — Croissances comparées 
+ 06 Notion 4 · gendarmes_asymptotes — Théorème des gendarmes 
+ 07 Notion 4 · gendarmes_asymptotes — Asymptotes horizontale et verticale 
+ 00 
+ Motivation 
+ La pirogue qui s'approche de la rive 
+ Imagine une pirogue sur le fleuve, à 64 mètres de la rive. À chaque minute, elle parcourt exactement la moitié de la distance qui la sépare de la rive : 32 m, puis 16 m, puis 8 m, puis 4 m… La distance restante devient aussi petite qu'on veut , sans jamais s'annuler. On dit qu'elle tend vers 0 .
+ Cette idée — « vers quoi tend une quantité quand une autre varie ? » — est exactement celle de la limite d'une fonction . Et ici, pas d'histoire compliquée : ce chapitre est une affaire de calculs . Tu vas apprendre à écrire proprement lim(x→a) f(x) = L , à lever les formes indéterminées grâce à deux techniques de calcul, et à traduire une limite en asymptote sur la courbe.
+ Les trois questions de cette partie 
+ Que vaut f(x) quand x s'approche d'un point a , ou quand x devient très grand ? (Notion 1) 
+ Comment combiner les limites — et que faire quand le calcul « bloque » ? (Notion 2) 
+ Qui l'emporte entre xⁿ , e^x et ln x à l'infini — et que voit-on alors sur la courbe ? (Notions 3 et 4) 
+ 🌍 Pour aller plus loin 
+ Le mot « limite » vient du latin limes : la borne, la frontière. Les mathématiciens ont mis plus de deux mille ans — de Zénon d'Élée à Cauchy au XIXᵉ siècle — pour le rendre précis. Aujourd'hui, une ligne de calcul bien rédigée suffit à le manipuler.
+ 01 
+ Notion 1 · limite_point 
+ Limite en un point et à l'infini 
+ Premier geste du chapitre : donner un sens précis à « f(x) se rapproche de L ». La définition officielle ne parle jamais de la valeur f(a) elle-même — seulement du voisinage du point a .
+ 📗 Définition — Limite en un point 
+ On dit que la fonction f admet pour limite le réel L en a lorsque f(x) est aussi proche qu'on veut de L dès que x est assez proche de a (avec x ≠ a ). On écrit : lim(x→a) f(x) = L . 
+ Deux remarques essentielles : 
+ Le point a lui-même ne compte pas : la condition est x ≠ a . La fonction peut même être non définie en a et avoir pourtant une limite en a (exemple en section 02). 
+ « Aussi proche qu'on veut » : pour tout écart ε aussi petit soit-il, on peut trouver des x assez proches de a tels que f(x) soit à moins de ε de L . C'est la pirogue : on s'approche « autant qu'on veut ». 
+ 📗 Limite à l'infini 
+ On écrit lim(x→+∞) f(x) = L lorsque f(x) est aussi proche qu'on veut de L dès que x est assez grand (positivement ou négativement pour x → −∞ ). De même, lim(x→a) f(x) = +∞ signifie que f(x) devient plus grand que tout nombre fixé d'avance pour x assez proche de a ; −∞ se lit de façon analogue. 
+ ⚠️ +∞ et −∞ ne sont pas des nombres 
+ Écrire lim(x→+∞) f(x) = +∞ ne veut pas dire que f « atteint » l'infini : cela décrit une tendance — les valeurs de f dépassent n'importe quel nombre fixé pour x assez grand. On ne note jamais f(x) = ∞ . 
+ 🧮 Exemple résolu — deux limites de référence 
+ Calculer lim(x→3) f(x) pour f(x) = x² + 2x , puis lim(x→+∞) g(x) pour g(x) = 1/x . 
+ 1 
+ Testons des valeurs proches de 3 pour f(x) = x² + 2x : f(2,9) = 8,41 + 5,8 = 14,21 ; f(2,99) = 8,9401 + 5,98 = 14,9201 ; f(3,01) = 9,0601 + 6,02 = 15,0801 . Les valeurs s'approchent de 15 . 
+ 2 
+ Conclusion pour f : lim(x→3) (x² + 2x) = 15 Pour une fonction polynôme, la limite en un point a s'obtient en remplaçant x par a (on justifiera ce réflexe par la continuité, partie 2). 
+ 3 
+ Pour g(x) = 1/x à l'infini : g(100) = 0,01 ; g(10 000) = 0,0001 ; g(−10 000) = −0,0001 . Les valeurs s'approchent de 0 des deux côtés : lim(x→+∞) 1/x = 0 lim(x→−∞) 1/x = 0 
+ 4 
+ Comparaison avec x² : lim(x→+∞) x² = +∞ (les valeurs dépassent tout : 100² = 10 000 , 1 000² = 1 000 000 …) et lim(x→−∞) x² = +∞ car un carré est positif. En revanche lim(x→−∞) x³ = −∞ : la puissance impaire garde le signe de x . 
+ Les limites de référence à connaître par cœur — chaque limite sur sa ligne : 
+ Fonction Limite Quand 
+ xⁿ avec n ≥ 1 +∞ x → +∞ 
+ x² (puissance paire) +∞ x → −∞ 
+ x³ (puissance impaire) −∞ x → −∞ 
+ 1/x 0 x → ±∞ 
+ √x +∞ x → +∞ 
+ ln x +∞ x → +∞ 
+ e^x 0 x → −∞ 
+ e^x +∞ x → +∞ 
+ 02 
+ Notion 1 · limite_point 
+ Limites à droite et à gauche 
+ On peut s'approcher d'un point a par les valeurs plus grandes que a (par la droite) ou par les valeurs plus petites (par la gauche). Rien ne garantit que la fonction fasse la même chose des deux côtés — surtout près d'une borne du domaine, comme 0 pour 1/x .
+ 📗 Définition — Limites unilatérales 
+ Limite à droite : lim(x→a⁺) f(x) = L₁ signifie que f(x) tend vers L₁ quand x s'approche de a par les valeurs x > a . Limite à gauche : lim(x→a⁻) f(x) = L₂ , avec cette fois x < a . 
+ Théorème : f admet une limite L en a si et seulement si les limites à droite et à gauche existent et sont égales : L₁ = L₂ = L . 
+ 🧮 Exemple résolu — 1/x en 0 : deux comportements opposés 
+ Étudier les limites de f(x) = 1/x en 0 . La fonction n'est pas définie en 0 (division par zéro), mais on peut l'approcher des deux côtés. 
+ 1 
+ À droite de 0 : f(0,1) = 10 ; f(0,01) = 100 ; f(0,001) = 1 000 . Les valeurs deviennent aussi grandes qu'on veut : lim(x→0⁺) 1/x = +∞ 
+ 2 
+ À gauche de 0 : f(−0,1) = −10 ; f(−0,01) = −100 ; f(−0,001) = −1 000 . Les valeurs deviennent aussi petites (négatives) qu'on veut : lim(x→0⁻) 1/x = −∞ 
+ 3 
+ Conclusion : les deux limites unilatérales existent mais sont différentes ( +∞ et −∞ ). Donc f n'admet pas de limite en 0 . La courbe « explose » de part et d'autre de l'axe des ordonnées. 
+ 🧮 Exemple résolu — une limite existe sans que f(a) existe 
+ Soit f(x) = (x² − 4)/(x − 2) , définie pour x ≠ 2 . Calculer lim(x→2) f(x) . 
+ 1 
+ Diagnostic : en x = 2 , le numérateur vaut 4 − 4 = 0 et le dénominateur vaut 0 : forme 0/0 , indéterminée. On factorise le numérateur : x² − 4 = (x − 2)(x + 2) . 
+ 2 
+ Simplification (valable car x ≠ 2 ) : f(x) = ((x − 2)(x + 2))/(x − 2) = x + 2 Conclusion : la limite existe et vaut 4 , alors même que f(2) n'existe pas — la définition de la limite ne demande que x ≠ 2 : lim(x→2⁺) f(x) = lim(x→2⁻) f(x) = 4 
+ ⚠️ Réflexe devant une borne du domaine 
+ Chaque fois que a est une valeur interdite (dénominateur nul, racine ou logarithme en butée), étudie toujours les deux limites unilatérales lim(x→a⁺) et lim(x→a⁻) avant de conclure : c'est elles qui décident de l'existence de la limite et du sens de l'asymptote verticale (section 07). 
+ 03 
+ Notion 2 · operations_limites 
+ Opérations sur les limites 
+ Bonne nouvelle : dans la plupart des cas, une limite se calcule brique par brique . Si f et g admettent des limites, alors f + g , f × g et f/g (avec g de limite non nulle) en admettent aussi, obtenues par les règles du tableau ci-dessous. Dans ce tableau, « L finie » désigne un réel, « 0 » une limite nulle , et « F.I. » une forme indéterminée (traitée en section 04).
+ lim f lim g lim (f + g) lim (f × g) lim f/g 
+ L finie M finie L + M L × M L/M (si M ≠ 0 ) 
+ L finie ≠ 0 +∞ +∞ ±∞ (signe de L ) 0 
+ 0 +∞ +∞ F.I. 0 
+ L finie ≠ 0 −∞ −∞ ±∞ (signe de L ) 0 
+ 0 −∞ −∞ F.I. 0 
+ +∞ +∞ +∞ +∞ F.I. 
+ −∞ −∞ −∞ +∞ F.I. 
+ +∞ −∞ F.I. −∞ F.I. 
+ b finie ≠ 0 0 b 0 ±∞ (signe de b et du côté) 
+ 0 0 0 0 F.I. 
+ Pour le quotient, retiens aussi la règle des signes : le signe de f/g est le signe du quotient des signes de f et g au voisinage du point étudié. Trois applications directes, en pas à pas :
+ 1 
+ Exemple A (quotient de limites finies) : lim(x→2) (x² + 1)/(x − 1) . Numérateur : 4 + 1 = 5 ; dénominateur : 2 − 1 = 1 ≠ 0 . lim(x→2) (x² + 1)/(x − 1) = 5/1 = 5 
+ 2 
+ Exemple B (produit sans surprise) : lim(x→+∞) x² × (2 + 1/x) . D'une part x² → +∞ ; d'autre part 2 + 1/x → 2 + 0 = 2 ≠ 0 . Produit : +∞ × 2 = +∞ 
+ 3 
+ Exemple C (somme) : lim(x→+∞) (2x + 3) + (5/x) . Or 2x + 3 → +∞ et 5/x → 0 . Somme : +∞ + 0 = +∞ 
+ Erreur fréquente au Bac 
+ Écrire ∞ − ∞ = 0 ou 0 × ∞ = 0 est faux ! Ces écritures sont des formes indéterminées : le résultat n'est pas automatique, il dépend de la fonction. Il faut transformer l'expression (factoriser, simplifier, conjuguée…) avant de conclure — c'est l'objet de la section suivante. 
+ 04 
+ Notion 2 · operations_limites 
+ Formes indéterminées : deux techniques 
+ Il existe quatre formes indéterminées à connaître par cœur : 
+ Forme Situation typique Technique de levée 
+ ∞ − ∞ différence de deux grandes quantités factoriser, ou quantité conjuguée si racine 
+ 0 × ∞ ex. (x² + 1) × (3/x) en +∞ développer : 3x + 3/x → +∞ 
+ ∞/∞ quotient de polynômes en ±∞ factoriser le terme dominant 
+ 0/0 dénominateur nul au point visé factoriser, ou quantité conjuguée si racine 
+ 🧠 Technique 1 — Factoriser le terme dominant 
+ En ±∞ , factorise le terme de plus haut degré au numérateur et au dénominateur : les termes en 1/x , 1/x² … tendent vers 0 et disparaissent. Pour un ∞ − ∞ polynomial, mets le facteur commun en évidence : x³ − x² = x²(x − 1) → +∞ en +∞ .
+ 🧮 Exemple résolu — une limite ∞/∞ par factorisation 
+ Calculer lim(x→+∞) (3x² − 5x + 2)/(2x² + x − 7) . Forme ∞/∞ : les deux polynômes tendent vers +∞ . 
+ 1 
+ On factorise le terme dominant x² au numérateur et au dénominateur : (3x² − 5x + 2)/(2x² + x − 7) = (x²(3 − 5/x + 2/x²))/(x²(2 + 1/x − 7/x²)) = (3 − 5/x + 2/x²)/(2 + 1/x − 7/x²) Quand x → +∞ : 5/x → 0 , 2/x² → 0 , 1/x → 0 , 7/x² → 0 : = (3 − 0 + 0)/(2 + 0 − 0) = 3/2 
+ 2 
+ Conclusion — le résultat sur sa propre ligne : lim(x→+∞) (3x² − 5x + 2)/(2x² + x − 7) = 3/2 Seul compte le rapport des coefficients dominants, 3 et 2. 
+ 🧠 Technique 2 — La quantité conjuguée 
+ Dès qu'une racine carrée est en jeu dans une forme 0/0 ou ∞ − ∞ , multiplie numérateur et dénominateur par la conjuguée. L'identité clé :
+ (√a − b)(√a + b) = a − b² 
+ La conjuguée fait disparaître la racine du numérateur (ou du dénominateur) : c'est l'outil standard des limites avec √. 
+ 🧮 Exemple résolu — conjuguée pour une forme 0/0 
+ Calculer lim(x→0) (√(x + 1) − 1)/x . 
+ 1 
+ Diagnostic : en x = 0 , le numérateur vaut √1 − 1 = 0 et le dénominateur vaut 0 : forme 0/0 , indéterminée. 
+ 2 
+ Conjuguée : on multiplie haut et bas par √(x + 1) + 1 , le numérateur se simplifie : (√(x + 1) − 1)/x = ((√(x + 1) − 1)(√(x + 1) + 1))/(x(√(x + 1) + 1)) or (√(x + 1) − 1)(√(x + 1) + 1) = (x + 1) − 1 = x = x/(x(√(x + 1) + 1)) = 1/(√(x + 1) + 1) (pour x ≠ 0 ) La racine a disparu : plus aucune forme indéterminée. 
+ 3 
+ Conclusion : quand x → 0 , √(x + 1) → 1 , donc : lim(x→0) (√(x + 1) − 1)/x = 1/(1 + 1) = 1/2 Forme indéterminée levée. 
+ 🧮 Exemple résolu — conjuguée pour une forme ∞ − ∞ 
+ Calculer lim(x→+∞) (√(x² + 3x) − x) . Les deux termes tendent vers +∞ : forme ∞ − ∞ . 
+ 1 
+ Conjuguée : on multiplie et on divise par √(x² + 3x) + x : √(x² + 3x) − x = ((√(x² + 3x) − x)(√(x² + 3x) + x))/(√(x² + 3x) + x) or (√(x² + 3x))² − x² = (x² + 3x) − x² = 3x = 3x/(√(x² + 3x) + x) 
+ 2 
+ On factorise x (avec x > 0 , donc √(x² + 3x) = x√(1 + 3/x) ) : 3x/(√(x² + 3x) + x) = 3x/(x(√(1 + 3/x) + 1)) = 3/(√(1 + 3/x) + 1) Conclusion : 3/x → 0 donc √(1 + 3/x) → 1 , et : lim(x→+∞) (√(x² + 3x) − x) = 3/(1 + 1) = 3/2 Le « combat » ∞ − ∞ se solde par un nombre fini : 3/2 . 
+ ⚠️ Choisir la bonne arme 
+ Pas de racine → factorise le terme dominant . Racine présente → quantité conjuguée . Multiplier par la conjuguée d'un polynôme sans racine ne sert à rien et complique le calcul. 
+ 05 
+ Notion 3 · croissances_comparees 
+ Croissances comparées 
+ À l'infini, les fonctions de référence ne grandissent pas toutes à la même vitesse. Les croissances comparées fixent la hiérarchie une fois pour toutes — et permettent de trancher des formes indéterminées sans calcul lourd.
+ La hiérarchie des puissances à l'infini 
+ lim(x→+∞) e^x/xⁿ = +∞ lim(x→+∞) xⁿ/e^x = 0 lim(x→+∞) (ln x)/x = 0 
+ La hiérarchie e^x ≫ xⁿ ≫ ln x : à l'infini, l'exponentielle l'emporte sur toute puissance, qui l'emporte sur le logarithme. Compare les VITESSES de croissance, jamais les valeurs. 
+ lim(x→+∞) e^x/xⁿ = +∞ 
+ lim(x→+∞) x·e^(−x) = 0 
+ lim(x→+∞) (ln x)/x = 0 
+ lim(x→0⁺) x·ln x = 0
+ À l'infini, l'exponentielle l'emporte sur toute puissance xⁿ (n ≥ 1) , qui l'emporte elle-même sur le logarithme : e^x ≫ xⁿ ≫ ln x . Et près de 0, x·ln x → 0 : le logarithme « perd » aussi en 0⁺. Retiens la phrase : l'exponentielle domine, le logarithme est dominé. 
+ CROISSANCES COMPARÉES EN +∞ : e^x ≫ xⁿ ≫ ln x 
+ x 
+ y 
+ O 
+ à partir d'ici, e^x domine 
+ ln x 
+ xⁿ 
+ e^x 
+ Allure des trois croissances en +∞ : la puissance xⁿ finit par dépasser ln x , puis l'exponentielle e^x dépasse tout à partir du seuil indiqué — la hiérarchie e^x ≫ xⁿ ≫ ln x se lit sur le dessin. 
+ ⚠️ Ne pas confondre les deux limites avec ln 
+ lim(x→0⁺) x·ln x = 0 (près de zéro, le produit s'écrase), mais lim(x→+∞) x·ln x = +∞ (à l'infini, la puissance x l'emporte et pousse le produit vers +∞ ). Même écriture, deux points différents, deux résultats opposés : vérifie toujours le point où la limite est prise. 
+ 🧮 Exemples résolus — trancher deux formes indéterminées 
+ Calculer lim(x→+∞) x³/e^x , puis lim(x→+∞) (x·ln x)/x² . Les deux sont des formes ∞/∞ . 
+ 1 
+ Première limite : x³/e^x oppose une puissance à l'exponentielle. Par croissances comparées, l'exponentielle l'emporte : lim(x→+∞) x³/e^x = 0 
+ 2 
+ Deuxième limite : on simplifie d'abord l'écriture — (x·ln x)/x² = (ln x)/x pour x > 0 . 
+ 3 
+ Conclusion : par croissances comparées, lim(x→+∞) (ln x)/x = 0 , donc : lim(x→+∞) (x·ln x)/x² = 0 
+ 06 
+ Notion 4 · gendarmes_asymptotes 
+ Théorème des gendarmes 
+ Quand une fonction est coincée entre deux autres qui convergent vers la même valeur, elle n'a pas le choix : elle converge aussi. C'est le théorème des gendarmes — l'outil parfait quand la limite de f résiste au calcul direct (souvent à cause d'un sin x ou cos x , qui oscillent sans limite propre).
+ 📘 Théorème des gendarmes (énoncé exact) 
+ Si , au voisinage du point a (ou pour x assez grand), on a g(x) ≤ f(x) ≤ h(x) , et si lim g = lim h = L où L est un réel , alors lim f = L . 
+ Hypothèses à vérifier : (1) l'encadrement est valable sur un voisinage du point (ou au-delà d'un certain seuil à l'infini) ; (2) les deux limites « gendarmes » existent, sont égales et finies . 
+ 🧮 Exemple résolu — sin(x)/x en +∞ 
+ Calculer lim(x→+∞) sin(x)/x . Impossible de séparer le calcul : sin x oscille entre −1 et 1 sans avoir de limite à l'infini. 
+ 1 
+ Encadrement de base : pour tout réel x , −1 ≤ sin x ≤ 1 . 
+ 2 
+ Division par x > 0 (le sens des inégalités est conservé) : −1/x ≤ sin(x)/x ≤ 1/x 
+ 3 
+ Limite des gendarmes : lim(x→+∞) (−1/x) = 0 et lim(x→+∞) 1/x = 0 — les deux gendarmes convergent vers la même limite finie 0 . 
+ 4 
+ Conclusion : par le théorème des gendarmes, lim(x→+∞) sin(x)/x = 0 
+ ⚠️ L = +∞ ? Le théorème ne s'applique pas tel quel 
+ L'énoncé exige des gendarmes de limite réelle . Si g(x) ≤ f(x) avec lim g = +∞ , on peut seulement conclure que lim f = +∞ (comparaison directe) — mais un encadrement par deux fonctions qui divergent ne détermine rien. 
+ 07 
+ Notion 4 · gendarmes_asymptotes 
+ Asymptotes horizontale et verticale 
+ Les limites que l'on vient de calculer ont une lecture graphique directe : elles tracent des droites que la courbe suit ou fuit. C'est le premier bénéfice concret du calcul de limites : deux lignes de calcul → deux droites sur le dessin.
+ 📗 Définitions — Asymptotes 
+ Asymptote horizontale : si lim(x→+∞) f(x) = b (ou lim(x→−∞) f(x) = b ) avec b réel, alors la droite d'équation y = b est asymptote horizontale à la courbe de f (en +∞ et/ou en −∞ ). 
+ Asymptote verticale : si lim(x→a⁺) f(x) = ±∞ ou lim(x→a⁻) f(x) = ±∞ , alors la droite d'équation x = a est asymptote verticale à la courbe. 
+ La traduction limite → droite 
+ lim(x→±∞) f(x) = b ⇒ asymptote y = b 
+ lim(x→a) f(x) = ±∞ ⇒ asymptote x = a
+ Horizontale : la courbe se colle à une hauteur fixe à l'infini. Verticale : la courbe explose près d'une valeur interdite. 
+ 🧮 Exemple résolu complet — les deux asymptotes d'une même fonction 
+ Soit f(x) = (2x + 1)/(x − 3) . Déterminer le domaine, puis toutes les asymptotes de la courbe. 
+ 1 
+ Domaine : le dénominateur s'annule en 3 , donc D = ℝ ∖ {3} . Le point 3 est le candidat asymptote verticale. 
+ 2 
+ Limites en 3 : le numérateur tend vers 2 × 3 + 1 = 7 ≠ 0 . Chaque côté sur sa ligne : x − 3 → 0⁺ donc lim(x→3⁺) f(x) = 7/0⁺ = +∞ x − 3 → 0⁻ donc lim(x→3⁻) f(x) = 7/0⁻ = −∞ Bilan : la droite x = 3 est asymptote verticale. 
+ 3 
+ Limites en ±∞ : forme ∞/∞ → on factorise x : f(x) = (x(2 + 1/x))/(x(1 − 3/x)) = (2 + 1/x)/(1 − 3/x) Quand x → ±∞ , 1/x → 0 et 3/x → 0 , donc : lim(x→±∞) f(x) = (2 + 0)/(1 − 0) = 2 Bilan : la droite y = 2 est asymptote horizontale (en +∞ et en −∞ ). 
+ 4 
+ Bilan complet : la courbe admet l'asymptote verticale x = 3 (branche montante à droite, descendante à gauche) et l'asymptote horizontale y = 2 des deux côtés. 
+ ALLURE DE LA COURBE : f(x) = (2x + 1)/(x − 3) 
+ x 
+ y 
+ O 
+ x = 3 
+ y = 2 
+ Cf 
+ Allure de la courbe de f(x) = (2x + 1)/(x − 3) : la branche de gauche part de y = 2 (qu'elle approche par dessous) et plonge vers −∞ le long de x = 3 ; la branche de droite descend de +∞ et se colle à y = 2 par-dessus la ligne. 
+ 🎯 
+ Limite 
+ Valeur dont f(x) s'approche autant qu'on veut 
+ 🚧 
+ Forme indéterminée 
+ ∞ − ∞, 0 × ∞, ∞/∞, 0/0 : à transformer avant de conclure 
+ 📏 
+ Asymptote horizontale 
+ lim(x→±∞) f(x) = b → droite y = b 
+ 🧗 
+ Asymptote verticale 
+ lim(x→a) f(x) = ±∞ → droite x = a 
+ Q1 — lim(x→+∞) (5x² + 3x)/(x² + 1) vaut : 
+ A) 0 
+ B) 5 
+ C) +∞ 
+ D) 3 
+ Voir la réponse 
+ B) 5. Forme ∞/∞ : on factorise le terme dominant, (5x² + 3x)/(x² + 1) = (5 + 3/x)/(1 + 1/x²) → 5/1 = 5 , car 3/x → 0 et 1/x² → 0 . 
+ Q2 — lim(x→0) (√(x + 4) − 2)/x vaut : 
+ A) 0 
+ B) 1/4 
+ C) 1/2 
+ D) +∞ 
+ Voir la réponse 
+ B) 1/4. Forme 0/0 : conjuguée √(x + 4) + 2 . Le numérateur devient (x + 4) − 4 = x , d'où 1/(√(x + 4) + 2) → 1/(2 + 2) = 1/4 . 
+ Q3 — Si lim(x→+∞) f(x) = 3 , alors la courbe de f admet : 
+ A) une asymptote verticale x = 3 
+ B) une asymptote horizontale y = 3 
+ C) aucune asymptote 
+ D) une asymptote y = x + 3 
+ Voir la réponse 
+ B) une asymptote horizontale y = 3. Une limite finie b en ±∞ donne l'asymptote horizontale y = b . L'asymptote verticale x = a correspondrait au contraire à une limite infinie en a . 
+ 📌 Ce qu'il faut retenir 
+ [limite_point] lim(x→a) f(x) = L : f(x) s'approche autant qu'on veut de L quand x s'approche de a — la valeur f(a) n'intervient pas ( x ≠ a ) 
+ [limite_point] Limite en a ⇔ limites à droite ( x→a⁺ ) et à gauche ( x→a⁻ ) existent et sont égales 
+ [limite_point] Références : lim(x→±∞) 1/x = 0 ; lim(x→+∞) xⁿ = +∞ ; lim(x→−∞) x² = +∞ ; lim(x→−∞) x³ = −∞ 
+ [operations_limites] Somme, produit, quotient : on combine les limites — sauf les 4 formes indéterminées : ∞ − ∞ , 0 × ∞ , ∞/∞ , 0/0 
+ [operations_limites] ∞/∞ de polynômes : factoriser le terme dominant ; 0/0 ou ∞ − ∞ avec racine : quantité conjuguée (√a − b)(√a + b) = a − b² 
+ [croissances_comparees] En +∞ : e^x/xⁿ → +∞ , x·e^(−x) → 0 , (ln x)/x → 0 ; en 0⁺ : x·ln x → 0 . L'exponentielle domine, le logarithme est dominé 
+ [gendarmes_asymptotes] Gendarmes : g ≤ f ≤ h et lim g = lim h = L réel ⇒ lim f = L 
+ [gendarmes_asymptotes] lim(x→±∞) f(x) = b (réel) ⇒ asymptote horizontale y = b 
+ [gendarmes_asymptotes] lim(x→a) f(x) = ±∞ ⇒ asymptote verticale x = a (penser aux deux limites unilatérales) 
+ [operations_limites] Une forme indéterminée n'a pas de réponse automatique : transformer l'écriture d'abord, conclure ensuite 
+ 🎯 
+ Partie 1 terminée ! 
+ Passe à la partie 2 : continuité, TVI et théorème de la bijection 

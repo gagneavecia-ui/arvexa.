@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ARVEXA — À proximité</title>
+  <meta name="theme-color" content="#0A0A0A">
+<script>(function(){try{if(localStorage.getItem('arvexa-theme')==='light')document.documentElement.setAttribute('data-theme','light')}catch(e){}})();</script>
+<script src="theme.js"></script><script src="arvexa-i18n.js" defer></script>
+  <meta name="description" content="ARVEXA School - Trouve des camarades à proximité pour traiter des exercices ensemble">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon.png">
+  <link rel="stylesheet" href="perf.css">
+  <link rel="icon" href="icon.png" type="image/png">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <script src="analytics.js"></script>
+  <script src="register-sw.js" defer></script>
+  <script src="offline.js" defer></script>
+
+  <link rel="stylesheet" href="arvexa-ui.css">
+  <style>
+       /* ============================================================
+       ROOT — Design system ARVEXA (identique aux autres pages)
+       ============================================================ */
+    :root {
+      --primary: #1A3A2A;
+      --primary-dark: #0A1A12;
+      --primary-light: #2A5A3A;
+      --accent: #B8860B;
+      --accent-bright: #E0B84A;
+      --accent-dim: rgba(184, 134, 11, 0.08);
+      --success: #2D7D5A;
+      --success-light: #3AB67E;
+      --danger: #B85C3A;
+      --danger-light: #E07A5F;
+      --warning: #D4A017;
+      --bg-dark: #0A0A0A;
+      --bg-surface: #141414;
+      --bg-card: rgba(20, 20, 20, 0.7);
+      --text-light: #F5F0E8;
+      --text-dim: #8A8A7A;
+      --text-muted: #5A5A4A;
+      --card-border: rgba(184, 134, 11, 0.06);
+      --card-border-hover: rgba(184, 134, 11, 0.2);
+      --transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+      --transition-fast: all 0.15s ease;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+      --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.5);
+      --radius: 16px;
+      --radius-lg: 20px;
+      --sidebar-width: 280px;
+      --header-height: 64px;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html { scroll-behavior: smooth; width: 100%; overflow-x: hidden; -webkit-text-size-adjust: 100%; }
+    body {
+      font-family: 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-light);
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100vh;
+      width: 100%;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      display: flex;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ============================================================
+       BACKGROUND — halos statiques (identique au site)
+       ============================================================ */
+    .gradient-bg {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2;
+      background: radial-gradient(ellipse 40% 30% at 30% 15%, rgba(184, 134, 11,  0.16) 0%, transparent 70%),
+                  radial-gradient(ellipse 35% 25% at 75% 85%, rgba(184, 134, 11, 0.05) 0%, transparent 60%),
+                  linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-deep) 100%);
+    }
+    .glow {
+      position: fixed; border-radius: 50%; filter: blur(80px); pointer-events: none; z-index: -1;
+      opacity: 0.12;
+    }
+    .glow-1 { width: 350px; height: 350px; background: rgba(184, 134, 11, 0.18); top: -80px; right: -80px; }
+    .glow-2 { width: 200px; height: 200px; background: rgba(184,134,11,0.05); bottom: 0; left: 0; }
+    .glow-3 { width: 250px; height: 250px; background: rgba(184, 134, 11, 0.1); top: 30%; left: 60%; transform: translate(-50%,-50%); }
+
+    .sidebar-overlay {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+      background: rgba(0,0,0,0.6); z-index: 99; opacity: 0; transition: opacity 0.3s ease;
+    }
+    .sidebar-overlay.active { display: block; opacity: 1; }
+
+    /* ============================================================
+       SIDEBAR
+       ============================================================ */
+    .sidebar {
+      position: fixed; top: 0; left: -280px; width: 280px; height: 100vh;
+      background: rgba(var(--rgb-veil), 0.97); backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-right: 1px solid rgba(184, 134, 11, 0.06);
+      padding: calc(24px + var(--safe-top)) 16px calc(24px + var(--safe-bottom));
+      display: flex; flex-direction: column; z-index: 100;
+      overflow-y: auto; transition: left 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+    .sidebar.open { left: 0; }
+    .sidebar .logo {
+      display: flex; align-items: center; text-decoration: none; color: var(--text-light);
+      font-size: 20px; font-weight: 700; font-family: 'Playfair Display', Georgia, serif;
+      letter-spacing: 2px; padding-bottom: 20px; margin-bottom: 16px;
+      border-bottom: 1px solid rgba(var(--rgb-soft), 0.04);
+    }
+    .sidebar .logo span {
+      background: linear-gradient(90deg, var(--accent), var(--accent-bright), var(--accent));
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent; font-style: italic;
+      margin-left: 4px;
+    }
+    .sidebar .nav { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+    .sidebar .nav a {
+      display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 10px;
+      color: var(--text-dim); text-decoration: none; transition: var(--transition);
+      font-size: 13px; font-weight: 500;
+    }
+    .sidebar .nav a i { width: 20px; text-align: center; font-size: 15px; }
+    .sidebar .nav a:hover { color: var(--text-light); background: rgba(var(--rgb-soft), 0.03); }
+    .sidebar .nav a.active { color: var(--text-light); background: rgba(184, 134, 11, 0.08); border: 1px solid rgba(184, 134, 11, 0.08); }
+    .sidebar .nav a.active i { color: var(--accent); }
+    .sidebar .nav a.avis-link {
+      color: var(--accent-bright);
+      background: rgba(184, 134, 11, 0.06);
+      border: 1px solid rgba(184, 134, 11, 0.12);
+      margin-top: 4px;
+    }
+    .sidebar .nav a.avis-link:hover {
+      background: rgba(184, 134, 11, 0.12);
+      color: var(--accent-bright);
+    }
+    .sidebar .nav-divider { height: 1px; background: rgba(var(--rgb-soft), 0.04); margin: 6px 0; }
+    .sidebar .nav-bottom { margin-top: auto; padding-top: 12px; border-top: 1px solid rgba(var(--rgb-soft), 0.04); }
+    .sidebar .nav-bottom a { color: var(--text-muted); font-size: 12px; }
+    .sidebar .nav-bottom a:hover { color: var(--text-dim); }
+
+    /* ============================================================
+       MAIN CONTENT
+       ============================================================ */
+    .main-content { flex: 1; width: 100%; min-height: 100vh; padding-bottom: 32px; }
+
+    .header {
+      position: sticky; top: 0; z-index: 50; display: flex; align-items: center;
+      justify-content: space-between; padding: calc(10px + var(--safe-top)) 16px 10px;
+      background: rgba(var(--rgb-veil), 0.92);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(184, 134, 11, 0.06);
+      gap: 12px; min-height: var(--header-height);
+    }
+    .header .header-left { display: flex; align-items: center; gap: 12px; }
+    .header .menu-toggle {
+      display: flex; align-items: center; justify-content: center; width: 36px; height: 36px;
+      border-radius: 10px; border: 1px solid rgba(var(--rgb-soft), 0.05); background: transparent;
+      color: var(--text-dim); cursor: pointer; transition: var(--transition); font-size: 16px;
+    }
+    .header .menu-toggle:hover { border-color: rgba(184, 134, 11, 0.14); color: var(--text-light); }
+    .header .page-title {
+      font-size: clamp(13px, 1.6vw, 15px);
+      font-weight: 600; color: var(--text-light); font-family: 'Playfair Display', serif;
+    }
+    .header .page-title i { color: var(--accent-bright); margin-right: 6px; font-size: 14px; }
+    .header .header-actions { display: flex; align-items: center; gap: 6px; }
+    .header .header-actions button {
+      width: 36px; height: 36px; border-radius: 50%; border: none; background: rgba(var(--rgb-soft), 0.04);
+      color: var(--text-dim); cursor: pointer; transition: var(--transition); font-size: 15px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .header .header-actions button:hover { background: rgba(var(--rgb-soft), 0.07); color: var(--text-light); }
+
+    .container { max-width: 700px; margin: 0 auto; padding: 16px 16px 20px; }
+
+    /* ============================================================
+       CARTES (style identique à .profile-card du site)
+       ============================================================ */
+    .loc-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      padding: 0;
+      position: relative;
+      overflow: hidden;
+      animation: fadeInUp 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+      margin-bottom: 14px;
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .loc-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent-bright), transparent);
+      z-index: 3;
+      opacity: 0.8;
+    }
+    .loc-card .card-inner { padding: 18px 18px 16px; }
+
+    .loc-hero { text-align: center; padding: 26px 18px 20px; }
+    .loc-hero .hero-icon {
+      width: 58px; height: 58px; margin: 0 auto 12px; border-radius: 18px;
+      display: flex; align-items: center; justify-content: center; font-size: 24px;
+      background: rgba(184, 134, 11, 0.1); border: 1px solid rgba(184, 134, 11, 0.16);
+      color: var(--accent-bright);
+    }
+    .loc-hero h2 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(19px, 3.6vw, 24px); font-weight: 700; color: var(--text-light);
+      margin-bottom: 6px; letter-spacing: 0.3px;
+    }
+    .loc-hero p { color: var(--text-dim); font-size: 13px; max-width: 440px; margin: 0 auto; }
+
+    /* ---------- COMPTEURS ---------- */
+    .counts-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+    .count-chip {
+      background: var(--bg-card); border: 1px solid var(--card-border); border-radius: var(--radius);
+      padding: 12px 8px; text-align: center; transition: var(--transition);
+    }
+    .count-chip:hover { border-color: var(--card-border-hover); }
+    .count-chip .n { display: block; font-size: 22px; font-weight: 800; color: var(--accent-bright); font-family: 'Playfair Display', serif; }
+    .count-chip .l { display: block; font-size: 10.5px; color: var(--text-dim); margin-top: 2px; }
+
+    /* ---------- STATUT / PARTAGE ---------- */
+    .status-pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 7px 14px; border-radius: 999px; font-size: 12.5px; font-weight: 600;
+      background: rgba(var(--rgb-soft), 0.05); color: var(--text-dim);
+      border: 1px solid rgba(var(--rgb-soft), 0.08);
+      transition: var(--transition);
+    }
+    .status-pill .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-muted); flex: 0 0 auto; }
+    .status-pill.live { background: rgba(58, 182, 126, 0.1); border-color: rgba(58, 182, 126, 0.25); color: var(--success-light); }
+    .status-pill.live .dot { background: var(--success-light); animation: pulse 1.6s infinite; }
+    .status-pill.searching { background: rgba(212, 160, 23, 0.1); border-color: rgba(212, 160, 23, 0.3); color: var(--warning); }
+    .status-pill.searching .dot { background: var(--warning); animation: pulse 1.1s infinite; }
+    .status-pill.denied { background: rgba(184, 92, 58, 0.12); border-color: rgba(184, 92, 58, 0.3); color: var(--danger-light); }
+    .status-pill.denied .dot { background: var(--danger-light); }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
+
+    .share-btn {
+      width: 100%; margin-top: 14px; padding: 13px 16px; border-radius: 14px;
+      border: none; cursor: pointer; font-family: 'Inter', sans-serif;
+      font-size: 14px; font-weight: 700; letter-spacing: 0.2px;
+      color: #0A0A0A; background: linear-gradient(135deg, var(--accent), var(--accent-bright));
+      transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 9px;
+    }
+    .share-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(184, 134, 11, 0.25); }
+    .share-btn:active { transform: translateY(0); }
+    .share-btn.stop {
+      color: var(--text-light); background: transparent;
+      border: 1px solid rgba(184, 92, 58, 0.4);
+    }
+    .share-btn.stop:hover { background: rgba(184, 92, 58, 0.1); box-shadow: none; }
+    .share-btn:disabled { opacity: 0.6; cursor: wait; transform: none; }
+
+    .kv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
+    .kv {
+      background: rgba(var(--rgb-soft), 0.03); border: 1px solid rgba(var(--rgb-soft), 0.05);
+      border-radius: 12px; padding: 9px 12px;
+    }
+    .kv .k { display: block; font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; }
+    .kv .v { display: block; font-size: 12.5px; color: var(--text-light); font-weight: 600; margin-top: 2px; word-break: break-word; }
+
+    /* ---------- VIE PRIVÉE ---------- */
+    .privacy-list { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+    .privacy-list li { display: flex; gap: 10px; font-size: 12.5px; color: var(--text-dim); line-height: 1.5; }
+    .privacy-list li i { color: var(--success-light); margin-top: 2px; flex: 0 0 auto; font-size: 12px; }
+    .section-label {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase;
+      color: var(--text-muted); margin: 18px 0 10px;
+    }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: rgba(var(--rgb-soft), 0.06); }
+
+    /* ---------- GROUPES / CAMARADES ---------- */
+    .group-block { margin-bottom: 16px; }
+    .group-title {
+      display: flex; align-items: center; gap: 8px; margin-bottom: 9px;
+      font-size: 13.5px; font-weight: 700; color: var(--text-light);
+    }
+    .group-title .gcount {
+      font-size: 11px; font-weight: 700; color: var(--accent-bright);
+      background: rgba(184, 134, 11, 0.1); border: 1px solid rgba(184, 134, 11, 0.15);
+      padding: 1px 9px; border-radius: 999px;
+    }
+    .people-grid { display: flex; flex-direction: column; gap: 8px; }
+    .person {
+      display: flex; align-items: center; gap: 12px;
+      background: var(--bg-card); border: 1px solid var(--card-border);
+      border-radius: var(--radius); padding: 12px 14px; transition: var(--transition);
+      animation: fadeInUp 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+    .person:hover { border-color: var(--card-border-hover); transform: translateY(-1px); }
+    .person .avatar {
+      width: 42px; height: 42px; border-radius: 50%; flex: 0 0 auto;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700; color: var(--accent-bright);
+      background: rgba(184, 134, 11, 0.1); border: 1px solid rgba(184, 134, 11, 0.18);
+    }
+    .person .p-info { flex: 1; min-width: 0; }
+    .person .p-name { font-size: 13.5px; font-weight: 600; color: var(--text-light); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .person .p-meta { font-size: 11.5px; color: var(--text-dim); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .person .p-dist { font-size: 12.5px; font-weight: 700; color: var(--accent-bright); flex: 0 0 auto; text-align: right; }
+    .person .p-fresh { display: block; font-size: 10.5px; font-weight: 500; color: var(--text-muted); }
+    .chat-btn {
+      flex: 0 0 auto; display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 13px; border-radius: 10px; text-decoration: none;
+      font-size: 11.5px; font-weight: 700; color: #0A0A0A;
+      background: linear-gradient(135deg, var(--accent), var(--accent-bright));
+      transition: var(--transition);
+    }
+    .chat-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(184, 134, 11, 0.25); }
+
+    /* ---------- ÉTATS ---------- */
+    .state-box { text-align: center; padding: 26px 18px; }
+    .state-box .big { font-size: 34px; margin-bottom: 10px; }
+    .state-box h3 { font-family: 'Playfair Display', serif; font-size: 16px; color: var(--text-light); margin-bottom: 6px; }
+    .state-box p { font-size: 12.5px; color: var(--text-dim); max-width: 400px; margin: 0 auto 4px; }
+    .state-box.error p { color: var(--danger-light); }
+    .help-steps { text-align: left; margin: 12px auto 0; max-width: 400px; }
+    .help-steps li { font-size: 12px; color: var(--text-dim); margin: 6px 0 6px 18px; }
+    .banner-warn {
+      display: flex; gap: 10px; align-items: flex-start;
+      background: rgba(212, 160, 23, 0.08); border: 1px solid rgba(212, 160, 23, 0.25);
+      border-radius: 12px; padding: 11px 13px; font-size: 12px; color: var(--warning);
+      margin-top: 12px;
+    }
+    .banner-warn i { margin-top: 2px; }
+
+    /* ---------- SKELETON ---------- */
+    .skeleton { background: linear-gradient(90deg, rgba(184,134,11,0.04) 25%, rgba(184,134,11,0.1) 50%, rgba(184,134,11,0.04) 75%); background-size: 200% 100%; animation: sk 1.4s infinite; border-radius: 10px; }
+    @keyframes sk { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+    /* ---------- TOASTS ---------- */
+    .toast-container { position: fixed; top: calc(14px + var(--safe-top)); left: 50%; transform: translateX(-50%); z-index: 2000; display: flex; flex-direction: column; gap: 8px; width: min(92vw, 420px); pointer-events: none; }
+    .toast {
+      display: flex; align-items: center; gap: 10px; padding: 11px 15px; border-radius: 12px;
+      background: var(--bg-surface); border: 1px solid var(--card-border-hover);
+      box-shadow: var(--shadow); font-size: 12.5px; color: var(--text-light);
+      opacity: 0; transform: translateY(-8px); transition: var(--transition);
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.error { border-color: rgba(184, 92, 58, 0.4); }
+    .toast.success { border-color: rgba(58, 182, 126, 0.4); }
+
+    /* ---------- RESPONSIVE (identique au site) ---------- */
+    @media (min-width: 768px) {
+      .sidebar { left: 0; }
+      .main-content { margin-left: 280px; width: calc(100% - 280px); }
+      .menu-toggle { display: none; }
+      .container { padding: 24px 24px 32px; }
+    }
+    @media (max-width: 767px) {
+      .sidebar { box-shadow: var(--shadow-lg); }
+    }
+    @media (max-width: 480px) {
+      .counts-row { gap: 6px; }
+      .count-chip .n { font-size: 18px; }
+      .person { padding: 10px 12px; }
+      .chat-btn { padding: 7px 10px; }
+      .kv-grid { grid-template-columns: 1fr; }
+    }
+
+    a:focus-visible, button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
+      outline: 2px solid var(--accent-bright); outline-offset: 3px; border-radius: 8px;
+    }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(184, 134, 11, 0.25); border-radius: 10px; }
+  </style>
+</head>
+<body>
+
+  <div class="gradient-bg"></div>
+  <div class="glow glow-1"></div>
+  <div class="glow glow-2"></div>
+  <div class="glow glow-3"></div>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar" id="sidebar">
+    <a href="index.html" class="logo">ARVEX<span>A School</span></a>
+    <nav class="nav">
+      <a href="index.html"><i class="fas fa-home"></i> Accueil</a>
+      <a href="profil.html"><i class="fas fa-user"></i> Mon profil</a>
+      <a href="abonnement.html"><i class="fas fa-crown"></i> Mon abonnement</a>
+      <a href="notifications.html"><i class="fas fa-bell"></i> Notifications</a>
+      <a href="arv-progress.html"><i class="fas fa-graduation-cap"></i> Arv-progress</a>
+      <a href="outils.html"><i class="fas fa-toolbox"></i> Outils</a>
+      <a href="localisation.html" class="active"><i class="fas fa-location-dot"></i> À proximité</a>
+      <div class="nav-divider"></div>
+      <a href="index.html?avis=1" class="avis-link"><i class="fas fa-star"></i> Donner mon avis</a>
+      <div class="nav-divider"></div>
+      <div class="nav-bottom">
+        <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- ===== MAIN ===== -->
+  <div class="main-content">
+
+    <header class="header">
+      <div class="header-left">
+        <button class="menu-toggle" id="menuToggle" aria-label="Ouvrir le menu">
+          <i class="fas fa-bars"></i>
+        </button>
+        <h1 class="page-title"><i class="fas fa-location-dot"></i> À proximité</h1>
+      </div>
+      <div class="header-actions">
+        <button id="refreshBtn" aria-label="Rafraîchir" title="Rafraîchir">
+          <i class="fas fa-sync-alt"></i>
+        </button>
+        <button id="notifBtn" aria-label="Notifications" onclick="window.location.href='notifications.html'">
+          <i class="fas fa-bell"></i>
+        </button>
+      </div>
+    </header>
+
+    <div class="container">
+
+      <!-- SKELETON -->
+      <div id="skeletonLoading">
+        <div class="loc-card"><div class="card-inner" style="text-align:center;padding:30px 18px;">
+          <div class="skeleton" style="width:58px;height:58px;border-radius:18px;margin:0 auto 12px;"></div>
+          <div class="skeleton" style="height:16px;width:200px;margin:0 auto 10px;"></div>
+          <div class="skeleton" style="height:12px;width:280px;margin:0 auto;"></div>
+        </div></div>
+        <div class="loc-card"><div class="card-inner">
+          <div class="skeleton" style="height:34px;width:180px;margin:0 auto 14px;border-radius:999px;"></div>
+          <div class="skeleton" style="height:44px;border-radius:14px;"></div>
+        </div></div>
+      </div>
+
+      <!-- CONTENU -->
+      <div id="dynamicContent" style="display:none;">
+
+        <!-- HÉRO -->
+        <div class="loc-card">
+          <div class="loc-hero">
+            <div class="hero-icon"><i class="fas fa-users-viewfinder"></i></div>
+            <h2>Trouve tes camarades à proximité</h2>
+            <p>Révise ensemble ! Découvre qui utilise ARVEXA dans ta ville, dans ton quartier, ou à quelques pas de chez toi — et traitez vos exercices en groupe.</p>
+          </div>
+        </div>
+
+        <!-- MON PARTAGE -->
+        <div class="loc-card">
+          <div class="card-inner">
+            <div style="text-align:center;">
+              <span class="status-pill" id="statusPill"><span class="dot"></span><span id="statusText">Chargement…</span></span>
+            </div>
+
+            <button class="share-btn" id="shareBtn">
+              <i class="fas fa-location-crosshairs" id="shareBtnIcon"></i>
+              <span id="shareBtnText">Activer ma localisation</span>
+            </button>
+
+            <div class="kv-grid" id="kvGrid" style="display:none;">
+              <div class="kv"><span class="k">Ville détectée</span><span class="v" id="kvCity">—</span></div>
+              <div class="kv"><span class="k">Précision du signal</span><span class="v" id="kvAccuracy">—</span></div>
+              <div class="kv"><span class="k">Dernière mise à jour</span><span class="v" id="kvUpdated">—</span></div>
+              <div class="kv"><span class="k">Mode</span><span class="v" id="kvMode">—</span></div>
+            </div>
+
+            <div class="banner-warn" id="rulesWarn" style="display:none;">
+              <i class="fas fa-triangle-exclamation"></i>
+              <span>La synchronisation est bloquée pour le moment (activation du service en cours). Réessaie dans quelques minutes.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- COMPTEURS -->
+        <div class="counts-row" id="countsRow" style="display:none;">
+          <div class="count-chip"><span class="n" id="cntPas">0</span><span class="l">À quelques pas</span></div>
+          <div class="count-chip"><span class="n" id="cntQuartier">0</span><span class="l">Dans ton quartier</span></div>
+          <div class="count-chip"><span class="n" id="cntVille">0</span><span class="l">Dans ta ville</span></div>
+        </div>
+
+        <!-- LISTE -->
+        <div id="listArea">
+
+          <!-- état : partage coupé -->
+          <div class="loc-card" id="teaserCard">
+            <div class="state-box">
+              <div class="big">🔒</div>
+              <h3>Qui est autour de toi ?</h3>
+              <p>Active ta localisation pour découvrir les camarades près de toi. C'est réciproque : toi aussi tu apparaîtras (distance et ville seulement, jamais ton adresse).</p>
+            </div>
+          </div>
+
+          <!-- état : permission refusée -->
+          <div class="loc-card" id="deniedCard" style="display:none;">
+            <div class="state-box error">
+              <div class="big">📍</div>
+              <h3>Localisation refusée</h3>
+              <p>Tu as refusé l'accès à ta position. Pour la réactiver :</p>
+              <ul class="help-steps">
+                <li>Ouvre les <strong>réglages de ton navigateur</strong> pour ce site</li>
+                <li>Trouve <strong>Localisation</strong> et choisis <strong>Autoriser</strong></li>
+                <li>Reviens ici et appuie sur <strong>Réessayer</strong></li>
+              </ul>
+              <button class="share-btn" style="max-width:260px;margin:14px auto 0;" id="retryBtn"><i class="fas fa-rotate-right"></i><span>Réessayer</span></button>
+            </div>
+          </div>
+
+          <!-- état : personne -->
+          <div class="loc-card" id="emptyCard" style="display:none;">
+            <div class="state-box">
+              <div class="big">🌤️</div>
+              <h3>Personne autour de toi pour l'instant</h3>
+              <p>Aucun camarade n'a activé son partage dans un rayon proche. Reviens plus tard : dès qu'un élève près de toi allume sa localisation, il apparaît ici en direct.</p>
+            </div>
+          </div>
+
+          <!-- état : hors ligne -->
+          <div class="loc-card" id="offlineCard" style="display:none;">
+            <div class="state-box error">
+              <div class="big">📴</div>
+              <h3>Tu es hors ligne</h3>
+              <p>La carte des camarades a besoin d'Internet. Reconnecte-toi et la liste reviendra automatiquement.</p>
+            </div>
+          </div>
+
+          <div id="groupsWrap"></div>
+        </div>
+
+        <!-- VIE PRIVÉE -->
+        <div class="section-label"><i class="fas fa-shield-halved"></i> Ta vie privée</div>
+        <div class="loc-card">
+          <div class="card-inner">
+            <ul class="privacy-list">
+              <li><i class="fas fa-check"></i><span>Ta position n'est enregistrée <strong>que si tu actives toi-même le partage</strong> — jamais à ton insu.</span></li>
+              <li><i class="fas fa-check"></i><span>On ne voit <strong>jamais ton adresse</strong> : seulement ta ville, ta distance approximative (arrondie) et ton pseudo.</span></li>
+              <li><i class="fas fa-check"></i><span>Le partage continue tant que le site reste ouvert (même onglet en arrière-plan). Si tu fermes ARVEXA, ta dernière position disparaît de la liste après 24 h.</span></li>
+              <li><i class="fas fa-check"></i><span>Un seul bouton <strong>Arrêter le partage</strong> coupe tout immédiatement et efface ta position.</span></li>
+            </ul>
+          </div>
+        </div>
+
+      </div><!-- /dynamicContent -->
+    </div>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script type="importmap">
+{
+  "imports": {
+    "firebase/app": "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
+    "firebase/auth": "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js",
+    "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js"
+  }
+}
+</script>
+  <script type="module" src="./arvexa-confirm.js"></script>
+
+  <script type="module">
+// ================================================================
+// À PROXIMITY — « À proximité » (localisation) — ARVEXA School v8.15
+// Principe :
+//  - La position d'un utilisateur n'est capturée SI ET SEULEMENT SI
+//    sa localisation est activée (bouton + permission navigateur).
+//  - Tant que le site reste ouvert (avant- ou arrière-plan), la
+//    position se rafraîchit (watchPosition + battement de cœur).
+//  - Collection Firestore `positions/{uid}` : pseudo, ville,
+//    lat/lng arrondies (~110 m), précision, fraîcheur.
+//  - La liste est RÉCIPROQUE : on voit les autres seulement quand
+//    on partage soi-même (équité + vie privée).
+// ================================================================
+
+import { requireAuth } from './auth-guard.js';
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import {
+  getAuth, signOut
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import {
+  initializeFirestore,
+  persistentLocalCache,
+  persistentSingleTabManager,
+  doc, setDoc, deleteDoc, collection, onSnapshot, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+// ---------------- Constantes ----------------
+const SHARE_KEY = 'arvexa-geo-sharing';      // préférence persistée
+const STALE_MS = 24 * 60 * 60 * 1000;        // positions > 24 h invisibles
+const MIN_WRITE_MS = 40 * 1000;              // ≥ 40 s entre 2 écritures
+const MOVE_M = 60;                           // ou déplacement ≥ 60 m
+const BG_HEARTBEAT_MS = 60 * 1000;           // battement arrière-plan (1 min)
+const BG_MIN_WRITE_MS = 4 * 60 * 1000;       // en arrière-plan : ≥ 4 min
+const GEO_OPTS = { enableHighAccuracy: true, timeout: 30000, maximumAge: 15000 };
+
+// ---------------- État ----------------
+let myUid = null;
+let myName = '';
+let db = null;
+let auth = null;
+let shareOn = false;
+let watchId = null;
+let myPos = null;              // { lat, lng, accuracy, ts }
+let lastWrite = null;          // { lat, lng, t }
+let lastWriteTry = 0;
+let cityCache = { key: null, city: '', country: null };
+let people = {};               // uid -> doc
+let unsubPeople = null;
+let geoState = 'off';          // off | searching | live | denied | unavailable | blocked
+let isRedirecting = false;
+let heartbeatTimer = null;
+
+// ---------------- Helpers DOM ----------------
+const $ = (id) => document.getElementById(id);
+const statusPill = $('statusPill'), statusText = $('statusText');
+const shareBtn = $('shareBtn'), shareBtnIcon = $('shareBtnIcon'), shareBtnText = $('shareBtnText');
+const kvGrid = $('kvGrid'), kvCity = $('kvCity'), kvAccuracy = $('kvAccuracy'), kvUpdated = $('kvUpdated'), kvMode = $('kvMode');
+const countsRow = $('countsRow'), cntPas = $('cntPas'), cntQuartier = $('cntQuartier'), cntVille = $('cntVille');
+const teaserCard = $('teaserCard'), deniedCard = $('deniedCard'), emptyCard = $('emptyCard'), offlineCard = $('offlineCard');
+const groupsWrap = $('groupsWrap'), rulesWarn = $('rulesWarn');
+
+// ---------------- Utilitaires ----------------
+function distM(a, b) { // haversine en mètres
+  const R = 6371000, rad = Math.PI / 180;
+  const dLat = (b.lat - a.lat) * rad, dLng = (b.lng - a.lng) * rad;
+  const s = Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * rad) * Math.cos(b.lat * rad) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(s));
+}
+function round3(n) { return Math.round(n * 1000) / 1000; } // ~110 m de flou volontaire
+function fmtKm(m) {
+  if (m < 1000) return Math.round(m) + ' m';
+  return (m / 1000).toFixed(1).replace('.', ',') + ' km';
+}
+function fmtAgo(ts) {
+  const s = Math.max(0, Math.floor((Date.now() - ts) / 1000));
+  if (s < 60) return 'à l\u2019instant';
+  if (s < 3600) return Math.floor(s / 60) + ' min';
+  if (s < 86400) return Math.floor(s / 3600) + ' h';
+  return Math.floor(s / 86400) + ' j';
+}
+function initials(name) {
+  const p = (name || '?').trim().split(/\s+/);
+  const a = (p[0] || '?').charAt(0), b = p.length > 1 ? p[p.length - 1].charAt(0) : '';
+  return (a + b).toUpperCase();
+}
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function showToast(message, type = 'info') {
+  const icons = { success: 'fa-circle-check', error: 'fa-circle-exclamation', info: 'fa-circle-info' };
+  const colors = { success: 'var(--success-light)', error: 'var(--danger-light)', info: 'var(--accent-bright)' };
+  const c = $('toastContainer'); if (!c) return;
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.innerHTML = '<i class="fas ' + (icons[type] || icons.info) + '" style="color:' + (colors[type] || colors.info) + '"></i><span>' + esc(message) + '</span>';
+  c.appendChild(t);
+  requestAnimationFrame(() => t.classList.add('show'));
+  setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 3200);
+}
+
+// ---------------- Géocodage inverse (ville) ----------------
+async function reverseGeocode(lat, lng) {
+  const key = lat.toFixed(1) + ',' + lng.toFixed(1); // cache ~11 km
+  if (cityCache.key === key) return cityCache;
+  try {
+    const ctrl = new AbortController();
+    const to = setTimeout(() => ctrl.abort(), 8000);
+    const r = await fetch('https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=' + lat + '&longitude=' + lng + '&localityLanguage=fr', { signal: ctrl.signal });
+    clearTimeout(to);
+    const j = await r.json();
+    const city = String(j.city || j.locality || j.principalSubdivision || '').trim().slice(0, 60);
+    const cc = String(j.countryCode || '').trim().toUpperCase();
+    cityCache = { key, city, country: /^[A-Z]{2}$/.test(cc) ? cc : null };
+  } catch (e) {
+    cityCache = { key, city: '', country: null };
+  }
+  return cityCache;
+}
+
+// ---------------- Statut UI ----------------
+const STATUS = {
+  off: { cls: '', label: 'Partage coupé' },
+  searching: { cls: 'searching', label: 'Recherche du signal GPS…' },
+  live: { cls: 'live', label: 'Partage activé — tu es visible' },
+  denied: { cls: 'denied', label: 'Localisation refusée' },
+  unavailable: { cls: 'denied', label: 'Position indisponible' },
+  blocked: { cls: 'denied', label: 'Synchronisation bloquée' }
+};
+function setGeoState(s) {
+  geoState = s;
+  const st = STATUS[s] || STATUS.off;
+  statusPill.className = 'status-pill ' + st.cls;
+  statusText.textContent = st.label;
+  shareBtn.classList.toggle('stop', shareOn);
+  shareBtnIcon.className = shareOn ? 'fas fa-stop' : 'fas fa-location-crosshairs';
+  shareBtnText.textContent = shareOn ? 'Arrêter le partage' : 'Activer ma localisation';
+  // cartes d'état
+  deniedCard.style.display = s === 'denied' || s === 'unavailable' ? '' : 'none';
+  if (s === 'denied' || s === 'unavailable') { teaserCard.style.display = 'none'; emptyCard.style.display = 'none'; }
+}
+
+// ---------------- Écriture de ma position ----------------
+async function writePosition(force = false) {
+  if (!myUid || !shareOn || !myPos || !db) return;
+  const now = Date.now();
+  if (!force && now - lastWriteTry < 8000) return; // garde-fou anti-tempête
+  lastWriteTry = now;
+  try {
+    const geo = await reverseGeocode(myPos.lat, myPos.lng);
+    const payload = {
+      uid: myUid,
+      name: myName || 'Élève',
+      lat: round3(myPos.lat),
+      lng: round3(myPos.lng),
+      accuracy: Math.min(100000, Math.max(0, Math.round(myPos.accuracy || 0))),
+      city: geo.city || '',
+      updatedAt: serverTimestamp()
+    };
+    if (geo.country) payload.country = geo.country;
+    await setDoc(doc(db, 'positions', myUid), payload, { merge: true });
+    lastWrite = { lat: myPos.lat, lng: myPos.lng, t: now };
+    kvCity.textContent = geo.city || 'Ville non détectée';
+    kvUpdated.textContent = fmtAgo(now);
+    rulesWarn.style.display = 'none';
+    render(); // la ville peut déplacer des camarades entre « Dans ta ville » et « Ailleurs »
+  } catch (e) {
+    console.warn('[Proximité] écriture impossible :', e && e.code, e && e.message);
+    if (e && (e.code === 'permission-denied')) {
+      rulesWarn.style.display = '';
+      setGeoState('blocked');
+    }
+  }
+}
+
+// ---------------- Géolocalisation ----------------
+function onFix(pos) {
+  myPos = {
+    lat: pos.coords.latitude,
+    lng: pos.coords.longitude,
+    accuracy: pos.coords.accuracy || 0,
+    ts: Date.now()
+  };
+  if (geoState !== 'blocked') setGeoState('live');
+  kvAccuracy.textContent = '± ' + Math.round(myPos.accuracy) + ' m';
+  kvUpdated.textContent = fmtAgo(myPos.ts);
+  kvMode.textContent = document.hidden ? 'Arrière-plan' : 'Site ouvert';
+  const now = Date.now();
+  const moved = lastWrite ? distM(lastWrite, myPos) : Infinity;
+  if (!lastWrite || now - lastWrite.t >= MIN_WRITE_MS || moved >= MOVE_M) {
+    writePosition();
+  }
+  render();
+}
+function onGeoError(e) {
+  console.warn('[Proximité] geo error', e && e.code);
+  if (e && e.code === 1) { setGeoState('denied'); localStorage.setItem(SHARE_KEY, '0'); shareOn = false; render(); }
+  else if (e && e.code === 2) setGeoState('unavailable');
+  else setGeoState('searching'); // timeout : on continue d'essayer
+}
+function startSharing() {
+  if (!('geolocation' in navigator)) {
+    showToast('Ton navigateur ne supporte pas la localisation', 'error');
+    return;
+  }
+  shareOn = true;
+  localStorage.setItem(SHARE_KEY, '1');
+  setGeoState('searching');
+  kvGrid.style.display = '';
+  kvMode.textContent = 'Site ouvert';
+  if (watchId != null) navigator.geolocation.clearWatch(watchId);
+  watchId = navigator.geolocation.watchPosition(onFix, onGeoError, GEO_OPTS);
+  startHeartbeat();
+  watchPeople();
+  render();
+}
+function stopSharing(silent = false) {
+  shareOn = false;
+  localStorage.setItem(SHARE_KEY, '0');
+  if (watchId != null && navigator.geolocation) { navigator.geolocation.clearWatch(watchId); watchId = null; }
+  stopHeartbeat();
+  if (unsubPeople) { try { unsubPeople(); } catch (e) {} unsubPeople = null; }
+  people = {};
+  if (myUid && db) {
+    deleteDoc(doc(db, 'positions', myUid)).catch(() => {}); // hors ligne : la position expire d'elle-même (24 h)
+  }
+  myPos = null; lastWrite = null;
+  setGeoState('off');
+  kvGrid.style.display = 'none';
+  if (!silent) showToast('Partage arrêté — ta position a été effacée', 'success');
+  render();
+}
+function startHeartbeat() {
+  stopHeartbeat();
+  heartbeatTimer = setInterval(() => {
+    if (!shareOn) return;
+    if (document.hidden) {
+      // Arrière-plan : battement lent (respecte l'économie du navigateur)
+      if (lastWrite && Date.now() - lastWrite.t >= BG_MIN_WRITE_MS) writePosition(true);
+      if (myPos) kvMode.textContent = 'Arrière-plan';
+    } else if (myPos && Date.now() - myPos.ts >= 3 * 60 * 1000 && (!lastWrite || Date.now() - lastWrite.t >= MIN_WRITE_MS)) {
+      navigator.geolocation.getCurrentPosition(onFix, onGeoError, GEO_OPTS); // rafraîchit le fix
+    }
+  }, BG_HEARTBEAT_MS);
+}
+function stopHeartbeat() { if (heartbeatTimer) { clearInterval(heartbeatTimer); heartbeatTimer = null; } }
+
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && shareOn && myPos) {
+    kvMode.textContent = 'Site ouvert';
+    if (!lastWrite || Date.now() - lastWrite.t >= 10 * 1000) writePosition(true);
+  }
+});
+
+// ---------------- Liste des camarades ----------------
+function watchPeople() {
+  if (unsubPeople || !db) return;
+  unsubPeople = onSnapshot(collection(db, 'positions'),
+    (snap) => {
+      people = {};
+      snap.forEach((d) => { people[d.id] = d.data(); });
+      offlineCard.style.display = 'none';
+      render();
+    },
+    (err) => {
+      console.warn('[Proximité] snapshot :', err && err.code);
+      if (err && err.code === 'permission-denied') {
+        rulesWarn.style.display = '';
+        setGeoState('blocked');
+      } else if (!navigator.onLine) {
+        offlineCard.style.display = '';
+      }
+    }
+  );
+}
+window.addEventListener('online', () => { offlineCard.style.display = 'none'; if (shareOn) watchPeople(); });
+window.addEventListener('offline', () => { if (shareOn) offlineCard.style.display = ''; });
+
+function sameCity(a, b) {
+  if (!a || !b) return false;
+  return a.trim().toLocaleLowerCase('fr') === b.trim().toLocaleLowerCase('fr');
+}
+function render() {
+  const mine = myUid;
+  const list = [];
+  Object.keys(people).forEach((uid) => {
+    if (uid === mine) return;
+    const p = people[uid];
+    if (!p || typeof p.lat !== 'number' || typeof p.lng !== 'number') return;
+    const ts = p.updatedAt && typeof p.updatedAt.toMillis === 'function' ? p.updatedAt.toMillis() : 0;
+    if (!ts || Date.now() - ts > STALE_MS) return; // fraîcheur ≤ 24 h
+    list.push({ uid, name: p.name || 'Élève', city: p.city || '', lat: p.lat, lng: p.lng, ts });
+  });
+
+  // Affichage de la liste : uniquement si je partage moi-même (réciprocité)
+  const showList = shareOn && geoState !== 'blocked';
+  teaserCard.style.display = (!shareOn && geoState !== 'denied' && geoState !== 'unavailable') ? '' : 'none';
+  if (!showList) {
+    countsRow.style.display = 'none';
+    groupsWrap.innerHTML = '';
+    if (!shareOn && geoState !== 'denied' && geoState !== 'unavailable') emptyCard.style.display = 'none';
+    return;
+  }
+  if (!myPos) return; // pas encore de fix : la liste s'affichera au premier point GPS
+
+  list.forEach((p) => { p.d = distM(myPos, p); });
+  list.sort((a, b) => a.d - b.d);
+
+  const myCity = myCityName();
+  const gPas = list.filter((p) => p.d < 1000);
+  const gQuartier = list.filter((p) => p.d >= 1000 && p.d < 5000);
+  const gVille = list.filter((p) => p.d >= 5000 && sameCity(p.city, myCity));
+  const gAilleurs = list.filter((p) => p.d >= 5000 && !sameCity(p.city, myCity));
+
+  cntPas.textContent = gPas.length;
+  cntQuartier.textContent = gQuartier.length;
+  cntVille.textContent = gVille.length;
+  countsRow.style.display = '';
+
+  const hasAny = list.length > 0;
+  emptyCard.style.display = hasAny ? 'none' : '';
+
+  const group = (title, icon, arr) => {
+    if (!arr.length) return '';
+    const cards = arr.map((p) => (
+      '<div class="person">' +
+        '<div class="avatar">' + esc(initials(p.name)) + '</div>' +
+        '<div class="p-info">' +
+          '<div class="p-name">' + esc(p.name) + '</div>' +
+          '<div class="p-meta">' + esc(p.city || 'Ville inconnue') + ' · ⏱ ' + esc(fmtAgo(p.ts)) + '</div>' +
+        '</div>' +
+        '<div class="p-dist">' + esc(fmtKm(p.d)) + '<span class="p-fresh">de toi</span></div>' +
+        '<a class="chat-btn" href="groupe.html"><i class="fas fa-comments"></i> Discuter</a>' +
+      '</div>'
+    )).join('');
+    return '<div class="group-block"><div class="group-title">' + icon + ' ' + title +
+      ' <span class="gcount">' + arr.length + '</span></div><div class="people-grid">' + cards + '</div></div>';
+  };
+
+  groupsWrap.innerHTML =
+    group('À quelques pas de toi', '🚶', gPas) +
+    group('Dans ton quartier', '🏘️', gQuartier) +
+    group('Dans ta ville' + (myCity ? ' — ' + esc(myCity) : ''), '🌆', gVille) +
+    group('Ailleurs', '🗺️', gAilleurs);
+}
+function myCityName() {
+  return cityCache.city || '';
+}
+
+// ---------------- Rendu périodique de la fraîcheur ----------------
+setInterval(() => {
+  if (shareOn && kvUpdated.textContent && kvUpdated.textContent !== '—') {
+    kvUpdated.textContent = fmtAgo(lastWrite ? lastWrite.t : (myPos ? myPos.ts : Date.now()));
+  }
+  if (shareOn && people && Object.keys(people).length) render();
+}, 60000);
+
+// ---------------- UI fixe ----------------
+$('menuToggle').addEventListener('click', () => {
+  $('sidebar').classList.add('open'); $('sidebarOverlay').classList.add('active');
+});
+$('sidebarOverlay').addEventListener('click', () => {
+  $('sidebar').classList.remove('open'); $('sidebarOverlay').classList.remove('active');
+});
+$('refreshBtn').addEventListener('click', () => window.location.reload());
+shareBtn.addEventListener('click', () => {
+  if (shareOn) stopSharing();
+  else startSharing();
+});
+$('retryBtn').addEventListener('click', () => { startSharing(); });
+
+// Déconnexion — standard v8.4 du site
+$('logoutBtn').addEventListener('click', (e) => {
+  e.preventDefault();
+  window.arvexaConfirm({
+    title: 'Se déconnecter ?',
+    message: 'Tu devras te <strong>reconnecter</strong> pour accéder à ton compte.',
+    icon: '⚠️',
+    confirmText: 'Se déconnecter',
+    cancelText: 'Annuler',
+    variant: 'danger',
+    onConfirm: async () => {
+      try {
+        isRedirecting = true;
+        if (shareOn) stopSharing(true); // stoppe le watch + efface la position
+        if (unsubPeople) { try { unsubPeople(); } catch (err) {} }
+        try { await signOut(auth); } catch (err) {}
+        window.location.replace('auth-choice.html');
+      } catch (error) {
+        window.location.replace('auth-choice.html');
+      }
+    }
+  });
+});
+
+// ---------------- Initialisation ----------------
+requireAuth({
+  redirectTo: 'auth-choice.html',
+  onUser: (user) => {
+    myUid = user.uid;
+    auth = getAuth();
+    try {
+      let data = null;
+      try { data = JSON.parse(localStorage.getItem('arvexa_user_data') || 'null'); } catch (e) {}
+      const fn = (data && (data.firstName || data.prenom)) || '';
+      const ln = (data && (data.lastName || data.nom)) || '';
+      myName = ((fn + ' ' + ln).trim() || (user.email ? user.email.split('@')[0] : 'Élève')).slice(0, 60);
+    } catch (e) { myName = user.email ? user.email.split('@')[0] : 'Élève'; }
+
+    // App Firebase [DEFAULT] déjà créée par auth-guard.js — on la réutilise (leçon v8.12)
+    const defaultApp = getApps().find((a) => a.name === '[DEFAULT]');
+    db = initializeFirestore(defaultApp, {
+      localCache: persistentLocalCache({ tabManager: persistentSingleTabManager() })
+    });
+
+    $('skeletonLoading').style.display = 'none';
+    $('dynamicContent').style.display = '';
+
+    // Reprendre le partage si l'élève l'avait laissé activé
+    let wanted = '0';
+    try { wanted = localStorage.getItem(SHARE_KEY) || '0'; } catch (e) {}
+    if (wanted === '1') startSharing();
+    else { setGeoState('off'); render(); }
+
+    console.log('[Proximité] prêt —', myUid);
+  }
+});
+  </script>
+</body>
+</html>

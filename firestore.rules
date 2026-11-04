@@ -5,8 +5,13 @@ service cloud.firestore {
 
     // ═══════════════════════════════════════════════════════════════
     // RÈGLES ARVEXA SCHOOL
-    // Version : 2026-11-04 (v4 — « À proximité » : positions partagées)
+    // Version : 2026-11-05 (v5 — analytics_daily débloqué + « À proximité » v4)
     // Changements majeurs :
+    //  - NOUVEAU v5 : sous-collection users/{uid}/analytics_daily/{date}
+    //    (+ results) — le tracker client analytics.js v3 tombait en
+    //    permission-denied (refus par défaut : aucune règle ne couvrait ce
+    //    chemin) depuis le durcissement v3 → page admin Analytics vide.
+    //    Lecture/écriture propriétaire, champs strictement bornés.
     //  - NOUVEAU v4 : collection positions/{uid} — partage VOLONTAIRE de
     //    la position (ville + distance approximative, jamais l'adresse)
     //    pour se trouver entre camarades ; lecture connectés, écriture
@@ -178,6 +183,75 @@ service cloud.firestore {
       // ─── favorites ──────────────────────────────────────────────
       match /favorites/{docId} {
         allow read, write: if isOwner(userId);
+      }
+
+      // ─── analytics_daily (v5) ───────────────────────────────────
+      // Télémétrie locale du tracker client (analytics.js v3) :
+      // 1 doc par jour (id = « YYYY-MM-DD ») + sous-collection results
+      // (résultats d'examen/révision). Sans règle dédiée, l'écriture
+      // client tombait en permission-denied (refus par défaut) et la
+      // page admin Analytics restait vide depuis le durcissement v3.
+      // Écriture/lecture : propriétaire uniquement. Champs bornés.
+      match /analytics_daily/{dateKey} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow create, update: if isOwner(userId)
+          && dateKey is string
+          && dateKey.matches('^\\d{4}-\\d{2}-\\d{2}$')
+          && request.resource.data.keys().hasOnly([
+               'date', 'device', 'lastSeenAt',
+               'pages', 'features', 'byTimeOfDay', 'byDayOfWeek',
+               'contents', 'totalTime', 'sessions', 'resultsCount'
+             ])
+          && request.resource.data.date == dateKey
+          && (!('device' in request.resource.data)
+              || (request.resource.data.device is string
+                  && request.resource.data.device.size() <= 20))
+          && (!('totalTime' in request.resource.data)
+              || request.resource.data.totalTime is number)
+          && (!('sessions' in request.resource.data)
+              || request.resource.data.sessions is number)
+          && (!('resultsCount' in request.resource.data)
+              || request.resource.data.resultsCount is number)
+          && (!('pages' in request.resource.data)
+              || (request.resource.data.pages is map
+                  && request.resource.data.pages.size() <= 120))
+          && (!('features' in request.resource.data)
+              || (request.resource.data.features is map
+                  && request.resource.data.features.size() <= 80))
+          && (!('byTimeOfDay' in request.resource.data)
+              || (request.resource.data.byTimeOfDay is map
+                  && request.resource.data.byTimeOfDay.size() <= 6))
+          && (!('byDayOfWeek' in request.resource.data)
+              || (request.resource.data.byDayOfWeek is map
+                  && request.resource.data.byDayOfWeek.size() <= 8))
+          && (!('contents' in request.resource.data)
+              || (request.resource.data.contents is map
+                  && request.resource.data.contents.size() <= 60));
+        allow delete: if false;
+
+        match /results/{resultId} {
+          allow read: if isOwner(userId) || isAdmin();
+          allow create: if isOwner(userId)
+            && request.resource.data.keys().hasOnly(
+                 ['kind', 'subject', 'score', 'total', 'difficulty', 'ts', 'createdAt'])
+            && request.resource.data.kind is string
+            && request.resource.data.kind.size() <= 40
+            && (!('subject' in request.resource.data)
+                || (request.resource.data.subject is string
+                    && request.resource.data.subject.size() <= 40))
+            && request.resource.data.score is number
+            && request.resource.data.score >= 0
+            && request.resource.data.score <= 1000
+            && (!('total' in request.resource.data)
+                || (request.resource.data.total is number
+                    && request.resource.data.total >= 0
+                    && request.resource.data.total <= 1000))
+            && (!('difficulty' in request.resource.data)
+                || (request.resource.data.difficulty is string
+                    && request.resource.data.difficulty.size() <= 20))
+            && request.resource.data.ts is number;
+          allow update, delete: if false;
+        }
       }
     }
 

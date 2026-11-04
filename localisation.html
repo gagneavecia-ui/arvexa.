@@ -20,6 +20,7 @@
   <script src="offline.js" defer></script>
 
   <link rel="stylesheet" href="arvexa-ui.css">
+  <link rel="stylesheet" href="leaflet/leaflet.css">
   <style>
        /* ============================================================
        ROOT — Design system ARVEXA (identique aux autres pages)
@@ -359,6 +360,114 @@
     .toast.error { border-color: rgba(184, 92, 58, 0.4); }
     .toast.success { border-color: rgba(58, 182, 126, 0.4); }
 
+    /* ---------- VUE CARTE / LISTE — v8.17 ---------- */
+    .view-toggle {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+      background: rgba(var(--rgb-soft), 0.04); border: 1px solid var(--card-border);
+      border-radius: 12px; padding: 5px; margin-bottom: 12px;
+    }
+    .view-toggle button {
+      padding: 9px 12px; border-radius: 9px; border: none; background: transparent;
+      color: var(--text-dim); font-family: 'Inter', sans-serif; font-size: 12.5px; font-weight: 700;
+      cursor: pointer; transition: var(--transition);
+      display: flex; align-items: center; justify-content: center; gap: 7px;
+    }
+    .view-toggle button.active {
+      background: linear-gradient(135deg, var(--accent), var(--accent-bright));
+      color: #0A0A0A; box-shadow: 0 4px 14px rgba(184, 134, 11, 0.22);
+    }
+
+    .map-card { height: min(56vh, 460px); }
+    .map-card #arvMap { position: absolute; inset: 0; background: rgba(var(--rgb-soft), 0.05); }
+    .map-card .center-me {
+      position: absolute; right: 12px; bottom: 26px; z-index: 500;
+      width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--card-border-hover);
+      background: var(--bg-card); color: var(--accent-bright); font-size: 16px; cursor: pointer;
+      box-shadow: var(--shadow); display: flex; align-items: center; justify-content: center;
+    }
+    .map-card .center-me:hover { transform: translateY(-1px); color: var(--text-light); }
+    .map-hint {
+      position: absolute; left: 10px; bottom: 30px; z-index: 500; pointer-events: none;
+      background: rgba(var(--rgb-veil), 0.92); border: 1px solid var(--card-border);
+      border-radius: 10px; padding: 7px 11px; font-size: 11px; color: var(--text-dim);
+      max-width: 250px;
+    }
+    .map-net {
+      position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 500;
+      display: none; align-items: center; gap: 7px;
+      background: rgba(212, 160, 23, 0.14); border: 1px solid rgba(212, 160, 23, 0.35);
+      color: var(--warning); border-radius: 999px; padding: 6px 12px; font-size: 11px; font-weight: 600;
+    }
+    /* Marqueur MOI : pastille verte pulsante */
+    .me-mark { position: relative; width: 18px; height: 18px; }
+    .me-mark .dot {
+      position: absolute; inset: 0; border-radius: 50%;
+      background: #3AB67E; border: 3px solid #FFFFFF; box-shadow: 0 1px 8px rgba(0, 0, 0, 0.45);
+    }
+    .me-mark .halo {
+      position: absolute; left: 50%; top: 50%; width: 18px; height: 18px; margin: -9px 0 0 -9px;
+      border-radius: 50%; border: 2px solid rgba(58, 182, 126, 0.6);
+      animation: mePulse 2.2s ease-out infinite;
+    }
+    @keyframes mePulse { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(2.8); opacity: 0; } }
+    /* Marqueur CAMARADE : avatar initiales + pseudo */
+    .mate-mark { display: flex; flex-direction: column; align-items: center; gap: 2px; transform: translateY(-4px); }
+    .mate-mark .ini {
+      width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 800; color: var(--accent-bright);
+      background: var(--bg-card); border: 2px solid var(--accent-bright); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+    }
+    .mate-mark .nm {
+      font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700; color: var(--text-light);
+      background: rgba(var(--rgb-veil), 0.9); border: 1px solid var(--card-border);
+      padding: 1px 7px; border-radius: 999px; white-space: nowrap; max-width: 110px; overflow: hidden; text-overflow: ellipsis;
+    }
+    .mate-mark.stale { filter: grayscale(1); opacity: 0.6; }
+    /* Popup ARVEXA + contrôles Leaflet aux couleurs du site */
+    .arv-pop .leaflet-popup-content-wrapper {
+      background: var(--bg-card); color: var(--text-light);
+      border: 1px solid var(--card-border-hover); border-radius: 14px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    }
+    .arv-pop .leaflet-popup-tip { background: var(--bg-card); border: 1px solid var(--card-border-hover); }
+    .arv-pop .leaflet-popup-content { margin: 12px 14px; font-family: 'Inter', sans-serif; }
+    .arv-pop .pop-head { display: flex; align-items: center; gap: 9px; margin-bottom: 6px; }
+    .arv-pop .pop-ava {
+      width: 34px; height: 34px; border-radius: 50%; flex: 0 0 auto;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 800; color: var(--accent-bright);
+      background: rgba(184, 134, 11, 0.1); border: 1px solid rgba(184, 134, 11, 0.2);
+    }
+    .arv-pop .pop-name { font-size: 13px; font-weight: 700; color: var(--text-light); line-height: 1.2; }
+    .arv-pop .pop-meta { font-size: 11px; color: var(--text-dim); margin-top: 1px; }
+    .arv-pop .pop-geo { font-size: 10.5px; color: var(--text-muted); margin: 6px 0 9px; }
+    .arv-pop .pop-geo i { color: var(--success-light); margin-right: 4px; }
+    .arv-pop .pop-actions { display: flex; gap: 7px; }
+    .go-btn {
+      flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      padding: 9px 10px; border-radius: 10px; text-decoration: none;
+      font-size: 11.5px; font-weight: 700; color: #0A0A0A;
+      background: linear-gradient(135deg, #3AB67E, #2D7D5A);
+      transition: var(--transition);
+    }
+    .go-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(58, 182, 126, 0.3); }
+    .arv-pop .chat-btn { flex: 1; justify-content: center; }
+    .go-mini {
+      flex: 0 0 auto; display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 12px; border-radius: 10px; text-decoration: none;
+      font-size: 11.5px; font-weight: 700; color: var(--success-light);
+      background: rgba(58, 182, 126, 0.1); border: 1px solid rgba(58, 182, 126, 0.28);
+      transition: var(--transition);
+    }
+    .go-mini:hover { transform: translateY(-1px); background: rgba(58, 182, 126, 0.16); }
+    .person { cursor: pointer; }
+    .leaflet-container { font-family: 'Inter', sans-serif; }
+    .leaflet-bar a, .leaflet-control-attribution {
+      background: var(--bg-card) !important; color: var(--text-dim) !important;
+      border-color: var(--card-border) !important;
+    }
+    .leaflet-control-attribution a { color: var(--accent-bright) !important; }
+
     /* ---------- RESPONSIVE (identique au site) ---------- */
     @media (min-width: 768px) {
       .sidebar { left: 0; }
@@ -502,7 +611,7 @@
             <div class="state-box">
               <div class="big">🔒</div>
               <h3>Qui est autour de toi ?</h3>
-              <p>Active ta localisation pour découvrir les camarades près de toi. C'est réciproque : toi aussi tu apparaîtras (distance et ville seulement, jamais ton adresse).</p>
+              <p>Active ta localisation pour voir la carte des camarades autour de toi. C'est réciproque : toi aussi tu apparaîtras sur la carte tant que tu partages.</p>
             </div>
           </div>
 
@@ -539,6 +648,18 @@
             </div>
           </div>
 
+          <!-- VUE CARTE / LISTE — v8.17 -->
+          <div class="view-toggle" id="viewToggle" style="display:none;">
+            <button id="viewMapBtn" type="button"><i class="fas fa-map"></i> Carte</button>
+            <button id="viewListBtn" type="button"><i class="fas fa-list"></i> Liste</button>
+          </div>
+          <div class="loc-card map-card" id="mapCard" style="display:none;">
+            <div id="arvMap"></div>
+            <div class="map-net" id="mapNet"><i class="fas fa-wifi"></i><span>Le fond de carte a besoin d'Internet</span></div>
+            <div class="map-hint">Touche un camarade pour voir sa position exacte et t'y rendre</div>
+            <button class="center-me" id="centerMeBtn" title="Centrer sur moi" aria-label="Centrer sur moi"><i class="fas fa-crosshairs"></i></button>
+          </div>
+
           <div id="groupsWrap"></div>
         </div>
 
@@ -548,7 +669,7 @@
           <div class="card-inner">
             <ul class="privacy-list">
               <li><i class="fas fa-check"></i><span>Ta position n'est enregistrée <strong>que si tu actives toi-même le partage</strong> — jamais à ton insu.</span></li>
-              <li><i class="fas fa-check"></i><span>On ne voit <strong>jamais ton adresse</strong> : seulement ta ville, ta distance approximative (arrondie) et ton pseudo.</span></li>
+              <li><i class="fas fa-check"></i><span>On ne voit <strong>jamais ton adresse</strong> : seulement ta position sur la carte, ta ville et ton pseudo. L'itinéraire s'ouvre dans ton GPS (Google Maps) seulement quand tu appuies sur « Y aller ».</span></li>
               <li><i class="fas fa-check"></i><span>Le partage continue tant que le site reste ouvert (même onglet en arrière-plan). Si tu fermes ARVEXA, ta dernière position disparaît de la liste après 24 h.</span></li>
               <li><i class="fas fa-check"></i><span>Un seul bouton <strong>Arrêter le partage</strong> coupe tout immédiatement et efface ta position.</span></li>
             </ul>
@@ -561,6 +682,7 @@
 
   <div class="toast-container" id="toastContainer"></div>
 
+  <script src="leaflet/leaflet.js"></script>
   <script type="importmap">
 {
   "imports": {
@@ -574,15 +696,20 @@
 
   <script type="module">
 // ================================================================
-// À PROXIMITY — « À proximité » (localisation) — ARVEXA School v8.15
+// À PROXIMITÉ — « À proximité » (localisation) — ARVEXA School v8.17
 // Principe :
 //  - La position d'un utilisateur n'est capturée SI ET SEULEMENT SI
 //    sa localisation est activée (bouton + permission navigateur).
 //  - Tant que le site reste ouvert (avant- ou arrière-plan), la
 //    position se rafraîchit (watchPosition + battement de cœur).
 //  - Collection Firestore `positions/{uid}` : pseudo, ville,
-//    lat/lng arrondies (~110 m), précision, fraîcheur.
-//  - La liste est RÉCIPROQUE : on voit les autres seulement quand
+//    lat/lng EXACTES (6 décimales, v8.17 — carte + itinéraire GPS),
+//    précision, fraîcheur.
+//  - VRAIE CARTE INTERACTIVE (Leaflet, v8.17) : ma position exacte +
+//    celle des camarades, popup par camarade avec bouton ITINÉRAIRE
+//    qui ouvre Google Maps (navigation voiture) vers sa position —
+//    l'app ne trace pas de plan : on a la position, le GPS guide.
+//  - Liste et carte RÉCIPROQUES : on voit les autres seulement quand
 //    on partage soi-même (équité + vie privée).
 // ================================================================
 
@@ -600,6 +727,8 @@ import {
 
 // ---------------- Constantes ----------------
 const SHARE_KEY = 'arvexa-geo-sharing';      // préférence persistée
+const VIEW_KEY = 'arvexa-geo-view';          // vue mémorisée : 'map' | 'list' (v8.17)
+const FRESH_MS = 60 * 60 * 1000;             // marqueur grisé après 1 h (v8.17)
 const STALE_MS = 24 * 60 * 60 * 1000;        // positions > 24 h invisibles
 const MIN_WRITE_MS = 40 * 1000;              // ≥ 40 s entre 2 écritures
 const MOVE_M = 60;                           // ou déplacement ≥ 60 m
@@ -623,6 +752,13 @@ let unsubPeople = null;
 let geoState = 'off';          // off | searching | live | denied | unavailable | blocked
 let isRedirecting = false;
 let heartbeatTimer = null;
+// v8.17 — carte réelle
+let viewMode = 'map';
+let map = null;
+let myMarker = null;
+let mateMarkers = {};        // uid -> L.Marker
+let lastList = [];           // dernière liste rendue (showOnMap)
+let fitDone = false;
 
 // ---------------- Helpers DOM ----------------
 const $ = (id) => document.getElementById(id);
@@ -632,6 +768,8 @@ const kvGrid = $('kvGrid'), kvCity = $('kvCity'), kvAccuracy = $('kvAccuracy'), 
 const countsRow = $('countsRow'), cntPas = $('cntPas'), cntQuartier = $('cntQuartier'), cntVille = $('cntVille');
 const teaserCard = $('teaserCard'), deniedCard = $('deniedCard'), emptyCard = $('emptyCard'), offlineCard = $('offlineCard');
 const groupsWrap = $('groupsWrap'), rulesWarn = $('rulesWarn');
+const viewToggle = $('viewToggle'), viewMapBtn = $('viewMapBtn'), viewListBtn = $('viewListBtn');
+const mapCard = $('mapCard'), mapNet = $('mapNet'), centerMeBtn = $('centerMeBtn');
 
 // ---------------- Utilitaires ----------------
 function distM(a, b) { // haversine en mètres
@@ -640,7 +778,7 @@ function distM(a, b) { // haversine en mètres
   const s = Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * rad) * Math.cos(b.lat * rad) * Math.sin(dLng / 2) ** 2;
   return 2 * R * Math.asin(Math.sqrt(s));
 }
-function round3(n) { return Math.round(n * 1000) / 1000; } // ~110 m de flou volontaire
+function round6(n) { return Math.round(n * 1e6) / 1e6; } // v8.17 : position exacte (≈ 11 cm) pour l'itinéraire GPS
 function fmtKm(m) {
   if (m < 1000) return Math.round(m) + ' m';
   return (m / 1000).toFixed(1).replace('.', ',') + ' km';
@@ -670,6 +808,122 @@ function showToast(message, type = 'info') {
   c.appendChild(t);
   requestAnimationFrame(() => t.classList.add('show'));
   setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 3200);
+}
+
+// ---------------- Carte réelle (Leaflet) — v8.17 ----------------
+const GO_URL = (lat, lng) => 'https://www.google.com/maps/dir/?api=1&destination=' + lat + ',' + lng + '&travelmode=driving';
+
+function ensureMap() {
+  if (map) return true;
+  if (typeof L === 'undefined') { mapNet.style.display = 'flex'; return false; }
+  map = L.map('arvMap', { zoomControl: true });
+  const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'
+  }).addTo(map);
+  tiles.on('tileerror', () => { mapNet.style.display = 'flex'; });
+  tiles.on('tileload', () => { mapNet.style.display = 'none'; });
+  map.setView(myPos ? [myPos.lat, myPos.lng] : [13.5127, 2.1098], myPos ? 16 : 12);
+  centerMeBtn.addEventListener('click', () => {
+    if (myPos) map.flyTo([myPos.lat, myPos.lng], 16, { duration: 0.6 });
+  });
+  return true;
+}
+
+function popHtml(p) {
+  return (
+    '<div class="pop-head">' +
+      '<div class="pop-ava">' + esc(initials(p.name)) + '</div>' +
+      '<div><div class="pop-name">' + esc(p.name) + '</div>' +
+      '<div class="pop-meta">' + esc(p.city || 'Ville inconnue') +
+      (myPos ? ' · ' + esc(fmtKm(distM(myPos, p))) + ' de toi' : '') +
+      ' · ⏱ ' + esc(fmtAgo(p.ts)) + '</div></div>' +
+    '</div>' +
+    '<div class="pop-geo"><i class="fas fa-location-dot"></i> Position exacte : ' + round6(p.lat) + ', ' + round6(p.lng) + '</div>' +
+    '<div class="pop-actions">' +
+      '<a class="go-btn" target="_blank" rel="noopener" href="' + GO_URL(p.lat, p.lng) + '"><i class="fas fa-diamond-turn-right"></i> Itinéraire</a>' +
+      '<a class="chat-btn" href="groupe.html"><i class="fas fa-comments"></i> Discuter</a>' +
+    '</div>'
+  );
+}
+
+function updateMyMarker() {
+  if (!map) return;
+  if (!myPos) { if (myMarker) { map.removeLayer(myMarker); myMarker = null; } return; }
+  if (!myMarker) {
+    myMarker = L.marker([myPos.lat, myPos.lng], {
+      icon: L.divIcon({ className: '', html: '<div class="me-mark"><span class="halo"></span><span class="dot"></span></div>', iconSize: [18, 18], iconAnchor: [9, 9] }),
+      zIndexOffset: 1000, interactive: false, keyboard: false
+    }).addTo(map);
+  } else {
+    myMarker.setLatLng([myPos.lat, myPos.lng]);
+  }
+}
+
+function updateMateMarkers(list) {
+  if (!map) return;
+  const seen = {};
+  list.forEach((p) => {
+    seen[p.uid] = true;
+    const stale = (Date.now() - p.ts) > FRESH_MS;
+    const html = '<div class="mate-mark' + (stale ? ' stale' : '') + '"><span class="ini">' + esc(initials(p.name)) + '</span><span class="nm">' + esc(p.name) + '</span></div>';
+    if (mateMarkers[p.uid]) {
+      mateMarkers[p.uid].setLatLng([p.lat, p.lng]);
+      mateMarkers[p.uid].setIcon(L.divIcon({ className: '', html, iconSize: [34, 34], iconAnchor: [17, 21] }));
+      mateMarkers[p.uid].setPopupContent(popHtml(p));
+    } else {
+      const m = L.marker([p.lat, p.lng], {
+        icon: L.divIcon({ className: '', html, iconSize: [34, 34], iconAnchor: [17, 21] }),
+        riseOnHover: true
+      }).addTo(map);
+      m.bindPopup(popHtml(p), { className: 'arv-pop', maxWidth: 260, offset: [0, -10] });
+      mateMarkers[p.uid] = m;
+    }
+  });
+  Object.keys(mateMarkers).forEach((uid) => {
+    if (!seen[uid]) { map.removeLayer(mateMarkers[uid]); delete mateMarkers[uid]; }
+  });
+  // Cadrage initial : moi + tous les camarades d'un seul regard
+  if (!fitDone && myPos && list.length) {
+    const b = L.latLngBounds([[myPos.lat, myPos.lng]], list.map((p) => [p.lat, p.lng]));
+    map.fitBounds(b.pad(0.3), { maxZoom: 16 });
+    fitDone = true;
+  }
+}
+
+function setView(v) {
+  viewMode = (v === 'list') ? 'list' : 'map';
+  try { localStorage.setItem(VIEW_KEY, viewMode); } catch (e) {}
+  viewMapBtn.classList.toggle('active', viewMode === 'map');
+  viewListBtn.classList.toggle('active', viewMode === 'list');
+  applyView();
+}
+
+function applyView() {
+  const show = shareOn && geoState !== 'blocked';
+  viewToggle.style.display = show ? '' : 'none';
+  mapCard.style.display = (show && viewMode === 'map') ? '' : 'none';
+  groupsWrap.style.display = (show && viewMode === 'list') ? '' : 'none';
+  if (show && viewMode === 'map' && ensureMap()) {
+    requestAnimationFrame(() => {
+      map.invalidateSize();
+      if (myPos) map.panTo([myPos.lat, myPos.lng], { animate: false });
+    });
+    updateMyMarker();
+    updateMateMarkers(lastList);
+  }
+}
+
+function showOnMap(uid) {
+  const p = lastList.find((x) => x.uid === uid);
+  if (!p) return;
+  setView('map');
+  setTimeout(() => {
+    if (!map) return;
+    map.flyTo([p.lat, p.lng], 16, { duration: 0.6 });
+    const m = mateMarkers[uid];
+    if (m) setTimeout(() => m.openPopup(), 650);
+  }, 120);
 }
 
 // ---------------- Géocodage inverse (ville) ----------------
@@ -724,8 +978,8 @@ async function writePosition(force = false) {
     const payload = {
       uid: myUid,
       name: myName || 'Élève',
-      lat: round3(myPos.lat),
-      lng: round3(myPos.lng),
+      lat: round6(myPos.lat),
+      lng: round6(myPos.lng),
       accuracy: Math.min(100000, Math.max(0, Math.round(myPos.accuracy || 0))),
       city: geo.city || '',
       updatedAt: serverTimestamp()
@@ -777,6 +1031,7 @@ function startSharing() {
     return;
   }
   shareOn = true;
+  fitDone = false; // recadrera la carte avec la nouvelle session
   localStorage.setItem(SHARE_KEY, '1');
   setGeoState('searching');
   kvGrid.style.display = '';
@@ -798,6 +1053,8 @@ function stopSharing(silent = false) {
     deleteDoc(doc(db, 'positions', myUid)).catch(() => {}); // hors ligne : la position expire d'elle-même (24 h)
   }
   myPos = null; lastWrite = null;
+  fitDone = false;
+  if (map) { updateMyMarker(); updateMateMarkers([]); } // v8.17 : je disparais de la carte
   setGeoState('off');
   kvGrid.style.display = 'none';
   if (!silent) showToast('Partage arrêté — ta position a été effacée', 'success');
@@ -867,6 +1124,7 @@ function render() {
 
   // Affichage de la liste : uniquement si je partage moi-même (réciprocité)
   const showList = shareOn && geoState !== 'blocked';
+  applyView(); // v8.17 : visibilité du toggle Carte/Liste + de la carte
   teaserCard.style.display = (!shareOn && geoState !== 'denied' && geoState !== 'unavailable') ? '' : 'none';
   if (!showList) {
     countsRow.style.display = 'none';
@@ -878,6 +1136,7 @@ function render() {
 
   list.forEach((p) => { p.d = distM(myPos, p); });
   list.sort((a, b) => a.d - b.d);
+  lastList = list;
 
   const myCity = myCityName();
   const gPas = list.filter((p) => p.d < 1000);
@@ -896,13 +1155,14 @@ function render() {
   const group = (title, icon, arr) => {
     if (!arr.length) return '';
     const cards = arr.map((p) => (
-      '<div class="person">' +
+      '<div class="person" data-uid="' + esc(p.uid) + '">' +
         '<div class="avatar">' + esc(initials(p.name)) + '</div>' +
         '<div class="p-info">' +
           '<div class="p-name">' + esc(p.name) + '</div>' +
           '<div class="p-meta">' + esc(p.city || 'Ville inconnue') + ' · ⏱ ' + esc(fmtAgo(p.ts)) + '</div>' +
         '</div>' +
         '<div class="p-dist">' + esc(fmtKm(p.d)) + '<span class="p-fresh">de toi</span></div>' +
+        '<a class="go-mini" target="_blank" rel="noopener" href="' + GO_URL(p.lat, p.lng) + '"><i class="fas fa-diamond-turn-right"></i> Y aller</a>' +
         '<a class="chat-btn" href="groupe.html"><i class="fas fa-comments"></i> Discuter</a>' +
       '</div>'
     )).join('');
@@ -915,7 +1175,18 @@ function render() {
     group('Dans ton quartier', '🏘️', gQuartier) +
     group('Dans ta ville' + (myCity ? ' — ' + esc(myCity) : ''), '🌆', gVille) +
     group('Ailleurs', '🗺️', gAilleurs);
+
+  // v8.17 : synchronise les marqueurs de la carte
+  updateMyMarker();
+  updateMateMarkers(list);
 }
+
+// Voir un camarade sur la carte : tap sur sa carte (hors boutons « Y aller » / « Discuter »)
+groupsWrap.addEventListener('click', (e) => {
+  if (e.target.closest('a')) return;
+  const card = e.target.closest('.person');
+  if (card && card.dataset.uid) showOnMap(card.dataset.uid);
+});
 function myCityName() {
   return cityCache.city || '';
 }
@@ -941,6 +1212,13 @@ shareBtn.addEventListener('click', () => {
   else startSharing();
 });
 $('retryBtn').addEventListener('click', () => { startSharing(); });
+
+// v8.17 — bascule Carte / Liste (préférence mémorisée)
+viewMapBtn.addEventListener('click', () => setView('map'));
+viewListBtn.addEventListener('click', () => setView('list'));
+try { viewMode = localStorage.getItem(VIEW_KEY) === 'list' ? 'list' : 'map'; } catch (e) { viewMode = 'map'; }
+viewMapBtn.classList.toggle('active', viewMode === 'map');
+viewListBtn.classList.toggle('active', viewMode === 'list');
 
 // Déconnexion — standard v8.4 du site
 $('logoutBtn').addEventListener('click', (e) => {

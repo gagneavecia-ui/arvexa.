@@ -1,0 +1,748 @@
+<!-- ============================================================ -->
+<!-- COURS PHYSIQUE · TERMINALE C&D · CHAPITRE MOUVEMENT RECTILIGNE -->
+<!-- PARTIE 3 : ÉQUATIONS HORAIRES & DIAGRAMMES                    -->
+<!-- (NOTIONS : equations_horaires + diagrammes)                   -->
+<!-- Équation horaire · exploitation · diagrammes x(t), v(t),      -->
+<!-- a(t) · pente · aire · exemple fil (le car) · croisement       -->
+<!-- ============================================================ -->
+
+<div class="lecture-container">
+
+  <!-- Présentation : toutes les classes utilisées ici sont stylées par lecture.html
+       (seule source de vérité) — aucun style inline, conforme à la charte du projet. -->
+
+  <!-- ===== HERO ===== -->
+  <header class="lecture-hero">
+    <div class="lecture-hero-badge">
+      <span class="lecture-hero-icon">📘</span>
+      <span class="lecture-hero-label">Partie 03 · Lire le mouvement sur un graphique</span>
+    </div>
+    <h1 class="lecture-hero-title">
+      Équations horaires &amp; <em>Diagrammes</em>
+    </h1>
+    <p class="lecture-hero-intro">
+      Les formules sont prêtes (partie 2), les mouvements sont classés — il reste à apprendre à <strong>lire le mouvement d'un coup d'œil</strong>. Cette partie couvre <strong>2 notions</strong> : les <strong>équations horaires</strong> — ces formules qui donnent la position ou la vitesse à n'importe quelle date <span class="math">t</span> —, puis les <strong>diagrammes</strong> x(t), v(t) et a(t), où la <strong>pente</strong> et l'<strong>aire</strong> remplacent le calcul. Un radar de gendarmerie, un car de transport et deux mobiles qui se croisent seront nos terrains d'entraînement.
+    </p>
+    <div class="lecture-hero-meta">
+      <span class="lecture-hero-meta-item">⏱ 25 min</span>
+      <span class="lecture-hero-meta-item">⚡ 2 notions</span>
+      <span class="lecture-hero-meta-item">📚 9 sections</span>
+      <span class="lecture-hero-meta-item">🎓 Terminale C&amp;D</span>
+    </div>
+  </header>
+
+  <!-- ===== SOMMAIRE ===== -->
+  <nav class="lecture-toc">
+    <div class="lecture-toc-header">
+      <span>Dans cette partie</span>
+      <span class="lecture-toc-count">2 notions · 9 sections</span>
+    </div>
+    <ol class="lecture-toc-list">
+      <li><a href="#s0"><span class="toc-num">00</span><span>Motivation — Le radar route de Zinder</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>Notion 1 · equations_horaires — Qu'est-ce qu'une équation horaire ?</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>Notion 1 · equations_horaires — Exploiter une équation horaire</span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>Notion 2 · diagrammes — Le diagramme des positions x(t)</span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>Notion 2 · diagrammes — Le diagramme des vitesses v(t)</span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>Notion 2 · diagrammes — Le diagramme des accélérations a(t)</span></a></li>
+      <li><a href="#s6"><span class="toc-num">06</span><span>Exemple fil complet — Le trajet du car</span></a></li>
+      <li><a href="#s7"><span class="toc-num">07</span><span>Fiche méthode — Lire un diagramme en 4 étapes</span></a></li>
+      <li><a href="#s8"><span class="toc-num">08</span><span>Exercices d'application</span></a></li>
+    </ol>
+  </nav>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 0 : MOTIVATION -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s0">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">00</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Motivation</span>
+        <h2 class="lecture-section-title">Le radar route de Zinder dit tout</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Sur la route de Zinder, la gendarmerie a installé un radar. Cet appareil ne « voit » ni la vitesse ni l'accélération : il enregistre seulement, à des dates précises, la <strong>position</strong> de chaque véhicule — des couples <span class="math">(t ; x)</span>. Pourtant, quand on trace ces couples sur un graphique, <strong>tout le mouvement apparaît d'un coup d'œil</strong> : où était la voiture, à quelle allure elle roulait, si elle accélère ou freine. C'est toute la beauté de cette partie : <strong>un dessin bien lu remplace dix lignes de calcul</strong>.
+      </p>
+
+      <!-- SVG : le radar et ses couples (t ; x) -->
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 540 262" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Un radar de la gendarmerie releve des couples date position d'une voiture, listes a droite : t egale 0, 2, 4, 6 secondes">
+          <text x="270" y="24" style="fill:var(--accent-bright)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle" letter-spacing="2">LE RADAR ENREGISTRE DES COUPLES (t ; x)</text>
+
+          <rect x="28" y="44" width="310" height="160" rx="12" fill="rgba(96,165,250,0.05)" style="stroke:var(--info)" stroke-width="1.5"/>
+          <rect x="48" y="64" width="40" height="30" rx="4" fill="rgba(224,184,74,0.15)" style="stroke:var(--accent-bright)" stroke-width="1.5"/>
+          <line x1="68" y1="64" x2="68" y2="48" style="stroke:var(--accent-bright)" stroke-width="2"/>
+          <circle cx="68" cy="46" r="3" style="fill:var(--accent-bright)"/>
+          <text x="68" y="112" style="fill:var(--text-muted)" font-size="11.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">radar</text>
+          <line x1="88" y1="72" x2="248" y2="118" stroke="rgba(224,184,74,0.6)" stroke-width="1.5" stroke-dasharray="5 3"/>
+          <line x1="88" y1="88" x2="248" y2="126" stroke="rgba(224,184,74,0.6)" stroke-width="1.5" stroke-dasharray="5 3"/>
+          <line x1="40" y1="170" x2="328" y2="170" style="stroke:var(--text-muted)" stroke-width="3"/>
+          <rect x="250" y="136" width="64" height="22" rx="6" fill="rgba(74,222,128,0.15)" style="stroke:var(--success-light)" stroke-width="1.5"/>
+          <circle cx="264" cy="160" r="5" fill="rgba(224,184,74,0.3)" style="stroke:var(--success-light)" stroke-width="1.5"/>
+          <circle cx="300" cy="160" r="5" fill="rgba(224,184,74,0.3)" style="stroke:var(--success-light)" stroke-width="1.5"/>
+          <line x1="258" y1="126" x2="300" y2="126" style="stroke:var(--success-light)" stroke-width="2" marker-end="url(#m3s1)"/>
+          <text x="282" y="186" style="fill:var(--text-muted)" font-size="11.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">voiture</text>
+          <text x="184" y="196" style="fill:var(--text-muted)" font-size="11.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">axe de la route (Ox)</text>
+
+          <rect x="352" y="44" width="160" height="160" rx="12" fill="rgba(224,184,74,0.06)" style="stroke:var(--accent-bright)" stroke-width="1.5"/>
+          <text x="432" y="64" style="fill:var(--accent-bright)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">RELEVÉ</text>
+          <g style="fill:var(--text-muted)" font-size="12" font-family="Inter, system-ui, sans-serif"><text x="368" y="90">t = 0 s ; x = 0 m</text><text x="368" y="114">t = 2 s ; x = 60 m</text><text x="368" y="138">t = 4 s ; x = 120 m</text><text x="368" y="162">t = 6 s ; x = 180 m</text></g>
+          <text x="432" y="188" style="fill:var(--success-light)" font-size="12" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">60/2 = 30 m chaque 2 s</text>
+
+          <text x="270" y="230" style="fill:var(--text-muted)" font-size="12.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">quatre couples (t ; x) suffisent à dessiner</text>          <text x="270" y="248" style="fill:var(--text-muted)" font-size="12.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">tout le mouvement d'un coup d'œil</text>
+          <defs><marker id="m3s1" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7" fill="none" style="stroke:var(--success-light)" stroke-width="1.3"/></marker></defs>
+        </svg>
+        <figcaption class="lecture-figure-caption">Le radar ne mesure que des couples (t ; x). Mais la suite de ces couples contient tout : la vitesse (écart des positions), les phases du mouvement, le croisement avec un autre mobile.</figcaption>
+      </figure>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">La grande idée du jour</div>
+          <p>Un mouvement peut se décrire de <strong>deux façons équivalentes</strong> : par des <strong>équations</strong> (x(t), v(t), a(t) — établies en partie 2) ou par des <strong>graphes</strong> (les diagrammes x(t), v(t), a(t)). Savoir passer de l'un à l'autre — et lire une pente, une hauteur, une aire — c'est gagner du temps sur presque tous les exercices du Bac.</p>
+        </div>
+      </div>
+
+      <p class="lecture-text">
+        On commence par l'outil écrit — l'équation horaire — puis on apprend à le <strong>dessiner</strong> et à le <strong>relire</strong>. Route de Zinder, en avant.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 1 : NOTION 1 — QU'EST-CE QU'UNE ÉQUATION HORAIRE ? -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s1">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">01</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1 · equations_horaires</span>
+        <h2 class="lecture-section-title">Qu'est-ce qu'une équation horaire ?</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Le car qui fait Niamey–Dosso ne s'arrête pas au « kilomètre 87 » par hasard : sa position à chaque instant suit une <strong>règle écrite d'avance</strong>. Cette règle, c'est l'équation horaire — l'horaire de bus du mobile, en quelque sorte : il te dit où il est (et à quelle allure il roule) à <strong>chaque date</strong>, sans refaire le trajet.
+      </p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Définition officielle — équation horaire</div>
+          <p>Une <strong>équation horaire</strong> est une formule qui donne la <strong>position</strong> — ou la <strong>vitesse</strong> — d'un mobile à <strong>N'IMPORTE QUELLE date t</strong> : on remplace t par la date choisie, et la formule rend la grandeur demandée. Elle n'est valable que <strong>dans le repère choisi</strong> (même mobile, autre origine → autre x₀) et tant que le mouvement reste du <strong>même type</strong> (MRU ou MRUV).</p>
+        </div>
+      </div>
+
+      <p class="lecture-text">
+        Les trois équations du chapitre ont été <strong>établies en partie 2</strong> — ici, on ne les redémontre pas, on les <strong>utilise</strong>. Les revoir une minute, avec ce qu'elles savent faire :
+      </p>
+
+      <div class="lecture-table">
+        <table>
+          <thead>
+            <tr><th>Équation (partie 2)</th><th>Valable pour</th><th>Qu'on peut en tirer</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><span class="math">x(t) = x₀ + v·t</span></td><td>MRU (v constante)</td><td>la position à une date ; v ou x₀ à partir de mesures ; la date d'un passage</td></tr>
+            <tr><td><span class="math">v(t) = v₀ + a·t</span></td><td>MRUV (a constante)</td><td>la vitesse à une date ; la date d'arrêt (en résolvant v = 0)</td></tr>
+            <tr><td><span class="math">x(t) = x₀ + v₀·t + (1/2)·a·t²</span></td><td>MRUV (a constante)</td><td>la position à une date ; x₀, v₀ ou a à partir de mesures</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <ul class="lecture-list">
+        <li><strong>x₀, v₀</strong> : position et vitesse « de départ » (à <span class="math">t₀ = 0</span>) — elles fixent le point de départ de la règle.</li>
+        <li><strong>v, a</strong> : vitesse (MRU) et accélération (MRUV), constantes tant que le mouvement ne change pas de type.</li>
+        <li><strong>t</strong> : la date, comptée depuis l'origine des dates choisie — changer d'origine change toutes les dates.</li>
+      </ul>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Piège d'examen n° 1</div>
+          <p>Une équation horaire n'est pas « universelle » : elle dépend du <strong>repère</strong> (origine et sens de l'axe) et de l'<strong>origine des dates</strong>. Si l'énoncé place l'origine au péage et l'origine des dates au départ du car, c'est <strong>cette convention-là</strong> qu'il faut garder du début à la fin — sinon x₀ et t₀ changent sous tes pieds.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 2 : NOTION 1 — EXPLOITER UNE ÉQUATION HORAIRE -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s2">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">02</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1 · equations_horaires</span>
+        <h2 class="lecture-section-title">Exploiter une équation horaire : trois usages</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Une équation horaire est un <strong>outil à trois usages</strong>. Les connaître, c'est savoir ce qu'un énoncé attend de toi dès la première lecture.
+      </p>
+
+      <ul class="lecture-list-elegant">
+        <li><strong>Prédire</strong><span>on connaît la formule et la date → on calcule la position ou la vitesse à cette date (« où est-il à t = 5 s ? »).</span></li>
+        <li><strong>Dater</strong><span>on connaît la formule et une position (ou v = 0 pour un arrêt) → on résout pour trouver la date (« quand dépasse-t-il le pont ? »).</span></li>
+        <li><strong>Retrouver</strong><span>on connaît des mesures (x ; t) → on remonte aux constantes v₀, x₀ ou a, puis on écrit la formule complète.</span></li>
+      </ul>
+
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-label">Formule majeure n° 1 — deux mesures, un MRU (usage « retrouver »)</div>
+        <div class="lecture-formula-hero-main">v = (x₂ − x₁)/(t₂ − t₁)</div>
+        <div class="lecture-formula-hero-desc">Dans un MRU, la vitesse est la pente de la position : deux relevés (t₁ ; x₁) et (t₂ ; x₂) suffisent. On en déduit ensuite x₀ avec <span class="math">x₀ = x₁ − v·t₁</span>, et l'équation horaire complète est en main.</div>
+      </div>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">Exemple travaillé — les deux relevés du radar</div>
+        <div class="lecture-example-content">
+          <p><strong>Données :</strong> sur une route rectiligne, un mobile est en MRU. Le radar relève <span class="math">x(1) = 14 m</span> et <span class="math">x(3) = 30 m</span>. Retrouver v et x₀, puis écrire l'équation horaire.</p>
+          <p><strong>Résolution en 6 étapes :</strong></p>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p>MRU → on utilise <span class="math">x(t) = x₀ + v·t</span> : deux mesures donnent <strong>deux équations</strong> à deux inconnues (x₀ et v).</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p>Premier relevé : <span class="math">x₀ + v × 1 = 14</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p>Second relevé : <span class="math">x₀ + v × 3 = 30</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p>On soustrait la première de la seconde : <span class="math">2·v = 30 − 14 = 16</span>, donc <span class="math">v = 8 m·s⁻¹</span> (c'est (30 − 14)/2).</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">5</div><div class="lecture-step-content"><p>On remplace dans la première équation : <span class="math">x₀ = 14 − 8 × 1 = 6 m</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">6</div><div class="lecture-step-content"><p><strong>Résultat :</strong> <span class="math">x(t) = 6 + 8·t</span> — vérification : <span class="math">x(3) = 6 + 24 = 30 m</span> ✔</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Piège d'examen n° 2</div>
+          <p>Avant toute exploitation : <strong>tout convertir en unités SI</strong> (km·h⁻¹ → m·s⁻¹ en divisant par 3,6, minutes → secondes). Et méfie-toi de l'usage « dater » : résoudre <span class="math">x₀ + v·t = x</span> est une <strong>équation en t</strong> — isole t comme dans toute équation, une operation par ligne.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 3 : NOTION 2 — LE DIAGRAMME DES POSITIONS x(t) -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s3">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">03</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2 · diagrammes</span>
+        <h2 class="lecture-section-title">Le diagramme des positions x(t)</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Le <strong>diagramme des positions</strong> est le graphe de x en fonction de t : l'axe horizontal porte le <strong>temps</strong> (en s), l'axe vertical porte la <strong>position</strong> (en m). Attention : ce graphe n'est <strong>pas la trajectoire</strong> — le mobile roule en ligne droite, mais son graphe peut être une parabole !
+      </p>
+
+      <div class="lecture-section-sub">
+        <h3 class="lecture-subtitle">Tracer un diagramme x(t) à la main (4 étapes)</h3>
+        <div class="lecture-steps">
+          <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Faire le tableau de valeurs</strong> : une ligne de dates t, une ligne de positions x — les couples fournis par l'énoncé ou par l'équation horaire.</p></div></div>
+          <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Choisir les échelles</strong> : 1 carreau = … s sur l'axe horizontal, 1 carreau = … m sur l'axe vertical — les écrire sur le graphe.</p></div></div>
+          <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Placer les points</strong>, puis tracer la courbe <strong>régulière</strong> qui les relie : droite ou parabole, jamais un zigzag de segments cassés.</p></div></div>
+          <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Légender</strong> : titre, grandeurs sur les axes, unités. Un graphe sans légende ne rapporte aucun point.</p></div></div>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Définition officielle — la lecture par la pente</div>
+          <p>Sur un diagramme x(t), la <strong>pente</strong> de la courbe à une date t (la « côte » de la courbe, l'inclinaison de sa tangente) est la <strong>vitesse instantanée</strong> du mobile à cette date. Pente raide = mobile rapide ; pente nulle (courbe horizontale) = mobile immobile.</p>
+        </div>
+      </div>
+
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-label">Formule majeure n° 2 — la vitesse se lit en pente</div>
+        <div class="lecture-formula-hero-main">v = Δx/Δt</div>
+        <div class="lecture-formula-hero-desc">Sur une portion rectiligne du graphe, la pente vaut la variation de x divisée par la variation de t — exactement la définition de la vitesse de la partie 1. Elle se lit en m·s⁻¹, pas en mètres.</div>
+      </div>
+
+      <!-- SVG : parabole x(t) du MRUV avec tangentes -->
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 540 310" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Graphe x de t d'un MRUV en parabole montante avec trois tangentes de plus en plus raides : pente faible, moyenne, forte">
+          <text x="270" y="24" style="fill:var(--accent-bright)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle" letter-spacing="2">x(t) DU MRUV — LA PENTE AUGMENTE</text>
+
+          <g style="stroke:var(--accent-bright)" stroke-width="2" marker-end="url(#m3g2)"><line x1="80" y1="250" x2="500" y2="250"/><line x1="80" y1="250" x2="80" y2="60"/></g>
+          <text x="498" y="268" style="fill:var(--accent-bright)" font-size="12" font-family="Inter, system-ui, sans-serif">t (s)</text>
+          <text x="52" y="66" style="fill:var(--accent-bright)" font-size="12" font-family="Inter, system-ui, sans-serif">x (m)</text>
+
+          <path d="M80,250 Q230,248 350,78" fill="none" style="stroke:var(--info)" stroke-width="2.5"/>
+          <line x1="135" y1="244" x2="210" y2="221" style="stroke:var(--accent-bright)" stroke-width="1.8"/>
+          <line x1="185" y1="229" x2="265" y2="178" style="stroke:var(--accent-bright)" stroke-width="1.8"/>
+          <line x1="250" y1="190" x2="330" y2="110" style="stroke:var(--accent-bright)" stroke-width="1.8"/>
+          <circle cx="153" cy="238" r="4" fill="rgba(74,222,128,0.2)" style="stroke:var(--success-light)" stroke-width="2"/>
+          <circle cx="223" cy="206" r="4" fill="rgba(74,222,128,0.2)" style="stroke:var(--success-light)" stroke-width="2"/>
+          <circle cx="288" cy="153" r="4" fill="rgba(74,222,128,0.2)" style="stroke:var(--success-light)" stroke-width="2"/>
+          <text x="218" y="214" style="fill:var(--text-muted)" font-size="11.5" font-family="Inter, system-ui, sans-serif">pente faible</text>
+          <text x="272" y="172" style="fill:var(--text-muted)" font-size="11.5" font-family="Inter, system-ui, sans-serif">pente moyenne</text>
+          <text x="338" y="104" style="fill:var(--text-muted)" font-size="11.5" font-family="Inter, system-ui, sans-serif">pente forte</text>
+
+          <line x1="70" y1="90" x2="340" y2="90" stroke="rgba(224,184,74,0.5)" stroke-width="1.2" stroke-dasharray="4 4"/>
+          <text x="62" y="94" style="fill:var(--text-muted)" font-size="11" font-family="Inter, system-ui, sans-serif" text-anchor="end">100</text>
+          <g style="fill:var(--text-muted)" font-size="11" font-family="Inter, system-ui, sans-serif" text-anchor="middle"><text x="80" y="266">0</text><text x="170" y="266">4</text><text x="260" y="266">8</text><text x="350" y="266">12</text></g>
+
+          <text x="270" y="288" style="fill:var(--text-muted)" font-size="12.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">la pente de x(t) est la vitesse : elle</text>          <text x="270" y="304" style="fill:var(--text-muted)" font-size="12.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">augmente d'une tangente à l'autre (accéléré)</text>
+          <defs><marker id="m3g2" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7" fill="none" style="stroke:var(--accent-bright)" stroke-width="1.3"/></marker></defs>
+        </svg>
+        <figcaption class="lecture-figure-caption">Sur le graphe x(t) d'un MRUV (une parabole), on pose la règle sur la courbe : la pente de chaque tangente est la vitesse à cette date — elle croît régulièrement, le mobile accélère.</figcaption>
+      </figure>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">🧮 Application flash — mesurer une pente</div>
+        <div class="lecture-example-content"><p>Sur un diagramme x(t), la courbe passe du point (2 s ; 20 m) au point (6 s ; 60 m). La pente vaut <span class="math">v = (60 − 20)/(6 − 2) = 40/4 = 10 m·s⁻¹</span> — le mobile avance à 10 m·s⁻¹ sur cette portion ✔</p></div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Piège d'examen n° 3</div>
+          <p>Ne confonds pas la <strong>hauteur</strong> d'un point du graphe (c'est la <strong>position</strong>, en m) et sa <strong>pente</strong> (c'est la <strong>vitesse</strong>, en m·s⁻¹). Une parabole qui monte peut démarrer avec une pente quasi nulle : le mobile s'éloigne déjà, mais lentement. Et « le graphe monte » ne veut pas dire « le mobile accélère » — seule la pente qui <strong>augmente</strong> le prouve.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 4 : NOTION 2 — LE DIAGRAMME DES VITESSES v(t) -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s4">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">04</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2 · diagrammes</span>
+        <h2 class="lecture-section-title">Le diagramme des vitesses v(t)</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Le <strong>diagramme des vitesses</strong> porte la vitesse (en m·s⁻¹) sur l'axe vertical, le temps (en s) sur l'axe horizontal. C'est le graphe le plus riche du chapitre : sa <strong>pente</strong> donne l'accélération, son <strong>aire</strong> donne la distance — deux lectures pour le prix d'un dessin. Imagine des mètres qui s'empilent à chaque seconde : plus la vitesse est grande, plus la pile grossit vite — l'aire compte toute la pile.
+      </p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Définition officielle — les deux lectures de v(t)</div>
+          <p>Sur un diagramme v(t) : <strong>1)</strong> la <strong>pente</strong> de la courbe à une date t est l'<strong>accélération</strong> a à cette date ; <strong>2)</strong> l'<strong>aire</strong> entre la courbe et l'axe des dates, entre deux dates t₁ et t₂, est la <strong>distance parcourue</strong> pendant cette durée.</p>
+        </div>
+      </div>
+
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-label">Formule majeure n° 3 — l'accélération se lit en pente</div>
+        <div class="lecture-formula-hero-main">a = Δv/Δt</div>
+        <div class="lecture-formula-hero-desc">Variation de vitesse divisée par la durée (partie 1) : sur v(t), c'est la pente. Elle se lit en m·s⁻². Une droite qui monte → a positif ; qui descend → a négatif (freinage, si →v garde son sens) ; palier → a = 0.</div>
+      </div>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">d = v·Δt</div>
+        <div class="lecture-formula-desc">Cas du MRU : v est constante, l'aire sous v(t) est un <strong>rectangle</strong> de hauteur v et de largeur Δt — on retrouve la formule Δx = v·Δt de la partie 2. L'aire, c'est la même chose, vue en dessin.</div>
+      </div>
+
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-label">Formule majeure n° 4 — l'aire du trapèze (MRUV)</div>
+        <div class="lecture-formula-hero-main">d = (1/2)·(v₀ + v)·Δt</div>
+        <div class="lecture-formula-hero-desc">Quand la vitesse varie régulièrement de v₀ à v, l'aire sous v(t) est un <strong>trapèze</strong> : demi-somme des deux bases (les vitesses) × hauteur (la durée). Résultat en mètres — c'est la distance parcourue.</div>
+      </div>
+
+      <!-- SVG : trapèze v(t) avec aire -->
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 540 300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Diagramme v de t : trapeze entre 4 et 12 metres par seconde pendant 5 secondes, aire coloriee egale a 40 metres">
+          <text x="270" y="24" style="fill:var(--accent-bright)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle" letter-spacing="2">L'AIRE SOUS v(t) DONNE LA DISTANCE</text>
+
+          <g style="stroke:var(--accent-bright)" stroke-width="2" marker-end="url(#m3g3)"><line x1="70" y1="240" x2="505" y2="240"/><line x1="70" y1="240" x2="70" y2="60"/></g>
+          <text x="498" y="258" style="fill:var(--accent-bright)" font-size="12" font-family="Inter, system-ui, sans-serif">t (s)</text>
+          <text x="18" y="66" style="fill:var(--accent-bright)" font-size="12" font-family="Inter, system-ui, sans-serif">v (m·s⁻¹)</text>
+
+          <polygon points="110,190 310,90 310,240 110,240" fill="rgba(74,222,128,0.18)" style="stroke:var(--success-light)" stroke-width="2"/>
+          <line x1="70" y1="190" x2="110" y2="190" stroke="rgba(224,184,74,0.5)" stroke-width="1.2" stroke-dasharray="4 4"/>
+          <line x1="70" y1="90" x2="310" y2="90" stroke="rgba(224,184,74,0.5)" stroke-width="1.2" stroke-dasharray="4 4"/>
+          <text x="74" y="182" style="fill:var(--text-muted)" font-size="11.5" font-family="Inter, system-ui, sans-serif">v₀ = 4</text>
+          <text x="74" y="82" style="fill:var(--text-muted)" font-size="11.5" font-family="Inter, system-ui, sans-serif">v = 12</text>
+          <text x="215" y="172" style="fill:var(--success-light)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">aire = 40 m</text>
+          <text x="210" y="222" style="fill:var(--text-muted)" font-size="12" font-family="Inter, system-ui, sans-serif" text-anchor="middle">(1/2) × (4 + 12) × 5</text>
+
+          <g style="fill:var(--text-muted)" font-size="11" font-family="Inter, system-ui, sans-serif"><text x="62" y="194" text-anchor="end">4</text><text x="62" y="94" text-anchor="end">12</text><text x="62" y="244" text-anchor="end">0</text></g>
+          <g style="fill:var(--text-muted)" font-size="11" font-family="Inter, system-ui, sans-serif" text-anchor="middle"><text x="110" y="258">0</text><text x="310" y="258">5</text></g>
+          <text x="210" y="272" style="fill:var(--accent-bright)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">Δt = 5 s</text>
+
+          <text x="270" y="290" style="fill:var(--text-muted)" font-size="12.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">rectangle si v constante (MRU), trapèze si v varie (MRUV)</text>
+          <defs><marker id="m3g3" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7" fill="none" style="stroke:var(--accent-bright)" stroke-width="1.3"/></marker></defs>
+        </svg>
+        <figcaption class="lecture-figure-caption">Le mobile passe de 4 à 12 m·s⁻¹ en 5 s : l'aire du trapèze vaut (1/2)·(4 + 12)·5 = 40 m. C'est exactement la distance parcourue pendant ces 5 secondes.</figcaption>
+      </figure>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">Exemple travaillé — compter l'aire du trapèze</div>
+        <div class="lecture-example-content">
+          <p><strong>Données :</strong> un mobile en MRUV passe de <span class="math">v₀ = 4 m·s⁻¹</span> à <span class="math">v = 12 m·s⁻¹</span> en <span class="math">Δt = 5 s</span>. Quelle distance a-t-il parcourue ?</p>
+          <p><strong>Résolution en 4 étapes :</strong></p>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p>La vitesse varie → l'aire sous v(t) est un <strong>trapèze</strong> : <span class="math">d = (1/2)·(v₀ + v)·Δt</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p>On remplace : <span class="math">d = (1/2) × (4 + 12) × 5</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p>On calcule : <span class="math">d = (1/2) × 16 × 5 = 40 m</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p>Bonus — la pente donne l'accélération : <span class="math">a = (12 − 4)/5 = 1,6 m·s⁻²</span> ✔</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Piège d'examen n° 4</div>
+          <p>L'aire sous v(t) s'exprime en <strong>mètres</strong> (des m·s⁻¹ multipliés par des s), pas en m·s⁻¹ ! Et elle se compte <strong>au-dessus de l'axe des dates</strong> : si la vitesse devient négative (le mobile recule), l'aire sous l'axe correspond à un déplacement en sens inverse.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 5 : NOTION 2 — LE DIAGRAMME DES ACCÉLÉRATIONS a(t) -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s5">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">05</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2 · diagrammes</span>
+        <h2 class="lecture-section-title">Le diagramme des accélérations a(t)</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Le <strong>diagramme des accélérations</strong> porte l'accélération (en m·s⁻²) sur l'axe vertical. Dans ce chapitre, il est d'une simplicité désarmante : le MRU et le MRUV ont tous les deux une accélération <strong>constante</strong> — donc leur a(t) est toujours une <strong>droite horizontale</strong>. Seule sa hauteur change : à zéro pour le MRU, à la valeur a pour le MRUV.
+      </p>
+
+      <div class="lecture-table">
+        <table>
+          <thead>
+            <tr><th>Mouvement</th><th>a(t) : allure de la courbe</th><th>Signification</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>MRU</td><td>droite <strong>confondue avec l'axe</strong> des dates (a = 0)</td><td>la vitesse ne change jamais</td></tr>
+            <tr><td>MRUV accéléré</td><td>droite <strong>horizontale au-dessus</strong> de l'axe (a constant positif)</td><td>la vitesse augmente régulièrement</td></tr>
+            <tr><td>MRUV ralenti</td><td>droite <strong>horizontale au-dessous</strong> de l'axe (a constant négatif)</td><td>la vitesse diminue régulièrement</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- SVG : les trois diagrammes du MRU alignés -->
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 540 300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Triplet du MRU : x de t droite montante, v de t palier, a de t confondue avec l'axe des dates">
+          <text x="270" y="24" style="fill:var(--accent-bright)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle" letter-spacing="2">MRU — LES TROIS DIAGRAMMES CÔTE À CÔTE</text>
+
+          <g style="stroke:var(--text-muted)" stroke-width="1.6"><line x1="45" y1="190" x2="190" y2="190"/><line x1="45" y1="190" x2="45" y2="70"/><line x1="215" y1="190" x2="360" y2="190"/><line x1="215" y1="190" x2="215" y2="70"/><line x1="385" y1="190" x2="530" y2="190"/><line x1="385" y1="190" x2="385" y2="70"/></g>
+          <g style="fill:var(--text-muted)" font-size="12" font-family="Inter, system-ui, sans-serif"><text x="33" y="76">x</text><text x="203" y="76">v</text><text x="373" y="76">a</text><text x="188" y="206">t</text><text x="358" y="206">t</text><text x="528" y="206">t</text></g>
+
+          <line x1="57" y1="186" x2="178" y2="88" style="stroke:var(--success-light)" stroke-width="2.5"/>
+          <line x1="227" y1="130" x2="348" y2="130" style="stroke:var(--accent-bright)" stroke-width="2.5"/>
+          <line x1="397" y1="188" x2="518" y2="188" style="stroke:var(--danger-light)" stroke-width="2.5"/>
+
+          <g font-family="Inter, system-ui, sans-serif" text-anchor="middle"><text x="117" y="214" style="fill:var(--accent-bright)" font-size="12.5" font-weight="700">x(t) : droite</text><text x="117" y="231" style="fill:var(--text-muted)" font-size="11.5">pente = v</text><text x="287" y="214" style="fill:var(--accent-bright)" font-size="12.5" font-weight="700">v(t) : palier</text><text x="287" y="231" style="fill:var(--text-muted)" font-size="11.5">v = cte</text><text x="457" y="214" style="fill:var(--accent-bright)" font-size="12.5" font-weight="700">a(t) : sur l'axe</text><text x="457" y="231" style="fill:var(--text-muted)" font-size="11.5">a = 0</text></g>
+
+          <text x="270" y="260" style="fill:var(--text-muted)" font-size="12.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">lecture croisée : la pente de x(t) donne v,</text>          <text x="270" y="278" style="fill:var(--text-muted)" font-size="12.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">la pente de v(t) donne a = 0 — tout se tient</text>
+        </svg>
+        <figcaption class="lecture-figure-caption">Dans un MRU, tout est « droit » : x(t) monte régulièrement (pente v), v(t) est un palier, a(t) colle à l'axe des dates. Les trois diagrammes racontent la même histoire.</figcaption>
+      </figure>
+
+      <p class="lecture-text">
+        La <strong>lecture croisée</strong> résume ce que chaque diagramme sait donner — c'est le tableau à connaître par cœur :
+      </p>
+
+      <div class="lecture-table">
+        <table>
+          <thead>
+            <tr><th>Diagramme</th><th>La hauteur donne…</th><th>La pente donne…</th><th>L'aire donne…</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>x(t)</td><td>la position (en m)</td><td>la vitesse (en m·s⁻¹)</td><td>— (pas au programme)</td></tr>
+            <tr><td>v(t)</td><td>la vitesse (en m·s⁻¹)</td><td>l'accélération (en m·s⁻²)</td><td>la distance (en m)</td></tr>
+            <tr><td>a(t)</td><td>l'accélération (en m·s⁻²)</td><td>— (pas au programme)</td><td>— (pas au programme)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="lecture-callout lecture-callout-danger">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Erreur fréquente au Bac</div>
+          <p>Un palier dans a(t) ne veut <strong>pas</strong> dire « mobile immobile » ! a constante (même nulle) décrit <strong>comment la vitesse change</strong>, pas où est le mobile : un car en MRU a a = 0 et pourtant il parcourt des kilomètres. Relis toujours l'axe vertical avant de conclure.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 6 : EXEMPLE FIL COMPLET — LE TRAJET DU CAR -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s6">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">06</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Exemple fil</span>
+        <h2 class="lecture-section-title">Exemple fil complet — le trajet du car</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Un car de transport relie deux villages sur une route rectiligne. Il <strong>accélère</strong> de 0 à 10 m·s⁻¹ en 10 s, roule ensuite à <strong>10 m·s⁻¹ constante</strong> pendant 40 s, puis <strong>freine</strong> jusqu'à s'arrêter en 20 s. Quelle distance totale a-t-il parcourue ? Une seule arme : l'aire sous v(t), phase par phase.
+      </p>
+
+      <div class="lecture-table">
+        <table>
+          <thead>
+            <tr><th>Phase</th><th>Mouvement</th><th>Vitesse</th><th>Durée</th><th>Distance (aire)</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>1</strong></td><td>MRUV accéléré</td><td>0 → 10 m·s⁻¹</td><td>10 s</td><td>triangle : (1/2)×10×10 = 50 m</td></tr>
+            <tr><td><strong>2</strong></td><td>MRU</td><td>10 m·s⁻¹ constante</td><td>40 s</td><td>rectangle : 10×40 = 400 m</td></tr>
+            <tr><td><strong>3</strong></td><td>MRUV ralenti</td><td>10 → 0 m·s⁻¹</td><td>20 s</td><td>triangle : (1/2)×10×20 = 100 m</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">Exemple complet — la distance totale du car</div>
+        <div class="lecture-example-content">
+          <p><strong>Énoncé :</strong> calculer la distance totale parcourue, puis la vérifier d'un seul coup avec le trapèze global.</p>
+          <p><strong>Résolution en 6 étapes :</strong></p>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Phase 1 (accélération).</strong> v part de 0 et monte à 10 m·s⁻¹ : l'aire est un triangle de base 10 s et de hauteur 10 m·s⁻¹ → <span class="math">d₁ = (1/2) × 10 × 10 = 50 m</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Phase 2 (palier).</strong> v = 10 m·s⁻¹ constante pendant 40 s : rectangle → <span class="math">d₂ = 10 × 40 = 400 m</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Phase 3 (freinage).</strong> v redescend de 10 à 0 en 20 s : triangle → <span class="math">d₃ = (1/2) × 10 × 20 = 100 m</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Total :</strong> <span class="math">d = 50 + 400 + 100 = 550 m</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">5</div><div class="lecture-step-content"><p><strong>Vérification (trapèze global).</strong> La grande base vaut 10 + 40 + 20 = 70 s, la petite base 40 s, la hauteur 10 m·s⁻¹ : <span class="math">d = (1/2) × (70 + 40) × 10 = 550 m</span> ✔</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">6</div><div class="lecture-step-content"><p><strong>Conclusion :</strong> le car a parcouru <strong>550 m</strong> en 70 s — deux méthodes, un même résultat : le compte est bon ✔</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SVG : le v(t) complet du car -->
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 540 305" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Diagramme v de t du car : montee de 0 a 10 en 10 s, palier de 40 s, descente a zero en 20 s, aire totale 550 metres">
+          <text x="270" y="22" style="fill:var(--accent-bright)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle" letter-spacing="2">LE TRAJET DU CAR — v(t) EN TROIS PHASES</text>
+
+          <g style="stroke:var(--accent-bright)" stroke-width="2" marker-end="url(#m3g4)"><line x1="60" y1="240" x2="515" y2="240"/><line x1="60" y1="240" x2="60" y2="60"/></g>
+          <text x="508" y="258" style="fill:var(--accent-bright)" font-size="12" font-family="Inter, system-ui, sans-serif">t (s)</text>
+          <text x="14" y="66" style="fill:var(--accent-bright)" font-size="12" font-family="Inter, system-ui, sans-serif">v (m·s⁻¹)</text>
+
+          <polygon points="60,240 120,100 360,100 480,240" fill="rgba(74,222,128,0.12)"/>
+          <line x1="60" y1="240" x2="120" y2="100" style="stroke:var(--success-light)" stroke-width="2.5"/>
+          <line x1="120" y1="100" x2="360" y2="100" style="stroke:var(--accent-bright)" stroke-width="2.5"/>
+          <line x1="360" y1="100" x2="480" y2="240" style="stroke:var(--danger-light)" stroke-width="2.5"/>
+          <line x1="60" y1="100" x2="120" y2="100" stroke="rgba(224,184,74,0.5)" stroke-width="1.2" stroke-dasharray="4 4"/>
+
+          <text x="88" y="180" style="fill:var(--success-light)" font-size="14" font-weight="700" font-family="Inter, system-ui, sans-serif">1</text>
+          <text x="240" y="88" style="fill:var(--accent-bright)" font-size="14" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">2</text>
+          <text x="425" y="180" style="fill:var(--danger-light)" font-size="14" font-weight="700" font-family="Inter, system-ui, sans-serif">3</text>
+          <text x="134" y="164" style="fill:var(--success-light)" font-size="11.5" font-family="Inter, system-ui, sans-serif">a = +1</text>
+          <text x="238" y="132" style="fill:var(--text-muted)" font-size="11.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">a = 0</text>
+          <text x="388" y="164" style="fill:var(--danger-light)" font-size="11.5" font-family="Inter, system-ui, sans-serif">a = −0,5</text>
+          <text x="240" y="76" style="fill:var(--accent-bright)" font-size="12" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">v = 10 m·s⁻¹</text>
+          <text x="270" y="206" style="fill:var(--success-light)" font-size="14" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">aire = 550 m</text>
+
+          <g style="fill:var(--text-muted)" font-size="11" font-family="Inter, system-ui, sans-serif"><text x="52" y="104" text-anchor="end">10</text><text x="52" y="244" text-anchor="end">0</text></g>
+          <g style="fill:var(--text-muted)" font-size="11" font-family="Inter, system-ui, sans-serif" text-anchor="middle"><text x="60" y="258">0</text><text x="120" y="258">10</text><text x="360" y="258">50</text><text x="480" y="258">70</text></g>
+
+          <text x="270" y="282" style="fill:var(--text-muted)" font-size="12.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">aire = 50 + 400 + 100 = 550 m, retrouvée</text>          <text x="270" y="298" style="fill:var(--text-muted)" font-size="12.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">d'un seul coup : (1/2) × (70 + 40) × 10 = 550 m</text>
+          <defs><marker id="m3g4" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7" fill="none" style="stroke:var(--accent-bright)" stroke-width="1.3"/></marker></defs>
+        </svg>
+        <figcaption class="lecture-figure-caption">Le car accélère (a = +1 m·s⁻²), roule à 10 m·s⁻¹ (a = 0), puis freine (a = −0,5 m·s⁻²) : trois phases simples, une seule aire — et une vérification par le trapèze global.</figcaption>
+      </figure>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Piège d'examen n° 5</div>
+          <p>On ne mélange pas les phases ! Chaque phase a ses <strong>propres</strong> v₀ et son propre point de départ : à la fin de la phase 1, la position atteinte (50 m) devient l'« origine » de la phase 2. Traite les phases <strong>l'une après l'autre</strong>, puis additionne — jamais un MRU et un MRUV dans une seule formule.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 7 : FICHE MÉTHODE -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s7">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">07</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Fiche méthode</span>
+        <h2 class="lecture-section-title">Lire un diagramme en 4 étapes</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Devant n'importe quel graphe de mouvement — en exercice comme en interrogation — la même marche à venir fonctionne. Quatre gestes, dans l'ordre :
+      </p>
+
+      <div class="lecture-steps">
+        <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Identifier les axes.</strong> Quelle grandeur sur l'axe vertical — position, vitesse ou accélération ? Quelle unité ? C'est l'axe vertical qui décide de TOUTE la lecture.</p></div></div>
+        <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Repérer les phases.</strong> Chaque portion de courbe (segment incliné, palier, arc de parabole) décrit une phase du mouvement : les compter, les dater, nommer leur type (MRU, MRUV accéléré, MRUV ralenti).</p></div></div>
+        <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Sortir la bonne grandeur.</strong> On cherche une position → hauteur de x(t) ; une vitesse → pente de x(t) ou hauteur de v(t) ; une accélération → pente de v(t) ou hauteur de a(t) ; une distance → aire sous v(t).</p></div></div>
+        <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Conclure avec l'unité.</strong> Un résultat de lecture s'écrit toujours avec son unité — m, m·s⁻¹ ou m·s⁻² — et une phrase : « à t = 8 s, le mobile est à 80 m de l'origine ».</p></div></div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-gold">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">💡 Le réflexe qui rapporte des points</div>
+          <p>Avant de calculer quoi que ce soit sur un diagramme, demande-toi : <strong>« pente ou aire ? »</strong>. La pente donne les grandeurs « de changement » (vitesse, accélération) ; l'aire sous v(t) donne la distance. Choisir la bonne lecture dès la première seconde, c'est la moitié de l'exercice de faite.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 8 : EXERCICES D'APPLICATION -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s8">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">08</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Entraînement</span>
+        <h2 class="lecture-section-title">Exercices d'application</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Trois exercices, trois lectures du mouvement : un tableau de valeurs à interpréter, une aire à compter, un croisement à dater. Cherche d'abord seul, puis déroule les corrigés ligne par ligne.
+      </p>
+
+      <div class="lecture-exercise">
+        <div class="lecture-exercise-label">✏️ Exercice d'application 1 — Le relevé du radar (lecture de x(t))</div>
+        <p class="lecture-text"><strong>Énoncé :</strong> sur une route rectiligne, le radar relève la position d'un mobile : (0 s ; 0 m), (10 s ; 200 m), (20 s ; 400 m). a) Montrer que le mouvement est un MRU. b) Calculer la vitesse en m·s⁻¹ puis en km·h⁻¹. c) Donner l'équation horaire x(t).</p>
+        <details>
+          <summary>Voir la solution détaillée</summary>
+          <div class="lecture-quiz-answer">
+            <div class="lecture-steps">
+              <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>a)</strong> Pente entre les deux premiers points : <span class="math">v = 200/10 = 20 m·s⁻¹</span></p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>a)</strong> Pente entre les points suivants : <span class="math">v = (400 − 200)/10 = 20 m·s⁻¹</span> — même valeur → vitesse constante → <strong>MRU</strong> ✔</p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>b)</strong> Conversion : <span class="math">v = 20 × 3,6 = 72 km·h⁻¹</span> ✔</p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>c)</strong> MRU avec <span class="math">x₀ = 0 m</span> : <span class="math">x(t) = 20·t</span> — vérification : <span class="math">x(20) = 400 m</span> ✔</p></div></div>
+            </div>
+            <p><strong>Bilan :</strong> quand la pente Δx/Δt est la même sur toutes les portions, le graphe x(t) est une droite : c'est la signature d'un MRU.</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="lecture-exercise">
+        <div class="lecture-exercise-label">✏️ Exercice d'application 2 — L'aire du diagramme v(t)</div>
+        <p class="lecture-text"><strong>Énoncé :</strong> sur un diagramme v(t), la vitesse d'un mobile passe de 6 m·s⁻¹ à 14 m·s⁻¹ en 8 s (MRUV). a) Calculer la distance parcourue par la méthode des aires. b) En déduire l'accélération.</p>
+        <details>
+          <summary>Voir la solution détaillée</summary>
+          <div class="lecture-quiz-answer">
+            <div class="lecture-steps">
+              <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>a)</strong> La vitesse varie → l'aire sous v(t) est un trapèze : <span class="math">d = (1/2)·(v₀ + v)·Δt</span></p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>a)</strong> On remplace : <span class="math">d = (1/2) × (6 + 14) × 8 = (1/2) × 20 × 8 = 80 m</span> ✔</p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>b)</strong> La pente de v(t) donne l'accélération : <span class="math">a = (14 − 6)/8 = 1 m·s⁻²</span> ✔</p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p>Contrôle : <span class="math">v(t) = 6 + 1·t</span>, donc à <span class="math">t = 8 s</span> : <span class="math">v = 6 + 8 = 14 m·s⁻¹</span> — cohérent avec l'énoncé ✔</p></div></div>
+            </div>
+            <p><strong>Bilan :</strong> deux lectures d'un même diagramme : l'aire (trapèze) a donné la distance 80 m, la pente a donné l'accélération 1 m·s⁻².</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">x₁(t) = x₂(t)</div>
+        <div class="lecture-formula-desc">Condition de croisement : deux mobiles se croisent quand ils occupent la <strong>même position à la même date</strong>. On écrit les deux équations horaires dans le même repère, on les égale, et on résout en t — une seule inconnue.</div>
+      </div>
+
+      <!-- SVG : le croisement des deux x(t) -->
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 540 300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Graphe du croisement : x1 egale 10 t montante et x2 egale 120 moins 5 t descendante se coupent a t egale 8 s et x egale 80 m">
+          <text x="270" y="24" style="fill:var(--accent-bright)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle" letter-spacing="2">LE CROISEMENT DES DEUX MOBILES</text>
+
+          <g style="stroke:var(--accent-bright)" stroke-width="2" marker-end="url(#m3g5)"><line x1="70" y1="250" x2="510" y2="250"/><line x1="70" y1="250" x2="70" y2="60"/></g>
+          <text x="502" y="268" style="fill:var(--accent-bright)" font-size="12" font-family="Inter, system-ui, sans-serif">t (s)</text>
+          <text x="40" y="66" style="fill:var(--accent-bright)" font-size="12" font-family="Inter, system-ui, sans-serif">x (m)</text>
+
+          <line x1="70" y1="250" x2="490" y2="70" style="stroke:var(--success-light)" stroke-width="2.5"/>
+          <line x1="70" y1="70" x2="490" y2="160" style="stroke:var(--info)" stroke-width="2.5"/>
+          <circle cx="70" cy="70" r="4" style="fill:var(--info)"/>
+          <text x="58" y="74" style="fill:var(--text-muted)" font-size="11" font-family="Inter, system-ui, sans-serif" text-anchor="end">120 m</text>
+
+          <circle cx="350" cy="130" r="6.5" fill="rgba(224,184,74,0.25)" style="stroke:var(--accent-bright)" stroke-width="2.5"/>
+          <line x1="350" y1="130" x2="350" y2="250" stroke="rgba(224,184,74,0.5)" stroke-width="1.3" stroke-dasharray="4 4"/>
+          <line x1="350" y1="130" x2="70" y2="130" stroke="rgba(224,184,74,0.5)" stroke-width="1.3" stroke-dasharray="4 4"/>
+          <text x="350" y="268" style="fill:var(--accent-bright)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">t = 8 s</text>
+          <text x="62" y="134" style="fill:var(--accent-bright)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="end">x = 80 m</text>
+
+          <text x="428" y="92" style="fill:var(--success-light)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif">x₁ = 10·t</text>
+          <text x="180" y="64" style="fill:var(--info)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif">x₂ = 120 − 5·t</text>
+
+          <text x="270" y="288" style="fill:var(--text-muted)" font-size="12.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">au croisement : même position, même date</text>
+          <defs><marker id="m3g5" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7" fill="none" style="stroke:var(--accent-bright)" stroke-width="1.3"/></marker></defs>
+        </svg>
+        <figcaption class="lecture-figure-caption">Le mobile 1 remonte depuis l'origine, le mobile 2 descend depuis 120 m : leurs droites x(t) se coupent à t = 8 s, en x = 80 m — l'endroit exact du croisement.</figcaption>
+      </figure>
+
+      <div class="lecture-exercise">
+        <div class="lecture-exercise-label">✏️ Exercice d'application 3 — Le croisement des deux mobiles</div>
+        <p class="lecture-text"><strong>Énoncé :</strong> sur une route rectiligne, le mobile 1 démarre de l'origine à 10 m·s⁻¹ : <span class="math">x₁(t) = 10·t</span>. Le mobile 2 se trouve 120 m devant, roulant vers lui à 5 m·s⁻¹ : <span class="math">x₂(t) = 120 − 5·t</span> (t en s, x en m). a) Écrire la condition de croisement. b) À quelle date les mobiles se croisent-ils ? c) À quelle position ?</p>
+        <details>
+          <summary>Voir la solution détaillée</summary>
+          <div class="lecture-quiz-answer">
+            <div class="lecture-steps">
+              <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>a)</strong> Au croisement, même position à la même date : <span class="math">x₁(t) = x₂(t)</span></p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>b)</strong> On remplace : <span class="math">10t = 120 − 5t</span></p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>b)</strong> On regroupe : <span class="math">10t + 5t = 120</span>, donc <span class="math">15t = 120</span>, donc <span class="math">t = 8 s</span> ✔</p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>c)</strong> On remplace t = 8 s dans x₁ : <span class="math">x = 10 × 8 = 80 m</span></p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">5</div><div class="lecture-step-content"><p><strong>c)</strong> Vérification avec x₂ : <span class="math">120 − 5 × 8 = 120 − 40 = 80 m</span> ✔ — les deux mobiles sont bien au même point.</p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">6</div><div class="lecture-step-content"><p><strong>Conclusion :</strong> « les deux mobiles se croisent à <span class="math">t = 8 s</span>, au point d'abscisse <span class="math">x = 80 m</span> » — date ET position, toujours les deux ✔</p></div></div>
+            </div>
+            <p><strong>Bilan :</strong> un croisement se résout comme une équation à une inconnue : le graphique le montre (les droites se coupent), le calcul le prouve.</p>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== QCM ===== -->
+  <div class="lecture-quiz">
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q1. Sur un diagramme v(t), la distance parcourue entre deux dates se lit…</p>
+      <div class="lecture-quiz-options"><span>A) sur la hauteur de la courbe</span><span>B) par la pente de la courbe</span><span>C) par l'aire sous la courbe</span><span>D) par l'origine du graphe</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><p><strong>Réponse : C.</strong> L'aire sous v(t) entre deux dates vaut la distance parcourue (rectangle en MRU, trapèze en MRUV). La hauteur (A) donne la vitesse, la pente (B) donne l'accélération.</p></div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q2. Le diagramme x(t) d'un MRUV (départ accéléré depuis l'origine) est…</p>
+      <div class="lecture-quiz-options"><span>A) une droite inclinée</span><span>B) une parabole de pente croissante</span><span>C) une droite horizontale</span><span>D) une ligne en zigzag</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><p><strong>Réponse : B.</strong> x(t) = x₀ + v₀·t + (1/2)·a·t² est du second degré : une parabole dont la pente — la vitesse — augmente avec le temps. La droite inclinée (A) est le x(t) d'un MRU.</p></div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q3. Un mobile roule à v = 15 m·s⁻¹ constante pendant 30 s. L'aire sous v(t) vaut…</p>
+      <div class="lecture-quiz-options"><span>A) 15 m</span><span>B) 45 m</span><span>C) 450 m</span><span>D) 2 m</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><p><strong>Réponse : C.</strong> v constante → rectangle : d = v·Δt = 15 × 30 = 450 m. L'option A recopie la vitesse, la B confond avec v × 3.</p></div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q4. Deux mobiles se croisent à la date t où…</p>
+      <div class="lecture-quiz-options"><span>A) leurs vitesses deviennent égales</span><span>B) leurs positions deviennent égales</span><span>C) leurs accélérations sont opposées</span><span>D) ils partent au même instant</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><p><strong>Réponse : B.</strong> Se croiser = occuper la même position à la même date : x₁(t) = x₂(t). Les vitesses égales (A) signifient seulement qu'elles roulent à la même allure à cet instant, pas qu'elles se rencontrent.</p></div></details>
+    </div>
+  </div>
+
+  <!-- ===== RÉCAP ===== -->
+  <div class="lecture-recap">
+    <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
+    <ul class="lecture-recap-list">
+      <li><strong>[equation_horaire]</strong> Une équation horaire donne la position ou la vitesse à N'IMPORTE QUELLE date t — valable dans le repère choisi, tant que le mouvement garde son type.</li>
+      <li><strong>[les_trois_formules]</strong> Établies en partie 2 : x(t) = x₀ + v·t (MRU), v(t) = v₀ + a·t et x(t) = x₀ + v₀·t + (1/2)·a·t² (MRUV).</li>
+      <li><strong>[exploiter]</strong> Trois usages : prédire (calculer x ou v à une date), dater (résoudre en t), retrouver (x₀, v₀ ou a à partir de mesures — deux relevés suffisent en MRU).</li>
+      <li><strong>[pente_de_x]</strong> Sur x(t), la pente est la vitesse : v = Δx/Δt, en m·s⁻¹. Parabole de pente croissante = MRUV accéléré.</li>
+      <li><strong>[aire_de_v]</strong> Sous v(t), l'aire est la distance : rectangle d = v·Δt (MRU), trapèze d = (1/2)·(v₀ + v)·Δt (MRUV) — résultat en mètres.</li>
+      <li><strong>[pente_de_v]</strong> Sur v(t), la pente est l'accélération : a = Δv/Δt, en m·s⁻² ; sur a(t), MRU → droite sur l'axe, MRUV → droite horizontale.</li>
+      <li><strong>[lecture_croisee]</strong> Le tableau d'or : hauteur de x(t) = position, pente de x(t) = vitesse, pente de v(t) = accélération, aire de v(t) = distance.</li>
+      <li><strong>[croisement]</strong> Deux mobiles se croisent quand x₁(t) = x₂(t) : même position à la même date — on égale, on résout, on vérifie dans les deux équations.</li>
+    </ul>
+  </div>
+
+  <!-- ===== FIN ===== -->
+  <div class="lecture-end">
+    <div class="lecture-end-icon">🎯</div>
+    <div class="lecture-end-text">Partie 3 terminée !</div>
+    <div class="lecture-end-sub">Tu sais exploiter une équation horaire, tirer une vitesse d'une pente, une distance d'une aire et une rencontre d'un point d'intersection. La partie 4 condense tout le chapitre « Mouvement rectiligne » en une fiche complète de révision — formules, grande table et réflexes Bac.</div>
+    <div class="lecture-end-divider"></div>
+  </div>
+
+</div>

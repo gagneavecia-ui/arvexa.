@@ -1,0 +1,801 @@
+<!-- ============================================================ -->
+<!-- PARTIE 1 : NOTION DE RÉFÉRENTIEL & REPÈRES (2 NOTIONS)        -->
+<!-- Notion 1 : referentiel — Définir et choisir un référentiel    -->
+<!-- Notion 2 : reperes — Repère d'espace, repère de temps, système-->
+<!-- ============================================================ -->
+
+<div class="lecture-container">
+
+  <!-- Présentation : toutes les classes utilisées ici sont stylées par lecture.html
+       (seule source de vérité) — aucun style inline, conforme à la charte du projet. -->
+
+  <!-- ===== HERO ===== -->
+  <header class="lecture-hero">
+    <div class="lecture-hero-badge">
+      <span class="lecture-hero-icon">📘</span>
+      <span class="lecture-hero-label">Partie 01 · Fondations de la mécanique</span>
+    </div>
+    <h1 class="lecture-hero-title">
+      Notion de référentiel &amp; <em>Repères</em>
+    </h1>
+    <p class="lecture-hero-intro">
+      Avant de calculer une vitesse ou une accélération, il faut répondre à trois questions : <strong>où</strong> est le mobile, <strong>par rapport à qui</strong> l'observe-t-on, et <strong>quand</strong> ? Cette partie construit les fondations du chapitre autour de <strong>2 notions</strong> : le <strong>référentiel</strong> (le « poste d'observation » depuis lequel on regarde) et les <strong>repères d'espace et de temps</strong> (la grille de mesure). Sans elles, aucune équation de mouvement n'a de sens.
+    </p>
+    <div class="lecture-hero-meta">
+      <span class="lecture-hero-meta-item">⏱ 20 min</span>
+      <span class="lecture-hero-meta-item">⚡ 2 notions</span>
+      <span class="lecture-hero-meta-item">📚 8 sections</span>
+      <span class="lecture-hero-meta-item">🎓 Terminale C&amp;D</span>
+    </div>
+  </header>
+
+  <!-- ===== SOMMAIRE ===== -->
+  <nav class="lecture-toc">
+    <div class="lecture-toc-header">
+      <span>Dans cette partie</span>
+      <span class="lecture-toc-count">2 notions · 8 sections</span>
+    </div>
+    <ol class="lecture-toc-list">
+      <li><a href="#s0"><span class="toc-num">00</span><span>Motivation — Le car de Niamey</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>Notion 1 · referentiel — Qu'est-ce qu'un référentiel ?</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>Notion 1 · referentiel — Les 3 référentiels à connaître</span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>Notion 1 · referentiel — Le mouvement est relatif</span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>Notion 2 · reperes — Le repère d'espace</span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>Notion 2 · reperes — Repère de temps et système</span></a></li>
+      <li><a href="#s6"><span class="toc-num">06</span><span>Fiche méthode — Décrire un mouvement en 3 étapes</span></a></li>
+      <li><a href="#s7"><span class="toc-num">07</span><span>Exercices d'application</span></a></li>
+    </ol>
+  </nav>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 0 : MOTIVATION -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s0">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">00</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Motivation</span>
+        <h2 class="lecture-section-title">Le car de Niamey : es-tu vraiment immobile ?</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Imagine-toi assis dans un car qui roule à <span class="math">80 km·h⁻¹</span> sur la route de Niamey à Dosso. Ton camarade est assis en face de toi. Pendant tout le trajet, tu peux lui passer un cahier, discuter, jouer aux dames — pour toi, il est <strong>totalement immobile</strong>. Pourtant, un jeune homme debout au bord de la route te regarde passer : pour lui, ton camarade file à <span class="math">80 km·h⁻¹</span>. Qui a raison ?
+      </p>
+
+      <!-- SVG : même objet, deux jugements de mouvement -->
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 540 300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Le camarade du car est immobile pour le passager, mais rapide pour le piéton">
+          <text x="270" y="24" style="fill:var(--accent-bright)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle" letter-spacing="2">UN MÊME CAMARADE, DEUX MOUVEMENTS DIFFÉRENTS</text>
+
+          <rect x="30" y="52" width="220" height="86" rx="10" fill="rgba(224,184,74,0.08)" style="stroke:var(--accent-bright)" stroke-width="1.5"/>
+          <circle cx="90" cy="95" r="16" fill="rgba(74,222,128,0.15)" style="stroke:var(--success-light)" stroke-width="2"/>
+          <text x="90" y="100" style="fill:var(--success-light)" font-size="12" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">TOI</text>
+          <circle cx="160" cy="95" r="16" fill="rgba(96,165,250,0.15)" style="stroke:var(--info)" stroke-width="2"/>
+          <text x="160" y="100" style="fill:var(--info)" font-size="11" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">CAM</text>
+          <circle cx="62" cy="140" r="8" fill="none" style="stroke:var(--text-muted)" stroke-width="2"/>
+          <circle cx="218" cy="140" r="8" fill="none" style="stroke:var(--text-muted)" stroke-width="2"/>
+          <text x="140" y="170" style="fill:var(--success-light)" font-size="13.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">Vue du passager : immobile</text>
+          <text x="140" y="188" style="fill:var(--text-muted)" font-size="12" font-family="Inter, system-ui, sans-serif" text-anchor="middle">référentiel = le car</text>
+
+          <rect x="300" y="52" width="210" height="86" rx="10" fill="rgba(96,165,250,0.06)" style="stroke:var(--info)" stroke-width="1.5"/>
+          <line x1="320" y1="138" x2="492" y2="138" style="stroke:var(--text-muted)" stroke-width="2"/>
+          <circle cx="352" cy="138" r="8" fill="none" style="stroke:var(--text-muted)" stroke-width="2"/>
+          <circle cx="470" cy="138" r="8" fill="none" style="stroke:var(--text-muted)" stroke-width="2"/>
+          <circle cx="415" cy="80" r="15" fill="rgba(96,165,250,0.15)" style="stroke:var(--info)" stroke-width="2"/>
+          <text x="415" y="85" style="fill:var(--info)" font-size="11" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">CAM</text>
+          <line x1="340" y1="80" x2="396" y2="80" style="stroke:var(--info)" stroke-width="2" marker-end="url(#arrowBlueP1)"/>
+          <text x="330" y="66" style="fill:var(--info)" font-size="12" font-weight="700" font-family="Inter, system-ui, sans-serif">80 km·h⁻¹</text>
+          <text x="405" y="170" style="fill:var(--info)" font-size="13.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">Vue du piéton : très rapide</text>
+          <text x="405" y="188" style="fill:var(--text-muted)" font-size="12" font-family="Inter, system-ui, sans-serif" text-anchor="middle">référentiel = le bord de la route</text>
+
+          <line x1="270" y1="60" x2="270" y2="180" stroke="rgba(224,184,74,0.35)" stroke-width="1" stroke-dasharray="4 4"/>
+          <text x="270" y="222" style="fill:var(--accent-bright)" font-size="14" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">Les DEUX ont raison : le mouvement dépend de l'observateur</text>
+          <text x="270" y="241.0" style="fill:var(--text-muted)" font-size="12.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">C'est le principe de relativité du</text>
+          <text x="270" y="259.0" style="fill:var(--text-muted)" font-size="12.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">mouvement — d'où la notion de référentiel</text>
+          <defs>
+            <marker id="arrowBlueP1" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto">
+              <path d="M0,0 L7,3.5 L0,7" fill="none" style="stroke:var(--info)" stroke-width="1.3"/>
+            </marker>
+          </defs>
+        </svg>
+        <figcaption class="lecture-figure-caption">Le camarade du car est immobile pour le passager et rapide pour le piéton : avant de décrire un mouvement, il faut annoncer DEPUIS OÙ on l'observe.</figcaption>
+      </figure>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">La grande idée du jour</div>
+          <p>Il n'existe <strong>aucun mouvement absolu</strong> : dire « l'objet bouge » ne veut rien dire tant qu'on n'a pas précisé <strong>par rapport à quoi</strong> on l'observe. Ce « par rapport à quoi » s'appelle un <strong>référentiel</strong>. Toute la mécanique commence par cette phrase rituelle : <em>« On étudie le mouvement de … dans le référentiel … »</em></p>
+        </div>
+      </div>
+
+      <p class="lecture-text">
+        Dans la suite, tu vas apprendre à définir proprement un référentiel, découvrir les trois grands référentiels de la mécanique, puis installer les <strong>repères</strong> — la grille d'espace et l'horloge — qui permettent de noter la position et la date d'un point à chaque instant. Ce sont les fondations que les parties 2 et 3 utiliseront pour définir la vitesse et l'accélération.
+      </p>
+
+      <aside class="lecture-aside">
+        <div class="lecture-aside-content">
+          <div class="lecture-aside-label">Un peu d'histoire</div>
+          <p>Copernic (1543) puis Galilée (1632) ont compris les premiers que « la Terre tourne » et « le Soleil se lève » décrivent la <strong>même réalité vue de deux référentiels différents</strong>. Galilée décrit même une cabine de bateau fermée : à l'intérieur, impossible de savoir si le navire avance — c'est le <strong>principe de relativité</strong> qui porte son nom.</p>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 1 : NOTION 1 — QU'EST-CE QU'UN RÉFÉRENTIEL ? -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s1">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">01</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1 · referentiel</span>
+        <h2 class="lecture-section-title">Qu'est-ce qu'un référentiel ?</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Pour observer un mouvement, il faut un « poste d'observation » : un solide sur lequel on s'installe, une horloge pour dater, et une grille pour mesurer les positions. Un référentiel rassemble ces trois ingrédients.
+      </p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Définition officielle — référentiel</div>
+          <p>Un <strong>référentiel</strong> est un <strong>corps de référence</strong> (un solide choisi comme poste d'observation, considéré comme immobile dans ce référentiel), muni d'un <strong>repère d'espace</strong> (pour noter les positions) et d'un <strong>repère de temps</strong> (une horloge, pour dater les événements).</p>
+        </div>
+      </div>
+
+      <div class="lecture-section-sub">
+        <h3 class="lecture-subtitle">Les trois ingrédients, un par un</h3>
+
+        <ul class="lecture-list-elegant">
+          <li><strong>Le corps de référence</strong> : c'est LE solide auquel on se « colle » mentalement. Si tu choisis le car, tout ce qui est fixé au car (les sièges, le chauffeur) est immobile ; si tu choisis le bord de la route, c'est le car entier qui se déplace. Un seul choix, mais il faut le <strong>faire et l'annoncer</strong>.</li>
+          <li><strong>Le repère d'espace</strong> : une origine <span class="math">O</span> et des axes orientés (section 04) qui permettent d'attribuer à chaque point un jeu de coordonnées.</li>
+          <li><strong>Le repère de temps</strong> : une horloge et une <strong>origine des dates</strong> <span class="math">t₀ = 0</span> (le moment où l'on démarre l'étude — départ du car, lâcher de la bille…).</li>
+        </ul>
+      </div>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">Référentiel = corps de référence + repère d'espace + repère de temps</div>
+        <div class="lecture-formula-desc">À retenir comme une recette à 3 ingrédients. Au Bac, citer les trois — un référentiel sans horloge ne permet pas de dater, un référentiel sans repère ne permet pas de localiser.</div>
+      </div>
+
+      <!-- SVG : anatomie d'un référentiel -->
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 540 260" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Les trois ingrédients d'un référentiel">
+          <text x="270" y="24" style="fill:var(--accent-bright)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle" letter-spacing="2">ANATOMIE D'UN RÉFÉRENTIEL — 3 INGRÉDIENTS</text>
+
+          <rect x="36" y="48" width="140" height="150" rx="12" fill="rgba(224,184,74,0.08)" style="stroke:var(--accent-bright)" stroke-width="1.5"/>
+          <line x1="46" y1="168" x2="166" y2="168" style="stroke:var(--text-muted)" stroke-width="2"/>
+          <circle cx="78" cy="168" r="6" fill="rgba(74,222,128,0.15)" style="stroke:var(--success-light)" stroke-width="2"/>
+          <circle cx="132" cy="168" r="6" fill="rgba(74,222,128,0.15)" style="stroke:var(--success-light)" stroke-width="2"/>
+          <line x1="106" y1="112" x2="106" y2="128" style="stroke:var(--success-light)" stroke-width="2.5"/>
+          <circle cx="106" cy="104" r="9" fill="rgba(74,222,128,0.2)" style="stroke:var(--success-light)" stroke-width="2"/>
+          <text x="106" y="196" style="fill:var(--accent-bright)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">1. Corps de référence</text>
+          <text x="106" y="214" style="fill:var(--text-muted)" font-size="11.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">le « sol » du laboratoire</text>
+
+          <rect x="200" y="48" width="140" height="150" rx="12" fill="rgba(96,165,250,0.08)" style="stroke:var(--info)" stroke-width="1.5"/>
+          <line x1="226" y1="176" x2="314" y2="176" style="stroke:var(--info)" stroke-width="2" marker-end="url(#arrowBlueP1b)"/>
+          <line x1="226" y1="176" x2="226" y2="76" style="stroke:var(--info)" stroke-width="2" marker-end="url(#arrowBlueP1b)"/>
+          <text x="318" y="192" style="fill:var(--info)" font-size="13" font-family="Inter, system-ui, sans-serif">x</text>
+          <text x="214" y="80" style="fill:var(--info)" font-size="13" font-family="Inter, system-ui, sans-serif">y</text>
+          <circle cx="226" cy="176" r="4" style="fill:var(--info)"/>
+          <text x="226" y="196" style="fill:var(--info)" font-size="12" font-family="Inter, system-ui, sans-serif" text-anchor="middle">O</text>
+          <text x="270" y="216" style="fill:var(--info)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">2. Repère d'espace</text>
+
+          <rect x="364" y="48" width="140" height="150" rx="12" fill="rgba(74,222,128,0.06)" style="stroke:var(--success-light)" stroke-width="1.5"/>
+          <circle cx="434" cy="112" r="26" fill="none" style="stroke:var(--success-light)" stroke-width="2"/>
+          <line x1="434" y1="112" x2="434" y2="128" style="stroke:var(--success-light)" stroke-width="2"/>
+          <line x1="434" y1="112" x2="452" y2="104" style="stroke:var(--success-light)" stroke-width="2.5"/>
+          <circle cx="434" cy="112" r="3.5" style="fill:var(--success-light)"/>
+          <text x="434" y="152" style="fill:var(--success-light)" font-size="12.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">t₀ = 0 · t en s</text>
+          <text x="434" y="196" style="fill:var(--success-light)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">3. Repère de temps</text>
+          <text x="434" y="214" style="fill:var(--text-muted)" font-size="11.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">horloge + origine des dates</text>
+
+          <text x="270" y="231.0" style="fill:var(--text-muted)" font-size="12.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">sans l'un des trois : aucune mesure</text>
+          <text x="270" y="249.0" style="fill:var(--text-muted)" font-size="12.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">de position ou de date n'est possible</text>
+          <defs>
+            <marker id="arrowBlueP1b" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto">
+              <path d="M0,0 L7,3.5 L0,7" fill="none" style="stroke:var(--info)" stroke-width="1.3"/>
+            </marker>
+          </defs>
+        </svg>
+        <figcaption class="lecture-figure-caption">Un référentiel complet : un solide de référence, un repère gradué pour les positions, une horloge pour les dates.</figcaption>
+      </figure>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Piège d'examen n° 1</div>
+          <p>Confondre <strong>référentiel</strong> et <strong>repère</strong>. Le repère (d'espace ou de temps) n'est qu'un <em>ingrédient</em> du référentiel. Le référentiel, c'est l'ensemble : corps de référence <strong>+ repère d'espace + repère de temps</strong>. Une question « cite le référentiel » attend le nom du solide (« référentiel terrestre », « référentiel lié au car »), jamais seulement « l'axe (Ox) ».</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 2 : NOTION 1 — LES 3 RÉFÉRENTIELS À CONNAÎTRE -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s2">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">02</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1 · referentiel</span>
+        <h2 class="lecture-section-title">Les 3 référentiels à connaître</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        En Terminale, trois référentiels reviennent sans arrêt. Il faut savoir les nommer, dire à quoi ils sont liés, et surtout <strong>quand les utiliser</strong>.
+      </p>
+
+      <div class="lecture-table">
+        <table>
+          <thead>
+            <tr><th>Référentiel</th><th>Lié à…</th><th>On l'utilise pour…</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Terrestre</strong></td><td>le sol, la salle de classe, le laboratoire</td><td>tout mouvement « quotidien » : voiture, ballon, chute d'une pierre, pendule</td></tr>
+            <tr><td><strong>Géocentrique</strong></td><td>le centre de la Terre + 3 axes dirigés vers des étoiles lointaines</td><td>les mouvements autour de la Terre : satellites, Lune, long trajet aérien</td></tr>
+            <tr><td><strong>Héliocentrique</strong></td><td>le centre du Soleil + 3 axes dirigés vers des étoiles lointaines</td><td>les planètes : Terre, Mars, comètes (mécanique céleste)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="lecture-text">
+        Les deux derniers ont un point commun astucieux : leurs axes pointent vers des <strong>étoiles très lointaines</strong>, si loin qu'elles paraissent fixes pendant l'étude. On obtient ainsi des axes qui « ne tournent pas » avec la Terre — indispensable pour étudier la rotation de la Terre elle-même sans tricher.
+      </p>
+
+      <!-- SVG : les trois référentiels emboîtés -->
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 540 330" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Terre, Soleil et référentiels emboîtés du plus petit au plus grand">
+          <text x="270" y="24" style="fill:var(--accent-bright)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle" letter-spacing="2">DES RÉFÉRENTIELS DE PLUS EN PLUS GRANDS</text>
+
+          <circle cx="270" cy="190" r="66" fill="rgba(96,165,250,0.10)" style="stroke:var(--accent-bright)" stroke-width="1.5" stroke-dasharray="5 4"/>
+          <text x="270" y="290" style="fill:var(--accent-bright)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">Référentiel HÉLIOCENTRIQUE : centre = Soleil</text>
+
+          <circle cx="270" cy="160" r="42" fill="rgba(96,165,250,0.12)" style="stroke:var(--info)" stroke-width="2"/>
+          <text x="270" y="106" style="fill:var(--info)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">Référentiel GÉOCENTRIQUE : centre = Terre</text>
+
+          <circle cx="252" cy="158" r="17" fill="rgba(74,222,128,0.15)" style="stroke:var(--success-light)" stroke-width="2"/>
+          <text x="252" y="163" style="fill:var(--success-light)" font-size="12" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">T</text>
+          <rect x="268" y="168" width="30" height="16" rx="3" fill="rgba(224,184,74,0.15)" style="stroke:var(--accent-bright)" stroke-width="1.5"/>
+          <text x="283" y="180" style="fill:var(--accent-bright)" font-size="9.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">SALLE</text>
+          <text x="322" y="182" style="fill:var(--success-light)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif">Référentiel TERRESTRE</text>
+
+          <circle cx="150" cy="120" r="7" fill="rgba(224,184,74,0.2)" style="stroke:var(--accent-bright)" stroke-width="1.5"/>
+          <text x="150" y="104" style="fill:var(--text-muted)" font-size="11.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">étoile lointaine (fixe)</text>
+          <circle cx="396" cy="120" r="7" fill="rgba(224,184,74,0.2)" style="stroke:var(--accent-bright)" stroke-width="1.5"/>
+          <text x="396" y="104" style="fill:var(--text-muted)" font-size="11.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">étoile lointaine (fixe)</text>
+          <line x1="270" y1="160" x2="158" y2="120" style="stroke:var(--accent-bright)" stroke-width="1.2" stroke-dasharray="3 3"/>
+          <line x1="270" y1="160" x2="388" y2="120" style="stroke:var(--accent-bright)" stroke-width="1.2" stroke-dasharray="3 3"/>
+
+          <text x="270" y="307.0" style="fill:var(--text-muted)" font-size="12.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">Le choix dépend du mouvement : ballon → terrestre ;</text>
+          <text x="270" y="325.0" style="fill:var(--text-muted)" font-size="12.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">satellite → géocentrique ; planète → héliocentrique</text>
+        </svg>
+        <figcaption class="lecture-figure-caption">Trois postes d'observation emboîtés : la salle (terrestre), le centre de la Terre (géocentrique), le centre du Soleil (héliocentrique).</figcaption>
+      </figure>
+
+      <div class="lecture-callout lecture-callout-danger">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Erreur fréquente au Bac</div>
+          <p>Étudier « la chute d'une bille dans la salle » dans le référentiel <strong>géocentrique</strong>, ou « le mouvement de la Lune » dans le référentiel <strong>terrestre</strong> : c'est un choix inadapté qui coûte des points. Règle simple : <strong>choisis le référentiel où l'observateur serait réellement installé</strong> — la salle pour la bille, le centre de la Terre pour la Lune.</p>
+        </div>
+      </div>
+
+      <div class="lecture-exercise">
+        <div class="lecture-exercise-label">✏️ Exercice d'application 1 — Choisir le bon référentiel</div>
+        <p class="lecture-text"><strong>Énoncé :</strong> pour chaque mouvement, indique le référentiel le mieux adapté : a) un ballon frappé dans la cour ; b) le satellite NigerSat ; c) la Lune autour de la Terre ; d) la planète Mars ; e) un passager assis dans un car.</p>
+        <details>
+          <summary>Voir la solution détaillée</summary>
+          <div class="lecture-quiz-answer">
+            <p><strong>a)</strong> Référentiel <strong>terrestre</strong> (lié à la cour) : le ballon se déplace sur quelques dizaines de mètres au-dessus du sol ✔</p>
+            <p><strong>b)</strong> Référentiel <strong>géocentrique</strong> : le satellite tourne autour de la Terre, on s'installe au centre de la Terre ✔</p>
+            <p><strong>c)</strong> Référentiel <strong>géocentrique</strong> : c'est exactement le mouvement vu du centre de la Terre ✔</p>
+            <p><strong>d)</strong> Référentiel <strong>héliocentrique</strong> : Mars tourne autour du Soleil ✔</p>
+            <p><strong>e)</strong> Deux réponses valables selon la question : passager immobile → référentiel <strong>lié au car</strong> ; passager en mouvement → référentiel <strong>terrestre</strong> (lié à la route) ✔</p>
+            <p><strong>Bilan :</strong> toujours se demander « depuis quel poste d'observation le mouvement est le plus simple ? ».</p>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 3 : NOTION 1 — LE MOUVEMENT EST RELATIF -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s3">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">03</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1 · referentiel</span>
+        <h2 class="lecture-section-title">Le mouvement est relatif : trajectoire selon l'observateur</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Changer de référentiel ne change pas seulement la vitesse : cela peut changer <strong>la forme de la trajectoire</strong> elle-même. C'est l'une des surprises les plus concrètes de la mécanique.
+      </p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Définition — trajectoire</div>
+          <p>La <strong>trajectoire</strong> d'un point est l'ensemble des positions successives qu'il occupe <strong>dans un référentiel donné</strong>, au cours du temps. La trajectoire dépend donc du référentiel choisi.</p>
+        </div>
+      </div>
+
+      <p class="lecture-text">
+        Exemple classique : une goutte de pluie tombe <strong>verticalement</strong> pour un piéton immobile. Mais pour le conducteur d'une voiture qui roule, la même goutte arrive <strong>en biais</strong>, venant de l'avant — c'est pourquoi elle trace des traînées inclinées sur le pare-brise. La goutte est la même ; seule la ligne décrite <em>dans chaque référentiel</em> change.
+      </p>
+
+      <!-- SVG : goutte verticale / oblique selon le référentiel -->
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 540 310" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Trajectoire d'une goutte de pluie droite pour le piéton et inclinée pour la voiture">
+          <text x="270" y="24" style="fill:var(--accent-bright)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle" letter-spacing="2">LA MÊME GOUTTE, DEUX TRAJECTOIRES</text>
+
+          <rect x="34" y="46" width="220" height="180" rx="12" fill="rgba(96,165,250,0.06)" style="stroke:var(--info)" stroke-width="1.5"/>
+          <circle cx="144" cy="72" r="5" fill="rgba(96,165,250,0.4)" style="stroke:var(--info)" stroke-width="1"/>
+          <line x1="144" y1="78" x2="144" y2="204" style="stroke:var(--info)" stroke-width="2" marker-end="url(#arrowBlueP1c)"/>
+          <line x1="110" y1="214" x2="178" y2="214" style="stroke:var(--text-muted)" stroke-width="2"/>
+          <circle cx="122" cy="214" r="7" fill="rgba(74,222,128,0.15)" style="stroke:var(--success-light)" stroke-width="2"/>
+          <circle cx="166" cy="214" r="7" fill="rgba(74,222,128,0.15)" style="stroke:var(--success-light)" stroke-width="2"/>
+          <text x="144" y="240" style="fill:var(--info)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">Piéton immobile</text>
+          <text x="144" y="258" style="fill:var(--text-muted)" font-size="11.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">trajectoire : segment vertical</text>
+
+          <rect x="286" y="46" width="220" height="180" rx="12" fill="rgba(239,68,68,0.05)" style="stroke:var(--danger-light)" stroke-width="1.5"/>
+          <circle cx="396" cy="72" r="5" fill="rgba(96,165,250,0.4)" style="stroke:var(--info)" stroke-width="1"/>
+          <line x1="396" y1="78" x2="318" y2="204" style="stroke:var(--danger-light)" stroke-width="2" marker-end="url(#arrowRedP1)"/>
+          <rect x="352" y="196" width="128" height="26" rx="8" fill="rgba(224,184,74,0.1)" style="stroke:var(--accent-bright)" stroke-width="1.5"/>
+          <circle cx="374" cy="224" r="6" fill="none" style="stroke:var(--text-muted)" stroke-width="2"/>
+          <circle cx="458" cy="224" r="6" fill="none" style="stroke:var(--text-muted)" stroke-width="2"/>
+          <line x1="336" y1="106" x2="378" y2="106" style="stroke:var(--accent-bright)" stroke-width="2" marker-end="url(#arrowGoldP1)"/>
+          <text x="340" y="96" style="fill:var(--accent-bright)" font-size="11.5" font-weight="700" font-family="Inter, system-ui, sans-serif">voiture →</text>
+          <text x="396" y="240" style="fill:var(--danger-light)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">Conducteur qui roule</text>
+          <text x="396" y="258" style="fill:var(--text-muted)" font-size="11.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">trajectoire : segment incliné</text>
+
+          <text x="270" y="289.0" style="fill:var(--text-muted)" font-size="12.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">La goutte est identique ; seule la description</text>
+          <text x="270" y="305" style="fill:var(--text-muted)" font-size="12.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">du mouvement change avec le référentiel</text>
+          <defs>
+            <marker id="arrowBlueP1c" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto">
+              <path d="M0,0 L7,3.5 L0,7" fill="none" style="stroke:var(--info)" stroke-width="1.3"/>
+            </marker>
+            <marker id="arrowRedP1" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto">
+              <path d="M0,0 L7,3.5 L0,7" fill="none" style="stroke:var(--danger-light)" stroke-width="1.3"/>
+            </marker>
+            <marker id="arrowGoldP1" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto">
+              <path d="M0,0 L7,3.5 L0,7" fill="none" style="stroke:var(--accent-bright)" stroke-width="1.3"/>
+            </marker>
+          </defs>
+        </svg>
+        <figcaption class="lecture-figure-caption">Pour le piéton la goutte tombe tout droit ; pour le conducteur elle arrive en biais. La trajectoire dépend du référentiel.</figcaption>
+      </figure>
+
+      <div class="lecture-callout lecture-callout-gold">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">À retenir — le trio gagnant</div>
+          <p>La description d'un mouvement repose toujours sur trois éléments indissociables : le <strong>système</strong> étudié (qui ?), le <strong>référentiel</strong> (depuis où ?), la <strong>trajectoire</strong> décrite dans ce référentiel (comment ?). Un énoncé de Bac bien rédigé cite les trois dès la première ligne.</p>
+        </div>
+      </div>
+
+      <div class="lecture-exercise">
+        <div class="lecture-exercise-label">✏️ Exercice d'application 2 — La valise du car</div>
+        <p class="lecture-text"><strong>Énoncé :</strong> une valise est posée sur le porte-bagages d'un car qui roule à <span class="math">72 km·h⁻¹</span> sur une route droite. Décris le mouvement de la valise : a) dans le référentiel lié au car ; b) dans le référentiel terrestre (la route). Précise dans chaque cas si la valise est en mouvement et quelle est sa trajectoire.</p>
+        <details>
+          <summary>Voir la solution détaillée</summary>
+          <div class="lecture-quiz-answer">
+            <p><strong>a) Référentiel lié au car :</strong> la valise est <strong>immobile</strong> par rapport au car (elle reste au même endroit sur le porte-bagages). Sa trajectoire dans ce référentiel se réduit à un <strong>point</strong> ✔</p>
+            <p><strong>b) Référentiel terrestre :</strong> la valise parcourt la route à <span class="math">72 km·h⁻¹</span> dans le sens du car. Sa trajectoire est une <strong>droite horizontale</strong> (la route supposée droite) ✔</p>
+            <p><strong>Conversion utile :</strong> <span class="math">72 km·h⁻¹ = 72 ÷ 3,6 = 20 m·s⁻¹</span> — la valise parcourt 20 m chaque seconde par rapport à la route ✔</p>
+            <p><strong>Bilan :</strong> même valise, deux descriptions : immobile ici, droite à 20 m·s⁻¹ là. Le mouvement est <strong>relatif</strong>.</p>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 4 : NOTION 2 — LE REPÈRE D'ESPACE -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s4">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">04</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2 · reperes</span>
+        <h2 class="lecture-section-title">Le repère d'espace : localiser un point</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Savoir DEPUIS OÙ on observe ne suffit pas : il faut pouvoir <strong>numéroter</strong> chaque position. C'est le rôle du repère d'espace — la grille de mesure posée sur le corps de référence.
+      </p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Définition officielle — repère de l'espace</div>
+          <p>Un <strong>repère de l'espace</strong> est un ensemble : une <strong>origine</strong> <span class="math">O</span>, des <strong>axes orientés</strong> munis d'une unité de longueur, et les <strong>vecteurs unitaires</strong> <span class="math">→i</span>, <span class="math">→j</span> (et <span class="math">→k</span> en 3D) portés par ces axes. On le note <span class="math">(O ; →i , →j)</span> dans le plan ou <span class="math">(O ; →i , →j , →k)</span> dans l'espace — on dit aussi <strong>repère cartésien</strong>.</p>
+        </div>
+      </div>
+
+      <div class="lecture-section-sub">
+        <h3 class="lecture-subtitle">Du cas le plus simple au cas général</h3>
+
+        <ul class="lecture-list-elegant">
+          <li><strong>Un seul axe (Ox)</strong> — mouvement sur une droite : le couloir, la route droite, la chute verticale. La position du point M se résume à <strong>une abscisse</strong> <span class="math">x</span>. C'est le cas des mouvements rectilignes (partie 2).</li>
+          <li><strong>Deux axes (O ; →i , →j)</strong> — mouvement dans un plan : le projectile lancé en l'air, la boule de pétanque. Position = <strong>deux coordonnées</strong> <span class="math">(x ; y)</span>.</li>
+          <li><strong>Trois axes (O ; →i , →j , →k)</strong> — mouvement dans l'espace : l'abeille qui butine, l'avion qui vire. Position = <strong>trois coordonnées</strong> <span class="math">(x ; y ; z)</span>.</li>
+        </ul>
+      </div>
+
+      <!-- SVG : repère (O ; i, j, k) et point M -->
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 540 320" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Repère cartésien avec vecteurs unitaires et point M de coordonnées x, y, z">
+          <text x="270" y="24" style="fill:var(--accent-bright)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle" letter-spacing="2">LE REPÈRE CARTÉSIEN (O ; →i , →j , →k)</text>
+
+          <line x1="90" y1="250" x2="430" y2="250" style="stroke:var(--accent-bright)" stroke-width="2" marker-end="url(#arrowGoldP1b)"/>
+          <line x1="90" y1="250" x2="90" y2="70" style="stroke:var(--accent-bright)" stroke-width="2" marker-end="url(#arrowGoldP1b)"/>
+          <line x1="90" y1="250" x2="190" y2="300" style="stroke:var(--accent-bright)" stroke-width="2" marker-end="url(#arrowGoldP1b)"/>
+          <text x="438" y="256" style="fill:var(--accent-bright)" font-size="14" font-family="Inter, system-ui, sans-serif">x</text>
+          <text x="76" y="66" style="fill:var(--accent-bright)" font-size="14" font-family="Inter, system-ui, sans-serif">y</text>
+          <text x="196" y="310" style="fill:var(--accent-bright)" font-size="14" font-family="Inter, system-ui, sans-serif">z</text>
+          <circle cx="90" cy="250" r="4" style="fill:var(--accent-bright)"/>
+          <text x="72" y="266" style="fill:var(--text-muted)" font-size="13" font-family="Inter, system-ui, sans-serif">O</text>
+
+          <line x1="100" y1="244" x2="122" y2="238" style="stroke:var(--text-muted)" stroke-width="1.5" stroke-dasharray="2 2"/>
+          <text x="118" y="232" style="fill:var(--text-muted)" font-size="12" font-family="Inter, system-ui, sans-serif">→i</text>
+          <line x1="84" y1="238" x2="78" y2="218" style="stroke:var(--text-muted)" stroke-width="1.5" stroke-dasharray="2 2"/>
+          <text x="52" y="216" style="fill:var(--text-muted)" font-size="12" font-family="Inter, system-ui, sans-serif">→j</text>
+          <line x1="98" y1="256" x2="116" y2="268" style="stroke:var(--text-muted)" stroke-width="1.5" stroke-dasharray="2 2"/>
+          <text x="120" y="280" style="fill:var(--text-muted)" font-size="12" font-family="Inter, system-ui, sans-serif">→k</text>
+
+          <line x1="90" y1="250" x2="290" y2="250" style="stroke:var(--info)" stroke-width="1.4" stroke-dasharray="4 3"/>
+          <line x1="290" y1="250" x2="290" y2="130" style="stroke:var(--info)" stroke-width="1.4" stroke-dasharray="4 3"/>
+          <line x1="290" y1="130" x2="330" y2="150" style="stroke:var(--info)" stroke-width="1.4" stroke-dasharray="4 3"/>
+          <circle cx="290" cy="130" r="6" fill="rgba(74,222,128,0.2)" style="stroke:var(--success-light)" stroke-width="2.5"/>
+          <text x="304" y="120" style="fill:var(--success-light)" font-size="15" font-weight="700" font-family="Playfair Display, Georgia, serif">M (x ; y ; z)</text>
+
+          <line x1="290" y1="250" x2="290" y2="130" style="stroke:var(--success-light)" stroke-width="2" marker-end="url(#arrowGreenP1)"/>
+          <text x="298" y="196" style="fill:var(--success-light)" font-size="13" font-family="Inter, system-ui, sans-serif">→OM</text>
+
+          <text x="190" y="268" style="fill:var(--text-muted)" font-size="12" font-family="Inter, system-ui, sans-serif" text-anchor="middle">abscisse x</text>
+          <text x="270" y="289.0" style="fill:var(--text-muted)" font-size="12.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">La position de M = le vecteur →OM,</text>
+          <text x="270" y="307.0" style="fill:var(--text-muted)" font-size="12.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">issu de l'origine O et pointant vers M</text>
+          <defs>
+            <marker id="arrowGoldP1b" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto">
+              <path d="M0,0 L7,3.5 L0,7" fill="none" style="stroke:var(--accent-bright)" stroke-width="1.3"/>
+            </marker>
+            <marker id="arrowGreenP1" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto">
+              <path d="M0,0 L7,3.5 L0,7" fill="none" style="stroke:var(--success-light)" stroke-width="1.3"/>
+            </marker>
+          </defs>
+        </svg>
+        <figcaption class="lecture-figure-caption">Un point M est repéré par ses coordonnées (x ; y ; z) ou, de façon équivalente, par le vecteur →OM partant de l'origine.</figcaption>
+      </figure>
+
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-label">Formule majeure — la position d'un point</div>
+        <div class="lecture-formula-hero-main">→OM = x·→i + y·→j + z·→k</div>
+        <div class="lecture-formula-hero-desc">Le vecteur position est la « recette » des trois pas : x unités selon →i, y unités selon →j, z unités selon →k. x, y, z se lisent directement sur les axes : ce sont les coordonnées cartésiennes de M.</div>
+      </div>
+
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-label">Formule majeure — distance à l'origine</div>
+        <div class="lecture-formula-hero-main">OM = √(x² + y² + z²)</div>
+        <div class="lecture-formula-hero-desc">La longueur du vecteur →OM (son module) donne la distance entre M et l'origine O. En 2D, on retire le terme en z ; sur un seul axe, OM = |x|. Le résultat est toujours positif, en mètres.</div>
+      </div>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">Exemple travaillé — calculer une distance à l'origine</div>
+        <div class="lecture-example-content">
+          <p><strong>Données :</strong> dans le repère <span class="math">(O ; →i , →j , →k)</span>, une bille M a pour coordonnées <span class="math">x = 2 m</span>, <span class="math">y = 3 m</span>, <span class="math">z = 6 m</span>. Calculer OM.</p>
+          <p><strong>Résolution en 5 étapes :</strong></p>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p>On écrit la formule : <span class="math">OM = √(x² + y² + z²)</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p>On remplace chaque lettre par sa valeur : <span class="math">OM = √(2² + 3² + 6²)</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p>On calcule les carrés : <span class="math">OM = √(4 + 9 + 36)</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p>On additionne : <span class="math">OM = √49</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">5</div><div class="lecture-step-content"><p>On prend la racine : <span class="math">OM = 7 m</span>. Vérification : <span class="math">7² = 49</span> ✔</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Piège d'examen n° 2</div>
+          <p>Un vecteur <strong>ne s'écrit jamais sans sa flèche</strong> : <span class="math">→OM</span> est le vecteur position (il a une direction, un sens, une longueur) tandis que <span class="math">OM</span> (sans flèche) est une <strong>distance</strong>, un nombre positif en mètres. Au Bac, confondre les deux est une faute classique — de même, les coordonnées <span class="math">(x ; y ; z)</span> sont des nombres, jamais des vecteurs.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 5 : NOTION 2 — REPÈRE DE TEMPS ET SYSTÈME -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s5">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">05</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2 · reperes</span>
+        <h2 class="lecture-section-title">Le repère de temps, la durée et le système</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Dernier ingrédient : l'horloge. La physique mesure des <strong>dates</strong> (à quel moment ?) et des <strong>durées</strong> (combien de temps entre deux instants ?). Les deux se notent différemment et il ne faut jamais les confondre.
+      </p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Définition — repère de temps, date, durée</div>
+          <p>Le <strong>repère de temps</strong> est constitué d'une horloge et d'une <strong>origine des dates</strong> <span class="math">t₀ = 0</span> (l'instant où commence l'étude). Une <strong>date</strong> <span class="math">t</span> est un instant repéré depuis <span class="math">t₀</span> ; une <strong>durée</strong> <span class="math">Δt</span> est l'écart entre deux dates.</p>
+        </div>
+      </div>
+
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-label">Formule majeure — la durée entre deux dates</div>
+        <div class="lecture-formula-hero-main">Δt = t₂ − t₁</div>
+        <div class="lecture-formula-hero-desc">La durée se calcule TOUJOURS par « date d'arrivée − date de départ », dans la même unité. Résultat positif, en secondes (s) dans le système international. Δt se lit « delta t ».</div>
+      </div>
+
+      <!-- SVG : axe des temps avec t0, t1, t2 -->
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 540 210" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Axe des temps : origine t0 égale zéro, deux dates t1 et t2, durée delta t entre elles">
+          <text x="270" y="24" style="fill:var(--accent-bright)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle" letter-spacing="2">DATES ET DURÉE SUR L'AXE DU TEMPS</text>
+
+          <line x1="50" y1="110" x2="500" y2="110" style="stroke:var(--accent-bright)" stroke-width="2" marker-end="url(#arrowGoldP1c)"/>
+          <text x="508" y="116" style="fill:var(--accent-bright)" font-size="13" font-family="Inter, system-ui, sans-serif">t</text>
+
+          <circle cx="140" cy="110" r="5" style="fill:var(--accent-bright)"/>
+          <text x="140" y="136" style="fill:var(--text-muted)" font-size="13" font-family="Inter, system-ui, sans-serif" text-anchor="middle">t₀ = 0</text>
+          <text x="140" y="92" style="fill:var(--accent-bright)" font-size="12" font-family="Inter, system-ui, sans-serif" text-anchor="middle">départ</text>
+
+          <circle cx="300" cy="110" r="5" style="fill:var(--info)"/>
+          <text x="300" y="136" style="fill:var(--text-muted)" font-size="13" font-family="Inter, system-ui, sans-serif" text-anchor="middle">t₁</text>
+
+          <circle cx="440" cy="110" r="5" style="fill:var(--success-light)"/>
+          <text x="440" y="136" style="fill:var(--text-muted)" font-size="13" font-family="Inter, system-ui, sans-serif" text-anchor="middle">t₂</text>
+
+          <line x1="306" y1="62" x2="434" y2="62" style="stroke:var(--success-light)" stroke-width="2" marker-start="url(#arrowGreenP1b)" marker-end="url(#arrowGreenP1b)"/>
+          <text x="370" y="50" style="fill:var(--success-light)" font-size="13.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">durée Δt = t₂ − t₁</text>
+
+          <text x="270" y="173.0" style="fill:var(--text-muted)" font-size="12.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">La date dit « quand » ; la durée dit « combien de</text>
+          <text x="270" y="191.0" style="fill:var(--text-muted)" font-size="12.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">temps ». Ne jamais écrire « la durée du départ »</text>
+          <defs>
+            <marker id="arrowGoldP1c" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto">
+              <path d="M0,0 L7,3.5 L0,7" fill="none" style="stroke:var(--accent-bright)" stroke-width="1.3"/>
+            </marker>
+            <marker id="arrowGreenP1b" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto">
+              <path d="M0,0 L7,3.5 L0,7" fill="none" style="stroke:var(--success-light)" stroke-width="1.3"/>
+            </marker>
+          </defs>
+        </svg>
+        <figcaption class="lecture-figure-caption">t₀ = 0 fixe l'origine des dates ; chaque événement a sa date t ; la durée Δt = t₂ − t₁ est un écart, jamais une date.</figcaption>
+      </figure>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">v[km·h⁻¹] = 3,6 × v[m·s⁻¹]</div>
+        <div class="lecture-formula-desc">Conversion de vitesse la plus utile du chapitre. Dans l'autre sens : v[m·s⁻¹] = v[km·h⁻¹] ÷ 3,6. Exemples : 54 km·h⁻¹ = 15 m·s⁻¹ ; 90 km·h⁻¹ = 25 m·s⁻¹. Origine du 3,6 : 1 h = 3 600 s et 1 km = 1 000 m, donc 3 600 ÷ 1 000 = 3,6.</div>
+      </div>
+
+      <div class="lecture-example">
+        <div class="lecture-example-label">Exemple travaillé — durée d'un trajet</div>
+        <div class="lecture-example-content">
+          <p><strong>Données :</strong> un car quitte la gare à <span class="math">t₁ = 10 h 05 min</span> et arrive à Dosso à <span class="math">t₂ = 10 h 23 min</span>. Calculer la durée du trajet en minutes puis en secondes.</p>
+          <p><strong>Résolution en 3 étapes :</strong></p>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p>On pose la formule de la durée : <span class="math">Δt = t₂ − t₁</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p>On remplace : <span class="math">Δt = 10 h 23 min − 10 h 05 min = 18 min</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p>On convertit en secondes : <span class="math">18 min = 18 × 60 s = 1 080 s</span>. Vérification : <span class="math">1 080 ÷ 60 = 18</span> ✔</p></div></div>
+          </div>
+          <p><strong>Réponse :</strong> le trajet dure <span class="math">18 min</span>, soit <span class="math">1 080 s</span>.</p>
+        </div>
+      </div>
+
+      <div class="lecture-section-sub">
+        <h3 class="lecture-subtitle">Et le « système » dans tout ça ?</h3>
+
+        <p class="lecture-text">
+          Avant même de choisir le référentiel, il faut dire <strong>QUI on observe</strong> : c'est le <strong>système</strong>. Un système est le corps (ou l'ensemble de corps) dont on étudie le mouvement, séparé du reste du monde (l'« extérieur ») par une frontière nette. Quand le système est assez petit devant les distances du problème — une bille, un ballon, un satellite — on le modélise par un <strong>point matériel</strong> <span class="math">M</span> : on concentre toute sa matière en un seul point, son centre.
+        </p>
+
+        <div class="lecture-table">
+          <table>
+            <thead>
+              <tr><th>Grandeur</th><th>Symbole</th><th>Unité SI</th><th>Instrument de mesure</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Position (abscisse sur un axe)</td><td><span class="math">x</span></td><td>mètre (m)</td><td>règle, décamètre, capteur</td></tr>
+              <tr><td>Temps (date)</td><td><span class="math">t</span></td><td>seconde (s)</td><td>horloge, chronomètre</td></tr>
+              <tr><td>Durée</td><td><span class="math">Δt</span></td><td>seconde (s)</td><td>chronomètre</td></tr>
+              <tr><td>Longueur (distance)</td><td><span class="math">OM</span>, <span class="math">AB</span></td><td>mètre (m)</td><td>règle, décamètre</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="lecture-callout lecture-callout-danger">
+          <div class="lecture-callout-body">
+            <div class="lecture-callout-title">Erreur fréquente au Bac</div>
+            <p>Mélanger les unités dans un même calcul : distance en <strong>km</strong> et vitesse en <strong>m·s⁻¹</strong>, temps en <strong>minutes</strong> et valeurs en <strong>secondes</strong>. Règle d'or : <strong>convertir TOUT en unités SI avant le premier calcul</strong> (km → m : ×1 000 ; min → s : ×60 ; km·h⁻¹ → m·s⁻¹ : ÷3,6).</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 6 : FICHE MÉTHODE -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s6">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">06</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Fiche méthode</span>
+        <h2 class="lecture-section-title">Décrire un mouvement en 3 étapes rituelles</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Voici LA méthode qui ouvre toute résolution de mécanique. Elle tient en trois phrases rituelles — apprends-les par cœur : elles rapportent des points à chaque exercice, dès la première ligne de la copie.
+      </p>
+
+      <div class="lecture-steps">
+        <div class="lecture-step">
+          <div class="lecture-step-number">1</div>
+          <div class="lecture-step-content">
+            <p><strong>Annoncer le système.</strong> « On étudie le mouvement du point M, centre du (mobile), assimilé à un point matériel. » Si l'objet est petit devant le trajet, cette modélisation est légitime.</p>
+          </div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">2</div>
+          <div class="lecture-step-content">
+            <p><strong>Annoncer le référentiel.</strong> « Le référentiel d'étude est le référentiel … (terrestre / géocentrique / héliocentrique / lié au car). » Une demi-phrase de justification suffit si le choix n'est pas évident.</p>
+          </div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">3</div>
+          <div class="lecture-step-content">
+            <p><strong>Installer les repères.</strong> « On munit ce référentiel d'un repère (O ; →i , →j) et d'un repère de temps d'origine t₀ = 0 au moment du … (lâcher / départ). » Puis seulement, on passe aux calculs.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-example lecture-example-featured">
+        <div class="lecture-example-label">Exemple complet — le moto-taxi de Niamey</div>
+        <div class="lecture-example-content">
+          <p><strong>Énoncé :</strong> un moto-taxi roule en ligne droite sur l'avenue de la Mairie. À l'instant choisi pour origine des dates, il se trouve à 120 m de l'intersection. Son abscisse mesurée : x(0) = 120 m ; x(2) = 140 m ; x(4) = 160 m ; x(6) = 180 m. Décrire proprement l'étude et commenter la série de valeurs.</p>
+          <p><strong>Rédaction modèle :</strong></p>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Système :</strong> le moto-taxi, assimilé à un point matériel M.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Référentiel :</strong> terrestre (lié à la route) — mouvement quotidien sur quelques centaines de mètres.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Repère :</strong> axe (Ox) orienté dans le sens du mouvement, origine O à l'intersection ; horloge d'origine t₀ = 0 au premier relevé.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Lecture :</strong> à chaque intervalle de <span class="math">2 s</span>, l'abscisse augmente de <span class="math">20 m</span> : la moto avance régulièrement sur l'axe.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">5</div><div class="lecture-step-content"><p><strong>Conclusion :</strong> mouvement <strong>rectiligne</strong> à position croissant linéairement (sa vitesse constante se calculera en partie 2 : <span class="math">20 ÷ 2 = 10 m·s⁻¹</span>).</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-gold">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Méthode — vérifier sa rédaction en 30 secondes</div>
+          <ul class="lecture-list">
+            <li>Le <strong>système</strong> est nommé avec l'objet réel (« le moto-taxi ») et sa modélisation (« point matériel M ») ✔</li>
+            <li>Le <strong>référentiel</strong> est nommé et justifié en quelques mots ✔</li>
+            <li>Les <strong>deux repères</strong> sont posés avec leurs origines (O géographique ET t₀ = 0) ✔</li>
+            <li>Toutes les grandeurs sont en <strong>unités SI</strong> avant tout calcul ✔</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 7 : EXERCICES D'APPLICATION -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s7">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">07</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Entraînement</span>
+        <h2 class="lecture-section-title">Exercices d'application</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Trois exercices gradués pour verrouiller la partie. Fais-les d'abord SANS regarder les corrigés : c'est la lutte avec l'exercice qui construit le réflexe.
+      </p>
+
+      <div class="lecture-exercise">
+        <div class="lecture-exercise-label">✏️ Exercice d'application 3 — Distance et conversion</div>
+        <p class="lecture-text"><strong>Énoncé :</strong> dans le plan <span class="math">(O ; →i , →j)</span>, une fourmi occupe la position <span class="math">M(30 cm ; 40 cm)</span>. a) Calculer OM. b) Exprimer OM en mètres. c) Un observateur annonce : « la fourmi est immobile » — quelle information manque pour juger cette phrase ?</p>
+        <details>
+          <summary>Voir la solution détaillée</summary>
+          <div class="lecture-quiz-answer">
+            <p><strong>a)</strong> <span class="math">OM = √(x² + y²) = √(30² + 40²) = √(900 + 1 600) = √2 500 = 50 cm</span> ✔</p>
+            <p><strong>b)</strong> <span class="math">50 cm = 0,50 m</span> (1 m = 100 cm, on divise par 100) ✔</p>
+            <p><strong>c)</strong> Il manque le <strong>référentiel</strong> : la fourmi peut être immobile dans le référentiel lié à la table, et en mouvement dans le référentiel terrestre si la table est en train d'être portée ! Une description de mouvement est incomplète sans son référentiel ✔</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="lecture-exercise">
+        <div class="lecture-exercise-label">✏️ Exercice d'application 4 — Le puits du village</div>
+        <p class="lecture-text"><strong>Énoncé :</strong> Aïcha lâche une pierre au-dessus d'un puits à <span class="math">t₁ = 0 s</span> (origine des dates) ; on entend le « plop » à <span class="math">t₂ = 1,4 s</span>. a) Calculer la durée de la chute. b) Le chronomètre avait été démarré 0,2 s AVANT le lâcher (t₁ = 0,2 s) : recalculer la durée. c) Que devient cette durée si l'origine des dates est prise au moment du « plop » ?</p>
+        <details>
+          <summary>Voir la solution détaillée</summary>
+          <div class="lecture-quiz-answer">
+            <p><strong>a)</strong> <span class="math">Δt = t₂ − t₁ = 1,4 − 0 = 1,4 s</span> ✔</p>
+            <p><strong>b)</strong> <span class="math">Δt = t₂ − t₁ = 1,4 − 0,2 = 1,2 s</span>. La durée ne dépend pas de l'origine choisie : décaler t₁ et t₂ de la même quantité ne change pas leur différence ✔</p>
+            <p><strong>c)</strong> Si <span class="math">t₂ = 0</span> alors <span class="math">t₁ = −1,2 s</span> et <span class="math">Δt = 0 − (−1,2) = 1,2 s</span>. Même durée — seules les dates changent de signe ✔</p>
+            <p><strong>Bilan :</strong> la durée est <strong>indépendante de l'origine des dates</strong> ; c'est une différence, pas une date.</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="lecture-exercise">
+        <div class="lecture-exercise-label">✏️ Exercice d'application 5 — Rédaction rituelle (Bac)</div>
+        <p class="lecture-text"><strong>Énoncé :</strong> rédige l'ouverture complète (les 3 étapes) pour l'étude du mouvement du centre d'une balle de tennis rebondissant dans un gymnase, filmée par une caméra fixée au mur. Puis dis quelle(s) coordonnée(s) suffiraient si la caméra filme de côté.</p>
+        <details>
+          <summary>Voir la solution détaillée</summary>
+          <div class="lecture-quiz-answer">
+            <p><strong>Rédaction :</strong> « On étudie le mouvement du point M, centre de la balle de tennis, assimilée à un point matériel. Le référentiel d'étude est le référentiel terrestre (lié au gymnase). On le munit d'un repère (O ; →i , →j) avec Ox horizontal et Oy vertical, et d'un repère de temps d'origine t₀ = 0 au premier rebond. » ✔</p>
+            <p><strong>Caméra de côté :</strong> le mouvement se déroule dans le plan de l'image : deux coordonnées suffisent, <span class="math">x</span> (horizontale) et <span class="math">y</span> (verticale) ✔</p>
+            <p><strong>Réflexe :</strong> caméra fixée au mur = observateur terrestre → référentiel terrestre, jamais géocentrique (la balle ne quitte pas la salle).</p>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== QCM ===== -->
+  <div class="lecture-quiz">
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q1. Un référentiel est constitué de…</p>
+      <div class="lecture-quiz-options"><span>A) un axe et une horloge</span><span>B) un corps de référence, un repère d'espace et un repère de temps</span><span>C) une trajectoire et une vitesse</span><span>D) trois axes seulement</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><p><strong>Réponse : B.</strong> Les trois ingrédients sont indissociables (corps de référence + repères d'espace et de temps). L'option A oublie le corps de référence, l'option D oublie l'horloge.</p></div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q2. La valise posée dans un car roulant à 72 km·h⁻¹ a, dans le référentiel terrestre, une vitesse de…</p>
+      <div class="lecture-quiz-options"><span>A) 0 m·s⁻¹</span><span>B) 20 m·s⁻¹</span><span>C) 72 m·s⁻¹</span><span>D) 7,2 m·s⁻¹</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><p><strong>Réponse : B.</strong> Dans le référentiel terrestre, la valise suit le car : 72 ÷ 3,6 = 20 m·s⁻¹. (Dans le référentiel lié au car, la réponse serait A : 0 m·s⁻¹.)</p></div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q3. Pour étudier le mouvement de la Lune autour de la Terre, on choisit…</p>
+      <div class="lecture-quiz-options"><span>A) le référentiel terrestre</span><span>B) le référentiel héliocentrique</span><span>C) le référentiel géocentrique</span><span>D) n'importe lequel</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><p><strong>Réponse : C.</strong> Le géocentrique a son origine au centre de la Terre : c'est le poste d'observation où le mouvement de la Lune se décrit le plus simplement.</p></div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q4. Un point M(2 ; 3 ; 6) dans (O ; →i , →j , →k) est à la distance OM égale à…</p>
+      <div class="lecture-quiz-options"><span>A) 11</span><span>B) 36</span><span>C) 7</span><span>D) 49</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><p><strong>Réponse : C.</strong> OM = √(2² + 3² + 6²) = √(4 + 9 + 36) = √49 = 7. L'option A (11) additionne les coordonnées sans les élever au carré ; l'option D oublie la racine.</p></div></details>
+    </div>
+  </div>
+
+  <!-- ===== RÉCAP ===== -->
+  <div class="lecture-recap">
+    <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
+    <ul class="lecture-recap-list">
+      <li><strong>[referentiel_def]</strong> Un référentiel = corps de référence + repère d'espace + repère de temps. Sans lui, « le mobile bouge » n'a aucun sens.</li>
+      <li><strong>[referentiel_3]</strong> Terrestre (salle, sol) pour le quotidien ; géocentrique (centre de la Terre) pour satellites et Lune ; héliocentrique (centre du Soleil) pour les planètes.</li>
+      <li><strong>[relativite]</strong> Le mouvement est relatif : trajectoire et vitesse changent avec le référentiel (valise immobile dans le car, 20 m·s⁻¹ sur la route).</li>
+      <li><strong>[reperes_espace]</strong> Repère cartésien (O ; →i , →j , →k) ; position = →OM = x·→i + y·→j + z·→k ; distance OM = √(x² + y² + z²).</li>
+      <li><strong>[reperes_temps]</strong> Date t (instant, depuis t₀ = 0) ≠ durée Δt = t₂ − t₁ (écart, indépendant de l'origine). Unité SI : la seconde.</li>
+      <li><strong>[conversion]</strong> v[km·h⁻¹] = 3,6 × v[m·s⁻¹] — à convertir AVANT tout calcul.</li>
+      <li><strong>[systeme]</strong> On annonce toujours : le système (point matériel M), le référentiel, les repères — puis on calcule.</li>
+    </ul>
+  </div>
+
+  <!-- ===== FIN ===== -->
+  <div class="lecture-end">
+    <div class="lecture-end-icon">🎯</div>
+    <div class="lecture-end-text">Partie 1 terminée !</div>
+    <div class="lecture-end-sub">Tu sais maintenant installer le « décor » de tout mouvement. Dans la partie 2, on filme ce décor image par image : position, vitesse et accélération — les trois vecteurs de la cinématique.</div>
+    <div class="lecture-end-divider"></div>
+  </div>
+
+</div>

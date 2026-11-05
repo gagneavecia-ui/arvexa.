@@ -804,6 +804,16 @@ let myMarker = null;
 let mateMarkers = {};        // uid -> Marker
 let lastList = [];           // dernière liste rendue (showOnMap)
 let fitDone = false;
+// v9.1 — cartes DOM stables : la carte d'un camarade est créée UNE fois,
+// puis seuls les compteurs (distance en mètres, fraîcheur) sont mis à jour.
+const cardEls = new Map();   // uid -> { el, distEl, metaEl, group, dist, name }
+const groupEls = {};         // clé -> { block, grid, count, titleEl }
+const GROUPS = [
+  { key: 'pas',      icon: '🚶', title: 'À quelques pas de toi' },
+  { key: 'quartier', icon: '🏘️', title: 'Dans ton quartier' },
+  { key: 'ville',    icon: '🌆', title: 'Dans ta ville' },
+  { key: 'ailleurs', icon: '🗺️', title: 'Ailleurs' }
+];
 
 // ---------------- Helpers DOM ----------------
 const $ = (id) => document.getElementById(id);
@@ -1284,6 +1294,7 @@ function stopSharing(silent = false) {
   myPos = null; lastWrite = null;
   fitDone = false;
   centeredOnce = false;
+  resetCards(); // v9.1 : les cartes DOM des camarades repartent de zéro
   if (map) { updateMyMarker(); updateMateMarkers([]); } // v8.17 : je disparais de la carte
   setGeoState('off');
   kvGrid.style.display = 'none';
@@ -1340,6 +1351,64 @@ function sameCity(a, b) {
   if (!a || !b) return false;
   return a.trim().toLocaleLowerCase('fr') === b.trim().toLocaleLowerCase('fr');
 }
+// v9.1 — CARTES DOM STABLES (signal propriétaire : « à chaque fois que la
+// distance se renouvelle c'est comme si des nouvelles cartes se produisent »).
+// Chaque camarade = UNE carte créée une seule fois, rangée dans son groupe ;
+// à chaque rafraîchissement, SEULS les compteurs changent (distance en
+// mètres/km, fraîcheur ⏱, compteurs de groupe). Aucun rebuild innerHTML,
+// aucune animation rejouée, aucun saut de liste : zéro clignotement.
+function resetCards() {
+  cardEls.forEach((entry) => { entry.el.remove(); });
+  cardEls.clear();
+  Object.keys(groupEls).forEach((k) => { delete groupEls[k]; });
+  groupsWrap.innerHTML = '';
+}
+
+function ensureGroup(key) {
+  if (groupEls[key]) return groupEls[key];
+  const g = GROUPS.find((x) => x.key === key);
+  const block = document.createElement('div');
+  block.className = 'group-block';
+  const title = document.createElement('div');
+  title.className = 'group-title';
+  const tspan = document.createElement('span');
+  tspan.textContent = g.icon + ' ' + g.title;
+  const count = document.createElement('span');
+  count.className = 'gcount';
+  count.textContent = '0';
+  title.appendChild(tspan);
+  title.appendChild(count);
+  const grid = document.createElement('div');
+  grid.className = 'people-grid';
+  block.appendChild(title);
+  block.appendChild(grid);
+  groupsWrap.appendChild(block);
+  groupEls[key] = { block, grid, count, titleEl: tspan };
+  return groupEls[key];
+}
+
+function buildCard(p) {
+  const el = document.createElement('div');
+  el.className = 'person';
+  el.dataset.uid = p.uid;
+  el.innerHTML =
+    '<div class="avatar">' + esc(initials(p.name)) + '</div>' +
+    '<div class="p-info">' +
+      '<div class="p-name">' + esc(p.name) + '</div>' +
+      '<div class="p-meta"></div>' +
+    '</div>' +
+    '<div class="p-dist"></div>' +
+    '<a class="go-mini" target="_blank" rel="noopener" href="' + GO_URL(p.lat, p.lng) + '"><i class="fas fa-diamond-turn-right"></i> Y aller</a>' +
+    '<a class="chat-btn" href="groupe.html"><i class="fas fa-comments"></i> Discuter</a>';
+  return el;
+}
+
+function groupKeyFor(p, myCity) {
+  if (p.d < 1000) return 'pas';
+  if (p.d < 5000) return 'quartier';
+  return sameCity(p.city, myCity) ? 'ville' : 'ailleurs';
+}
+
 function render() {
   const mine = myUid;
   const list = [];
@@ -1354,18 +1423,17 @@ function render() {
 
   // Affichage de la liste : uniquement si je partage moi-même (réciprocité)
   const showList = shareOn && geoState !== 'blocked';
-  applyView(); // v8.17 : visibilité du toggle Carte/Liste + de la carte
+  applyView(); // visibilité du toggle Carte/Liste + de la carte
   teaserCard.style.display = (!shareOn && geoState !== 'denied' && geoState !== 'unavailable') ? '' : 'none';
   if (!showList) {
     countsRow.style.display = 'none';
-    groupsWrap.innerHTML = '';
+    resetCards();
     if (!shareOn && geoState !== 'denied' && geoState !== 'unavailable') emptyCard.style.display = 'none';
     return;
   }
   if (!myPos) return; // pas encore de fix : la liste s'affichera au premier point GPS
 
   list.forEach((p) => { p.d = distM(myPos, p); });
-  list.sort((a, b) => a.d - b.d);
   lastList = list;
 
   const myCity = myCityName();
@@ -1382,31 +1450,62 @@ function render() {
   const hasAny = list.length > 0;
   emptyCard.style.display = hasAny ? 'none' : '';
 
-  const group = (title, icon, arr) => {
-    if (!arr.length) return '';
-    const cards = arr.map((p) => (
-      '<div class="person" data-uid="' + esc(p.uid) + '">' +
-        '<div class="avatar">' + esc(initials(p.name)) + '</div>' +
-        '<div class="p-info">' +
-          '<div class="p-name">' + esc(p.name) + '</div>' +
-          '<div class="p-meta">' + esc(p.city || 'Ville inconnue') + ' · ⏱ ' + esc(fmtAgo(p.ts)) + '</div>' +
-        '</div>' +
-        '<div class="p-dist">' + esc(fmtKm(p.d)) + '<span class="p-fresh">de toi</span></div>' +
-        '<a class="go-mini" target="_blank" rel="noopener" href="' + GO_URL(p.lat, p.lng) + '"><i class="fas fa-diamond-turn-right"></i> Y aller</a>' +
-        '<a class="chat-btn" href="groupe.html"><i class="fas fa-comments"></i> Discuter</a>' +
-      '</div>'
-    )).join('');
-    return '<div class="group-block"><div class="group-title">' + icon + ' ' + title +
-      ' <span class="gcount">' + arr.length + '</span></div><div class="people-grid">' + cards + '</div></div>';
-  };
+  const seen = new Set();
+  list.forEach((p) => {
+    seen.add(p.uid);
+    const gk = groupKeyFor(p, myCity);
+    let entry = cardEls.get(p.uid);
+    if (!entry) {
+      const el = buildCard(p);
+      entry = {
+        el,
+        distEl: el.querySelector('.p-dist'),
+        metaEl: el.querySelector('.p-meta'),
+        nameEl: el.querySelector('.p-name'),
+        avaEl: el.querySelector('.avatar'),
+        goEl: el.querySelector('.go-mini'),
+        group: gk,
+        dist: null,
+        name: p.name
+      };
+      cardEls.set(p.uid, entry);
+      ensureGroup(gk).grid.appendChild(el);
+    } else if (entry.group !== gk) {
+      // rare : le camarade change de tranche de distance → on déplace SON nœud
+      ensureGroup(gk).grid.appendChild(entry.el);
+      entry.group = gk;
+    }
+    // ⚡ MISE À JOUR DES SEULS COMPTEURS (jamais de recréation) :
+    const distTxt = esc(fmtKm(p.d)) + '<span class="p-fresh">de toi</span>';
+    if (entry.dist !== p.d) {
+      entry.distEl.innerHTML = distTxt;
+      entry.dist = p.d;
+    }
+    entry.metaEl.textContent = (p.city || 'Ville inconnue') + ' · ⏱ ' + fmtAgo(p.ts);
+    if (entry.name !== p.name) { // pseudo mis à jour côté camarade
+      entry.nameEl.textContent = p.name;
+      entry.avaEl.textContent = initials(p.name);
+      entry.goEl.href = GO_URL(p.lat, p.lng);
+      entry.name = p.name;
+    }
+  });
+  cardEls.forEach((entry, uid) => {
+    if (!seen.has(uid)) { entry.el.remove(); cardEls.delete(uid); }
+  });
 
-  groupsWrap.innerHTML =
-    group('À quelques pas de toi', '🚶', gPas) +
-    group('Dans ton quartier', '🏘️', gQuartier) +
-    group('Dans ta ville' + (myCity ? ' — ' + esc(myCity) : ''), '🌆', gVille) +
-    group('Ailleurs', '🗺️', gAilleurs);
+  // Compteurs de groupes + masquage des groupes vides
+  GROUPS.forEach((g) => {
+    const ge = groupEls[g.key];
+    if (!ge) return;
+    const n = list.filter((p) => groupKeyFor(p, myCity) === g.key).length;
+    ge.count.textContent = n;
+    ge.block.style.display = n ? '' : 'none';
+  });
+  if (groupEls.ville) {
+    groupEls.ville.titleEl.textContent = '🌆 Dans ta ville' + (myCity ? ' — ' + myCity : '');
+  }
 
-  // v8.17 : synchronise les marqueurs de la carte
+  // synchronise les marqueurs de la carte
   updateMyMarker();
   updateMateMarkers(list);
 }

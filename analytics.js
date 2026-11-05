@@ -1,5 +1,5 @@
 // ================================================================
-// ANALYTICS — ARVEXA School v4 (ultra-robuste, page-safe, universel)
+// ANALYTICS — ARVEXA School v4.1 (ultra-robuste, page-safe, universel, anti-perte persistante)
 // Ne bloque JAMAIS la page. Toutes les erreurs sont silencieuses.
 //
 // v4 (2026-11-05) — fin du « l'analytique ne marche pas chez moi » :
@@ -63,6 +63,9 @@
     const SESSION_TIMEOUT = 30 * 60 * 1000;
     const SESSION_KEY = 'arvexa_analytics_session';
     const LAST_ACTIVE_KEY = 'arvexa_analytics_last_active';
+    // ⚡ v4.1 — queue PERSISTÉE : si l'écriture échoue ET que l'onglet meurt,
+    // les compteurs survivent et repartent à la prochaine visite (zéro perte).
+    const QUEUE_KEY = 'arvexa_analytics_queue_v4';
 
     // ─────────────────────────────────────────────────────────────
     // ÉTAT
@@ -163,6 +166,37 @@
     }
 
     // ─────────────────────────────────────────────────────────────
+    // ⚡ v4.1 — PERSISTANCE DE LA QUEUE (localStorage)
+    // ─────────────────────────────────────────────────────────────
+    function saveQueue() {
+      try { if (queue) localStorage.setItem(QUEUE_KEY, JSON.stringify(queue)); } catch (e) {}
+    }
+    function clearSavedQueue() {
+      try { localStorage.removeItem(QUEUE_KEY); } catch (e) {}
+    }
+    function loadPersistedQueue() {
+      try {
+        const raw = localStorage.getItem(QUEUE_KEY);
+        if (!raw) return null;
+        const q = JSON.parse(raw);
+        if (!q || typeof q !== 'object' || !q.date) return null;
+        return q;
+      } catch (e) { return null; }
+    }
+    function hasQueueData(q) {
+      try {
+        return !!q && (
+          (q.totalTime || 0) > 0 ||
+          Object.keys(q.pages || {}).length > 0 ||
+          Object.keys(q.features || {}).length > 0 ||
+          Object.keys(q.contents || {}).length > 0 ||
+          (q.results || []).length > 0 ||
+          (q.sessions || 0) > 0
+        );
+      } catch (e) { return false; }
+    }
+
+    // ─────────────────────────────────────────────────────────────
     // SESSION
     // ─────────────────────────────────────────────────────────────
     function initSession() {
@@ -191,6 +225,7 @@
         if (!queue) resetQueue();
         const page = detectPage();
         queue.pages[page] = (queue.pages[page] || 0) + 1;
+        saveQueue();
       } catch (e) {}
     }
 
@@ -206,6 +241,7 @@
           queue.byDayOfWeek[dow] = (queue.byDayOfWeek[dow] || 0) + duration;
         }
         pageEntryTime = now();
+        saveQueue();
       } catch (e) {}
     }
 
@@ -214,13 +250,21 @@
         if (!queue) resetQueue();
         const page = detectPage();
 
+        // ⚡ v4.1 — carte COMPLÈTE des pages du site (l'ancienne oubliait
+        // accueil, mathmind, outils, whatsapp, sons, diagnostic, historiques,
+        // ARV-PILOT (page réelle = « arv »)… → leur usage n'apparaissait nulle part)
         const featureMap = {
+          '': 'accueil',
+          index: 'accueil',
           calculatrice: 'calculatrice',
           formulaires: 'formulaire',
           'tableau-periodique': 'tableau_periodique',
           exam: 'mode_examen',
+          'exam-history': 'exam_history',
           reviseur: 'reviseur',
-          'arv-pilot': 'arv_pilot',
+          'reviseur-history': 'reviseur_history',
+          arv: 'arv_pilot',
+          'arv-progress': 'arv_progress',
           groupe: 'groupe',
           planificateur: 'planificateur',
           abonnement: 'abonnement',
@@ -228,7 +272,14 @@
           notifications: 'notifications',
           lecture: 'lecture',
           chapitre: 'chapitre',
-          matiere: 'matiere'
+          matiere: 'matiere',
+          mathmind: 'mathmind',
+          outils: 'outils',
+          whatsapp: 'whatsapp',
+          sons: 'sons',
+          diagnostic: 'diagnostic',
+          onboarding: 'onboarding',
+          'auth-choice': 'auth_choice'
         };
 
         const feature = featureMap[page];
@@ -245,6 +296,12 @@
         if (info.subject) {
           const key = 'subject_' + cleanKey(info.subject);
           queue.contents[key] = (queue.contents[key] || 0) + 1;
+          // ⚡ v4.1 — chapitre PRÉCIS (pour savoir ce que l'élève a le plus aimé)
+          if (info.chapter) {
+            const ck = 'chapter_' + cleanKey(info.subject) + '_' + cleanKey(info.chapter);
+            queue.contents[ck] = (queue.contents[ck] || 0) + 1;
+          }
+          saveQueue();
         }
       } catch (e) {}
     }
@@ -279,6 +336,7 @@
         if (snapshot.results && snapshot.results.length) {
           queue.results = queue.results.concat(snapshot.results).slice(-50);
         }
+        saveQueue(); // ⚡ v4.1 — la queue en attente survit à une fermeture d'onglet
       } catch (e) {}
     }
 
@@ -371,12 +429,15 @@
         if (!sdkOk) {
           try {
             await restWrite(snapshot);
+            clearSavedQueue(); // ⚡ v4.1 — parti par REST → queue vide
           } catch (restErr) {
             console.warn('[Analytics] REST write KO → snapshot remis en file :', (restErr && restErr.message) || restErr);
             // ⚡ v4 : aucune des deux voies n'a marché → snapshot remis
             // dans la file, nouvelle tentative au prochain flush.
             mergeSnapshotBack(snapshot);
           }
+        } else {
+          clearSavedQueue(); // ⚡ v4.1 — parti par SDK → queue vide
         }
       } catch (e) {
         // silencieux
@@ -403,7 +464,7 @@
       // 1) lire l'état actuel (peut ne pas exister)
       let cur = { pages: {}, features: {}, byTimeOfDay: {}, byDayOfWeek: {}, contents: {}, totalTime: 0, sessions: 0, resultsCount: 0 };
       try {
-        const r = await fetch(docUrl, { headers: { 'Authorization': `Bearer ${idToken}` } });
+        const r = await fetch(docUrl, { headers: { 'Authorization': `Bearer ${idToken}` }, keepalive: true });
         if (r.ok) {
           const j = await r.json();
           const gv = (name) => {
@@ -456,7 +517,8 @@
       const resp = await fetch(url, {
         method: 'PATCH',
         headers: hdrs,
-        body: JSON.stringify({ fields })
+        body: JSON.stringify({ fields }),
+        keepalive: true // ⚡ v4.1 : survit à la fermeture de l'onglet
       });
       if (!resp.ok) {
         const t = await resp.text().catch(() => '');
@@ -541,6 +603,16 @@ async function startTracking(uid) {
   try {
     currentUid = uid;
     resetQueue();
+    // ⚡ v4.1 — restaurer une queue laissée par une session précédente
+    // (visite interrompue avant que l'écriture ne parte) → elle repartira
+    // vers SON propre doc daté au prochain flush (date == dateKey, règles OK).
+    try {
+      const saved = loadPersistedQueue();
+      if (saved && hasQueueData(saved)) {
+        queue = saved;
+        console.log('📊 [Analytics] queue restaurée (' + saved.date + ')');
+      }
+    } catch (e) {}
     initSession();
     trackPageView();
     trackAutoFeature();
@@ -689,7 +761,7 @@ async function startTracking(uid) {
       _uid: () => currentUid
     };
 
-    console.log('📊 ARVEXA Analytics v4 (universel, sans perte) — démarrage dans 3s');
+    console.log('📊 ARVEXA Analytics v4.1 (universel, sans perte, queue persistante) — démarrage dans 3s');
 
   } catch (globalError) {
     // ⚡ N'importe quelle erreur → silencieux total, la page n'est PAS affectée

@@ -977,6 +977,8 @@
     persistentSingleTabManager,
     doc,
     getDoc,
+    getDocFromServer,
+    setDoc,
     updateDoc,
     serverTimestamp
   } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
@@ -1053,9 +1055,7 @@
     'lecture.html',
     'chapitre.html',
     'groupe.html',
-    'reviseur.html',
     'exam-history.html',
-    'reviseur-history.html',
     'planificateur.html',
     'mathmind.html',
     'arv.html',
@@ -1272,6 +1272,74 @@
     window.location.replace(path);
   }
 
+  // ================================================================
+  // LECTURE RÉSILIENTE DU PROFIL (v9.0 — anti « Profil introuvable »)
+  // 1) getDoc (cache puis serveur), 2) en cas d'échec réseau : 2 retries
+  // espacés, 3) si le doc semble ABSENT : relecture FORCÉE sur le serveur
+  // (getDocFromServer) pour neutraliser tout cache local périmé.
+  // ================================================================
+  const MAX_PROFILE_READS = 3;
+
+  async function readProfile(user) {
+    const userRef = doc(db, 'users', user.uid);
+    let lastErr = null;
+    for (let attempt = 1; attempt <= MAX_PROFILE_READS; attempt++) {
+      try {
+        const snap = await getDoc(userRef);
+        if (snap.exists()) return snap;
+        // Absent d'après le SDK → on DEMANDE AU SERVEUR avant de conclure :
+        // un cache local périmé (tombstone) ou une réponse en vol ne doit
+        // jamais verrouiller un élève dehors.
+        try {
+          const serverSnap = await getDocFromServer(userRef);
+          return serverSnap;
+        } catch (e2) {
+          if (e2 && (e2.code === 'permission-denied' || e2.code === 'unauthenticated')) throw e2;
+          lastErr = e2;
+        }
+      } catch (e) {
+        lastErr = e;
+      }
+      if (attempt < MAX_PROFILE_READS) {
+        await new Promise((r) => setTimeout(r, attempt === 1 ? 800 : 2000));
+      }
+    }
+    const err = new Error(lastErr ? (lastErr.code || lastErr.message) : 'profil_illisible');
+    err.code = lastErr && lastErr.code ? lastErr.code : 'unavailable';
+    throw err;
+  }
+
+  // ================================================================
+  // AUTO-RÉPARATION DU PROFIL (v9.0)
+  // Le compte Auth existe, le document Firestore manque (inscription
+  // interrompue, écriture perdue, nettoyage accidentel…) : on recrée
+  // un profil « étudiant gratuit » conforme aux règles, au lieu de
+  // renvoyer l'élève vers l'inscription — où son email serait refusé
+  // (« déjà utilisé ») : cul-de-sac total. Ses données (progression,
+  // examResults…) restent intactes : même UID.
+  // ================================================================
+  async function createMissingProfile(user) {
+    const now = serverTimestamp();
+    await setDoc(doc(db, 'users', user.uid), {
+      uid: user.uid,
+      firstName: '',
+      lastName: '',
+      fullName: '',
+      email: user.email || '',
+      establishment: '',
+      classId: 'terminale_d',
+      exam: 'bac',
+      role: 'student',
+      onboardingCompleted: false,
+      premium: false,
+      isUnlocked: false,
+      hasDeposited: false,
+      accountStatus: 'active',
+      createdAt: now,
+      updatedAt: now
+    });
+  }
+
   async function attemptAccess(user) {
     if (!user) return;
     if (isResolving || isRedirecting) return;
@@ -1282,8 +1350,7 @@
 
     let userDoc;
     try {
-      const userRef = doc(db, 'users', user.uid);
-      userDoc = await getDoc(userRef);
+      userDoc = await readProfile(user);
     } catch (err) {
       console.warn('[Firestore] Lecture du profil échouée :', err.code || err.message);
       const code = err && err.code ? err.code : '';
@@ -1302,23 +1369,30 @@
       return;
     }
 
-    // Profil absent
+    // Profil absent → AUTO-RÉPARATION (v9.0) au lieu du rejet vers l'inscription
     if (!userDoc.exists()) {
-      try { await signOut(auth); } catch (e) { console.warn('[Auth] signOut :', e.code || e.message); }
-      clearSession();
-      showToast('Profil introuvable. Redirection vers l\'inscription…', 'error', 3000);
-      cancelProfileRedirect();
-      profileRedirectTimer = setTimeout(() => {
-        profileRedirectTimer = null;
-        redirectTo('register.html');
-      }, 1500);
-      isResolving = false;
-      loginBtn.disabled = false;
-      loginBtn.classList.remove('loading');
-      return;
+      try {
+        await createMissingProfile(user);
+        userDoc = await getDocFromServer(doc(db, 'users', user.uid)); // relecture de preuve
+        showToast('✅ Ton profil a été restauré, connexion en cours…', 'success', 2600);
+      } catch (repairErr) {
+        console.warn('[Firestore] Auto-réparation impossible :', repairErr.code || repairErr.message);
+        const code = repairErr && repairErr.code ? repairErr.code : '';
+        if (code === 'unavailable' || code === 'network-request-failed') {
+          showToast('Problème de connexion. Vérifie ta connexion internet et réessaie.', 'error', 6000);
+        } else {
+          showToast('Connexion vérifiée, mais création du profil impossible pour le moment. Réessaie dans quelques instants.', 'error', 6000);
+        }
+        // Pas de signOut, PAS de redirection inscription : l'élève garde son compte.
+        isResolving = false;
+        handledUid = null;
+        loginBtn.disabled = false;
+        loginBtn.classList.remove('loading');
+        return;
+      }
     }
 
-    const userData = userDoc.data();
+    const userData = userDoc.data() || {};
 
     if (userData.accountStatus === 'blocked') {
       try { await signOut(auth); } catch (e) { console.warn('[Auth] signOut :', e.code || e.message); }
@@ -1454,7 +1528,7 @@
     }
   }
 
-  console.log('🚀 ARVEXA School — Login (sécurisé, redirection unique)');
+  console.log('🚀 ARVEXA School — Login (sécurisé, redirection unique, profil auto-réparé)');
   </script>
 
 </body>

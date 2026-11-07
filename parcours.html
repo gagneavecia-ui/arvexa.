@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>ARVEXA — Ton parcours vers le BAC</title>
+  <meta name="description" content="Ton parcours guidé vers le BAC : une seule route, les 57 chapitres mélangés semaine par semaine.">
+  <script>(function(){try{if(localStorage.getItem('arvexa-theme')==='light')document.documentElement.setAttribute('data-theme','light')}catch(e){}})();</script>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.png" type="image/png">
+  <link rel="apple-touch-icon" href="icon.png">
+  <link rel="stylesheet" href="perf.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="arvexa-ui.css">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:var(--bg-dark,#0A0A0A);color:var(--text-light,#F5F0E8);min-height:100vh;-webkit-font-smoothing:antialiased}
+    .pc-shell{max-width:760px;margin:0 auto;padding:18px 16px 48px}
+    .pc-head{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+    .pc-back{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:12px;background:var(--bg-surface,#141414);border:1px solid rgba(255,255,255,.10);color:var(--text-light,#F5F0E8);text-decoration:none;flex-shrink:0}
+    .pc-head h1{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;overflow-wrap:anywhere}
+
+    .pc-hero{background:var(--bg-card,rgba(20,20,20,.7));border:1px solid rgba(255,255,255,.08);border-radius:var(--radius,16px);padding:26px 22px;margin-bottom:22px;position:relative;overflow:hidden}
+    .pc-hero::before{content:'';position:absolute;top:-60px;right:-60px;width:180px;height:180px;border-radius:50%;background:rgba(224,184,74,.08);filter:blur(30px)}
+    .pc-hero-badge{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--accent-bright,#E0B84A);background:rgba(224,184,74,.10);border:1px solid rgba(224,184,74,.25);padding:7px 14px;border-radius:999px;margin-bottom:14px}
+    .pc-hero-title{font-family:'Playfair Display',serif;font-size:30px;font-weight:700;line-height:1.2;margin-bottom:10px;overflow-wrap:anywhere}
+    .pc-hero-title em{color:var(--accent-bright,#E0B84A)}
+    .pc-hero-sub{font-size:14px;line-height:1.6;color:var(--text-dim,#8A8A7A);margin-bottom:18px}
+    .pc-hero-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    .pc-stat{background:var(--bg-surface,#141414);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:12px 8px;text-align:center}
+    .pc-stat strong{display:block;font-size:18px;color:var(--accent-bright,#E0B84A)}
+    .pc-stat span{font-size:11px;color:var(--text-dim,#8A8A7A)}
+
+    .pc-h2{font-size:17px;font-weight:700;margin:26px 0 14px;display:flex;align-items:center;gap:10px}
+    .pc-h2 i{color:var(--accent-bright,#E0B84A)}
+    .pc-card{background:var(--bg-card,rgba(20,20,20,.7));border:1px solid rgba(255,255,255,.08);border-radius:var(--radius,16px);padding:22px}
+    .pc-card .pc-title{margin-top:14px}
+
+    .pc-weekblock{background:var(--bg-card,rgba(20,20,20,.7));border:1px solid rgba(255,255,255,.08);border-radius:var(--radius,16px);padding:14px;margin-bottom:12px}
+    .pc-weekhead{display:flex;justify-content:space-between;align-items:center;padding:2px 4px 12px;font-size:13px;color:var(--text-dim,#8A8A7A)}
+    .pc-weekhead strong{color:var(--text-light,#F5F0E8);font-size:14px}
+    .pc-row{display:flex;align-items:center;gap:10px;padding:10px 6px;border-top:1px solid rgba(255,255,255,.05);flex-wrap:wrap}
+    .pc-dot{width:22px;height:22px;border-radius:50%;border:2px solid rgba(255,255,255,.18);display:inline-flex;align-items:center;justify-content:center;font-size:11px;color:#0A0A0A;flex-shrink:0}
+    .pc-dot.done{background:#7AE04A;border-color:#7AE04A}
+    .pc-dot.started{border-color:var(--accent-bright,#E0B84A);color:var(--accent-bright,#E0B84A)}
+    .pc-num{font-size:12px;font-weight:700;color:var(--text-muted,#5A5A4A);width:22px;flex-shrink:0}
+    .pc-ico{width:34px;height:34px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;color:#0A0A0A;font-size:14px;flex-shrink:0}
+    .pc-ico.lg{width:46px;height:46px;font-size:18px}
+    .pc-rowmain{flex:1;min-width:140px}
+    .pc-rowtitle{font-size:14px;font-weight:600;color:var(--text-light,#F5F0E8);overflow-wrap:anywhere}
+    .pc-rowsub{font-size:12px;color:var(--text-dim,#8A8A7A);margin-top:2px}
+    .pc-row.done .pc-rowtitle{color:var(--text-dim,#8A8A7A);text-decoration:line-through;text-decoration-color:rgba(122,224,74,.5)}
+    .pc-mini{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:8px 13px;border-radius:999px;background:var(--bg-surface,#141414);color:var(--text-light,#F5F0E8);border:1px solid rgba(255,255,255,.10);text-decoration:none;flex-shrink:0}
+    .pc-mini.pc-val{padding:8px 11px;color:var(--text-dim,#8A8A7A)}
+    .pc-mini.pc-val.on{background:#7AE04A;border-color:#7AE04A;color:#0A0A0A}
+    .pc-milestone{display:flex;align-items:center;gap:12px;background:rgba(224,184,74,.08);border:1px dashed rgba(224,184,74,.4);border-radius:var(--radius,16px);padding:14px 16px;margin-bottom:12px;text-decoration:none;color:var(--text-light,#F5F0E8)}
+    .pc-milestone i{color:var(--accent-bright,#E0B84A);font-size:16px}
+    .pc-milestone span{flex:1;font-size:13px;font-weight:600}
+    .pc-milestone strong{font-size:13px;color:var(--accent-bright,#E0B84A)}
+    .pc-milestone.bac{background:rgba(122,224,74,.07);border-color:rgba(122,224,74,.35)}
+    .pc-milestone.bac strong{color:#7AE04A}
+
+    .pc-note{font-size:13px;color:var(--text-dim,#8A8A7A);margin:-6px 0 12px}
+    .pc-subjgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    .pc-subjcard{background:var(--bg-card,rgba(20,20,20,.7));border:1px solid rgba(255,255,255,.08);border-radius:var(--radius,16px);padding:16px 10px;text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
+    .pc-subjcard strong{font-size:13px;color:var(--text-light,#F5F0E8);overflow-wrap:anywhere}
+    .pc-subjn{font-size:11px;color:var(--text-dim,#8A8A7A)}
+    .pc-footnote{font-size:11px;color:var(--text-muted,#5A5A4A);margin-top:26px;text-align:center}
+    .pc-skeleton{padding:60px 0;text-align:center;color:var(--text-dim,#8A8A7A);font-size:14px}
+
+    @media (max-width:560px){
+      .pc-hero-stats{grid-template-columns:repeat(2,1fr)}
+      .pc-subjgrid{grid-template-columns:repeat(2,1fr)}
+      .pc-hero-title{font-size:23px}
+      .pc-row .pc-mini{margin-left:56px}
+      html[data-theme="light"] .pc-dot{border-color:rgba(0,0,0,.25)}
+      html[data-theme="light"] .pc-row{border-top-color:rgba(0,0,0,.06)}
+    }
+    html[data-theme="light"] body{background:var(--bg-dark,#F7F4EC);color:var(--text-light,#1A1A12)}
+    html[data-theme="light"] .pc-hero,html[data-theme="light"] .pc-card,html[data-theme="light"] .pc-weekblock{background:var(--bg-card,rgba(255,255,255,.85))}
+    html[data-theme="light"] .pc-hero-title,html[data-theme="light"] .pc-h2{color:var(--text-light,#1A1A12)}
+  </style>
+</head>
+<body>
+  <div class="pc-shell">
+    <div class="pc-head">
+      <a href="index.html" class="pc-back" aria-label="Retour à l'accueil"><i class="fas fa-arrow-left"></i></a>
+      <h1>Mon parcours</h1>
+    </div>
+    <div id="pcApp">
+      <div class="pc-skeleton"><i class="fas fa-route fa-pulse"></i>&nbsp; Chargement de ton parcours…</div>
+    </div>
+  </div>
+  <script src="bac-date.js"></script>
+  <script src="parcours.js" defer></script>
+</body>
+</html>

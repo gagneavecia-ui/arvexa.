@@ -20,7 +20,6 @@
   <script src="offline.js" defer></script>
 
   <link rel="stylesheet" href="arvexa-ui.css">
-  <link rel="stylesheet" href="leaflet/leaflet.css">
   <style>
        /* ============================================================
        ROOT — Design system ARVEXA (identique aux autres pages)
@@ -385,15 +384,45 @@
       background: var(--bg-card); color: var(--accent-bright); font-size: 16px; cursor: pointer;
       box-shadow: var(--shadow); display: flex; align-items: center; justify-content: center;
     }
+    /* v8.20 — sélecteur de fond de carte (Plan / Satellite / Hybride) */
+    .map-style-seg {
+      position: absolute; top: 10px; left: 10px; z-index: 500;
+      display: flex; gap: 2px; padding: 3px;
+      background: rgba(var(--rgb-veil), 0.94); border: 1px solid var(--card-border);
+      border-radius: 999px; box-shadow: var(--shadow);
+    }
+    .map-style-seg button {
+      display: inline-flex; align-items: center; gap: 5px;
+      border: none; background: transparent; color: var(--text-dim);
+      font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700;
+      padding: 6px 10px; border-radius: 999px; cursor: pointer; transition: var(--transition);
+    }
+    .map-style-seg button.active {
+      background: linear-gradient(135deg, var(--accent), var(--accent-bright));
+      color: #0A0A0A; box-shadow: 0 2px 8px rgba(184, 134, 11, 0.25);
+    }
+    /* v8.20 — bouton Vue 3D */
+    .map-card .dim3-btn {
+      position: absolute; top: 10px; right: 10px; z-index: 500;
+      width: 42px; height: 42px; border-radius: 12px; border: 1px solid var(--card-border-hover);
+      background: rgba(var(--rgb-veil), 0.94); color: var(--accent-bright); font-size: 16px; cursor: pointer;
+      box-shadow: var(--shadow); display: flex; align-items: center; justify-content: center;
+      transition: var(--transition);
+    }
+    .map-card .dim3-btn:hover { transform: translateY(-1px); }
+    .map-card .dim3-btn.active {
+      background: linear-gradient(135deg, var(--accent), var(--accent-bright));
+      color: #0A0A0A; box-shadow: 0 4px 14px rgba(184, 134, 11, 0.3);
+    }
     .map-card .center-me:hover { transform: translateY(-1px); color: var(--text-light); }
     .map-hint {
-      position: absolute; left: 10px; bottom: 30px; z-index: 500; pointer-events: none;
+      position: absolute; left: 10px; bottom: 14px; z-index: 500; pointer-events: none;
       background: rgba(var(--rgb-veil), 0.92); border: 1px solid var(--card-border);
       border-radius: 10px; padding: 7px 11px; font-size: 11px; color: var(--text-dim);
-      max-width: 250px;
+      max-width: 230px;
     }
     .map-net {
-      position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 500;
+      position: absolute; top: 62px; left: 50%; transform: translateX(-50%); z-index: 500;
       display: none; align-items: center; gap: 7px;
       background: rgba(212, 160, 23, 0.14); border: 1px solid rgba(212, 160, 23, 0.35);
       color: var(--warning); border-radius: 999px; padding: 6px 12px; font-size: 11px; font-weight: 600;
@@ -423,14 +452,14 @@
       padding: 1px 7px; border-radius: 999px; white-space: nowrap; max-width: 110px; overflow: hidden; text-overflow: ellipsis;
     }
     .mate-mark.stale { filter: grayscale(1); opacity: 0.6; }
-    /* Popup ARVEXA + contrôles Leaflet aux couleurs du site */
-    .arv-pop .leaflet-popup-content-wrapper {
+    /* Popup ARVEXA + contrôles MapLibre aux couleurs du site (v8.20) */
+    .arv-pop .maplibregl-popup-content {
       background: var(--bg-card); color: var(--text-light);
       border: 1px solid var(--card-border-hover); border-radius: 14px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35); padding: 12px 14px;
+      font-family: 'Inter', sans-serif;
     }
-    .arv-pop .leaflet-popup-tip { background: var(--bg-card); border: 1px solid var(--card-border-hover); }
-    .arv-pop .leaflet-popup-content { margin: 12px 14px; font-family: 'Inter', sans-serif; }
+    .arv-pop .maplibregl-popup-tip { border-top-color: var(--bg-card); border-bottom-color: var(--bg-card); }
     .arv-pop .pop-head { display: flex; align-items: center; gap: 9px; margin-bottom: 6px; }
     .arv-pop .pop-ava {
       width: 34px; height: 34px; border-radius: 50%; flex: 0 0 auto;
@@ -461,12 +490,20 @@
     }
     .go-mini:hover { transform: translateY(-1px); background: rgba(58, 182, 126, 0.16); }
     .person { cursor: pointer; }
-    .leaflet-container { font-family: 'Inter', sans-serif; }
-    .leaflet-bar a, .leaflet-control-attribution {
-      background: var(--bg-card) !important; color: var(--text-dim) !important;
-      border-color: var(--card-border) !important;
+    .maplibregl-map { font-family: 'Inter', sans-serif; }
+    /* Contrôles MapLibre aux couleurs du site */
+    .maplibregl-ctrl-group { background: var(--bg-card) !important; border: 1px solid var(--card-border) !important; border-radius: 10px !important; overflow: hidden; }
+    .maplibregl-ctrl-group button { background-color: transparent !important; }
+    .maplibregl-ctrl-group button .maplibregl-ctrl-icon { filter: saturate(0.4) sepia(0.6) hue-rotate(-15deg); }
+    [data-theme="dark"] .maplibregl-ctrl-group button .maplibregl-ctrl-icon { filter: invert(1) saturate(0.4); }
+    .maplibregl-ctrl-attrib {
+      background: rgba(var(--rgb-veil), 0.85) !important; font-size: 9.5px !important;
     }
-    .leaflet-control-attribution a { color: var(--accent-bright) !important; }
+    .maplibregl-ctrl-attrib a { color: var(--text-dim) !important; }
+    .maplibregl-ctrl-scale {
+      background: rgba(var(--rgb-veil), 0.85) !important; border-color: var(--card-border) !important;
+      color: var(--text-dim) !important; font-size: 10px !important; border-radius: 4px;
+    }
 
     /* ---------- RESPONSIVE (identique au site) ---------- */
     @media (min-width: 768px) {
@@ -655,6 +692,12 @@
           </div>
           <div class="loc-card map-card" id="mapCard" style="display:none;">
             <div id="arvMap"></div>
+            <div class="map-style-seg" id="mapStyleSeg" role="group" aria-label="Fond de carte">
+              <button type="button" data-base="plan" class="active"><i class="fas fa-map"></i> Plan</button>
+              <button type="button" data-base="sat"><i class="fas fa-satellite"></i> Satellite</button>
+              <button type="button" data-base="hyb"><i class="fas fa-layer-group"></i> Hybride</button>
+            </div>
+            <button class="dim3-btn" id="dim3Btn" title="Vue 3D" aria-label="Vue 3D"><i class="fas fa-cube"></i></button>
             <div class="map-net" id="mapNet"><i class="fas fa-wifi"></i><span>Le fond de carte a besoin d'Internet</span></div>
             <div class="map-hint">Touche un camarade pour voir sa position exacte et t'y rendre</div>
             <button class="center-me" id="centerMeBtn" title="Centrer sur moi" aria-label="Centrer sur moi"><i class="fas fa-crosshairs"></i></button>
@@ -682,7 +725,7 @@
 
   <div class="toast-container" id="toastContainer"></div>
 
-  <script src="leaflet/leaflet.js"></script>
+  <!-- v8.20 : MapLibre GL (carte 3D + satellite) chargé paresseusement par ensureMap() -->
   <script type="importmap">
 {
   "imports": {
@@ -705,8 +748,10 @@
 //  - Collection Firestore `positions/{uid}` : pseudo, ville,
 //    lat/lng EXACTES (6 décimales, v8.17 — carte + itinéraire GPS),
 //    précision, fraîcheur.
-//  - VRAIE CARTE INTERACTIVE (Leaflet, v8.17) : ma position exacte +
-//    celle des camarades, popup par camarade avec bouton ITINÉRAIRE
+//  - VRAIE CARTE INTERACTIVE 3D (MapLibre GL, v8.20) : fonds Plan / Satellite
+//    / Hybride, bâtiments en 3D, cercle de précision GPS, échelle — la caméra
+//    ne bouge JAMAIS toute seule : seuls les chiffres (distance, précision)
+//    se mettent à jour. Popup par camarade avec bouton ITINÉRAIRE
 //    qui ouvre Google Maps (navigation voiture) vers sa position —
 //    l'app ne trace pas de plan : on a la position, le GPS guide.
 //  - Liste et carte RÉCIPROQUES : on voit les autres seulement quand
@@ -752,13 +797,23 @@ let unsubPeople = null;
 let geoState = 'off';          // off | searching | live | denied | unavailable | blocked
 let isRedirecting = false;
 let heartbeatTimer = null;
-// v8.17 — carte réelle
+// v8.20 — carte réelle (MapLibre GL : Plan / Satellite / Hybride + vue 3D)
 let viewMode = 'map';
 let map = null;
 let myMarker = null;
-let mateMarkers = {};        // uid -> L.Marker
+let mateMarkers = {};        // uid -> Marker
 let lastList = [];           // dernière liste rendue (showOnMap)
 let fitDone = false;
+// v9.1 — cartes DOM stables : la carte d'un camarade est créée UNE fois,
+// puis seuls les compteurs (distance en mètres, fraîcheur) sont mis à jour.
+const cardEls = new Map();   // uid -> { el, distEl, metaEl, group, dist, name }
+const groupEls = {};         // clé -> { block, grid, count, titleEl }
+const GROUPS = [
+  { key: 'pas',      icon: '🚶', title: 'À quelques pas de toi' },
+  { key: 'quartier', icon: '🏘️', title: 'Dans ton quartier' },
+  { key: 'ville',    icon: '🌆', title: 'Dans ta ville' },
+  { key: 'ailleurs', icon: '🗺️', title: 'Ailleurs' }
+];
 
 // ---------------- Helpers DOM ----------------
 const $ = (id) => document.getElementById(id);
@@ -770,6 +825,7 @@ const teaserCard = $('teaserCard'), deniedCard = $('deniedCard'), emptyCard = $(
 const groupsWrap = $('groupsWrap'), rulesWarn = $('rulesWarn');
 const viewToggle = $('viewToggle'), viewMapBtn = $('viewMapBtn'), viewListBtn = $('viewListBtn');
 const mapCard = $('mapCard'), mapNet = $('mapNet'), centerMeBtn = $('centerMeBtn');
+const dim3Btn = $('dim3Btn'); // v8.20 vue 3D
 
 // ---------------- Utilitaires ----------------
 function distM(a, b) { // haversine en mètres
@@ -810,24 +866,177 @@ function showToast(message, type = 'info') {
   setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 3200);
 }
 
-// ---------------- Carte réelle (Leaflet) — v8.17 ----------------
+// ---------------- Carte réelle (MapLibre GL 3D/Satellite) — v8.20 ----------------
+// RÈGLE D'OR STABILITÉ : la caméra ne bouge JAMAIS toute seule.
+// Une mise à jour (fix GPS, mouvement d'un camarade, nouvelle distance)
+// ne touche QUE : le marqueur (setLngLat), le cercle de précision (setData)
+// et les textes (± précision, mètres). Le recentrage = actions explicites
+// seulement : bouton « Centrer sur moi », tap sur un camarade dans la liste,
+// ou le tout premier placement de la session.
 const GO_URL = (lat, lng) => 'https://www.google.com/maps/dir/?api=1&destination=' + lat + ',' + lng + '&travelmode=driving';
+const BASE_KEY = 'arvexa-geo-base';   // fond mémorisé : plan | sat | hyb (v8.20)
 
-function ensureMap() {
+let baseMode = 'plan';
+try { const b = localStorage.getItem(BASE_KEY); if (b === 'sat' || b === 'hyb') baseMode = b; } catch (e) {}
+let dim3 = false;            // vue 3D (inclinaison + bâtiments)
+let centeredOnce = false;    // placement automatique : une seule fois par session
+let mateEls = {};            // uid -> élément DOM du marqueur
+let mateKeys = {};           // uid -> signature du contenu (anti-rebuild)
+let tileErrCount = 0;
+let mapLibPromise = null;
+
+function loadMapLibre() { // chargement paresseux (~800 Ko) : seulement si la carte est affichée
+  if (window.maplibregl) return Promise.resolve();
+  if (!mapLibPromise) {
+    mapLibPromise = new Promise((resolve, reject) => {
+      const css = document.createElement('link');
+      css.rel = 'stylesheet'; css.href = 'maplibre/maplibre-gl.css';
+      document.head.appendChild(css);
+      const s = document.createElement('script');
+      s.src = 'maplibre/maplibre-gl.js';
+      s.onload = () => resolve();
+      s.onerror = () => { mapLibPromise = null; reject(new Error('maplibre indisponible')); };
+      document.head.appendChild(s);
+    });
+  }
+  return mapLibPromise;
+}
+
+function arvStyle(mode) { // style fait main : aucun re-setStyle au changement de fond
+  const vis = (m) => (mode === m ? 'visible' : 'none');
+  return {
+    version: 8,
+    sources: {
+      osm: {
+        type: 'raster',
+        tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+        tileSize: 256, maxzoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'
+      },
+      sat: {
+        type: 'raster',
+        tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],
+        tileSize: 256, maxzoom: 19,
+        attribution: 'Images &copy; <a href="https://www.esri.com" target="_blank" rel="noopener">Esri</a>, Maxar, Earthstar Geographics'
+      },
+      satlab: {
+        type: 'raster',
+        tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}'],
+        tileSize: 256, maxzoom: 19
+      },
+      ofm: { type: 'vector', url: 'https://tiles.openfreemap.org/planet' }, // bâtiments 3D
+      acc: { type: 'geojson', data: { type: 'FeatureCollection', features: [] } }
+    },
+    layers: [
+      { id: 'bg', type: 'background', paint: { 'background-color': '#d8e1ea' } },
+      { id: 'osm', type: 'raster', source: 'osm', layout: { visibility: vis('plan') } },
+      { id: 'sat', type: 'raster', source: 'sat', layout: { visibility: vis('sat') } },
+      { id: 'satlab', type: 'raster', source: 'satlab', layout: { visibility: vis('hyb') } },
+      { id: 'accfill', type: 'fill', source: 'acc', paint: { 'fill-color': 'rgba(58, 182, 126, 0.13)' } },
+      { id: 'accline', type: 'line', source: 'acc', paint: { 'line-color': 'rgba(58, 182, 126, 0.45)', 'line-width': 1.2, 'line-dasharray': [2, 2] } },
+      { id: 'bldg3d', type: 'fill-extrusion', source: 'ofm', 'source-layer': 'building', minzoom: 14,
+        layout: { visibility: 'none' },
+        paint: {
+          'fill-extrusion-color': '#d9c8a7',
+          'fill-extrusion-height': ['coalesce', ['get', 'render_height'], 5],
+          'fill-extrusion-base': ['coalesce', ['get', 'render_min_height'], 0],
+          'fill-extrusion-opacity': 0.72
+        } }
+    ]
+  };
+}
+
+async function ensureMap() {
   if (map) return true;
-  if (typeof L === 'undefined') { mapNet.style.display = 'flex'; return false; }
-  map = L.map('arvMap', { zoomControl: true });
-  const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'
-  }).addTo(map);
-  tiles.on('tileerror', () => { mapNet.style.display = 'flex'; });
-  tiles.on('tileload', () => { mapNet.style.display = 'none'; });
-  map.setView(myPos ? [myPos.lat, myPos.lng] : [13.5127, 2.1098], myPos ? 16 : 12);
-  centerMeBtn.addEventListener('click', () => {
-    if (myPos) map.flyTo([myPos.lat, myPos.lng], 16, { duration: 0.6 });
-  });
+  mapNet.style.display = 'flex'; // indicateur le temps du chargement
+  try { await loadMapLibre(); } catch (e) { return false; }
+  try {
+    map = new maplibregl.Map({
+      container: 'arvMap',
+      style: arvStyle(baseMode),
+      center: myPos ? [myPos.lng, myPos.lat] : [2.1098, 13.5127], // Niamey par défaut
+      zoom: myPos ? 16 : 12,
+      pitch: 0, bearing: 0,
+      attributionControl: { compact: true }
+    });
+    map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
+    map.addControl(new maplibregl.ScaleControl({ unit: 'metric' }), 'bottom-right');
+    map.on('error', () => { tileErrCount++; if (tileErrCount >= 4) mapNet.style.display = 'flex'; });
+    map.on('data', (e) => {
+      if (e && e.dataType === 'source' && e.isSourceLoaded) { tileErrCount = 0; mapNet.style.display = 'none'; }
+    });
+    centerMeBtn.addEventListener('click', () => {
+      if (myPos && map) map.flyTo({ center: [myPos.lng, myPos.lat], zoom: 16.5, duration: 800 });
+    });
+  } catch (e) {
+    console.warn('[Proximité] carte 3D indisponible :', e);
+    map = null;
+    const t = mapNet.querySelector('span');
+    if (t) t.textContent = 'Vue carte non supportée par ce navigateur — utilise la liste';
+    return false;
+  }
+  mapNet.style.display = 'none';
+  syncBaseButtons();
+  window.__arvMap = map; // handle de diagnostic (tests, console)
   return true;
+}
+
+// Fond de carte : bascule de VISIBILITÉ des couches — la caméra ne bouge pas
+function setBase(mode) {
+  if (!['plan', 'sat', 'hyb'].includes(mode)) mode = 'plan';
+  baseMode = mode;
+  try { localStorage.setItem(BASE_KEY, mode); } catch (e) {}
+  syncBaseButtons();
+  if (!map) return;
+  map.setLayoutProperty('osm', 'visibility', mode === 'plan' ? 'visible' : 'none');
+  map.setLayoutProperty('sat', 'visibility', mode === 'plan' ? 'none' : 'visible');
+  map.setLayoutProperty('satlab', 'visibility', mode === 'hyb' ? 'visible' : 'none');
+  map.setLayoutProperty('bldg3d', 'visibility', dim3 ? 'visible' : 'none');
+  map.setPaintProperty('bldg3d', 'fill-extrusion-opacity', mode === 'plan' ? 0.72 : 0.55);
+}
+function syncBaseButtons() {
+  document.querySelectorAll('#mapStyleSeg button').forEach((b) => {
+    b.classList.toggle('active', b.dataset.base === baseMode);
+  });
+}
+document.querySelectorAll('#mapStyleSeg button').forEach((b) => {
+  b.addEventListener('click', () => setBase(b.dataset.base));
+});
+// Vue 3D : inclinaison + bâtiments extrudés — uniquement sur appui du bouton
+dim3Btn.addEventListener('click', () => {
+  dim3 = !dim3;
+  dim3Btn.classList.toggle('active', dim3);
+  if (!map) return;
+  map.setLayoutProperty('bldg3d', 'visibility', dim3 ? 'visible' : 'none');
+  map.easeTo({ pitch: dim3 ? 60 : 0, bearing: dim3 ? -20 : 0, duration: 700 });
+});
+
+// Cercle de précision GPS (rayon ± accuracy) — mise à jour SANS toucher à la caméra
+function accCircleFeature(lat, lng, acc) {
+  const r = Math.min(600, Math.max(8, acc || 0));
+  const pts = [];
+  for (let a = 0; a < 360; a += 6) {
+    const rad = a * Math.PI / 180;
+    const dLat = r * Math.cos(rad) / 111320;
+    const dLng = r * Math.sin(rad) / ((111320 * Math.cos(lat * Math.PI / 180)) || 1);
+    pts.push([lng + dLng, lat + dLat]);
+  }
+  pts.push(pts[0]);
+  return { type: 'Feature', properties: {}, geometry: { type: 'Polygon', coordinates: [pts] } };
+}
+function updateAccCircle() {
+  if (!map) return;
+  const src = map.getSource('acc');
+  if (!src) return;
+  src.setData(myPos
+    ? { type: 'FeatureCollection', features: [accCircleFeature(myPos.lat, myPos.lng, myPos.accuracy)] }
+    : { type: 'FeatureCollection', features: [] });
+}
+
+function popNode(p) {
+  const wrap = document.createElement('div');
+  wrap.innerHTML = popHtml(p);
+  return wrap;
 }
 
 function popHtml(p) {
@@ -848,15 +1057,25 @@ function popHtml(p) {
 }
 
 function updateMyMarker() {
-  if (!map) return;
-  if (!myPos) { if (myMarker) { map.removeLayer(myMarker); myMarker = null; } return; }
+  if (!map || !myPos) {
+    if (map && myMarker) { myMarker.remove(); myMarker = null; updateAccCircle(); }
+    return;
+  }
   if (!myMarker) {
-    myMarker = L.marker([myPos.lat, myPos.lng], {
-      icon: L.divIcon({ className: '', html: '<div class="me-mark"><span class="halo"></span><span class="dot"></span></div>', iconSize: [18, 18], iconAnchor: [9, 9] }),
-      zIndexOffset: 1000, interactive: false, keyboard: false
-    }).addTo(map);
+    const el = document.createElement('div');
+    el.className = 'me-mark';
+    el.innerHTML = '<span class="halo"></span><span class="dot"></span>';
+    myMarker = new maplibregl.Marker({ element: el, anchor: 'center' })
+      .setLngLat([myPos.lng, myPos.lat]).addTo(map);
   } else {
-    myMarker.setLatLng([myPos.lat, myPos.lng]);
+    // Le point glisse vers sa nouvelle position — LA CAMÉRA, ELLE, NE BOUGE PAS
+    myMarker.setLngLat([myPos.lng, myPos.lat]);
+  }
+  updateAccCircle();
+  if (!centeredOnce) {
+    // SEUL placement automatique de la session : la toute première position
+    centeredOnce = true;
+    map.easeTo({ center: [myPos.lng, myPos.lat], zoom: Math.max(map.getZoom(), 16), duration: 650 });
   }
 }
 
@@ -866,28 +1085,43 @@ function updateMateMarkers(list) {
   list.forEach((p) => {
     seen[p.uid] = true;
     const stale = (Date.now() - p.ts) > FRESH_MS;
-    const html = '<div class="mate-mark' + (stale ? ' stale' : '') + '"><span class="ini">' + esc(initials(p.name)) + '</span><span class="nm">' + esc(p.name) + '</span></div>';
+    // signature anti-rebuild : on ne touche au DOM que si le contenu change
+    const key = p.lat.toFixed(6) + ',' + p.lng.toFixed(6) + '|' + (stale ? 's' : 'f') + '|' + p.name + '|' + (myPos ? Math.round(distM(myPos, p)) : 0);
     if (mateMarkers[p.uid]) {
-      mateMarkers[p.uid].setLatLng([p.lat, p.lng]);
-      mateMarkers[p.uid].setIcon(L.divIcon({ className: '', html, iconSize: [34, 34], iconAnchor: [17, 21] }));
-      mateMarkers[p.uid].setPopupContent(popHtml(p));
+      mateMarkers[p.uid].setLngLat([p.lng, p.lat]); // position à jour, caméra intacte
+      if (mateKeys[p.uid] !== key) {
+        mateKeys[p.uid] = key;
+        const el = mateEls[p.uid];
+        el.className = 'mate-mark' + (stale ? ' stale' : '');
+        el.innerHTML = '<span class="ini">' + esc(initials(p.name)) + '</span><span class="nm">' + esc(p.name) + '</span>';
+        const pop = mateMarkers[p.uid].getPopup();
+        if (pop) pop.setDOMContent(popNode(p));
+      }
     } else {
-      const m = L.marker([p.lat, p.lng], {
-        icon: L.divIcon({ className: '', html, iconSize: [34, 34], iconAnchor: [17, 21] }),
-        riseOnHover: true
-      }).addTo(map);
-      m.bindPopup(popHtml(p), { className: 'arv-pop', maxWidth: 260, offset: [0, -10] });
-      mateMarkers[p.uid] = m;
+      const el = document.createElement('div');
+      el.className = 'mate-mark' + (stale ? ' stale' : '');
+      el.innerHTML = '<span class="ini">' + esc(initials(p.name)) + '</span><span class="nm">' + esc(p.name) + '</span>';
+      const mk = new maplibregl.Marker({ element: el, anchor: 'top', offset: [0, -14] })
+        .setLngLat([p.lng, p.lat])
+        .setPopup(new maplibregl.Popup({ className: 'arv-pop', closeButton: false, maxWidth: '280px' }).setDOMContent(popNode(p)))
+        .addTo(map);
+      mateMarkers[p.uid] = mk; mateEls[p.uid] = el; mateKeys[p.uid] = key;
     }
   });
   Object.keys(mateMarkers).forEach((uid) => {
-    if (!seen[uid]) { map.removeLayer(mateMarkers[uid]); delete mateMarkers[uid]; }
+    if (!seen[uid]) {
+      mateMarkers[uid].remove();
+      delete mateMarkers[uid]; delete mateEls[uid]; delete mateKeys[uid];
+    }
   });
-  // Cadrage initial : moi + tous les camarades d'un seul regard
+  // Cadrage initial : moi + tous les camarades — UNE SEULE fois par session
   if (!fitDone && myPos && list.length) {
-    const b = L.latLngBounds([[myPos.lat, myPos.lng]], list.map((p) => [p.lat, p.lng]));
-    map.fitBounds(b.pad(0.3), { maxZoom: 16 });
     fitDone = true;
+    const b = list.reduce(
+      (bb, p) => bb.extend([p.lng, p.lat]),
+      new maplibregl.LngLatBounds([myPos.lng, myPos.lat], [myPos.lng, myPos.lat])
+    );
+    map.fitBounds(b, { padding: 70, maxZoom: 16, duration: 700 });
   }
 }
 
@@ -904,13 +1138,17 @@ function applyView() {
   viewToggle.style.display = show ? '' : 'none';
   mapCard.style.display = (show && viewMode === 'map') ? '' : 'none';
   groupsWrap.style.display = (show && viewMode === 'list') ? '' : 'none';
-  if (show && viewMode === 'map' && ensureMap()) {
-    requestAnimationFrame(() => {
-      map.invalidateSize();
-      if (myPos) map.panTo([myPos.lat, myPos.lng], { animate: false });
+  if (show && viewMode === 'map') {
+    ensureMap().then((ok) => {
+      if (!ok || !map) return;
+      // ✅ FIX v8.20 : resize après affichage — JAMAIS de panTo/invalidateSize
+      // ici. Avant, chaque fix GPS re-recentrait la carte (elle « bavait » à
+      // chaque mise à jour des mètres). Désormais la caméra est immobile :
+      // seuls les marqueurs et les chiffres changent.
+      requestAnimationFrame(() => map.resize());
+      updateMyMarker();
+      updateMateMarkers(lastList);
     });
-    updateMyMarker();
-    updateMateMarkers(lastList);
   }
 }
 
@@ -920,10 +1158,10 @@ function showOnMap(uid) {
   setView('map');
   setTimeout(() => {
     if (!map) return;
-    map.flyTo([p.lat, p.lng], 16, { duration: 0.6 });
-    const m = mateMarkers[uid];
-    if (m) setTimeout(() => m.openPopup(), 650);
-  }, 120);
+    map.flyTo({ center: [p.lng, p.lat], zoom: 16, duration: 700 }); // action explicite
+    const mk = mateMarkers[uid];
+    if (mk) setTimeout(() => { try { mk.togglePopup(); } catch (e) {} }, 750);
+  }, 150);
 }
 
 // ---------------- Géocodage inverse (ville) ----------------
@@ -1031,7 +1269,8 @@ function startSharing() {
     return;
   }
   shareOn = true;
-  fitDone = false; // recadrera la carte avec la nouvelle session
+  fitDone = false;      // recadrera la carte avec la nouvelle session
+  centeredOnce = false; // v8.20 : re-placement unique de la session
   localStorage.setItem(SHARE_KEY, '1');
   setGeoState('searching');
   kvGrid.style.display = '';
@@ -1054,6 +1293,8 @@ function stopSharing(silent = false) {
   }
   myPos = null; lastWrite = null;
   fitDone = false;
+  centeredOnce = false;
+  resetCards(); // v9.1 : les cartes DOM des camarades repartent de zéro
   if (map) { updateMyMarker(); updateMateMarkers([]); } // v8.17 : je disparais de la carte
   setGeoState('off');
   kvGrid.style.display = 'none';
@@ -1110,6 +1351,64 @@ function sameCity(a, b) {
   if (!a || !b) return false;
   return a.trim().toLocaleLowerCase('fr') === b.trim().toLocaleLowerCase('fr');
 }
+// v9.1 — CARTES DOM STABLES (signal propriétaire : « à chaque fois que la
+// distance se renouvelle c'est comme si des nouvelles cartes se produisent »).
+// Chaque camarade = UNE carte créée une seule fois, rangée dans son groupe ;
+// à chaque rafraîchissement, SEULS les compteurs changent (distance en
+// mètres/km, fraîcheur ⏱, compteurs de groupe). Aucun rebuild innerHTML,
+// aucune animation rejouée, aucun saut de liste : zéro clignotement.
+function resetCards() {
+  cardEls.forEach((entry) => { entry.el.remove(); });
+  cardEls.clear();
+  Object.keys(groupEls).forEach((k) => { delete groupEls[k]; });
+  groupsWrap.innerHTML = '';
+}
+
+function ensureGroup(key) {
+  if (groupEls[key]) return groupEls[key];
+  const g = GROUPS.find((x) => x.key === key);
+  const block = document.createElement('div');
+  block.className = 'group-block';
+  const title = document.createElement('div');
+  title.className = 'group-title';
+  const tspan = document.createElement('span');
+  tspan.textContent = g.icon + ' ' + g.title;
+  const count = document.createElement('span');
+  count.className = 'gcount';
+  count.textContent = '0';
+  title.appendChild(tspan);
+  title.appendChild(count);
+  const grid = document.createElement('div');
+  grid.className = 'people-grid';
+  block.appendChild(title);
+  block.appendChild(grid);
+  groupsWrap.appendChild(block);
+  groupEls[key] = { block, grid, count, titleEl: tspan };
+  return groupEls[key];
+}
+
+function buildCard(p) {
+  const el = document.createElement('div');
+  el.className = 'person';
+  el.dataset.uid = p.uid;
+  el.innerHTML =
+    '<div class="avatar">' + esc(initials(p.name)) + '</div>' +
+    '<div class="p-info">' +
+      '<div class="p-name">' + esc(p.name) + '</div>' +
+      '<div class="p-meta"></div>' +
+    '</div>' +
+    '<div class="p-dist"></div>' +
+    '<a class="go-mini" target="_blank" rel="noopener" href="' + GO_URL(p.lat, p.lng) + '"><i class="fas fa-diamond-turn-right"></i> Y aller</a>' +
+    '<a class="chat-btn" href="groupe.html"><i class="fas fa-comments"></i> Discuter</a>';
+  return el;
+}
+
+function groupKeyFor(p, myCity) {
+  if (p.d < 1000) return 'pas';
+  if (p.d < 5000) return 'quartier';
+  return sameCity(p.city, myCity) ? 'ville' : 'ailleurs';
+}
+
 function render() {
   const mine = myUid;
   const list = [];
@@ -1124,18 +1423,17 @@ function render() {
 
   // Affichage de la liste : uniquement si je partage moi-même (réciprocité)
   const showList = shareOn && geoState !== 'blocked';
-  applyView(); // v8.17 : visibilité du toggle Carte/Liste + de la carte
+  applyView(); // visibilité du toggle Carte/Liste + de la carte
   teaserCard.style.display = (!shareOn && geoState !== 'denied' && geoState !== 'unavailable') ? '' : 'none';
   if (!showList) {
     countsRow.style.display = 'none';
-    groupsWrap.innerHTML = '';
+    resetCards();
     if (!shareOn && geoState !== 'denied' && geoState !== 'unavailable') emptyCard.style.display = 'none';
     return;
   }
   if (!myPos) return; // pas encore de fix : la liste s'affichera au premier point GPS
 
   list.forEach((p) => { p.d = distM(myPos, p); });
-  list.sort((a, b) => a.d - b.d);
   lastList = list;
 
   const myCity = myCityName();
@@ -1152,31 +1450,62 @@ function render() {
   const hasAny = list.length > 0;
   emptyCard.style.display = hasAny ? 'none' : '';
 
-  const group = (title, icon, arr) => {
-    if (!arr.length) return '';
-    const cards = arr.map((p) => (
-      '<div class="person" data-uid="' + esc(p.uid) + '">' +
-        '<div class="avatar">' + esc(initials(p.name)) + '</div>' +
-        '<div class="p-info">' +
-          '<div class="p-name">' + esc(p.name) + '</div>' +
-          '<div class="p-meta">' + esc(p.city || 'Ville inconnue') + ' · ⏱ ' + esc(fmtAgo(p.ts)) + '</div>' +
-        '</div>' +
-        '<div class="p-dist">' + esc(fmtKm(p.d)) + '<span class="p-fresh">de toi</span></div>' +
-        '<a class="go-mini" target="_blank" rel="noopener" href="' + GO_URL(p.lat, p.lng) + '"><i class="fas fa-diamond-turn-right"></i> Y aller</a>' +
-        '<a class="chat-btn" href="groupe.html"><i class="fas fa-comments"></i> Discuter</a>' +
-      '</div>'
-    )).join('');
-    return '<div class="group-block"><div class="group-title">' + icon + ' ' + title +
-      ' <span class="gcount">' + arr.length + '</span></div><div class="people-grid">' + cards + '</div></div>';
-  };
+  const seen = new Set();
+  list.forEach((p) => {
+    seen.add(p.uid);
+    const gk = groupKeyFor(p, myCity);
+    let entry = cardEls.get(p.uid);
+    if (!entry) {
+      const el = buildCard(p);
+      entry = {
+        el,
+        distEl: el.querySelector('.p-dist'),
+        metaEl: el.querySelector('.p-meta'),
+        nameEl: el.querySelector('.p-name'),
+        avaEl: el.querySelector('.avatar'),
+        goEl: el.querySelector('.go-mini'),
+        group: gk,
+        dist: null,
+        name: p.name
+      };
+      cardEls.set(p.uid, entry);
+      ensureGroup(gk).grid.appendChild(el);
+    } else if (entry.group !== gk) {
+      // rare : le camarade change de tranche de distance → on déplace SON nœud
+      ensureGroup(gk).grid.appendChild(entry.el);
+      entry.group = gk;
+    }
+    // ⚡ MISE À JOUR DES SEULS COMPTEURS (jamais de recréation) :
+    const distTxt = esc(fmtKm(p.d)) + '<span class="p-fresh">de toi</span>';
+    if (entry.dist !== p.d) {
+      entry.distEl.innerHTML = distTxt;
+      entry.dist = p.d;
+    }
+    entry.metaEl.textContent = (p.city || 'Ville inconnue') + ' · ⏱ ' + fmtAgo(p.ts);
+    if (entry.name !== p.name) { // pseudo mis à jour côté camarade
+      entry.nameEl.textContent = p.name;
+      entry.avaEl.textContent = initials(p.name);
+      entry.goEl.href = GO_URL(p.lat, p.lng);
+      entry.name = p.name;
+    }
+  });
+  cardEls.forEach((entry, uid) => {
+    if (!seen.has(uid)) { entry.el.remove(); cardEls.delete(uid); }
+  });
 
-  groupsWrap.innerHTML =
-    group('À quelques pas de toi', '🚶', gPas) +
-    group('Dans ton quartier', '🏘️', gQuartier) +
-    group('Dans ta ville' + (myCity ? ' — ' + esc(myCity) : ''), '🌆', gVille) +
-    group('Ailleurs', '🗺️', gAilleurs);
+  // Compteurs de groupes + masquage des groupes vides
+  GROUPS.forEach((g) => {
+    const ge = groupEls[g.key];
+    if (!ge) return;
+    const n = list.filter((p) => groupKeyFor(p, myCity) === g.key).length;
+    ge.count.textContent = n;
+    ge.block.style.display = n ? '' : 'none';
+  });
+  if (groupEls.ville) {
+    groupEls.ville.titleEl.textContent = '🌆 Dans ta ville' + (myCity ? ' — ' + myCity : '');
+  }
 
-  // v8.17 : synchronise les marqueurs de la carte
+  // synchronise les marqueurs de la carte
   updateMyMarker();
   updateMateMarkers(list);
 }

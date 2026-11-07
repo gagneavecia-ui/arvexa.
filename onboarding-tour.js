@@ -142,7 +142,7 @@
         element: '.tools-grid a[href*="outils.html"]',
         popover: {
           title: '🧰 Tous tes outils',
-          description: 'ARV-Assistant, Réviseur, MathMind, Planificateur… Tout ton arsenal t\'attend dans la page Outils. ARV est ton tuteur IA, il te connaît déjà.',
+          description: 'ARV-Assistant, MathMind, Planificateur… Tout ton arsenal t\'attend dans la page Outils. ARV est ton tuteur IA, il te connaît déjà.',
           side: 'top', align: 'start'
         }
       },
@@ -376,9 +376,7 @@
         '<div class="arvexa-premium-benefits">' +
           '<div class="arvexa-premium-benefit"><i class="fas fa-book-open"></i><span>Tous les chapitres de toutes les matières</span></div>' +
           '<div class="arvexa-premium-benefit"><i class="fas fa-robot"></i><span>ARV-Assistant illimité (60 questions/jour)</span></div>' +
-          '<div class="arvexa-premium-benefit"><i class="fas fa-file-circle-check"></i><span>Examens IA illimités + historique complet</span></div>' +
-          '<div class="arvexa-premium-benefit"><i class="fas fa-chalkboard-user"></i><span>Réviseur et génération de fiches illimités</span></div>' +
-          '<div class="arvexa-premium-benefit"><i class="fas fa-calendar-week"></i><span>Planificateur IA personnalisé</span></div>' +
+          '<div class="arvexa-premium-benefit"><i class="fas fa-file-circle-check"></i><span>Examens IA illimités + historique complet</span></div>' +          '<div class="arvexa-premium-benefit"><i class="fas fa-calendar-week"></i><span>Planificateur IA personnalisé</span></div>' +
           '<div class="arvexa-premium-benefit"><i class="fas fa-cloud-arrow-down"></i><span>Contenu hors ligne complet</span></div>' +
         '</div>' +
         '<div class="arvexa-premium-actions">' +

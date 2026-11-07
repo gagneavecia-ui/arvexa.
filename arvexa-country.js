@@ -31,7 +31,7 @@
      pays : les matières scientifiques sont toutes les mêmes. »
 
    Fonctionnement :
-   1. POP-UP FORCÉ — exam.html / reviseur.html appellent
+   1. POP-UP FORCÉ — exam.html appelle
       ArvexaCountry.ready() puis maybeShowForcedModal() après l'auth :
       si le pays n'est pas encore confirmé, une modale BLOQUANTE (sans
       croix, sans Échap, sans clic extérieur) demande le pays (recherche

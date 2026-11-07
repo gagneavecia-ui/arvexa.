@@ -862,6 +862,23 @@
     }
     .table-wrap table { margin: 0; border: none; border-radius: 0; min-width: 100%; }
 
+    /* v8.20 — ANTI-DÉBORDEMENT des fiches : sur mobile, chaque tableau tient
+       DANS son cadre (colonnes fixes + renvoi à la ligne), rien ne sort
+       de l'écran, plus besoin de faire défiler pour lire. */
+    @media (max-width: 620px) {
+      .table-wrap { overflow-x: hidden; }
+      .table-wrap table { table-layout: fixed; width: 100%; }
+      .table-wrap th, .table-wrap td {
+        overflow-wrap: break-word; word-break: break-word; hyphens: auto;
+      }
+      #contentBody .table-wrap thead th { white-space: normal; letter-spacing: 0.5px; }
+      .table-wrap .katex { font-size: 0.92em; }
+    }
+    @media (max-width: 420px) {
+      .table-wrap th, .table-wrap td { font-size: 12px; padding: 8px 6px; }
+      .table-wrap .katex { font-size: 0.86em; }
+    }
+
     /* ============================================================
        FORMULES MATHÉMATIQUES — lisibles, sans débordement
        ============================================================ */
@@ -1935,6 +1952,98 @@
     ::-webkit-scrollbar-thumb {
       background: rgba(184, 134, 11, 0.22);
       border-radius: 10px;
+    }
+
+    /* ============================================================
+       ANTI-DÉBORDEMENT IMPRESSION — GÉNÉRATION DE FICHES PDF (v8.20)
+       Garantit qu'à l'impression / « Enregistrer en PDF » (fiches de
+       révision), TOUT le contenu reste DANS son cadre et DANS la page :
+       encres sombres sur papier blanc (quel que soit le thème), aucun
+       débordement horizontal, schémas et tableaux jamais coupés en deux,
+       chrome de l'application masqué. S'applique à tous les cours
+       (maths, physique, SVT, chimie) car lecture.html est l'unique
+       rendu des parties.
+       ============================================================ */
+    @media print {
+      /* 1) Encre sombre sur papier blanc, quel que soit le thème actif */
+      :root, html[data-theme="light"] {
+        --bg-dark: #FFFFFF; --bg-deep: #FFFFFF; --bg-surface: #FFFFFF;
+        --bg-card: #FFFFFF; --bg-elev: #FFFFFF;
+        --rgb-veil: 255, 255, 255; --rgb-card: 255, 255, 255; --rgb-soft: 0, 0, 0;
+        --text-light: #1C1B17; --text-body: #2A2924; --text-dim: #565549; --text-muted: #6E6C60;
+        --border-soft: rgba(0, 0, 0, 0.16); --border-gold: rgba(150, 101, 10, 0.38);
+        --card-border: rgba(150, 101, 10, 0.30);
+        --accent: #8A6208; --accent-bright: #8A6208;
+        --success: #1E6B47; --success-light: #1E6B47;
+        --danger: #B3402A; --danger-light: #B3261E;
+        --warning: #9A6B00; --warning-bright: #9A6B00;
+        --info: #1D6FA5;
+        --tint-gold: rgba(150, 101, 10, 0.07); --tint-red: rgba(179, 38, 30, 0.06); --tint-warn: rgba(154, 107, 0, 0.07);
+        --shadow-soft: none;
+      }
+      /* 2) Page : largeur libre, aucun contenu coupé par un débordement */
+      @page { size: A4; margin: 13mm 12mm; }
+      html, body {
+        width: auto !important; max-width: 100% !important;
+        overflow: visible !important;
+        background: #FFFFFF !important; color: #1C1B17 !important;
+        display: block !important; min-height: 0 !important;
+      }
+      /* 3) Masquer le chrome de l'application (boutons, barres, overlays) */
+      .header, .read-progress, .tts-progress, .gradient-bg, .nav-bar,
+      .toast, .notes-panel, .note-saved, .modal-overlay, .loading-state,
+      .hourglass-wrap, .arv-pdf-toolbar, .tts-btn, .notes-btn, .icon-btn,
+      .scroll-top, .fab, #arvexaInstallBanner, #arvexaInstallHow { display: none !important; }
+      .content-wrapper {
+        max-width: 100% !important; padding: 0 !important; margin: 0 !important;
+        width: auto !important;
+      }
+      #contentBody {
+        font-size: 12.5px; line-height: 1.6;
+        max-width: 100% !important; overflow: visible !important;
+      }
+      .lecture-container { max-width: 100% !important; }
+      /* 4) Figures / SVG : toujours ENTIERS, jamais coupés ni écrasés */
+      .lecture-figure {
+        max-width: 100% !important; width: auto !important;
+        break-inside: avoid; page-break-inside: avoid;
+      }
+      .lecture-figure svg {
+        width: 100% !important; height: auto;
+        max-width: 100% !important; max-height: 150mm;
+        background: #FFFFFF !important;
+        border-color: rgba(0, 0, 0, 0.22) !important;
+        box-sizing: border-box;
+      }
+      .lecture-figure-caption { break-inside: avoid; page-break-inside: avoid; }
+      /* 5) Tableaux : tenir dans la page (annule tout défilement horizontal) */
+      .lecture-table, .table-wrap { overflow: visible !important; max-width: 100%; }
+      .lecture-table table {
+        width: 100% !important; table-layout: fixed;
+        font-size: 10.5px !important; line-height: 1.45;
+        break-inside: auto; page-break-inside: auto;
+      }
+      .lecture-table th, .lecture-table td {
+        padding: 5px 6px !important;
+        overflow-wrap: break-word; word-wrap: break-word; hyphens: auto;
+      }
+      .lecture-table tr { break-inside: avoid; page-break-inside: avoid; }
+      /* 6) Blocs pédagogiques : jamais coupés en deux pages */
+      .lecture-hero, .lecture-toc, .lecture-callout, .lecture-example,
+      .lecture-exercise, .lecture-quiz-item, .lecture-recap, .lecture-end,
+      .lecture-formula-box, .lecture-formula-hero, .lecture-vocab-grid,
+      .lecture-aside, .lecture-rule, .lecture-formula {
+        break-inside: avoid; page-break-inside: avoid;
+      }
+      .lecture-steps { break-inside: auto; page-break-inside: auto; }
+      .lecture-step { break-inside: avoid; page-break-inside: avoid; }
+      h1, h2, h3, .lecture-section-title, .lecture-section-header {
+        break-after: avoid; page-break-after: avoid;
+      }
+      /* 7) Marges resserrées + liens propres */
+      a { color: inherit !important; text-decoration: none !important; }
+      .lecture-hero, .lecture-section { margin-bottom: 18px !important; }
+      .katex { font-size: 0.95em; }
     }
   </style>
 </head>

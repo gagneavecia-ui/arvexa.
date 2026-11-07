@@ -517,8 +517,7 @@
     "h estimées": "h estimated",
     "Il est": "It's",
 
-    /* ── Réviseur & planificateur ── */
-    "Réviseur": "Reviser",
+    /* ── Planificateur ── */
     "Générer mes premières notions": "Generate my first notions",
     "Génère d'abord des notions": "Generate notions first",
     "Aucune notion générée": "No notions generated",
@@ -870,9 +869,7 @@
     "Page introuvable | ARVEXA School": "Page not found | ARVEXA School",
     "ARVEXA | Planificateur Premium": "ARVEXA | Premium Planner",
     "ARVEXA — Groupe d'échange": "ARVEXA — Exchange group",
-    "ARVEXA — Historique Réviseur": "ARVEXA — Reviser History",
     "ARVEXA — Mon cahier": "ARVEXA — My notebook",
-    "ARVEXA — Réviseur": "ARVEXA — Reviser",
     "© 2026 ARVEXA School — Tous droits réservés": "© 2026 ARVEXA School — All rights reserved",
     "© 2026 ARVEXA School — Tous droits réservés •": "© 2026 ARVEXA School — All rights reserved •",
     "© 2026 ARVEXA School — Tous droits réservés.": "© 2026 ARVEXA School — All rights reserved.",
@@ -1189,7 +1186,7 @@
     "Suivant →": "Next →",
     "Le temps qu'il reste avant le BAC, jour après jour. Reviens chaque jour pour garder le cap !": "The time left before the BAC, day after day. Come back every day to stay on track!",
     "Ton carnet intelligent. Ajoute tes cours, l'IA les analyse et te dit exactement quoi réviser. Ton meilleur allié pour progresser.": "Your smart notebook. Add your lessons, the AI analyzes them and tells you exactly what to revise. Your best ally to progress.",
-    "ARV-Assistant, Réviseur, MathMind, Planificateur… Tout ton arsenal t'attend dans la page Outils. ARV est ton tuteur IA, il te connaît déjà.": "ARV-Assistant, Reviser, MathMind, Planner… Your whole arsenal is waiting in the Tools page. ARV is your AI tutor, it already knows you.",
+    "ARV-Assistant, MathMind, Planificateur… Tout ton arsenal t'attend dans la page Outils. ARV est ton tuteur IA, il te connaît déjà.": "ARV-Assistant, MathMind, Planner… Your whole arsenal is waiting in the Tools page. ARV is your AI tutor, it already knows you.",
     "Tu connais maintenant l'essentiel. Explore tes matières, lance ton premier examen et bonne réussite pour ton BAC !": "You now know the essentials. Explore your subjects, start your first exam and good luck with your BAC!",
     "Faisons un tour en 1 minute. Tu vas découvrir comment réviser efficacement et décrocher ton BAC.": "A 1-minute tour. You are about to discover how to revise efficiently and nail your BAC.",
     "👤 Ton profil": "👤 Your profile",
@@ -1198,7 +1195,6 @@
     "Maths, Physique, Chimie, SVT. Clique sur une matière pour accéder à ses chapitres, cours, exercices et corrections.": "Maths, Physics, Chemistry, Biology. Click a subject to access its chapters, lessons, exercises and corrections.",
     "Dans ton profil, clique « Télécharger tout hors ligne ». Tous tes cours restent accessibles au village ou en déplacement, même sans réseau.": "In your profile, tap “Download everything offline”. All your lessons stay available in the village or on the move, even without network.",
     "Planificateur IA personnalisé": "Personalized AI planner",
-    "Réviseur et génération de fiches illimités": "Unlimited Reviser and sheet generation",
     "Examens IA illimités + historique complet": "Unlimited AI exams + full history",
     "ARV-Assistant illimité (60 questions/jour)": "Unlimited ARV-Assistant (60 questions/day)",
 

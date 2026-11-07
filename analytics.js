@@ -261,8 +261,6 @@
           'tableau-periodique': 'tableau_periodique',
           exam: 'mode_examen',
           'exam-history': 'exam_history',
-          reviseur: 'reviseur',
-          'reviseur-history': 'reviseur_history',
           arv: 'arv_pilot',
           'arv-progress': 'arv_progress',
           groupe: 'groupe',

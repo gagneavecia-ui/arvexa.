@@ -426,7 +426,7 @@ RÈGLES CRITIQUES
 8. Prévois AU MOINS 1 jour de repos (le dimanche idéalement)
 9. Utilise un ton PROFESSIONNEL et BIENVEILLANT
 10. Si données insuffisantes (< 3 examens), propose des actions génériques utiles + recommande de passer plus d'examens
-11. Fournis les LIENS vers les ressources (reviseur, examen, fiche)
+11. Fournis les LIENS vers les ressources (examen, fiche)
 
 ═══════════════════════════════════════════════════════════════
 THÈMES DES JOURS (à assigner intelligemment)
@@ -470,7 +470,6 @@ FORMAT DE RÉPONSE (JSON UNIQUEMENT)
       "reason": "Moyenne faible ET en baisse. 2 exercices critiques identifiés.",
       "concreteGoal": "Réussir 5 dérivées composées d'affilée sans erreur",
       "linkedResources": [
-        { "type": "reviseur", "label": "Fiche dérivées", "url": "reviseur.html" },
         { "type": "exam", "label": "Mini-examen dérivées", "url": "exam.html" }
       ]
     }
@@ -698,7 +697,6 @@ function buildLocalPlan(aggregated) {
           ? `Réussir 5 exercices du type ${weakChapterLabel}`
           : `Améliorer la moyenne de ${s.subject} à ${Math.min(20, Math.round(s.averageScore + 1))}/20`,
         linkedResources: [
-          { type: 'reviseur', label: `Fiche ${s.subject}`, url: 'reviseur.html' },
           { type: 'exam', label: `Mini-examen ${s.subject}`, url: 'exam.html' }
         ]
       };

@@ -277,7 +277,36 @@
     }
     .tool-card .name { font-size: clamp(11px, 1.1vw, 12px); font-weight: 600; }
 
-    
+    /* ============================================================
+       À DÉCOUVRIR (v8.26) — les fonctionnalités qu'on découvre trop tard
+       ============================================================ */
+    .discover-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .disc-card {
+      background: var(--bg-card); backdrop-filter: blur(10px);
+      border: 1px solid var(--card-border); border-radius: 16px;
+      padding: 14px 12px; text-decoration: none; color: var(--text-light);
+      display: flex; flex-direction: column; gap: 6px; min-height: 122px;
+      transition: var(--transition); text-align: left; cursor: pointer;
+      font-family: inherit; font-size: inherit;
+    }
+    .disc-card:hover {
+      border-color: rgba(224, 184, 74, 0.25); transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+    }
+    .disc-card:active { transform: scale(0.97); }
+    .disc-emoji {
+      width: 38px; height: 38px; border-radius: 11px; font-size: 19px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(184, 134, 11, 0.10); border: 1px solid rgba(184, 134, 11, 0.14);
+      flex-shrink: 0; line-height: 1;
+    }
+    .disc-card .disc-name { font-size: 13px; font-weight: 700; color: var(--text-light); overflow-wrap: anywhere; }
+    .disc-card .disc-desc { font-size: 11.5px; color: var(--text-dim); line-height: 1.45; overflow-wrap: anywhere; }
+    .disc-card .disc-cta { margin-top: auto; font-size: 11px; font-weight: 800; color: var(--accent-bright); overflow-wrap: anywhere; }
+
     /* ============================================================
        AVIS / ABONNEMENT
        ============================================================ */
@@ -1162,6 +1191,12 @@
       .tool-card { padding: 12px 6px; min-height: 76px; }
       .tool-card .icon-badge { width: 30px; height: 30px; font-size: 13px; }
       .tool-card .name { font-size: 10px; }
+      .discover-grid { gap: 8px; }
+      .disc-card { min-height: 112px; padding: 12px 10px; }
+      .disc-emoji { width: 34px; height: 34px; font-size: 17px; }
+      .disc-card .disc-name { font-size: 12px; }
+      .disc-card .disc-desc { font-size: 11px; }
+      .disc-card .disc-cta { font-size: 10.5px; }
       .header .header-actions button { width: 32px; height: 32px; font-size: 13px; }
       .next-card .title { font-size: 16px; }
       .next-card .message { font-size: 13px; }
@@ -1180,6 +1215,12 @@
       .tool-card { padding: 10px 4px; min-height: 68px; border-radius: 10px; }
       .tool-card .icon-badge { width: 28px; height: 28px; font-size: 12px; }
       .tool-card .name { font-size: 9px; }
+      .discover-grid { grid-template-columns: 1fr 1fr; gap: 6px; }
+      .disc-card { min-height: 104px; padding: 11px 9px; border-radius: 12px; }
+      .disc-emoji { width: 30px; height: 30px; font-size: 15px; }
+      .disc-card .disc-name { font-size: 11px; }
+      .disc-card .disc-desc { font-size: 10px; line-height: 1.4; }
+      .disc-card .disc-cta { font-size: 10px; }
       .header .greeting { font-size: 11px; }
       .card { padding: 14px; }
       .section-title { margin: 18px 0 8px; }
@@ -1603,6 +1644,74 @@
         })();
         </script>
 
+        <!-- ============================================================
+             BLOC 1 — À DÉCOUVRIR (v8.26) : rendre visibles les perles que les
+             inscrits découvrent trop tard (Ma journée, classement, essai
+             Premium, MathMind, partage série, relance 7 h).
+             ============================================================ -->
+        <div class="section-title"><h3>✨ À découvrir</h3></div>
+        <div class="discover-grid" id="discoverGrid">
+          <a href="ma-journee.html" class="disc-card">
+            <span class="disc-emoji">📅</span>
+            <span class="disc-name">Ma journée</span>
+            <span class="disc-desc">Checklist du jour, progression par matière et pronostic BAC honnête.</span>
+            <span class="disc-cta">Ouvrir →</span>
+          </a>
+          <a href="classement.html" class="disc-card">
+            <span class="disc-emoji">🏆</span>
+            <span class="disc-name">Classement hebdo</span>
+            <span class="disc-desc">La compétition de la semaine : lis des cours, gagne des points, vise le top 20.</span>
+            <span class="disc-cta">Voir le classement →</span>
+          </a>
+          <a href="ma-journee.html" class="disc-card">
+            <span class="disc-emoji">🎁</span>
+            <span class="disc-name">Essai Premium 24 h</span>
+            <span class="disc-desc">Atteins 7 jours de série 🔥 : Premium offert 24 h, tout est débloqué.</span>
+            <span class="disc-cta">Comment gagner →</span>
+          </a>
+          <a href="mathmind.html" class="disc-card">
+            <span class="disc-emoji">🎮</span>
+            <span class="disc-name">MathMind</span>
+            <span class="disc-desc">Le jeu de maths : objectif 33 étoiles, chapitre par chapitre.</span>
+            <span class="disc-cta">Jouer →</span>
+          </a>
+          <button type="button" class="disc-card" id="shareStreakCard" aria-label="Partager ma série">
+            <span class="disc-emoji">📲</span>
+            <span class="disc-name">Partager ma série</span>
+            <span class="disc-desc">Montre ta série 🔥 à tes amis sur WhatsApp et défie-les de faire mieux.</span>
+            <span class="disc-cta">Partager →</span>
+          </button>
+          <a href="notifications.html" class="disc-card">
+            <span class="disc-emoji">⏰</span>
+            <span class="disc-name">Relance 7 h</span>
+            <span class="disc-desc">Active les notifications : ta question du jour t'attend chaque matin.</span>
+            <span class="disc-cta">Activer →</span>
+          </a>
+        </div>
+        <script>
+        /* PARTAGE DE LA SÉRIE (v8.26) — même format que quotidien.html et
+           profil.html (v8.25) : navigator.share natif, repli api.whatsapp.com
+           (le redirecteur wa.me corrompt les emoji 4 octets). */
+        (function () {
+          var btn = document.getElementById('shareStreakCard');
+          if (!btn) return;
+          btn.addEventListener('click', function () {
+            var n = 0;
+            try {
+              if (window.ARVEXA_STREAK) n = (window.ARVEXA_STREAK.get() || {}).count || 0;
+            } catch (e) { n = 0; }
+            var txt = '🔥 ' + n + (n === 1 ? ' jour' : ' jours') + ' de série sur ARVEXA School — je prépare le BAC, rejoins-moi : https://arvexaschool.vercel.app';
+            try {
+              if (navigator.share) {
+                navigator.share({ title: 'ARVEXA School', text: txt }).catch(function () { });
+              } else {
+                window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent(txt), '_blank', 'noopener');
+              }
+            } catch (e) { /* jamais casser la page */ }
+          });
+        })();
+        </script>
+
                 <!-- ============================================================
              BLOC 3 — PARCOURS (Modèle A « Ton parcours vers le BAC »)
              ============================================================ -->
@@ -1650,22 +1759,6 @@
         <div class="badges-scroll" id="badgesScroll" aria-label="Badges débloqués"></div>
 
         <!-- ============================================================
-             BLOC 6 — AVIS
-             ============================================================ -->
-        <div class="section-title"><h3>⭐ Ton avis compte</h3></div>
-        <div class="next-card avis-card">
-          <div class="badge"><i class="fas fa-star"></i> Aide-nous à nous améliorer</div>
-          <div class="title">Partage ton expérience</div>
-          <div class="message">
-            Ton avis est <strong>précieux</strong> pour nous aider à améliorer ARVEXA School.
-            Ça ne prend que 30 secondes et ça nous aide énormément !
-          </div>
-          <button class="avis-btn-inline" id="avisBtnInline">
-            <i class="fas fa-star"></i> Donner mon avis
-          </button>
-        </div>
-
-        <!-- ============================================================
              BLOC 7 — ABONNEMENT
              ============================================================ -->
         <div class="subscription-reminder" id="subscriptionReminder" style="display:none;">
@@ -1678,6 +1771,23 @@
             </div>
             <a href="abonnement.html" class="sub-btn" id="subBtn">Voir les offres</a>
           </div>
+        </div>
+
+        <!-- ============================================================
+             BLOC 8 — AVIS (v8.26 : déplacé en fin de page — l'élève termine
+             son parcours par le feedback, après la monétisation)
+             ============================================================ -->
+        <div class="section-title"><h3>⭐ Ton avis compte</h3></div>
+        <div class="next-card avis-card">
+          <div class="badge"><i class="fas fa-star"></i> Aide-nous à nous améliorer</div>
+          <div class="title">Partage ton expérience</div>
+          <div class="message">
+            Ton avis est <strong>précieux</strong> pour nous aider à améliorer ARVEXA School.
+            Ça ne prend que 30 secondes et ça nous aide énormément !
+          </div>
+          <button class="avis-btn-inline" id="avisBtnInline">
+            <i class="fas fa-star"></i> Donner mon avis
+          </button>
         </div>
 
       </div>

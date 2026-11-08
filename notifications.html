@@ -463,7 +463,9 @@
       background: rgba(0, 0, 0, 0.85);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      z-index: 1000;
+      /* ✅ v8.27 : 9500 > bandeau d'installation (9400) — sans ça, le bandeau
+         PWA passait DEVANT la modale et interceptait les boutons Ouvrir/Fermer */
+      z-index: 9500;
       display: flex;
       align-items: flex-end;
       justify-content: center;
@@ -731,6 +733,7 @@
     <a href="index.html" class="logo">ARVEX<span>A School</span></a>
     <nav class="nav">
       <a href="index.html"><i class="fas fa-home"></i> Accueil</a>
+      <a href="ma-journee.html"><i class="fas fa-calendar-day"></i> Ma journée</a>
       <a href="profil.html"><i class="fas fa-user"></i> Mon profil</a>
       <a href="abonnement.html"><i class="fas fa-crown"></i> Mon abonnement</a>
       <a href="notifications.html" class="active"><i class="fas fa-bell"></i> Notifications</a>
@@ -1202,6 +1205,9 @@ async function openNotifDetail(id) {
     <div class="modal-body">${escapeHtml(body)}</div>
 
     <div class="modal-actions">
+      ${notif.link ? `<button class="modal-btn primary" id="openNotifLinkBtn">
+        <i class="fas fa-arrow-right"></i> Ouvrir
+      </button>` : ''}
       <button class="modal-btn secondary" id="closeModalBtn">
         <i class="fas fa-check"></i> Fermer
       </button>
@@ -1213,6 +1219,16 @@ async function openNotifDetail(id) {
 
   document.getElementById('modalCloseBtn').addEventListener('click', closeNotifDetail);
   document.getElementById('closeModalBtn').addEventListener('click', closeNotifDetail);
+  // ✅ v8.27 — la notification peut emmener ailleurs : la relance pointe
+  // vers la question du jour (quotidien.html). Sécurité : uniquement un
+  // chemin interne de l'app (page .html), jamais d'URL externe ou js:.
+  const openLinkBtn = document.getElementById('openNotifLinkBtn');
+  if (openLinkBtn && notif.link) {
+    openLinkBtn.addEventListener('click', () => {
+      const url = String(notif.link);
+      window.location.href = /^[a-zA-Z0-9_-]+\.html$/.test(url) ? url : 'index.html';
+    });
+  }
 
   setupModalSwipe(modalContent);
 }

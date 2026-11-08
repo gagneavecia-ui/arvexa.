@@ -38,24 +38,11 @@
     /* ── Ma journée + démo sans compte + relance (v8.24) ── */
     "Ma journée": "My day",
     "📅 Voir ma journée complète →": "📅 See my full day →",
-    /* ── Accueil « À découvrir » (v8.26) ── */
-    "✨ À découvrir": "✨ Discover",
-    "Checklist du jour, progression par matière et pronostic BAC honnête.": "Today's checklist, progress per subject and an honest BAC forecast.",
-    "Ouvrir →": "Open →",
-    "Classement hebdo": "Weekly leaderboard",
-    "La compétition de la semaine : lis des cours, gagne des points, vise le top 20.": "The week's competition: read lessons, earn points, aim for the top 20.",
-    "Voir le classement →": "See the leaderboard →",
-    "Essai Premium 24 h": "24 h Premium trial",
-    "Atteins 7 jours de série 🔥 : Premium offert 24 h, tout est débloqué.": "Reach a 7-day streak 🔥: 24 h of Premium for free, everything unlocked.",
-    "Comment gagner →": "How to earn it →",
-    "Le jeu de maths : objectif 33 étoiles, chapitre par chapitre.": "The maths game: aim for 33 stars, chapter by chapter.",
-    "Jouer →": "Play →",
-    "Partager ma série": "Share my streak",
-    "Montre ta série 🔥 à tes amis sur WhatsApp et défie-les de faire mieux.": "Show your 🔥 streak to your friends on WhatsApp and challenge them to beat it.",
-    "Partager →": "Share →",
-    "Relance 7 h": "7 am reminder",
-    "Active les notifications : ta question du jour t'attend chaque matin.": "Turn on notifications: your daily question waits for you every morning.",
-    "Activer →": "Turn on →",
+    /* ── Carte Notifications (outils.html, v8.27 — la section « À découvrir »
+          de l'accueil a été retirée : surcharge ; la découvrabilité passe par
+          le menu (Ma journée) et les outils) ── */
+    "Ouvrir mes notifications": "Open my notifications",
+    "Ton centre de notifications : la relance de 7 h, les annonces importantes. Active-les pour ne jamais rater ta question du jour.": "Your notification center: the 7 am reminder and important announcements. Turn them on so you never miss your daily question.",
     "Partager": "Share",
     // ── P2 v8.25 : classement hebdo + partage série + essai 24 h ──
     "📲 Partager ma série": "📲 Share my streak",

@@ -8,6 +8,7 @@
 <script>(function(){try{if(localStorage.getItem('arvexa-theme')==='light')document.documentElement.setAttribute('data-theme','light')}catch(e){}})();</script>
 <script src="theme.js"></script><script src="arvexa-i18n.js" defer></script>
 <script src="arvexa-sync.js" defer></script><!-- ✅ v8.0 sync Firebase des progressions (par compte) -->
+<script src="arvexa-flashcards.js" defer></script><!-- ✅ v8.21 flashcards par chapitre + section -->
   <meta name="description" content="ARVEXA School - Chapitre">
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon.png">
@@ -1086,6 +1087,7 @@
   const params = new URLSearchParams(window.location.search);
   const subjectKey = params.get('subject') || 'mathematiques';
   const chapIdx = parseInt(params.get('chapter')) || 0;
+  let chapterTitle = ''; // ✅ v8.21 — titre réel du chapitre (pour les flashcards)
   const tabParam = params.get('tab') || 'cours';
 
   // ================================================================
@@ -1358,6 +1360,7 @@ function loadManifest() {
     .then((data) => {
       // ⚡ Trouver le chapitre par son numéro
       const chapter = (data.chapters || []).find((c) => c.number === chapIdx);
+      chapterTitle = (chapter && chapter.title) ? chapter.title : ('Chapitre ' + (chapIdx + 1));
       if (!chapter) {
         currentParts = [];
         renderEmpty();
@@ -1448,11 +1451,41 @@ function loadManifest() {
               ${badge ? `<span class="pc-badge ${badgeClass}">${badge}</span>` : ''}
             </div>
             <div class="pc-sub">${label} ${i + 1} — ${subjectConfig.name}</div>
+            ${currentTab === 'cours' ? `<span class="afc-slot" data-part="${i}"></span>` : ''}
           </div>
           <div class="pc-arrow"><i class="fas fa-chevron-right"></i></div>
         </div>
       `;
     }).join('');
+
+    // ✅ v8.21 — FLASHCARDS : hydrater les emplacements (chaque section a son bouton)
+    if (currentTab === 'cours' && window.ArvexaFlashcards) {
+      container.querySelectorAll('.afc-slot').forEach((slot) => {
+        const pi = parseInt(slot.dataset.part, 10);
+        const part = currentParts[pi];
+        if (!part) return;
+        slot.replaceWith(window.ArvexaFlashcards.makeButton({
+          key: window.ArvexaFlashcards.deckKey(subjectKey, chapIdx, 'cours', pi),
+          subject: subjectKey,
+          subjectLabel: subjectConfig.name,
+          chapterTitle: chapterTitle,
+          sectionTitle: part.title,
+          contentLoader: () => loadPartContent(part),
+          labels: { add: '🃏 Générer des flashcards', review: '🃏 Revoir', busy: '🃏 Génération…' }
+        }));
+      });
+    }
+  }
+
+  // ✅ v8.21 — charge le contenu brut de la section (fragment HTML du cours)
+  // pour la génération de flashcards ; l'API nettoie les balises elle-même.
+  async function loadPartContent(part) {
+    const file = part.file || part.path || '';
+    if (!file) throw Object.assign(new Error('Contenu de la section introuvable.'), { code: 'NO_FILE' });
+    const r = await fetch(file);
+    if (!r.ok) throw Object.assign(new Error('Contenu de la section introuvable.'), { code: 'NO_FILE' });
+    const html = await r.text();
+    return html.slice(0, 14000);
   }
 
   function renderEmpty() {

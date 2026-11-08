@@ -723,10 +723,10 @@ function buildLocalPlan(aggregated) {
         subjectKey: 'general',
         durationMinutes: 30,
         task: 'Effectuer un premier examen pour créer tes priorités',
-        steps: ['Aller dans Mode Examen', 'Choisir une matière', 'Faire un sujet complet'],
+        steps: ['Aller dans Test moi', 'Choisir une matière', 'Faire un sujet complet'],
         objective: 'Obtenir une première analyse',
         successCriteria: 'Tu as terminé 1 examen',
-        linkedResources: [{ type: 'exam', label: 'Mode Examen', url: 'exam.html' }]
+        linkedResources: [{ type: 'exam', label: 'Test moi', url: 'exam.html' }]
       });
       continue;
     }

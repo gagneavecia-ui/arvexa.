@@ -20,41 +20,6 @@
   <script src="register-sw.js" defer></script>
   <script src="offline.js" defer></script>
 
-<!-- ✅ TUTORIEL ARVEXA — injection directe -->
-<script>
-(function() {
-  'use strict';
-
-  var path = window.location.pathname.toLowerCase();
-  var SKIP = ['login', 'register', 'forgot-password', 'auth-choice',
-              'onboarding.html', 'conditions', 'confidentialite',
-              'offline', '404', 'diagnostic'];
-  for (var i = 0; i < SKIP.length; i++) {
-    if (path.indexOf(SKIP[i]) !== -1) return;
-  }
-
-  try {
-    if (localStorage.getItem('arvexa_tour_completed_v1') === '1') return;
-  } catch (e) { return; }
-
-  if (!document.querySelector('link[data-arvexa-tour-css]')) {
-    var link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = 'tour-styles.css';
-    link.setAttribute('data-arvexa-tour-css', '1');
-    document.head.appendChild(link);
-  }
-
-  var script = document.createElement('script');
-  script.id = 'arvexaTourScript';
-  script.src = 'onboarding-tour.js';
-  script.defer = true;
-  script.onerror = function() {
-    console.warn('[Tour] Impossible de charger onboarding-tour.js');
-  };
-  document.head.appendChild(script);
-})();
-</script>
   <script src="register-fcm-sw.js" defer></script>
   <script src="bac-date.js"></script>
 
@@ -1463,7 +1428,7 @@
       <a href="profil.html"><i class="fas fa-user"></i> Mon profil</a>
       <a href="abonnement.html"><i class="fas fa-crown"></i> Mon abonnement</a>
       <a href="notifications.html"><i class="fas fa-bell"></i> Notifications</a>
-      <a href="arv-progress.html"><i class="fas fa-graduation-cap"></i> Arv-progress</a>
+      <a href="arv-progress.html"><i class="fas fa-graduation-cap"></i> Résumé</a>
       <a href="outils.html"><i class="fas fa-toolbox"></i> Outils</a>
       <a href="localisation.html"><i class="fas fa-location-dot"></i> À proximité</a>
       <div class="nav-divider"></div>
@@ -1582,11 +1547,11 @@
           </a>
           <a href="exam.html" class="tool-card">
             <div class="icon-badge"><i class="fas fa-stopwatch"></i></div>
-            <div class="name">Mode Examen</div>
+            <div class="name">Test moi</div>
           </a>
           <a href="arv-progress.html" class="tool-card">
             <div class="icon-badge"><i class="fas fa-graduation-cap"></i></div>
-            <div class="name">ARV Progress</div>
+            <div class="name">Résumé</div>
           </a>
           <a href="outils.html" class="tool-card tool-more">
             <div class="icon-badge"><i class="fas fa-toolbox"></i></div>

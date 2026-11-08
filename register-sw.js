@@ -269,44 +269,7 @@
     injectOffline();
     injectInstallBanner();
     injectAnalytics();
-    injectTour();
     injectPrefetch();
-  }
-
-  // ═══ INJECTION DU TUTORIEL ═══
-  function injectTour() {
-    if (document.getElementById('arvexaTourScript')) return;
-
-    const path = window.location.pathname.toLowerCase();
-    const SKIP = [
-      'login', 'register', 'forgot-password', 'auth-choice',
-      'onboarding.html', 'conditions', 'confidentialite',
-      'offline', '404', 'onboarding-tour',
-      // ✅ v4.30 — ne JAMAIS interrompre une lecture ou un examen :
-      // le tour reprendra au retour sur l'accueil / les listes
-      'lecture.html', 'exam.html', 'exam-history.html'
-    ];
-
-    if (SKIP.some((p) => path.includes(p))) return;
-
-    try {
-      if (localStorage.getItem('arvexa_tour_completed_v1') === '1') return;
-    } catch (e) { return; }
-
-    if (!document.querySelector('link[data-arvexa-tour-css]')) {
-      const link = document.createElement('link');
-      link.rel = 'stylesheet';
-      link.href = 'tour-styles.css';
-      link.setAttribute('data-arvexa-tour-css', '1');
-      document.head.appendChild(link);
-    }
-
-    const script = document.createElement('script');
-    script.id = 'arvexaTourScript';
-    script.src = 'onboarding-tour.js';
-    script.defer = true;
-    script.onerror = () => console.warn('[Tour] Impossible de charger onboarding-tour.js');
-    document.head.appendChild(script);
   }
 
   if (document.readyState === 'loading') {

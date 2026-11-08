@@ -97,7 +97,7 @@
 <h1>🔍 Diagnostic ARVEXA</h1>
 
 <div class="info-box">
-  Cette page teste si le tutoriel est correctement installé.
+  Cette page teste si l'application est correctement installée.
   Ouvre-la sur ton téléphone, puis fais une capture d'écran ou copie les résultats.
 </div>
 
@@ -106,7 +106,7 @@
 <div class="section">
   <h2>Actions</h2>
   <button class="btn" onclick="resetAndReload()">
-    🔄 Réinitialiser et relancer le tutoriel
+    🏠 Aller à l'accueil
   </button>
   <button class="btn secondary" onclick="location.reload()">
     ⏱️ Relancer le test
@@ -138,75 +138,40 @@
     `).join('');
   }
 
-  // ═══ Test 1 : localStorage ═══
-  try {
-    const tourDone = localStorage.getItem('arvexa_tour_completed_v1');
-    addItem(
-      '1. localStorage "arvexa_tour_completed_v1"',
-      tourDone === null ? 'absent (OK)' : tourDone,
-      tourDone === null
-    );
-  } catch (e) {
-    addItem('1. localStorage', 'ERREUR', false);
-  }
-
-  // ═══ Test 2 : Script injecté ═══
-  const scriptInjected = !!document.getElementById('arvexaTourScript');
-  addItem(
-    '2. Script onboarding-tour.js injecté',
-    scriptInjected ? 'OUI' : 'NON',
-    scriptInjected
-  );
-
-  // ═══ Test 3 : Driver.js chargé ═══
-  const driverLoaded = !!window.driver;
-  addItem(
-    '3. Driver.js chargé',
-    driverLoaded ? 'OUI' : 'NON',
-    driverLoaded
-  );
-
-  // ═══ Test 4 : CSS tour chargé ═══
-  const cssLoaded = !!document.querySelector('link[data-arvexa-tour-css]');
-  addItem(
-    '4. CSS tour-styles.css chargé',
-    cssLoaded ? 'OUI' : 'NON',
-    cssLoaded
-  );
-
-  // ═══ Test 5 : Éléments HTML présents ═══
+  // ═══ Test 1 : Éléments HTML présents ═══
+  // (le tutoriel de présentation a été supprimé — ses tests 1 à 4 ne servent plus)
   const profileBtn = !!document.querySelector('#profileBtn');
   addItem(
-    '5. Bouton #profileBtn existe',
+    '1. Bouton #profileBtn existe',
     profileBtn ? 'OUI' : 'NON',
     profileBtn
   );
 
   const notifBtn = !!document.querySelector('#notifBtn');
   addItem(
-    '6. Bouton #notifBtn existe',
+    '2. Bouton #notifBtn existe',
     notifBtn ? 'OUI' : 'NON',
     notifBtn
   );
 
   const subjectsGrid = !!document.querySelector('.subjects-grid');
   addItem(
-    '7. .subjects-grid existe',
+    '3. .subjects-grid existe',
     subjectsGrid ? 'OUI' : 'NON',
     subjectsGrid
   );
 
   const toolsGrid = !!document.querySelector('.tools-grid');
   addItem(
-    '8. .tools-grid existe',
+    '4. .tools-grid existe',
     toolsGrid ? 'OUI' : 'NON',
     toolsGrid
   );
 
   render();
 
-  // ═══ Test 9 : Réseau (async) ═══
-  const files = ['onboarding-tour.js', 'tour-styles.css', 'register-sw.js'];
+  // ═══ Test 5 : Réseau (async) ═══
+  const files = ['register-sw.js', 'offline.js', 'analytics.js'];
   const networkResults = [];
 
   Promise.all(files.map(async (file) => {
@@ -231,11 +196,8 @@
       networkResults.map(r => `${r.ok ? '✅' : '❌'} ${r.file} : ${r.status}`).join('\n');
   });
 
-  // ═══ Reset et relance ═══
+  // ═══ Retour à l'accueil ═══
   window.resetAndReload = function() {
-    try {
-      localStorage.removeItem('arvexa_tour_completed_v1');
-    } catch (e) {}
     location.href = 'index.html';
   };
 

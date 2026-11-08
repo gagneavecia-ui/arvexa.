@@ -7,7 +7,8 @@
 <script>(function(){try{if(localStorage.getItem('arvexa-theme')==='light')document.documentElement.setAttribute('data-theme','light')}catch(e){}})();</script>
 <script src="theme.js"></script><script src="wake-lock.js"></script><script src="arvexa-i18n.js" defer></script>
 <script src="arvexa-sync.js" defer></script><!-- ✅ v8.0 sync Firebase des progressions (par compte) -->
-<title>ARVEXA — Mon cahier</title>
+<script src="arvexa-flashcards.js" defer></script><!-- ✅ v8.21 flashcards par chapitre + section -->
+<title>ARVEXA — Résumé</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.png" type="image/png">
 <link rel="apple-touch-icon" href="icon.png">
@@ -2287,7 +2288,7 @@ select:focus-visible,
     <span class="header-divider" aria-hidden="true"></span>
     <h1 class="page-title" id="pageTitle">
       <span class="emoji">📓</span>
-      <span id="pageTitleText">Mon cahier</span>
+      <span id="pageTitleText">Résumé</span>
     </h1>
   </div>
   <div class="header-right">
@@ -2678,8 +2679,8 @@ function applyRoute(route) {
 
 function updateHeader() {
   const map = {
-    notebooks: { emoji: '📓', text: 'Mon cahier' },
-    notebook: { emoji: SUBJECTS[state.params.subject]?.emoji || '📘', text: SUBJECTS[state.params.subject]?.label || 'Cahier' },
+    notebooks: { emoji: '📓', text: 'Résumé' },
+    notebook: { emoji: SUBJECTS[state.params.subject]?.emoji || '📘', text: SUBJECTS[state.params.subject]?.label || 'Résumé' },
     chapter: { emoji: '📘', text: 'Chapitre' },
     section: { emoji: '📙', text: 'Section' },
     lesson: { emoji: '📗', text: 'Leçon' }
@@ -2909,6 +2910,100 @@ function renderTodaySessions() {
 // ══════════════════════════════════════════════════════════════
 // VUE 1 — DASHBOARD
 // ══════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════
+// ✅ v8.21 — HUB FLASHCARDS (« Résumé »)
+// Tous les paquets générés par chapitre + section, à revoir d'abord.
+// Révision : bouton → overlay du module (Je savais ✅ / À revoir 🔁, 1j/3j/7j).
+// ════════════════════════════════════════════
+function renderFlashcardsHub() {
+  const hub = document.getElementById('afcHub');
+  if (!hub || !window.ArvexaFlashcards) return;
+  const AF = window.ArvexaFlashcards;
+  const decks = AF.listDecks();
+  const countEl = document.getElementById('afcHubCount');
+  if (countEl) countEl.textContent = String(decks.length);
+
+  if (!decks.length) {
+    hub.innerHTML = `
+      <div class="block">
+        <div class="block-head"><i class="fas fa-circle-info"></i>Aucune flashcard pour l'instant</div>
+        <div class="block-body">Dans chaque section de cours et à la fin de chaque leçon complète, le bouton
+        « 🃏 Générer des flashcards » crée un paquet pour cette section exacte. Tes paquets seront ajoutés ici
+        pour te tester et réviser — même hors ligne.</div>
+      </div>`;
+    return;
+  }
+
+  const totalDue = AF.dueCount();
+  const top = decks.slice().sort((a, b) => b.due - a.due)[0];
+
+  const rows = decks.map((d) => `
+    <div class="list-item" data-afc-key="${escapeHtml(d.key)}" role="button" tabindex="0">
+      <div class="list-item-icon">🃏</div>
+      <div class="list-item-body">
+        <div class="list-item-title">${escapeHtml(d.chapterTitle || d.subjectLabel)} · ${escapeHtml(d.sectionTitle || '')}</div>
+        <div class="list-item-meta">
+          <span>${escapeHtml(d.subjectLabel)}</span>
+          <span class="dot"></span>
+          <span>${d.cardsCount} carte${d.cardsCount > 1 ? 's' : ''}${d.due > 0 ? ' · <strong style="color:var(--accent-bright,#E0B84A);">' + d.due + ' à revoir</strong>' : ' · à jour ✓'}</span>
+        </div>
+      </div>
+      <span class="afc-del" data-afc-del="${escapeHtml(d.key)}" role="button" aria-label="Supprimer ce paquet"><i class="fas fa-trash-can"></i></span>
+      <div class="list-item-arrow"><i class="fas fa-chevron-right"></i></div>
+    </div>
+  `).join('');
+
+  hub.innerHTML = `
+    ${totalDue > 0 ? `
+    <button class="afc-btn" id="afcHubReview" style="width:100%;justify-content:center;padding:13px 14px;font-size:14px;margin-bottom:12px;">
+      ⚡ Réviser maintenant — ${totalDue} carte${totalDue > 1 ? 's' : ''} à revoir
+    </button>` : ''}
+    <div class="list">${rows}</div>
+  `;
+
+  const reviewBtn = document.getElementById('afcHubReview');
+  if (reviewBtn && top && top.due > 0) {
+    reviewBtn.addEventListener('click', () => AF.review(top.key));
+  }
+
+  hub.querySelectorAll('[data-afc-key]').forEach((row) => {
+    const open = () => AF.review(row.dataset.afcKey);
+    row.addEventListener('click', open);
+    row.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
+  });
+
+  hub.querySelectorAll('[data-afc-del]').forEach((del) => {
+    del.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const key = del.dataset.afcDel;
+      const deck = AF.getDeck(key);
+      if (!deck) return;
+      const doDelete = () => { AF.deleteDeck(key); renderFlashcardsHub(); };
+      if (typeof window.arvexaConfirm === 'function') {
+        window.arvexaConfirm({
+          title: 'Supprimer ce paquet ?',
+          message: `Les <strong>${(deck.cards || []).length} flashcards</strong> de « ${escapeHtml(deck.sectionTitle || key)} » seront supprimées. Cette action est <strong>définitive</strong>.`,
+          icon: '🃏',
+          confirmText: 'Supprimer',
+          cancelText: 'Garder',
+          variant: 'danger',
+          onConfirm: doDelete
+        });
+      } else if (window.confirm('Supprimer ce paquet de flashcards ?')) {
+        doDelete();
+      }
+    });
+  });
+}
+
+// Re-rendu du hub quand les paquets changent (génération, révision, sync cloud)
+window.addEventListener('arvexa-flashcards-changed', () => {
+  if (document.getElementById('afcHub')) renderFlashcardsHub();
+});
+window.addEventListener('arvexa-flashcards-synced', () => {
+  if (document.getElementById('afcHub')) renderFlashcardsHub();
+});
+
 async function renderNotebooksView() {
   const el = $('view-notebooks');
   showLoadingState(el, 'Chargement...');
@@ -2983,11 +3078,17 @@ async function renderNotebooksView() {
         </div>
       </div>
 
+      <div class="section-title"><i class="fas fa-clone"></i> Mes flashcards <span class="count" id="afcHubCount"></span></div>
+      <div id="afcHub"></div>
+
       <div class="section-title"><i class="fas fa-book"></i> Mes matières <span class="count">${ALL_SUBJECT_KEYS.length}</span></div>
       <div class="subjects-grid">${subjectCards}</div>
 
       ${activityHtml}
     `;
+
+    // ✅ v8.21 — HUB FLASHCARDS : tous les paquets, à revoir d'abord
+    renderFlashcardsHub();
 
     el.querySelectorAll('[data-subject]').forEach((btn) => {
       btn.addEventListener('click', () => {
@@ -3263,7 +3364,7 @@ async function renderSectionView(params) {
         <button class="cta-exam" id="goToExamBtn" data-subject="${escapeHtml(subject)}" data-chapter="${escapeHtml(chapterTitle)}">
           <i class="fas fa-file-circle-check"></i>
           <div class="cta-exam-body">
-            <div class="cta-exam-title">Passer en mode examen</div>
+            <div class="cta-exam-title">Tester mes connaissances</div>
             <div class="cta-exam-sub">Teste-toi dans les conditions du BAC</div>
           </div>
           <i class="fas fa-chevron-right cta-exam-arrow"></i>
@@ -3272,8 +3373,8 @@ async function renderSectionView(params) {
       <div class="content-section">
         <div class="content-section-title"><i class="fas fa-graduation-cap"></i>Teste-toi sur cette partie</div>
         <div class="block">
-          <div class="block-head"><i class="fas fa-circle-info"></i>Pas d'examen en anglais</div>
-          <div class="block-body">Le mode examen n'est pas disponible pour l'anglais. Utilise la banque de questions de cette section pour te tester.</div>
+          <div class="block-head"><i class="fas fa-circle-info"></i>Pas de test en anglais</div>
+          <div class="block-body">Test moi n'est pas disponible pour l'anglais. Utilise la banque de questions de cette section pour te tester.</div>
         </div>
       </div>` : '')}
     `;
@@ -3336,7 +3437,7 @@ async function renderSectionView(params) {
       var chap = $('goToExamBtn').dataset.chapter;
       var examSubject = EXAM_SUBJECT_MAP[subj] || '';
       if (!examSubject) {
-        showToast('Cette matière n\'est pas encore disponible en mode examen.', 'info', 3000);
+        showToast('Cette matière n\'est pas encore disponible dans Test moi.', 'info', 3000);
         return;
       }
       var params = new URLSearchParams();
@@ -3814,7 +3915,7 @@ async function renderLessonView(params) {
         <button class="cta-exam" id="goToExamLessonBtn" data-subject="${escapeHtml(subject)}" data-chapter="${escapeHtml(chapterTitle)}">
           <i class="fas fa-file-circle-check"></i>
           <div class="cta-exam-body">
-            <div class="cta-exam-title">Passer en mode examen</div>
+            <div class="cta-exam-title">Tester mes connaissances</div>
             <div class="cta-exam-sub">Teste tout le chapitre dans les conditions du BAC</div>
           </div>
           <i class="fas fa-chevron-right cta-exam-arrow"></i>
@@ -3829,7 +3930,7 @@ async function renderLessonView(params) {
       var chap = $('goToExamLessonBtn').dataset.chapter;
       var examSubject = EXAM_SUBJECT_MAP[subj] || '';
       if (!examSubject) {
-        showToast('Cette matière n\'est pas encore disponible en mode examen.', 'info', 3000);
+        showToast('Cette matière n\'est pas encore disponible dans Test moi.', 'info', 3000);
         return;
       }
       var params = new URLSearchParams();

@@ -166,8 +166,8 @@
   function doneBannerHtml() {
     return '<div class="pc-top"><span class="pc-badge"><i class="fas fa-trophy"></i> Parcours terminé</span></div>'
       + '<div class="pc-title">Les 57 chapitres sont maîtrisés !</div>'
-      + '<div class="pc-meta"><span><i class="fas fa-stopwatch"></i> Il reste ' + (daysToBac() || '—') + ' jours avant le BAC : passe en mode examens.</span></div>'
-      + '<div class="pc-actions"><a class="pc-btn pc-btn-main" href="exam.html"><i class="fas fa-stopwatch"></i> Mode Examen</a>'
+      + '<div class="pc-meta"><span><i class="fas fa-stopwatch"></i> Il reste ' + (daysToBac() || '—') + ' jours avant le BAC : passe dans Test moi.</span></div>'
+      + '<div class="pc-actions"><a class="pc-btn pc-btn-main" href="exam.html"><i class="fas fa-stopwatch"></i> Test moi</a>'
       + '<a class="pc-btn pc-btn-ghost" href="parcours.html"><i class="fas fa-map"></i> Revoir mon parcours</a></div>';
   }
 

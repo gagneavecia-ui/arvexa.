@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0A0A0A">
+  <meta name="description" content="ARVEXA — Question du jour : 4 questions, 1 par matière, 90 secondes. Fais vivre ta série 🔥">
+<script>(function(){try{if(localStorage.getItem('arvexa-theme')==='light')document.documentElement.setAttribute('data-theme','light')}catch(e){}})();</script>
+<script src="theme.js"></script><script src="arvexa-i18n.js" defer></script>
+  <title>ARVEXA — Question du jour</title>
+  <link rel="icon" href="icon.png" type="image/png">
+  <link rel="apple-touch-icon" href="icon.png">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="perf.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="arvexa-ui.css">
+  <style>
+    :root {
+      --accent: #B8860B;
+      --accent-bright: #E0B84A;
+      --bg-dark: #0A0A0A;
+      --bg-surface: #141414;
+      --bg-deep: #060606;
+      --text-light: #F5F0E8;
+      --text-dim: #8A8A7A;
+      --text-muted: #5A5A4A;
+      --success: #2ECC71;
+      --warning: #F1C40F;
+      --danger: #E74C3C;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-light);
+      min-height: 100vh;
+      min-height: 100dvh;
+      -webkit-font-smoothing: antialiased;
+      position: relative;
+    }
+    .bg-layer {
+      position: fixed; inset: 0; z-index: -2;
+      background:
+        radial-gradient(ellipse 40% 30% at 30% 15%, rgba(184,134,11,.16) 0%, transparent 70%),
+        radial-gradient(ellipse 35% 25% at 78% 88%, rgba(184,134,11,.07) 0%, transparent 60%),
+        linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-deep) 100%);
+    }
+    .glow {
+      position: fixed; width: 300px; height: 300px; border-radius: 50%;
+      background: var(--accent); filter: blur(110px); opacity: .1;
+      pointer-events: none; z-index: -1; top: -120px; right: -80px;
+    }
+    .page { max-width: 560px; margin: 0 auto; padding: calc(var(--safe-top) + 16px) 16px calc(var(--safe-bottom) + 32px); }
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      padding: 6px 0 18px;
+    }
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.09);
+      color: var(--text-light); border-radius: 12px; padding: 9px 13px;
+      font-size: 13px; font-weight: 600; text-decoration: none; cursor: pointer;
+    }
+    .streak-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(224,184,74,.1); border: 1px solid rgba(224,184,74,.3);
+      color: var(--accent-bright); border-radius: 999px; padding: 8px 13px;
+      font-size: 13px; font-weight: 700; white-space: nowrap;
+    }
+    .hero { text-align: center; padding: 6px 0 20px; }
+    .hero-icon { font-size: 40px; line-height: 1; }
+    .hero h1 {
+      font-family: 'Playfair Display', Georgia, serif; font-size: 27px; font-weight: 700;
+      margin: 10px 0 6px; color: var(--text-light);
+    }
+    .hero h1 em { color: var(--accent-bright); font-style: italic; }
+    .hero p { color: var(--text-dim); font-size: 13.5px; }
+    .card {
+      background: linear-gradient(160deg, var(--bg-surface), var(--bg-dark));
+      border: 1px solid rgba(224,184,74,.18); border-radius: 18px;
+      padding: 20px 18px; margin-top: 4px;
+      box-shadow: 0 14px 40px rgba(0,0,0,.4);
+    }
+    .qd-dots { display: flex; gap: 7px; justify-content: center; margin-bottom: 16px; }
+    .qd-dot {
+      width: 26px; height: 5px; border-radius: 99px;
+      background: rgba(255,255,255,.12); transition: background .25s;
+    }
+    .qd-dot.on { background: var(--accent-bright); }
+    .qd-dot.ok { background: var(--success); }
+    .qd-dot.ko { background: var(--danger); }
+    .qd-matiere {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      margin-bottom: 12px; flex-wrap: wrap;
+    }
+    .qd-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(224,184,74,.12); border: 1px solid rgba(224,184,74,.3);
+      color: var(--accent-bright); font-size: 12px; font-weight: 700;
+      border-radius: 999px; padding: 5px 11px;
+    }
+    .qd-chap { color: var(--text-muted); font-size: 11.5px; overflow-wrap: anywhere; }
+    .qd-q {
+      font-size: 17px; font-weight: 700; line-height: 1.45;
+      margin: 4px 0 16px; overflow-wrap: anywhere;
+    }
+    .qd-opt {
+      display: flex; align-items: flex-start; gap: 10px; width: 100%; text-align: left;
+      background: rgba(255,255,255,.035); border: 1px solid rgba(255,255,255,.1);
+      color: var(--text-light); border-radius: 13px; padding: 12px 13px;
+      font-size: 14.5px; font-weight: 500; cursor: pointer; margin-bottom: 9px;
+      transition: border-color .18s, background .18s; overflow-wrap: anywhere;
+      font-family: inherit;
+    }
+    .qd-opt .lettre {
+      flex-shrink: 0; width: 24px; height: 24px; border-radius: 8px;
+      display: inline-flex; align-items: center; justify-content: center;
+      background: rgba(224,184,74,.14); color: var(--accent-bright);
+      font-size: 12px; font-weight: 800;
+    }
+    .qd-opt:hover { border-color: rgba(224,184,74,.45); }
+    .qd-opt.good { border-color: var(--success); background: rgba(46,204,113,.12); }
+    .qd-opt.good .lettre { background: rgba(46,204,113,.25); color: var(--success); }
+    .qd-opt.bad { border-color: var(--danger); background: rgba(231,76,60,.12); }
+    .qd-opt.bad .lettre { background: rgba(231,76,60,.25); color: var(--danger); }
+    .qd-opt:disabled { cursor: default; opacity: .92; }
+    .qd-feedback {
+      display: none; border-radius: 13px; padding: 13px 14px; margin-top: 4px;
+      font-size: 13.5px; line-height: 1.5; overflow-wrap: anywhere;
+    }
+    .qd-feedback.show { display: block; animation: qdIn .25s ease; }
+    .qd-feedback.good { background: rgba(46,204,113,.1); border: 1px solid rgba(46,204,113,.3); color: var(--text-light); }
+    .qd-feedback.bad { background: rgba(231,76,60,.1); border: 1px solid rgba(231,76,60,.3); color: var(--text-light); }
+    .qd-feedback strong { display: block; margin-bottom: 4px; }
+    .qd-feedback.good strong { color: var(--success); }
+    .qd-feedback.bad strong { color: var(--danger); }
+    .qd-actions { display: flex; justify-content: center; margin-top: 16px; }
+    .qd-btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      background: linear-gradient(135deg, var(--accent-bright), var(--accent));
+      color: #141414; border: none; border-radius: 999px; padding: 13px 30px;
+      font-size: 14.5px; font-weight: 800; cursor: pointer; font-family: inherit;
+      box-shadow: 0 8px 22px rgba(184,134,11,.3);
+    }
+    .qd-btn.ghost {
+      background: transparent; color: var(--accent-bright);
+      border: 1.5px solid rgba(224,184,74,.4); box-shadow: none;
+    }
+    .qd-score {
+      text-align: center; padding: 10px 0 4px;
+    }
+    .qd-score .big {
+      font-family: 'Playfair Display', Georgia, serif; font-size: 52px; font-weight: 700;
+      color: var(--accent-bright); line-height: 1;
+    }
+    .qd-score .sub { color: var(--text-dim); font-size: 13.5px; margin-top: 8px; line-height: 1.55; }
+    .qd-streak-line {
+      margin-top: 16px; text-align: center; font-size: 14px; font-weight: 700;
+      color: var(--accent-bright); overflow-wrap: anywhere;
+    }
+    .qd-streak-line .conge { color: var(--text-dim); font-weight: 500; font-size: 12px; }
+    .qd-msg {
+      text-align: center; margin: 4px 0 14px; font-size: 15px; font-weight: 600; color: var(--text-light);
+    }
+    .qd-center { text-align: center; color: var(--text-dim); font-size: 14px; padding: 26px 8px; line-height: 1.6; }
+    .qd-actions-col { display: flex; flex-direction: column; gap: 10px; align-items: center; margin-top: 18px; }
+    .hidden { display: none !important; }
+    @keyframes qdIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  </style>
+</head>
+<body>
+  <div class="bg-layer"></div>
+  <div class="glow"></div>
+
+  <div class="page">
+    <div class="topbar">
+      <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Accueil</a>
+      <span class="streak-chip" id="streakChip" aria-label="Série de jours consécutifs">🔥 0</span>
+    </div>
+
+    <div class="hero">
+      <div class="hero-icon">🎯</div>
+      <h1>Question du <em>jour</em></h1>
+      <p>4 questions — une par matière · 90 secondes · ta série 🔥 avance</p>
+    </div>
+
+    <div class="card">
+      <!-- CHARGEMENT -->
+      <div id="loadingView" class="qd-center">⏳ Chargement des questions…</div>
+
+      <!-- ERREUR -->
+      <div id="errorView" class="hidden">
+        <div class="qd-center">😕 Impossible de charger les questions.<br>Vérifie ta connexion puis réessaie.</div>
+        <div class="qd-actions"><button class="qd-btn ghost" id="retryBtn">Réessayer</button></div>
+      </div>
+
+      <!-- QUIZ -->
+      <div id="quizView" class="hidden">
+        <div class="qd-dots" id="qdDots"></div>
+        <div class="qd-matiere">
+          <span class="qd-badge" id="qdMatiere">📘</span>
+          <span class="qd-chap" id="qdChap"></span>
+        </div>
+        <div class="qd-q" id="qdQ"></div>
+        <div id="qdOpts"></div>
+        <div class="qd-feedback" id="qdFb"></div>
+        <div class="qd-actions"><button class="qd-btn hidden" id="nextBtn">Suivant</button></div>
+      </div>
+
+      <!-- RÉSULTAT / DÉJÀ FAIT -->
+      <div id="doneView" class="hidden">
+        <div class="qd-score">
+          <div class="big" id="doneScore">4/4</div>
+          <div class="sub" id="doneSub"></div>
+        </div>
+        <div class="qd-msg" id="doneMsg"></div>
+        <div class="qd-streak-line" id="doneStreak"></div>
+        <div class="qd-actions-col">
+          <a href="index.html" class="qd-btn">Revenir à l'accueil</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script src="arvexa-streak.js" defer></script>
+<script>
+(function () {
+  'use strict';
+  var KEY = 'arvexa-quotidien-v1';
+  var MATIERES = [
+    { id: 'mathematiques', label: 'Mathématiques', icon: '📐' },
+    { id: 'physique', label: 'Physique', icon: '⚡' },
+    { id: 'chimie', label: 'Chimie', icon: '⚗️' },
+    { id: 'svt', label: 'SVT', icon: '🧬' }
+  ];
+  var LETTRES = ['A', 'B', 'C', 'D'];
+  var bank = null;
+  var ordre = [];
+  var idx = 0;
+  var score = 0;
+  var verrouille = false;
+
+  function $(id) { return document.getElementById(id); }
+  function dayKey(d) {
+    var dt = d || new Date();
+    var m = String(dt.getMonth() + 1).padStart(2, '0');
+    var j = String(dt.getDate()).padStart(2, '0');
+    return dt.getFullYear() + '-' + m + '-' + j;
+  }
+  function etat() {
+    try {
+      var raw = localStorage.getItem(KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch (e) { return {}; }
+  }
+  function saveEtat(e) {
+    try { localStorage.setItem(KEY, JSON.stringify(e)); } catch (err) {}
+  }
+  function show(view) {
+    ['loadingView', 'errorView', 'quizView', 'doneView'].forEach(function (v) {
+      $(v).classList.toggle('hidden', v !== view);
+    });
+  }
+  function renderChip() {
+    var st = window.ARVEXA_STREAK ? window.ARVEXA_STREAK.get() : { count: 0, activeToday: false };
+    $('streakChip').textContent = '🔥 ' + (st.count || 0);
+  }
+  function renderDots() {
+    var html = '';
+    for (var i = 0; i < ordre.length; i++) {
+      var cls = 'qd-dot' + (i < idx ? ' ok' : (i === idx && verrouille ? ' on' : (i === idx ? ' on' : '')));
+      html += '<span class="' + cls + '"></span>';
+    }
+    $('qdDots').innerHTML = html;
+  }
+  function renderQuestion() {
+    verrouille = false;
+    var item = ordre[idx];
+    var mat = MATIERES.filter(function (m) { return m.id === item.matiere; })[0];
+    renderDots();
+    $('qdMatiere').textContent = mat.icon + ' ' + mat.label;
+    $('qdChap').textContent = item.data.c ? 'Chapitre : ' + item.data.c : '';
+    $('qdQ').textContent = item.data.q;
+    var box = $('qdOpts');
+    box.innerHTML = '';
+    item.data.o.forEach(function (opt, i) {
+      var b = document.createElement('button');
+      b.className = 'qd-opt';
+      b.type = 'button';
+      b.innerHTML = '<span class="lettre">' + LETTRES[i] + '</span><span></span>';
+      b.lastChild.textContent = opt;
+      b.addEventListener('click', function () { repondre(i, b); });
+      box.appendChild(b);
+    });
+    $('qdFb').className = 'qd-feedback';
+    $('qdFb').innerHTML = '';
+    $('nextBtn').classList.add('hidden');
+    $('nextBtn').textContent = (idx === ordre.length - 1) ? 'Voir mon résultat' : 'Suivant';
+  }
+  function repondre(choice, btn) {
+    if (verrouille) return;
+    verrouille = true;
+    var item = ordre[idx];
+    var juste = choice === item.data.a;
+    if (juste) score += 1;
+    var opts = $('qdOpts').children;
+    for (var i = 0; i < opts.length; i++) {
+      opts[i].disabled = true;
+      if (i === item.data.a) opts[i].classList.add('good');
+      if (i === choice && !juste) opts[i].classList.add('bad');
+    }
+    var dots = $('qdDots').children;
+    if (dots[idx]) dots[idx].className = 'qd-dot ' + (juste ? 'ok' : 'ko');
+    var fb = $('qdFb');
+    fb.className = 'qd-feedback show ' + (juste ? 'good' : 'bad');
+    fb.innerHTML = '';
+    var strong = document.createElement('strong');
+    strong.textContent = juste ? '✅ Exact !' : '❌ Raté — la bonne réponse était ' + LETTRES[item.data.a];
+    fb.appendChild(strong);
+    var p = document.createElement('span');
+    p.textContent = item.data.e || '';
+    fb.appendChild(p);
+    $('nextBtn').classList.remove('hidden');
+  }
+  function terminer() {
+    var e = etat();
+    e.lastDone = dayKey();
+    e.score = score;
+    saveEtat(e);
+    var st = window.ARVEXA_STREAK ? window.ARVEXA_STREAK.mark() : { count: 0, best: 0, freeze: 0, activeToday: true };
+    $('doneScore').textContent = score + '/' + ordre.length;
+    var msg;
+    if (score === ordre.length) msg = 'Parfait ! Tu maîtrises le programme du jour 🎯';
+    else if (score >= Math.ceil(ordre.length / 2)) msg = 'Bien joué ! Revois les détails et ta série grandira 🔥';
+    else msg = "C'est un début — le cours du jour t'attend, et demain tu feras mieux !";
+    $('doneMsg').textContent = msg;
+    var jours = st.count === 1 ? 'jour' : 'jours';
+    var ligne = '🔥 Série : ' + st.count + ' ' + jours + ' (record : ' + st.best + ')';
+    if (st.freeze > 0) ligne += ' · <span class="conge">🛡️ 1 congé disponible</span>';
+    $('doneStreak').innerHTML = ligne;
+    $('doneSub').textContent = 'Les mêmes questions reviennent en révision : chaque jour, un nouveau tour du programme.';
+    show('doneView');
+    renderChip();
+  }
+  function demarrerQuiz() {
+    idx = 0;
+    score = 0;
+    show('quizView');
+    renderQuestion();
+  }
+  function charger() {
+    show('loadingView');
+    fetch('./quotidien.json')
+      .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(function (data) {
+        bank = data;
+        var lancement = new Date(data.lancement + 'T00:00:00');
+        var today = new Date();
+        today.setHours(0, 0, 0, 0);
+        var jourNum = Math.floor((today - lancement) / 86400000);
+        if (!isFinite(jourNum) || jourNum < 0) jourNum = 0;
+        ordre = MATIERES.map(function (m) {
+          var liste = (data.matieres && data.matieres[m.id]) || [];
+          if (!liste.length) return null;
+          return { matiere: m.id, data: liste[jourNum % liste.length] };
+        }).filter(Boolean);
+        if (ordre.length === 0) throw new Error('banque vide');
+        var e = etat();
+        if (e.lastDone === dayKey()) {
+          $('doneScore').textContent = (typeof e.score === 'number' ? e.score : '—') + '/' + ordre.length;
+          $('doneMsg').textContent = "Tu as déjà fait la question du jour aujourd'hui. Reviens demain à 7h — ta série t'attend 🔥";
+          $('doneSub').textContent = 'Chaque jour apporte 4 nouvelles questions, une par matière.';
+          var st = window.ARVEXA_STREAK ? window.ARVEXA_STREAK.get() : { count: 0, best: 0, freeze: 0 };
+          $('doneStreak').textContent = '🔥 Série actuelle : ' + (st.count || 0) + (st.count === 1 ? ' jour' : ' jours');
+          show('doneView');
+        } else {
+          demarrerQuiz();
+        }
+      })
+      .catch(function () { show('errorView'); });
+  }
+  $('nextBtn').addEventListener('click', function () {
+    if (idx < ordre.length - 1) { idx += 1; renderQuestion(); }
+    else terminer();
+  });
+  $('retryBtn').addEventListener('click', charger);
+  document.addEventListener('arvexa-streak-change', renderChip);
+  window.addEventListener('DOMContentLoaded', function () {
+    renderChip();
+    charger();
+  });
+})();
+</script>
+<script src="analytics.js" defer></script>
+<script src="register-sw.js" defer></script>
+</body>
+</html>

@@ -1525,6 +1525,33 @@
           </div>
         </section>
 
+        <!-- ============================================================
+             BLOC 0.5 — QUESTION DU JOUR + SÉRIE 🔥 (v8.23 — P0 rétention)
+             ============================================================ -->
+        <a href="quotidien.html" id="qjCard" style="display:flex;align-items:center;gap:13px;margin:14px 0 0;padding:15px 16px;background:linear-gradient(135deg,rgba(184,134,11,.14),rgba(184,134,11,.04));border:1px solid rgba(224,184,74,.28);border-radius:16px;text-decoration:none;box-shadow:0 10px 30px rgba(0,0,0,.25)">
+          <span style="font-size:30px;line-height:1;flex-shrink:0">🎯</span>
+          <span style="flex:1;min-width:0">
+            <span style="display:block;font-size:16px;font-weight:800;color:var(--text-light,#F5F0E8);overflow-wrap:anywhere">Question du jour</span>
+            <span style="display:block;font-size:12.5px;color:var(--text-dim,#8A8A7A);margin-top:3px;overflow-wrap:anywhere" id="qjSub">4 questions · une par matière · 90 secondes</span>
+          </span>
+          <span id="qjStreak" aria-label="Série de jours consécutifs" style="flex-shrink:0;background:rgba(224,184,74,.12);border:1px solid rgba(224,184,74,.35);color:var(--accent-bright,#E0B84A);font-size:13px;font-weight:800;border-radius:999px;padding:7px 12px;white-space:nowrap">🔥 0</span>
+        </a>
+        <script>
+        (function () {
+          function majQJ() {
+            if (!window.ARVEXA_STREAK) return;
+            var st = window.ARVEXA_STREAK.get();
+            var chip = document.getElementById('qjStreak');
+            var sub = document.getElementById('qjSub');
+            if (chip) chip.textContent = '🔥 ' + (st.count || 0);
+            if (sub) sub.textContent = st.activeToday ? "✅ Fait pour aujourd'hui — reviens demain à 7h" : '4 questions · une par matière · 90 secondes';
+          }
+          window.addEventListener('DOMContentLoaded', majQJ);
+          document.addEventListener('arvexa-streak-change', majQJ);
+          window.addEventListener('pageshow', majQJ);
+        })();
+        </script>
+
                 <!-- ============================================================
              BLOC 3 — PARCOURS (Modèle A « Ton parcours vers le BAC »)
              ============================================================ -->
@@ -1550,6 +1577,10 @@
           <a href="tableau-periodique.html" class="tool-card">
             <div class="icon-badge"><i class="fas fa-table-cells"></i></div>
             <div class="name">Tableau périodique</div>
+          </a>
+          <a href="quotidien.html" class="tool-card">
+            <div class="icon-badge"><i class="fas fa-bullseye"></i></div>
+            <div class="name">Question du jour</div>
           </a>
           <a href="exam.html" class="tool-card">
             <div class="icon-badge"><i class="fas fa-stopwatch"></i></div>
@@ -3832,6 +3863,7 @@
 
   console.log('🚀 ARVEXA School — Accueil : compte à rebours BAC en ouverture');
   </script>
+<script src="arvexa-streak.js" defer></script>
 <script src="parcours.js" defer></script>
 <script src="arvexa-vivant.js"></script>
 </body>

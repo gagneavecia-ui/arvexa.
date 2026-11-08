@@ -1279,6 +1279,7 @@
               <div class="stat-label">📈 Niveau</div>
             </div>
           </div>
+          <div id="profilStreak" style="text-align:center;font-size:13.5px;font-weight:800;color:var(--accent-bright,#E0B84A);padding:0 20px 14px;overflow-wrap:anywhere">🔥 Série : 0 jour</div>
 
           <!-- BADGES -->
           <div class="badges-section">
@@ -2255,5 +2256,21 @@ if (downloadBtn) {
   })();
   console.log('🚀 ARVEXA — Profil (version nettoyée)');
   </script>
+<script src="arvexa-streak.js" defer></script>
+<script>
+(function () {
+  function majProfilStreak() {
+    if (!window.ARVEXA_STREAK) return;
+    var st = window.ARVEXA_STREAK.get();
+    var el = document.getElementById('profilStreak');
+    if (!el) return;
+    var txt = '🔥 Série : ' + (st.count || 0) + ((st.count === 1) ? ' jour' : ' jours');
+    if (st.freeze > 0) txt += ' · 🛡️ 1 congé';
+    el.textContent = txt;
+  }
+  window.addEventListener('DOMContentLoaded', majProfilStreak);
+  document.addEventListener('arvexa-streak-change', majProfilStreak);
+})();
+</script>
 </body>
 </html>

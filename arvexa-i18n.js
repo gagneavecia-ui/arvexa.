@@ -27,6 +27,14 @@
   var DICT_RAW = {
     /* ── Navigation & commun ── */
     "Accueil": "Home",
+    /* ── Question du jour & Série (v8.23) ── */
+    "Question du jour": "Daily question",
+    "4 questions · une par matière · 90 secondes": "4 questions · one per subject · 90 seconds",
+    "✅ Fait pour aujourd'hui — reviens demain à 7h": "✅ Done for today — come back tomorrow at 7am",
+    "Voir mon résultat": "See my result",
+    "Revenir à l'accueil": "Back to home",
+    "Chargement des questions…": "Loading questions…",
+    "Série de jours consécutifs": "Consecutive-day streak",
     "Retour": "Back",
     "Retour à l'accueil": "Back to home",
     "🏠 Retour à l'accueil": "🏠 Back to home",

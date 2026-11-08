@@ -319,11 +319,16 @@ select:-webkit-autofill {
   transform: scale(0.97);
 }
 
-/* ── ANTI-RETOUR-À-LA-LIGNE ──
-   Le texte d'un bouton reste TOUJOURS sur une seule ligne
-   (« Se déconnecter » ne doit jamais se couper en « Se » / « déconnecter »).
-   Spécificité zéro : une page peut surcharger si nécessaire. */
-:where(button, .btn, [class*="btn"], [class*="button"], [role="button"]) {
+/* ── BOUTONS SUR UNE SEULE LIGNE — UNIQUEMENT POP-UP DÉCONNEXION + PREMIUM ──
+   Consigne propriétaire : « c'est uniquement les pop-up de déconnexion et de
+   premium seulement qui doivent rester intact ne revienne jamais. Mais tout
+   le reste doit revenir à la ligne. »
+   → Partout ailleurs sur le site, un bouton au texte long REVIENT À LA LIGNE
+   au lieu de déborder (fini les débordements causés par le nowrap global
+   d'avant). Seuls les boutons/CTA de ces pop-ups gardent leur ligne unique. */
+.arvexa-confirm-overlay .arvexa-confirm-btn,
+.arvexa-popup-overlay .arvexa-popup-btn,
+#premiumModal .modal-btn {
   white-space: nowrap;
   max-width: 100%;
 }
@@ -409,6 +414,18 @@ dialog, dialog * {
 .katex-display {
   overflow-x: auto;
   overflow-y: hidden;
+  max-width: 100%;
+}
+
+/* ── LOGO ARVEXA : jamais coupé au milieu d'un mot ──
+   (« ARVE / X / A School » sur mobile = nom de marque brisé — inacceptable).
+   Le logo est un nom propre court, pas un texte à replier : il reste sur une
+   ligne et ne se laisse PAS comprimer par :where(*) { min-width: 0 }.
+   Placé APRÈS le bloc anti-débordement pour gagner le conflit de cascade.
+   Le texte voisin (lien d'entête, etc.) revient à la ligne, lui. */
+.logo {
+  white-space: nowrap;
+  min-width: max-content;
   max-width: 100%;
 }
 

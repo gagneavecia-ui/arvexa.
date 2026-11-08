@@ -8,7 +8,6 @@
 <script>(function(){try{if(localStorage.getItem('arvexa-theme')==='light')document.documentElement.setAttribute('data-theme','light')}catch(e){}})();</script>
 <script src="theme.js"></script><script src="arvexa-i18n.js" defer></script>
 <script src="arvexa-sync.js" defer></script><!-- ✅ v8.0 sync Firebase des progressions (par compte) -->
-<script src="arvexa-flashcards.js" defer></script><!-- ✅ v8.21 flashcards par chapitre + section -->
   <meta name="description" content="ARVEXA School - Lecture">
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon.png">
@@ -226,7 +225,7 @@
 
     .header-right {
       display: flex; align-items: center; gap: 7px;
-      flex-shrink: 0;
+      flex-shrink: 1; min-width: 0; /* ✅ v8.22 — rétrécissable : un libellé long revient à la ligne au lieu d'être coupé */
     }
 
     .tts-btn {
@@ -2090,8 +2089,6 @@
       </div>
     </div>
 
-    <div id="afcLessonSlot"></div><!-- ✅ v8.21 flashcards fin de leçon -->
-
     <div class="nav-bar" id="navBar">
       <div class="nav-progress" id="partDots" hidden></div>
       <div class="nav-row">
@@ -2387,43 +2384,6 @@ function markPartAsRead() {
     // ✅ v8.0 — SYNC FIREBASE : la section lue part dans le compte (arrayUnion)
     if (window.ArvexaProgress) window.ArvexaProgress.notifyChange('read', key);
   }
-}
-
-// ✅ v8.21 — FLASHCARDS : CTA en fin de leçon.
-// « dans chaque section et dans chaque leçon complet il y aura le bouton
-// pour générer des flashcards » — monté dès que la partie est affichée/marquée lue.
-const AFC_SUBJECT_LABELS = {
-  mathematiques: 'Mathématiques', physique: 'Physique', chimie: 'Chimie',
-  svt: 'SVT', philosophie: 'Philosophie', histoire: 'Histoire',
-  geographie: 'Géographie', anglais: 'Anglais'
-};
-let afcMountedKey = null;
-function mountFlashcardsCta() {
-  const slot = document.getElementById('afcLessonSlot');
-  if (!slot || !window.ArvexaFlashcards) return;
-  const key = window.ArvexaFlashcards.deckKey(subject, chapter, tab, currentIndex);
-  if (afcMountedKey === key && slot.childElementCount) return;
-  afcMountedKey = key;
-  slot.innerHTML = '';
-  const part = parts[currentIndex];
-  const btn = window.ArvexaFlashcards.makeButton({
-    key: key,
-    subject: subject,
-    subjectLabel: AFC_SUBJECT_LABELS[subject] || subject,
-    chapterTitle: 'Chapitre ' + (chapter + 1),
-    sectionTitle: (part && part.title) || ('Partie ' + (currentIndex + 1)),
-    variant: 'cta',
-    contentLoader: () => {
-      const el = document.getElementById('contentBody');
-      return Promise.resolve(((el && el.innerText) || '').slice(0, 14000));
-    },
-    labels: {
-      add: '🃏 Générer des flashcards de cette leçon',
-      review: '🃏 Revoir mes flashcards',
-      busy: '🃏 Génération…'
-    }
-  });
-  slot.appendChild(btn);
 }
 
 // Gamification accueil : compte les sections lues aujourd'hui
@@ -3094,7 +3054,6 @@ function renderPdfReader(pdfPath) {
   `;
 
   markPartAsRead();
-  mountFlashcardsCta();
 
   // préchauffage hors-ligne : le PDF consulté est mis en cache par le SW.
   // ✅ v5.3 — DIFFÉRÉ côté SW (6 s) : le téléchargement complet du PDF ne
@@ -3792,7 +3751,6 @@ function loadPartHtml(filePath) {
       const cleaned = preprocessContent(html);
       contentBody.innerHTML = cleaned;
       markPartAsRead();
-      mountFlashcardsCta();
       loadNotes();
       renderKaTeX();
       enhanceContent();

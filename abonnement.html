@@ -314,6 +314,23 @@
     .status-section .status-left .status-icon.pending { background: rgba(212,160,23,0.12); color: var(--warning); }
     .status-section .status-text .status-title { font-size: 14px; font-weight: 600; color: var(--text-light); }
     .status-section .status-text .status-sub { font-size: 12.5px; color: var(--text-dim); }
+    .status-badge.renew { background: rgba(184,92,58,0.12); color: var(--danger-light); border: 1px solid rgba(184,92,58,0.22); }
+
+    /* ✅ v8.22 — Bandeau de renouvellement : affiché quand l'abonnement est
+       encore actif mais entre dans sa dernière semaine (≤ 7 jours restants).
+       La page montre alors les TARIFS au lieu du bloc « abonnement actif ». */
+    .renew-notice {
+      display: flex; align-items: flex-start; gap: 12px;
+      background: rgba(184, 92, 58, 0.10);
+      border: 1px solid rgba(184, 92, 58, 0.25);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 18px;
+    }
+    .renew-notice-icon { font-size: 22px; line-height: 1.2; }
+    .renew-notice-body { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+    .renew-notice-body strong { font-size: 14px; color: var(--danger-light); }
+    .renew-notice-body span { font-size: 12.5px; color: var(--text-dim); line-height: 1.55; overflow-wrap: anywhere; }
     .status-section .status-right .status-badge {
       padding: 4px 14px; border-radius: 999px; font-size: 11px; font-weight: 600;
     }
@@ -1435,16 +1452,24 @@
         </div>
       </div>
 
+      <div class="renew-notice" id="renewNotice" style="display:none;">
+        <div class="renew-notice-icon">⏳</div>
+        <div class="renew-notice-body">
+          <strong id="renewNoticeTitle">Ton abonnement se termine bientôt</strong>
+          <span id="renewNoticeText"></span>
+        </div>
+      </div>
+
       <div class="status-section">
         <div class="status-left">
           <div class="status-icon free"><i class="fas fa-unlock"></i></div>
           <div class="status-text">
-            <div class="status-title">🔓 Compte gratuit</div>
-            <div class="status-sub">Tu as accès à une partie du contenu. Passe à Premium !</div>
+            <div class="status-title" id="freeStatusTitle">🔓 Compte gratuit</div>
+            <div class="status-sub" id="freeStatusSub">Tu as accès à une partie du contenu. Passe à Premium !</div>
           </div>
         </div>
         <div class="status-right">
-          <span class="status-badge free">Gratuit</span>
+          <span class="status-badge free" id="freeStatusBadge">Gratuit</span>
         </div>
       </div>
 
@@ -2117,11 +2142,51 @@ function routeToScreen(data) {
       renderPendingScreen(data);
       showScreen('pending');
       break;
-    case 'premium':
+    case 'premium': {
+      // ✅ v8.22 — RENOUVELLEMENT : à 7 jours ou moins de la fin de l'abonnement,
+      // la page doit REMONTRER LES TARIFS (formulaire + offres) au lieu du bloc
+      // « abonnement actif » — c'est le moment où l'élève reçoit le panneau
+      // d'expiration (7 jours avant) et appuie sur « Renouveler maintenant ».
+      const endDate = toDate(data && data.subscriptionEndDate);
+      const daysLeft = endDate ? Math.ceil((endDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)) : null;
+      if (daysLeft !== null && daysLeft <= 7) {
+        showScreen('free');
+        const notice = document.getElementById('renewNotice');
+        if (notice) {
+          notice.style.display = 'flex';
+          const nTitle = document.getElementById('renewNoticeTitle');
+          const nText = document.getElementById('renewNoticeText');
+          if (nTitle) {
+            nTitle.textContent = daysLeft > 0
+              ? `⚠️ Ton abonnement se termine dans ${daysLeft} jour${daysLeft > 1 ? 's' : ''}`
+              : '⚠️ Ton abonnement se termine aujourd\'hui';
+          }
+          if (nText) {
+            nText.textContent = `Ton accès Premium marche encore jusqu'au ${endDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}. Choisis ton offre ci-dessous pour le renouveler et ne rien perdre.`;
+          }
+        }
+        const freeStatusTitle = document.getElementById('freeStatusTitle');
+        const freeStatusSub = document.getElementById('freeStatusSub');
+        const freeStatusBadge = document.getElementById('freeStatusBadge');
+        if (freeStatusTitle) freeStatusTitle.textContent = '⏳ Abonnement presque terminé';
+        if (freeStatusSub) freeStatusSub.textContent = 'Ton accès Premium fonctionne encore. Renouvelle pour ne rien perdre.';
+        if (freeStatusBadge) {
+          freeStatusBadge.textContent = daysLeft > 0 ? `Premium · ${daysLeft} j` : 'Premium · fin aujourd\'hui';
+          freeStatusBadge.classList.remove('free');
+          freeStatusBadge.classList.add('renew');
+        }
+        if (data && fullNameInput) {
+          const fullName = data.fullName || ((data.firstName || '') + ' ' + (data.lastName || '')).trim();
+          if (fullName && !fullNameInput.value) fullNameInput.value = fullName;
+          if (data.phone && !whatsappInput.value) whatsappInput.value = data.phone;
+        }
+        break;
+      }
       try { localStorage.removeItem(RENEW_FLAG_KEY); } catch (e) {}
       renderPremiumScreen(data);
       showScreen('premium');
       break;
+    }
     case 'expired':
       renderExpiredScreen(data);
       showScreen('expired');

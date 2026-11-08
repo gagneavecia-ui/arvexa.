@@ -7,7 +7,6 @@
 <script>(function(){try{if(localStorage.getItem('arvexa-theme')==='light')document.documentElement.setAttribute('data-theme','light')}catch(e){}})();</script>
 <script src="theme.js"></script><script src="wake-lock.js"></script><script src="arvexa-i18n.js" defer></script>
 <script src="arvexa-sync.js" defer></script><!-- ✅ v8.0 sync Firebase des progressions (par compte) -->
-<script src="arvexa-flashcards.js" defer></script><!-- ✅ v8.21 flashcards par chapitre + section -->
 <title>ARVEXA — Résumé</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.png" type="image/png">
@@ -156,7 +155,7 @@ button:disabled { cursor: not-allowed; opacity: 0.55; }
 }
 .page-title .emoji { font-size: 16px; }
 .page-title i { color: var(--accent-bright); font-size: 14px; }
-.header-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.header-right { display: flex; align-items: center; gap: 8px; flex-shrink: 1; min-width: 0; } /* ✅ v8.22 — rétrécissable : un libellé long revient à la ligne au lieu d'être coupé */
 .icon-btn {
   width: 38px; height: 38px; border-radius: 10px;
   border: 1px solid rgba(var(--rgb-soft), 0.06); background: transparent;
@@ -183,7 +182,12 @@ button:disabled { cursor: not-allowed; opacity: 0.55; }
   text-decoration: none;
   transition: var(--transition);
   min-height: 38px;
-  flex-shrink: 0;
+  /* ✅ v8.22 — rétrécissable : un libellé long revient à la ligne au lieu
+     d'être coupé par le clip horizontal (consigne propriétaire) */
+  flex-shrink: 1;
+  min-width: 0;
+  max-width: 100%;
+  white-space: normal;
 }
 .home-btn:hover {
   color: var(--accent-bright);
@@ -2910,100 +2914,6 @@ function renderTodaySessions() {
 // ══════════════════════════════════════════════════════════════
 // VUE 1 — DASHBOARD
 // ══════════════════════════════════════════════════════════════
-// ════════════════════════════════════════════
-// ✅ v8.21 — HUB FLASHCARDS (« Résumé »)
-// Tous les paquets générés par chapitre + section, à revoir d'abord.
-// Révision : bouton → overlay du module (Je savais ✅ / À revoir 🔁, 1j/3j/7j).
-// ════════════════════════════════════════════
-function renderFlashcardsHub() {
-  const hub = document.getElementById('afcHub');
-  if (!hub || !window.ArvexaFlashcards) return;
-  const AF = window.ArvexaFlashcards;
-  const decks = AF.listDecks();
-  const countEl = document.getElementById('afcHubCount');
-  if (countEl) countEl.textContent = String(decks.length);
-
-  if (!decks.length) {
-    hub.innerHTML = `
-      <div class="block">
-        <div class="block-head"><i class="fas fa-circle-info"></i>Aucune flashcard pour l'instant</div>
-        <div class="block-body">Dans chaque section de cours et à la fin de chaque leçon complète, le bouton
-        « 🃏 Générer des flashcards » crée un paquet pour cette section exacte. Tes paquets seront ajoutés ici
-        pour te tester et réviser — même hors ligne.</div>
-      </div>`;
-    return;
-  }
-
-  const totalDue = AF.dueCount();
-  const top = decks.slice().sort((a, b) => b.due - a.due)[0];
-
-  const rows = decks.map((d) => `
-    <div class="list-item" data-afc-key="${escapeHtml(d.key)}" role="button" tabindex="0">
-      <div class="list-item-icon">🃏</div>
-      <div class="list-item-body">
-        <div class="list-item-title">${escapeHtml(d.chapterTitle || d.subjectLabel)} · ${escapeHtml(d.sectionTitle || '')}</div>
-        <div class="list-item-meta">
-          <span>${escapeHtml(d.subjectLabel)}</span>
-          <span class="dot"></span>
-          <span>${d.cardsCount} carte${d.cardsCount > 1 ? 's' : ''}${d.due > 0 ? ' · <strong style="color:var(--accent-bright,#E0B84A);">' + d.due + ' à revoir</strong>' : ' · à jour ✓'}</span>
-        </div>
-      </div>
-      <span class="afc-del" data-afc-del="${escapeHtml(d.key)}" role="button" aria-label="Supprimer ce paquet"><i class="fas fa-trash-can"></i></span>
-      <div class="list-item-arrow"><i class="fas fa-chevron-right"></i></div>
-    </div>
-  `).join('');
-
-  hub.innerHTML = `
-    ${totalDue > 0 ? `
-    <button class="afc-btn" id="afcHubReview" style="width:100%;justify-content:center;padding:13px 14px;font-size:14px;margin-bottom:12px;">
-      ⚡ Réviser maintenant — ${totalDue} carte${totalDue > 1 ? 's' : ''} à revoir
-    </button>` : ''}
-    <div class="list">${rows}</div>
-  `;
-
-  const reviewBtn = document.getElementById('afcHubReview');
-  if (reviewBtn && top && top.due > 0) {
-    reviewBtn.addEventListener('click', () => AF.review(top.key));
-  }
-
-  hub.querySelectorAll('[data-afc-key]').forEach((row) => {
-    const open = () => AF.review(row.dataset.afcKey);
-    row.addEventListener('click', open);
-    row.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
-  });
-
-  hub.querySelectorAll('[data-afc-del]').forEach((del) => {
-    del.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const key = del.dataset.afcDel;
-      const deck = AF.getDeck(key);
-      if (!deck) return;
-      const doDelete = () => { AF.deleteDeck(key); renderFlashcardsHub(); };
-      if (typeof window.arvexaConfirm === 'function') {
-        window.arvexaConfirm({
-          title: 'Supprimer ce paquet ?',
-          message: `Les <strong>${(deck.cards || []).length} flashcards</strong> de « ${escapeHtml(deck.sectionTitle || key)} » seront supprimées. Cette action est <strong>définitive</strong>.`,
-          icon: '🃏',
-          confirmText: 'Supprimer',
-          cancelText: 'Garder',
-          variant: 'danger',
-          onConfirm: doDelete
-        });
-      } else if (window.confirm('Supprimer ce paquet de flashcards ?')) {
-        doDelete();
-      }
-    });
-  });
-}
-
-// Re-rendu du hub quand les paquets changent (génération, révision, sync cloud)
-window.addEventListener('arvexa-flashcards-changed', () => {
-  if (document.getElementById('afcHub')) renderFlashcardsHub();
-});
-window.addEventListener('arvexa-flashcards-synced', () => {
-  if (document.getElementById('afcHub')) renderFlashcardsHub();
-});
-
 async function renderNotebooksView() {
   const el = $('view-notebooks');
   showLoadingState(el, 'Chargement...');
@@ -3078,17 +2988,12 @@ async function renderNotebooksView() {
         </div>
       </div>
 
-      <div class="section-title"><i class="fas fa-clone"></i> Mes flashcards <span class="count" id="afcHubCount"></span></div>
-      <div id="afcHub"></div>
-
       <div class="section-title"><i class="fas fa-book"></i> Mes matières <span class="count">${ALL_SUBJECT_KEYS.length}</span></div>
       <div class="subjects-grid">${subjectCards}</div>
 
       ${activityHtml}
     `;
 
-    // ✅ v8.21 — HUB FLASHCARDS : tous les paquets, à revoir d'abord
-    renderFlashcardsHub();
 
     el.querySelectorAll('[data-subject]').forEach((btn) => {
       btn.addEventListener('click', () => {

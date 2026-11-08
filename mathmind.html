@@ -292,7 +292,8 @@
     .section-title:first-child{margin-top:0}
     .section-title h3{font-size:clamp(15px,1.7vw,18px);font-weight:600;color:var(--text-light);line-height:1.25}
     .section-note,.section-link{
-      flex:none;border:0;background:none;color:var(--text-muted);
+      /* ✅ v8.22 — rétrécissable : un libellé long revient à la ligne */
+      flex:0 1 auto;min-width:0;border:0;background:none;color:var(--text-muted);
       font-size:10px;font-weight:600;text-decoration:none;transition:var(--transition);
     }
     .section-link{padding:3px 0;cursor:pointer}
@@ -310,7 +311,9 @@
       min-height:42px;padding:0 18px;border:1px solid transparent;border-radius:999px;
       display:inline-flex;align-items:center;justify-content:center;gap:8px;
       font-size:12px;font-weight:700;line-height:1;text-decoration:none;
-      transition:var(--transition);white-space:nowrap;
+      /* ✅ v8.22 — nowrap retiré : un libellé long revient à la ligne
+         (consigne : tout revient à la ligne, SAUF pop-ups déconnexion + premium) */
+      transition:var(--transition);white-space:normal;max-width:100%;
     }
     .btn .icon{width:14px;height:14px}
     .btn:hover{transform:translateY(-1px)}

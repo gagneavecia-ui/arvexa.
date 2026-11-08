@@ -356,7 +356,11 @@
       color: var(--on-gold); font-size: clamp(11px, 1.1vw, 12px);
       font-weight: 700; cursor: pointer; transition: var(--transition);
       font-family: 'Inter', sans-serif; text-decoration: none;
-      white-space: nowrap; display: inline-flex; align-items: center; gap: 6px;
+      /* ✅ v8.22 — plus de nowrap : « Renouveler maintenant » revient à la
+         ligne si le libellé est long (consigne : tout revient à la ligne,
+         SAUF les pop-ups déconnexion + premium) ; max-width:100% au cas où */
+      white-space: normal; display: inline-flex; align-items: center; gap: 6px;
+      max-width: 100%; text-align: center;
       flex-shrink: 0;
     }
     .sub-card .sub-btn:hover {
@@ -420,13 +424,15 @@
     .fcm-text { flex: 1; min-width: 0; }
     .fcm-title { font-size: 14px; font-weight: 700; color: var(--text-light); margin-bottom: 2px; }
     .fcm-desc { font-size: 12px; color: var(--text-dim); line-height: 1.5; }
-    .fcm-actions { display: flex; gap: 6px; flex-shrink: 0; }
+    .fcm-actions { display: flex; gap: 6px; flex-shrink: 1; min-width: 0; } /* ✅ v8.22 — rétrécissable : libellés longs → retour à la ligne */
     .fcm-btn-later,
     .fcm-btn-activate {
       padding: 8px 14px; border-radius: 20px; border: none;
       font-size: 12px; font-weight: 600; cursor: pointer;
       transition: var(--transition); font-family: 'Inter', sans-serif;
-      white-space: nowrap;
+      /* ✅ v8.22 — nowrap retiré : tout revient à la ligne (sauf pop-ups
+         déconnexion + premium) ; max-width:100% garde la bannière en place */
+      white-space: normal; max-width: 100%;
     }
     .fcm-btn-later { background: transparent; color: var(--text-muted); }
     .fcm-btn-later:hover { color: var(--text-light); background: rgba(var(--rgb-soft), 0.04); }

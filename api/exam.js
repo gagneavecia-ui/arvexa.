@@ -527,7 +527,7 @@ async function saveExercisesToPool(exam, subject, difficulty, uid) {
   }
 }
 
-async function buildExamFromPool(config) {
+async function buildExamFromPool(config, avoidList) {
   try {
     const { db, FieldValue } = getAdminServices();
     const snap = await db.collection(POOL_COLLECTION)
@@ -552,7 +552,17 @@ async function buildExamFromPool(config) {
       exerciseCompliant(e, config.subject, config.chapter));
     if (!eligible.length) return null;
 
-    let poolEx = eligible;
+    // ✅ v8.25 — anti-répétition en mode POOL-FIRST : évite (dans la mesure
+    // du possible) les énoncés déjà servis à CET élève sur cet appareil.
+    let base = eligible;
+    if (Array.isArray(avoidList) && avoidList.length) {
+      const norm = (s) => String(s || '').toLowerCase().replace(/\s+/g, ' ').trim().slice(0, 80);
+      const avoidSet = new Set(avoidList.map(norm));
+      const fresh = eligible.filter((e) => !avoidSet.has(norm(e.statement)));
+      if (fresh.length >= 6) base = fresh;
+    }
+
+    let poolEx = base;
     if (config.chapter && config.chapter !== 'all') {
       const byChapter = eligible.filter((e) => e.chapter === config.chapter);
       if (byChapter.length >= 6) {
@@ -2764,6 +2774,22 @@ module.exports = async function handler(request, response) {
   if (action === 'generate') {
     const validationError = validateConfig(body);
     if (validationError) return jsonError(response, 400, validationError);
+
+    // ✅ v8.25 — POOL-FIRST (économie de quota IA) : si le pool contient assez
+    // d'exercices conformes pour cette matière, l'examen est servi SANS aucun
+    // appel IA et SANS consommer le quota gratuit (2/jour) — le quota IA
+    // gratuit est la ressource la plus rare de la plateforme. Le mode
+    // « cahier » (notebookContext, personnalisé) garde la génération IA.
+    if (!body.notebookContext) {
+      try {
+        const pooledEarly = await buildExamFromPool(body, sanitizeAvoidList(body.avoidStatements));
+        if (pooledEarly) {
+          return response.status(200).json({
+            success: true, exam: pooledEarly, meta: { provider: 'pool' }, source: 'pool'
+          });
+        }
+      } catch (_) { /* pool indisponible → cheminement IA normal */ }
+    }
 
     const reservation = await reserveFreeGeneration(verifiedUser.uid).catch(() => null);
     if (!reservation) return jsonError(response, 503, 'Vérification du quota indisponible.');

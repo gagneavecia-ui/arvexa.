@@ -15,6 +15,25 @@
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<script>
+(function () {
+  'use strict';
+  document.addEventListener('DOMContentLoaded', function () {
+    var btn = document.getElementById('profilShareBtn');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+      var st = window.ARVEXA_STREAK ? window.ARVEXA_STREAK.get() : { count: 0 };
+      var n = Math.max(0, st.count || 0);
+      var txt = '🔥 ' + n + (n === 1 ? ' jour' : ' jours') + ' de série sur ARVEXA School — je prépare le BAC, rejoins-moi : https://arvexaschool.vercel.app';
+      if (navigator.share) {
+        navigator.share({ title: 'ARVEXA School', text: txt }).catch(function () { });
+      } else {
+        window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent(txt), '_blank', 'noopener');
+      }
+    });
+  });
+})();
+</script>
   <script src="analytics.js"></script>
   <script src="register-sw.js" defer></script>
   <script src="offline.js" defer></script>
@@ -1170,6 +1189,11 @@
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: rgba(184, 134, 11, 0.25); border-radius: 10px; }
     ::-webkit-scrollbar-thumb:hover { background: rgba(184, 134, 11, 0.4); }
+    .arv-share-btn {
+      padding: 9px 20px; border-radius: 999px; border: 1px solid rgba(224,184,74,.45);
+      background: rgba(224,184,74,.12); color: var(--accent-bright, #E0B84A);
+      font-weight: 800; font-size: 13px; cursor: pointer; font-family: 'Inter', sans-serif;
+    }
   </style>
 </head>
 <body>
@@ -1191,6 +1215,7 @@
       <a href="notifications.html"><i class="fas fa-bell"></i> Notifications</a>
       <a href="arv-progress.html"><i class="fas fa-graduation-cap"></i> Résumé</a>
       <a href="outils.html"><i class="fas fa-toolbox"></i> Outils</a>
+      <a href="classement.html"><i class="fas fa-trophy"></i> Classement</a>
       <a href="localisation.html"><i class="fas fa-location-dot"></i> À proximité</a>
       <div class="nav-divider"></div>
       <a href="index.html?avis=1" class="avis-link"><i class="fas fa-star"></i> Donner mon avis</a>
@@ -1280,6 +1305,7 @@
             </div>
           </div>
           <div id="profilStreak" style="text-align:center;font-size:13.5px;font-weight:800;color:var(--accent-bright,#E0B84A);padding:0 20px 14px;overflow-wrap:anywhere">🔥 Série : 0 jour</div>
+          <div style="text-align:center;padding:0 20px 10px"><button id="profilShareBtn" class="arv-share-btn" type="button">📲 Partager ma série</button></div>
 
           <!-- BADGES -->
           <div class="badges-section">

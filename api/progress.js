@@ -2290,6 +2290,49 @@ async function createSection(uid, body) {
     throw { status: 503, message: 'Aucun fournisseur IA disponible.' };
   }
 
+  // ✅ v8.25 — CACHE IA PARTAGÉ : ce contenu a-t-il déjà été généré pour un
+  // autre élève ? Si oui : 0 appel IA + quota mensuel remboursé.
+  const cacheKey = aiCacheKey(profile, tasks.map((t) => t.userPrompt || ''));
+  const cachedAnalysis = await readAiCache(cacheKey);
+  if (cachedAnalysis) {
+    if (quota.reserved) await releaseSectionQuota(uid);
+    console.log(`[FAN-OUT] CACHE HIT ${cacheKey.slice(0, 18)}… — 0 appel IA`);
+
+    const cachedRef = chapterRef.collection('sections').doc();
+    const cachedId = cachedRef.id;
+    await cachedRef.set({
+      title: cachedAnalysis.sectionTitle || cachedAnalysis.explanation?.sectionTitle || 'Section',
+      rawInput: trimmed,
+      profile,
+      analysis: cachedAnalysis,
+      userNotes: '',
+      createdAt: FieldValue.serverTimestamp(),
+      updatedAt: FieldValue.serverTimestamp()
+    });
+    await chapterRef.set({
+      sectionsCount: FieldValue.increment(1),
+      updatedAt: FieldValue.serverTimestamp()
+    }, { merge: true });
+    await markDailyActivity(uid, { sectionsCreated: 1 });
+
+    return {
+      success: true,
+      sectionId: cachedId,
+      meta: { cache: true, elapsedMs: 0, counts: {
+        parts: (Array.isArray(cachedAnalysis.explanation?.parts) ? cachedAnalysis.explanation.parts.length : 0),
+        questions: (Array.isArray(cachedAnalysis.questions) ? cachedAnalysis.questions.length : 0)
+      } },
+      section: {
+        id: cachedId,
+        title: cachedAnalysis.sectionTitle || 'Section',
+        rawInput: trimmed,
+        profile,
+        analysis: cachedAnalysis,
+        userNotes: ''
+      }
+    };
+  }
+
   console.log(`[FAN-OUT] ${tasks.length} tâches, ${providers.length} fournisseurs pour profil "${profile}"`);
 
   let analysis;
@@ -2329,6 +2372,14 @@ async function createSection(uid, body) {
   } catch (err) {
     if (quota.reserved) await releaseSectionQuota(uid);
     throw err;
+  }
+
+  // ✅ v8.25 — succès IA : publie le résultat dans le cache partagé (si le
+  // contenu est exploitable) — les prochains élèves de cette section : 0 IA.
+  const hasCacheableContent = (Array.isArray(analysis.explanation?.parts) && analysis.explanation.parts.length > 0) ||
+                              (Array.isArray(analysis.questions) && analysis.questions.length > 0);
+  if (hasCacheableContent && !analysis.fallback) {
+    await writeAiCache(cacheKey, profile, analysis);
   }
 
   const sectionRef = chapterRef.collection('sections').doc();
@@ -2510,6 +2561,42 @@ async function getFullLesson(uid, body) {
 // ═══════════════════════════════════════════════════════════════
 // HANDLER
 // ═══════════════════════════════════════════════════════════════
+// ✅ v8.25 — CACHE IA PARTAGÉ : une même section (même contenu + même profil)
+// n'est générée qu'UNE SEULE FOIS pour TOUS les élèves — l'élève suivant qui
+// crée la même section reçoit le résultat en cache (0 appel IA, quota mensuel
+// NON consommé). C'est le levier n°1 d'économie du quota IA gratuit.
+const AI_CACHE_COLLECTION = 'ai_cache';
+const AI_CACHE_VERSION = 'v1';
+
+function aiCacheKey(profile, userPrompts) {
+  const crypto = require('crypto');
+  return AI_CACHE_VERSION + '-' + crypto.createHash('sha1')
+    .update(String(profile) + '::' + userPrompts.join('\u0000')).digest('hex');
+}
+
+async function readAiCache(key) {
+  try {
+    const { db } = getAdminServices();
+    const snap = await db.collection(AI_CACHE_COLLECTION).doc(key).get();
+    if (!snap.exists) return null;
+    const data = snap.data() || {};
+    return (data.analysis && typeof data.analysis === 'object' && !data.analysis.fallback) ? data.analysis : null;
+  } catch (_) { return null; }
+}
+
+async function writeAiCache(key, profile, analysis) {
+  try {
+    if (!analysis || analysis.fallback) return;
+    const hasContent = (Array.isArray(analysis.explanation?.parts) && analysis.explanation.parts.length > 0) ||
+                       (Array.isArray(analysis.questions) && analysis.questions.length > 0);
+    if (!hasContent) return;
+    const { db, FieldValue } = getAdminServices();
+    await db.collection(AI_CACHE_COLLECTION).doc(key).set({
+      analysis, profile, version: AI_CACHE_VERSION, createdAt: FieldValue.serverTimestamp()
+    });
+  } catch (_) { /* le cache est un bonus, jamais bloquant */ }
+}
+
 module.exports = async function handler(request, response) {
   applyCors(request, response);
 

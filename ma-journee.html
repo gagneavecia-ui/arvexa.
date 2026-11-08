@@ -183,6 +183,13 @@
         <a href="parcours.html" class="bac-btn">Voir mon parcours</a>
       </div>
     </div>
+    <!-- ESSAI PREMIUM 24 H (v8.25 — P2 : 7 jours de série = récompense) -->
+    <div class="card" id="essaiCard" style="border-color:rgba(224,184,74,.55);display:none">
+      <div class="card-title">🎁 7 jours de série — bravo !</div>
+      <p style="font-size:13px;color:var(--text-dim,#8A8A7A);line-height:1.55;margin-bottom:10px">Ta régularité est récompensée : réclame tes <b>24 h de Premium offertes</b> — Test moi illimité, Résumé sans limite, planificateur.</p>
+      <button id="essaiBtn" style="width:100%;padding:11px;border:none;border-radius:10px;background:linear-gradient(135deg,#E0B84A,#B8860B);color:#0A0A0A;font-weight:800;font-size:14px;cursor:pointer;font-family:'Inter',sans-serif">Réclamer mes 24 h de Premium</button>
+      <p id="essaiNote" style="font-size:11.5px;color:var(--text-muted,#5A5A4A);margin-top:8px;line-height:1.5">Une seule fois par compte. Ta série est vérifiée côté serveur, en toute honnêteté.</p>
+    </div>
 
     <!-- CHECKLIST DU JOUR -->
     <div class="card">
@@ -501,6 +508,79 @@
     matieres(bacInfo);
   });
 })();
+</script>
+<script type="module">
+import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, getIdToken } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+const firebaseConfig = {
+  apiKey: "AIzaSyDHscOXw3rLuhV6z1Cny-bdYCumqpnG7QE",
+  authDomain: "arvexa-fbf10.firebaseapp.com",
+  projectId: "arvexa-fbf10",
+  storageBucket: "arvexa-fbf10.firebasestorage.app",
+  messagingSenderId: "920108330053",
+  appId: "1:920108330053:web:f532d71cbc2c824bc7472c"
+};
+let app = null;
+try { app = getApp(); } catch (e) { }
+if (!app) { try { app = initializeApp(firebaseConfig); } catch (e2) { app = null; } }
+const auth = app ? getAuth(app) : null;
+const CLAIM_KEY = 'arvexa-trial-claimed';
+
+function revendique() {
+  try { return localStorage.getItem(CLAIM_KEY) === '1'; } catch (e) { return false; }
+}
+function majCarte() {
+  var st = window.ARVEXA_STREAK ? window.ARVEXA_STREAK.get() : { count: 0 };
+  var card = document.getElementById('essaiCard');
+  if (!card) return;
+  card.style.display = (st.count >= 7 && !revendique()) ? 'block' : 'none';
+}
+function note(t) {
+  var n = document.getElementById('essaiNote');
+  if (n) n.textContent = t;
+}
+onAuthStateChanged(auth, function (u) {
+  var btn = document.getElementById('essaiBtn');
+  if (!btn) return;
+  if (!u) {
+    btn.disabled = true;
+    btn.textContent = 'Connecte-toi pour réclamer';
+    return;
+  }
+  btn.addEventListener('click', async function () {
+    if (btn.disabled) return;
+    btn.disabled = true;
+    btn.textContent = 'Vérification…';
+    try {
+      const token = await getIdToken(u, false);
+      const r = await fetch('/api/streak-trial', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      const j = await r.json().catch(() => ({}));
+      if (r.ok && j.success) {
+        try { localStorage.setItem(CLAIM_KEY, '1'); } catch (e) { }
+        btn.textContent = '✅ 24 h de Premium activées !';
+        note('Profites-en : Test moi illimité, Résumé sans limite, planificateur — jusqu\u2019au ' +
+          (j.until ? new Date(j.until).toLocaleString('fr-FR') : 'demain à cette heure') + '.');
+      } else if (j.code === 'ALREADY_USED' || j.code === 'PREMIUM_ACTIVE') {
+        try { localStorage.setItem(CLAIM_KEY, '1'); } catch (e) { }
+        majCarte();
+      } else {
+        btn.disabled = false;
+        btn.textContent = 'Réclamer mes 24 h de Premium';
+        note(j.error || 'Indisponible pour le moment — réessaie plus tard.');
+      }
+    } catch (e) {
+      btn.disabled = false;
+      btn.textContent = 'Réclamer mes 24 h de Premium';
+      note('Réseau indisponible — réessaie quand la connexion revient.');
+    }
+  });
+});
+document.addEventListener('arvexa-streak-change', majCarte);
+document.addEventListener('DOMContentLoaded', majCarte);
+majCarte();
 </script>
 <script src="analytics.js" defer></script>
 <script src="register-sw.js" defer></script>

@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0A0A0A">
+  <meta name="description" content="ARVEXA — Classement de la semaine : les élèves les plus réguliers. Opt-in, tes données restent les tiennes.">
+<script>(function(){try{if(localStorage.getItem('arvexa-theme')==='light')document.documentElement.setAttribute('data-theme','light')}catch(e){}})();</script>
+<script src="theme.js"></script><script src="arvexa-i18n.js" defer></script>
+  <title>ARVEXA — Classement de la semaine</title>
+  <link rel="icon" href="icon.png" type="image/png">
+  <link rel="apple-touch-icon" href="icon.png">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="perf.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="arvexa-ui.css">
+  <style>
+    :root {
+      --accent: #B8860B;
+      --accent-bright: #E0B84A;
+      --bg-dark: #0A0A0A;
+      --bg-surface: #141414;
+      --bg-deep: #060606;
+      --text-light: #F5F0E8;
+      --text-dim: #8A8A7A;
+      --text-muted: #5A5A4A;
+      --success: #2ECC71;
+      --danger: #E74C3C;
+      --safe-top: env(safe-area-inset-top, 0px);
+    }
+    [data-theme="light"] {
+      --bg-dark: #FAF7F0;
+      --bg-surface: #FFFFFF;
+      --bg-deep: #F0EBE0;
+      --text-light: #262115;
+      --text-dim: #6E6753;
+      --text-muted: #A39B85;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-light);
+      min-height: 100vh;
+      padding-top: var(--safe-top);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .wrap { max-width: 560px; margin: 0 auto; padding: 0 16px 90px; }
+    header.top {
+      display: flex; align-items: center; gap: 10px;
+      padding: 14px 0 6px;
+    }
+    .back {
+      width: 38px; height: 38px; border-radius: 10px;
+      background: var(--bg-surface); border: 1px solid rgba(224,184,74,.18);
+      color: var(--text-light); display: flex; align-items: center; justify-content: center;
+      cursor: pointer; flex-shrink: 0; text-decoration: none; font-size: 15px;
+    }
+    h1 { font-family: 'Playfair Display', serif; font-size: 21px; font-weight: 700; letter-spacing: .2px; min-width: 0; }
+    .week-sub { font-size: 12.5px; color: var(--text-dim); font-weight: 600; padding: 2px 0 14px; }
+    .card {
+      background: var(--bg-surface);
+      border: 1px solid rgba(224,184,74,.14);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    .card h2 { font-size: 15px; font-weight: 800; margin-bottom: 6px; }
+    .card p { font-size: 13px; color: var(--text-dim); line-height: 1.55; }
+    .toggle-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 12px; }
+    .toggle-label { font-size: 13.5px; font-weight: 700; min-width: 0; overflow-wrap: anywhere; }
+    .switch { position: relative; width: 46px; height: 26px; flex-shrink: 0; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute; cursor: pointer; inset: 0;
+      background: var(--bg-deep); border: 1px solid rgba(224,184,74,.25);
+      border-radius: 26px; transition: .2s;
+    }
+    .slider:before {
+      content: ""; position: absolute; height: 18px; width: 18px;
+      left: 3px; top: 3px; background: var(--text-dim); border-radius: 50%; transition: .2s;
+    }
+    .switch input:checked + .slider { background: rgba(224,184,74,.25); }
+    .switch input:checked + .slider:before { transform: translateX(20px); background: var(--accent-bright); }
+    .points-rule { font-size: 12px; color: var(--text-muted); margin-top: 10px; line-height: 1.5; }
+    .state-box { text-align: center; padding: 26px 14px; }
+    .state-box .ico { font-size: 30px; margin-bottom: 8px; }
+    .state-box .msg { font-size: 13.5px; color: var(--text-dim); line-height: 1.55; overflow-wrap: anywhere; }
+    .state-box a.btn-go {
+      display: inline-block; margin-top: 12px; padding: 9px 18px; border-radius: 10px;
+      background: var(--accent); color: #0A0A0A; font-weight: 800; font-size: 13px;
+      text-decoration: none;
+    }
+    .podium { display: flex; align-items: flex-end; justify-content: center; gap: 8px; padding: 10px 0 4px; }
+    .pod { flex: 1 1 0; min-width: 0; text-align: center; }
+    .pod .avatar {
+      width: 44px; height: 44px; border-radius: 50%; margin: 0 auto 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 15px; color: #0A0A0A;
+      background: linear-gradient(135deg, var(--accent-bright), var(--accent));
+    }
+    .pod .pname { font-size: 12px; font-weight: 700; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .pod .ppts { font-size: 11.5px; color: var(--text-dim); font-weight: 600; }
+    .pod .medal { font-size: 17px; }
+    .pod.p1 .avatar { width: 54px; height: 54px; font-size: 18px; box-shadow: 0 0 0 2px rgba(224,184,74,.55); }
+    .pod { padding-bottom: 8px; }
+    .pod.p1 { padding-bottom: 20px; }
+    .pod.p3 { padding-bottom: 2px; }
+    ol.rk { list-style: none; }
+    ol.rk li {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 6px; border-bottom: 1px solid rgba(224,184,74,.08);
+      font-size: 13.5px;
+    }
+    ol.rk li:last-child { border-bottom: none; }
+    ol.rk .pos { width: 26px; color: var(--text-dim); font-weight: 800; flex-shrink: 0; text-align: center; }
+    ol.rk .who { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+    ol.rk .pts { color: var(--accent-bright); font-weight: 800; flex-shrink: 0; }
+    ol.rk li.me { background: rgba(224,184,74,.09); border-radius: 9px; }
+    .me-card { border-color: rgba(224,184,74,.4); }
+    .me-card .row { display: flex; justify-content: space-between; gap: 10px; font-size: 13.5px; font-weight: 700; }
+    .me-card .row span:last-child { color: var(--accent-bright); }
+    .honest { font-size: 11.5px; color: var(--text-muted); line-height: 1.5; margin-top: 8px; }
+    .hidden { display: none !important; }
+    .retry {
+      margin-top: 10px; padding: 8px 16px; border-radius: 9px; border: none;
+      background: var(--accent-bright); color: #0A0A0A; font-weight: 800; font-size: 12.5px; cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <a class="back" href="index.html" aria-label="Retour">←</a>
+      <h1>🏆 Classement de la semaine</h1>
+    </header>
+    <div class="week-sub" id="weekSub"></div>
+
+    <!-- État : déconnexion -->
+    <div class="card state-box hidden" id="boxGuest">
+      <div class="ico">🔐</div>
+      <div class="msg">Connecte-toi pour voir le classement et y participer si tu le veux.</div>
+      <a class="btn-go" href="login.html">Se connecter</a>
+    </div>
+
+    <!-- État : chargement -->
+    <div class="card state-box" id="boxLoading">
+      <div class="ico">⏳</div>
+      <div class="msg">Chargement du classement…</div>
+    </div>
+
+    <!-- État : erreur -->
+    <div class="card state-box hidden" id="boxError">
+      <div class="ico">📡</div>
+      <div class="msg">Classement indisponible (hors ligne ou service occupé). Il se chargera au retour du réseau.</div>
+      <button class="retry" id="retryBtn">Réessayer</button>
+    </div>
+
+    <!-- Opt-in -->
+    <div class="card hidden" id="boxOptin">
+      <h2>🙋 Participer au classement ?</h2>
+      <p>C'est <b>volontaire</b> : si tu participes, ton pseudo, tes points et ta série 🔥 sont visibles des autres élèves. Si non, personne ne te voit et rien ne change pour toi.</p>
+      <div class="toggle-row">
+        <span class="toggle-label" id="optinLabel">Je participe à cette semaine</span>
+        <label class="switch">
+          <input type="checkbox" id="optinToggle">
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="points-rule">Points de la semaine : <b>2 × sections de cours lues</b> + <b>3 × jours de série 🔥</b>. Remise à zéro chaque lundi.</div>
+    </div>
+
+    <!-- Podium + liste -->
+    <div id="boxRanking" class="hidden">
+      <div class="card">
+        <h2>🥇 Podium</h2>
+        <div class="podium" id="podium"></div>
+      </div>
+      <div class="card">
+        <h2>Top 20</h2>
+        <ol class="rk" id="rkList"></ol>
+      </div>
+      <div class="card me-card" id="meCard">
+        <div class="row"><span id="meLabel">Ta place</span><span id="mePts">—</span></div>
+        <div class="honest" id="meNote">Le classement se met à jour à chaque ouverture de cette page.</div>
+      </div>
+    </div>
+  </div>
+
+<script type="module">
+import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import {
+  getFirestore, collection, doc, getDoc, getDocs, setDoc, deleteDoc,
+  query, orderBy, limit, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+const $ = (id) => document.getElementById(id);
+const LS_KEY = 'arvexa-leaderboard-v1';
+const WRITE_COOLDOWN_MS = 6 * 60 * 60 * 1000; // max 1 écriture / 6 h
+
+/* ── Semaine ISO : « YYYY-Www » (remise à zéro le lundi) ─────────── */
+function weekKey(d) {
+  const dt = d ? new Date(d) : new Date();
+  const t = new Date(Date.UTC(dt.getFullYear(), dt.getMonth(), dt.getDate()));
+  const dayNum = (t.getUTCDay() + 6) % 7;
+  t.setUTCDate(t.getUTCDate() - dayNum + 3);
+  const firstThursday = new Date(Date.UTC(t.getUTCFullYear(), 0, 4));
+  const fDayNum = (firstThursday.getUTCDay() + 6) % 7;
+  firstThursday.setUTCDate(firstThursday.getUTCDate() - fDayNum + 3);
+  const week = 1 + Math.round((t - firstThursday) / (7 * 24 * 3600 * 1000));
+  return t.getUTCFullYear() + '-W' + String(week).padStart(2, '0');
+}
+
+function loadPref() {
+  try { return JSON.parse(localStorage.getItem(LS_KEY)) || {}; } catch (e) { return {}; }
+}
+function savePref(p) {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(p)); } catch (e) { }
+}
+
+/* ── Points : 2 × sections lues (7 derniers jours) + 3 × série 🔥 ── */
+function sections7j() {
+  let total = 0;
+  try {
+    const act = JSON.parse(localStorage.getItem('arvexa_daily_activity') || '{}');
+    for (let i = 0; i < 7; i++) {
+      const k = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
+      total += Math.max(0, Math.min(60, Number(act[k]) || 0));
+    }
+  } catch (e) { }
+  return total;
+}
+function mesPoints() {
+  const st = window.ARVEXA_STREAK ? window.ARVEXA_STREAK.get() : { count: 0 };
+  return Math.min(100000, 2 * sections7j() + 3 * Math.min(730, Math.max(0, st.count || 0)));
+}
+function initiales(name) {
+  const parts = String(name || 'Élève').trim().split(/\s+/).slice(0, 2);
+  return parts.map((p) => (p[0] || '').toUpperCase()).join('') || 'É';
+}
+
+/* ── Firebase (config identique aux autres pages, app [DEFAULT]) ─── */
+const firebaseConfig = {
+  apiKey: "AIzaSyDHscOXw3rLuhV6z1Cny-bdYCumqpnG7QE",
+  authDomain: "arvexa-fbf10.firebaseapp.com",
+  projectId: "arvexa-fbf10",
+  storageBucket: "arvexa-fbf10.firebasestorage.app",
+  messagingSenderId: "920108330053",
+  appId: "1:920108330053:web:f532d71cbc2c824bc7472c"
+};
+let app = null;
+try { app = getApp(); } catch (e) { }
+if (!app) {
+  try {
+    app = getApps().find((a) => a.options && a.options.projectId === firebaseConfig.projectId) || null;
+  } catch (e2) { app = null; }
+}
+if (!app) {
+  try { app = initializeApp(firebaseConfig); } catch (e3) { app = null; }
+}
+const auth = app ? getAuth(app) : null;
+const db = app ? getFirestore(app) : null;
+
+function show(id) {
+  ['boxGuest', 'boxLoading', 'boxError', 'boxOptin', 'boxRanking'].forEach((x) => $(x).classList.add('hidden'));
+  if (id) $(id).classList.remove('hidden');
+}
+
+function renderList(entries, myUid) {
+  const podium = $('podium');
+  const list = $('rkList');
+  podium.innerHTML = '';
+  list.innerHTML = '';
+  const medals = ['🥇', '🥈', '🥉'];
+  const order = [1, 0, 2]; // 2e, 1er, 3e (podium classique)
+  order.forEach((ix) => {
+    const e = entries[ix];
+    const div = document.createElement('div');
+    div.className = 'pod p' + (ix + 1);
+    if (!e) {
+      div.innerHTML = '<div class="medal">' + medals[ix] + '</div><div class="pname">—</div><div class="ppts">·</div>';
+    } else {
+      div.innerHTML = '<div class="medal">' + medals[ix] + '</div>' +
+        '<div class="avatar">' + initiales(e.name) + '</div>' +
+        '<div class="pname"></div><div class="ppts">' + e.points + ' pts · 🔥 ' + e.streak + '</div>';
+      div.querySelector('.pname').textContent = e.name;
+      if (e.uid === myUid) div.querySelector('.pname').textContent += ' (toi)';
+    }
+    podium.appendChild(div);
+  });
+  entries.slice(3).forEach((e, i) => {
+    const li = document.createElement('li');
+    if (e.uid === myUid) li.className = 'me';
+    li.innerHTML = '<span class="pos">' + (i + 4) + '</span><span class="who"></span><span class="pts">' + e.points + ' pts</span>';
+    li.querySelector('.who').textContent = e.name + (e.uid === myUid ? ' (toi)' : '');
+    list.appendChild(li);
+  });
+}
+
+async function charger(user) {
+  show('boxLoading');
+  const wk = weekKey();
+  try {
+    const pref = loadPref();
+    const entriesRef = collection(db, 'leaderboard', wk, 'entries');
+    const topQ = query(entriesRef, orderBy('points', 'desc'), limit(20));
+    const [topSnap, mySnap] = await Promise.all([
+      getDocs(topQ),
+      getDoc(doc(entriesRef, user.uid))
+    ]);
+    const entries = topSnap.docs.map((d) => d.data());
+    const mine = mySnap.exists() ? mySnap.data() : null;
+
+    // Opt-in (état réel = présence de l'entry)
+    $('optinToggle').checked = Boolean(mine);
+    show(pref.optIn === false && !mine ? 'boxOptin' : null);
+    $('boxOptin').classList.remove('hidden');
+
+    if (!entries.length && !mine) {
+      $('podium').innerHTML = '';
+      $('rkList').innerHTML = '';
+      const empty = document.createElement('div');
+      empty.className = 'state-box';
+      empty.innerHTML = '<div class="ico">🌱</div><div class="msg">Personne ne participe encore cette semaine. Active le curseur et ouvre la voie !</div>';
+      $('boxRanking').classList.remove('hidden');
+      $('boxOptin').classList.remove('hidden');
+      $('mePts').textContent = mesPoints() + ' pts';
+      return;
+    }
+
+    $('boxRanking').classList.remove('hidden');
+    renderList(entries, user.uid);
+
+    if (mine) {
+      const inTop = entries.some((e) => e.uid === user.uid);
+      const myPts = Number(mine.points) || 0;
+      const best = entries.length ? Number(entries[entries.length - 1].points) : -1;
+      $('meLabel').textContent = inTop ? 'Ta place : top ' + (entries.findIndex((e) => e.uid === user.uid) + 1) : 'Ta place';
+      $('mePts').textContent = myPts + ' pts · 🔥 ' + (Number(mine.streak) || 0);
+      $('meNote').textContent = (!inTop && myPts < best)
+        ? 'Tu es au-delà du top 20 — continue, la semaine est longue !'
+        : 'Le classement se met à jour à chaque ouverture de cette page.';
+    } else {
+      $('meLabel').textContent = 'Tu ne participes pas cette semaine';
+      $('mePts').textContent = mesPoints() + ' pts (non publiés)';
+      $('meNote').textContent = 'Active le curseur pour apparaître au classement.';
+    }
+  } catch (e) {
+    console.warn('[CLASSEMENT] chargement:', e && e.message);
+    show('boxError');
+  }
+}
+
+/* ── Opt-in / opt-out ─────────────────────────────────────────────── */
+async function appliquerOptin(user, veutParticiper) {
+  const pref = loadPref();
+  const wk = weekKey();
+  const entriesRef = collection(db, 'leaderboard', wk, 'entries');
+  try {
+    if (veutParticiper) {
+      let name = pref.name;
+      if (!name) {
+        try {
+          const uSnap = await getDoc(doc(db, 'users', user.uid));
+          const d = uSnap.exists() ? uSnap.data() : {};
+          name = String(d.name || d.displayName || (user.email || '').split('@')[0] || 'Élève').slice(0, 60);
+        } catch (e) { name = 'Élève'; }
+        pref.name = name;
+      }
+      const st = window.ARVEXA_STREAK ? window.ARVEXA_STREAK.get() : { count: 0 };
+      await setDoc(doc(entriesRef, user.uid), {
+        uid: user.uid,
+        name,
+        points: mesPoints(),
+        streak: Math.min(730, Math.max(0, st.count || 0)),
+        updatedAt: serverTimestamp()
+      });
+      pref.optIn = true;
+      pref.lastWrite = Date.now();
+      savePref(pref);
+      $('optinLabel').textContent = 'Je participe à cette semaine ✅';
+    } else {
+      await deleteDoc(doc(entriesRef, user.uid)).catch(() => { });
+      pref.optIn = false;
+      savePref(pref);
+      $('optinLabel').textContent = 'Je participe à cette semaine';
+    }
+  } catch (e) {
+    console.warn('[CLASSEMENT] opt-in:', e && e.message);
+    $('optinLabel').textContent = veutParticiper
+      ? 'Impossible pour le moment — réessaie plus tard'
+      : 'Je participe à cette semaine';
+    $('optinToggle').checked = !veutParticiper;
+  }
+  if (auth.currentUser) charger(auth.currentUser);
+}
+
+/* ── Mise à jour périodique des points (max 1 écriture / 6 h) ────── */
+async function majPointsSiDû(user) {
+  const pref = loadPref();
+  if (!pref.optIn) return;
+  if (pref.lastWrite && (Date.now() - pref.lastWrite) < WRITE_COOLDOWN_MS) return;
+  try {
+    const st = window.ARVEXA_STREAK ? window.ARVEXA_STREAK.get() : { count: 0 };
+    await setDoc(doc(collection(db, 'leaderboard', weekKey(), 'entries'), user.uid), {
+      uid: user.uid,
+      name: String(pref.name || 'Élève').slice(0, 60),
+      points: mesPoints(),
+      streak: Math.min(730, Math.max(0, st.count || 0)),
+      updatedAt: serverTimestamp()
+    }, { merge: true });
+    pref.lastWrite = Date.now();
+    savePref(pref);
+  } catch (e) { /* silencieux */ }
+}
+
+$('optinToggle').addEventListener('change', function () {
+  if (!auth || !auth.currentUser) { this.checked = false; return; }
+  appliquerOptin(auth.currentUser, this.checked);
+});
+$('retryBtn').addEventListener('click', function () {
+  if (auth && auth.currentUser) charger(auth.currentUser);
+  else demarrer();
+});
+
+function demarrer() {
+  // Libellé semaine : visible même pour les visiteurs (état invité honnête)
+  try {
+    $('weekSub').textContent = 'Semaine ' + weekKey() + ' — remise à zéro chaque lundi';
+  } catch (e) { }
+  if (!auth || !db) { show('boxError'); return; }
+  onAuthStateChanged(auth, function (user) {
+    if (!user) { show('boxGuest'); return; }
+    charger(user).then(() => majPointsSiDû(user));
+  });
+}
+
+document.addEventListener('DOMContentLoaded', demarrer);
+if (document.readyState !== 'loading') demarrer();
+</script>
+<script src="analytics.js" defer></script>
+<script src="register-sw.js" defer></script>
+</body>
+</html>

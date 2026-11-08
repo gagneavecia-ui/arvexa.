@@ -5,8 +5,15 @@ service cloud.firestore {
 
     // ═══════════════════════════════════════════════════════════════
     // RÈGLES ARVEXA SCHOOL
-    // Version : 2026-11-05 (v5 — analytics_daily débloqué + « À proximité » v4)
+    // Version : 2026-11-09 (v6 — classement hebdo + streak borné + collections serveur)
     // Changements majeurs :
+    //  - NOUVEAU v6 : leaderboard/{week}/entries/{uid} — classement
+    //    hebdomadaire OPT-IN (P2 rétention) : lecture connectés, écriture de
+    //    SES SEULES données, champs strictement bornés, retrait = soi-même.
+    //  - NOUVEAU v6 : users/{uid}/progression/streak borné (compteurs ≤ 730,
+    //    champs exacts) — la série 🔥 devient multi-appareils (P2).
+    //  - NOUVEAU v6 : ai_cache + examPool explicitement FERMÉS au client
+    //    (écrits uniquement par le serveur — cache IA partagé + pool d'examens).
     //  - NOUVEAU v5 : sous-collection users/{uid}/analytics_daily/{date}
     //    (+ results) — le tracker client analytics.js v3 tombait en
     //    permission-denied (refus par défaut : aucune règle ne couvrait ce
@@ -178,6 +185,28 @@ service cloud.firestore {
           && (!('stats' in request.resource.data)
               || request.resource.data.stats is map);
         allow delete: if false;
+
+        // ── Série 🔥 cloud (v6 — P2) : doc unique « streak » —
+        // multi-appareils ; champs EXACTS et bornés (un compte tricheur ne
+        // peut pas écrire count = 999 999 ; le serveur re-vérifie de toute
+        // façon l'activité réelle avant l'essai Premium).
+        match /streak {
+          allow read: if isOwner(userId) || isAdmin();
+          allow create, update: if isOwner(userId)
+            && request.resource.data.keys().hasOnly(['count', 'best', 'freeze', 'last'])
+            && request.resource.data.count is int
+            && request.resource.data.count >= 0
+            && request.resource.data.count <= 730
+            && request.resource.data.best is int
+            && request.resource.data.best >= 0
+            && request.resource.data.best <= 730
+            && request.resource.data.freeze is int
+            && request.resource.data.freeze >= 0
+            && request.resource.data.freeze <= 1
+            && request.resource.data.last is string
+            && request.resource.data.last.matches('^\\d{4}-\\d{2}-\\d{2}$');
+          allow delete: if false;
+        }
       }
 
       // ─── favorites ──────────────────────────────────────────────
@@ -446,6 +475,53 @@ service cloud.firestore {
     }
 
     // ─── Codes promo : lecture pour connectés ────────────────────
+    // ─── Classement hebdomadaire OPT-IN (v6 — P2 rétention) ──────
+    // leaderboard/{weekKey}/entries/{uid} — semaine = « YYYY-Www ».
+    //  - OPT-IN : l'élève choisit d'apparaître (le retrait supprime son entry).
+    //  - Lecture : tous les connectés (c'est le but).
+    //  - Écriture : SES SEULES données, champs exacts, points bornés,
+    //    horodatage serveur (anti-fausse fraîcheur). Pseudo borné.
+    //  - Points (lecture + régularité) calculés par le client sur SES données
+    //    locales ; limite connue et assumée : un tricheur ne gonfle que SA
+    //    place d'affichage — aucun gain premium n'est lié au classement.
+    match /leaderboard/{weekKey} {
+      allow read, write: if false;
+
+      match /entries/{entryUid} {
+        allow read: if request.auth != null;
+        allow create, update: if isOwner(entryUid)
+          && weekKey is string
+          && weekKey.matches('^\\d{4}-W\\d{2}$')
+          && request.resource.data.keys().hasOnly(
+               ['uid', 'name', 'points', 'streak', 'updatedAt'])
+          && request.resource.data.uid == request.auth.uid
+          && request.resource.data.name is string
+          && request.resource.data.name.size() >= 1
+          && request.resource.data.name.size() <= 60
+          && request.resource.data.points is int
+          && request.resource.data.points >= 0
+          && request.resource.data.points <= 100000
+          && request.resource.data.streak is int
+          && request.resource.data.streak >= 0
+          && request.resource.data.streak <= 730
+          && request.resource.data.updatedAt == request.time;
+        allow delete: if isOwner(entryUid) || isAdmin();
+      }
+    }
+
+    // ─── Cache IA partagé (v6) : SERVEUR uniquement ──────────────
+    // Une même section générée UNE fois pour tous les élèves
+    // (api/progress.js). Le SDK admin contourne ces règles.
+    match /ai_cache/{docId} {
+      allow read, write: if false;
+    }
+
+    // ─── Pool d'exercices « Test moi » : SERVEUR uniquement ─────
+    // (fermé par défaut, rendu explicite avec le pool-first v8.25)
+    match /examPool/{docId} {
+      allow read, write: if false;
+    }
+
     match /promoCodes/{code} {
       allow read: if request.auth != null;
       allow write: if false;

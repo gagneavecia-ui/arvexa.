@@ -264,6 +264,7 @@
           arv: 'arv_pilot',
           'arv-progress': 'arv_progress',
           quotidien: 'question_du_jour',
+          classement: 'classement',
           'ma-journee': 'ma_journee',
           demo: 'demo_quiz',
           planificateur: 'planificateur',

@@ -168,7 +168,15 @@
     .qd-actions-col { display: flex; flex-direction: column; gap: 10px; align-items: center; margin-top: 18px; }
     .hidden { display: none !important; }
     @keyframes qdIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-  </style>
+      .qd-share-btn {
+      display: inline-block; margin: 14px auto 2px; padding: 10px 22px;
+      border-radius: 999px; border: 1px solid rgba(224,184,74,.45);
+      background: rgba(224,184,74,.12); color: var(--accent-bright, #E0B84A);
+      font-weight: 800; font-size: 13.5px; cursor: pointer;
+      font-family: 'Inter', sans-serif;
+    }
+    .qd-share-btn:active { transform: scale(.97); }
+</style>
 </head>
 <body>
   <div class="bg-layer"></div>
@@ -217,6 +225,7 @@
         </div>
         <div class="qd-msg" id="doneMsg"></div>
         <div class="qd-streak-line" id="doneStreak"></div>
+          <button class="qd-share-btn" id="qdShareBtn" type="button">📲 Partager ma série</button>
         <div class="qd-actions-col">
           <a href="index.html" class="qd-btn">Revenir à l'accueil</a>
         </div>
@@ -390,6 +399,28 @@
   window.addEventListener('DOMContentLoaded', function () {
     renderChip();
     charger();
+  });
+})();
+</script>
+<script>
+(function () {
+  'use strict';
+  function textePartage() {
+    var st = window.ARVEXA_STREAK ? window.ARVEXA_STREAK.get() : { count: 0 };
+    var n = Math.max(0, st.count || 0);
+    return '🔥 ' + n + (n === 1 ? ' jour' : ' jours') + ' de série sur ARVEXA School — je prépare le BAC, rejoins-moi : https://arvexaschool.vercel.app';
+  }
+  document.addEventListener('DOMContentLoaded', function () {
+    var btn = document.getElementById('qdShareBtn');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+      var txt = textePartage();
+      if (navigator.share) {
+        navigator.share({ title: 'ARVEXA School', text: txt }).catch(function () { });
+      } else {
+        window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent(txt), '_blank', 'noopener');
+      }
+    });
   });
 })();
 </script>

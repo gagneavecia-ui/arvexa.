@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0A0A0A">
+  <meta name="description" content="ARVEXA — Ma journée : ta checklist du jour, tes 4 matières, ta série 🔥, le compte à rebours BAC et un pronostic honnête.">
+<script>(function(){try{if(localStorage.getItem('arvexa-theme')==='light')document.documentElement.setAttribute('data-theme','light')}catch(e){}})();</script>
+<script src="theme.js"></script><script src="arvexa-i18n.js" defer></script>
+  <title>ARVEXA — Ma journée</title>
+  <link rel="icon" href="icon.png" type="image/png">
+  <link rel="apple-touch-icon" href="icon.png">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="perf.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="arvexa-ui.css">
+  <style>
+    :root {
+      --accent: #B8860B;
+      --accent-bright: #E0B84A;
+      --bg-dark: #0A0A0A;
+      --bg-surface: #141414;
+      --bg-deep: #060606;
+      --text-light: #F5F0E8;
+      --text-dim: #8A8A7A;
+      --text-muted: #5A5A4A;
+      --success: #2ECC71;
+      --warning: #F1C40F;
+      --danger: #E74C3C;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-light);
+      min-height: 100vh;
+      min-height: 100dvh;
+      -webkit-font-smoothing: antialiased;
+      position: relative;
+    }
+    .bg-layer {
+      position: fixed; inset: 0; z-index: -2;
+      background:
+        radial-gradient(ellipse 40% 30% at 30% 15%, rgba(184,134,11,.16) 0%, transparent 70%),
+        radial-gradient(ellipse 35% 25% at 78% 88%, rgba(184,134,11,.07) 0%, transparent 60%),
+        linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-deep) 100%);
+    }
+    .glow {
+      position: fixed; width: 300px; height: 300px; border-radius: 50%;
+      background: var(--accent); filter: blur(110px); opacity: .1;
+      pointer-events: none; z-index: -1; top: -120px; right: -80px;
+    }
+    .page { max-width: 560px; margin: 0 auto; padding: calc(var(--safe-top) + 16px) 16px calc(var(--safe-bottom) + 32px); }
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      padding: 6px 0 18px;
+    }
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.09);
+      color: var(--text-light); border-radius: 12px; padding: 9px 13px;
+      font-size: 13px; font-weight: 600; text-decoration: none; cursor: pointer;
+    }
+    .streak-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(224,184,74,.1); border: 1px solid rgba(224,184,74,.3);
+      color: var(--accent-bright); border-radius: 999px; padding: 8px 13px;
+      font-size: 13px; font-weight: 700; white-space: nowrap;
+    }
+    .hero { text-align: center; padding: 6px 0 20px; }
+    .hero-icon { font-size: 40px; line-height: 1; }
+    .hero h1 {
+      font-family: 'Playfair Display', Georgia, serif; font-size: 27px; font-weight: 700;
+      margin: 10px 0 6px; color: var(--text-light);
+    }
+    .hero h1 em { color: var(--accent-bright); font-style: italic; }
+    .hero p { color: var(--text-dim); font-size: 13.5px; overflow-wrap: anywhere; }
+    .card {
+      background: linear-gradient(160deg, var(--bg-surface), var(--bg-dark));
+      border: 1px solid rgba(224,184,74,.18); border-radius: 18px;
+      padding: 18px 16px; margin-top: 14px;
+      box-shadow: 0 14px 40px rgba(0,0,0,.4);
+    }
+    .card-title {
+      font-size: 15px; font-weight: 800; color: var(--text-light);
+      margin-bottom: 13px; letter-spacing: .01em;
+    }
+    /* ── BAC ── */
+    .bac-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+    .bac-days {
+      font-family: 'Playfair Display', Georgia, serif; font-size: 40px; font-weight: 700;
+      color: var(--accent-bright); line-height: 1; white-space: nowrap;
+    }
+    .bac-days small { font-size: 14px; font-family: 'Inter', sans-serif; font-weight: 700; color: var(--text-dim); margin-left: 5px; }
+    .bac-info { flex: 1; min-width: 150px; }
+    .bac-info .l1 { font-size: 13.5px; font-weight: 700; color: var(--text-light); overflow-wrap: anywhere; }
+    .bac-info .l2 { font-size: 12px; color: var(--text-dim); margin-top: 3px; overflow-wrap: anywhere; }
+    .bac-btn {
+      flex-shrink: 0; display: inline-flex; align-items: center; gap: 6px;
+      background: transparent; border: 1.5px solid rgba(224,184,74,.4);
+      color: var(--accent-bright); border-radius: 999px; padding: 9px 16px;
+      font-size: 12.5px; font-weight: 800; text-decoration: none; white-space: nowrap;
+    }
+    /* ── Checklist ── */
+    .task {
+      display: flex; align-items: center; gap: 12px; width: 100%;
+      background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.08);
+      border-radius: 14px; padding: 12px 13px; margin-bottom: 9px;
+      text-decoration: none; color: inherit; transition: border-color .18s;
+    }
+    .task:hover { border-color: rgba(224,184,74,.4); }
+    .task-icon { font-size: 22px; line-height: 1; flex-shrink: 0; }
+    .task-body { flex: 1; min-width: 0; }
+    .task-body strong { display: block; font-size: 14px; font-weight: 700; color: var(--text-light); }
+    .task-body span { display: block; font-size: 12px; color: var(--text-dim); margin-top: 2px; overflow-wrap: anywhere; }
+    .task-state {
+      flex-shrink: 0; font-size: 11.5px; font-weight: 800; border-radius: 999px;
+      padding: 6px 11px; white-space: nowrap;
+      background: rgba(224,184,74,.12); border: 1px solid rgba(224,184,74,.3); color: var(--accent-bright);
+    }
+    .task-state.done { background: rgba(46,204,113,.12); border-color: rgba(46,204,113,.35); color: var(--success); }
+    .task-state.ghost { background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.12); color: var(--text-dim); }
+    .hint { font-size: 11.5px; color: var(--text-muted); margin-top: 11px; line-height: 1.55; overflow-wrap: anywhere; }
+    /* ── Matières ── */
+    .mat-row { padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,.06); }
+    .mat-row:last-child { border-bottom: none; padding-bottom: 2px; }
+    .mat-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .mat-name { font-size: 14px; font-weight: 700; color: var(--text-light); overflow-wrap: anywhere; }
+    .mat-pct { font-size: 12.5px; font-weight: 800; color: var(--accent-bright); white-space: nowrap; }
+    .mat-bar { height: 7px; border-radius: 99px; background: rgba(255,255,255,.08); margin: 8px 0 7px; overflow: hidden; }
+    .mat-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--accent), var(--accent-bright)); transition: width .4s ease; }
+    .mat-sub { font-size: 12px; color: var(--text-dim); overflow-wrap: anywhere; }
+    .mat-sub strong { color: var(--text-light); font-weight: 600; }
+    .mat-cta {
+      display: inline-flex; align-items: center; gap: 6px; margin-top: 9px;
+      background: linear-gradient(135deg, var(--accent-bright), var(--accent));
+      color: #141414; border: none; border-radius: 999px; padding: 8px 16px;
+      font-size: 12.5px; font-weight: 800; text-decoration: none;
+    }
+    .mat-cta.ghost { background: transparent; border: 1.5px solid rgba(224,184,74,.4); color: var(--accent-bright); }
+    /* ── Pronostic ── */
+    .prono-rhythm {
+      display: inline-flex; align-items: baseline; gap: 6px;
+      background: rgba(224,184,74,.08); border: 1px solid rgba(224,184,74,.25);
+      border-radius: 12px; padding: 9px 13px; margin-bottom: 12px;
+      font-size: 12.5px; color: var(--text-dim); overflow-wrap: anywhere;
+    }
+    .prono-rhythm b { color: var(--accent-bright); font-size: 15px; font-weight: 800; }
+    .prono-verdict { font-size: 14.5px; font-weight: 700; line-height: 1.55; color: var(--text-light); overflow-wrap: anywhere; }
+    .prono-verdict.good { color: var(--success); }
+    .prono-verdict.warn { color: var(--warning); }
+    .prono-extra { font-size: 12.5px; color: var(--text-dim); margin-top: 9px; line-height: 1.6; overflow-wrap: anywhere; }
+    .prono-actions { display: flex; gap: 9px; flex-wrap: wrap; margin-top: 13px; }
+    .qd-center { text-align: center; color: var(--text-dim); font-size: 13.5px; padding: 18px 6px; line-height: 1.6; overflow-wrap: anywhere; }
+  </style>
+</head>
+<body>
+  <div class="bg-layer"></div>
+  <div class="glow"></div>
+
+  <div class="page">
+    <div class="topbar">
+      <a href="index.html" class="back-btn">← <span>Accueil</span></a>
+      <span class="streak-chip" id="streakChip" aria-label="Série de jours consécutifs">🔥 0</span>
+    </div>
+
+    <div class="hero">
+      <div class="hero-icon">📅</div>
+      <h1>Ma <em>journée</em></h1>
+      <p id="todayLine">—</p>
+    </div>
+
+    <!-- COMPTE À REBOURS BAC -->
+    <div class="card">
+      <div class="bac-row">
+        <div class="bac-days"><span id="bacDays">--</span><small>jours</small></div>
+        <div class="bac-info">
+          <div class="l1">avant le <span id="bacLabel">BAC</span></div>
+          <div class="l2" id="bacDateLine">date indicative</div>
+        </div>
+        <a href="parcours.html" class="bac-btn">Voir mon parcours</a>
+      </div>
+    </div>
+
+    <!-- CHECKLIST DU JOUR -->
+    <div class="card">
+      <div class="card-title">✅ Aujourd'hui</div>
+
+      <a class="task" id="taskQj" href="quotidien.html">
+        <span class="task-icon">🎯</span>
+        <span class="task-body">
+          <strong>Question du jour</strong>
+          <span id="taskQjSub">4 questions · une par matière · 90 secondes</span>
+        </span>
+        <span class="task-state" id="taskQjState">À faire</span>
+      </a>
+
+      <a class="task" id="taskCours" href="index.html">
+        <span class="task-icon">📖</span>
+        <span class="task-body">
+          <strong>Lire un cours</strong>
+          <span id="taskCoursSub">Chargement du programme…</span>
+        </span>
+        <span class="task-state" id="taskCoursState">À faire</span>
+      </a>
+
+      <a class="task" href="exam.html">
+        <span class="task-icon">📝</span>
+        <span class="task-body">
+          <strong>Test moi</strong>
+          <span>Un test compte aussi pour la série</span>
+        </span>
+        <span class="task-state ghost">Ouvrir</span>
+      </a>
+
+      <div class="hint">Un seul de ces efforts par jour fait avancer ta série 🔥 — les jours manqués sont pardonnés une fois avec un congé 🛡️.</div>
+    </div>
+
+    <!-- TES MATIÈRES -->
+    <div class="card">
+      <div class="card-title">📚 Tes matières</div>
+      <div id="matieresList"><div class="qd-center">⏳ Chargement du programme…</div></div>
+    </div>
+
+    <!-- PRONOSTIC BAC -->
+    <div class="card">
+      <div class="card-title">🔮 Pronostic <span id="pronoBacLabel">BAC</span></div>
+      <div id="pronoBody"><div class="qd-center">⏳ Calcul de ton rythme…</div></div>
+      <div class="hint">Estimation simple, calculée sur ton appareil à partir de ton rythme des 7 derniers jours.</div>
+    </div>
+  </div>
+
+<script src="arvexa-streak.js" defer></script>
+<script src="bac-date.js" defer></script>
+<script>
+(function () {
+  'use strict';
+
+  var MATIERES = [
+    { id: 'mathematiques', label: 'Mathématiques', icon: '📐' },
+    { id: 'physique', label: 'Physique', icon: '⚡' },
+    { id: 'chimie', label: 'Chimie', icon: '⚗️' },
+    { id: 'svt', label: 'SVT', icon: '🧬' }
+  ];
+  var ONGLETS = ['cours', 'exercices', 'corrections'];
+  var K_READ = 'arvexa_read_parts';
+  var K_ACT = 'arvexa_daily_activity';
+  var K_QJ = 'arvexa-quotidien-v1';
+
+  function $(id) { return document.getElementById(id); }
+
+  function dayKey(d) {
+    var dt = (d instanceof Date) ? d : new Date();
+    var m = String(dt.getMonth() + 1).padStart(2, '0');
+    var j = String(dt.getDate()).padStart(2, '0');
+    return dt.getFullYear() + '-' + m + '-' + j;
+  }
+
+  function lireJSON(k, def) {
+    try { var v = JSON.parse(localStorage.getItem(k) || 'null'); return v == null ? def : v; }
+    catch (e) { return def; }
+  }
+
+  /* ── Sections lues → par matière / chapitre (format « matiere_3_cours_2 ») ── */
+  function mapLus() {
+    var arr = lireJSON(K_READ, []);
+    var map = Object.create(null); // { subject: { chapter: { 'tab_part': true } } }
+    (Array.isArray(arr) ? arr : []).forEach(function (k) {
+      var p = String(k || '').split('_');
+      if (p.length < 4) return;
+      var sj = p[0], ch = p[1], part = p[p.length - 1], tab = p.slice(2, p.length - 1).join('_');
+      if (!map[sj]) map[sj] = Object.create(null);
+      if (!map[sj][ch]) map[sj][ch] = Object.create(null);
+      map[sj][ch][tab + '_' + part] = true;
+    });
+    return map;
+  }
+
+  function chapitreLu(lus, sj, ch) {
+    var m = lus[sj] && lus[sj][String(ch.i)];
+    if (!m) return 0;
+    var n = 0;
+    ONGLETS.forEach(function (t) {
+      for (var p = 0; p < (ch.tabs && ch.tabs[t] || 0); p++) {
+        if (m[t + '_' + p]) n++;
+      }
+    });
+    return n;
+  }
+
+  /* ── Prochaine action d'une matière : 1re section non lue, onglets dans l'ordre ── */
+  function prochaineAction(lus, sj, chapters) {
+    for (var c = 0; c < chapters.length; c++) {
+      var ch = chapters[c];
+      for (var t = 0; t < ONGLETS.length; t++) {
+        var tab = ONGLETS[t];
+        var total = (ch.tabs && ch.tabs[tab]) || 0;
+        for (var p = 0; p < total; p++) {
+          var m = lus[sj] && lus[sj][String(ch.i)];
+          if (!(m && m[tab + '_' + p])) {
+            return {
+              done: false,
+              url: 'lecture.html?subject=' + sj + '&chapter=' + ch.i + '&tab=' + tab + '&part=' + p,
+              chapTitle: ch.title,
+              chapDone: chapitreLu(lus, sj, ch),
+              chapTotal: ch.total || 0
+            };
+          }
+        }
+      }
+    }
+    return { done: true, url: 'chapitre.html?subject=' + sj + '&chapter=0&tab=cours' };
+  }
+
+  /* ── En-tête : date + salutation ── */
+  function entete() {
+    var d = new Date();
+    var h = d.getHours();
+    var salut = h < 12 ? 'Bonjour' : (h < 18 ? 'Bon après-midi' : 'Bonsoir');
+    try {
+      $('todayLine').textContent = salut + ' — ' + d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    } catch (e) {
+      $('todayLine').textContent = salut;
+    }
+  }
+
+  /* ── Série 🔥 ── */
+  function serie() {
+    function maj() {
+      var st = window.ARVEXA_STREAK ? window.ARVEXA_STREAK.get() : { count: 0, best: 0, freeze: 1, activeToday: false };
+      $('streakChip').textContent = '🔥 ' + (st.count || 0);
+      $('streakChip').title = 'Record : ' + (st.best || 0) + ' jours' + (st.freeze > 0 ? ' · 🛡️ congé disponible' : '');
+    }
+    maj();
+    document.addEventListener('arvexa-streak-change', maj);
+  }
+
+  /* ── Compte à rebours BAC ── */
+  function bac() {
+    var label = (window.ARVEXA_BAC_DATE && window.ARVEXA_BAC_DATE.label) || 'BAC';
+    $('bacLabel').textContent = label;
+    $('pronoBacLabel').textContent = label;
+    if (typeof window.ARVEXA_getExamDate !== 'function') return null;
+    var exam = window.ARVEXA_getExamDate();
+    var days = Math.ceil((exam - new Date()) / 86400000);
+    if (!isFinite(days) || days < 0) days = 0;
+    $('bacDays').textContent = days;
+    try {
+      $('bacDateLine').textContent = exam.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) + ' · date indicative';
+    } catch (e) { /* garde la ligne par défaut */ }
+    return { exam: exam, days: days };
+  }
+
+  /* ── Question du jour : fait / à faire ── */
+  function etatQuestionDuJour() {
+    var e = lireJSON(K_QJ, {});
+    var fait = e && e.lastDone === dayKey();
+    $('taskQjState').textContent = fait ? '✅ Fait' : 'À faire';
+    $('taskQjState').className = 'task-state' + (fait ? ' done' : '');
+    $('taskQjSub').textContent = fait
+      ? 'Score du jour : ' + (typeof e.score === 'number' ? e.score : '—') + '/4 · reviens demain à 7h'
+      : '4 questions · une par matière · 90 secondes';
+  }
+
+  /* ── Matières + checklist cours (require progress-totals.json) ── */
+  function matieres(bacInfo) {
+    var lus = mapLus();
+    var act = lireJSON(K_ACT, {});
+    var aujourdhui = dayKey();
+    var luAujourdhui = Number(act[aujourdhui]) || 0;
+
+    fetch('./progress-totals.json')
+      .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(function (totals) {
+        var subjects = (totals && totals.subjects) || {};
+        var box = $('matieresList');
+        box.innerHTML = '';
+        var sommeLues = 0, sommeTotal = 0;
+        var premiereUrl = null, premiereTitre = null;
+
+        MATIERES.forEach(function (m) {
+          var st = subjects[m.id];
+          if (!st) return;
+          var lu = 0;
+          (st.chapters || []).forEach(function (ch) { lu += Math.min(chapitreLu(lus, m.id, ch), ch.total || 0); });
+          var tot = st.sectionsTotal || 0;
+          sommeLues += lu; sommeTotal += tot;
+          var pct = tot > 0 ? Math.round((lu / tot) * 100) : 0;
+          var next = prochaineAction(lus, m.id, st.chapters || []);
+          if (!premiereUrl && !next.done) { premiereUrl = next.url; premiereTitre = next.chapTitle; }
+
+          var row = document.createElement('div');
+          row.className = 'mat-row';
+          var sub;
+          if (next.done) {
+            sub = lu + '/' + tot + ' sections · <strong>✔ Programme terminé — bravo !</strong>';
+          } else {
+            sub = lu + '/' + tot + ' sections · Prochain : <strong>' + esc(next.chapTitle) + '</strong>' +
+              (next.chapDone > 0 ? ' <span style="color:var(--text-muted)">(' + next.chapDone + '/' + next.chapTotal + ' de ce chapitre)</span>' : '');
+          }
+          row.innerHTML =
+            '<div class="mat-head"><span class="mat-name">' + m.icon + ' ' + esc(m.label) + '</span>' +
+            '<span class="mat-pct">' + pct + '%</span></div>' +
+            '<div class="mat-bar"><div class="mat-fill" style="width:' + pct + '%"></div></div>' +
+            '<div class="mat-sub">' + sub + '</div>';
+          var cta = document.createElement('a');
+          cta.className = 'mat-cta' + (next.done ? ' ghost' : '');
+          cta.href = next.url;
+          cta.textContent = next.done ? 'Réviser' : 'Continuer';
+          row.appendChild(cta);
+          box.appendChild(row);
+        });
+
+        /* Checklist « Lire un cours » */
+        if (premiereUrl) $('taskCours').href = premiereUrl;
+        if (luAujourdhui > 0) {
+          $('taskCoursState').textContent = '✅ ' + luAujourdhui + (luAujourdhui === 1 ? ' section' : ' sections');
+          $('taskCoursState').className = 'task-state done';
+          $('taskCoursSub').textContent = premiereTitre
+            ? 'Continuer avec : ' + premiereTitre
+            : 'Encore un effort ? Ta série adore ça 🔥';
+        } else {
+          $('taskCoursSub').textContent = premiereTitre
+            ? 'Prochain chapitre : ' + premiereTitre
+            : 'Chargement du programme…';
+        }
+
+        pronostic(bacInfo, sommeLues, sommeTotal, act, aujourdhui);
+      })
+      .catch(function () {
+        $('matieresList').innerHTML = '<div class="qd-center">Programme indisponible hors ligne au premier chargement.<br>Rouvre cette page une fois connectée — tout sera en cache ensuite.</div>';
+        $('pronoBody').innerHTML = '<div class="qd-center">Pronostic indisponible sans le programme.</div>';
+        $('taskCoursSub').textContent = 'Programme indisponible hors ligne';
+      });
+  }
+
+  /* ── Pronostic BAC honnête ── */
+  function pronostic(bacInfo, lu, total, act, aujourdhui) {
+    var body = $('pronoBody');
+    if (!bacInfo) {
+      body.innerHTML = '<div class="qd-center">Compte à rebours indisponible.</div>';
+      return;
+    }
+    var restant = Math.max(0, total - lu);
+    var html = '';
+
+    if (total > 0) {
+      var rythme = 0;
+      for (var i = 0; i < 7; i++) {
+        var d = new Date(Date.now() - i * 86400000);
+        rythme += Number(act[dayKey(d)]) || 0;
+      }
+      rythme = rythme / 7;
+
+      var ligneRythme = '<div class="prono-rhythm">Ton rythme : <b>' + (rythme < 1 && rythme > 0 ? rythme.toFixed(1) : Math.round(rythme)) +
+        '</b> section' + (Math.round(rythme) > 1 ? 's' : '') + ' lue' + (Math.round(rythme) > 1 ? 's' : '') + ' / jour (7 derniers jours)</div>';
+      html += ligneRythme;
+
+      if (restant === 0) {
+        html += '<div class="prono-verdict good">🎉 Programme entièrement lu — maintenant, chaque relecture t\'approche du ' + (window.ARVEXA_BAC_DATE && window.ARVEXA_BAC_DATE.label || 'BAC') + '.</div>';
+      } else if (rythme <= 0) {
+        html += '<div class="prono-verdict warn">Aucune section lue ces 7 derniers jours. Une seule section aujourd\'hui relance tout — le programme du jour t\'attend.</div>';
+        html += '<div class="prono-extra">À 1 section par jour, les ' + restant + ' sections restantes seraient finies dans ' + restant + ' jours' + finVsBac(restant, bacInfo) + '.</div>';
+      } else {
+        var jours = Math.ceil(restant / rythme);
+        var dateFin = new Date(Date.now() + jours * 86400000);
+        var ds = '';
+        try { ds = dateFin.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' }); } catch (e) {}
+        if (jours <= bacInfo.days) {
+          html += '<div class="prono-verdict good">🎉 À ce rythme, tu termines le programme le ' + ds + ' — ' + (bacInfo.days - jours) + ' jour' + ((bacInfo.days - jours) > 1 ? 's' : '') + ' avant le ' + (window.ARVEXA_BAC_DATE && window.ARVEXA_BAC_DATE.label || 'BAC') + '.</div>';
+          html += '<div class="prono-extra">Continue exactement comme ça : ' + restant + ' sections restantes à ton rythme actuel.</div>';
+        } else {
+          var couvert = Math.min(100, Math.floor((rythme * bacInfo.days / restant) * 100));
+          var parJour = Math.ceil(restant / Math.max(1, bacInfo.days));
+          html += '<div class="prono-verdict warn">⚠️ À ce rythme, tu auras lu environ ' + couvert + '% du programme le jour du ' + (window.ARVEXA_BAC_DATE && window.ARVEXA_BAC_DATE.label || 'BAC') + '.</div>';
+          html += '<div class="prono-extra">Pour tout finir avant : passe à <b style="color:var(--accent-bright)">' + parJour + ' section' + (parJour > 1 ? 's' : '') + ' par jour</b> — c\'est ' + Math.round(rythme * 10) / 10 + ' aujourd\'hui. Chaque section compte.</div>';
+        }
+      }
+    }
+    body.innerHTML = html;
+  }
+
+  function finVsBac(jours, bacInfo) {
+    if (jours <= bacInfo.days) return ' soit ' + (bacInfo.days - jours) + ' jours avant le ' + (window.ARVEXA_BAC_DATE && window.ARVEXA_BAC_DATE.label || 'BAC');
+    return ' — après le ' + (window.ARVEXA_BAC_DATE && window.ARVEXA_BAC_DATE.label || 'BAC') + ', accélère un peu';
+  }
+
+  function esc(s) {
+    return String(s || '').replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  window.addEventListener('DOMContentLoaded', function () {
+    entete();
+    serie();
+    var bacInfo = bac();
+    etatQuestionDuJour();
+    matieres(bacInfo);
+  });
+})();
+</script>
+<script src="analytics.js" defer></script>
+<script src="register-sw.js" defer></script>
+</body>
+</html>

@@ -1536,8 +1536,51 @@
           </span>
           <span id="qjStreak" aria-label="Série de jours consécutifs" style="flex-shrink:0;background:rgba(224,184,74,.12);border:1px solid rgba(224,184,74,.35);color:var(--accent-bright,#E0B84A);font-size:13px;font-weight:800;border-radius:999px;padding:7px 12px;white-space:nowrap">🔥 0</span>
         </a>
+        <!-- RELANCE INTELLIGENTE (v8.24 — P1) : max 1 rappel/jour, seulement si la
+             question du jour n'est pas faite et qu'il est 7h ou plus. Dismissible. -->
+        <div id="qjNudge" style="display:none;align-items:center;gap:10px;margin:8px 0 0;padding:10px 12px;background:rgba(224,184,74,.07);border:1px dashed rgba(224,184,74,.35);border-radius:12px">
+          <span style="flex:1;min-width:0;font-size:12.5px;font-weight:600;color:var(--text-light,#F5F0E8);overflow-wrap:anywhere">⏰ Ta question du jour t'attend — 90 s pour garder ta série 🔥</span>
+          <button id="qjNudgeClose" type="button" aria-label="Masquer" style="flex-shrink:0;width:28px;height:28px;border-radius:8px;border:none;background:rgba(255,255,255,.06);color:var(--text-dim,#8A8A7A);font-size:13px;cursor:pointer;line-height:1">✕</button>
+        </div>
+        <div style="display:flex;justify-content:flex-end;margin-top:8px">
+          <a href="ma-journee.html" style="font-size:12.5px;font-weight:800;color:var(--accent-bright,#E0B84A);text-decoration:none;overflow-wrap:anywhere">📅 Voir ma journée complète →</a>
+        </div>
         <script>
         (function () {
+          function dayKey(d) {
+            var dt = (d instanceof Date) ? d : new Date();
+            var m = String(dt.getMonth() + 1).padStart(2, '0');
+            var j = String(dt.getDate()).padStart(2, '0');
+            return dt.getFullYear() + '-' + m + '-' + j;
+          }
+          function qjFaitAujourdhui() {
+            try {
+              var e = JSON.parse(localStorage.getItem('arvexa-quotidien-v1') || '{}');
+              return e && e.lastDone === dayKey();
+            } catch (err) { return false; }
+          }
+          /* RELANCE INTELLIGENTE (v8.24) : bandeau « question du jour pas faite »,
+             affiché AU MAXIMUM 1 fois par jour (date mémorisée dans
+             localStorage 'arvexa-nudge-v1'), seulement à partir de 7h,
+             et jamais si la question du jour est déjà faite. La décision est
+             prise UNE SEULE FOIS par vue de page (majQJ tourne plusieurs fois :
+             DOMContentLoaded, event série, pageshow) — sinon la 2e passe
+             masquerait le bandeau qu'elle vient d'afficher. */
+          var nudgeDecide = false;
+          function majNudge() {
+            var box = document.getElementById('qjNudge');
+            if (!box || nudgeDecide) return;
+            nudgeDecide = true;
+            var today = dayKey();
+            var vu = '';
+            try { vu = (JSON.parse(localStorage.getItem('arvexa-nudge-v1') || '{}') || {}).date || ''; } catch (err) {}
+            if (qjFaitAujourdhui() || vu === today || new Date().getHours() < 7) {
+              box.style.display = 'none';
+              return;
+            }
+            box.style.display = 'flex';
+            try { localStorage.setItem('arvexa-nudge-v1', JSON.stringify({ date: today })); } catch (err) {}
+          }
           function majQJ() {
             if (!window.ARVEXA_STREAK) return;
             var st = window.ARVEXA_STREAK.get();
@@ -1545,10 +1588,17 @@
             var sub = document.getElementById('qjSub');
             if (chip) chip.textContent = '🔥 ' + (st.count || 0);
             if (sub) sub.textContent = st.activeToday ? "✅ Fait pour aujourd'hui — reviens demain à 7h" : '4 questions · une par matière · 90 secondes';
+            majNudge();
           }
           window.addEventListener('DOMContentLoaded', majQJ);
           document.addEventListener('arvexa-streak-change', majQJ);
           window.addEventListener('pageshow', majQJ);
+          var nudgeClose = document.getElementById('qjNudgeClose');
+          if (nudgeClose) nudgeClose.addEventListener('click', function () {
+            var box = document.getElementById('qjNudge');
+            if (box) box.style.display = 'none';
+            try { localStorage.setItem('arvexa-nudge-v1', JSON.stringify({ date: dayKey() })); } catch (err) {}
+          });
         })();
         </script>
 
@@ -1573,10 +1623,6 @@
           <a href="formulaires.html" class="tool-card">
             <div class="icon-badge"><i class="fas fa-square-root-variable"></i></div>
             <div class="name">Formulaires</div>
-          </a>
-          <a href="tableau-periodique.html" class="tool-card">
-            <div class="icon-badge"><i class="fas fa-table-cells"></i></div>
-            <div class="name">Tableau périodique</div>
           </a>
           <a href="quotidien.html" class="tool-card">
             <div class="icon-badge"><i class="fas fa-bullseye"></i></div>

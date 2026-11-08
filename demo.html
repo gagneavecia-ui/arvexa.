@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0A0A0A">
+  <meta name="description" content="ARVEXA — Essaie 3 questions sans créer de compte : maths, physique, chimie. 60 secondes, aucune inscription.">
+<script>(function(){try{if(localStorage.getItem('arvexa-theme')==='light')document.documentElement.setAttribute('data-theme','light')}catch(e){}})();</script>
+<script src="theme.js"></script><script src="arvexa-i18n.js" defer></script>
+  <title>ARVEXA — Essai sans compte</title>
+  <link rel="icon" href="icon.png" type="image/png">
+  <link rel="apple-touch-icon" href="icon.png">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="perf.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="arvexa-ui.css">
+  <style>
+    :root {
+      --accent: #B8860B;
+      --accent-bright: #E0B84A;
+      --bg-dark: #0A0A0A;
+      --bg-surface: #141414;
+      --bg-deep: #060606;
+      --text-light: #F5F0E8;
+      --text-dim: #8A8A7A;
+      --text-muted: #5A5A4A;
+      --success: #2ECC71;
+      --warning: #F1C40F;
+      --danger: #E74C3C;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-light);
+      min-height: 100vh;
+      min-height: 100dvh;
+      -webkit-font-smoothing: antialiased;
+      position: relative;
+    }
+    .bg-layer {
+      position: fixed; inset: 0; z-index: -2;
+      background:
+        radial-gradient(ellipse 40% 30% at 30% 15%, rgba(184,134,11,.16) 0%, transparent 70%),
+        radial-gradient(ellipse 35% 25% at 78% 88%, rgba(184,134,11,.07) 0%, transparent 60%),
+        linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-deep) 100%);
+    }
+    .glow {
+      position: fixed; width: 300px; height: 300px; border-radius: 50%;
+      background: var(--accent); filter: blur(110px); opacity: .1;
+      pointer-events: none; z-index: -1; top: -120px; right: -80px;
+    }
+    .page { max-width: 560px; margin: 0 auto; padding: calc(var(--safe-top) + 16px) 16px calc(var(--safe-bottom) + 32px); }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 6px 0 18px; }
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.09);
+      color: var(--text-light); border-radius: 12px; padding: 9px 13px;
+      font-size: 13px; font-weight: 600; text-decoration: none; cursor: pointer;
+    }
+    .free-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(224,184,74,.1); border: 1px solid rgba(224,184,74,.3);
+      color: var(--accent-bright); border-radius: 999px; padding: 8px 13px;
+      font-size: 12.5px; font-weight: 700; white-space: nowrap;
+    }
+    .hero { text-align: center; padding: 6px 0 20px; }
+    .hero-icon { font-size: 40px; line-height: 1; }
+    .hero h1 {
+      font-family: 'Playfair Display', Georgia, serif; font-size: 27px; font-weight: 700;
+      margin: 10px 0 6px; color: var(--text-light);
+    }
+    .hero h1 em { color: var(--accent-bright); font-style: italic; }
+    .hero p { color: var(--text-dim); font-size: 13.5px; }
+    .card {
+      background: linear-gradient(160deg, var(--bg-surface), var(--bg-dark));
+      border: 1px solid rgba(224,184,74,.18); border-radius: 18px;
+      padding: 20px 18px; margin-top: 4px;
+      box-shadow: 0 14px 40px rgba(0,0,0,.4);
+    }
+    .dm-dots { display: flex; gap: 7px; justify-content: center; margin-bottom: 16px; }
+    .dm-dot { width: 26px; height: 5px; border-radius: 99px; background: rgba(255,255,255,.12); transition: background .25s; }
+    .dm-dot.on { background: var(--accent-bright); }
+    .dm-dot.ok { background: var(--success); }
+    .dm-dot.ko { background: var(--danger); }
+    .dm-matiere { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+    .dm-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(224,184,74,.12); border: 1px solid rgba(224,184,74,.3);
+      color: var(--accent-bright); font-size: 12px; font-weight: 700;
+      border-radius: 999px; padding: 5px 11px;
+    }
+    .dm-chap { color: var(--text-muted); font-size: 11.5px; overflow-wrap: anywhere; }
+    .dm-q { font-size: 17px; font-weight: 700; line-height: 1.45; margin: 4px 0 16px; overflow-wrap: anywhere; }
+    .dm-opt {
+      display: flex; align-items: flex-start; gap: 10px; width: 100%; text-align: left;
+      background: rgba(255,255,255,.035); border: 1px solid rgba(255,255,255,.1);
+      color: var(--text-light); border-radius: 13px; padding: 12px 13px;
+      font-size: 14.5px; font-weight: 500; cursor: pointer; margin-bottom: 9px;
+      transition: border-color .18s, background .18s; overflow-wrap: anywhere;
+      font-family: inherit;
+    }
+    .dm-opt .lettre {
+      flex-shrink: 0; width: 24px; height: 24px; border-radius: 8px;
+      display: inline-flex; align-items: center; justify-content: center;
+      background: rgba(224,184,74,.14); color: var(--accent-bright);
+      font-size: 12px; font-weight: 800;
+    }
+    .dm-opt:hover { border-color: rgba(224,184,74,.45); }
+    .dm-opt.good { border-color: var(--success); background: rgba(46,204,113,.12); }
+    .dm-opt.good .lettre { background: rgba(46,204,113,.25); color: var(--success); }
+    .dm-opt.bad { border-color: var(--danger); background: rgba(231,76,60,.12); }
+    .dm-opt.bad .lettre { background: rgba(231,76,60,.25); color: var(--danger); }
+    .dm-opt:disabled { cursor: default; opacity: .92; }
+    .dm-feedback {
+      display: none; border-radius: 13px; padding: 13px 14px; margin-top: 4px;
+      font-size: 13.5px; line-height: 1.5; overflow-wrap: anywhere;
+    }
+    .dm-feedback.show { display: block; animation: dmIn .25s ease; }
+    .dm-feedback.good { background: rgba(46,204,113,.1); border: 1px solid rgba(46,204,113,.3); color: var(--text-light); }
+    .dm-feedback.bad { background: rgba(231,76,60,.1); border: 1px solid rgba(231,76,60,.3); color: var(--text-light); }
+    .dm-feedback strong { display: block; margin-bottom: 4px; }
+    .dm-feedback.good strong { color: var(--success); }
+    .dm-feedback.bad strong { color: var(--danger); }
+    .dm-actions { display: flex; justify-content: center; margin-top: 16px; }
+    .dm-btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      background: linear-gradient(135deg, var(--accent-bright), var(--accent));
+      color: #141414; border: none; border-radius: 999px; padding: 13px 30px;
+      font-size: 14.5px; font-weight: 800; cursor: pointer; font-family: inherit;
+      box-shadow: 0 8px 22px rgba(184,134,11,.3); text-decoration: none;
+    }
+    .dm-btn.ghost {
+      background: transparent; color: var(--accent-bright);
+      border: 1.5px solid rgba(224,184,74,.4); box-shadow: none;
+    }
+    .dm-score { text-align: center; padding: 10px 0 4px; }
+    .dm-score .big {
+      font-family: 'Playfair Display', Georgia, serif; font-size: 52px; font-weight: 700;
+      color: var(--accent-bright); line-height: 1;
+    }
+    .dm-score .sub { color: var(--text-dim); font-size: 13.5px; margin-top: 8px; line-height: 1.55; }
+    .dm-msg { text-align: center; margin: 4px 0 14px; font-size: 15px; font-weight: 600; color: var(--text-light); }
+    .dm-tease {
+      text-align: center; font-size: 13px; color: var(--text-dim);
+      background: rgba(224,184,74,.06); border: 1px solid rgba(224,184,74,.2);
+      border-radius: 13px; padding: 12px 14px; margin: 14px 0 4px; line-height: 1.6; overflow-wrap: anywhere;
+    }
+    .dm-tease b { color: var(--accent-bright); }
+    .dm-center { text-align: center; color: var(--text-dim); font-size: 14px; padding: 26px 8px; line-height: 1.6; }
+    .dm-actions-col { display: flex; flex-direction: column; gap: 10px; align-items: center; margin-top: 18px; }
+    .hidden { display: none !important; }
+    @keyframes dmIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  </style>
+</head>
+<body>
+  <div class="bg-layer"></div>
+  <div class="glow"></div>
+
+  <div class="page">
+    <div class="topbar">
+      <a href="login.html" class="back-btn">← <span>Retour</span></a>
+      <span class="free-chip">🎁 100 % gratuit</span>
+    </div>
+
+    <div class="hero">
+      <div class="hero-icon">✨</div>
+      <h1>Essaie sans <em>compte</em></h1>
+      <p>3 questions · 60 secondes · aucune inscription</p>
+    </div>
+
+    <div class="card">
+      <!-- INTRO -->
+      <div id="introView">
+        <div class="dm-center" style="padding-top:6px">
+          Un avant-goût d'ARVEXA School :<br>
+          <b style="color:var(--text-light)">1 question de maths</b> · <b style="color:var(--text-light)">1 de physique</b> · <b style="color:var(--text-light)">1 de chimie</b><br><br>
+          Chaque réponse vient avec son explication — comme dans les vrais cours.
+        </div>
+        <div class="dm-actions"><button class="dm-btn" id="startBtn">Commencer le mini-quiz</button></div>
+      </div>
+
+      <!-- QUIZ -->
+      <div id="quizView" class="hidden">
+        <div class="dm-dots" id="dmDots"></div>
+        <div class="dm-matiere">
+          <span class="dm-badge" id="dmMatiere">📘</span>
+          <span class="dm-chap" id="dmChap"></span>
+        </div>
+        <div class="dm-q" id="dmQ"></div>
+        <div id="dmOpts"></div>
+        <div class="dm-feedback" id="dmFb"></div>
+        <div class="dm-actions"><button class="dm-btn hidden" id="nextBtn">Suivant</button></div>
+      </div>
+
+      <!-- RÉSULTAT -->
+      <div id="doneView" class="hidden">
+        <div class="dm-score">
+          <div class="big" id="doneScore">3/3</div>
+          <div class="sub">C'est un aperçu — avec ton compte, ce rituel revient <b>chaque jour à 7h</b>.</div>
+        </div>
+        <div class="dm-msg" id="doneMsg"></div>
+        <div class="dm-tease">
+          Avec ton compte gratuit, chaque jour à 7h :<br>
+          🎯 <b>4 nouvelles questions</b> (une par matière) · 📖 <b>un nouveau chapitre</b> par matière · 🔥 <b>ta série</b> et ta progression sauvegardées
+        </div>
+        <div class="dm-actions-col">
+          <a href="register.html" class="dm-btn">Créer mon compte gratuit</a>
+          <a href="login.html" class="dm-btn ghost">J'ai déjà un compte</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+(function () {
+  'use strict';
+
+  var LETTRES = ['A', 'B', 'C', 'D'];
+  var QUESTIONS = [
+    {
+      icon: '📐', label: 'Mathématiques', c: 'Nombres complexes',
+      q: 'Que vaut i² (i est le nombre imaginaire) ?',
+      o: ['1', 'i', '−1', '−i'], a: 2,
+      e: 'Par définition i = √(−1), donc i² = −1. C\'est la propriété de base de tous les calculs avec les nombres complexes.'
+    },
+    {
+      icon: '⚡', label: 'Physique', c: 'Grandeurs et unités',
+      q: 'Quelle est l\'unité SI de la force ?',
+      o: ['Le joule (J)', 'Le newton (N)', 'Le watt (W)', 'Le pascal (Pa)'], a: 1,
+      e: 'Le newton : 1 N = 1 kg·m·s⁻², la force qui donne une accélération de 1 m/s² à une masse de 1 kg.'
+    },
+    {
+      icon: '⚗️', label: 'Chimie', c: 'Solutions aqueuses et pH',
+      q: 'Que vaut le pH d\'une solution neutre à 25 °C ?',
+      o: ['0', '14', '1', '7'], a: 3,
+      e: 'À 25 °C, une solution neutre a [H₃O⁺] = [HO⁻] = 10⁻⁷ mol/L, donc pH = −log(10⁻⁷) = 7.'
+    }
+  ];
+
+  var idx = 0;
+  var score = 0;
+  var verrouille = false;
+
+  function $(id) { return document.getElementById(id); }
+  function show(view) {
+    ['introView', 'quizView', 'doneView'].forEach(function (v) {
+      $(v).classList.toggle('hidden', v !== view);
+    });
+  }
+  function renderDots() {
+    var html = '';
+    for (var i = 0; i < QUESTIONS.length; i++) {
+      var cls = 'dm-dot' + (i === idx ? ' on' : '');
+      html += '<span class="' + cls + '"></span>';
+    }
+    $('dmDots').innerHTML = html;
+  }
+  function renderQuestion() {
+    verrouille = false;
+    var item = QUESTIONS[idx];
+    renderDots();
+    $('dmMatiere').textContent = item.icon + ' ' + item.label;
+    $('dmChap').textContent = item.c;
+    $('dmQ').textContent = item.q;
+    var box = $('dmOpts');
+    box.innerHTML = '';
+    item.o.forEach(function (opt, i) {
+      var b = document.createElement('button');
+      b.className = 'dm-opt';
+      b.type = 'button';
+      b.innerHTML = '<span class="lettre">' + LETTRES[i] + '</span><span></span>';
+      b.lastChild.textContent = opt;
+      b.addEventListener('click', function () { repondre(i, b); });
+      box.appendChild(b);
+    });
+    $('dmFb').className = 'dm-feedback';
+    $('dmFb').innerHTML = '';
+    $('nextBtn').classList.add('hidden');
+    $('nextBtn').textContent = (idx === QUESTIONS.length - 1) ? 'Voir mon résultat' : 'Suivant';
+  }
+  function repondre(choice) {
+    if (verrouille) return;
+    verrouille = true;
+    var item = QUESTIONS[idx];
+    var juste = choice === item.a;
+    if (juste) score += 1;
+    var opts = $('dmOpts').children;
+    for (var i = 0; i < opts.length; i++) {
+      opts[i].disabled = true;
+      if (i === item.a) opts[i].classList.add('good');
+      if (i === choice && !juste) opts[i].classList.add('bad');
+    }
+    var dots = $('dmDots').children;
+    if (dots[idx]) dots[idx].className = 'dm-dot ' + (juste ? 'ok' : 'ko');
+    var fb = $('dmFb');
+    fb.className = 'dm-feedback show ' + (juste ? 'good' : 'bad');
+    fb.innerHTML = '';
+    var strong = document.createElement('strong');
+    strong.textContent = juste ? '✅ Exact !' : '❌ Raté — la bonne réponse était ' + LETTRES[item.a];
+    fb.appendChild(strong);
+    var p = document.createElement('span');
+    p.textContent = item.e || '';
+    fb.appendChild(p);
+    $('nextBtn').classList.remove('hidden');
+  }
+  function terminer() {
+    $('doneScore').textContent = score + '/' + QUESTIONS.length;
+    var msg;
+    if (score === QUESTIONS.length) msg = 'Sans faute ! Tu es fait pour ARVEXA 🎯';
+    else if (score >= 2) msg = 'Bien joué — les explications des cours complètent le reste.';
+    else msg = 'C\'est exactement pour ça qu\'ARVEXA existe : chaque cours est expliqué pas à pas.';
+    $('doneMsg').textContent = msg;
+    show('doneView');
+  }
+  $('startBtn').addEventListener('click', function () {
+    idx = 0; score = 0;
+    show('quizView');
+    renderQuestion();
+  });
+  $('nextBtn').addEventListener('click', function () {
+    if (idx < QUESTIONS.length - 1) { idx += 1; renderQuestion(); }
+    else terminer();
+  });
+})();
+</script>
+<script src="analytics.js" defer></script>
+<script src="register-sw.js" defer></script>
+</body>
+</html>

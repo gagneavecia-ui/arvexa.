@@ -1,6 +1,6 @@
 // ================================================================
 // FIREBASE MESSAGING SERVICE WORKER — ARVEXA School
-// Version : 1.4.0
+// Version : 1.5.0
 // Corrections appliquées :
 //  - C1 : client.navigate() avec fallback openWindow (navigation fiable)
 //  - C2 : try/catch sur showNotification (évite les rejets silencieux)
@@ -15,6 +15,13 @@
 //         logo de l'app (lanceur, à gauche) + titre + message ; AUCUN champ
 //         `icon` → rien à droite. Le badge atome (variante 4) reste l'icône
 //         de la barre d'état.
+//  - C7 (v1.5.0, P1 « relance intelligente », audit 09/11/2026) — MAX 1
+//         NOTIFICATION TOUTES LES 20 H pour les messages data-only : le
+//         dernier affichage est mémorisé dans IndexedDB ; si un push arrive
+//         avant le délai, il est journalisé puis ignoré (pas de spam). Les
+//         messages avec payload `notification` natif restent affichés par le
+//         SDK FCM lui-même (non interceptables côté SW) ; la discipline côté
+//         envoi reste donc nécessaire pour ce cas.
 // ================================================================
 
 // ⚡ Imports FCM (version compat, obligatoire pour Service Worker)
@@ -63,6 +70,54 @@ function getSafeNotificationUrl(value) {
 }
 
 // ================================================================
+// ✅ C7 — RELANCE INTELLIGENTE : throttle 20 h (IndexedDB)
+// ================================================================
+const THROTTLE_DB = 'arvexa-notif-throttle';
+const THROTTLE_MS = 20 * 60 * 60 * 1000; // 20 heures
+
+function throttleGetLastShown() {
+  return new Promise((resolve) => {
+    try {
+      const req = indexedDB.open(THROTTLE_DB, 1);
+      req.onupgradeneeded = () => {
+        try { req.result.createObjectStore('kv'); } catch (e) { /* déjà créée */ }
+      };
+      req.onerror = () => resolve(0);
+      req.onsuccess = () => {
+        const db = req.result;
+        try {
+          const tx = db.transaction('kv', 'readonly');
+          const get = tx.objectStore('kv').get('lastShown');
+          get.onsuccess = () => resolve(Number(get.result) || 0);
+          get.onerror = () => resolve(0);
+        } catch (e) { resolve(0); }
+      };
+    } catch (e) { resolve(0); }
+  });
+}
+
+function throttleSetLastShown(ts) {
+  return new Promise((resolve) => {
+    try {
+      const req = indexedDB.open(THROTTLE_DB, 1);
+      req.onupgradeneeded = () => {
+        try { req.result.createObjectStore('kv'); } catch (e) { /* déjà créée */ }
+      };
+      req.onerror = () => resolve(false);
+      req.onsuccess = () => {
+        const db = req.result;
+        try {
+          const tx = db.transaction('kv', 'readwrite');
+          tx.objectStore('kv').put(ts, 'lastShown');
+          tx.oncomplete = () => resolve(true);
+          tx.onerror = () => resolve(false);
+        } catch (e) { resolve(false); }
+      };
+    } catch (e) { resolve(false); }
+  });
+}
+
+// ================================================================
 // MESSAGES EN ARRIÈRE-PLAN
 // ================================================================
 messaging.onBackgroundMessage((payload) => {
@@ -97,7 +152,7 @@ messaging.onBackgroundMessage((payload) => {
     // MONOCHROME blanc (variante 4 « atome ») reste l'icône de la barre d'état.
     badge: 'notif-icon.png',
     vibrate: [200, 100, 200],
-    tag: 'arvexa-notification-' + Date.now(),
+    tag: 'arvexa-relance',
     renotify: true,
     requireInteraction: false,
     data: {
@@ -106,15 +161,27 @@ messaging.onBackgroundMessage((payload) => {
     }
   };
 
-  // ✅ C2 — try/catch sur showNotification (évite les rejets silencieux)
-  try {
-    self.registration.showNotification(notificationTitle, notificationOptions)
-      .catch((error) => {
-        console.warn('[FCM-SW] showNotification échoué :', error && error.message ? error.message : error);
-      });
-  } catch (error) {
-    console.warn('[FCM-SW] showNotification exception :', error && error.message ? error.message : error);
-  }
+  // ✅ C7 — RELANCE INTELLIGENTE : une seule notification data-only affichée
+  // toutes les 20 h ; les pushes qui arrivent avant le délai sont ignorés.
+  throttleGetLastShown().then((lastShown) => {
+    const now = Date.now();
+    if (lastShown && (now - lastShown) < THROTTLE_MS) {
+      console.log('[FCM-SW] Relance intelligente : notification ignorée ' +
+        '(dernière affichée il y a ' + Math.round((now - lastShown) / 60000) + ' min, max 1 / 20 h)');
+      return;
+    }
+    throttleSetLastShown(now);
+
+    // ✅ C2 — try/catch sur showNotification (évite les rejets silencieux)
+    try {
+      self.registration.showNotification(notificationTitle, notificationOptions)
+        .catch((error) => {
+          console.warn('[FCM-SW] showNotification échoué :', error && error.message ? error.message : error);
+        });
+    } catch (error) {
+      console.warn('[FCM-SW] showNotification exception :', error && error.message ? error.message : error);
+    }
+  });
 });
 
 // ================================================================
@@ -189,4 +256,4 @@ self.addEventListener('pushsubscriptionchange', (event) => {
   event.waitUntil(Promise.resolve());
 });
 
-console.log('[FCM-SW] Firebase Messaging Service Worker chargé (v1.4.0).');
+console.log('[FCM-SW] Firebase Messaging Service Worker chargé (v1.5.0 — relance intelligente : max 1 notif / 20 h).');

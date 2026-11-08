@@ -2396,6 +2396,43 @@
   }
 
   // ================================================================
+  // ✅ v8.28 — ÉCONOMIE FIRESTORE : PORTES JOUR (day-gate)
+  // Demande propriétaire : « réduire les appels Firebase — la 1re fois
+  // qu'on ouvre la page dans la journée, on charge, on affiche, puis on
+  // fige ; ensuite le cache s'affiche et on actualise en arrière-plan. »
+  // Chaque lecture serveur coûteuse devient : 1re ouverture du jour =
+  // lecture + affichage + figage en localStorage ; ouvertures suivantes
+  // = cache instantané, ZÉRO appel, revalidation en arrière-plan
+  // seulement si le cache dépasse 3 h.
+  // ================================================================
+  const ARVEXA_DAY_GATES_KEY = 'arvexa_day_gates';
+
+  function arvexaDayKey() {
+    const d = new Date();
+    return d.getFullYear() + '-' +
+      String(d.getMonth() + 1).padStart(2, '0') + '-' +
+      String(d.getDate()).padStart(2, '0');
+  }
+
+  function readDayGate(name) {
+    try {
+      const gates = JSON.parse(localStorage.getItem(ARVEXA_DAY_GATES_KEY) || '{}');
+      const gate = gates[name] || null;
+      // Une porte d'un autre jour est considérée comme jamais passée.
+      return (gate && gate.day === arvexaDayKey()) ? gate : null;
+    } catch (e) { return null; }
+  }
+
+  function writeDayGate(name, value) {
+    try {
+      const gates = JSON.parse(localStorage.getItem(ARVEXA_DAY_GATES_KEY) || '{}');
+      gates[name] = { ...value, day: arvexaDayKey() };
+      // Clés à nom fixe : le fichier ne grossit jamais (quelques octets).
+      localStorage.setItem(ARVEXA_DAY_GATES_KEY, JSON.stringify(gates));
+    } catch (e) {}
+  }
+
+  // ================================================================
   // SNAPSHOT DE SESSION — retour instantané sur l'accueil
   // 1er chargement : splash + Firestore. Retours ensuite : le dernier
   // rendu est restauré immédiatement (sessionStorage) pendant que
@@ -2953,9 +2990,40 @@
 
 
   // ================================================================
-  // NOTIFICATIONS NON LUES
+  // NOTIFICATIONS NON LUES — point 🔔 jour-calé (✅ v8.28)
+  // Avant : 1 requête Firestore À CHAQUE ouverture de l'accueil (+1 à
+  // chaque mise à jour du profil). Après : la 1re ouverture du jour
+  // interroge le serveur, affiche le point et FIGE le résultat ; les
+  // ouvertures suivantes affichent le cache (0 lecture) et ne
+  // re-valident en arrière-plan que si la vérification date de plus de
+  // 3 h (ex. relance écrite à 7 h 10 app fermé). notifications.html
+  // met aussi le cache à jour localement après une lecture → retour
+  // sur l'accueil juste, sans aucun appel.
   // ================================================================
-  async function checkUnreadNotifications(userId) {
+  const NOTIF_DOT_CACHE_KEY = 'arvexa_notif_dot';
+  const NOTIF_RECHECK_DELAY = 3 * 60 * 60 * 1000; // 3 h
+
+  function applyNotifDot(unread) {
+    lastNotifUnread = unread;
+    if (notifDot) notifDot.classList.toggle('show', unread);
+  }
+
+  function readNotifDotCache() {
+    try {
+      const c = JSON.parse(localStorage.getItem(NOTIF_DOT_CACHE_KEY) || 'null');
+      return (c && c.day === arvexaDayKey()) ? c : null;
+    } catch (e) { return null; }
+  }
+
+  function saveNotifDotCache(unread) {
+    try {
+      localStorage.setItem(NOTIF_DOT_CACHE_KEY, JSON.stringify({
+        day: arvexaDayKey(), unread: !!unread, at: Date.now()
+      }));
+    } catch (e) {}
+  }
+
+  async function fetchNotifDotServer(userId) {
     try {
       const q = query(
         collection(db, 'users', userId, 'notifications'),
@@ -2963,14 +3031,30 @@
         limit(1)
       );
       const snapshot = await getDocs(q);
-      lastNotifUnread = !snapshot.empty;
-      if (notifDot) notifDot.classList.toggle('show', lastNotifUnread);
+      applyNotifDot(!snapshot.empty);
+      saveNotifDotCache(!snapshot.empty);
       saveIndexSnapshot();
     } catch (e) {
       console.warn('[Notif] checkUnread:', e.message);
-      lastNotifUnread = false;
-      if (notifDot) notifDot.classList.remove('show');
+      // Hors ligne/erreur : si le cache du jour existe déjà, on le garde
+      // (le point reste tel qu'affiché) ; sinon on éteint le point.
+      if (!readNotifDotCache()) applyNotifDot(false);
     }
+  }
+
+  async function checkUnreadNotifications(userId) {
+    const cached = readNotifDotCache();
+    if (cached) {
+      // Déjà fait aujourd'hui : affichage immédiat depuis le cache, 0 appel.
+      applyNotifDot(cached.unread);
+      if (Date.now() - (cached.at || 0) > NOTIF_RECHECK_DELAY) {
+        // Revalidation décalée en arrière-plan (au plus ~4/jour).
+        fetchNotifDotServer(userId);
+      }
+      return;
+    }
+    // 1re ouverture du jour : on interroge, on affiche, on fige.
+    await fetchNotifDotServer(userId);
   }
 
   // ================================================================
@@ -3234,10 +3318,17 @@
     }
   }
 
+  // ✅ v8.28 — jour-calée : avant, CHAQUE ouverture avec notifications
+  // accordées refaisait 1 lecture + 1 écriture Firestore pour
+  // ré-enregistrer un token IDENTIQUE. Désormais : 1re ouverture du
+  // jour (ou rotation réelle du token — mise à jour d'app,
+  // réinstallation) = sauvegarde ; tout le reste = 0 appel.
   async function saveFcmToken(token) {
     const user = auth.currentUser;
     if (!user) return;
     try {
+      const gate = readDayGate('fcm');
+      if (gate && gate.token === token) return; // déjà enregistré aujourd'hui
       const userRef = doc(db, 'users', user.uid);
       const userSnap = await getDoc(userRef);
       const data = userSnap.exists() ? userSnap.data() : {};
@@ -3250,6 +3341,7 @@
         fcmTokenUpdatedAt: serverTimestamp(),
         fcmToken: token
       });
+      writeDayGate('fcm', { token });
     } catch (e) {
       console.error('[FCM] Erreur sauvegarde:', e.message);
     }
@@ -3783,6 +3875,16 @@
     try {
       const u = auth.currentUser;
       if (!u) return;
+      // ✅ v8.28 — une seule fois par JOUR (et par compte) au lieu de
+      // chaque session : 9 lectures Firestore économisées à chaque
+      // ré-ouverture de l'app le même jour. Le contenu des matières
+      // change rarement, et matiere.html revalide de toute façon par
+      // lui-même (onSnapshot) quand on visite la page.
+      const gate = readDayGate('prewarm');
+      if (gate && gate.uid === u.uid) {
+        console.log('[Cache] Préchauffage déjà fait aujourd\'hui — 0 lecture Firestore');
+        return;
+      }
       // 4 matières : doc + sous-collection chapters (données matiere.html)
       for (const key of ['mathematiques', 'physique', 'chimie', 'svt']) {
         await getDoc(doc(db, 'subjects', key)).catch(() => {});
@@ -3790,6 +3892,7 @@
       }
       // Notifications (notifications.html)
       await getDocs(collection(db, 'users', u.uid, 'notifications')).catch(() => {});
+      writeDayGate('prewarm', { uid: u.uid });
       console.log('[Cache] Préchauffage des pages terminé');
     } catch (e) {}
   }

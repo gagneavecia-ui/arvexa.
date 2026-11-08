@@ -1182,6 +1182,20 @@ async function openNotifDetail(id) {
         doc(db, 'users', currentUid, 'notifications', id),
         { read: true }
       );
+      // ✅ v8.28 — tient le point 🔔 de l'accueil à jour SANS nouvel
+      // appel Firestore : on réécrit le cache-jour « arvexa_notif_dot »
+      // que index.html lit au démarrage (1re ouverture du jour =
+      // serveur, ensuite cache). localStorage uniquement, jamais de
+      // ré-écriture du doc utilisateur.
+      notif.read = true;
+      const stillUnread = allNotifications.some(n => !n.read);
+      const d = new Date();
+      const day = d.getFullYear() + '-' +
+        String(d.getMonth() + 1).padStart(2, '0') + '-' +
+        String(d.getDate()).padStart(2, '0');
+      localStorage.setItem('arvexa_notif_dot', JSON.stringify({
+        day, unread: stillUnread, at: Date.now()
+      }));
     } catch (e) {
       // Silencieux : le clic doit ouvrir même si le marquage échoue
     }

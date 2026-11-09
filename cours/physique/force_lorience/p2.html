@@ -1,0 +1,382 @@
+<!-- PARTIE 02 — Mouvement d'une charge dans un champ magnétique (Force de Lorience) -->
+<div class="lecture-container">
+
+  <!-- ===== HERO ===== -->
+  <header class="lecture-hero">
+    <div class="lecture-hero-badge">
+      <span class="lecture-hero-icon">📘</span>
+      <span class="lecture-hero-label">Terminale C&D · Force de Lorience · Partie 02</span>
+    </div>
+    <h1 class="lecture-hero-title">
+      Mouvement d'une charge dans un <em>champ magnétique</em>
+    </h1>
+    <p class="lecture-hero-intro">
+      La force de Lorience est maintenant entre tes mains : reste à suivre la particule dans le temps. Cette partie répond à trois questions : pourquoi la vitesse ne change-t-elle jamais de valeur ? quel cercle décrit la particule quand <em><span class="math">→v</span> est perpendiculaire à <span class="math">→B</span></em> ? et que se passe-t-il quand elle arrive de biais ? Tu repartiras avec trois formules : le travail nul, le rayon du cercle et la période du tour.
+    </p>
+    <div class="lecture-hero-meta">
+      <span class="lecture-hero-meta-item">⏱ 25 min</span>
+      <span class="lecture-hero-meta-item">⚡ 4 notions</span>
+      <span class="lecture-hero-meta-item">📚 6 sections</span>
+      <span class="lecture-hero-meta-item">🎓 Terminale C&D</span>
+    </div>
+  </header>
+  <!-- ===== SOMMAIRE ===== -->
+  <nav class="lecture-toc">
+    <div class="lecture-toc-header">
+      <span>Dans cette partie</span>
+      <span class="lecture-toc-count">4 notions · 6 sections</span>
+    </div>
+    <ol class="lecture-toc-list">
+      <li><a href="#s0"><span class="toc-num">00</span><span>Courber sans accélérer</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>La force de Lorience ne travaille pas</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>Trajectoire circulaire (<span class="math">→v</span> ⊥ <span class="math">→B</span>)</span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>Période et fréquence : <span class="math">T</span> et <span class="math">f</span></span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>Trajectoire hélicoïdale (<span class="math">→v</span> oblique)</span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>Bilan : exercices de synthèse</span></a></li>
+    </ol>
+  </nav>
+  <!-- ============================================================ -->
+  <!-- SECTION s0 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s0">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">00</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Motivation</span>
+        <h2 class="lecture-section-title">Courber sans accélérer</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Attache une pierre au bout d'une ficelle et fais-la tourner au-dessus de ta tête : la ficelle tire en permanence vers le centre, pourtant la pierre ne va ni plus vite ni moins vite. La tension courbe la trajectoire mais ne travaille pas, car elle reste perpendiculaire au déplacement. La force de Lorience joue exactement ce rôle pour une particule chargée dans un champ magnétique.</p>
+      <p class="lecture-text">Dans cette partie, tu comprends pourquoi la norme de la vitesse reste constante, puis tu calcules le rayon du cercle décrit quand <span class="math">→v</span> est perpendiculaire à <span class="math">→B</span>, la période de ce mouvement, et enfin la trajectoire en hélice quand <span class="math">→v</span> arrive de biais. Ce sont ces résultats qui rendent possibles le cyclotron et le spectromètre de masse de la Partie 03.</p>
+      <svg viewBox="0 0 560 260" style="width:100%;height:auto" role="img" aria-label="À chaque instant, la force de Lorience est perpendiculaire à la vitesse">
+        <circle cx="280" cy="140" r="100" fill="none" style="stroke:var(--accent-bright)" stroke-width="1.5" stroke-dasharray="6 5"/>
+        <text x="272" y="146" font-size="16" style="fill:var(--accent-bright)">⊗</text>
+        <text x="296" y="152" font-size="12" style="fill:currentColor">→B entrant</text>
+        <circle cx="280" cy="40" r="9" style="fill:rgba(251,191,36,0.30);stroke:rgba(251,191,36,0.95)" stroke-width="2"/>
+        <line x1="292" y1="40" x2="348" y2="40" style="stroke:rgba(52,211,153,0.95)" stroke-width="2.5"/>
+        <polygon points="360,40 346,34 346,46" style="fill:rgba(52,211,153,0.95)"/>
+        <text x="308" y="30" font-size="13" style="fill:rgba(52,211,153,0.95)">→v</text>
+        <line x1="280" y1="52" x2="280" y2="94" style="stroke:rgba(248,113,113,0.95)" stroke-width="2.5"/>
+        <polygon points="280,106 274,92 286,92" style="fill:rgba(248,113,113,0.95)"/>
+        <text x="290" y="88" font-size="13" style="fill:rgba(248,113,113,0.95)">→F</text>
+        <circle cx="380" cy="140" r="9" style="fill:rgba(251,191,36,0.30);stroke:rgba(251,191,36,0.95)" stroke-width="2"/>
+        <line x1="380" y1="152" x2="380" y2="208" style="stroke:rgba(52,211,153,0.95)" stroke-width="2.5"/>
+        <polygon points="380,220 374,206 386,206" style="fill:rgba(52,211,153,0.95)"/>
+        <circle cx="180" cy="140" r="9" style="fill:rgba(251,191,36,0.30);stroke:rgba(251,191,36,0.95)" stroke-width="2"/>
+        <line x1="180" y1="128" x2="180" y2="72" style="stroke:rgba(52,211,153,0.95)" stroke-width="2.5"/>
+        <polygon points="180,60 174,74 186,74" style="fill:rgba(52,211,153,0.95)"/>
+        <line x1="192" y1="140" x2="236" y2="140" style="stroke:rgba(248,113,113,0.95)" stroke-width="2.5"/>
+        <polygon points="248,140 234,134 234,146" style="fill:rgba(248,113,113,0.95)"/>
+        <text x="150" y="248" font-size="13" style="fill:currentColor">à chaque instant : →F ⊥ →v — la force tourne la vitesse, jamais elle ne l'accélère</text>
+      </svg>
+      <p class="lecture-text">Le fil de la ficelle est remplacé par le champ <span class="math">→B</span> : invisible, mais tout aussi efficace pour tenir la particule en laisse.</p>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s1 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s1">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">01</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1</span>
+        <h2 class="lecture-section-title">La force de Lorience ne travaille pas</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Repartons de la définition <span class="math">→F = q·→v∧→B</span> : le produit vectoriel donne un vecteur perpendiculaire à <span class="math">→v</span> à chaque instant. Or le travail d'une force le long d'un déplacement dépend de l'angle entre la force et la vitesse. Ici, cet angle vaut toujours 90° : le travail est donc nul, et l'énergie de la particule ne change pas.</p>
+      <div class="lecture-callout lecture-callout-key"><strong>🔑 Résultat officiel</strong> — La force de Lorience est perpendiculaire à la vitesse à chaque instant : sa puissance est nulle, <span class="math">P = →F·→v = 0</span>, donc elle ne travaille jamais : <span class="math">W = 0</span>. L'énergie cinétique <span class="math">Ec = ½·m·v²</span> de la particule reste constante.</div>
+      <div class="lecture-formula-hero">
+        <p class="lecture-formula-hero-main">Conséquence énergétique</p>
+        <p class="lecture-formula-hero-main"><span class="math">W = 0 ⟹ Ec = ½·m·v² = constante</span></p>
+        <p class="lecture-formula-hero-desc">la norme <span class="math">v</span> de la vitesse ne change jamais — seule l'orientation de <span class="math">→v</span> change</p>
+      </div>
+      <p class="lecture-text">La force de Lorience est un « courbeur », pas un « pousseur » : elle oriente la vitesse sans jamais la faire grossir. Pour changer la norme de <span class="math">v</span>, il faudrait une composante de la force le long du mouvement — et elle n'existe pas ici.</p>
+      <svg viewBox="0 0 560 200" style="width:100%;height:auto" role="img" aria-label="La norme de la vitesse reste constante, seule sa direction change">
+        <circle cx="110" cy="100" r="12" style="fill:rgba(251,191,36,0.30);stroke:rgba(251,191,36,0.95)" stroke-width="2"/>
+        <line x1="124" y1="100" x2="224" y2="100" style="stroke:rgba(52,211,153,0.95)" stroke-width="3"/>
+        <polygon points="236,100 222,93 222,107" style="fill:rgba(52,211,153,0.95)"/>
+        <text x="158" y="88" font-size="14" style="fill:rgba(52,211,153,0.95)">→v₁</text>
+        <line x1="110" y1="86" x2="110" y2="46" style="stroke:rgba(248,113,113,0.95)" stroke-width="3"/>
+        <polygon points="110,34 103,50 117,50" style="fill:rgba(248,113,113,0.95)"/>
+        <text x="122" y="52" font-size="14" style="fill:rgba(248,113,113,0.95)">→F</text>
+        <text x="256" y="66" font-size="14" style="fill:currentColor">même norme :</text>
+        <text x="250" y="90" font-size="14" style="fill:currentColor">v₁ = v₂ = v</text>
+        <circle cx="430" cy="120" r="12" style="fill:rgba(251,191,36,0.30);stroke:rgba(251,191,36,0.95)" stroke-width="2"/>
+        <line x1="430" y1="106" x2="430" y2="46" style="stroke:rgba(52,211,153,0.95)" stroke-width="3"/>
+        <polygon points="430,34 423,50 437,50" style="fill:rgba(52,211,153,0.95)"/>
+        <text x="442" y="82" font-size="14" style="fill:rgba(52,211,153,0.95)">→v₂</text>
+        <line x1="418" y1="120" x2="362" y2="120" style="stroke:rgba(248,113,113,0.95)" stroke-width="3"/>
+        <polygon points="350,120 364,113 364,127" style="fill:rgba(248,113,113,0.95)"/>
+        <text x="368" y="142" font-size="14" style="fill:rgba(248,113,113,0.95)">→F</text>
+        <text x="110" y="180" font-size="13" style="fill:currentColor">la direction de →v tourne ; sa norme, elle, ne bouge jamais</text>
+      </svg>
+      <div class="lecture-formula-box">
+        <p class="lecture-formula-main">📋 Ce que W = 0 implique</p>
+        <p>La norme <span class="math">v</span> reste constante pendant tout le mouvement.</p>
+        <p>L'énergie cinétique <span class="math">Ec</span> se conserve : aucun échange d'énergie avec le champ.</p>
+        <p>La trajectoire est purement géométrique : elle dépend seulement de la direction initiale de <span class="math">→v</span> par rapport à <span class="math">→B</span>.</p>
+      </div>
+      <div class="lecture-example-content">
+        <p class="lecture-example-label">💡 Démonstration type Bac — pourquoi W = 0 ?</p>
+        <ol class="lecture-steps">
+          <li><strong>Étape 1.</strong> La puissance d'une force vaut <span class="math">P = F·v·cos α</span>, où <span class="math">α</span> est l'angle entre <span class="math">→F</span> et <span class="math">→v</span>.</li>
+          <li><strong>Étape 2.</strong> Ici <span class="math">α = 90°</span> à chaque instant, donc <span class="math">P = F·v·cos 90° = 0 W</span>.</li>
+          <li><strong>Étape 3.</strong> Le travail est la somme des puissances au fil du temps : <span class="math">W = 0 J</span> sur toute la durée du mouvement.</li>
+          <li><strong>Étape 4.</strong> Théorème de l'énergie cinétique : <span class="math">ΔEc = W = 0 J</span>, donc <span class="math">Ec</span> constante, donc <span class="math">v</span> constante.</li>
+        </ol>
+        <p class="lecture-example-content"><strong>Résultat :</strong> quatre lignes suffisent au Bac — angle de 90°, puissance nulle, travail nul, énergie cinétique conservée.</p>
+      </div>
+      <div class="lecture-callout lecture-callout-warning"><strong>⚠️ Piège d'examen</strong> — « Vitesse constante » signifie <strong>norme</strong> constante : la direction de <span class="math">→v</span> change en permanence, donc le <strong>vecteur</strong> vitesse n'est pas constant. Écrire « le vecteur vitesse est constant » est faux et coûte des points.</div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s2 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s2">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">02</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2</span>
+        <h2 class="lecture-section-title">Trajectoire circulaire (<span class="math">→v</span> ⊥ <span class="math">→B</span>)</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Plaçons-nous dans le cas le plus fréquent au Bac : la particule entre avec <span class="math">→v</span> perpendiculaire à <span class="math">→B</span>. La force, de norme constante <span class="math">F = |q|·v·B</span>, est toujours perpendiculaire à <span class="math">→v</span> et toujours tournée du même côté : elle se comporte comme une force centripète parfaite. Résultat : un mouvement circulaire uniforme.</p>
+      <div class="lecture-callout lecture-callout-key"><strong>🔑 Résultat officiel</strong> — Si <span class="math">→v</span> est perpendiculaire à <span class="math">→B</span>, la particule décrit un cercle dans le plan perpendiculaire à <span class="math">→B</span>, à vitesse constante : c'est un mouvement circulaire uniforme. Le champ <span class="math">→B</span> ne travaille pas, il ne fait que courber.</div>
+      <div class="lecture-formula-hero">
+        <p class="lecture-formula-hero-main">Rayon de la trajectoire circulaire</p>
+        <p class="lecture-formula-hero-main"><span class="math">r = m·v/(|q|·B)</span></p>
+        <p class="lecture-formula-hero-desc"><span class="math">m</span> en kg · <span class="math">v</span> en m·s⁻¹ · <span class="math">|q|</span> en C · <span class="math">B</span> en T · <span class="math">r</span> en mètres (m)</p>
+      </div>
+      <div class="lecture-example-content">
+        <p class="lecture-example-label">💡 Démonstration — d'où vient le rayon ?</p>
+        <ol class="lecture-steps">
+          <li><strong>Étape 1.</strong> On applique la deuxième loi de Newton dans le plan du mouvement : la seule force est <span class="math">→F</span>.</li>
+          <li><strong>Étape 2.</strong> Pour un mouvement circulaire de rayon <span class="math">r</span> à vitesse constante, l'accélération vaut <span class="math">a = v²/r</span>, dirigée vers le centre.</li>
+          <li><strong>Étape 3.</strong> La force centripète est donc <span class="math">F = m·v²/r</span>, avec ici <span class="math">F = |q|·v·B</span> (car <span class="math">θ = 90°</span>).</li>
+          <li><strong>Étape 4.</strong> On écrit l'égalité : <span class="math">|q|·v·B = m·v²/r</span>.</li>
+          <li><strong>Étape 5.</strong> On simplifie par <span class="math">v</span> et on isole <span class="math">r</span> : <span class="math">r = m·v/(|q|·B)</span>.</li>
+        </ol>
+        <p class="lecture-example-content"><strong>Résultat :</strong> la formule du rayon, à savoir refaire seule en cinq lignes.</p>
+      </div>
+      <svg viewBox="0 0 560 280" style="width:100%;height:auto" role="img" aria-label="Mouvement circulaire uniforme d'une charge positive dans un champ entrant">
+        <text x="90" y="76" font-size="17" style="fill:var(--accent-bright)">⊗</text>
+        <text x="470" y="76" font-size="17" style="fill:var(--accent-bright)">⊗</text>
+        <text x="90" y="246" font-size="17" style="fill:var(--accent-bright)">⊗</text>
+        <text x="470" y="246" font-size="17" style="fill:var(--accent-bright)">⊗</text>
+        <text x="60" y="52" font-size="13" style="fill:currentColor">→B entrant</text>
+        <circle cx="250" cy="150" r="100" fill="none" style="stroke:var(--accent-bright)" stroke-width="1.5" stroke-dasharray="6 5"/>
+        <circle cx="250" cy="150" r="3" style="fill:currentColor"/>
+        <text x="238" y="170" font-size="13" style="fill:currentColor">O</text>
+        <line x1="250" y1="150" x2="250" y2="62" style="stroke:currentColor" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <text x="226" y="110" font-size="15" style="fill:currentColor">r</text>
+        <circle cx="250" cy="50" r="11" style="fill:rgba(251,191,36,0.30);stroke:rgba(251,191,36,0.95)" stroke-width="2"/>
+        <text x="246" y="55" font-size="13" style="fill:currentColor">+</text>
+        <line x1="263" y1="50" x2="356" y2="50" style="stroke:rgba(52,211,153,0.95)" stroke-width="3"/>
+        <polygon points="368,50 354,43 354,57" style="fill:rgba(52,211,153,0.95)"/>
+        <text x="298" y="38" font-size="14" style="fill:rgba(52,211,153,0.95)">→v</text>
+        <line x1="250" y1="63" x2="250" y2="112" style="stroke:rgba(248,113,113,0.95)" stroke-width="3"/>
+        <polygon points="250,124 243,110 257,110" style="fill:rgba(248,113,113,0.95)"/>
+        <text x="262" y="106" font-size="14" style="fill:rgba(248,113,113,0.95)">→F</text>
+        <text x="120" y="268" font-size="13" style="fill:currentColor">mouvement circulaire uniforme : F = |q|·v·B = m·v²/r, d'où r = m·v/(|q|·B)</text>
+      </svg>
+      <div class="lecture-example-content">
+        <p class="lecture-example-label">💡 Exemple travaillé — Rayon d'un proton</p>
+        <p class="lecture-example-content">Un proton (<span class="math">m = 1,67 × 10⁻²⁷ kg</span>, <span class="math">|q| = 1,6 × 10⁻¹⁹ C</span>) entre à <span class="math">v = 2,0 × 10⁶ m·s⁻¹</span>, perpendiculairement à un champ <span class="math">B = 0,50 T</span>. Calculer le rayon de son cercle.</p>
+        <ol class="lecture-steps">
+          <li><strong>Étape 1 — Situation.</strong> <span class="math">→v</span> ⊥ <span class="math">→B</span> : mouvement circulaire uniforme, on utilise <span class="math">r = m·v/(|q|·B)</span>.</li>
+          <li><strong>Étape 2 — Numérateur.</strong> <span class="math">m·v = 1,67 × 10⁻²⁷ × 2,0 × 10⁶ = 3,34 × 10⁻²¹</span>.</li>
+          <li><strong>Étape 3 — Dénominateur.</strong> <span class="math">|q|·B = 1,6 × 10⁻¹⁹ × 0,50 = 8,0 × 10⁻²⁰</span>.</li>
+          <li><strong>Étape 4 — Division.</strong> <span class="math">r = 3,34 × 10⁻²¹ / 8,0 × 10⁻²⁰ = 4,2 × 10⁻² m</span>.</li>
+          <li><strong>Étape 5 — Conclusion.</strong> <span class="math">r = 4,2 cm</span> : voilà pourquoi les accélérateurs doivent être énormes pour des protons rapides.</li>
+        </ol>
+        <p class="lecture-example-content"><strong>Résultat :</strong> <span class="math">r ≈ 4,2 cm</span>, calcul vérifiable en multipliant à l'envers : <span class="math">8,0 × 10⁻²⁰ × 4,2 × 10⁻² ≈ 3,34 × 10⁻²¹</span>.</p>
+      </div>
+      <div class="lecture-callout lecture-callout-warning"><strong>⚠️ Piège d'examen</strong> — Dans <span class="math">r = m·v/(|q|·B)</span>, le rayon augmente avec <span class="math">m</span> et <span class="math">v</span>, diminue avec <span class="math">B</span> et <span class="math">|q|</span>. Et c'est toujours <span class="math">|q|</span> au dénominateur — jamais <span class="math">q</span> seul.</div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s3 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s3">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">03</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 3</span>
+        <h2 class="lecture-section-title">Période et fréquence : <span class="math">T</span> et <span class="math">f</span></h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Combien de temps met la particule pour faire un tour ? Cette durée, la période <span class="math">T</span>, cache une surprise qui rendra possible le cyclotron : elle ne dépend pas de la vitesse de la particule.</p>
+      <div class="lecture-callout lecture-callout-key"><strong>🔑 Définitions officielles</strong> — La période <span class="math">T</span> est la durée d'un tour complet ; la fréquence <span class="math">f</span> est le nombre de tours par seconde, <span class="math">f = 1/T</span>. Pour le mouvement circulaire uniforme dans <span class="math">→B</span> : <span class="math">T = 2π·m/(|q|·B)</span>.</div>
+      <div class="lecture-formula-hero">
+        <p class="lecture-formula-hero-main">Période du mouvement circulaire</p>
+        <p class="lecture-formula-hero-main"><span class="math">T = 2π·m/(|q|·B)</span></p>
+        <p class="lecture-formula-hero-desc"><span class="math">T</span> en secondes (s) · fréquence : <span class="math">f = 1/T = |q|·B/(2π·m)</span> en hertz (Hz) · <span class="math">T</span> et <span class="math">f</span> ne dépendent ni de <span class="math">v</span> ni de <span class="math">r</span></p>
+      </div>
+      <p class="lecture-text">Va plus vite ⟹ cercle plus grand, mais temps par tour identique : les deux effets se compensent exactement. C'est ce « métronome universel » qui synchronisera le cyclotron de la Partie 03.</p>
+      <div class="lecture-example-content">
+        <p class="lecture-example-label">💡 Exemple travaillé — Période du proton de la section 02</p>
+        <p class="lecture-example-content">Reprenons le proton (<span class="math">m = 1,67 × 10⁻²⁷ kg</span>, <span class="math">|q| = 1,6 × 10⁻¹⁹ C</span>) dans <span class="math">B = 0,50 T</span>. Calculer <span class="math">T</span> puis <span class="math">f</span>.</p>
+        <ol class="lecture-steps">
+          <li><strong>Étape 1 — Formule.</strong> <span class="math">T = 2π·m/(|q|·B)</span>.</li>
+          <li><strong>Étape 2 — Numérateur.</strong> <span class="math">2π·m = 6,28 × 1,67 × 10⁻²⁷ = 1,05 × 10⁻²⁶</span>.</li>
+          <li><strong>Étape 3 — Dénominateur.</strong> <span class="math">|q|·B = 1,6 × 10⁻¹⁹ × 0,50 = 8,0 × 10⁻²⁰</span> (déjà calculé en section 02).</li>
+          <li><strong>Étape 4 — Division et fréquence.</strong> <span class="math">T = 1,05 × 10⁻²⁶ / 8,0 × 10⁻²⁰ = 1,3 × 10⁻⁷ s</span>, soit <span class="math">f = 1/T ≈ 7,6 × 10⁶ Hz = 7,6 MHz</span>.</li>
+        </ol>
+        <p class="lecture-example-content"><strong>Résultat :</strong> <span class="math">T ≈ 1,3 × 10⁻⁷ s</span> (0,13 µs) et <span class="math">f ≈ 7,6 MHz</span> — quelles que soient les vitesses envisagées.</p>
+      </div>
+      <div class="lecture-formula-box">
+        <p class="lecture-formula-main">📋 Pourquoi c'est génial</p>
+        <p><span class="math">T</span> et <span class="math">f</span> ne dépendent pas de <span class="math">v</span> : dans un cyclotron (Partie 03), une tension alternative de fréquence fixe reste synchronisée avec la particule pendant toute son accélération.</p>
+      </div>
+      <div class="lecture-callout lecture-callout-warning"><strong>⚠️ Piège d'examen</strong> — Question piège classique : « si on double <span class="math">v</span>, que devient <span class="math">T</span> ? » Réponse : rien ! <span class="math">T = 2π·m/(|q|·B)</span> ne contient pas <span class="math">v</span>. Seul le rayon <span class="math">r</span> double.</div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s4 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s4">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">04</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 4</span>
+        <h2 class="lecture-section-title">Trajectoire hélicoïdale (<span class="math">→v</span> oblique)</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Et si la particule arrive de biais, avec un angle <span class="math">α</span> entre <span class="math">→v</span> et <span class="math">→B</span> ? On décompose la vitesse en deux composantes : <span class="math">v∥ = v·cos α</span>, parallèle à <span class="math">→B</span>, et <span class="math">v⊥ = v·sin α</span>, perpendiculaire à <span class="math">→B</span>. La composante parallèle n'est pas déviée ; la composante perpendiculaire tourne en cercle. La superposition des deux donne une hélice.</p>
+      <div class="lecture-callout lecture-callout-key"><strong>🔑 Résultat officiel</strong> — Si <span class="math">→v</span> est oblique par rapport à <span class="math">→B</span>, la trajectoire est une hélice d'axe parallèle à <span class="math">→B</span> : rotation circulaire de rayon <span class="math">r = m·v·sin α/(|q|·B)</span> et translation uniforme à la vitesse <span class="math">v·cos α</span> le long de <span class="math">→B</span>.</div>
+      <div class="lecture-example-content">
+        <p class="lecture-example-label">💡 Exemple travaillé — Décomposer une vitesse oblique</p>
+        <p class="lecture-example-content">Une particule arrive à <span class="math">v = 4,0 × 10⁶ m·s⁻¹</span> avec <span class="math">α = 60°</span> par rapport à <span class="math">→B</span>. Décomposer <span class="math">→v</span> et décrire la trajectoire.</p>
+        <ol class="lecture-steps">
+          <li><strong>Étape 1 — Composante le long de →B.</strong> <span class="math">v∥ = v·cos 60° = 4,0 × 10⁶ × 0,5 = 2,0 × 10⁶ m·s⁻¹</span>.</li>
+          <li><strong>Étape 2 — Composante perpendiculaire.</strong> <span class="math">v⊥ = v·sin 60° = 4,0 × 10⁶ × 0,87 ≈ 3,5 × 10⁶ m·s⁻¹</span>.</li>
+          <li><strong>Étape 3 — Le cercle.</strong> Seule <span class="math">v⊥</span> tourne : le rayon vaut <span class="math">r = m·v⊥/(|q|·B)</span>.</li>
+          <li><strong>Étape 4 — La translation.</strong> Le centre du cercle avance à <span class="math">v∥ = 2,0 × 10⁶ m·s⁻¹</span> le long de <span class="math">→B</span> : la trajectoire est une hélice.</li>
+        </ol>
+        <p class="lecture-example-content"><strong>Résultat :</strong> cercle de rayon fixé par <span class="math">v⊥ ≈ 3,5 × 10⁶ m·s⁻¹</span>, qui glisse le long de <span class="math">→B</span> à <span class="math">2,0 × 10⁶ m·s⁻¹</span> — un ressort enroulé autour du champ.</p>
+      </div>
+      <svg viewBox="0 0 560 240" style="width:100%;height:auto" role="img" aria-label="Trajectoire hélicoïdale d'une charge entrant obliquement dans le champ">
+        <line x1="60" y1="130" x2="478" y2="130" style="stroke:var(--accent-bright)" stroke-width="2.5"/>
+        <polygon points="490,130 476,124 476,136" style="fill:var(--accent-bright)"/>
+        <text x="500" y="135" font-size="14" style="fill:currentColor">→B</text>
+        <path d="M 80 130 Q 105 55 130 130 T 180 130 T 230 130 T 280 130 T 330 130 T 380 130 T 430 130" fill="none" style="stroke:rgba(248,113,113,0.9)" stroke-width="2.5"/>
+        <polygon points="442,130 428,124 428,136" style="fill:rgba(248,113,113,0.9)"/>
+        <text x="150" y="40" font-size="13" style="fill:rgba(248,113,113,0.95)">trajectoire hélicoïdale</text>
+        <circle cx="80" cy="130" r="9" style="fill:rgba(251,191,36,0.30);stroke:rgba(251,191,36,0.95)" stroke-width="2"/>
+        <line x1="80" y1="130" x2="168" y2="86" style="stroke:rgba(52,211,153,0.95)" stroke-width="2.5"/>
+        <polygon points="178,81 163,83 170,93" style="fill:rgba(52,211,153,0.95)"/>
+        <text x="182" y="76" font-size="13" style="fill:rgba(52,211,153,0.95)">→v</text>
+        <line x1="80" y1="130" x2="168" y2="130" style="stroke:var(--accent-bright)" stroke-width="2" stroke-dasharray="4 3"/>
+        <text x="96" y="150" font-size="12" style="fill:currentColor">v∥ = v·cos α</text>
+        <line x1="168" y1="130" x2="168" y2="86" style="stroke:rgba(248,113,113,0.9)" stroke-width="2" stroke-dasharray="4 3"/>
+        <text x="174" y="112" font-size="12" style="fill:currentColor">v⊥ = v·sin α</text>
+        <text x="150" y="222" font-size="13" style="fill:currentColor">α = angle entre →v et →B : le cercle tourne avec v⊥, l'axe avance avec v∥</text>
+      </svg>
+      <div class="lecture-formula-box">
+        <p class="lecture-formula-main">🧮 Formule à retenir</p>
+        <p><span class="math">r = m·v·sin α/(|q|·B)</span> : le rayon de l'hélice se calcule avec la composante <span class="math">v⊥ = v·sin α</span>, jamais avec la vitesse totale <span class="math">v</span>.</p>
+      </div>
+      <div class="lecture-callout lecture-callout-warning"><strong>⚠️ Piège d'examen</strong> — L'erreur classique : mettre <span class="math">v</span> au lieu de <span class="math">v·sin α</span> dans le rayon. Demande-toi toujours : quelle composante tourne ? C'est elle qui fixe <span class="math">r</span>.</div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s5 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s5">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">05</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Bilan & exercices</span>
+        <h2 class="lecture-section-title">Exercices de synthèse</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Deux exercices pour verrouiller la partie : un calcul de rayon complet pour l'électron, puis une comparaison proton/électron qui explique pourquoi on sépare si bien les particules dans un champ magnétique.</p>
+      <div class="lecture-text">
+        <p class="lecture-exercise-label">✏️ Exercice 1 — Le rayon de l'électron</p>
+        <p class="lecture-text">Un électron (<span class="math">mₑ = 9,11 × 10⁻³¹ kg</span>, <span class="math">|q| = 1,6 × 10⁻¹⁹ C</span>) entre à <span class="math">v = 1,0 × 10⁷ m·s⁻¹</span>, perpendiculairement à un champ <span class="math">B = 2,0 × 10⁻² T</span>. Calculer le rayon de sa trajectoire.</p>
+        <details class="lecture-text">
+          <summary>Solution détaillée</summary>
+          <ol class="lecture-steps">
+            <li><strong>Étape 1 — Situation.</strong> <span class="math">→v</span> ⊥ <span class="math">→B</span> ⟹ mouvement circulaire uniforme de rayon <span class="math">r = m·v/(|q|·B)</span>.</li>
+            <li><strong>Étape 2 — Numérateur.</strong> <span class="math">m·v = 9,11 × 10⁻³¹ × 1,0 × 10⁷ = 9,11 × 10⁻²⁴</span>.</li>
+            <li><strong>Étape 3 — Dénominateur.</strong> <span class="math">|q|·B = 1,6 × 10⁻¹⁹ × 2,0 × 10⁻² = 3,2 × 10⁻²¹</span>.</li>
+            <li><strong>Étape 4 — Division.</strong> <span class="math">r = 9,11 × 10⁻²⁴ / 3,2 × 10⁻²¹ = 2,8 × 10⁻³ m</span>.</li>
+            <li><strong>Étape 5 — Conclusion.</strong> <span class="math">r ≈ 2,8 mm</span> : l'électron tourne très serré, comparé aux 4,2 cm du proton.</li>
+          </ol>
+        </details>
+      </div>
+      <div class="lecture-text">
+        <p class="lecture-exercise-label">✏️ Exercice 2 — Proton contre électron</p>
+        <p class="lecture-text">Un proton (<span class="math">m_p = 1,67 × 10⁻²⁷ kg</span>) et un électron (<span class="math">mₑ = 9,11 × 10⁻³¹ kg</span>) entrent avec la même vitesse <span class="math">v</span>, perpendiculairement au même champ <span class="math">B</span>. Comparer leurs rayons de trajectoire.</p>
+        <details class="lecture-text">
+          <summary>Solution détaillée</summary>
+          <ol class="lecture-steps">
+            <li><strong>Étape 1 — Même charge en valeur.</strong> Les deux particules ont <span class="math">|q| = e</span> : avec même <span class="math">v</span> et même <span class="math">B</span>, le rapport des rayons vaut le rapport des masses.</li>
+            <li><strong>Étape 2 — Rapport.</strong> <span class="math">r_p/r_e = m_p/mₑ = 1,67 × 10⁻²⁷ / 9,11 × 10⁻³¹</span>.</li>
+            <li><strong>Étape 3 — Calcul.</strong> <span class="math">1,67/9,11 ≈ 0,18</span> et <span class="math">10⁻²⁷⁺³¹ = 10⁴</span>, donc <span class="math">r_p/r_e ≈ 0,18 × 10⁴ ≈ 1,8 × 10³</span>.</li>
+            <li><strong>Étape 4 — Conclusion.</strong> Le proton tourne environ 1 800 fois plus large que l'électron : d'où une séparation très nette des particules.</li>
+          </ol>
+        </details>
+      </div>
+      <div class="lecture-callout lecture-callout-warning"><strong>⚠️ Piège d'examen</strong> — Avant d'appliquer <span class="math">r = m·v/(|q|·B)</span>, vérifie deux lignes de l'énoncé : <span class="math">→v</span> est-il bien perpendiculaire à <span class="math">→B</span> ? La question demande-t-elle <span class="math">r</span> ou <span class="math">T</span> ? Relire, c'est gagner.</div>
+      <table class="lecture-table">
+        <thead>
+          <tr><th>Objet</th><th>Force de Lorience</th><th>Force de Laplace</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Travail</strong></td><td><span class="math">W = 0</span> : <span class="math">Ec</span> constante</td><td><span class="math">W = 0</span> : énergie du fil conservée</td></tr>
+          <tr><td><strong>Effet sur le mouvement</strong></td><td>courbe la trajectoire (cercle, hélice)</td><td>pousse le fil (moteur, haut-parleur)</td></tr>
+          <tr><td><strong>Grandeur caractéristique</strong></td><td><span class="math">r = m·v/(|q|·B)</span> ; <span class="math">T = 2π·m/(|q|·B)</span></td><td><span class="math">F = I·ℓ·B·sin θ</span></td></tr>
+          <tr><td><strong>Ce qui varie</strong></td><td>la direction de <span class="math">→v</span> (pas sa norme)</td><td>la position du fil (pas <span class="math">I</span>)</td></tr>
+          <tr><td><strong>Applications</strong></td><td>cyclotron, spectromètre, aurores</td><td>moteurs, haut-parleurs, galvanomètres</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+  <!-- ===== QCM ===== -->
+  <div class="lecture-quiz">
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Dans un champ magnétique uniforme, la norme de la vitesse d'une particule chargée :</p>
+      <div class="lecture-quiz-options"><span>A) augmente</span><span>B) diminue</span><span>C) reste constante</span><span>D) s'annule au bout d'un tour</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><strong>C.</strong> La force de Lorience ne travaille pas (<span class="math">W = 0</span>), donc <span class="math">Ec</span> et <span class="math">v</span> restent constantes.</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Si <span class="math">→v</span> est perpendiculaire à <span class="math">→B</span>, la trajectoire est :</p>
+      <div class="lecture-quiz-options"><span>A) rectiligne uniforme</span><span>B) parabolique</span><span>C) circulaire uniforme</span><span>D) hélicoïdale</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><strong>C.</strong> <span class="math">→v</span> ⊥ <span class="math">→B</span> : force centripète de norme constante <span class="math">F = |q|·v·B</span>, donc cercle de rayon <span class="math">r = m·v/(|q|·B)</span>. L'hélice demande un <span class="math">→v</span> oblique.</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">On double la vitesse <span class="math">v</span> (<span class="math">→v</span> toujours ⊥ <span class="math">→B</span>). Le rayon <span class="math">r</span> :</p>
+      <div class="lecture-quiz-options"><span>A) est divisé par 2</span><span>B) ne change pas</span><span>C) double</span><span>D) quadruple</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><strong>C.</strong> <span class="math">r = m·v/(|q|·B)</span> est proportionnel à <span class="math">v</span> : doubler <span class="math">v</span> double <span class="math">r</span>. Mais <span class="math">T = 2π·m/(|q|·B)</span>, elle, ne change pas.</div></details>
+    </div>
+  </div>
+  <!-- ===== RÉCAP ===== -->
+  <div class="lecture-recap">
+    <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
+    <ul class="lecture-recap-list">
+      <li><strong>Travail nul</strong> : <span class="math">→F</span> ⊥ <span class="math">→v</span> à chaque instant ⟹ <span class="math">W = 0</span> ⟹ <span class="math">Ec</span> et <span class="math">v</span> (en norme) constantes.</li>
+      <li><strong>Cercle</strong> : si <span class="math">→v</span> ⊥ <span class="math">→B</span>, mouvement circulaire uniforme de rayon <span class="math">r = m·v/(|q|·B)</span> et de période <span class="math">T = 2π·m/(|q|·B)</span>, indépendante de <span class="math">v</span>.</li>
+      <li><strong>Hélice</strong> : si <span class="math">→v</span> est oblique, seule <span class="math">v⊥ = v·sin α</span> tourne : trajectoire hélicoïdale d'axe parallèle à <span class="math">→B</span>.</li>
+    </ul>
+  </div>
+  <!-- ===== FIN ===== -->
+  <div class="lecture-end">
+    <div class="lecture-end-icon">🎯</div>
+    <div class="lecture-end-text">Partie 02 terminée !</div>
+    <div class="lecture-end-sub">Partie 03 : ces cercles et ces hélices deviennent des machines — cyclotron, spectromètre de masse, tube cathodique et bouclier magnétique de la Terre.</div>
+    <div class="lecture-end-divider"></div>
+  </div>
+</div>

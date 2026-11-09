@@ -1,0 +1,368 @@
+<!-- PARTIE 02 — Champ créé par un fil, une spire, un solénoïde (Champ magnétique) -->
+<div class="lecture-container">
+
+  <!-- ===== HERO ===== -->
+  <header class="lecture-hero">
+    <div class="lecture-hero-badge">
+      <span class="lecture-hero-icon">📘</span>
+      <span class="lecture-hero-label">Terminale C&D · Champ magnétique · Partie 02</span>
+    </div>
+    <h1 class="lecture-hero-title">
+      Champ créé par un fil, une spire, <em>un solénoïde</em>
+    </h1>
+    <p class="lecture-hero-intro">
+      En 1820, Oersted fait frémir l'aiguille d'une boussole près d'un simple fil branché : l'électricité crée du magnétisme. Dans cette partie, tu apprends à calculer le champ <span class="math">→B</span> produit par les trois distributions de courant du programme : le fil droit, la spire circulaire et le solénoïde. Deux formules à connaître par cœur, une règle de la main à ne plus jamais oublier, et tu ouvres la porte des électro-aimants, des moteurs et des alternateurs.
+    </p>
+    <div class="lecture-hero-meta">
+      <span class="lecture-hero-meta-item">⏱ 25 min</span>
+      <span class="lecture-hero-meta-item">⚡ 4 notions</span>
+      <span class="lecture-hero-meta-item">📚 6 sections</span>
+      <span class="lecture-hero-meta-item">🎓 Terminale C&D</span>
+    </div>
+  </header>
+  <!-- ===== SOMMAIRE ===== -->
+  <nav class="lecture-toc">
+    <div class="lecture-toc-header">
+      <span>Dans cette partie</span>
+      <span class="lecture-toc-count">4 notions · 6 sections</span>
+    </div>
+    <ol class="lecture-toc-list">
+      <li><a href="#s0"><span class="toc-num">00</span><span>La grue qui tient la ferraille</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>L'expérience d'Oersted : le courant crée un champ</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>Fil droit : main droite et bonhomme d'Ampère</span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>La spire circulaire</span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>Le solénoïde, l'aimant qu'on allume</span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>Tableau des trois distributions + exercices</span></a></li>
+    </ol>
+  </nav>
+  <!-- ============================================================ -->
+  <!-- SECTION s0 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s0">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">00</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Motivation</span>
+        <h2 class="lecture-section-title">La grue qui tient la ferraille</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Sur les chantiers de Niamey, tu as peut-être vu une grue soulever un paquet de ferrailles à béton sans crochet, sans sangle : juste une grosse plaque métallique plaquée dessus. Le secret ? Un électro-aimant : une bobine parcourue par un courant intense qui devient aimant tant que le courant circule. Quand le chauffeur coupe l'intensité, la ferraille tombe exactement là où il veut — un aimant permanent ne saurait pas « lâcher prise » aussi proprement.</p>
+      <p class="lecture-text">Le même principe anime la sonnette de ta maison, le relais du démarreur d'une voiture, et les grosses poulies des trieurs de ferraille. Toute cette magie repose sur une seule découverte : un courant électrique crée autour de lui un champ magnétique, dont on sait aujourd'hui calculer la valeur en chaque point. C'est ce calcul que tu apprends ici, avec les trois géométries au programme.</p>
+      <p class="lecture-text">Au programme officiel de Terminale C et D, ce chapitre ne demande aucune démonstration : il demande des applications directes et des schémas justes. Fil droit, spire, solénoïde : trois dessins, trois formules, une seule constante. C'est l'un des investissements les plus rentables de ton année de Terminale.</p>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s1 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s1">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">01</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1</span>
+        <h2 class="lecture-section-title">L'expérience d'Oersted : le courant crée un champ</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Étudiant danois et professeur de physique, Hans Christian Oersted pose en 1820 un fil relié à une pile au-dessus d'une boussole, presque par accident de démonstration. À la fermeture du circuit, l'aiguille dévie ; il coupe le courant, elle revient ; il inverse le courant, elle dévie dans l'autre sens. La liaison entre électricité et magnétisme, soupçonnée depuis des années, est établie en quelques minutes de cours.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <p class="lecture-text"><strong>Définition officielle — conséquence de l'expérience d'Oersted :</strong> tout conducteur parcouru par un courant électrique crée, dans l'espace qui l'entoure, un champ magnétique <span class="math">→B</span>. Ce champ existe que le conducteur soit droit, plié ou enroulé ; seule sa géométrie change. Si le courant s'annule, le champ créé par le conducteur s'annule aussi.</p>
+      </div>
+      <p class="lecture-text">Le sens physique est profond : le magnétisme n'est pas une propriété réservée aux aimants, c'est la signature d'un mouvement de charges. Autour du fil, le champ tourne autour de l'axe du conducteur : on dit qu'il est annulaire, comme des anneaux empilés le long du fil. Une boussole posée près du fil tourne jusqu'à se placer tangentiellement à ces anneaux.</p>
+      <p class="lecture-text">Cette découverte a tout changé : elle a relié deux sciences qui semblaient séparées, l'électricité de Volta et le magnétisme des boussoles. Quelques mois seulement après l'annonce d'Oersted, Ampère avait formulé les lois qui portent son nom — et que tu vas manipuler aujourd'hui en une ligne de calcul.</p>
+      <div class="lecture-formula-box">
+        <span class="math">courant I → champ →B annulaire autour du fil · I = 0 → champ nul</span>
+        <p class="lecture-text"><strong>À retenir de l'expérience :</strong> déviation de l'aiguille dès que le courant passe ; déviation inversée si on inverse le courant ; plus l'aiguille est proche du fil, plus la déviation est nette. Ces trois faits suffisent à justifier l'existence d'un champ magnétique créé par le courant.</p>
+      </div>
+      <div class="lecture-example-content">
+        <p class="lecture-text"><strong>🔬 Exemple travaillé — Reproduire Oersted sur la table.</strong> Tu disposes d'un fil, d'une pile, d'un interrupteur et d'une boussole. Décris ce que tu observes à chaque étape et ce que cela prouve.</p>
+        <div class="lecture-steps">
+          <div class="lecture-step"><strong>Étape 1 · Témoin.</strong> Interrupteur ouvert : la boussole pointe tranquillement vers le nord terrestre. Le fil sans courant ne crée pas de champ magnétique détectable.</div>
+          <div class="lecture-step"><strong>Étape 2 · Fermeture du circuit.</strong> Dès que le courant passe, l'aiguille dévie et prend une orientation nouvelle, perpendiculaire à peu près au fil. Un champ magnétique créé par le courant vient s'ajouter au champ terrestre.</div>
+          <div class="lecture-step"><strong>Étape 3 · Inversion de la pile.</strong> L'aiguille dévie maintenant dans le sens opposé : le sens du champ créé dépend du sens du courant. C'est la preuve que le champ est lié au sens de déplacement des charges.</div>
+          <div class="lecture-step"><strong>Étape 4 · Conclusion.</strong> Déviation à la fermeture, inversion avec le courant, effet maximal au plus près du fil : exactement le protocole d'Oersted, et la preuve expérimentale qu'un courant crée un champ magnétique.</div>
+        </div>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <p class="lecture-text"><strong>⚠ Piège d'examen :</strong> ne dis jamais « la boussole crée le champ » ni « le champ vient de la pile en tant qu'objet ». C'est le courant — le mouvement ordonné des charges dans le conducteur — qui crée le champ. Un fil débranché, même relié à une pile, ne crée aucun champ.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s2 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s2">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">02</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2</span>
+        <h2 class="lecture-section-title">Fil droit : main droite et bonhomme d'Ampère</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Pour un long fil droit parcouru par un courant <span class="math">I</span>, le champ magnétique s'enroule autour du fil en cercles concentriques. Sa norme diminue quand on s'éloigne : elle est inversement proportionnelle à la distance <span class="math">d</span> à l'axe du fil. Reste à fixer le sens de rotation — c'est là qu'interviennent ta main droite ou le fameux bonhomme d'Ampère.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <p class="lecture-text"><strong>Définition officielle — champ d'un fil droit :</strong> en un point situé à la distance <span class="math">d</span> de l'axe d'un fil droit infiniment long parcouru par un courant <span class="math">I</span>, le champ magnétique a pour norme <span class="math">B = μ₀·I/(2π·d)</span>. Sa direction est tangente au cercle de rayon <span class="math">d</span> centré sur l'axe ; son sens se donne par la règle de la main droite.</p>
+      </div>
+      <div class="lecture-formula-hero">
+        <span class="math">B = μ₀·I/(2π·d)</span>
+        <p class="lecture-text">avec <span class="math">μ₀ = 4π × 10⁻⁷ T·m·A⁻¹</span> (perméabilité du vide, à connaître par cœur), <span class="math">I</span> en ampères (A), <span class="math">d</span> en mètres (m) et <span class="math">B</span> en tesla (T). Note la double proportionnalité : <span class="math">B</span> croît avec <span class="math">I</span> et décroît en <span class="math">1/d</span>.</p>
+      </div>
+      <p class="lecture-text"><strong>Règle de la main droite :</strong> le pouce de la main droite pointe dans le sens du courant <span class="math">I</span>, les autres doigts se referment dans le sens de <span class="math">→B</span> autour du fil. <strong>Bonhomme d'Ampère :</strong> imagine un nageur couché le long du fil, courant entrant par les pieds et sortant par la tête, ventre face à toi : sa main droite indique le sens de <span class="math">→B</span> de ton côté du fil. Les deux règles disent la même chose — choisis la tienne et garde-la.</p>
+      <svg viewBox="0 0 480 255" role="img" aria-label="Vue de face d'un fil perpendiculaire à la feuille parcouru par un courant sortant : trois cercles de champ concentriques avec des flèches dans le sens anti-horaire">
+        <circle cx="240" cy="120" r="100" style="fill:none;stroke:rgba(96,165,250,0.35);stroke-width:1.4;stroke-dasharray:6 5"/>
+        <circle cx="240" cy="120" r="72" style="fill:none;stroke:rgba(96,165,250,0.55);stroke-width:1.5;stroke-dasharray:6 5"/>
+        <circle cx="240" cy="120" r="45" style="fill:none;stroke:var(--accent-bright);stroke-width:1.6;stroke-dasharray:6 5"/>
+        <polygon points="189,118 201,118 195,132" style="fill:rgba(96,165,250,0.9)"/>
+        <polygon points="162,118 174,118 168,132" style="fill:rgba(96,165,250,0.9)"/>
+        <polygon points="134,118 146,118 140,132" style="fill:rgba(96,165,250,0.9)"/>
+        <circle cx="240" cy="120" r="14" style="fill:rgba(96,165,250,0.25);stroke:var(--accent-bright);stroke-width:2"/>
+        <circle cx="240" cy="120" r="4" style="fill:currentColor"/>
+        <text x="240" y="237" text-anchor="middle" style="fill:currentColor;font-size:12px">vue de face : I sort de la feuille (symbole ⊙)</text>
+        <text x="240" y="252" text-anchor="middle" style="fill:currentColor;font-size:12px">→B tourne dans le sens anti-horaire (main droite)</text>
+      </svg>
+      <svg viewBox="0 0 560 260" role="img" aria-label="Vue de profil d'un fil vertical parcouru par un courant montant, avec le bonhomme d'Ampère couché le long du fil : courant entrant par les pieds, sortant par la tête, la main droite indiquant le sens du champ devant le fil">
+        <line x1="110" y1="30" x2="110" y2="230" style="stroke:var(--accent-bright);stroke-width:3;fill:none"/>
+        <polygon points="102,48 118,48 110,26" style="fill:rgba(96,165,250,0.9)"/>
+        <text x="134" y="52" style="fill:currentColor;font-size:13px;font-weight:700">I</text>
+        <ellipse cx="110" cy="90" rx="45" ry="13" style="fill:none;stroke:rgba(96,165,250,0.5);stroke-width:1.4;stroke-dasharray:5 4"/>
+        <ellipse cx="110" cy="160" rx="45" ry="13" style="fill:none;stroke:rgba(96,165,250,0.5);stroke-width:1.4;stroke-dasharray:5 4"/>
+        <circle cx="150" cy="42" r="11" style="fill:rgba(96,165,250,0.2);stroke:var(--accent-bright);stroke-width:1.6"/>
+        <line x1="150" y1="53" x2="150" y2="180" style="stroke:var(--accent-bright);stroke-width:2.2;fill:none"/>
+        <line x1="150" y1="100" x2="100" y2="100" style="stroke:var(--accent-bright);stroke-width:2.2;fill:none"/>
+        <line x1="150" y1="100" x2="200" y2="100" style="stroke:rgba(96,165,250,0.5);stroke-width:2.2;fill:none"/>
+        <circle cx="100" cy="100" r="5" style="fill:rgba(239,68,68,0.85)"/>
+        <line x1="150" y1="180" x2="140" y2="205" style="stroke:var(--accent-bright);stroke-width:2.2;fill:none"/>
+        <line x1="150" y1="180" x2="160" y2="205" style="stroke:var(--accent-bright);stroke-width:2.2;fill:none"/>
+        <text x="205" y="34" style="fill:currentColor;font-size:11px">tête : I sort</text>
+        <text x="180" y="216" style="fill:currentColor;font-size:11px">pieds : I entre</text>
+        <text x="78" y="86" text-anchor="end" style="fill:currentColor;font-size:11px">main droite</text>
+        <text x="385" y="120" text-anchor="middle" style="fill:currentColor;font-size:12px">bonhomme d'Ampère couché sur le fil</text>
+        <text x="385" y="140" text-anchor="middle" style="fill:currentColor;font-size:12px">ventre face à toi</text>
+        <text x="385" y="160" text-anchor="middle" style="fill:currentColor;font-size:12px">sa main droite donne le sens de →B</text>
+        <text x="385" y="238" text-anchor="middle" style="fill:currentColor;font-size:11px">ici : I monte → devant le fil, →B pointe vers la gauche</text>
+      </svg>
+      <p class="lecture-text">Lis bien les deux figures : à gauche, tu regardes le fil par la pointe du courant et le champ tourne dans le sens anti-horaire ; à droite, tu regardes le fil de côté et le bonhomme d'Ampère fixe le sens de <span class="math">→B</span> devant le fil. Savoir passer d'une vue à l'autre est exactement ce que l'énoncé du Bac attend de toi.</p>
+      <div class="lecture-example-content">
+        <p class="lecture-text"><strong>🔬 Exemple travaillé — Champ près d'un fil d'installation.</strong> Un fil droit d'installation électrique, assimilable à un fil infini, est parcouru par <span class="math">I = 10 A</span>. Calcule la norme du champ créé à la distance <span class="math">d = 5,0 cm</span> de l'axe, puis compare-la au champ terrestre <span class="math">B_T = 5,0 × 10⁻⁵ T</span>.</p>
+        <div class="lecture-steps">
+          <div class="lecture-step"><strong>Étape 1 · Convertir en unités SI.</strong> <span class="math">d = 5,0 cm = 0,050 m</span>. C'est LE réflexe : la formule exige des mètres, jamais des centimètres.</div>
+          <div class="lecture-step"><strong>Étape 2 · Appliquer la formule.</strong> <span class="math">B = μ₀·I/(2π·d) = (4π × 10⁻⁷ × 10)/(2π × 0,050)</span>. Les <span class="math">π</span> se simplifient : il reste <span class="math">(4 × 10⁻⁷ × 10)/(0,10)</span>.</div>
+          <div class="lecture-step"><strong>Étape 3 · Calculer.</strong> <span class="math">B = (4 × 10⁻⁶)/(1,0 × 10⁻¹) = 4,0 × 10⁻⁵ T</span>.</div>
+          <div class="lecture-step"><strong>Étape 4 · Vérifier par la voie numérique.</strong> <span class="math">μ₀·I = 1,2566 × 10⁻⁶ × 10 = 1,2566 × 10⁻⁵</span> et <span class="math">2π·d = 0,31416</span> ; le quotient <span class="math">1,2566 × 10⁻⁵/0,31416</span> redonne bien <span class="math">4,0 × 10⁻⁵ T</span>.</div>
+          <div class="lecture-step"><strong>Étape 5 · Conclure.</strong> <span class="math">B/B_T = (4,0 × 10⁻⁵)/(5,0 × 10⁻⁵) = 0,80</span> : à 5 cm d'un fil de 10 A, le champ est du même ordre que le champ terrestre — d'où la déviation nette de la boussole d'Oersted.</div>
+        </div>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <p class="lecture-text"><strong>⚠ Piège d'examen :</strong> 90 % des points perdus ici viennent du centimètre non converti. Avec <span class="math">d = 5,0 cm</span> laissé tel quel, tu trouves un champ 100 fois trop petit. Deuxième piège : dessiner les cercles de champ dans le mauvais sens — refais mentalement le test de la main droite avant de tracer.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s3 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s3">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">03</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 3</span>
+        <h2 class="lecture-section-title">La spire circulaire</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Plie ton fil droit en cercle : tu obtiens une spire, la brique de base de toutes les bobines. Au centre de la spire, toutes les portions de fil contribuent dans le même sens, et le champ s'aligne sur l'axe perpendiculaire au plan de la spire. C'est le chaînon manquant entre le fil et le solénoïde de la section suivante.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <p class="lecture-text"><strong>Définition officielle — champ au centre d'une spire :</strong> au centre d'une spire circulaire de rayon <span class="math">R</span> parcourue par un courant <span class="math">I</span>, le champ magnétique est porté par l'axe de la spire, perpendiculaire à son plan, et a pour norme <span class="math">B = μ₀·I/(2·R)</span>. Son sens se donne encore par la main droite : les doigts suivent le courant dans la spire, le pouce pointe le sens de <span class="math">→B</span>.</p>
+      </div>
+      <p class="lecture-text">Compare les deux formules : fil droit <span class="math">B = μ₀·I/(2π·d)</span>, spire <span class="math">B = μ₀·I/(2·R)</span>. La structure est la même, seul le dénominateur change — distance de calcul au fil pour le fil droit, rayon pour la spire. Enroule plusieurs spires jointives sur un même axe et les champs s'ajoutent : une bobine plate de <span class="math">N</span> spires donne <span class="math">N</span> fois le champ d'une spire seule.</p>
+      <div class="lecture-formula-box">
+        <span class="math">centre d'une spire : B = μ₀·I/(2·R) · bobine plate de N spires : B = N·μ₀·I/(2·R)</span>
+        <p class="lecture-text">avec <span class="math">R</span> en mètres et <span class="math">B</span> en tesla. La formule avec <span class="math">N</span> est valable si les spires sont serrées et superposées au même endroit.</p>
+      </div>
+      <svg viewBox="0 0 480 240" role="img" aria-label="Spire circulaire vue de face parcourue par un courant anti-horaire : au centre, le champ magnétique sort de la feuille, symbolisé par un point dans un cercle">
+        <text x="240" y="24" text-anchor="middle" style="fill:currentColor;font-size:12px">spire vue de face : I anti-horaire</text>
+        <circle cx="240" cy="125" r="70" style="fill:none;stroke:var(--accent-bright);stroke-width:3"/>
+        <polygon points="246,49 246,61 232,55" style="fill:rgba(96,165,250,0.9)"/>
+        <polygon points="234,189 234,201 248,195" style="fill:rgba(96,165,250,0.9)"/>
+        <circle cx="240" cy="125" r="13" style="fill:rgba(96,165,250,0.2);stroke:var(--accent-bright);stroke-width:2"/>
+        <circle cx="240" cy="125" r="4" style="fill:currentColor"/>
+        <line x1="244" y1="121" x2="300" y2="72" style="stroke:rgba(96,165,250,0.4);stroke-width:1.2;stroke-dasharray:5 4;fill:none"/>
+        <text x="310" y="68" style="fill:currentColor;font-size:12px">R</text>
+        <text x="240" y="224" text-anchor="middle" style="fill:currentColor;font-size:12px">au centre : →B sort de la feuille (⊙), porté par l'axe</text>
+      </svg>
+      <p class="lecture-text">Et si tu répètes cette spire cent fois le long d'un cylindre ? Tu obtiens le solénoïde de la section suivante : le champ de la spire est la brique élémentaire, et le solénoïde empile ses contributions pour fabriquer un champ uniforme.</p>
+      <div class="lecture-example-content">
+        <p class="lecture-text"><strong>🔬 Exemple travaillé — Spire de laboratoire.</strong> Une spire circulaire de rayon <span class="math">R = 10 cm</span> est parcourue par <span class="math">I = 5,0 A</span>. Calcule la norme du champ au centre et compare-la au champ terrestre.</p>
+        <div class="lecture-steps">
+          <div class="lecture-step"><strong>Étape 1 · Convertir.</strong> <span class="math">R = 10 cm = 0,10 m</span> : encore une conversion obligatoire avant tout calcul.</div>
+          <div class="lecture-step"><strong>Étape 2 · Appliquer la formule.</strong> <span class="math">B = μ₀·I/(2·R) = (4π × 10⁻⁷ × 5,0)/(2 × 0,10) = (2,0π × 10⁻⁶)/(0,20)</span>.</div>
+          <div class="lecture-step"><strong>Étape 3 · Calculer.</strong> <span class="math">B = 1,0π × 10⁻⁵ = 3,1 × 10⁻⁵ T</span> en prenant <span class="math">π ≈ 3,14</span>.</div>
+          <div class="lecture-step"><strong>Étape 4 · Vérifier par la voie numérique.</strong> <span class="math">μ₀·I = 1,2566 × 10⁻⁶ × 5,0 = 6,283 × 10⁻⁶</span> ; division par <span class="math">0,20</span> : <span class="math">6,283 × 10⁻⁶/0,20 = 3,14 × 10⁻⁵ T</span>. On retrouve <span class="math">3,1 × 10⁻⁵ T</span>.</div>
+          <div class="lecture-step"><strong>Étape 5 · Conclure.</strong> <span class="math">B/B_T ≈ 3,1 × 10⁻⁵/5,0 × 10⁻⁵ ≈ 0,62</span> : une simple spire de 5 A crée au centre un champ du même ordre que le champ terrestre — suffisant pour dévier nettement une boussole.</div>
+        </div>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <p class="lecture-text"><strong>⚠ Piège d'examen :</strong> la formule <span class="math">B = μ₀·I/(2·R)</span> ne vaut qu'au centre de la spire. Ne l'applique jamais à un point quelconque du plan, et ne confonds pas rayon <span class="math">R</span> et diamètre : si l'énoncé donne un diamètre de 20 cm, le rayon vaut 0,10 m.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s4 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s4">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">04</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 4</span>
+        <h2 class="lecture-section-title">Le solénoïde, l'aimant qu'on allume</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Enroule un long fil en hélice régulière autour d'un cylindre : tu obtiens un solénoïde, c'est-à-dire une bobine longue formée de <span class="math">N</span> spires jointives réparties sur une longueur <span class="math">L</span>. Chaque spire apporte sa contribution au centre, et le champ total y devient remarquablement uniforme : même direction, même sens, même norme partout à l'intérieur, loin des extrémités.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <p class="lecture-text"><strong>Définition officielle — champ à l'intérieur d'un solénoïde :</strong> à l'intérieur d'un solénoïde long parcouru par un courant <span class="math">I</span>, le champ magnétique est uniforme, parallèle à l'axe, et a pour norme <span class="math">B = μ₀·n·I</span>, où <span class="math">n = N/L</span> est le nombre de spires par mètre (en <span class="math">m⁻¹</span>). À l'extérieur, le champ est très faible.</p>
+      </div>
+      <div class="lecture-formula-hero">
+        <span class="math">B = μ₀·n·I   avec   n = N/L</span>
+        <p class="lecture-text"><span class="math">N</span> : nombre total de spires (sans unité) ; <span class="math">L</span> : longueur du solénoïde en mètres (m) ; <span class="math">n</span> : densité de spires en <span class="math">m⁻¹</span> ; <span class="math">μ₀ = 4π × 10⁻⁷ T·m·A⁻¹</span>. Pour augmenter <span class="math">B</span> : augmenter <span class="math">I</span>, resserrer les spires (diminuer <span class="math">L</span>) ou ajouter des spires.</p>
+      </div>
+      <p class="lecture-text">Le solénoïde parcouru par un courant se comporte exactement comme un aimant droit : une extrémité se comporte en pôle N (les lignes de champ en sortent), l'autre en pôle S, et les lignes internes vont de S vers N. C'est cette équivalence qui fonde les électro-aimants : un noyau de fer doux placé dans la bobine multiplie le champ, et tout disparaît dès qu'on coupe le courant.</p>
+      <p class="lecture-text">Ce noyau de fer doux agit comme un amplificateur : il concentre les lignes de champ et peut multiplier la norme par des centaines. Bobine, courant, noyau : voilà le trio gagnant de l'électro-aimant, réversible à volonté — exactement ce qu'il faut pour une grue qui doit lâcher sa ferraille au bon endroit.</p>
+      <svg viewBox="0 0 600 250" role="img" aria-label="Solénoïde vu de côté : à l'intérieur, des lignes de champ droites et parallèles à l'axe allant de S vers N ; à l'extérieur, des lignes qui bouclent du pôle N à droite vers le pôle S à gauche">
+        <text x="320" y="20" text-anchor="middle" style="fill:currentColor;font-size:12px">champ quasi uniforme à l'intérieur, lignes de S vers N</text>
+        <path d="M 470 78 Q 320 15 170 78" style="fill:none;stroke:var(--accent-bright);stroke-width:1.6"/>
+        <polygon points="330,40 330,52 310,46" style="fill:rgba(96,165,250,0.9)"/>
+        <path d="M 470 162 Q 320 225 170 162" style="fill:none;stroke:var(--accent-bright);stroke-width:1.6"/>
+        <polygon points="330,187 330,199 310,193" style="fill:rgba(96,165,250,0.9)"/>
+        <ellipse cx="170" cy="120" rx="14" ry="50" style="fill:rgba(96,165,250,0.06);stroke:var(--accent-bright);stroke-width:1.6"/>
+        <ellipse cx="220" cy="120" rx="14" ry="50" style="fill:rgba(96,165,250,0.06);stroke:var(--accent-bright);stroke-width:1.6"/>
+        <ellipse cx="270" cy="120" rx="14" ry="50" style="fill:rgba(96,165,250,0.06);stroke:var(--accent-bright);stroke-width:1.6"/>
+        <ellipse cx="320" cy="120" rx="14" ry="50" style="fill:rgba(96,165,250,0.06);stroke:var(--accent-bright);stroke-width:1.6"/>
+        <ellipse cx="370" cy="120" rx="14" ry="50" style="fill:rgba(96,165,250,0.06);stroke:var(--accent-bright);stroke-width:1.6"/>
+        <ellipse cx="420" cy="120" rx="14" ry="50" style="fill:rgba(96,165,250,0.06);stroke:var(--accent-bright);stroke-width:1.6"/>
+        <ellipse cx="470" cy="120" rx="14" ry="50" style="fill:rgba(96,165,250,0.06);stroke:var(--accent-bright);stroke-width:1.6"/>
+        <line x1="156" y1="95" x2="484" y2="95" style="stroke:var(--accent-bright);stroke-width:1.6;fill:none"/>
+        <line x1="156" y1="120" x2="484" y2="120" style="stroke:var(--accent-bright);stroke-width:1.6;fill:none"/>
+        <line x1="156" y1="145" x2="484" y2="145" style="stroke:var(--accent-bright);stroke-width:1.6;fill:none"/>
+        <polygon points="270,89 270,101 288,95" style="fill:rgba(96,165,250,0.9)"/>
+        <polygon points="270,114 270,126 288,120" style="fill:rgba(96,165,250,0.9)"/>
+        <polygon points="270,139 270,151 288,145" style="fill:rgba(96,165,250,0.9)"/>
+        <text x="525" y="125" text-anchor="middle" style="fill:currentColor;font-size:15px;font-weight:700">N</text>
+        <text x="115" y="125" text-anchor="middle" style="fill:currentColor;font-size:15px;font-weight:700">S</text>
+        <text x="320" y="240" text-anchor="middle" style="fill:currentColor;font-size:12px">n = N/L spires par mètre : le solénoïde équivaut à un aimant droit</text>
+      </svg>
+      <div class="lecture-example-content">
+        <p class="lecture-text"><strong>🔬 Exemple travaillé — Électro-aimant de TP.</strong> Un solénoïde comporte <span class="math">N = 1000</span> spires réparties sur <span class="math">L = 50 cm</span>, parcourues par <span class="math">I = 2,0 A</span>. Calcule <span class="math">n</span> puis la norme <span class="math">B</span> du champ à l'intérieur, et compare-la au champ terrestre.</p>
+        <div class="lecture-steps">
+          <div class="lecture-step"><strong>Étape 1 · Convertir la longueur.</strong> <span class="math">L = 50 cm = 0,50 m</span> : la densité de spires s'exprime en <span class="math">m⁻¹</span>, donc la longueur doit être en mètres.</div>
+          <div class="lecture-step"><strong>Étape 2 · Calculer la densité de spires.</strong> <span class="math">n = N/L = 1000/0,50 = 2000 m⁻¹ = 2,0 × 10³ m⁻¹</span>.</div>
+          <div class="lecture-step"><strong>Étape 3 · Appliquer la formule.</strong> <span class="math">B = μ₀·n·I = 4π × 10⁻⁷ × 2,0 × 10³ × 2,0</span>.</div>
+          <div class="lecture-step"><strong>Étape 4 · Calculer.</strong> <span class="math">B = 16π × 10⁻⁴ = 50,3 × 10⁻⁴ = 5,0 × 10⁻³ T</span> (vérification numérique : <span class="math">1,2566 × 10⁻⁶ × 2000 × 2,0 = 5,03 × 10⁻³ T</span>).</div>
+          <div class="lecture-step"><strong>Étape 5 · Conclure.</strong> <span class="math">B/B_T = (5,0 × 10⁻³)/(5,0 × 10⁻⁵) = 100</span> : ce solénoïde de TP crée un champ cent fois plus intense que le champ terrestre, et de surcroît uniforme — idéal pour les mesures du programme.</div>
+        </div>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <p class="lecture-text"><strong>⚠ Piège d'examen :</strong> ne confonds jamais <span class="math">N</span> (nombre total de spires) et <span class="math">n</span> (spires par mètre) : dans <span class="math">B = μ₀·n·I</span>, on insère <span class="math">n = N/L</span>, pas <span class="math">N</span>. L'autre erreur classique : donner <span class="math">L</span> en centimètres. Avec <span class="math">L = 50 cm</span> non converti, <span class="math">n</span> tombe à 20 m⁻¹ et le champ est cent fois trop faible.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s5 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s5">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">05</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Synthèse + exercices</span>
+        <h2 class="lecture-section-title">Tableau des trois distributions</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Trois géométries, trois formules — mais une seule logique : plus on « concentre » le courant (courant fort, spires serrées), plus le champ monte. Voici le tableau à savoir reconstruire.</p>
+      <table class="lecture-table">
+        <thead>
+          <tr><th>Distribution</th><th>Formule</th><th>Astuce</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Fil droit infini</td><td><span class="math">B = μ₀·I/(2π·d)</span></td><td><span class="math">d</span> en m ; cercles de champ autour du fil</td></tr>
+          <tr><td>Spire (au centre)</td><td><span class="math">B = μ₀·I/(2·R)</span></td><td><span class="math">R</span> en m ; champ perpendiculaire au plan</td></tr>
+          <tr><td>Solénoïde (intérieur)</td><td><span class="math">B = μ₀·n·I</span>, <span class="math">n = N/L</span></td><td><span class="math">L</span> en m ; champ uniforme, axe du solénoïde</td></tr>
+          <tr><td>Bobine plate de <span class="math">N</span> spires</td><td><span class="math">B = N·μ₀·I/(2·R)</span></td><td>spires serrées : les champs s'ajoutent</td></tr>
+          <tr><td>Constante</td><td><span class="math">μ₀ = 4π × 10⁻⁷ T·m·A⁻¹</span></td><td>à connaître par cœur, aucun calcul sans elle</td></tr>
+          <tr><td>Repère</td><td><span class="math">B_T ≈ 5,0 × 10⁻⁵ T</span></td><td>toujours comparer ton résultat au champ terrestre</td></tr>
+        </tbody>
+      </table>
+      <div class="lecture-text">
+        <div class="lecture-exercise-label">📝 Exercice guidé 1 — Sous la ligne électrique</div>
+        <p class="lecture-text">Une ligne électrique aérienne transporte <span class="math">I = 100 A</span> dans un conducteur droit, assimilable à un fil infini. 1) Calcule la norme du champ créé à <span class="math">d = 2,0 m</span> du conducteur (hauteur d'une personne). 2) À quelle distance de l'axe le champ vaut-il <span class="math">5,0 × 10⁻⁵ T</span>, soit la valeur du champ terrestre ?</p>
+        <details><summary>Voir la solution pas à pas</summary>
+          <div class="lecture-steps">
+            <div class="lecture-step"><strong>Étape 1 · Formule et unités.</strong> Fil droit : <span class="math">B = μ₀·I/(2π·d)</span> avec <span class="math">d = 2,0 m</span> déjà en unités SI, <span class="math">μ₀ = 4π × 10⁻⁷ T·m·A⁻¹</span>.</div>
+            <div class="lecture-step"><strong>Étape 2 · Calcul de B.</strong> <span class="math">B = (4π × 10⁻⁷ × 100)/(2π × 2,0) = (4π × 10⁻⁵)/(4π) = 1,0 × 10⁻⁵ T</span> : les <span class="math">π</span> se simplifient entièrement.</div>
+            <div class="lecture-step"><strong>Étape 3 · Vérification numérique.</strong> <span class="math">μ₀·I = 1,2566 × 10⁻⁴</span> et <span class="math">2π·d = 12,566</span> ; le quotient vaut <span class="math">1,0 × 10⁻⁵ T</span>. Cohérent : sous une ligne, on est loin du fil.</div>
+            <div class="lecture-step"><strong>Étape 4 · Question 2 : isoler d.</strong> <span class="math">d = μ₀·I/(2π·B) = (4π × 10⁻⁵)/(2π × 5,0 × 10⁻⁵) = (4π × 10⁻⁵)/(π × 10⁻⁴) = 0,40 m</span>.</div>
+            <div class="lecture-step"><strong>Étape 5 · Conclusion.</strong> À 2 m sous la ligne, le champ (1,0 × 10⁻⁵ T) est 5 fois plus faible que le champ terrestre ; il ne l'égale qu'à 40 cm du conducteur. Bon ordre de grandeur à citer en rédaction.</div>
+          </div>
+        </details>
+      </div>
+      <div class="lecture-text">
+        <div class="lecture-exercise-label">📝 Exercice guidé 2 — Fabriquer son électro-aimant</div>
+        <p class="lecture-text">1) Un solénoïde comporte <span class="math">N = 800</span> spires sur une longueur <span class="math">L = 40 cm</span>, parcourues par <span class="math">I = 1,5 A</span>. Calcule <span class="math">n</span> puis <span class="math">B</span> à l'intérieur. 2) On veut un champ de <span class="math">4,0 × 10⁻³ T</span> avec un solénoïde de longueur <span class="math">L = 25 cm</span> parcouru par <span class="math">I = 2,0 A</span> : combien de spires faut-il ?</p>
+        <details><summary>Voir la solution pas à pas</summary>
+          <div class="lecture-steps">
+            <div class="lecture-step"><strong>Étape 1 · Densité de spires.</strong> <span class="math">L = 0,40 m</span> donc <span class="math">n = N/L = 800/0,40 = 2000 m⁻¹</span>.</div>
+            <div class="lecture-step"><strong>Étape 2 · Champ du premier solénoïde.</strong> <span class="math">B = μ₀·n·I = 4π × 10⁻⁷ × 2000 × 1,5 = 12π × 10⁻⁴ = 3,8 × 10⁻³ T</span> (numériquement : <span class="math">1,2566 × 10⁻⁶ × 3000 = 3,77 × 10⁻³ T</span>).</div>
+            <div class="lecture-step"><strong>Étape 3 · Question 2 : formule du produit croisé.</strong> On veut <span class="math">B = μ₀·n·I</span> avec <span class="math">B = 4,0 × 10⁻³ T</span> et <span class="math">I = 2,0 A</span> : <span class="math">n = B/(μ₀·I) = (4,0 × 10⁻³)/(1,2566 × 10⁻⁶ × 2,0)</span>.</div>
+            <div class="lecture-step"><strong>Étape 4 · Calcul de n puis N.</strong> <span class="math">n ≈ 1,6 × 10³ m⁻¹</span>, donc <span class="math">N = n·L = 1,6 × 10³ × 0,25 ≈ 4,0 × 10²</span> : il faut environ 400 spires sur 25 cm.</div>
+            <div class="lecture-step"><strong>Étape 5 · Contrôle.</strong> Inverse : <span class="math">N = 398</span> spires sur 0,25 m donnent <span class="math">n = 1592 m⁻¹</span> et <span class="math">B = 1,2566 × 10⁻⁶ × 1592 × 2,0 ≈ 4,0 × 10⁻³ T</span>. La boucle est bouclée, résultat vérifié.</div>
+          </div>
+        </details>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <p class="lecture-text"><strong>⚠ Piège d'examen (toutes formules) :</strong> avant d'écrire le moindre chiffre, vérifie la trilogie des unités : <span class="math">d</span> ou <span class="math">R</span> ou <span class="math">L</span> en mètres, <span class="math">I</span> en ampères, résultat en tesla. Et garde la comparaison avec <span class="math">B_T ≈ 5,0 × 10⁻⁵ T</span> en fin de calcul : c'est ce qui prouve au correcteur que tu comprends, pas seulement que tu calcules.</p>
+      </div>
+      <p class="lecture-text">Tu sais maintenant produire et calculer des champs magnétiques. La partie 03 te montre comment les décrire rigoureusement comme des vecteurs — puis comment les superposer quand plusieurs sources coexistent au même point, comme dans un haut-parleur ou un alternateur.</p>
+    </div>
+  </section>
+  <!-- ===== QCM ===== -->
+  <div class="lecture-quiz">
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">On double la distance <span class="math">d</span> qui sépare un point de l'axe d'un fil droit parcouru par un courant constant. La norme du champ créé…</p>
+      <div class="lecture-quiz-options"><span>A) est divisée par 2</span><span>B) est divisée par 4</span><span>C) est multipliée par 2</span><span>D) ne change pas</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">Réponse A. <span class="math">B = μ₀·I/(2π·d)</span> : <span class="math">B</span> est proportionnelle à <span class="math">1/d</span>, donc doubler <span class="math">d</span> divise <span class="math">B</span> par 2.</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Un solénoïde comporte <span class="math">N = 500</span> spires réparties sur <span class="math">L = 25 cm</span>. La densité de spires vaut…</p>
+      <div class="lecture-quiz-options"><span>A) 20 m⁻¹</span><span>B) 200 m⁻¹</span><span>C) 2000 m⁻¹</span><span>D) 12 500 m⁻¹</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">Réponse C. <span class="math">n = N/L = 500/0,25 = 2000 m⁻¹</span> : ne pas oublier de convertir les 25 cm en 0,25 m avant de diviser.</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">À l'intérieur d'un long solénoïde parcouru par un courant, loin des extrémités, le champ magnétique est…</p>
+      <div class="lecture-quiz-options"><span>A) nul</span><span>B) uniforme et parallèle à l'axe</span><span>C) perpendiculaire à l'axe</span><span>D) très intense uniquement près des spires</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">Réponse B. Dans un solénoïde long, le champ intérieur est uniforme : même direction (l'axe), même sens (de S vers N) et même norme <span class="math">B = μ₀·n·I</span> en tout point loin des bouts. À l'extérieur, il est en revanche très faible.</div></details>
+    </div>
+  </div>
+  <!-- ===== RÉCAP ===== -->
+  <div class="lecture-recap">
+    <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
+    <ul class="lecture-recap-list">
+      <li><strong>Oersted</strong> tout courant crée un champ magnétique ; inverse le courant, tu inverses le champ ; coupe le courant, le champ disparaît.</li>
+      <li><strong>Fil droit</strong> <span class="math">B = μ₀·I/(2π·d)</span>, cercles de champ autour du fil, sens donné par la main droite ou le bonhomme d'Ampère.</li>
+      <li><strong>Spire</strong> <span class="math">B = μ₀·I/(2·R)</span> au centre, champ perpendiculaire au plan de la spire.</li>
+      <li><strong>Solénoïde</strong> <span class="math">B = μ₀·n·I</span> avec <span class="math">n = N/L</span> en <span class="math">m⁻¹</span> : champ uniforme à l'intérieur, et le tout équivaut à un aimant droit dont on choisit le courant.</li>
+    </ul>
+  </div>
+  <!-- ===== FIN ===== -->
+  <div class="lecture-end">
+    <div class="lecture-end-icon">🎯</div>
+    <div class="lecture-end-text">Partie 02 terminée !</div>
+    <div class="lecture-end-sub">Tu sais maintenant calculer un champ créé par un courant. Mais <span class="math">B</span> reste un vecteur : direction, sens, norme — comment les manipuler quand deux champs coexistent ? Réponse dans la partie 03, avec la superposition.</div>
+    <div class="lecture-end-divider"></div>
+  </div>
+</div>

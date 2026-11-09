@@ -1,0 +1,379 @@
+<!-- PARTIE 03 — Énergie & Conservation dans un circuit LC (Circuit LC) -->
+<div class="lecture-container">
+
+  <!-- ===== HERO ===== -->
+  <header class="lecture-hero">
+    <div class="lecture-hero-badge">
+      <span class="lecture-hero-icon">📘</span>
+      <span class="lecture-hero-label">Terminale C&D · Circuit LC · Partie 03</span>
+    </div>
+    <h1 class="lecture-hero-title">
+      Énergie & Conservation dans un <em>circuit LC</em>
+    </h1>
+    <p class="lecture-hero-intro">
+      Dernière ligne droite du chapitre. On commence par la grandeur qui mesure « combien » le condensateur est chargé : la charge q. Puis on tient le registre de l'énergie : qui en gagne, qui en perd, et pourquoi la somme reste fixe dans un circuit parfait. Enfin, on confronte le rêve à la réalité — la résistance amortit tout — et on découvre l'astuce des électroniciens pour faire vibrer un circuit sans fin.
+    </p>
+    <div class="lecture-hero-meta">
+      <span class="lecture-hero-meta-item">⏱ 25 min</span>
+      <span class="lecture-hero-meta-item">⚡ 4 notions</span>
+      <span class="lecture-hero-meta-item">📚 6 sections</span>
+      <span class="lecture-hero-meta-item">🎓 Terminale C&D</span>
+    </div>
+  </header>
+  <!-- ===== SOMMAIRE ===== -->
+  <nav class="lecture-toc">
+    <div class="lecture-toc-header">
+      <span>Dans cette partie</span>
+      <span class="lecture-toc-count">4 notions · 6 sections</span>
+    </div>
+    <ol class="lecture-toc-list">
+      <li><a href="#s0"><span class="toc-num">00</span><span>Pourquoi les oscillations finissent-elles par s'arrêter ?</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>La charge du condensateur : q = C·u</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>Le bilan d'énergie : une somme qui ne bouge pas</span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>Amortissement : le régime pseudo-périodique</span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>Entretenir les oscillations</span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>Exercices d'application + table des régimes</span></a></li>
+    </ol>
+  </nav>
+  <!-- ============================================================ -->
+  <!-- SECTION s0 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s0">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">00</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Motivation</span>
+        <h2 class="lecture-section-title">Pourquoi les oscillations finissent-elles par s'arrêter ?</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Frappe un diapason : il vibre, puis revient le silence. Lance une balançoire d'un seul coup de pied : elle s'amortit. Nos circuits LC, eux aussi, finissent par s'arrêter — à cause de la résistance, faible mais réelle, qui transforme peu à peu l'énergie des oscillations en chaleur.</p>
+      <p class="lecture-text">Pourtant, la radio de ta grand-mère diffuse la même station pendant des heures : son oscillation est <strong>entretenue</strong>. Un étage électronique redonne au circuit, à chaque période, exactement ce qu'il a perdu. C'est cette histoire complète — compter l'énergie, comprendre l'amortissement, maîtriser l'entretien — que cette partie te raconte, avec les formules qui vont avec.</p>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s1 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s1">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">01</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1</span>
+        <h2 class="lecture-section-title">La charge du condensateur : q = C·u</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Un instant : comment mesure-t-on « combien » un condensateur est chargé ? La bonne grandeur est la <strong>charge électrique</strong> <span class="math">q</span>, stockée sur les plaques. Entre elle et la tension <span class="math">u</span>, le lien est direct : plus la capacité est grande, plus il faut de charges pour créer la même tension.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-title">🔑 Définition</div>
+        <p>La <strong>charge</strong> <span class="math">q</span> (en coulomb, C) d'un condensateur de capacité <span class="math">C</span> (en farad, F) porté à la tension <span class="math">u</span> (en volt, V) vaut <span class="math">q = C·u</span>. Attention aux deux « C » : la capacité <span class="math">C</span> est une grandeur, le coulomb (C) est une unité !</p>
+      </div>
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-main"><span class="math">q = C·u</span></div>
+        <p class="lecture-formula-main"><span class="math">q</span> en coulomb (C) · <span class="math">C</span> en farad (F) · <span class="math">u</span> en volt (V) — relation linéaire : doubler u double q</p>
+      </div>
+      <svg viewBox="0 0 640 320" style="width:100%;height:auto" role="img" aria-label="Circuit LC : condensateur sur la branche gauche avec charges plus q et moins q sur les plaques, bobine en bas, flèches de u et de i">
+        <rect width="640" height="320" rx="14" fill="rgba(96,165,250,0.06)"/>
+        <path d="M200 70 H480 M480 70 V260 M480 260 H400 M300 260 H200 M200 260 V162 M200 140 V70" style="stroke:var(--accent-bright)" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M178 140 H222 M178 162 H222" style="stroke:var(--accent-bright)" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <path d="M300 260 a25 25 0 0 1 50 0 a25 25 0 0 1 50 0" style="stroke:var(--accent-bright)" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <text x="230" y="148" fill="rgba(248,113,113,1)" style="font-size:16px;font-weight:700">+ q</text>
+        <text x="230" y="174" fill="rgba(96,165,250,1)" style="font-size:16px;font-weight:700">− q</text>
+        <path d="M258 162 V146" style="stroke:rgba(248,113,113,1)" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M258 138 L251 154 L265 154 Z" fill="rgba(248,113,113,1)"/>
+        <text x="272" y="158" fill="rgba(248,113,113,1)" style="font-size:19px;font-style:italic;font-weight:700">u</text>
+        <path d="M300 70 H360" style="stroke:rgba(52,211,153,1)" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M368 70 L354 63 L354 77 Z" fill="rgba(52,211,153,1)"/>
+        <text x="326" y="58" fill="rgba(52,211,153,1)" style="font-size:19px;font-style:italic;font-weight:700">i</text>
+        <text x="152" y="156" fill="currentColor" style="font-size:18px;font-style:italic;font-weight:700">C</text>
+        <text x="350" y="300" text-anchor="middle" fill="currentColor" style="font-size:18px;font-style:italic;font-weight:700">L</text>
+        <text x="470" y="298" text-anchor="end" fill="currentColor" style="font-size:13px">le courant i transporte la charge : la charge en mouvement</text>
+      </svg>
+      <div class="lecture-formula-box">
+        <p><strong>Formule compagne</strong> : <span class="math">u = q/C</span>. La tension est la charge divisée par la capacité — un condensateur de grande capacité « digère » beaucoup de charges pour une tension modérée.</p>
+      </div>
+      <p class="lecture-text"><strong>L'analogie qui colle</strong> : dans le pendule élastique, <span class="math">q</span> joue le rôle de l'élongation <span class="math">x</span> — la grandeur « stockée » qui oscille. Et le courant <span class="math">i</span> est à <span class="math">q</span> ce que la vitesse <span class="math">v</span> est à <span class="math">x</span> : le courant est la charge en mouvement, son intensité mesure la vitesse de transfert des charges.</p>
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">🎯 Exemple travaillé — Combien de charges sur les plaques ?</div>
+        <p class="lecture-example-content">Le condensateur de référence (<span class="math">C = 10 μF</span>) est chargé sous <span class="math">u = 6,0 V</span>. Calculer <span class="math">q</span>, puis retrouver <span class="math">E_C</span> avec la charge.</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step"><strong>Convertir.</strong> <span class="math">C = 10 μF = 1,0·10⁻⁵ F</span>.</li>
+          <li class="lecture-step"><strong>Calculer la charge.</strong> <span class="math">q = C·u = 1,0·10⁻⁵ × 6,0 = 6,0·10⁻⁵ C</span>, soit 60 μC.</li>
+          <li class="lecture-step"><strong>Énergie avec la charge.</strong> <span class="math">E_C = q²/(2·C) = (6,0·10⁻⁵)²/(2,0·10⁻⁵) = 3,6·10⁻⁹/2,0·10⁻⁵ = 1,8·10⁻⁴ J</span>.</li>
+          <li class="lecture-step"><strong>Cohérence.</strong> Avec la tension : <span class="math">E_C = ½·C·u² = 0,5 × 1,0·10⁻⁵ × 36 = 1,8·10⁻⁴ J</span> — même résultat ✓</li>
+        </ol>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-title">⚠️ Piège d'examen</div>
+        <p>Le piège des deux C : <span class="math">q</span> se mesure en coulomb (unité notée C) alors que la capacité se note <span class="math">C</span> (grandeur). Dans un calcul, convertis toujours : <span class="math">10 μF = 1,0·10⁻⁵ F</span>, et garde <span class="math">q</span> en coulombs.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s2 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s2">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">02</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2</span>
+        <h2 class="lecture-section-title">Le bilan d'énergie : une somme qui ne bouge pas</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Réunissons les billes du chapitre : l'énergie électrique du condensateur, l'énergie magnétique de la bobine, et la décharge oscillante qui les fait alterner. Dans un circuit parfait, quand l'une monte, l'autre descend, et leur somme reste figée : l'énergie se transforme, elle ne disparaît pas.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-title">🔑 Principe</div>
+        <p>Dans un circuit LC <strong>idéal</strong> (résistance nulle), l'énergie totale <span class="math">E = E_C + E_L</span> reste constante au cours du temps : l'énergie passe du condensateur à la bobine, puis revient, sans aucune perte.</p>
+      </div>
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-main"><span class="math">E = ½·C·u² + ½·L·i² = constante</span></div>
+        <p class="lecture-formula-main">à tout instant de la décharge oscillante — c'est l'outil pour relier <span class="math">u</span> et <span class="math">i</span> sans connaître <span class="math">t</span></p>
+      </div>
+      <svg viewBox="0 0 640 300" style="width:100%;height:auto" role="img" aria-label="Courbes des énergies E_C et E_L en fonction du temps : elles pulsent en opposition et leur somme, en ligne pointillée, reste constante">
+        <rect width="640" height="300" rx="14" fill="rgba(96,165,250,0.06)"/>
+        <path d="M60 60 V260" style="stroke:rgba(148,163,184,0.9)" stroke-width="2"/>
+        <path d="M60 54 L53 68 L67 68 Z" fill="rgba(148,163,184,0.9)"/>
+        <path d="M60 250 H620" style="stroke:rgba(148,163,184,0.9)" stroke-width="2"/>
+        <path d="M628 250 L614 243 L614 257 Z" fill="rgba(148,163,184,0.9)"/>
+        <text x="34" y="82" fill="currentColor" style="font-size:17px;font-style:italic">E</text>
+        <text x="600" y="276" fill="currentColor" style="font-size:17px;font-style:italic">t</text>
+        <path d="M60 110 H620" style="stroke:rgba(251,191,36,0.8)" stroke-width="2.5" stroke-dasharray="8 6"/>
+        <text x="614" y="102" text-anchor="end" fill="rgba(251,191,36,1)" style="font-size:14px;font-style:italic;font-weight:700">E totale (constante)</text>
+        <path d="M60 110 L80 158 L100 237 L120 237 L140 158 L160 110 L180 158 L200 237 L220 237 L240 158 L260 110 L280 158 L300 237 L320 237 L340 158 L360 110 L380 158 L400 237 L420 237 L440 158 L460 110 L480 158 L500 237 L520 237 L540 158 L560 110 L580 158 L600 237 L620 237" style="stroke:var(--accent-bright)" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M60 250 L80 202 L100 123 L120 123 L140 202 L160 250 L180 202 L200 123 L220 123 L240 202 L260 250 L280 202 L300 123 L320 123 L340 202 L360 250 L380 202 L400 123 L420 123 L440 202 L460 250 L480 202 L500 123 L520 123 L540 202 L560 250 L580 202 L600 123 L620 123" style="stroke:rgba(52,211,153,1)" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="66" y="134" fill="rgba(96,165,250,1)" style="font-size:15px;font-style:italic;font-weight:700">E_C</text>
+        <text x="66" y="240" fill="rgba(52,211,153,1)" style="font-size:15px;font-style:italic;font-weight:700">E_L</text>
+        <path d="M66 70 H154" style="stroke:rgba(251,191,36,1)" stroke-width="2"/>
+        <path d="M60 70 L72 64 L72 76 Z" fill="rgba(251,191,36,1)"/>
+        <path d="M160 70 L148 64 L148 76 Z" fill="rgba(251,191,36,1)"/>
+        <text x="110" y="60" text-anchor="middle" fill="rgba(251,191,36,1)" style="font-size:14px;font-style:italic;font-weight:700">T₀/2</text>
+      </svg>
+      <p class="lecture-text">Détail remarquable : chaque énergie pulse avec une période <span class="math">T₀/2</span>, deux fois plus rapide que la tension. Logique : <span class="math">u</span> et <span class="math">−u</span> donnent la même énergie, puisque <span class="math">u</span> est au carré. La somme, elle, reste à plat — c'est la ligne pointillée.</p>
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">🎯 Exemple travaillé — Suivre l'énergie instant par instant</div>
+        <p class="lecture-example-content">Circuit de référence : <span class="math">C = 10 μF</span>, <span class="math">L = 0,10 H</span>, condensateur chargé sous <span class="math">U₀ = 6,0 V</span>. Vérifier la conservation à trois instants clés.</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step"><strong>À t = 0.</strong> <span class="math">u = 6,0 V</span> et <span class="math">i = 0</span> : <span class="math">E = ½ × 1,0·10⁻⁵ × 36 + 0 = 1,8·10⁻⁴ J</span>.</li>
+          <li class="lecture-step"><strong>À t = T₀/4.</strong> <span class="math">u = 0</span> donc <span class="math">E_C = 0</span> : toute l'énergie est magnétique, <span class="math">E_L = 1,8·10⁻⁴ J</span> — elle a changé de camp, rien n'a disparu.</li>
+          <li class="lecture-step"><strong>Intensité correspondante.</strong> <span class="math">½·L·I₀² = 1,8·10⁻⁴</span> → <span class="math">I₀ = √(2 × 1,8·10⁻⁴/0,10) = 6,0·10⁻² A</span>.</li>
+          <li class="lecture-step"><strong>Bilan.</strong> À chaque instant, <span class="math">E_C + E_L = 1,8·10⁻⁴ J = constante ✓</span></li>
+        </ol>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-title">⚠️ Piège d'examen</div>
+        <p>La somme n'est constante <strong>que si la résistance est négligeable</strong>. Ajoute un fil résistant et le bilan change : c'est tout l'objet de la section suivante.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s3 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s3">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">03</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 3</span>
+        <h2 class="lecture-section-title">Amortissement : le régime pseudo-périodique</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Tout circuit réel contient une résistance, même faible : celle des fils, celle de la bobine. À chaque navette, la résistance prélève une part de l'énergie et la convertit en chaleur (effet Joule). Résultat : la sinusoïde perd de l'altitude — l'<strong>amplitude décroît</strong> — mais les passages par zéro restent régulièrement espacés : le <strong>rythme</strong>, lui, ne change presque pas.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-title">🔑 Définition</div>
+        <p><strong>Régime pseudo-périodique</strong> : oscillations dont l'amplitude diminue mais dont la période <span class="math">T</span> reste quasi constante. Si la résistance est faible, <span class="math">T ≈ T₀ = 2π√(L·C)</span> : on parle d'oscillations <strong>quasi-périodiques</strong>.</p>
+      </div>
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-main"><span class="math">T ≈ T₀ = 2π√(L·C)</span></div>
+        <p class="lecture-formula-main">pseudo-période, valable si la résistance totale est faible — l'amplitude décroît, pas le rythme</p>
+      </div>
+      <svg viewBox="0 0 640 330" style="width:100%;height:auto" role="img" aria-label="Oscillogramme d'oscillations amorties : sinusoïde d'amplitude décroissante entre deux enveloppes en pointillés, pseudo-période T annotée entre deux sommets">
+        <rect width="640" height="330" rx="14" fill="rgba(96,165,250,0.06)"/>
+        <rect x="60" y="40" width="560" height="256" rx="10" fill="rgba(2,6,23,0.35)" style="stroke:var(--accent)" stroke-width="2"/>
+        <path d="M116 40 V296 M172 40 V296 M228 40 V296 M284 40 V296 M340 40 V296 M396 40 V296 M452 40 V296 M508 40 V296 M564 40 V296" style="stroke:rgba(96,165,250,0.15)" stroke-width="1.5" fill="none"/>
+        <path d="M60 72 H620 M60 104 H620 M60 136 H620 M60 200 H620 M60 232 H620 M60 264 H620" style="stroke:rgba(96,165,250,0.15)" stroke-width="1.5" fill="none"/>
+        <path d="M60 168 H620" style="stroke:rgba(96,165,250,0.4)" stroke-width="1.5" stroke-dasharray="6 6"/>
+        <path d="M60 98 L620 135" style="stroke:rgba(251,191,36,0.65)" stroke-width="2" stroke-dasharray="6 5" fill="none"/>
+        <path d="M60 238 L620 201" style="stroke:rgba(251,191,36,0.65)" stroke-width="2" stroke-dasharray="6 5" fill="none"/>
+        <path d="M60 168 L80 127 L100 101 L120 101 L140 127 L160 168 L180 209 L200 235 L220 235 L240 209 L260 168 L280 142 L300 125 L320 125 L340 142 L360 168 L380 194 L400 211 L420 211 L440 194 L460 168 L480 151 L500 140 L520 140 L540 151 L560 168 L580 185 L600 196 L620 196" style="stroke:var(--accent-bright)" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M110 96 V84 M310 116 V84" style="stroke:rgba(251,191,36,0.5)" stroke-width="1.5" stroke-dasharray="4 4"/>
+        <path d="M118 84 H302" style="stroke:rgba(251,191,36,1)" stroke-width="2.5"/>
+        <path d="M110 84 L124 77 L124 91 Z" fill="rgba(251,191,36,1)"/>
+        <path d="M310 84 L296 77 L296 91 Z" fill="rgba(251,191,36,1)"/>
+        <text x="210" y="72" text-anchor="middle" fill="rgba(251,191,36,1)" style="font-size:16px;font-style:italic;font-weight:700">T ≈ T₀</text>
+        <text x="452" y="160" fill="rgba(251,191,36,1)" style="font-size:13px;font-weight:600">enveloppes : amplitude qui diminue</text>
+        <text x="340" y="318" text-anchor="middle" fill="currentColor" style="font-size:14px;font-weight:600">régime pseudo-périodique (résistance faible)</text>
+      </svg>
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">🎯 Exemple travaillé — Lire un oscillogramme amorti</div>
+        <p class="lecture-example-content">Circuit : <span class="math">L = 0,10 H</span>, <span class="math">C = 1,0 μF</span>, résistance faible. Sur l'écran (0,5 ms/div), deux sommets successifs sont séparés de 4 divisions. Comparer <span class="math">T</span> et <span class="math">T₀</span>.</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step"><strong>Mesurer la pseudo-période.</strong> <span class="math">T = 4 × 0,5 = 2,0 ms</span>.</li>
+          <li class="lecture-step"><strong>Calculer la période propre.</strong> <span class="math">L·C = 0,10 × 1,0·10⁻⁶ = 1,0·10⁻⁷ s²</span>.</li>
+          <li class="lecture-step"><strong>Terminer le calcul.</strong> <span class="math">T₀ = 2π × 3,16·10⁻⁴ = 1,99·10⁻³ s ≈ 2,0 ms</span>.</li>
+          <li class="lecture-step"><strong>Conclure.</strong> <span class="math">T ≈ T₀ ✓</span> : la résistance fait surtout baisser l'amplitude, elle modifie à peine le rythme.</li>
+        </ol>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-title">⚠️ Piège d'examen</div>
+        <p>Deux confusions à bannir : croire que <span class="math">T</span> est <em>exactement</em> <span class="math">T₀</span> (ce n'est vrai qu'en première approximation, pour <span class="math">R</span> faible) ; et croire que c'est la <strong>période</strong> qui s'amortit — non, c'est l'<strong>amplitude</strong>.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s4 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s4">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">04</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 4</span>
+        <h2 class="lecture-section-title">Entretenir les oscillations</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Comment faire chanter un circuit sans fin ? En lui rendant, à chaque période, l'énergie que la résistance lui vole. C'est le rôle du <strong>dispositif d'entretien</strong> : un étage électronique qui prélève l'énergie ailleurs (pile, alimentation) et la réinjecte au bon rythme. La balançoire qu'on pousse à chaque passage, l'horloge à pendule qu'on remonte : même idée.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-title">🔑 Définition</div>
+        <p><strong>Oscillations entretenues</strong> : oscillations d'amplitude constante obtenues en compensant, à chaque période, l'énergie dissipée par la résistance. Conditions : une résistance totale faible et une réinjection synchronisée sur la période propre du circuit.</p>
+      </div>
+      <svg viewBox="0 0 640 300" style="width:100%;height:auto" role="img" aria-label="Dispositif d'entretien : le circuit LC perd de l'énergie par effet Joule et le dispositif d'entretien la réinjecte à chaque période ; sinusoïde d'amplitude constante">
+        <rect width="640" height="300" rx="14" fill="rgba(96,165,250,0.06)"/>
+        <rect x="40" y="60" width="250" height="120" rx="14" fill="rgba(96,165,250,0.10)" style="stroke:var(--accent-bright)" stroke-width="2.5"/>
+        <text x="165" y="92" text-anchor="middle" fill="currentColor" style="font-size:17px;font-weight:700">Circuit LC</text>
+        <path d="M80 135 H120 M136 135 H176" style="stroke:var(--accent-bright)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <path d="M120 118 V152 M136 118 V152" style="stroke:var(--accent-bright)" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <path d="M176 135 a12 12 0 0 1 24 0 a12 12 0 0 1 24 0" style="stroke:var(--accent-bright)" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M224 135 H252" style="stroke:var(--accent-bright)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <text x="128" y="112" fill="currentColor" style="font-size:14px;font-style:italic;font-weight:700">C</text>
+        <text x="204" y="168" fill="currentColor" style="font-size:14px;font-style:italic;font-weight:700">L</text>
+        <rect x="380" y="60" width="210" height="120" rx="14" fill="rgba(52,211,153,0.10)" style="stroke:rgba(52,211,153,1)" stroke-width="2.5"/>
+        <text x="485" y="98" text-anchor="middle" fill="currentColor" style="font-size:16px;font-weight:700">Dispositif</text>
+        <text x="485" y="120" text-anchor="middle" fill="currentColor" style="font-size:16px;font-weight:700">d'entretien</text>
+        <text x="485" y="144" text-anchor="middle" fill="currentColor" style="font-size:13px">(étage amplificateur)</text>
+        <path d="M374 100 H298" style="stroke:rgba(52,211,153,1)" stroke-width="3" stroke-linecap="round"/>
+        <path d="M290 100 L306 93 L306 107 Z" fill="rgba(52,211,153,1)"/>
+        <text x="337" y="86" text-anchor="middle" fill="rgba(52,211,153,1)" style="font-size:13px;font-weight:600">énergie réinjectée</text>
+        <path d="M298 150 H374" style="stroke:rgba(251,191,36,1)" stroke-width="3" stroke-linecap="round"/>
+        <path d="M382 150 L366 143 L366 157 Z" fill="rgba(251,191,36,1)"/>
+        <text x="337" y="176" text-anchor="middle" fill="rgba(251,191,36,1)" style="font-size:13px;font-weight:600">énergie dissipée (effet Joule)</text>
+        <path d="M60 240 H320" style="stroke:rgba(148,163,184,0.9)" stroke-width="2"/>
+        <path d="M60 240 L73 222 L86 211 L99 211 L112 222 L125 240 L138 258 L151 269 L164 269 L177 258 L190 240 L203 222 L216 211 L229 211 L242 222 L255 240 L268 258 L281 269 L294 269 L307 258 L320 240" style="stroke:var(--accent-bright)" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="190" y="196" text-anchor="middle" fill="rgba(52,211,153,1)" style="font-size:13px;font-weight:600">amplitude constante</text>
+        <text x="480" y="240" text-anchor="middle" fill="currentColor" style="font-size:13px">à chaque période, on rend</text>
+        <text x="480" y="260" text-anchor="middle" fill="currentColor" style="font-size:13px">exactement ce que R a pris</text>
+      </svg>
+      <div class="lecture-formula-box">
+        <p><strong>Le bilan qui résume tout</strong> : par période, <span class="math">ΔE</span> réinjectée = <span class="math">ΔE</span> dissipée par effet Joule → énergie totale constante → amplitude constante, au rythme propre <span class="math">T₀</span> du circuit.</p>
+      </div>
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">🎯 Exemple de raisonnement — Le mécanisme de l'entretien</div>
+        <ol class="lecture-steps">
+          <li class="lecture-step"><strong>La perte.</strong> Pendant une période, la résistance dissipe une petite énergie <span class="math">ΔE</span> : l'énergie totale passe de <span class="math">E</span> à <span class="math">E − ΔE</span>, l'amplitude baisse d'un poil.</li>
+          <li class="lecture-step"><strong>La veille.</strong> Le dispositif d'entretien observe <span class="math">u(t)</span> et attend le bon instant du cycle.</li>
+          <li class="lecture-step"><strong>La compensation.</strong> Au moment voulu, il réinjecte exactement <span class="math">ΔE</span>, en phase avec l'oscillation.</li>
+          <li class="lecture-step"><strong>Le bilan.</strong> <span class="math">(E − ΔE) + ΔE = E</span> : l'énergie totale reprend sa valeur, la sinusoïde ne s'amortit plus ✓</li>
+        </ol>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-title">⚠️ Piège d'examen</div>
+        <p>Entretenir n'est pas amplifier : on <strong>compense exactement</strong> la perte. Trop réinjecter ferait croître l'amplitude jusqu'à saturer le circuit ; réinjecter au mauvais rythme casserait l'oscillation au lieu de l'entretenir.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s5 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s5">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">05</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Exercices</span>
+        <h2 class="lecture-section-title">Exercices d'application + table des régimes</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <div class="lecture-text">
+        <div class="lecture-exercise-label">📝 Exercice 1 — Énergie et conservation (niveau Bac)</div>
+        <p class="lecture-text">Circuit de référence : <span class="math">C = 10 μF</span>, <span class="math">L = 0,10 H</span>, condensateur chargé sous <span class="math">U₀ = 6,0 V</span>, résistance négligeable. a) Calculer la charge initiale <span class="math">q₀</span>. b) Calculer l'énergie totale. c) Quand la tension vaut <span class="math">u = 3,0 V</span>, quelle est l'intensité <span class="math">i</span> ?</p>
+        <details>
+          <summary>Voir la solution détaillée</summary>
+          <ol class="lecture-steps">
+            <li class="lecture-step"><strong>a) Charge initiale.</strong> <span class="math">q₀ = C·U₀ = 1,0·10⁻⁵ × 6,0 = 6,0·10⁻⁵ C</span>, soit 60 μC.</li>
+            <li class="lecture-step"><strong>b) Énergie totale.</strong> <span class="math">E = ½·C·U₀² = 0,5 × 1,0·10⁻⁵ × 36 = 1,8·10⁻⁴ J</span>.</li>
+            <li class="lecture-step"><strong>c) Énergie électrique à u = 3,0 V.</strong> <span class="math">E_C = 0,5 × 1,0·10⁻⁵ × 9,0 = 4,5·10⁻⁵ J</span>.</li>
+            <li class="lecture-step"><strong>Énergie magnétique par différence.</strong> <span class="math">E_L = 1,8·10⁻⁴ − 4,5·10⁻⁵ = 1,35·10⁻⁴ J</span>.</li>
+            <li class="lecture-step"><strong>Intensité.</strong> <span class="math">i = √(2·E_L/L) = √(2 × 1,35·10⁻⁴/0,10) = √(2,7·10⁻³) = 5,2·10⁻² A</span>. Contrôle : <span class="math">0,5 × 0,10 × (5,2·10⁻²)² = 1,35·10⁻⁴ ✓</span></li>
+          </ol>
+        </details>
+      </div>
+      <div class="lecture-text">
+        <div class="lecture-exercise-label">📝 Exercice 2 — Reconnaître et exploiter un régime (niveau Bac)</div>
+        <p class="lecture-text">Un circuit série comprend une bobine d'inductance <span class="math">L = 0,10 H</span> (résistance totale <span class="math">r = 2,0 Ω</span>, faible) et un condensateur de capacité <span class="math">C = 1,0 μF</span>. a) Quel est le régime des oscillations ? b) Calculer la pseudo-période. c) Quelle fréquence un fréquencomètre afficherait-il ?</p>
+        <details>
+          <summary>Voir la solution détaillée</summary>
+          <ol class="lecture-steps">
+            <li class="lecture-step"><strong>a) Identifier le régime.</strong> Résistance faible mais non nulle → régime <strong>pseudo-périodique</strong> : oscillations amorties.</li>
+            <li class="lecture-step"><strong>b) Pseudo-période.</strong> <span class="math">T ≈ T₀ = 2π√(L·C) = 2π√(1,0·10⁻⁷) = 2π × 3,16·10⁻⁴ ≈ 2,0·10⁻³ s</span>, soit 2,0 ms.</li>
+            <li class="lecture-step"><strong>c) Fréquence.</strong> <span class="math">f ≈ 1/T = 1/(2,0·10⁻³) = 5,0·10² Hz</span>, soit 500 Hz.</li>
+            <li class="lecture-step"><strong>Cohérence.</strong> <span class="math">T₀ = 1,99 ms</span> et <span class="math">f₀ = 503 Hz</span> : avec <span class="math">r</span> faible, l'écart est négligeable ✓</li>
+          </ol>
+        </details>
+      </div>
+      <p class="lecture-text">Pour clôturer le chapitre, voici la table des quatre régimes possibles d'un circuit oscillant. Savoir nommer le régime à partir des données, c'est une question de cours quasi systématique au Bac.</p>
+      <div >
+        <table class="lecture-table">
+          <thead>
+            <tr><th>Régime</th><th>Condition</th><th>Allure de u(t)</th><th>Énergie totale</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Périodique (idéal)</td><td>résistance nulle</td><td>sinusoïde d'amplitude constante</td><td>conservée</td></tr>
+            <tr><td>Pseudo-périodique</td><td>résistance faible</td><td>sinusoïde amortie, <span class="math">T ≈ T₀</span></td><td>dissipée progressivement</td></tr>
+            <tr><td>Apériodique</td><td>résistance grande</td><td>retour à zéro sans oscillation</td><td>dissipée d'un coup</td></tr>
+            <tr><td>Entretenu</td><td>résistance faible + apport d'énergie</td><td>sinusoïde d'amplitude constante</td><td>compensée à chaque période</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+  <!-- ===== QCM ===== -->
+  <div class="lecture-quiz">
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Un condensateur de capacité <span class="math">C</span> porté à la tension <span class="math">u</span> porte la charge :</p>
+      <div class="lecture-quiz-options"><span>A) <span class="math">q = u/C</span></span><span>B) <span class="math">q = C·u</span></span><span>C) <span class="math">q = C·u²</span></span><span>D) <span class="math">q = ½·C·u</span></span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">Réponse B. La charge est proportionnelle à la tension : <span class="math">q = C·u</span>. Contrôle : <span class="math">C = 10 μF</span> sous <span class="math">u = 6,0 V</span> donne <span class="math">q = 6,0·10⁻⁵ C = 60 μC</span>.</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Dans un circuit LC réel de faible résistance, au fil du temps :</p>
+      <div class="lecture-quiz-options"><span>A) la pseudo-période diminue</span><span>B) l'amplitude diminue</span><span>C) l'amplitude augmente</span><span>D) l'énergie totale augmente</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">Réponse B. La résistance dissipe l'énergie par effet Joule : l'amplitude décroît, mais la pseudo-période reste proche de <span class="math">T₀ = 2π√(L·C)</span>. L'énergie totale, elle, diminue — elle n'augmente jamais seule.</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Pour entretenir les oscillations d'un circuit LC, il faut :</p>
+      <div class="lecture-quiz-options"><span>A) augmenter la capacité C</span><span>B) supprimer la bobine</span><span>C) réinjecter l'énergie dissipée à chaque période</span><span>D) doubler la résistance</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">Réponse C. L'entretien compense exactement l'énergie perdue par effet Joule, synchronisé sur la période propre. Augmenter <span class="math">R</span> (réponse D) aggraverait l'amortissement, et supprimer <span class="math">L</span> (réponse B) supprimerait les oscillations.</div></details>
+    </div>
+  </div>
+  <!-- ===== RÉCAP ===== -->
+  <div class="lecture-recap">
+    <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
+    <ul class="lecture-recap-list">
+      <li><strong>Charge</strong> : <span class="math">q = C·u</span> — attention au double « C » (capacité en F, charge en coulomb).</li>
+      <li><strong>Conservation</strong> : circuit idéal → <span class="math">½·C·u² + ½·L·i² = constante</span> ; chaque énergie pulse avec la période <span class="math">T₀/2</span>.</li>
+      <li><strong>Résistance faible</strong> : régime pseudo-périodique, <span class="math">T ≈ T₀</span> ; l'entretien réinjecte ce que la résistance dissipe.</li>
+    </ul>
+  </div>
+  <!-- ===== FIN ===== -->
+  <div class="lecture-end">
+    <div class="lecture-end-icon">🎯</div>
+    <div class="lecture-end-text">Partie 03 terminée !</div>
+    <div class="lecture-end-sub">Chapitre bouclé : tu maîtrises le circuit LC de la première charge jusqu'à l'oscillation entretenue. Il te reste la partie 04 — la fiche complète de révision — pour tout condenser avant le devoir.</div>
+    <div class="lecture-end-divider"></div>
+  </div>
+</div>

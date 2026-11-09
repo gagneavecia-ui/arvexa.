@@ -1,0 +1,388 @@
+<!-- PARTIE 02 — Équation différentielle & Pulsation propre (Circuit LC) -->
+<div class="lecture-container">
+
+  <!-- ===== HERO ===== -->
+  <header class="lecture-hero">
+    <div class="lecture-hero-badge">
+      <span class="lecture-hero-icon">📘</span>
+      <span class="lecture-hero-label">Terminale C&D · Circuit LC · Partie 02</span>
+    </div>
+    <h1 class="lecture-hero-title">
+      Équation différentielle & <em>Pulsation propre</em>
+    </h1>
+    <p class="lecture-hero-intro">
+      En partie 01, tu as vu l'énergie faire la navette entre condensateur et bobine. Maintenant, on met des équations sur ce ballet. Tu vas établir l'équation différentielle du circuit LC à partir des lois fondamentales, découvrir sa solution sinusoïdale, et en extraire deux grandeurs magiques : la pulsation propre et la période propre — celles-là mêmes qui accordent les postes de radio.
+    </p>
+    <div class="lecture-hero-meta">
+      <span class="lecture-hero-meta-item">⏱ 25 min</span>
+      <span class="lecture-hero-meta-item">⚡ 4 notions</span>
+      <span class="lecture-hero-meta-item">📚 6 sections</span>
+      <span class="lecture-hero-meta-item">🎓 Terminale C&D</span>
+    </div>
+  </header>
+  <!-- ===== SOMMAIRE ===== -->
+  <nav class="lecture-toc">
+    <div class="lecture-toc-header">
+      <span>Dans cette partie</span>
+      <span class="lecture-toc-count">4 notions · 6 sections</span>
+    </div>
+    <ol class="lecture-toc-list">
+      <li><a href="#s0"><span class="toc-num">00</span><span>L'objectif : prédire la courbe</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>Établir l'équation différentielle</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>La solution sinusoïdale</span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>La pulsation propre ω₀</span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>La période propre T₀</span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>Exercices d'application + table de synthèse</span></a></li>
+    </ol>
+  </nav>
+  <!-- ============================================================ -->
+  <!-- SECTION s0 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s0">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">00</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Motivation</span>
+        <h2 class="lecture-section-title">L'objectif : prédire la courbe</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Branche un oscilloscope aux bornes du condensateur d'un circuit LC : une belle sinusoïde défile à l'écran. En regardant l'écran, tu peux mesurer la période. Mais un physicien veut mieux : prédire cette période <strong>par le calcul</strong>, avant même de brancher l'oscilloscope.</p>
+      <p class="lecture-text">C'est exactement ce que fait le concepteur d'une radio : il choisit les valeurs de <span class="math">L</span> et de <span class="math">C</span> pour que le circuit résonne sur la fréquence de la station voulue. Pas de tâtonnement : une formule. Cette partie te la fait démontrer toi-même, en trois gestes : écrire l'équation du circuit, la résoudre, lire la période dans la solution.</p>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s1 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s1">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">01</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1</span>
+        <h2 class="lecture-section-title">Établir l'équation différentielle</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Reprenons le circuit : condensateur initialement chargé, bobine, fils parfaits (résistance nulle). On note <span class="math">u</span> la tension aux bornes du condensateur et <span class="math">i</span> l'intensité du courant. Trois lois se combinent : la loi des mailles (les tensions), la loi de la bobine (tension et courant), la loi du condensateur (courant et tension). Résultat : une équation unique qui gouverne toute l'évolution.</p>
+      <svg viewBox="0 0 640 320" style="width:100%;height:auto" role="img" aria-label="Circuit LC avec flèches de tension u et de tension de la bobine orientées pour la loi des mailles">
+        <rect width="640" height="320" rx="14" fill="rgba(96,165,250,0.06)"/>
+        <path d="M180 60 H300 M320 60 H460 M460 60 V250 M460 250 H380 M260 250 H180 M180 250 V60" style="stroke:var(--accent-bright)" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M300 36 V84 M320 36 V84" style="stroke:var(--accent-bright)" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <path d="M260 250 a20 20 0 0 1 40 0 a20 20 0 0 1 40 0 a20 20 0 0 1 40 0" style="stroke:var(--accent-bright)" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <text x="280" y="66" fill="rgba(248,113,113,1)" style="font-size:18px;font-weight:700">+</text>
+        <text x="328" y="66" fill="rgba(96,165,250,1)" style="font-size:18px;font-weight:700">−</text>
+        <path d="M352 24 H306" style="stroke:rgba(248,113,113,1)" stroke-width="3" stroke-linecap="round"/>
+        <path d="M298 24 L316 17 L316 31 Z" fill="rgba(248,113,113,1)"/>
+        <text x="360" y="30" fill="rgba(248,113,113,1)" style="font-size:19px;font-style:italic;font-weight:700">u</text>
+        <path d="M380 286 H286" style="stroke:rgba(248,113,113,1)" stroke-width="3" stroke-linecap="round"/>
+        <path d="M278 286 L296 279 L296 293 Z" fill="rgba(248,113,113,1)"/>
+        <text x="390" y="292" fill="rgba(248,113,113,1)" style="font-size:17px;font-style:italic;font-weight:700">u_L</text>
+        <path d="M180 110 V180" style="stroke:rgba(52,211,153,1)" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M172 174 L180 192 L188 174 Z" fill="rgba(52,211,153,1)"/>
+        <text x="148" y="152" fill="rgba(52,211,153,1)" style="font-size:19px;font-style:italic;font-weight:700">i</text>
+        <text x="298" y="110" fill="currentColor" style="font-size:18px;font-style:italic;font-weight:700">C</text>
+        <text x="400" y="260" fill="currentColor" style="font-size:18px;font-style:italic;font-weight:700">L</text>
+      </svg>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-title">🔑 Définition</div>
+        <p><strong>Équation différentielle d'un circuit LC</strong> : la dérivée seconde de <span class="math">u</span>, ajoutée au quotient de <span class="math">u</span> par <span class="math">L·C</span>, est égale à zéro. On la note <span class="math">u'' + u/(L·C) = 0</span>, où « la dérivée seconde de <span class="math">u</span> » (notée <span class="math">u''</span>) désigne la dérivée de la dérivée de <span class="math">u</span> par rapport au temps.</p>
+      </div>
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-main"><span class="math">u'' + u/(L·C) = 0</span></div>
+        <p class="lecture-formula-main"><span class="math">u''</span> : la dérivée seconde de u · <span class="math">L</span> en henry (H) · <span class="math">C</span> en farad (F) · <span class="math">L·C</span> s'exprime en s²</p>
+      </div>
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">🧭 Démonstration guidée — d'où sort cette équation ?</div>
+        <ol class="lecture-steps">
+          <li class="lecture-step"><strong>Loi des mailles.</strong> En parcourant la boucle : <span class="math">u = u_L</span> — toute la tension du condensateur se retrouve aux bornes de la bobine.</li>
+          <li class="lecture-step"><strong>Loi de la bobine</strong> (convention récepteur) : <span class="math">u_L = L</span> × « la dérivée de i par rapport au temps ».</li>
+          <li class="lecture-step"><strong>Loi du condensateur en décharge.</strong> Le courant qui sort vaut <span class="math">i = −C</span> × « la dérivée de u par rapport au temps », car la charge <span class="math">q = C·u</span> diminue.</li>
+          <li class="lecture-step"><strong>On dérive une fois de plus et on combine.</strong> « La dérivée de i » vaut <span class="math">−C</span> × « la dérivée seconde de u ». En reportant dans <span class="math">u = L</span> × « la dérivée de i », puis en divisant par <span class="math">L·C</span> : <span class="math">u'' + u/(L·C) = 0</span> ✓</li>
+        </ol>
+      </div>
+      <div class="lecture-formula-box">
+        <p><strong>Contrôle d'homogénéité.</strong> Le henry vaut un volt·seconde par ampère et le farad un ampère·seconde par volt : leur produit vaut des secondes au carré, <span class="math">L·C</span> s'exprime en <span class="math">s²</span>. Donc <span class="math">√(L·C)</span> est un temps et <span class="math">1/√(L·C)</span> un inverse de temps. Tout est cohérent.</p>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-title">⚠️ Piège d'examen</div>
+        <p>Ne confonds pas la dérivée seconde de <span class="math">u</span> (notée <span class="math">u''</span>) avec le carré de la dérivée : c'est « la dérivée de la dérivée », un tout autre objet. Et le second membre est <strong>strictement nul</strong> dans un circuit parfait.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s2 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s2">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">02</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2</span>
+        <h2 class="lecture-section-title">La solution sinusoïdale</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Une équation différentielle décrit un destin ; sa solution le raconte. Pour le circuit LC, le destin est une vibration parfaite : la tension oscille comme un cosinus, indéfiniment, entre <span class="math">+U₀</span> et <span class="math">−U₀</span>. La forme de la solution est imposée par l'équation ; seuls l'amplitude et le décalage dépendent de la façon dont on a lancé le système.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-title">🔑 Définition</div>
+        <p><strong>Solution de l'équation du circuit LC</strong> : <span class="math">u(t) = U₀·cos(ω₀·t + φ)</span>, où <span class="math">U₀</span> est l'amplitude (en V), <span class="math">ω₀</span> la pulsation propre (en rad·s⁻¹) et <span class="math">φ</span> la phase à l'origine (en rad). Les valeurs de <span class="math">U₀</span> et <span class="math">φ</span> sont fixées par les conditions initiales.</p>
+      </div>
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-main"><span class="math">u(t) = U₀·cos(ω₀·t + φ)</span></div>
+        <p class="lecture-formula-main"><span class="math">U₀</span> en volt (V) · <span class="math">ω₀</span> en rad·s⁻¹ · <span class="math">φ</span> en rad (radians) · <span class="math">t</span> en seconde (s)</p>
+      </div>
+      <svg viewBox="0 0 640 320" style="width:100%;height:auto" role="img" aria-label="Courbe sinusoïdale u(t) égale à U₀ fois cosinus de ω₀ t, avec la période propre T₀ annotée entre deux sommets">
+        <rect width="640" height="320" rx="14" fill="rgba(96,165,250,0.06)"/>
+        <path d="M40 180 H620" style="stroke:rgba(148,163,184,0.9)" stroke-width="2"/>
+        <path d="M628 180 L614 173 L614 187 Z" fill="rgba(148,163,184,0.9)"/>
+        <path d="M60 40 V300" style="stroke:rgba(148,163,184,0.9)" stroke-width="2"/>
+        <path d="M60 34 L53 48 L67 48 Z" fill="rgba(148,163,184,0.9)"/>
+        <text x="30" y="62" fill="rgba(248,113,113,1)" style="font-size:19px;font-style:italic;font-weight:700">u</text>
+        <text x="600" y="206" fill="currentColor" style="font-size:17px;font-style:italic">t</text>
+        <path d="M60 100 H620" style="stroke:rgba(96,165,250,0.35)" stroke-width="1.5" stroke-dasharray="6 6"/>
+        <path d="M60 260 H620" style="stroke:rgba(96,165,250,0.35)" stroke-width="1.5" stroke-dasharray="6 6"/>
+        <text x="26" y="106" fill="rgba(96,165,250,1)" style="font-size:15px;font-style:italic;font-weight:700">U₀</text>
+        <text x="22" y="266" fill="rgba(96,165,250,1)" style="font-size:15px;font-style:italic;font-weight:700">−U₀</text>
+        <path d="M60 100 L80 115 L100 155 L120 205 L140 245 L160 260 L180 245 L200 205 L220 155 L240 115 L260 100 L280 115 L300 155 L320 205 L340 245 L360 260 L380 245 L400 205 L420 155 L440 115 L460 100 L480 115 L500 155 L520 205 L540 245 L560 260 L580 245 L600 205 L620 165" style="stroke:var(--accent-bright)" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M60 100 V64 M260 100 V64" style="stroke:rgba(251,191,36,0.5)" stroke-width="1.5" stroke-dasharray="4 4"/>
+        <path d="M66 64 H254" style="stroke:rgba(251,191,36,1)" stroke-width="2.5"/>
+        <path d="M60 64 L74 57 L74 71 Z" fill="rgba(251,191,36,1)"/>
+        <path d="M260 64 L246 57 L246 71 Z" fill="rgba(251,191,36,1)"/>
+        <text x="160" y="52" text-anchor="middle" fill="rgba(251,191,36,1)" style="font-size:18px;font-style:italic;font-weight:700">T₀</text>
+        <text x="60" y="204" text-anchor="middle" fill="currentColor" style="font-size:13px">0</text>
+        <text x="160" y="204" text-anchor="middle" fill="currentColor" style="font-size:13px">T₀/2</text>
+        <text x="260" y="204" text-anchor="middle" fill="currentColor" style="font-size:13px">T₀</text>
+        <text x="460" y="204" text-anchor="middle" fill="currentColor" style="font-size:13px">2T₀</text>
+      </svg>
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">🎯 Exemple travaillé — Déterminer U₀ et φ</div>
+        <p class="lecture-example-content">Notre décharge démarre à <span class="math">t = 0</span> avec <span class="math">u(0) = U₀ = 6,0 V</span> et un courant nul <span class="math">i(0) = 0</span>. Écrire <span class="math">u(t)</span>.</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step"><strong>Conditions initiales.</strong> À <span class="math">t = 0</span> : <span class="math">u = 6,0 V</span> et <span class="math">i = 0</span> (le condensateur est plein, la bobine est vide).</li>
+          <li class="lecture-step"><strong>Écrire la solution à l'origine.</strong> <span class="math">u(0) = U₀·cos(φ)</span>.</li>
+          <li class="lecture-step"><strong>Imposer la condition.</strong> Il faut <span class="math">U₀·cos(φ) = 6,0</span>, donc <span class="math">cos(φ) = 1</span> et <span class="math">φ = 0</span> (ou <span class="math">2π</span>, ce qui est équivalent).</li>
+          <li class="lecture-step"><strong>Conclure.</strong> <span class="math">u(t) = 6,0·cos(ω₀·t)</span> avec <span class="math">u</span> en V et <span class="math">t</span> en s : la courbe démarre au sommet, comme sur l'oscillogramme ✓</li>
+        </ol>
+      </div>
+      <div class="lecture-formula-box">
+        <p><strong>Autre lancement, autre phase.</strong> Si la décharge démarre à <span class="math">u(0) = 0</span> avec un courant maximal, la solution est <span class="math">u(t) = U₀·sin(ω₀·t)</span> : même physique, même période — seul le décalage <span class="math">φ</span> change.</p>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-title">⚠️ Piège d'examen</div>
+        <p>La phase <span class="math">φ</span> s'exprime en <strong>radians</strong>, jamais en degrés. Et l'amplitude <span class="math">U₀</span> est positive par convention : c'est le signe du cosinus qui décrit les alternances.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s3 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s3">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">03</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 3</span>
+        <h2 class="lecture-section-title">La pulsation propre ω₀</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Dans la solution, un acteur ne dépend ni de l'amplitude, ni des conditions initiales : la <strong>pulsation propre</strong> <span class="math">ω₀</span>. Elle est inscrite dans la constitution du circuit, comme la longueur d'un pendule fixe sa période. Compare avec le pendule élastique : <span class="math">L</span> joue le rôle de la masse <span class="math">m</span>, <span class="math">C</span> celui de l'inverse de la raideur <span class="math">1/k</span> — même équation, même musique.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-title">🔑 Définition</div>
+        <p><strong>Pulsation propre</strong> : <span class="math">ω₀ = 1/√(L·C)</span>, en radians par seconde (rad·s⁻¹). Elle ne dépend que de <span class="math">L</span> et de <span class="math">C</span> : un circuit LC donné vibre toujours à sa pulsation propre, quelle que soit l'amplitude.</p>
+      </div>
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-main"><span class="math">ω₀ = 1/√(L·C)</span></div>
+        <p class="lecture-formula-main"><span class="math">ω₀</span> en rad·s⁻¹ · <span class="math">L</span> en henry (H) · <span class="math">C</span> en farad (F) — produit <span class="math">L·C</span> en s²</p>
+      </div>
+      <div class="lecture-formula-box">
+        <p><strong>Lien avec la période</strong> : <span class="math">ω₀·T₀ = 2π</span>. La pulsation compte les tours de cosinus par seconde ; la période est la durée d'un tour complet.</p>
+      </div>
+      <svg viewBox="0 0 640 300" style="width:100%;height:auto" role="img" aria-label="Courbes de u(t) et de i(t) décalées d'un quart de période : à T₀ sur 4, u est nul et i est maximal">
+        <rect width="640" height="300" rx="14" fill="rgba(96,165,250,0.06)"/>
+        <path d="M40 150 H620" style="stroke:rgba(148,163,184,0.9)" stroke-width="2"/>
+        <path d="M628 150 L614 143 L614 157 Z" fill="rgba(148,163,184,0.9)"/>
+        <path d="M60 40 V260" style="stroke:rgba(148,163,184,0.9)" stroke-width="2"/>
+        <path d="M60 34 L53 48 L67 48 Z" fill="rgba(148,163,184,0.9)"/>
+        <path d="M460 56 H492" style="stroke:var(--accent-bright)" stroke-width="3.5" stroke-linecap="round"/>
+        <text x="500" y="61" fill="rgba(248,113,113,1)" style="font-size:15px;font-style:italic;font-weight:700">u(t)</text>
+        <path d="M556 56 H588" style="stroke:rgba(52,211,153,1)" stroke-width="3.5" stroke-linecap="round"/>
+        <text x="596" y="61" fill="rgba(52,211,153,1)" style="font-size:15px;font-style:italic;font-weight:700">i(t)</text>
+        <path d="M60 80 L80 93 L100 128 L120 172 L140 207 L160 220 L180 207 L200 172 L220 128 L240 93 L260 80 L280 93 L300 128 L320 172 L340 207 L360 220 L380 207 L400 172 L420 128 L440 93 L460 80 L480 93 L500 128 L520 172 L540 207 L560 220 L580 207 L600 172 L620 128" style="stroke:var(--accent-bright)" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M60 150 L80 121 L100 102 L120 102 L140 121 L160 150 L180 179 L200 198 L220 198 L240 179 L260 150 L280 121 L300 102 L320 102 L340 121 L360 150 L380 179 L400 198 L420 198 L440 179 L460 150 L480 121 L500 102 L520 102 L540 121 L560 150 L580 179 L600 198 L620 198" style="stroke:rgba(52,211,153,1)" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M110 60 V240" style="stroke:rgba(251,191,36,0.6)" stroke-width="1.5" stroke-dasharray="5 5"/>
+        <text x="110" y="52" text-anchor="middle" fill="rgba(251,191,36,1)" style="font-size:14px;font-style:italic;font-weight:700">T₀/4</text>
+        <text x="122" y="230" fill="rgba(251,191,36,1)" style="font-size:13px;font-weight:600">à T₀/4 : u = 0 et i est maximal</text>
+      </svg>
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">🎯 Exemple travaillé — La pulsation du circuit de référence</div>
+        <p class="lecture-example-content">Circuit de référence : <span class="math">L = 0,10 H</span> et <span class="math">C = 10 μF</span>. Calculer <span class="math">ω₀</span>.</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step"><strong>Convertir et multiplier.</strong> <span class="math">L·C = 0,10 × 10·10⁻⁶ = 1,0·10⁻⁶ s²</span>.</li>
+          <li class="lecture-step"><strong>Racine carrée.</strong> <span class="math">√(1,0·10⁻⁶) = 1,0·10⁻³ s</span>, car <span class="math">(10⁻³)² = 10⁻⁶ ✓</span></li>
+          <li class="lecture-step"><strong>Inverser.</strong> <span class="math">ω₀ = 1/(1,0·10⁻³) = 1,0·10³ rad·s⁻¹</span>, soit 1000 rad·s⁻¹.</li>
+          <li class="lecture-step"><strong>Vérifier l'homogénéité.</strong> <span class="math">L·C</span> en s², sa racine en s, son inverse en rad·s⁻¹ ✓</li>
+        </ol>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-title">⚠️ Piège d'examen</div>
+        <p>Oublier de convertir <span class="math">μF</span> fausse <span class="math">L·C</span> d'un facteur 10⁶, donc <span class="math">ω₀</span> d'un facteur 1000 : une erreur invisible sur le calcul, mais fatale sur le résultat.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s4 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s4">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">04</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 4</span>
+        <h2 class="lecture-section-title">La période propre T₀</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">La <strong>période propre</strong> est la durée d'une oscillation complète de la tension. C'est la grandeur qu'on lit sur un oscillogramme et qu'on retrouve par le calcul. Le mot « propre » signifie : caractéristique du circuit lui-même, indépendante de l'amplitude — on dit que les oscillations libres sont <strong>isochrones</strong>.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-title">🔑 Définition</div>
+        <p><strong>Période propre</strong> : <span class="math">T₀ = 2π√(L·C)</span>, en secondes (s). Elle ne dépend que de <span class="math">L</span> et <span class="math">C</span>. La fréquence propre vaut <span class="math">f₀ = 1/T₀</span>, en hertz (Hz).</p>
+      </div>
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-main"><span class="math">T₀ = 2π√(L·C)</span></div>
+        <p class="lecture-formula-main"><span class="math">T₀</span> en seconde (s) · <span class="math">L</span> en henry (H) · <span class="math">C</span> en farad (F) — c'est la formule la plus demandée du chapitre</p>
+      </div>
+      <div class="lecture-formula-box">
+        <p><strong>Fréquence propre</strong> : <span class="math">f₀ = 1/T₀ = 1/(2π√(L·C))</span>, en hertz (Hz). C'est elle que l'on accorde en radio : choisir <span class="math">L</span> et <span class="math">C</span>, c'est choisir la station.</p>
+      </div>
+      <svg viewBox="0 0 640 330" style="width:100%;height:auto" role="img" aria-label="Oscillogramme de u(t) sur un écran quadrillé : la période T₀ mesure 4 divisions, avec une sensibilité de 0,5 ms par division">
+        <rect width="640" height="330" rx="14" fill="rgba(96,165,250,0.06)"/>
+        <rect x="60" y="40" width="560" height="256" rx="10" fill="rgba(2,6,23,0.35)" style="stroke:var(--accent)" stroke-width="2"/>
+        <path d="M116 40 V296 M172 40 V296 M228 40 V296 M284 40 V296 M340 40 V296 M396 40 V296 M452 40 V296 M508 40 V296 M564 40 V296" style="stroke:rgba(96,165,250,0.15)" stroke-width="1.5" fill="none"/>
+        <path d="M60 72 H620 M60 104 H620 M60 136 H620 M60 200 H620 M60 232 H620 M60 264 H620" style="stroke:rgba(96,165,250,0.15)" stroke-width="1.5" fill="none"/>
+        <path d="M60 168 H620" style="stroke:rgba(96,165,250,0.4)" stroke-width="1.5" stroke-dasharray="6 6"/>
+        <path d="M340 40 V296" style="stroke:rgba(96,165,250,0.4)" stroke-width="1.5" stroke-dasharray="6 6"/>
+        <path d="M60 168 L88 123 L116 104 L144 123 L172 168 L200 213 L228 232 L256 213 L284 168 L312 123 L340 104 L368 123 L396 168 L424 213 L452 232 L480 213 L508 168 L536 123 L564 104 L592 123 L620 168" style="stroke:rgba(96,165,250,0.25)" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M60 168 L88 123 L116 104 L144 123 L172 168 L200 213 L228 232 L256 213 L284 168 L312 123 L340 104 L368 123 L396 168 L424 213 L452 232 L480 213 L508 168 L536 123 L564 104 L592 123 L620 168" style="stroke:var(--accent-bright)" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="116" cy="104" r="5" fill="rgba(251,191,36,1)"/>
+        <circle cx="340" cy="104" r="5" fill="rgba(251,191,36,1)"/>
+        <path d="M116 104 V88 M340 104 V88" style="stroke:rgba(251,191,36,0.5)" stroke-width="1.5" stroke-dasharray="4 4"/>
+        <path d="M122 88 H334" style="stroke:rgba(251,191,36,1)" stroke-width="2.5"/>
+        <path d="M116 88 L130 81 L130 95 Z" fill="rgba(251,191,36,1)"/>
+        <path d="M340 88 L326 81 L326 95 Z" fill="rgba(251,191,36,1)"/>
+        <text x="228" y="76" text-anchor="middle" fill="rgba(251,191,36,1)" style="font-size:16px;font-style:italic;font-weight:700">T₀ = 4 div</text>
+        <text x="340" y="318" text-anchor="middle" fill="currentColor" style="font-size:14px;font-weight:600">sensibilité horizontale : 0,5 ms/div</text>
+      </svg>
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">🎯 Exemple travaillé — Mesurer puis vérifier</div>
+        <p class="lecture-example-content">Circuit : <span class="math">L = 0,10 H</span> et <span class="math">C = 1,0 μF</span>. L'oscillogramme ci-dessus est affiché avec 0,5 ms/div. Mesurer <span class="math">T₀</span>, puis vérifier par la formule.</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step"><strong>Lire l'écran.</strong> Deux sommets successifs sont séparés de 4 divisions.</li>
+          <li class="lecture-step"><strong>Calculer la période mesurée.</strong> <span class="math">T₀ = 4 × 0,5 = 2,0 ms = 2,0·10⁻³ s</span>.</li>
+          <li class="lecture-step"><strong>Calculer par la formule.</strong> <span class="math">L·C = 0,10 × 1,0·10⁻⁶ = 1,0·10⁻⁷ s²</span>, puis <span class="math">√(1,0·10⁻⁷) = 3,16·10⁻⁴ s</span>.</li>
+          <li class="lecture-step"><strong>Multiplier par 2π.</strong> <span class="math">T₀ = 2π × 3,16·10⁻⁴ = 1,99·10⁻³ s ≈ 2,0 ms</span> ✓ — les deux méthodes coïncident.</li>
+          <li class="lecture-step"><strong>En déduire la fréquence.</strong> <span class="math">f₀ = 1/T₀ = 1/(2,0·10⁻³) = 5,0·10² Hz</span>, soit 500 Hz.</li>
+        </ol>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-title">⚠️ Piège d'examen</div>
+        <p>Ne mesure pas la période entre un sommet et un creux : c'est une <strong>demi-période</strong> ! Et vérifie toujours la sensibilité horizontale de l'écran avant de multiplier par le nombre de divisions.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s5 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s5">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">05</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Exercices</span>
+        <h2 class="lecture-section-title">Exercices d'application + table de synthèse</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <div class="lecture-text">
+        <div class="lecture-exercise-label">📝 Exercice 1 — Pulsation, période, solution (niveau Bac)</div>
+        <p class="lecture-text">Un circuit LC est constitué d'une bobine <span class="math">L = 0,50 H</span> et d'un condensateur <span class="math">C = 2,0 μF</span> initialement chargé sous <span class="math">U₀ = 6,0 V</span> (résistance négligeable, décharge démarrant à <span class="math">t = 0</span>). a) Calculer <span class="math">ω₀</span>. b) En déduire <span class="math">T₀</span>. c) Écrire <span class="math">u(t)</span>.</p>
+        <details>
+          <summary>Voir la solution détaillée</summary>
+          <ol class="lecture-steps">
+            <li class="lecture-step"><strong>a) Produit L·C.</strong> <span class="math">L·C = 0,50 × 2,0·10⁻⁶ = 1,0·10⁻⁶ s²</span>.</li>
+            <li class="lecture-step"><strong>Pulsation.</strong> <span class="math">ω₀ = 1/√(1,0·10⁻⁶) = 1,0·10³ rad·s⁻¹</span>, soit 1000 rad·s⁻¹.</li>
+            <li class="lecture-step"><strong>b) Période.</strong> <span class="math">T₀ = 2π/ω₀ = 2π × 1,0·10⁻³ = 6,28·10⁻³ s ≈ 6,3 ms</span>.</li>
+            <li class="lecture-step"><strong>c) Conditions initiales.</strong> <span class="math">u(0) = 6,0 V</span> et <span class="math">i(0) = 0</span> → <span class="math">cos(φ) = 1</span> → <span class="math">φ = 0</span>.</li>
+            <li class="lecture-step"><strong>Solution.</strong> <span class="math">u(t) = 6,0·cos(1000·t)</span> avec <span class="math">t</span> en s et <span class="math">u</span> en V. Contrôle : à <span class="math">t = 0</span>, <span class="math">u = 6,0 V ✓</span></li>
+          </ol>
+        </details>
+      </div>
+      <div class="lecture-text">
+        <div class="lecture-exercise-label">📝 Exercice 2 — Accorder un circuit (niveau Bac)</div>
+        <p class="lecture-text">On veut accorder un circuit LC sur une période propre <span class="math">T₀ = 2,0 ms</span>, avec un condensateur de capacité <span class="math">C = 5,0 μF</span>. Quelle inductance <span class="math">L</span> faut-il choisir ?</p>
+        <details>
+          <summary>Voir la solution détaillée</summary>
+          <ol class="lecture-steps">
+            <li class="lecture-step"><strong>Isoler la racine.</strong> De <span class="math">T₀ = 2π√(L·C)</span> on tire <span class="math">√(L·C) = T₀/(2π) = 2,0·10⁻³/6,28 = 3,18·10⁻⁴ s</span>.</li>
+            <li class="lecture-step"><strong>Élever au carré.</strong> <span class="math">L·C = (3,18·10⁻⁴)² = 1,01·10⁻⁷ s²</span>.</li>
+            <li class="lecture-step"><strong>Diviser par C.</strong> <span class="math">L = 1,01·10⁻⁷/5,0·10⁻⁶ = 2,0·10⁻² H</span>, soit 20 mH.</li>
+            <li class="lecture-step"><strong>Vérification.</strong> <span class="math">T₀ = 2π√(2,0·10⁻² × 5,0·10⁻⁶) = 2π√(1,0·10⁻⁷) = 2π × 3,16·10⁻⁴ ≈ 2,0·10⁻³ s ✓</span></li>
+            <li class="lecture-step"><strong>Astuce d'examen.</strong> La formule directe <span class="math">L = T₀²/(4π²·C)</span> donne le même résultat en une ligne.</li>
+          </ol>
+        </details>
+      </div>
+      <p class="lecture-text">Avant les QCM, une dernière table : retiens qui décide de quoi. C'est LA question piège des sujets — amplitude et phase d'un côté, rythme de l'autre, jamais de mélange.</p>
+      <div >
+        <table class="lecture-table">
+          <thead>
+            <tr><th>Grandeur</th><th>Symbole</th><th>Unité</th><th>Dont elle dépend</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Amplitude</td><td><span class="math">U₀</span></td><td>volt (V)</td><td>conditions initiales (charge du condensateur)</td></tr>
+            <tr><td>Phase à l'origine</td><td><span class="math">φ</span></td><td>radian (rad)</td><td>conditions initiales (valeur de <span class="math">u</span> et <span class="math">i</span> à <span class="math">t = 0</span>)</td></tr>
+            <tr><td>Pulsation propre</td><td><span class="math">ω₀</span></td><td>rad·s⁻¹</td><td><span class="math">L</span> et <span class="math">C</span> seulement</td></tr>
+            <tr><td>Période propre</td><td><span class="math">T₀</span></td><td>seconde (s)</td><td><span class="math">L</span> et <span class="math">C</span> seulement</td></tr>
+            <tr><td>Fréquence propre</td><td><span class="math">f₀</span></td><td>hertz (Hz)</td><td><span class="math">L</span> et <span class="math">C</span> seulement</td></tr>
+            <tr><td>Dérivée seconde de <span class="math">u</span></td><td><span class="math">u''</span></td><td>V·s⁻²</td><td>imposée par l'équation différentielle</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+  <!-- ===== QCM ===== -->
+  <div class="lecture-quiz">
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">L'équation différentielle d'un circuit LC idéal est :</p>
+      <div class="lecture-quiz-options"><span>A) <span class="math">u'' + u/(L·C) = 0</span></span><span>B) <span class="math">u' + u/(L·C) = 0</span></span><span>C) <span class="math">u'' − u/(L·C) = 0</span></span><span>D) <span class="math">u'' + L·C·u = 0</span></span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">Réponse A. La dérivée seconde de u, ajoutée à u divisé par L·C, donne zéro : ni première dérivée (réponse B), ni signe négatif (réponse C, qui décrirait une instabilité), ni produit L·C au numérateur (réponse D).</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">On quadruple l'inductance <span class="math">L</span>, la capacité <span class="math">C</span> restant inchangée. La période propre <span class="math">T₀</span> :</p>
+      <div class="lecture-quiz-options"><span>A) est divisée par 2</span><span>B) ne change pas</span><span>C) double</span><span>D) quadruple</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">Réponse C. <span class="math">T₀ = 2π√(L·C)</span> : multiplier <span class="math">L</span> par 4 multiplie <span class="math">L·C</span> par 4, donc <span class="math">√(L·C)</span> par 2, donc <span class="math">T₀</span> par 2. La racine carrée « divise » les facteurs d'échelle.</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Dans <span class="math">u(t) = U₀·cos(ω₀·t + φ)</span>, les grandeurs fixées par les conditions initiales sont :</p>
+      <div class="lecture-quiz-options"><span>A) <span class="math">ω₀</span></span><span>B) <span class="math">T₀</span></span><span>C) <span class="math">U₀</span> et <span class="math">φ</span></span><span>D) <span class="math">L·C</span></span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">Réponse C. L'amplitude <span class="math">U₀</span> et la phase <span class="math">φ</span> dépendent du lancement (charge initiale, courant initial). Le rythme (<span class="math">ω₀</span>, <span class="math">T₀</span>) ne dépend que de <span class="math">L</span> et <span class="math">C</span>.</div></details>
+    </div>
+  </div>
+  <!-- ===== RÉCAP ===== -->
+  <div class="lecture-recap">
+    <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
+    <ul class="lecture-recap-list">
+      <li><strong>Équation différentielle</strong> : la dérivée seconde de <span class="math">u</span> plus <span class="math">u/(L·C)</span> égale zéro — à savoir établir en 4 lignes par la loi des mailles.</li>
+      <li><strong>Solution</strong> : <span class="math">u(t) = U₀·cos(ω₀·t + φ)</span>, avec <span class="math">U₀</span> et <span class="math">φ</span> fixés par les conditions initiales.</li>
+      <li><strong>Signature du circuit</strong> : <span class="math">ω₀ = 1/√(L·C)</span> et <span class="math">T₀ = 2π√(L·C)</span> ne dépendent que des composants — c'est ce qui accorde une radio.</li>
+    </ul>
+  </div>
+  <!-- ===== FIN ===== -->
+  <div class="lecture-end">
+    <div class="lecture-end-icon">🎯</div>
+    <div class="lecture-end-text">Partie 02 terminée !</div>
+    <div class="lecture-end-sub">Tu sais désormais prédire et écrire n'importe quelle oscillation LC. Dans la partie 03, on compte l'énergie au centième de joule près : conservation, amortissement par la résistance et entretien des oscillations — la fin du voyage.</div>
+    <div class="lecture-end-divider"></div>
+  </div>
+</div>

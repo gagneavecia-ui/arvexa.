@@ -1,0 +1,405 @@
+<!-- PARTIE 01 — Mise en évidence & Expression (Force de Lorience) -->
+<div class="lecture-container">
+
+  <!-- ===== HERO ===== -->
+  <header class="lecture-hero">
+    <div class="lecture-hero-badge">
+      <span class="lecture-hero-icon">📘</span>
+      <span class="lecture-hero-label">Terminale C&D · Force de Lorience · Partie 01</span>
+    </div>
+    <h1 class="lecture-hero-title">
+      Mise en évidence <em>& Expression</em>
+    </h1>
+    <p class="lecture-hero-intro">
+      Un faisceau d'électrons file tout droit, on approche un aimant… et le faisceau tourne. Dans cette première partie, tu découvres la force cachée derrière cette déviation : la force de Lorience. On la met en évidence par une expérience simple, on écrit son expression vectorielle, puis on détaille une à une ses caractéristiques. Objectif final : calculer sa norme et donner son sens sans hésiter, deux compétences directement évaluées au Bac.
+    </p>
+    <div class="lecture-hero-meta">
+      <span class="lecture-hero-meta-item">⏱ 20 min</span>
+      <span class="lecture-hero-meta-item">⚡ 4 notions</span>
+      <span class="lecture-hero-meta-item">📚 6 sections</span>
+      <span class="lecture-hero-meta-item">🎓 Terminale C&D</span>
+    </div>
+  </header>
+  <!-- ===== SOMMAIRE ===== -->
+  <nav class="lecture-toc">
+    <div class="lecture-toc-header">
+      <span>Dans cette partie</span>
+      <span class="lecture-toc-count">4 notions · 6 sections</span>
+    </div>
+    <ol class="lecture-toc-list">
+      <li><a href="#s0"><span class="toc-num">00</span><span>Une force invisible à l'œuvre</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>Mise en évidence expérimentale</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>Définition : <span class="math">→F = q·→v∧→B</span></span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>Direction et sens de <span class="math">→F</span></span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>Norme : <span class="math">F = |q|·v·B·sin θ</span></span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>Bilan : Lorience vs Laplace</span></a></li>
+    </ol>
+  </nav>
+  <!-- ============================================================ -->
+  <!-- SECTION s0 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s0">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">00</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Motivation</span>
+        <h2 class="lecture-section-title">Une force invisible à l'œuvre</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Trois spectacles du quotidien partagent la même physique. La nuit, près des pôles, les aurores polaires naissent quand des particules chargées du vent solaire sont canalisées par le champ magnétique terrestre et viennent frapper l'atmosphère. Dans une télévision ancienne à tube cathodique, un canon tire des électrons et des bobines dévient ce faisceau pour dessiner l'image, ligne par ligne. Au CERN, des aimants géants courbent la trajectoire des protons dans un anneau de 27 km de circonférence.</p>
+      <p class="lecture-text">Dans les trois cas, une même force agit : la force de Lorience. Elle ne pousse pas la particule comme le vent pousse une feuille : elle la fait tourner. Cette partie te donne les outils pour la reconnaître, la calculer et la dessiner.</p>
+      <svg viewBox="0 0 560 240" style="width:100%;height:auto" role="img" aria-label="Le champ magnétique terrestre canalise les particules du vent solaire vers les pôles, créant les aurores polaires">
+        <circle cx="60" cy="120" r="24" style="fill:rgba(251,191,36,0.30);stroke:rgba(251,191,36,0.95)" stroke-width="2"/>
+        <text x="40" y="168" font-size="13" style="fill:currentColor">Soleil</text>
+        <path d="M 84 120 C 170 120 250 92 318 52" fill="none" style="stroke:rgba(248,113,113,0.9)" stroke-width="2" stroke-dasharray="7 5"/>
+        <polygon points="330,45 315,48 322,58" style="fill:rgba(248,113,113,0.9)"/>
+        <path d="M 84 128 C 170 128 250 156 318 196" fill="none" style="stroke:rgba(248,113,113,0.9)" stroke-width="2" stroke-dasharray="7 5"/>
+        <polygon points="330,203 315,200 322,190" style="fill:rgba(248,113,113,0.9)"/>
+        <text x="96" y="104" font-size="13" style="fill:currentColor">vent solaire (particules chargées)</text>
+        <circle cx="330" cy="120" r="56" style="fill:rgba(96,165,250,0.15);stroke:var(--accent-bright)" stroke-width="2"/>
+        <text x="310" y="196" font-size="13" style="fill:currentColor">Terre</text>
+        <path d="M 330 30 C 392 62 392 178 330 210" fill="none" style="stroke:var(--accent-bright)" stroke-width="1.5" stroke-dasharray="5 4"/>
+        <path d="M 330 30 C 268 62 268 178 330 210" fill="none" style="stroke:var(--accent-bright)" stroke-width="1.5" stroke-dasharray="5 4"/>
+        <text x="404" y="70" font-size="13" style="fill:currentColor">champ magnétique terrestre</text>
+        <ellipse cx="330" cy="46" rx="34" ry="9" style="fill:rgba(52,211,153,0.45)"/>
+        <ellipse cx="330" cy="216" rx="34" ry="9" style="fill:rgba(52,211,153,0.45)"/>
+        <text x="382" y="44" font-size="13" style="fill:rgba(52,211,153,0.95)">aurore polaire</text>
+      </svg>
+      <p class="lecture-text">Avant toute formule, une question simple : comment prouver que cette force existe ? Réponse dans la section suivante, avec un tube et un aimant.</p>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s1 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s1">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">01</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1</span>
+        <h2 class="lecture-section-title">Mise en évidence expérimentale</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Prenons un tube à vide : un filament chauffé y émet des électrons, et un écran fluorescent rend le faisceau visible. Le faisceau dessine une ligne parfaitement rectiligne. Approchons maintenant un aimant, sans rien toucher : la ligne se courbe instantanément. Quelque chose agit sur les électrons, à distance, sans contact.</p>
+      <div class="lecture-callout lecture-callout-key"><strong>🔑 Définition</strong> — La force de Lorience est la force exercée par un champ magnétique sur une particule chargée en mouvement. Certains livres la nomment aussi force de Lorentz.</div>
+      <svg viewBox="0 0 560 220" style="width:100%;height:auto" role="img" aria-label="Dans un tube à vide, un aimant courbe le faisceau d'électrons">
+        <rect x="30" y="55" width="500" height="110" rx="16" style="fill:rgba(96,165,250,0.08);stroke:var(--accent-bright)" stroke-width="2"/>
+        <rect x="44" y="98" width="14" height="24" style="fill:rgba(148,163,184,0.85)"/>
+        <text x="36" y="90" font-size="12" style="fill:currentColor">cathode</text>
+        <line x1="60" y1="110" x2="212" y2="110" style="stroke:rgba(52,211,153,0.95)" stroke-width="2.5" stroke-dasharray="7 5"/>
+        <polygon points="224,110 210,104 210,116" style="fill:rgba(52,211,153,0.95)"/>
+        <text x="88" y="138" font-size="12" style="fill:currentColor">faisceau d'électrons (q &lt; 0)</text>
+        <text x="250" y="86" font-size="17" style="fill:var(--accent-bright)">⊗</text>
+        <text x="290" y="86" font-size="17" style="fill:var(--accent-bright)">⊗</text>
+        <text x="330" y="86" font-size="17" style="fill:var(--accent-bright)">⊗</text>
+        <text x="250" y="146" font-size="17" style="fill:var(--accent-bright)">⊗</text>
+        <text x="290" y="146" font-size="17" style="fill:var(--accent-bright)">⊗</text>
+        <text x="330" y="146" font-size="17" style="fill:var(--accent-bright)">⊗</text>
+        <text x="248" y="68" font-size="13" style="fill:currentColor">→B entrant (aimant approché)</text>
+        <path d="M 224 110 C 282 112 322 130 366 150" fill="none" style="stroke:rgba(52,211,153,0.95)" stroke-width="2.5" stroke-dasharray="7 5"/>
+        <polygon points="378,156 362,154 369,143" style="fill:rgba(52,211,153,0.95)"/>
+        <text x="340" y="176" font-size="13" style="fill:rgba(248,113,113,0.95)">déviation vers le bas</text>
+        <text x="120" y="196" font-size="13" style="fill:currentColor">un aimant, sans toucher le tube, courbe le trajet : la force de Lorience existe !</text>
+      </svg>
+      <div class="lecture-formula-box">
+        <p class="lecture-formula-main">🧮 Les trois ingrédients de la force</p>
+        <p>Il faut <strong>les trois réunis</strong> : une charge <span class="math">q</span> non nulle, une vitesse <span class="math">→v</span> non nulle et un champ magnétique <span class="math">→B</span>. Il en manque un seul ? La force de Lorience est nulle.</p>
+      </div>
+      <div class="lecture-example-content">
+        <p class="lecture-example-label">💡 Exemple travaillé — Que vaut la force si la charge est immobile ?</p>
+        <p class="lecture-example-content">Une charge <span class="math">q</span> est posée, au repos, dans une zone où règne un champ magnétique <span class="math">→B</span> intense. Subit-elle la force de Lorience ?</p>
+        <ol class="lecture-steps">
+          <li><strong>Étape 1 — Formule.</strong> La norme de la force de Lorience s'écrit <span class="math">F = |q|·v·B·sin θ</span> (on la construit en section 04).</li>
+          <li><strong>Étape 2 — Application.</strong> Charge immobile signifie <span class="math">v = 0</span>, donc <span class="math">F = |q|·0·B·sin θ = 0 N</span>.</li>
+          <li><strong>Étape 3 — Conclusion.</strong> Sans mouvement, pas de force de Lorience : c'est une force « du mouvement », différente du poids ou de la force électrique.</li>
+        </ol>
+        <p class="lecture-example-content"><strong>Résultat :</strong> <span class="math">F = 0 N</span> — la charge au repos n'est pas déviée par <span class="math">→B</span>.</p>
+      </div>
+      <div class="lecture-callout lecture-callout-warning"><strong>⚠️ Piège d'examen</strong> — Une charge immobile (<span class="math">v = 0</span>) ne subit aucune force magnétique, et si <span class="math">→v</span> est colinéaire à <span class="math">→B</span> la déviation est nulle aussi : dans les deux cas <span class="math">F = 0</span>. Un faisceau ne se courbe que si les trois ingrédients sont réunis.</div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s2 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s2">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">02</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2</span>
+        <h2 class="lecture-section-title">Définition : <span class="math">→F = q·→v∧→B</span></h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">L'expérience du tube révèle la force ; la physique la traduit en une seule ligne, qui tient dans un coin de fiche. Cette formule est le cœur de tout le chapitre : les trois sections suivantes ne feront que la décortiquer.</p>
+      <div class="lecture-callout lecture-callout-key"><strong>🔑 Définition officielle</strong> — Lorsqu'une particule de charge <span class="math">q</span> se déplace avec la vitesse <span class="math">→v</span> dans un champ magnétique <span class="math">→B</span>, elle subit la force de Lorience : <span class="math">→F = q·→v∧→B</span>. Le symbole <span class="math">∧</span> désigne le produit vectoriel.</div>
+      <div class="lecture-formula-hero">
+        <p class="lecture-formula-hero-main">Formule fondamentale — expression de la force de Lorience</p>
+        <p class="lecture-formula-hero-main"><span class="math">→F = q·→v∧→B</span></p>
+        <p class="lecture-formula-hero-desc"><span class="math">q</span> en coulombs (C), avec son signe · <span class="math">v</span> en m·s⁻¹ · <span class="math">B</span> en teslas (T) · <span class="math">F</span> en newtons (N)</p>
+      </div>
+      <p class="lecture-text">Le produit vectoriel fabrique un vecteur perpendiculaire aux deux autres : <span class="math">→F</span> est donc à la fois perpendiculaire à <span class="math">→v</span> et à <span class="math">→B</span>. C'est exactement ce qu'on observe : le faisceau ne recule pas, il tourne.</p>
+      <p class="lecture-text">Autre image : la force de Lorience agit « de côté », comme un vent latéral sur un cycliste. Elle ne le pousse jamais vers l'avant, seulement vers le flanc — et plus il roule vite, plus la poussée latérale est forte.</p>
+      <svg viewBox="0 0 560 280" style="width:100%;height:auto" role="img" aria-label="Trièdre direct formé par les vecteurs vitesse, champ et force pour une charge positive dans un champ entrant">
+        <rect x="40" y="36" width="480" height="204" rx="12" style="fill:rgba(96,165,250,0.08)"/>
+        <text x="100" y="86" font-size="17" style="fill:var(--accent-bright)">⊗</text>
+        <text x="340" y="86" font-size="17" style="fill:var(--accent-bright)">⊗</text>
+        <text x="460" y="86" font-size="17" style="fill:var(--accent-bright)">⊗</text>
+        <text x="100" y="216" font-size="17" style="fill:var(--accent-bright)">⊗</text>
+        <text x="340" y="216" font-size="17" style="fill:var(--accent-bright)">⊗</text>
+        <text x="460" y="216" font-size="17" style="fill:var(--accent-bright)">⊗</text>
+        <text x="60" y="60" font-size="13" style="fill:currentColor">→B entrant (perpendiculaire à l'écran)</text>
+        <circle cx="150" cy="200" r="13" style="fill:rgba(251,191,36,0.30);stroke:rgba(251,191,36,0.95)" stroke-width="2"/>
+        <text x="145" y="206" font-size="15" style="fill:currentColor">+</text>
+        <text x="106" y="236" font-size="13" style="fill:currentColor">charge +q</text>
+        <line x1="150" y1="183" x2="150" y2="88" style="stroke:rgba(248,113,113,0.95)" stroke-width="3"/>
+        <polygon points="150,76 143,92 157,92" style="fill:rgba(248,113,113,0.95)"/>
+        <text x="162" y="98" font-size="15" style="fill:rgba(248,113,113,0.95)">→F</text>
+        <line x1="166" y1="200" x2="316" y2="200" style="stroke:rgba(52,211,153,0.95)" stroke-width="3"/>
+        <polygon points="328,200 314,193 314,207" style="fill:rgba(52,211,153,0.95)"/>
+        <text x="208" y="188" font-size="15" style="fill:rgba(52,211,153,0.95)">→v</text>
+        <path d="M 150 184 L 164 184 L 164 200" fill="none" style="stroke:rgba(226,232,240,0.7)" stroke-width="1.5"/>
+        <text x="60" y="266" font-size="13" style="fill:currentColor">q &gt; 0 : →v, →B, →F dans cet ordre forment un trièdre direct (règle de la main droite)</text>
+      </svg>
+      <div class="lecture-example-content">
+        <p class="lecture-example-label">💡 Exemple travaillé — Trouver le sens de <span class="math">→F</span></p>
+        <p class="lecture-example-content">Un proton (charge <span class="math">q = +e</span>) se déplace vers la droite dans une zone où <span class="math">→B</span> entre perpendiculairement dans l'écran. Vers où est-il dévié ?</p>
+        <ol class="lecture-steps">
+          <li><strong>Étape 1 — Données.</strong> <span class="math">q &gt; 0</span>, <span class="math">→v</span> vers la droite, <span class="math">→B</span> entrant (symbolisé par ⊗).</li>
+          <li><strong>Étape 2 — Main droite.</strong> Les doigts de la main droite pointent vers <span class="math">→v</span> (la droite), puis se courbent vers <span class="math">→B</span> (l'intérieur de l'écran).</li>
+          <li><strong>Étape 3 — Produit vectoriel.</strong> Le pouce tendu indique <span class="math">→v∧→B</span> : vers le haut de l'écran.</li>
+          <li><strong>Étape 4 — Signe de q.</strong> Comme <span class="math">q &gt; 0</span>, <span class="math">→F = q·→v∧→B</span> a le sens du pouce : le proton part vers le haut.</li>
+        </ol>
+        <p class="lecture-example-content"><strong>Résultat :</strong> <span class="math">→F</span> est vertical, vers le haut, perpendiculaire à <span class="math">→v</span> et à <span class="math">→B</span>. Un électron partirait vers le bas.</p>
+      </div>
+      <div class="lecture-callout lecture-callout-warning"><strong>⚠️ Piège d'examen</strong> — <span class="math">q</span> compte avec son signe : <span class="math">→F = q·→v∧→B</span>. Pour une charge négative, le sens de <span class="math">→F</span> est l'opposé de celui donné par la main droite. Oublier d'inverser pour l'électron est l'erreur n°1 au Bac.</div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s3 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s3">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">03</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 3</span>
+        <h2 class="lecture-section-title">Caractéristiques : direction et sens</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Une force vectorielle se décrit toujours par trois choses : sa direction, son sens, sa norme. Pour la force de Lorience, la direction et le sens se lisent directement sur la formule — à condition de maîtriser la règle de la main droite et le rôle du signe de la charge.</p>
+      <div class="lecture-callout lecture-callout-key"><strong>🔑 Caractéristiques officielles</strong> — <strong>Direction :</strong> <span class="math">→F</span> est perpendiculaire au plan formé par <span class="math">→v</span> et <span class="math">→B</span>, donc à la fois perpendiculaire à <span class="math">→v</span> et à <span class="math">→B</span>. <strong>Sens :</strong> pour <span class="math">q &gt; 0</span>, les trois vecteurs <span class="math">→v</span>, <span class="math">→B</span>, <span class="math">→F</span> pris dans cet ordre forment un trièdre direct (règle de la main droite) ; pour <span class="math">q &lt; 0</span>, le sens de <span class="math">→F</span> est inversé.</div>
+      <svg viewBox="0 0 560 260" style="width:100%;height:auto" role="img" aria-label="Deux charges de signes opposés sont déviées en sens opposés dans le même champ">
+        <rect x="30" y="40" width="240" height="170" rx="12" style="fill:rgba(96,165,250,0.08)"/>
+        <rect x="290" y="40" width="240" height="170" rx="12" style="fill:rgba(96,165,250,0.08)"/>
+        <text x="66" y="66" font-size="14" style="fill:currentColor">charge positive : q &gt; 0</text>
+        <text x="326" y="66" font-size="14" style="fill:currentColor">charge négative : q &lt; 0</text>
+        <text x="70" y="112" font-size="16" style="fill:var(--accent-bright)">⊗</text>
+        <text x="150" y="112" font-size="16" style="fill:var(--accent-bright)">⊗</text>
+        <text x="230" y="112" font-size="16" style="fill:var(--accent-bright)">⊗</text>
+        <text x="330" y="112" font-size="16" style="fill:var(--accent-bright)">⊗</text>
+        <text x="410" y="112" font-size="16" style="fill:var(--accent-bright)">⊗</text>
+        <text x="490" y="112" font-size="16" style="fill:var(--accent-bright)">⊗</text>
+        <text x="60" y="200" font-size="12" style="fill:currentColor">→B entrant</text>
+        <text x="320" y="200" font-size="12" style="fill:currentColor">→B entrant</text>
+        <circle cx="150" cy="150" r="12" style="fill:rgba(251,191,36,0.30);stroke:rgba(251,191,36,0.95)" stroke-width="2"/>
+        <text x="146" y="155" font-size="14" style="fill:currentColor">+</text>
+        <line x1="164" y1="150" x2="256" y2="150" style="stroke:rgba(52,211,153,0.95)" stroke-width="3"/>
+        <polygon points="268,150 254,143 254,157" style="fill:rgba(52,211,153,0.95)"/>
+        <text x="196" y="138" font-size="14" style="fill:rgba(52,211,153,0.95)">→v</text>
+        <line x1="150" y1="136" x2="150" y2="90" style="stroke:rgba(248,113,113,0.95)" stroke-width="3"/>
+        <polygon points="150,78 143,94 157,94" style="fill:rgba(248,113,113,0.95)"/>
+        <text x="162" y="100" font-size="14" style="fill:rgba(248,113,113,0.95)">→F</text>
+        <circle cx="410" cy="150" r="12" style="fill:rgba(251,191,36,0.30);stroke:rgba(251,191,36,0.95)" stroke-width="2"/>
+        <text x="406" y="155" font-size="14" style="fill:currentColor">−</text>
+        <line x1="424" y1="150" x2="516" y2="150" style="stroke:rgba(52,211,153,0.95)" stroke-width="3"/>
+        <polygon points="528,150 514,143 514,157" style="fill:rgba(52,211,153,0.95)"/>
+        <text x="456" y="138" font-size="14" style="fill:rgba(52,211,153,0.95)">→v</text>
+        <line x1="410" y1="164" x2="410" y2="210" style="stroke:rgba(248,113,113,0.95)" stroke-width="3"/>
+        <polygon points="410,222 403,206 417,206" style="fill:rgba(248,113,113,0.95)"/>
+        <text x="422" y="216" font-size="14" style="fill:rgba(248,113,113,0.95)">→F</text>
+        <text x="60" y="244" font-size="13" style="fill:currentColor">même →v, même →B : les charges opposées dévient en sens opposés</text>
+      </svg>
+      <div class="lecture-formula-box">
+        <p class="lecture-formula-main">📋 Fiche réflexe — les 3 caractéristiques</p>
+        <p><strong>Direction :</strong> <span class="math">→F</span> perpendiculaire à <span class="math">→v</span> ET à <span class="math">→B</span>.</p>
+        <p><strong>Sens :</strong> trièdre direct <span class="math">(→v, →B, →F)</span> si <span class="math">q &gt; 0</span> ; sens opposé si <span class="math">q &lt; 0</span>.</p>
+        <p><strong>Norme :</strong> <span class="math">F = |q|·v·B·sin θ</span> — détaillée dans la section suivante.</p>
+      </div>
+      <div class="lecture-example-content">
+        <p class="lecture-example-label">🖐️ Méthode — la règle de la main droite en 4 gestes</p>
+        <ol class="lecture-steps">
+          <li><strong>Geste 1.</strong> Pointe les doigts de la main droite dans la direction de <span class="math">→v</span>.</li>
+          <li><strong>Geste 2.</strong> Courbe-les vers <span class="math">→B</span> : si <span class="math">→B</span> entre dans l'écran (⊗), courbe-les vers l'intérieur de l'écran.</li>
+          <li><strong>Geste 3.</strong> Le pouce tendu donne le sens de <span class="math">→v∧→B</span>, donc de <span class="math">→F</span> si <span class="math">q &gt; 0</span>.</li>
+          <li><strong>Geste 4.</strong> Si <span class="math">q &lt; 0</span>, inverse le sens obtenu. Vérifie enfin que <span class="math">→F</span> est bien perpendiculaire à <span class="math">→v</span> et à <span class="math">→B</span>.</li>
+        </ol>
+      </div>
+      <div class="lecture-example-content">
+        <p class="lecture-example-label">💡 Exemple travaillé — Déviation dans un tube cathodique</p>
+        <p class="lecture-example-content">Dans une télévision ancienne, un électron (<span class="math">q &lt; 0</span>) se déplace vers la droite et <span class="math">→B</span> entre dans l'écran. Vers où dévie-t-il ?</p>
+        <ol class="lecture-steps">
+          <li><strong>Étape 1.</strong> Pour une charge positive placée dans la même situation, la main droite donnerait <span class="math">→F</span> vers le haut.</li>
+          <li><strong>Étape 2.</strong> L'électron porte <span class="math">q &lt; 0</span> : on inverse le sens obtenu, donc <span class="math">→F</span> vers le bas.</li>
+          <li><strong>Étape 3.</strong> Vérification : <span class="math">→F</span> est bien perpendiculaire à <span class="math">→v</span> (horizontal) et à <span class="math">→B</span> (entrant). Cohérent.</li>
+        </ol>
+        <p class="lecture-example-content"><strong>Résultat :</strong> le faisceau d'électrons descend — c'est ce balayage qui construit l'image (on y revient en Partie 03).</p>
+      </div>
+      <div class="lecture-callout lecture-callout-warning"><strong>⚠️ Piège d'examen</strong> — Ne confonds pas : la main droite donne <span class="math">→v∧→B</span>, mais la formule est <span class="math">→F = q·→v∧→B</span>. Le signe de <span class="math">q</span> fait partie de la formule — c'est lui qui décide du sens final.</div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s4 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s4">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">04</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 4</span>
+        <h2 class="lecture-section-title">Norme : <span class="math">F = |q|·v·B·sin θ</span></h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">La norme de la force de Lorience se calcule avec quatre grandeurs seulement : la charge, la vitesse, le champ et l'angle entre <span class="math">→v</span> et <span class="math">→B</span>. C'est la formule la plus demandée du chapitre — elle vaut à elle seule plusieurs points au Bac.</p>
+      <div class="lecture-formula-hero">
+        <p class="lecture-formula-hero-main">Norme de la force de Lorience</p>
+        <p class="lecture-formula-hero-main"><span class="math">F = |q|·v·B·sin θ</span></p>
+        <p class="lecture-formula-hero-desc"><span class="math">F</span> en newtons (N) · <span class="math">|q|</span> en coulombs (C) · <span class="math">v</span> en m·s⁻¹ · <span class="math">B</span> en teslas (T) · <span class="math">θ</span> = angle entre <span class="math">→v</span> et <span class="math">→B</span></p>
+      </div>
+      <p class="lecture-text">Le facteur <span class="math">sin θ</span> mesure « l'efficacité » du champ : à <span class="math">θ = 90°</span>, la particule fonce plein travers dans le champ et la force est maximale ; à <span class="math">θ = 0°</span>, elle glisse le long des lignes de champ et ne sent rien. Entre les deux, <span class="math">sin θ</span> fait la transition en douceur.</p>
+      <svg viewBox="0 0 560 220" style="width:100%;height:auto" role="img" aria-label="L'angle theta entre la vitesse et le champ magnétique règle la norme de la force">
+        <circle cx="140" cy="150" r="12" style="fill:rgba(251,191,36,0.30);stroke:rgba(251,191,36,0.95)" stroke-width="2"/>
+        <text x="136" y="155" font-size="14" style="fill:currentColor">+</text>
+        <line x1="154" y1="150" x2="328" y2="150" style="stroke:rgba(52,211,153,0.95)" stroke-width="3"/>
+        <polygon points="340,150 326,143 326,157" style="fill:rgba(52,211,153,0.95)"/>
+        <text x="224" y="172" font-size="14" style="fill:rgba(52,211,153,0.95)">→v</text>
+        <line x1="150" y1="142" x2="280" y2="84" style="stroke:var(--accent-bright)" stroke-width="3"/>
+        <polygon points="292,78 276,80 284,91" style="fill:var(--accent-bright)"/>
+        <text x="238" y="70" font-size="14" style="fill:currentColor">→B</text>
+        <path d="M 236 150 A 96 96 0 0 0 228 111" fill="none" style="stroke:currentColor" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <text x="252" y="134" font-size="15" style="fill:currentColor">θ</text>
+        <text x="140" y="196" font-size="13" style="fill:currentColor">θ = angle entre →v et →B : plus θ grandit (jusqu'à 90°), plus F grandit</text>
+      </svg>
+      <div class="lecture-example-content">
+        <p class="lecture-example-label">💡 Exemple travaillé — Calculer la norme de la force</p>
+        <p class="lecture-example-content">Un proton (<span class="math">q = +e = 1,6 × 10⁻¹⁹ C</span>) pénètre à <span class="math">v = 2,0 × 10⁶ m·s⁻¹</span> dans un champ <span class="math">B = 0,50 T</span>. Calculer <span class="math">F</span> pour <span class="math">θ = 90°</span>, puis pour <span class="math">θ = 30°</span>.</p>
+        <ol class="lecture-steps">
+          <li><strong>Étape 1 — Données.</strong> <span class="math">|q| = 1,6 × 10⁻¹⁹ C</span> ; <span class="math">v = 2,0 × 10⁶ m·s⁻¹</span> ; <span class="math">B = 0,50 T</span> ; <span class="math">θ = 90°</span> (entrée perpendiculaire).</li>
+          <li><strong>Étape 2 — Formule.</strong> <span class="math">F = |q|·v·B·sin θ</span> avec <span class="math">sin 90° = 1</span>, donc <span class="math">F = |q|·v·B</span>.</li>
+          <li><strong>Étape 3 — Produit.</strong> <span class="math">|q| × v = 1,6 × 10⁻¹⁹ × 2,0 × 10⁶ = 3,2 × 10⁻¹³</span>.</li>
+          <li><strong>Étape 4 — On multiplie par B.</strong> <span class="math">F = 3,2 × 10⁻¹³ × 0,50 = 1,6 × 10⁻¹³ N</span>.</li>
+          <li><strong>Étape 5 — Cas θ = 30°.</strong> <span class="math">F = 1,6 × 10⁻¹³ × sin 30° = 1,6 × 10⁻¹³ × 0,5 = 8,0 × 10⁻¹⁴ N</span>, soit deux fois moins.</li>
+        </ol>
+        <p class="lecture-example-content"><strong>Résultat :</strong> <span class="math">F = 1,6 × 10⁻¹³ N</span> (θ = 90°) et <span class="math">F = 8,0 × 10⁻¹⁴ N</span> (θ = 30°).</p>
+      </div>
+      <div class="lecture-formula-box">
+        <p class="lecture-formula-main">🧮 Cas particuliers à connaître par cœur</p>
+        <p><span class="math">θ = 0°</span> ou <span class="math">180°</span> (<span class="math">→v</span> colinéaire à <span class="math">→B</span>) : <span class="math">sin θ = 0</span> donc <span class="math">F = 0 N</span> — aucune déviation.</p>
+        <p><span class="math">θ = 90°</span> (<span class="math">→v</span> ⊥ <span class="math">→B</span>) : <span class="math">sin θ = 1</span> donc <span class="math">F = |q|·v·B</span> — déviation maximale.</p>
+      </div>
+      <div class="lecture-callout lecture-callout-warning"><strong>⚠️ Piège d'examen</strong> — Unités ! <span class="math">v</span> en m·s⁻¹ (pas en km·s⁻¹), <span class="math">B</span> en teslas (<span class="math">1 mT = 10⁻³ T</span>), et n'oublie jamais la valeur absolue : <span class="math">|q|</span>. Écrire <span class="math">F = q·v·B</span> avec <span class="math">q</span> négatif donnerait une norme… négative : impardonnable.</div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s5 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s5">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">05</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Bilan & exercices</span>
+        <h2 class="lecture-section-title">Lorience vs Laplace : premières différences</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">La force de Lorience agit sur une seule particule. Mais dans un fil électrique, ce sont des milliards de porteurs de charge qui avancent en même temps : en additionnant toutes leurs forces de Lorience, on obtient une force globale, la force de Laplace, qui anime moteurs et haut-parleurs.</p>
+      <div class="lecture-callout lecture-callout-key"><strong>🔑 Définition officielle</strong> — La force de Laplace est la résultante des forces de Lorience s'exerçant sur l'ensemble des porteurs de charge en mouvement dans un conducteur parcouru par un courant et placé dans un champ magnétique.</div>
+      <div class="lecture-formula-hero">
+        <p class="lecture-formula-hero-main">Aperçu — force de Laplace sur un fil rectiligne</p>
+        <p class="lecture-formula-hero-main"><span class="math">→F = I·→ℓ∧→B</span></p>
+        <p class="lecture-formula-hero-desc"><span class="math">I</span> en ampères (A) · <span class="math">ℓ</span> en mètres (m) · <span class="math">B</span> en teslas (T) · <span class="math">F</span> en newtons (N) — démonstration complète en Partie 03</p>
+      </div>
+      <div class="lecture-text">
+        <p class="lecture-exercise-label">✏️ Exercice 1 — Norme et sens pour un électron</p>
+        <p class="lecture-text">Un électron pénètre à <span class="math">v = 4,0 × 10⁶ m·s⁻¹</span>, perpendiculairement à un champ <span class="math">B = 2,0 × 10⁻² T</span>. Calculer la norme de la force de Lorience, puis donner son sens si l'électron va vers la droite et que <span class="math">→B</span> entre dans l'écran.</p>
+        <details class="lecture-text">
+          <summary>Solution détaillée</summary>
+          <ol class="lecture-steps">
+            <li><strong>Étape 1 — Données.</strong> <span class="math">|q| = 1,6 × 10⁻¹⁹ C</span> ; <span class="math">v = 4,0 × 10⁶ m·s⁻¹</span> ; <span class="math">B = 2,0 × 10⁻² T</span> ; <span class="math">θ = 90°</span> donc <span class="math">sin θ = 1</span>.</li>
+            <li><strong>Étape 2 — Formule.</strong> <span class="math">F = |q|·v·B·sin θ = |q|·v·B</span>.</li>
+            <li><strong>Étape 3 — Produit.</strong> <span class="math">|q| × v = 1,6 × 10⁻¹⁹ × 4,0 × 10⁶ = 6,4 × 10⁻¹³</span>.</li>
+            <li><strong>Étape 4 — On multiplie par B.</strong> <span class="math">F = 6,4 × 10⁻¹³ × 2,0 × 10⁻² = 12,8 × 10⁻¹⁵ = 1,28 × 10⁻¹⁴ N</span>.</li>
+            <li><strong>Étape 5 — Sens.</strong> Une charge positive serait déviée vers le haut (trièdre direct) ; l'électron, <span class="math">q &lt; 0</span>, est dévié vers le bas.</li>
+          </ol>
+        </details>
+      </div>
+      <div class="lecture-text">
+        <p class="lecture-exercise-label">✏️ Exercice 2 — Force avec un angle quelconque</p>
+        <p class="lecture-text">Un proton se déplace à <span class="math">v = 1,0 × 10⁶ m·s⁻¹</span> en faisant un angle <span class="math">θ = 60°</span> avec un champ <span class="math">B = 0,20 T</span>. Calculer la norme de la force de Lorience (on prendra <span class="math">sin 60° ≈ 0,87</span>).</p>
+        <details class="lecture-text">
+          <summary>Solution détaillée</summary>
+          <ol class="lecture-steps">
+            <li><strong>Étape 1 — Données.</strong> <span class="math">|q| = 1,6 × 10⁻¹⁹ C</span> ; <span class="math">v = 1,0 × 10⁶ m·s⁻¹</span> ; <span class="math">B = 0,20 T</span> ; <span class="math">θ = 60°</span>.</li>
+            <li><strong>Étape 2 — Formule.</strong> <span class="math">F = |q|·v·B·sin θ</span>.</li>
+            <li><strong>Étape 3 — Produit.</strong> <span class="math">|q| × v × B = 1,6 × 10⁻¹⁹ × 1,0 × 10⁶ × 0,20 = 3,2 × 10⁻¹⁴</span>.</li>
+            <li><strong>Étape 4 — On multiplie par sin θ.</strong> <span class="math">F = 3,2 × 10⁻¹⁴ × 0,87 = 2,8 × 10⁻¹⁴ N</span> (arrondi au dixième).</li>
+          </ol>
+        </details>
+      </div>
+      <div class="lecture-callout lecture-callout-warning"><strong>⚠️ Piège d'examen</strong> — Convertir avant de calculer : <span class="math">B = 20 mT = 2,0 × 10⁻² T</span> et <span class="math">ℓ = 10 cm = 0,10 m</span>. Un champ laissé en mT fausse le résultat d'un facteur 1 000.</div>
+      <table class="lecture-table">
+        <thead>
+          <tr><th>Objet</th><th>Force de Lorience</th><th>Force de Laplace</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Qui la subit ?</strong></td><td>une charge en mouvement</td><td>un fil parcouru par un courant</td></tr>
+          <tr><td><strong>Norme</strong></td><td><span class="math">F = |q|·v·B·sin θ</span></td><td><span class="math">F = I·ℓ·B·sin θ</span></td></tr>
+          <tr><td><strong>Direction</strong></td><td>perpendiculaire à <span class="math">→v</span> et à <span class="math">→B</span></td><td>perpendiculaire au fil et à <span class="math">→B</span></td></tr>
+          <tr><td><strong>Sens</strong></td><td>trièdre direct <span class="math">(→v, →B, →F)</span> si <span class="math">q &gt; 0</span>, inversé si <span class="math">q &lt; 0</span></td><td>trièdre direct <span class="math">(I, →B, →F)</span></td></tr>
+          <tr><td><strong>Travail</strong></td><td>nul (<span class="math">W = 0</span>)</td><td>nul (<span class="math">W = 0</span>)</td></tr>
+          <tr><td><strong>Rôle</strong></td><td>la brique élémentaire (une particule)</td><td>la somme des Lorience sur tout le fil</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+  <!-- ===== QCM ===== -->
+  <div class="lecture-quiz">
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Une particule chargée au repos dans un champ magnétique <span class="math">→B</span> :</p>
+      <div class="lecture-quiz-options"><span>A) subit une force maximale</span><span>B) subit une force nulle</span><span>C) subit une force perpendiculaire à <span class="math">→B</span></span><span>D) décrit un cercle</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><strong>B.</strong> <span class="math">F = |q|·v·B·sin θ</span> et <span class="math">v = 0</span>, donc <span class="math">F = 0 N</span> : sans mouvement, pas de force de Lorience.</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Pour une charge négative (<span class="math">q &lt; 0</span>), le sens de <span class="math">→F</span> est :</p>
+      <div class="lecture-quiz-options"><span>A) celui donné par <span class="math">→v∧→B</span></span><span>B) opposé à celui donné par <span class="math">→v∧→B</span></span><span>C) parallèle à <span class="math">→B</span></span><span>D) identique à celui d'une charge positive</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><strong>B.</strong> <span class="math">→F = q·→v∧→B</span> : le facteur <span class="math">q</span>, négatif, inverse le sens du produit vectoriel.</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Si <span class="math">θ = 90°</span>, la norme de la force de Lorience vaut :</p>
+      <div class="lecture-quiz-options"><span>A) <span class="math">F = |q|·v·B</span>, valeur maximale</span><span>B) <span class="math">F = 0 N</span></span><span>C) <span class="math">F = |q|·v·B/2</span></span><span>D) une valeur qui dépend du signe de <span class="math">q</span></span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><strong>A.</strong> <span class="math">sin 90° = 1</span>, donc <span class="math">F = |q|·v·B</span> : c'est le maximum, atteint quand <span class="math">→v</span> est perpendiculaire à <span class="math">→B</span>. La norme ne dépend jamais du signe de <span class="math">q</span>.</div></details>
+    </div>
+  </div>
+  <!-- ===== RÉCAP ===== -->
+  <div class="lecture-recap">
+    <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
+    <ul class="lecture-recap-list">
+      <li><strong>Définition</strong> : la force de Lorience <span class="math">→F = q·→v∧→B</span> s'exerce sur toute charge en mouvement dans un champ magnétique.</li>
+      <li><strong>Caractéristiques</strong> : perpendiculaire à <span class="math">→v</span> et à <span class="math">→B</span> ; sens donné par la règle de la main droite (inversé si <span class="math">q &lt; 0</span>) ; norme <span class="math">F = |q|·v·B·sin θ</span>.</li>
+      <li><strong>Limite et lien</strong> : charge immobile ou <span class="math">→v</span> colinéaire à <span class="math">→B</span> ⟹ force nulle ; et la force de Laplace est la somme des Lorience sur un fil.</li>
+    </ul>
+  </div>
+  <!-- ===== FIN ===== -->
+  <div class="lecture-end">
+    <div class="lecture-end-icon">🎯</div>
+    <div class="lecture-end-text">Partie 01 terminée !</div>
+    <div class="lecture-end-sub">Dans la Partie 02, on laisse cette force agir dans la durée : tu vas découvrir pourquoi elle ne travaille jamais et les trajectoires spectaculaires qu'elle dessine — cercles et hélices.</div>
+    <div class="lecture-end-divider"></div>
+  </div>
+</div>

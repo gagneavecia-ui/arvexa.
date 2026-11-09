@@ -1,0 +1,424 @@
+<!-- PARTIE 01 — Oscillations libres amorties (RLC série) (Circuit RLC) -->
+<div class="lecture-container">
+
+  <!-- ===== HERO ===== -->
+  <header class="lecture-hero">
+    <div class="lecture-hero-badge">
+      <span class="lecture-hero-icon">📘</span>
+      <span class="lecture-hero-label">Terminale C&D · Circuit RLC · Partie 01</span>
+    </div>
+    <h1 class="lecture-hero-title">
+      Oscillations libres amorties <em>(RLC série)</em>
+    </h1>
+    <p class="lecture-hero-intro">
+      Un condensateur chargé qu'on laisse se décharger dans une bobine ne se vide pas tranquillement : il oscille. Dans cette partie, tu vas monter ton premier circuit RLC série, comprendre comment l'énergie fait la navette entre le condensateur et la bobine, puis découvrir le régime pseudo-périodique et son enveloppe exponentielle. Tu apprendras enfin à calculer et à mesurer la pseudo-période, la carte d'identité de ton circuit.
+    </p>
+    <div class="lecture-hero-meta">
+      <span class="lecture-hero-meta-item">⏱ 20 min</span>
+      <span class="lecture-hero-meta-item">⚡ 4 notions</span>
+      <span class="lecture-hero-meta-item">📚 6 sections</span>
+      <span class="lecture-hero-meta-item">🎓 Terminale C&D</span>
+    </div>
+  </header>
+  <!-- ===== SOMMAIRE ===== -->
+  <nav class="lecture-toc">
+    <div class="lecture-toc-header">
+      <span>Dans cette partie</span>
+      <span class="lecture-toc-count">4 notions · 6 sections</span>
+    </div>
+    <ol class="lecture-toc-list">
+      <li><a href="#s0"><span class="toc-num">00</span><span>Une radio, une voiture, une balançoire</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>Le circuit RLC série</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>La décharge oscillante</span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>Régime pseudo-périodique et enveloppe</span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>La pseudo-période T ≈ T₀</span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>L'oscillateur mécanique jumeau</span></a></li>
+    </ol>
+  </nav>
+  <!-- ============================================================ -->
+  <!-- SECTION s0 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s0">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">00</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Motivation</span>
+        <h2 class="lecture-section-title">Une radio, une voiture, une balançoire</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Ce soir, tu allumes un vieux poste de radio et tu tournes le bouton : après un bref brouhaha, une station sort, nette et claire. Dans la voiture de tes parents, quand vous passez un dos d'âne, la suspension encaisse le choc puis se stabilise en un ou deux rebonds. Et sur la cour, quand tu pousses un ami sur une balançoire, tu apprends vite qu'il faut pousser au bon rythme pour qu'il monte toujours plus haut.</p>
+      <p class="lecture-text">Ces trois scènes racontent la même physique : des oscillations qui naissent, s'amortissent ou s'entretiennent. Ce chapitre te donne les clés électriques de cette histoire : un condensateur, une bobine et une résistance réunis dans le même circuit — le célèbre circuit RLC. Tu vas voir que derrière un poste de radio se cache… une balançoire.</p>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s1 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s1">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">01</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1</span>
+        <h2 class="lecture-section-title">Le circuit RLC série : trois composants, un seul chemin</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">On branche en série une résistance, une bobine et un condensateur préalablement chargé, le tout fermé par un interrupteur. Un seul chemin pour le courant, mais trois tempéraments très différents : la résistance freine et chauffe, la bobine déteste les variations du courant, le condensateur stocke des charges. Avant d'animer ce trio, il faut savoir dessiner le circuit et nommer chaque grandeur.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <p class="lecture-callout-label">📌 Définition — circuit RLC série</p>
+        <p class="lecture-text">Un circuit RLC série est un circuit dans lequel une résistance <span class="math">R</span> (en Ω), une bobine d'inductance <span class="math">L</span> (en H) et un condensateur de capacité <span class="math">C</span> (en F) sont traversés par le même courant <span class="math">i</span> (en A). La tension <span class="math">u</span> (en V) se mesure aux bornes du condensateur.</p>
+      </div>
+      <p class="lecture-text">🧠 Lis le schéma : le condensateur, déjà chargé, va se décharger dans la bobine à travers <span class="math">R</span> quand on ferme <span class="math">K</span>. La flèche verte donne le sens conventionnel du courant <span class="math">i</span>, la flèche orange la tension <span class="math">u</span> aux bornes du condensateur.</p>
+      <svg viewBox="0 0 640 360" role="img" aria-label="Circuit RLC série avec interrupteur, résistance, bobine, condensateur chargé, flèches du courant et de la tension">
+        <rect x="0" y="0" width="640" height="360" style="fill:rgba(15,23,42,0.03)"/>
+        <path d="M100,60 H170 M210,60 H240 M322,60 H390 M480,60 H540 M540,60 V260 M540,260 H340 M310,260 H100 M100,260 V60" style="stroke:var(--accent-bright);fill:none" stroke-width="2.5"/>
+        <path d="M170,60 L205,32" style="stroke:var(--accent-bright);fill:none" stroke-width="2.5"/>
+        <circle cx="170" cy="60" r="4" style="fill:var(--accent-bright)"/>
+        <circle cx="210" cy="60" r="4" style="fill:var(--accent-bright)"/>
+        <text x="186" y="22" font-size="15" text-anchor="middle" style="fill:var(--text, rgba(15,23,42,0.85))">K</text>
+        <polyline points="240,60 250,44 265,76 280,44 295,76 310,44 322,60" style="stroke:var(--accent-bright);fill:none" stroke-width="2.5"/>
+        <text x="281" y="26" font-size="15" text-anchor="middle" style="fill:var(--text, rgba(15,23,42,0.85))">R</text>
+        <text x="281" y="98" font-size="12" text-anchor="middle" style="fill:var(--text, rgba(15,23,42,0.55))">résistance (Ω)</text>
+        <path d="M390,60 A15,15 0 0 1 420,60 A15,15 0 0 1 450,60 A15,15 0 0 1 480,60" style="stroke:var(--accent-bright);fill:none" stroke-width="2.5"/>
+        <text x="435" y="26" font-size="15" text-anchor="middle" style="fill:var(--text, rgba(15,23,42,0.85))">L</text>
+        <text x="435" y="98" font-size="12" text-anchor="middle" style="fill:var(--text, rgba(15,23,42,0.55))">bobine (H)</text>
+        <path d="M310,240 V280 M340,240 V280" style="stroke:var(--accent-bright);fill:none" stroke-width="2.5"/>
+        <text x="316" y="256" font-size="12" style="fill:rgba(239,68,68,0.9)">+</text>
+        <text x="316" y="276" font-size="12" style="fill:rgba(239,68,68,0.9)">+</text>
+        <text x="332" y="256" font-size="12" style="fill:var(--text, rgba(15,23,42,0.6))">−</text>
+        <text x="332" y="276" font-size="12" style="fill:var(--text, rgba(15,23,42,0.6))">−</text>
+        <text x="325" y="230" font-size="15" text-anchor="middle" style="fill:var(--text, rgba(15,23,42,0.85))">C</text>
+        <path d="M352,300 H322" style="stroke:rgba(245,158,11,0.9);fill:none" stroke-width="2.5"/>
+        <polygon points="316,300 326,295 326,305" style="fill:rgba(245,158,11,0.9)"/>
+        <text x="340" y="322" font-size="15" text-anchor="middle" style="fill:rgba(245,158,11,0.9)">u</text>
+        <text x="325" y="344" font-size="12" text-anchor="middle" style="fill:var(--text, rgba(15,23,42,0.55))">condensateur chargé (F)</text>
+        <path d="M100,200 V126" style="stroke:rgba(16,185,129,0.9);fill:none" stroke-width="2.5"/>
+        <polygon points="100,120 94,132 106,132" style="fill:rgba(16,185,129,0.9)"/>
+        <text x="78" y="166" font-size="15" text-anchor="middle" style="fill:rgba(16,185,129,0.9)">i</text>
+        <text x="230" y="150" font-size="12" style="fill:var(--text, rgba(15,23,42,0.55))">à la fermeture de K, le condensateur</text>
+        <text x="230" y="168" font-size="12" style="fill:var(--text, rgba(15,23,42,0.55))">se décharge dans la bobine</text>
+      </svg>
+      <div class="lecture-formula-hero">
+        <p class="lecture-formula-hero-main">La relation fondamentale du condensateur</p>
+        <p class="lecture-formula-hero-main"><span class="math">q = C·u</span></p>
+        <p class="lecture-formula-hero"><span class="math">q</span> en coulombs (C), <span class="math">C</span> en farads (F), <span class="math">u</span> en volts (V) : plus <span class="math">C</span> est grande, plus le condensateur stocke de charges pour la même tension.</p>
+      </div>
+      <div class="lecture-formula-box">
+        <p class="lecture-formula-desc">Loi d'Ohm pour la résistance</p>
+        <p class="lecture-formula-main"><span class="math">uᵣ = R·i</span></p>
+        <p class="lecture-formula-desc"><span class="math">uᵣ</span> en V, <span class="math">R</span> en Ω, <span class="math">i</span> en A : la résistance ne stocke rien, elle freine et chauffe.</p>
+      </div>
+      <div class="lecture-example-content">
+        <p class="lecture-example-label">✍️ Exemple travaillé — charger le condensateur</p>
+        <p class="lecture-text">Un condensateur de capacité <span class="math">C</span> = 1,0·10⁻⁵ F est chargé sous la tension <span class="math">U₀</span> = 20 V. Quelle charge stocke-t-il ?</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step"><strong>Données.</strong> <span class="math">C</span> = 1,0·10⁻⁵ F (déjà en farads) et <span class="math">U₀</span> = 20 V.</li>
+          <li class="lecture-step"><strong>Formule.</strong> <span class="math">q₀ = C·U₀</span>.</li>
+          <li class="lecture-step"><strong>Calcul.</strong> <span class="math">q₀</span> = 1,0·10⁻⁵ × 20 = 2,0·10⁻⁴ C. Vérification d'ordre de grandeur : 10⁻⁵ × 2·10¹ = 2·10⁻⁴ ✓.</li>
+          <li class="lecture-step"><strong>Conclusion.</strong> Le condensateur stocke <span class="math">q₀</span> = 2,0·10⁻⁴ C ; à la fermeture de <span class="math">K</span>, ces charges se mettent en mouvement : le courant démarre.</li>
+        </ol>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <p class="lecture-callout-label">⚠️ Piège d'examen</p>
+        <p class="lecture-text">Ne confonds pas <span class="math">u</span> (tension instantanée aux bornes du condensateur) et <span class="math">U₀</span> (tension initiale). Et souviens-toi : une bobine réelle contient toujours une petite résistance interne <span class="math">r</span> qui s'ajoute à <span class="math">R</span> dans les bilans d'énergie.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s2 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s2">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">02</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2</span>
+        <h2 class="lecture-section-title">La décharge oscillante : l'énergie fait la navette</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">On ferme <span class="math">K</span> : le condensateur chargé n'a plus de générateur pour le recharger, mais la bobine l'empêche de se vider d'un coup. Ses charges font alors des allers-retours, et le courant va et vient. On parle d'oscillations libres : après l'apport initial d'énergie, plus aucun générateur n'intervient dans le circuit.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <p class="lecture-callout-label">📌 Définition — oscillations libres</p>
+        <p class="lecture-text">Des oscillations libres sont les oscillations d'un circuit qui, après un apport initial d'énergie (condensateur chargé), évolue sans générateur. L'énergie fait la navette entre le condensateur et la bobine, pendant que la résistance en prélève une part à chaque tour.</p>
+      </div>
+      <p class="lecture-text">🧠 Sur la courbe ci-dessous, la tension <span class="math">u</span> oscille en s'affaiblissant : c'est la décharge oscillante. Chaque sommet est un peu plus bas que le précédent, et tous ces sommets sont « coiffés » par deux courbes en pointillés rouges : l'enveloppe exponentielle, signature de l'amortissement.</p>
+      <svg viewBox="0 0 640 360" role="img" aria-label="Décharge oscillante amortie : oscillations décroissantes entre deux enveloppes exponentielles, pseudo-période annotée">
+        <rect x="0" y="0" width="640" height="360" style="fill:rgba(15,23,42,0.03)"/>
+        <path d="M60,30 V330 M40,180 H620" style="stroke:var(--text, rgba(15,23,42,0.45));fill:none" stroke-width="1.5"/>
+        <path d="M60,60 C82,60 83,282 105,282 C127,282 128,94 150,94 C172,94 173,253 195,253 C217,253 218,118 240,118 C262,118 263,232 285,232 C307,232 308,136 330,136 C352,136 353,217 375,217 C397,217 398,148 420,148 C442,148 443,207 465,207 C487,207 488,157 510,157 C532,157 533,199 555,199 C577,199 578,164 600,164" style="stroke:var(--accent-bright);fill:none" stroke-width="3"/>
+        <path d="M60,60 C100,76 120,86 150,94 C180,102 210,110 240,118 C270,126 300,131 330,136 C360,141 390,145 420,148 C450,151 480,155 510,157 C540,159 570,162 600,164" style="stroke:rgba(239,68,68,0.85);fill:none" stroke-width="2" stroke-dasharray="7 6"/>
+        <path d="M60,300 C80,292 95,286 105,282 C135,270 165,261 195,253 C225,245 255,237 285,232 C315,227 345,221 375,217 C405,213 435,209 465,207 C495,205 525,201 555,199 C575,198 590,197 600,196" style="stroke:rgba(239,68,68,0.85);fill:none" stroke-width="2" stroke-dasharray="7 6"/>
+        <path d="M60,48 H150" style="stroke:rgba(16,185,129,0.9);fill:none" stroke-width="2"/>
+        <polygon points="60,48 70,43 70,53" style="fill:rgba(16,185,129,0.9)"/>
+        <polygon points="150,48 140,43 140,53" style="fill:rgba(16,185,129,0.9)"/>
+        <text x="105" y="38" font-size="14" text-anchor="middle" style="fill:rgba(16,185,129,0.9)">T ≈ T₀</text>
+        <text x="430" y="118" font-size="12" text-anchor="middle" style="fill:rgba(239,68,68,0.85)">enveloppe exponentielle</text>
+        <text x="608" y="170" font-size="13" text-anchor="end" style="fill:var(--text, rgba(15,23,42,0.85))">u(t)</text>
+        <text x="612" y="200" font-size="13" style="fill:var(--text, rgba(15,23,42,0.85))">t</text>
+        <text x="46" y="200" font-size="12" text-anchor="end" style="fill:var(--text, rgba(15,23,42,0.55))">0</text>
+        <text x="26" y="24" font-size="12" style="fill:var(--text, rgba(15,23,42,0.55))">u (V)</text>
+        <text x="320" y="346" font-size="12" text-anchor="middle" style="fill:var(--text, rgba(15,23,42,0.55))">l'écart entre deux sommets reste constant : c'est la pseudo-période T</text>
+      </svg>
+      <svg viewBox="0 0 640 340" role="img" aria-label="Tension u et intensité i décalées de T0 sur 4 : quand u est maximale, i est nulle, et réciproquement">
+        <rect x="0" y="0" width="640" height="340" style="fill:rgba(15,23,42,0.03)"/>
+        <path d="M40,180 H620 M60,30 V320" style="stroke:var(--text, rgba(15,23,42,0.45));fill:none" stroke-width="1.5"/>
+        <path d="M60,50 V310 M120,50 V310" style="stroke:var(--text, rgba(15,23,42,0.18));fill:none" stroke-width="1" stroke-dasharray="4 4"/>
+        <path d="M60,90 C100,90 140,270 180,270 C220,270 260,90 300,90 C340,90 380,270 420,270 C460,270 500,90 540,90" style="stroke:var(--accent-bright);fill:none" stroke-width="3"/>
+        <path d="M60,180 C80,180 100,120 120,120 C140,120 160,180 180,180 C200,180 220,240 240,240 C260,240 280,180 300,180 C320,180 340,120 360,120 C380,120 400,180 420,180 C440,180 460,240 480,240 C500,240 520,180 540,180" style="stroke:rgba(245,158,11,0.9);fill:none" stroke-width="2.5" stroke-dasharray="8 5"/>
+        <text x="60" y="40" font-size="12" text-anchor="middle" style="fill:var(--accent-bright)">u max · i = 0</text>
+        <text x="120" y="40" font-size="12" text-anchor="middle" style="fill:rgba(245,158,11,0.9)">u = 0 · i max</text>
+        <path d="M440,26 H480" style="stroke:var(--accent-bright);fill:none" stroke-width="3"/>
+        <text x="488" y="31" font-size="12" style="fill:var(--text, rgba(15,23,42,0.85))">u(t)</text>
+        <path d="M440,52 H480" style="stroke:rgba(245,158,11,0.9);fill:none" stroke-width="2.5" stroke-dasharray="8 5"/>
+        <text x="488" y="57" font-size="12" style="fill:var(--text, rgba(15,23,42,0.85))">i(t)</text>
+        <text x="612" y="200" font-size="13" style="fill:var(--text, rgba(15,23,42,0.85))">t</text>
+        <text x="26" y="24" font-size="12" style="fill:var(--text, rgba(15,23,42,0.55))">u ; i</text>
+        <text x="320" y="330" font-size="12" text-anchor="middle" style="fill:var(--text, rgba(15,23,42,0.55))">u et i sont décalées de T₀/4 : quand l'une est au sommet, l'autre passe par zéro</text>
+      </svg>
+      <div class="lecture-formula-hero">
+        <p class="lecture-formula-hero-main">Le courant, débit de charges</p>
+        <p class="lecture-formula-hero-main"><span class="math">i = dq/dt</span></p>
+        <p class="lecture-formula-hero">Quand la charge du condensateur s'écoule, un courant <span class="math">i</span> (A) circule : c'est lui qui parcourt la bobine et la résistance.</p>
+      </div>
+      <div class="lecture-formula-box">
+        <p class="lecture-formula-desc">Le capital de départ</p>
+        <p class="lecture-formula-main"><span class="math">Eₑ = ½·C·u²</span></p>
+        <p class="lecture-formula-desc">À t = 0 (u = <span class="math">U₀</span>), toute l'énergie est électrique, stockée dans le condensateur : <span class="math">Eₑ</span> = ½·C·<span class="math">U₀</span>².</p>
+      </div>
+      <div class="lecture-example-content">
+        <p class="lecture-example-label">✍️ Exemple travaillé — où est l'énergie ?</p>
+        <p class="lecture-text">Reprenons le circuit de la section 01 : <span class="math">C</span> = 1,0·10⁻⁵ F chargé sous <span class="math">U₀</span> = 20 V. Décrivons l'énergie à t = 0 puis à T₀/4.</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step"><strong>À t = 0.</strong> u = <span class="math">U₀</span> = 20 V et i = 0 : toute l'énergie est électrique, dans le condensateur.</li>
+          <li class="lecture-step"><strong>Calcul.</strong> <span class="math">Eₑ</span> = ½·C·<span class="math">U₀</span>² = ½ × 1,0·10⁻⁵ × (20)² = 2,0·10⁻³ J. Vérification : ½ × 1,0·10⁻⁵ = 5,0·10⁻⁶ puis 5,0·10⁻⁶ × 400 = 2,0·10⁻³ ✓.</li>
+          <li class="lecture-step"><strong>À T₀/4.</strong> u = 0 et i est maximale : toute l'énergie est maintenant magnétique, stockée dans la bobine (<span class="math">Eₘ</span> = ½·L·i², voir partie 02).</li>
+          <li class="lecture-step"><strong>Conclusion.</strong> L'énergie fait la navette entre condensateur et bobine, mais à chaque navette la résistance en prélève une part : les sommets de u baissent.</li>
+        </ol>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <p class="lecture-callout-label">⚠️ Piège d'examen</p>
+        <p class="lecture-text">Croire que le courant est maximal dès t = 0 : faux ! À t = 0, i = 0 : la bobine s'oppose à toute variation brutale du courant, qui n'atteint son maximum qu'un quart de pseudo-période plus tard (quand u = 0).</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s3 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s3">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">03</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 3</span>
+        <h2 class="lecture-section-title">Le régime pseudo-périodique et son enveloppe</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Le circuit oscille, mais chaque sommet est plus bas que le précédent : les oscillations sont amorties. Quand l'amortissement est faible, le rythme reste très régulier et on parle de régime pseudo-périodique, c'est-à-dire « presque périodique ». C'est le régime roi des TP de Terminale, et tu dois savoir le reconnaître sur un écran en trois secondes.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <p class="lecture-callout-label">📌 Définition — régime pseudo-périodique</p>
+        <p class="lecture-text">Le régime pseudo-périodique est le régime d'oscillations libres amorties dans lequel le système oscille avec une pseudo-période <span class="math">T</span> quasi constante, tandis que l'amplitude décroît selon une enveloppe exponentielle. Il apparaît quand l'amortissement est faible (résistance <span class="math">R</span> petite).</p>
+      </div>
+      <p class="lecture-text">🧠 Imagine un trampoline sur lequel tu as sauté une seule fois : il vibre longtemps, mais chaque rebond est plus petit que le précédent. La durée entre deux rebonds, elle, ne change presque pas. Pour le circuit : la « hauteur » de la tension décroît, le « rythme » <span class="math">T</span> reste quasi constant.</p>
+      <div class="lecture-formula-hero">
+        <p class="lecture-formula-hero-main">L'enveloppe des sommets</p>
+        <p class="lecture-formula-hero-main"><span class="math">u max(t) = U₀·exp(−t/τ)</span></p>
+        <p class="lecture-formula-hero">τ (tau) est la constante de temps de l'amortissement : plus <span class="math">R</span> est grande, plus τ est petite, plus vite les sommets s'écrasent vers zéro.</p>
+      </div>
+      <div class="lecture-formula-box">
+        <p class="lecture-formula-desc">Deux horloges indépendantes</p>
+        <p class="lecture-formula-main"><span class="math">amplitude → τ ; rythme → T ≈ T₀</span></p>
+        <p class="lecture-formula-desc">L'enveloppe décroît à l'échelle de τ (réglée par <span class="math">R</span>) ; les oscillations défilent à l'échelle de <span class="math">T</span> (réglée par <span class="math">L</span> et <span class="math">C</span>).</p>
+      </div>
+      <div class="lecture-example-content">
+        <p class="lecture-example-label">✍️ Exemple travaillé — lire une courbe amortie</p>
+        <p class="lecture-text">Sur l'oscillogramme d'un circuit RLC, le premier sommet de u(t) atteint 8,0 V à t = 0 et le sommet suivant 6,5 V à t = 2,0 ms.</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step"><strong>Lecture 1.</strong> Amplitude initiale : 8,0 V ; amplitude suivante : 6,5 V → l'amplitude a diminué : les oscillations sont amorties.</li>
+          <li class="lecture-step"><strong>Lecture 2.</strong> L'écart entre les deux sommets vaut 2,0 ms − 0 = 2,0 ms : c'est la pseudo-période <span class="math">T</span>.</li>
+          <li class="lecture-step"><strong>Vérification.</strong> Les sommets suivants sont tous séparés d'environ 2,0 ms : le rythme ne change pas, seule la hauteur baisse ✓.</li>
+          <li class="lecture-step"><strong>Conclusion.</strong> Oscillations régulières + amplitude qui décroît = régime pseudo-périodique, avec ses sommets posés sur une enveloppe exponentielle.</li>
+        </ol>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <p class="lecture-callout-label">⚠️ Piège d'examen</p>
+        <p class="lecture-text">Ne confonds pas amplitude et période : l'amplitude décroît (enveloppe), mais la pseudo-période reste quasi constante. Et si l'amortissement devient fort, <span class="math">T</span> n'est plus exactement <span class="math">T₀</span> : la formule <span class="math">T ≈ T₀</span> suppose un amortissement faible.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s4 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s4">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">04</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 4</span>
+        <h2 class="lecture-section-title">Calculer et mesurer la pseudo-période</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">La pseudo-période se lit sur l'oscillogramme, mais on sait aussi la prévoir par le calcul : elle ne dépend que de la bobine et du condensateur. C'est l'une des formules les plus demandées du chapitre — sache la sortir les yeux fermés, avec ses unités et ses conditions de validité.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <p class="lecture-callout-label">📌 Définition — pseudo-période</p>
+        <p class="lecture-text">La pseudo-période <span class="math">T</span> est la durée qui sépare deux sommets successifs de la courbe u(t). Pour un amortissement faible, <span class="math">T ≈ T₀ = 2π·√(L·C)</span> : elle coïncide avec la période propre du circuit, celle qu'il aurait sans résistance.</p>
+      </div>
+      <p class="lecture-text">🧠 La bobine joue le rôle de l'inertie (elle « pèse »), le condensateur celui du ressort (il « rappelle ») : plus l'inertie est grande ou le ressort souple (C grand), plus le rythme est lent. La résistance, elle, ne décide pas du rythme : seulement de la vitesse à laquelle les oscillations s'éteignent.</p>
+      <div class="lecture-formula-hero">
+        <p class="lecture-formula-hero-main">LA formule du chapitre</p>
+        <p class="lecture-formula-hero-main"><span class="math">T ≈ T₀ = 2π·√(L·C)</span></p>
+        <p class="lecture-formula-hero">Valable si l'amortissement est faible. <span class="math">L</span> en H, <span class="math">C</span> en F, <span class="math">T₀</span> en s — et remarque : H·F = s², les unités se raccordent toutes seules.</p>
+      </div>
+      <div class="lecture-formula-box">
+        <p class="lecture-formula-desc">La fréquence propre</p>
+        <p class="lecture-formula-main"><span class="math">f₀ = 1/T₀ = 1/(2π·√(L·C))</span></p>
+        <p class="lecture-formula-desc">En hertz (Hz) : retiens-la dès maintenant, c'est exactement la fréquence de résonance de la partie 03.</p>
+      </div>
+      <svg viewBox="0 0 640 340" role="img" aria-label="Oscillogramme : quatre pseudo-périodes occupent 8,0 millisecondes">
+        <rect x="0" y="0" width="640" height="340" style="fill:rgba(15,23,42,0.03)"/>
+        <path d="M40,180 H620 M60,30 V320" style="stroke:var(--text, rgba(15,23,42,0.45));fill:none" stroke-width="1.5"/>
+        <path d="M80,60 V300 M200,60 V300 M320,60 V300 M440,60 V300 M560,60 V300" style="stroke:var(--text, rgba(15,23,42,0.15));fill:none" stroke-width="1" stroke-dasharray="4 4"/>
+        <path d="M80,80 C100,80 120,265 140,265 C160,265 180,95 200,95 C220,95 240,252 260,252 C280,252 300,108 320,108 C340,108 360,241 380,241 C400,241 420,119 440,119 C460,119 480,232 500,232 C520,232 540,128 560,128" style="stroke:var(--accent-bright);fill:none" stroke-width="3"/>
+        <path d="M80,56 H560" style="stroke:rgba(16,185,129,0.9);fill:none" stroke-width="2"/>
+        <polygon points="80,56 90,51 90,61" style="fill:rgba(16,185,129,0.9)"/>
+        <polygon points="560,56 550,51 550,61" style="fill:rgba(16,185,129,0.9)"/>
+        <text x="320" y="44" font-size="14" text-anchor="middle" style="fill:rgba(16,185,129,0.9)">4T = 8,0 ms</text>
+        <text x="612" y="200" font-size="13" style="fill:var(--text, rgba(15,23,42,0.85))">t</text>
+        <text x="26" y="24" font-size="12" style="fill:var(--text, rgba(15,23,42,0.55))">u (V)</text>
+        <text x="320" y="330" font-size="13" text-anchor="middle" style="fill:var(--text, rgba(15,23,42,0.85))">T = 8,0/4 = 2,0 ms : quatre oscillations tiennent dans 8,0 ms</text>
+      </svg>
+      <div class="lecture-example-content">
+        <p class="lecture-example-label">✍️ Exemple travaillé — prévoir T₀ puis f₀</p>
+        <p class="lecture-text">Un circuit RLC série comprend une bobine de <span class="math">L</span> = 1,0 H et un condensateur de <span class="math">C</span> = 1,0·10⁻⁵ F, en oscillations libres peu amorties. Calculer <span class="math">T₀</span> puis <span class="math">f₀</span>.</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step"><strong>Données.</strong> <span class="math">L</span> = 1,0 H ; <span class="math">C</span> = 1,0·10⁻⁵ F (déjà en farads).</li>
+          <li class="lecture-step"><strong>Produit.</strong> L·C = 1,0 × 1,0·10⁻⁵ = 1,0·10⁻⁵ s².</li>
+          <li class="lecture-step"><strong>Racine.</strong> √(1,0·10⁻⁵) = 3,16·10⁻³ s. Vérification : (3,16·10⁻³)² = 9,99·10⁻⁶ ≈ 1,0·10⁻⁵ ✓.</li>
+          <li class="lecture-step"><strong>T₀.</strong> T₀ = 2π × 3,16·10⁻³ = 1,99·10⁻² s ≈ 2,0·10⁻² s (20 ms).</li>
+          <li class="lecture-step"><strong>f₀.</strong> f₀ = 1/T₀ = 1/(1,99·10⁻²) ≈ 50 Hz. Vérification : 50 × 0,020 = 1,0 s⁻¹ ✓ cohérent.</li>
+        </ol>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <p class="lecture-callout-label">⚠️ Piège d'examen</p>
+        <p class="lecture-text">Piège d'unités : si <span class="math">C</span> est donné en microfarads, convertis AVANT de calculer (10 microfarads = 1,0·10⁻⁵ F). Et n'oublie ni le √ ni le 2π : 2π·L·C n'est pas 2π·√(L·C) !</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s5 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s5">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">05</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 5</span>
+        <h2 class="lecture-section-title">L'oscillateur mécanique jumeau — et tes exercices</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Ton circuit RLC a un jumeau mécanique : la masse accrochée à un ressort avec frottement. Mêmes équations, mêmes courbes, même physique — seule la langue change. Cette analogie t'économise des heures de révision : ce que tu sais déjà en mécanique se transpose tel quel en électricité, et inversement.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <p class="lecture-callout-label">📌 Définition — analogie électromécanique</p>
+        <p class="lecture-text">L'analogie électromécanique est la correspondance terme à terme entre un oscillateur mécanique (masse-ressort frottant) et le circuit RLC série : à chaque grandeur mécanique correspond une grandeur électrique, et les énergies se lisent avec les mêmes formules.</p>
+      </div>
+      <p class="lecture-text">🧠 Si tu comprends la balançoire, tu comprends le RLC. Apprends la table ci-dessous une seule fois : toute la mécanique des oscillateurs que tu connais déjà va te servir deux fois dans ce chapitre.</p>
+      <div class="lecture-example-content">
+        <p class="lecture-example-label">✍️ Exemple travaillé — traduire l'énergie cinétique</p>
+        <p class="lecture-text">Dans la masse-ressort, l'énergie cinétique vaut ½·m·v². Quelle est son image électrique dans le circuit RLC ?</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step"><strong>Traduction 1.</strong> La vitesse v = dx/dt devient l'intensité <span class="math">i = dq/dt</span> : ce qui « avance » devient ce qui « circule ».</li>
+          <li class="lecture-step"><strong>Traduction 2.</strong> L'inertie m devient l'inductance <span class="math">L</span> : l'énergie cinétique ½·m·v² devient l'énergie magnétique ½·L·i² de la bobine.</li>
+          <li class="lecture-step"><strong>Traduction 3.</strong> De même, l'énergie élastique ½·k·x² devient l'énergie électrique ½·q²/C du condensateur : le ressort raide joue le rôle d'un petit C.</li>
+        </ol>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <p class="lecture-callout-label">⚠️ Piège d'examen</p>
+        <p class="lecture-text">La raideur <span class="math">k</span> correspond à <span class="math">1/C</span>, et NON à <span class="math">C</span> : un ressort raide (k grand) joue le rôle d'un condensateur de faible capacité. Vérifie toujours l'analogie avec les énergies : ½·k·x² ↔ ½·q²/C ✓.</p>
+      </div>
+      <div class="lecture-text">
+        <p class="lecture-exercise-label">🏋️ Exercice 1 — Prévoir puis vérifier la pseudo-période</p>
+        <p class="lecture-text">Un circuit RLC série comprend une bobine de <span class="math">L</span> = 0,20 H et un condensateur de <span class="math">C</span> = 5,0·10⁻⁶ F, chargé puis laissé en oscillations libres. Sur l'oscillogramme, on mesure 8 pseudo-périodes sur 50 ms. 1) Calculer <span class="math">T₀</span>. 2) Comparer à la pseudo-période mesurée. 3) En déduire <span class="math">f₀</span>.</p>
+        <details>
+          <summary>Voir la solution détaillée</summary>
+          <ol class="lecture-steps">
+            <li class="lecture-step"><strong>Données.</strong> <span class="math">L</span> = 0,20 H ; <span class="math">C</span> = 5,0·10⁻⁶ F ; mesure : 8T = 50 ms.</li>
+            <li class="lecture-step"><strong>Produit.</strong> L·C = 0,20 × 5,0·10⁻⁶ = 1,0·10⁻⁶ s².</li>
+            <li class="lecture-step"><strong>Racine.</strong> √(1,0·10⁻⁶) = 1,0·10⁻³ s. Vérification : (1,0·10⁻³)² = 1,0·10⁻⁶ ✓.</li>
+            <li class="lecture-step"><strong>T₀.</strong> T₀ = 2π × 1,0·10⁻³ = 6,28·10⁻³ s ≈ 6,3 ms.</li>
+            <li class="lecture-step"><strong>Mesure.</strong> T = 50/8 = 6,25 ms ≈ 6,3 ms : on a bien T ≈ T₀, donc l'amortissement est faible ✓.</li>
+            <li class="lecture-step"><strong>Fréquence.</strong> f₀ = 1/T₀ = 1/(6,28·10⁻³) ≈ 1,6·10² Hz (soit 160 Hz).</li>
+          </ol>
+          <p class="lecture-text"><strong>Réponse :</strong> T₀ ≈ 6,3 ms, conforme à la mesure (T ≈ 6,25 ms) ; f₀ ≈ 160 Hz.</p>
+        </details>
+      </div>
+      <div class="lecture-text">
+        <p class="lecture-exercise-label">🏋️ Exercice 2 — Retrouver C à partir d'un oscillogramme</p>
+        <p class="lecture-text">Dans un circuit RLC série de bobine <span class="math">L</span> = 0,10 H, l'oscillogramme de la tension aux bornes du condensateur montre 4 pseudo-périodes sur 8,0 ms. En supposant l'amortissement faible, calculer la capacité <span class="math">C</span>.</p>
+        <details>
+          <summary>Voir la solution détaillée</summary>
+          <ol class="lecture-steps">
+            <li class="lecture-step"><strong>Pseudo-période.</strong> T = 8,0/4 = 2,0 ms = 2,0·10⁻³ s.</li>
+            <li class="lecture-step"><strong>Hypothèse.</strong> Amortissement faible donc T ≈ T₀ = 2π·√(L·C).</li>
+            <li class="lecture-step"><strong>Isoler C.</strong> T₀² = 4π²·L·C, donc C = T₀²/(4π²·L).</li>
+            <li class="lecture-step"><strong>Application numérique.</strong> T₀² = (2,0·10⁻³)² = 4,0·10⁻⁶ s² ; 4π²·L = 39,5 × 0,10 = 3,95.</li>
+            <li class="lecture-step"><strong>Calcul.</strong> C = 4,0·10⁻⁶/3,95 = 1,0·10⁻⁶ F. Vérification : T₀ = 2π·√(0,10 × 1,0·10⁻⁶) = 2π × 3,16·10⁻⁴ ≈ 2,0·10⁻³ s ✓.</li>
+          </ol>
+          <p class="lecture-text"><strong>Réponse :</strong> C ≈ 1,0·10⁻⁶ F.</p>
+        </details>
+      </div>
+      <div class="lecture-table">
+        <table>
+          <thead>
+            <tr><th>Oscillateur mécanique</th><th>Circuit RLC série</th><th>Ce qui est le même</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Position <span class="math">x</span> (m)</td><td>Charge <span class="math">q</span> (C)</td><td>la grandeur « stockée » qui oscille</td></tr>
+            <tr><td>Vitesse <span class="math">v</span> (m·s⁻¹)</td><td>Intensité <span class="math">i</span> (A)</td><td><span class="math">v = dx/dt</span> ↔ <span class="math">i = dq/dt</span></td></tr>
+            <tr><td>Masse <span class="math">m</span> (kg)</td><td>Inductance <span class="math">L</span> (H)</td><td>l'inertie, qui « pèse » sur le rythme</td></tr>
+            <tr><td>Raideur <span class="math">k</span> (N·m⁻¹)</td><td>Inverse <span class="math">1/C</span> (F⁻¹)</td><td>le « rappel » : ½·k·x² ↔ ½·q²/C</td></tr>
+            <tr><td>Frottement</td><td>Résistance <span class="math">R</span> (Ω)</td><td>qui dissipe l'énergie</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+  <!-- ===== QCM ===== -->
+  <div class="lecture-quiz">
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">QCM 1 — Dans un circuit RLC série en oscillations libres peu amorties, la pseudo-période dépend principalement :</p>
+      <div class="lecture-quiz-options"><span>A) de la résistance <span class="math">R</span></span><span>B) de <span class="math">L</span> et de <span class="math">C</span></span><span>C) de la tension initiale <span class="math">U₀</span></span><span>D) de la charge initiale <span class="math">q₀</span></span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">B — T ≈ T₀ = 2π·√(L·C) : la résistance règle l'amortissement, et les conditions initiales règlent seulement l'amplitude.</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">QCM 2 — L'enveloppe des sommets de u(t) en régime pseudo-périodique est :</p>
+      <div class="lecture-quiz-options"><span>A) une droite horizontale</span><span>B) une exponentielle décroissante</span><span>C) une droite croissante</span><span>D) un arc de parabole</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">B — Les sommets suivent u max(t) = U₀·exp(−t/τ) : l'amortissement par effet Joule écrase progressivement l'amplitude.</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">QCM 3 — On double la capacité <span class="math">C</span> en gardant <span class="math">L</span> fixe. La pseudo-période :</p>
+      <div class="lecture-quiz-options"><span>A) est multipliée par 2</span><span>B) est multipliée par √2</span><span>C) est divisée par 2</span><span>D) ne change pas</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">B — T₀ est proportionnelle à √C : doubler C multiplie T₀ par √2 ≈ 1,41.</div></details>
+    </div>
+  </div>
+  <!-- ===== RÉCAP ===== -->
+  <div class="lecture-recap">
+    <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
+    <ul class="lecture-recap-list">
+      <li><strong>Circuit RLC série</strong> — résistance, bobine et condensateur en série : après la charge du condensateur, la fermeture de K lance des oscillations libres.</li>
+      <li><strong>Décharge oscillante</strong> — l'énergie fait la navette entre le condensateur (½·C·u²) et la bobine (½·L·i²) ; quand l'amortissement est faible, le régime est pseudo-périodique.</li>
+      <li><strong>Pseudo-période</strong> — T ≈ T₀ = 2π·√(L·C), indépendante de R et de l'amplitude ; l'enveloppe exponentielle, elle, traduit l'amortissement.</li>
+    </ul>
+  </div>
+  <!-- ===== FIN ===== -->
+  <div class="lecture-end">
+    <div class="lecture-end-icon">🎯</div>
+    <div class="lecture-end-text">Partie 01 terminée !</div>
+    <div class="lecture-end-sub">Tu sais maintenant pourquoi ça oscille, et à quel rythme. Partie 02 : suivons l'énergie qui disparaît — et voyons comment la remplacer pour entretenir les oscillations.</div>
+    <div class="lecture-end-divider"></div>
+  </div>
+</div>

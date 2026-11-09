@@ -1,0 +1,358 @@
+<!-- PARTIE 01 — Notion d'acide faible et de base faible (Acide faible, base faible) -->
+<div class="lecture-container">
+
+  <!-- ===== HERO ===== -->
+  <header class="lecture-hero">
+    <div class="lecture-hero-badge">
+      <span class="lecture-hero-icon">📘</span>
+      <span class="lecture-hero-label">Terminale C&D · Acide faible, base faible · Partie 01</span>
+    </div>
+    <h1 class="lecture-hero-title">
+      Notion d'acide faible et de <em>base faible</em>
+    </h1>
+    <p class="lecture-hero-intro">
+      Le vinaigre assaisonne la salade, le citron se presse sur le poisson, l'eau gazeuse pétille : tous contiennent des acides, et pourtant aucun ne brûle la peau comme un débouche-évier. La raison tient en un mot : ces acides sont <strong>faibles</strong>, c'est-à-dire qu'ils ne réagissent avec l'eau que partiellement. Cette partie définit l'acide faible et la base faible, puis apprend à mesurer leur « timidité » avec deux nombres : le taux d'avancement final <span class="math">τ</span> et le degré de dissociation <span class="math">α</span>.
+    </p>
+    <div class="lecture-hero-meta">
+      <span class="lecture-hero-meta-item">⏱ 20 min</span>
+      <span class="lecture-hero-meta-item">⚗️ 4 notions</span>
+      <span class="lecture-hero-meta-item">📚 6 sections</span>
+      <span class="lecture-hero-meta-item">🎓 Terminale C&D</span>
+    </div>
+  </header>
+  <!-- ===== SOMMAIRE ===== -->
+  <nav class="lecture-toc">
+    <div class="lecture-toc-header">
+      <span>Dans cette partie</span>
+      <span class="lecture-toc-count">4 notions · 6 sections</span>
+    </div>
+    <ol class="lecture-toc-list">
+      <li><a href="#s0"><span class="toc-num">00</span><span>Le vinaigre, le citron et l'ammoniaque</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>Rappel : acides forts et bases fortes</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>Acide faible : une réaction limitée</span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>Base faible : l'exemple de l'ammoniac</span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>Réaction partielle : τ et degré α</span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>Synthèse : fort ou faible ?</span></a></li>
+    </ol>
+  </nav>
+  <!-- ============================================================ -->
+  <!-- SECTION s0 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s0">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">00</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Motivation</span>
+        <h2 class="lecture-section-title">Le vinaigre, le citron et l'ammoniaque</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Ouvre le placard de la cuisine : le vinaigre est une solution d'acide éthanoïque <span class="math">CH₃—COOH</span> à environ 5 %, le jus de citron doit son goût à l'acide citrique, et l'eau gazeuse contient de l'acide carbonique <span class="math">H₂CO₃</span> formé par dissolution du dioxyde de carbone. Côté ménage, l'ammoniaque des vitres est une solution d'ammoniac <span class="math">NH₃</span>, une base. Ces produits se manipulent sans gants (avec un minimum de prudence), alors qu'une goutte d'acide chlorhydrique concentré ou de soude laisse une brûlure.</p>
+      <p class="lecture-text">Pourquoi une telle différence ? Un acide <strong>fort</strong> réagit totalement avec l'eau : chaque molécule libère un ion oxonium <span class="math">H₃O⁺</span>. Un acide <strong>faible</strong> s'arrête en chemin : la majorité de ses molécules reste intacte, et la réaction atteint un équilibre. C'est cette réaction limitée que nous allons définir, illustrer, puis mesurer avec précision.</p>
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 560 250" role="img" aria-label="Produits acides et basiques du quotidien">
+          <text x="280" y="26" text-anchor="middle" font-size="14" font-weight="700" fill="rgba(224,184,74,0.95)">Des acides et des bases faibles dans la cuisine</text>
+          <rect x="55" y="58" width="70" height="92" rx="8" fill="rgba(224,184,74,0.04)" style="stroke:var(--border-soft)"/>
+          <rect x="60" y="104" width="60" height="40" rx="5" fill="rgba(224,184,74,0.45)"/>
+          <text x="90" y="172" text-anchor="middle" font-size="12.5" style="fill:var(--text-dim)">Jus de citron</text>
+          <text x="90" y="190" text-anchor="middle" font-size="12" font-weight="700" fill="rgba(224,184,74,0.9)">pH ≈ 2,4</text>
+          <rect x="195" y="58" width="70" height="92" rx="8" fill="rgba(224,184,74,0.04)" style="stroke:var(--border-soft)"/>
+          <rect x="200" y="104" width="60" height="40" rx="5" fill="rgba(224,184,74,0.28)"/>
+          <text x="230" y="172" text-anchor="middle" font-size="12.5" style="fill:var(--text-dim)">Vinaigre</text>
+          <text x="230" y="190" text-anchor="middle" font-size="12" font-weight="700" fill="rgba(224,184,74,0.9)">pH ≈ 2,9</text>
+          <rect x="335" y="58" width="70" height="92" rx="8" fill="rgba(224,184,74,0.04)" style="stroke:var(--border-soft)"/>
+          <rect x="340" y="104" width="60" height="40" rx="5" fill="rgba(96,165,250,0.40)"/>
+          <text x="370" y="172" text-anchor="middle" font-size="12.5" style="fill:var(--text-dim)">Eau gazeuse</text>
+          <text x="370" y="190" text-anchor="middle" font-size="12" font-weight="700" fill="rgba(96,165,250,0.95)">pH ≈ 5,0</text>
+          <rect x="475" y="58" width="70" height="92" rx="8" fill="rgba(224,184,74,0.04)" style="stroke:var(--border-soft)"/>
+          <rect x="480" y="104" width="60" height="40" rx="5" fill="rgba(74,222,128,0.40)"/>
+          <text x="510" y="172" text-anchor="middle" font-size="12.5" style="fill:var(--text-dim)">Ammoniaque</text>
+          <text x="510" y="190" text-anchor="middle" font-size="12" font-weight="700" fill="rgba(74,222,128,0.95)">pH ≈ 11,5</text>
+          <text x="280" y="228" text-anchor="middle" font-size="12" font-style="italic" style="fill:var(--text-dim)">Tous réagissent partiellement avec l'eau : aucun ne « mord » comme les produits forts.</text>
+        </svg>
+        <figcaption class="lecture-figure-caption">Sur l'étagère de la cuisine comme du magasin, des acides et des bases faibles partout — leur secret : une réaction limitée avec l'eau.</figcaption>
+      </figure>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s1 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s1">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">01</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1</span>
+        <h2 class="lecture-section-title">Rappel : acides forts et bases fortes</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Avant de découvrir les acides faibles, ressortons de nos souvenirs de Première les deux repères qui serviront de mètre-étalon : l'acide chlorhydrique <span class="math">HCl</span> et la soude <span class="math">NaOH</span>.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-title">📌 Définition officielle</div>
+        <p>Un <strong>acide fort</strong> est un acide dont la réaction avec l'eau est <strong>totale</strong> : toute molécule cède son proton et l'équation s'écrit avec une flèche simple, <span class="math">AH + H₂O → A⁻ + H₃O⁺</span>. De même, une <strong>base forte</strong> comme <span class="math">NaOH</span> se dissocie totalement : <span class="math">NaOH → Na⁺ + OH⁻</span>. Dans les deux cas, le taux d'avancement final vaut <span class="math">τ = 100 %</span>.</p>
+      </div>
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main"><span class="math">pH = −log [H₃O⁺]</span></div>
+        <div class="lecture-formula-desc">Définition du pH, valable pour toute solution aqueuse ; pour un acide fort, [H₃O⁺] = C donc pH = −log C.</div>
+      </div>
+      <p class="lecture-text">Conséquence immédiate : un acide fort de concentration <span class="math">C = 0,010 mol·L⁻¹</span> donne <span class="math">[H₃O⁺] = 0,010 mol·L⁻¹</span> et <span class="math">pH = 2,0</span> ; une base forte de même concentration donne <span class="math">[OH⁻] = 0,010 mol·L⁻¹</span> et <span class="math">pH = 12,0</span>. Ces deux valeurs serviront de point de comparaison pour juger la « faiblesse » des acides et des bases faibles.</p>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-title">⚠️ Piège d'examen</div>
+        <p>La règle <span class="math">pH = −log C</span> n'est valable <strong>que pour un acide fort</strong>. L'appliquer à un acide faible comme le vinaigre est l'erreur la plus sanctionnée du chapitre : pour un acide faible, <span class="math">[H₃O⁺]</span> est <strong>strictement inférieure</strong> à <span class="math">C</span>, donc le pH est toujours plus grand que <span class="math">−log C</span>.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s2 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s2">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">02</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2</span>
+        <h2 class="lecture-section-title">Acide faible : une réaction limitée</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Place au personnage principal : l'acide éthanoïque <span class="math">CH₃—COOH</span> du vinaigre. Observons ce qui se passe vraiment lorsqu'on le dissout dans l'eau.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-title">📌 Définition officielle</div>
+        <p>Un <strong>acide faible</strong> est un acide dont la réaction avec l'eau est <strong>limitée</strong> : seule une fraction des molécules <span class="math">AH</span> cède un proton à l'eau. La réaction ne s'achève pas : elle atteint un <strong>équilibre dynamique</strong>, et l'équation de dissociation s'écrit obligatoirement avec la double flèche <span class="math">⇌</span>.</p>
+      </div>
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-main">Équation de dissociation d'un acide faible</div>
+        <div class="lecture-formula-hero-main"><span class="math">AH + H₂O ⇌ A⁻ + H₃O⁺</span></div>
+        <div class="lecture-formula-hero-desc">Exemple : CH₃—COOH + H₂O ⇌ CH₃—COO⁻ + H₃O⁺ — la double flèche ⇌ traduit une réaction limitée, arrêtée à l'équilibre.</div>
+      </div>
+      <p class="lecture-text">Concrètement, dans une solution de vinaigre à <span class="math">0,10 mol·L⁻¹</span>, environ 99 molécules d'acide sur 100 n'ont rien cédé : elles coexistent avec les ions <span class="math">CH₃—COO⁻</span> et <span class="math">H₃O⁺</span> formés par la minorité réactive. Les deux réactions inverses se produisent simultanément, à la même vitesse : c'est l'équilibre chimique. Cette coexistence <span class="math">AH</span> / <span class="math">A⁻</span> est la signature de tous les acides faibles.</p>
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 560 235" role="img" aria-label="Équilibre de l'acide éthanoïque dans l'eau">
+          <rect x="22" y="88" width="152" height="56" rx="28" fill="rgba(224,184,74,0.10)" style="stroke:var(--accent-bright)"/>
+          <text x="98" y="112" text-anchor="middle" font-size="16" font-weight="700" fill="rgba(224,184,74,0.95)">CH₃—COOH</text>
+          <text x="98" y="131" text-anchor="middle" font-size="10.5" style="fill:var(--text-dim)">acide éthanoïque</text>
+          <text x="258" y="87" text-anchor="middle" font-size="10.5" style="fill:var(--text-dim)">cession d'un proton H⁺</text>
+          <line x1="184" y1="98" x2="330" y2="98" style="stroke:var(--accent-bright)"/>
+          <polygon points="330,93 342,98 330,103" fill="rgba(224,184,74,0.9)"/>
+          <line x1="332" y1="136" x2="188" y2="136" style="stroke:var(--info)" stroke-dasharray="6 4"/>
+          <polygon points="188,131 176,136 188,141" fill="rgba(96,165,250,0.9)"/>
+          <text x="260" y="155" text-anchor="middle" font-size="10.5" style="fill:var(--text-dim)">recombinaison</text>
+          <rect x="352" y="42" width="170" height="46" rx="23" fill="rgba(74,222,128,0.08)" style="stroke:var(--success-light)"/>
+          <text x="437" y="71" text-anchor="middle" font-size="15" font-weight="700" fill="rgba(74,222,128,0.95)">CH₃—COO⁻</text>
+          <text x="437" y="124" text-anchor="middle" font-size="16" style="fill:var(--text-dim)">+</text>
+          <rect x="352" y="134" width="170" height="46" rx="23" fill="rgba(96,165,250,0.08)" style="stroke:var(--info)"/>
+          <text x="437" y="163" text-anchor="middle" font-size="15" font-weight="700" fill="rgba(96,165,250,0.95)">H₃O⁺</text>
+          <text x="280" y="215" text-anchor="middle" font-size="12" font-style="italic" style="fill:var(--text-dim)">À l'équilibre : ≈ 99 molécules sur 100 restent intactes (α ≈ 1 % pour C = 0,10 mol·L⁻¹).</text>
+        </svg>
+        <figcaption class="lecture-figure-caption">L'équilibre de dissociation du vinaigre : les deux réactions inverses coexistent, et la forme moléculaire CH₃—COOH domine largement.</figcaption>
+      </figure>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-title">⚠️ Piège d'examen</div>
+        <p>Écrire <span class="math">CH₃—COOH + H₂O → CH₃—COO⁻ + H₃O⁺</span> avec une flèche simple est une faute : le correcteur conclut « acide traité comme fort » et retire la question. La double flèche <span class="math">⇌</span> fait partie de la réponse, au même titre que les coefficients.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s3 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s3">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">03</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 3</span>
+        <h2 class="lecture-section-title">Base faible : l'exemple de l'ammoniac</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Les bases faibles sont moins célèbres mais tout aussi présentes : l'ammoniac <span class="math">NH₃</span> des produits de nettoyage en est le champion. Voyons comment il se comporte dans l'eau.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-title">📌 Définition officielle</div>
+        <p>Une <strong>base faible</strong> est une base dont la réaction avec l'eau est <strong>limitée</strong> : elle ne capte qu'une fraction des protons disponibles dans l'eau. L'équation s'écrit avec la double flèche <span class="math">⇌</span> : <span class="math">B + H₂O ⇌ BH⁺ + OH⁻</span>. L'ion <span class="math">BH⁺</span> formé est l'acide conjugué de <span class="math">B</span>.</p>
+      </div>
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-main">Équation de réaction d'une base faible avec l'eau</div>
+        <div class="lecture-formula-hero-main"><span class="math">B + H₂O ⇌ BH⁺ + OH⁻</span></div>
+        <div class="lecture-formula-hero-desc">Exemple : NH₃ + H₂O ⇌ NH₄⁺ + OH⁻ — chaque ion OH⁻ apparu provient d'une molécule d'eau qui a cédé son proton à NH₃.</div>
+      </div>
+      <p class="lecture-text">Dans une ammoniaque à <span class="math">0,10 mol·L⁻¹</span>, on mesure <span class="math">pH = 11,1</span>, soit <span class="math">[OH⁻] = 1,3×10⁻³ mol·L⁻¹</span> : environ une molécule de <span class="math">NH₃</span> sur 80 a réagi. La soude <span class="math">NaOH</span> à la même concentration donnerait <span class="math">pH = 12,0</span> avec <span class="math">[OH⁻] = 0,10 mol·L⁻¹</span>. Vérifions le rapport : <span class="math">0,10 / 1,3×10⁻³ ≈ 80</span>. À concentration égale, l'ammoniaque libère environ 80 fois moins d'ions hydroxyde que la soude : voilà ce qu'être une base faible veut dire.</p>
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 560 225" role="img" aria-label="Équilibre de l'ammoniac avec l'eau">
+          <text x="280" y="24" text-anchor="middle" font-size="13" font-weight="700" fill="rgba(224,184,74,0.95)">NH₃ + H₂O ⇌ NH₄⁺ + OH⁻ — une base qui se retient</text>
+          <rect x="30" y="52" width="118" height="50" rx="25" fill="rgba(224,184,74,0.10)" style="stroke:var(--accent-bright)"/>
+          <text x="89" y="83" text-anchor="middle" font-size="16" font-weight="700" fill="rgba(224,184,74,0.95)">NH₃</text>
+          <rect x="30" y="122" width="118" height="50" rx="25" fill="rgba(96,165,250,0.08)" style="stroke:var(--info)"/>
+          <text x="89" y="153" text-anchor="middle" font-size="16" font-weight="700" fill="rgba(96,165,250,0.95)">H₂O</text>
+          <text x="250" y="76" text-anchor="middle" font-size="10.5" style="fill:var(--text-dim)">NH₃ capte un H⁺ de l'eau</text>
+          <line x1="160" y1="88" x2="330" y2="88" style="stroke:var(--accent-bright)"/>
+          <polygon points="330,83 342,88 330,93" fill="rgba(224,184,74,0.9)"/>
+          <line x1="332" y1="128" x2="162" y2="128" style="stroke:var(--info)" stroke-dasharray="6 4"/>
+          <polygon points="162,123 150,128 162,133" fill="rgba(96,165,250,0.9)"/>
+          <text x="250" y="147" text-anchor="middle" font-size="10.5" style="fill:var(--text-dim)">NH₄⁺ redonne un H⁺</text>
+          <rect x="350" y="52" width="150" height="50" rx="25" fill="rgba(74,222,128,0.08)" style="stroke:var(--success-light)"/>
+          <text x="425" y="83" text-anchor="middle" font-size="16" font-weight="700" fill="rgba(74,222,128,0.95)">NH₄⁺</text>
+          <rect x="350" y="122" width="150" height="50" rx="25" fill="rgba(96,165,250,0.08)" style="stroke:var(--info)"/>
+          <text x="425" y="153" text-anchor="middle" font-size="16" font-weight="700" fill="rgba(96,165,250,0.95)">OH⁻</text>
+          <text x="280" y="205" text-anchor="middle" font-size="12" font-style="italic" style="fill:var(--text-dim)">Une molécule NH₃ sur ≈ 80 réagit : l'ammoniaque (0,10 mol·L⁻¹) atteint pH = 11,1 — la soude, 12,0.</text>
+        </svg>
+        <figcaption class="lecture-figure-caption">L'ammoniac capte les protons de l'eau avec retenue : l'équilibre NH₃ / NH₄⁺ reste dominé par la forme NH₃.</figcaption>
+      </figure>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-title">⚠️ Piège d'examen</div>
+        <p>« Base faible » ne signifie pas « base diluée ». Diluer une soude cent fois ne la transforme pas en base faible : <span class="math">NaOH</span> reste totalement dissociée à toute concentration. La faiblesse est une propriété <strong>chimique de l'espèce</strong>, jamais de sa concentration.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s4 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s4">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">04</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 4</span>
+        <h2 class="lecture-section-title">Réaction partielle : τ et degré α</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">« Limitée » est un adjectif ; la chimie exige un nombre. Deux grandeurs mesurent l'intensité de la réaction : le taux d'avancement final <span class="math">τ</span> et le degré de dissociation <span class="math">α</span>.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-title">📌 Définition officielle</div>
+        <p>Le <strong>taux d'avancement final</strong> est <span class="math">τ = x_f / x_max</span>, rapport de l'avancement final à l'avancement maximal. Pour un acide faible <span class="math">AH</span> seul dissous dans l'eau, <span class="math">x_max = C·V</span> (tout l'acide aurait réagi) et <span class="math">x_f = [H₃O⁺]_éq·V</span>. Le <strong>degré de dissociation</strong> <span class="math">α</span> est la fraction d'acide dissociée : pour un acide faible monoprotique dans l'eau pure, <span class="math">α = τ</span>.</p>
+      </div>
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-main">Taux d'avancement final</div>
+        <div class="lecture-formula-hero-main"><span class="math">τ = x_f / x_max</span></div>
+        <div class="lecture-formula-hero-desc">τ = 100 % : réaction totale (acide fort) ; τ &lt; 100 % : réaction limitée (acide faible). Nombre sans unité, souvent exprimé en pourcentage.</div>
+      </div>
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main"><span class="math">α = τ = [H₃O⁺]_éq / C</span></div>
+        <div class="lecture-formula-desc">Acide faible monoprotique dissous seul dans l'eau ; [H₃O⁺]_éq se déduit du pH mesuré par [H₃O⁺] = 10^(−pH).</div>
+      </div>
+      <div class="lecture-example-content">
+        <span class="lecture-example-label">🔍 Exemple travaillé — le taux du vinaigre</span>
+        <div class="lecture-example-content">
+          <p>Une solution d'acide éthanoïque de concentration <span class="math">C = 0,050 mol·L⁻¹</span> a un pH mesuré égal à <span class="math">3,0</span>. Calculer le taux d'avancement final <span class="math">τ</span> et conclure sur la force de l'acide.</p>
+        </div>
+        <div class="lecture-steps">
+          <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Données et inconnue.</strong> <span class="math">C = 0,050 mol·L⁻¹</span>, <span class="math">pH = 3,0</span>, on cherche <span class="math">τ</span>. On calcule d'abord : <span class="math">[H₃O⁺] = 10^(−pH) = 10^(−3,0) = 1,0×10⁻³ mol·L⁻¹</span>.</p></div></div>
+          <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Exprimer les avancements.</strong> Pour un volume <span class="math">V</span> de solution : <span class="math">x_f = [H₃O⁺]_éq × V</span> et <span class="math">x_max = C × V</span> (si la réaction était totale).</p></div></div>
+          <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Calculer τ.</strong> <span class="math">τ = x_f / x_max = [H₃O⁺] / C = 1,0×10⁻³ / 0,050 = 2,0×10⁻²</span>, soit <span class="math">τ = 2,0 %</span>.</p></div></div>
+          <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Interpréter.</strong> <span class="math">τ = 2,0 %</span>, très inférieur à 100 % : la réaction est limitée, l'acide éthanoïque est bien un acide faible. Seules 2 molécules sur 100 ont cédé leur proton.</p></div></div>
+          <div class="lecture-step"><div class="lecture-step-number">5</div><div class="lecture-step-content"><p><strong>Vérifier (deuxième calcul).</strong> <span class="math">[H₃O⁺] = C × τ = 0,050 × 0,020 = 1,0×10⁻³ mol·L⁻¹</span> → <span class="math">pH = −log(1,0×10⁻³) = 3,0</span> ✔ : on retrouve le pH mesuré.</p></div></div>
+        </div>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-title">⚠️ Piège d'examen</div>
+        <p><span class="math">τ</span> est le rapport de deux avancements : il <strong>n'a pas d'unité</strong>. Écrire « <span class="math">τ = 2,0 % mol·L⁻¹</span> » est un non-sens qui coûte des points ; écrire <span class="math">τ = 0,020</span> ou <span class="math">τ = 2,0 %</span>, oui.</p>
+      </div>
+      <div class="lecture-text">
+        <div class="lecture-exercise-label">✏️ Exercice d'application 1 — Degré de dissociation d'un vinaigre dilué</div>
+        <p class="lecture-text">Une solution <span class="math">S</span> d'acide éthanoïque de concentration <span class="math">C = 0,020 mol·L⁻¹</span> a un pH égal à <span class="math">3,2</span>. 1) Calculer <span class="math">[H₃O⁺]</span>. 2) En déduire le degré de dissociation <span class="math">α</span>. 3) La réaction avec l'eau est-elle limitée ?</p>
+        <details><summary>Voir la solution</summary>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Concentration en ions oxonium.</strong> <span class="math">[H₃O⁺] = 10^(−3,2) = 10^(−4) × 10^(0,8) = 6,3×10⁻⁴ mol·L⁻¹</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Degré de dissociation.</strong> <span class="math">α = [H₃O⁺] / C = 6,3×10⁻⁴ / 0,020 = 3,15×10⁻²</span>, soit <span class="math">α ≈ 3,2 %</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Nature de la réaction.</strong> <span class="math">α ≈ 3,2 %</span>, très loin de 100 % : la réaction avec l'eau est très limitée, l'acide éthanoïque se comporte comme un acide faible.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Vérifier par le pH.</strong> <span class="math">[H₃O⁺] = C × α = 0,020 × 0,0315 = 6,3×10⁻⁴ mol·L⁻¹</span> → <span class="math">pH = −log(6,3×10⁻⁴) = 4 − log 6,3 = 4 − 0,80 = 3,2</span> ✔.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">5</div><div class="lecture-step-content"><p><strong>Conclure plus loin.</strong> À <span class="math">0,050 mol·L⁻¹</span> on trouvait <span class="math">α = 2,0 %</span>, à <span class="math">0,020 mol·L⁻¹</span> on trouve <span class="math">3,2 %</span> : plus la solution est diluée, plus l'acide se dissocie — la dilution « pousse » l'équilibre vers la dissociation.</p></div></div>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s5 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s5">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">05</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 5</span>
+        <h2 class="lecture-section-title">Synthèse : fort ou faible ?</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Réunissons tout dans un tableau de comparaison : c'est LE tableau à savoir refaire de mémoire le jour du Bac.</p>
+      <table class="lecture-table">
+        <thead><tr><th>Critère</th><th>Acide fort (HCl)</th><th>Acide faible (CH₃—COOH)</th></tr></thead>
+        <tbody>
+          <tr><td>Équation avec l'eau</td><td><span class="math">AH + H₂O → A⁻ + H₃O⁺</span> (totale)</td><td><span class="math">AH + H₂O ⇌ A⁻ + H₃O⁺</span> (limitée)</td></tr>
+          <tr><td>Taux d'avancement final τ</td><td>100 %</td><td>&lt; 100 % (ex. 1,3 % à 0,10 mol·L⁻¹)</td></tr>
+          <tr><td>Concentration [H₃O⁺]</td><td>= C</td><td>&lt; C</td></tr>
+          <tr><td>pH (C = 0,10 mol·L⁻¹)</td><td>1,0</td><td>≈ 2,9</td></tr>
+          <tr><td>Exemples</td><td>HCl, HNO₃, H₂SO₄ (1ʳᵉ acidité)</td><td>CH₃—COOH, HCOOH, H₂CO₃</td></tr>
+          <tr><td>Constante caractéristique</td><td>aucune (réaction totale)</td><td>Ka et pKa (partie 02)</td></tr>
+        </tbody>
+      </table>
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 560 260" role="img" aria-label="Comparaison des ions libérés à concentration égale">
+          <text x="280" y="26" text-anchor="middle" font-size="13.5" font-weight="700" fill="rgba(224,184,74,0.95)">Ions H₃O⁺ libérés à concentration égale (C = 0,10 mol·L⁻¹)</text>
+          <line x1="70" y1="40" x2="70" y2="196" style="stroke:var(--border-soft)"/>
+          <line x1="70" y1="196" x2="520" y2="196" style="stroke:var(--border-soft)"/>
+          <rect x="150" y="52" width="100" height="144" rx="6" fill="rgba(96,165,250,0.60)"/>
+          <text x="200" y="44" text-anchor="middle" font-size="12" font-weight="700" fill="rgba(96,165,250,0.95)">τ = 100 %</text>
+          <text x="200" y="216" text-anchor="middle" font-size="11.5" style="fill:var(--text-dim)">HCl (acide fort)</text>
+          <text x="200" y="233" text-anchor="middle" font-size="10.5" style="fill:var(--text-dim)">[H₃O⁺] = 0,10 mol·L⁻¹</text>
+          <rect x="340" y="193" width="100" height="3" rx="1.5" fill="rgba(224,184,74,0.85)"/>
+          <line x1="390" y1="120" x2="390" y2="188" style="stroke:var(--border-soft)" stroke-dasharray="4 4"/>
+          <text x="390" y="112" text-anchor="middle" font-size="12" font-weight="700" fill="rgba(224,184,74,0.95)">τ ≈ 1,3 %</text>
+          <text x="390" y="216" text-anchor="middle" font-size="11.5" style="fill:var(--text-dim)">CH₃—COOH (acide faible)</text>
+          <text x="390" y="233" text-anchor="middle" font-size="10.5" style="fill:var(--text-dim)">[H₃O⁺] = 1,3×10⁻³ mol·L⁻¹</text>
+          <text x="280" y="253" text-anchor="middle" font-size="12" font-style="italic" style="fill:var(--text-dim)">≈ 80 fois moins d'ions H₃O⁺ pour le vinaigre.</text>
+        </svg>
+        <figcaption class="lecture-figure-caption">À concentration égale, l'acide fort libère tous ses protons, l'acide faible une fraction infime : le pH fait la différence.</figcaption>
+      </figure>
+      <div class="lecture-text">
+        <div class="lecture-exercise-label">✏️ Exercice d'application 2 — Deux solutions, deux pH</div>
+        <p class="lecture-text">À 25 °C, une solution d'acide chlorhydrique et une solution d'acide éthanoïque ont la même concentration <span class="math">C = 0,010 mol·L⁻¹</span>. On mesure <span class="math">pH₁ = 2,0</span> pour la première et <span class="math">pH₂ = 3,4</span> pour la seconde. Identifier l'acide fort et l'acide faible, puis calculer <span class="math">α</span> pour l'acide éthanoïque.</p>
+        <details><summary>Voir la solution</summary>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Analyser la solution 1.</strong> <span class="math">[H₃O⁺] = 10^(−2,0) = 1,0×10⁻² mol·L⁻¹ = C</span> : tout l'acide a réagi, <span class="math">τ = 100 %</span> → acide fort (HCl).</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Analyser la solution 2.</strong> <span class="math">[H₃O⁺] = 10^(−3,4) = 10^(−4) × 10^(0,6) = 4,0×10⁻⁴ mol·L⁻¹</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Comparer.</strong> <span class="math">[H₃O⁺] = 4,0×10⁻⁴ mol·L⁻¹</span> est bien inférieure à <span class="math">C = 0,010 mol·L⁻¹</span> : une partie des molécules n'a pas réagi → acide éthanoïque faible.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Calculer α.</strong> <span class="math">α = [H₃O⁺] / C = 4,0×10⁻⁴ / 0,010 = 4,0×10⁻²</span>, soit <span class="math">α = 4,0 %</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">5</div><div class="lecture-step-content"><p><strong>Vérifier.</strong> <span class="math">C × α = 0,010 × 0,040 = 4,0×10⁻⁴ mol·L⁻¹</span> → <span class="math">pH = −log(4,0×10⁻⁴) = 4 − log 4,0 = 4 − 0,60 = 3,4</span> ✔. Une même concentration, deux pH : la faiblesse se lit sur le pH.</p></div></div>
+          </div>
+        </details>
+      </div>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-title">🔑 Règle de reconnaissance</div>
+        <p>À concentration égale, <strong>l'acide fort a toujours le pH le plus petit</strong>. Si le pH mesuré est supérieur à <span class="math">−log C</span>, l'acide est nécessairement faible : c'est le test de réflexe des questions de cours.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ===== QCM ===== -->
+  <div class="lecture-quiz">
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Une solution d'acide éthanoïque à 0,10 mol·L⁻¹ a un pH de 2,9. Son taux d'avancement final vaut environ :</p>
+      <div class="lecture-quiz-options"><span>A) 100 %</span><span>B) 13 %</span><span>C) 1,3 %</span><span>D) 2,9 %</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><p><strong>Réponse C.</strong> [H₃O⁺] = 10^(−2,9) ≈ 1,3×10⁻³ mol·L⁻¹, donc τ = [H₃O⁺]/C = 1,3×10⁻³/0,10 = 1,3×10⁻² = 1,3 %.</p><p>Cette valeur très inférieure à 100 % confirme que l'acide éthanoïque est faible.</p></div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Quelle équation décrit correctement la réaction de l'ammoniac avec l'eau ?</p>
+      <div class="lecture-quiz-options"><span>A) NH₃ + H₂O → NH₄⁺ + OH⁻</span><span>B) NH₃ + H₂O ⇌ NH₄⁺ + OH⁻</span><span>C) NH₃ + H₃O⁺ ⇌ NH₄⁺ + OH⁻</span><span>D) NH₄⁺ + OH⁻ ⇌ NH₃ + H₂O</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><p><strong>Réponse B.</strong> L'ammoniac est une base faible : la réaction est limitée et s'écrit avec la double flèche ⇌.</p><p>A est fausse (flèche simple = réaction totale) ; C ne conserve pas les charges (+1 à gauche, 0 à droite) ; D décrit la réaction inverse, pas celle de NH₃ avec l'eau.</p></div></details>
+    </div>
+  </div>
+  <!-- ===== RÉCAP ===== -->
+  <div class="lecture-recap">
+    <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
+    <ul class="lecture-recap-list">
+      <li><strong>Acide faible</strong> — sa réaction avec l'eau est limitée : AH + H₂O ⇌ A⁻ + H₃O⁺, la double flèche ⇌ est obligatoire et la majorité des molécules AH reste intacte.</li>
+      <li><strong>Base faible</strong> — elle ne capte qu'une fraction des protons de l'eau : B + H₂O ⇌ BH⁺ + OH⁻ ; l'ammoniac NH₃ en est l'exemple type (pH = 11,1 à 0,10 mol·L⁻¹, contre 12,0 pour la soude).</li>
+      <li><strong>Taux d'avancement</strong> — τ = x_f/x_max = [H₃O⁺]/C pour un acide faible seul dans l'eau, avec α = τ : un τ très inférieur à 100 % signe la faiblesse, et la dilution augmente α.</li>
+    </ul>
+  </div>
+  <!-- ===== FIN ===== -->
+  <div class="lecture-end">
+    <div class="lecture-end-icon">🎯</div>
+    <div class="lecture-end-text">Partie 01 terminée !</div>
+    <div class="lecture-end-sub">Tu sais désormais reconnaître et mesurer une réaction limitée. La partie 02 va donner un numéro d'identité à chaque acide faible : la constante d'acidité Ka et son compagnon pKa — le classement officiel des forces.</div>
+    <div class="lecture-end-divider"></div>
+  </div>
+</div>

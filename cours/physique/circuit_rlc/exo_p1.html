@@ -1,0 +1,237 @@
+<!-- EXERCICES PARTIE 01 — Circuit RLC : décharge amortie — 6 exercices d'entraînement -->
+<div class="lecture-container">
+
+  <!-- ===== HERO ===== -->
+  <header class="lecture-hero">
+    <div class="lecture-hero-badge">
+      <span class="lecture-hero-icon">📘</span>
+      <span class="lecture-hero-label">Terminale C&D · Physique · Circuit RLC · Exercices 01</span>
+    </div>
+    <h1 class="lecture-hero-title">
+      6 <em>exercices progressifs</em>
+    </h1>
+    <p class="lecture-hero-intro">
+      Dans la réalité, une bobine a toujours une résistance : le condensateur se décharge alors dans un dipôle RLC, et les oscillations s'amortissent peu à peu. Cette série t'apprend à reconnaître le régime d'oscillation, à lire une pseudo-période et une enveloppe exponentielle sur un oscillogramme, et à dresser le bilan d'énergie avec la dissipation par effet Joule. Les corrigés pas à pas sont dans <span class="math">corr_p1.html</span> : cherche d'abord, vérifie ensuite.
+    </p>
+    <div class="lecture-hero-meta">
+      <span class="lecture-hero-meta-item">⏱ 45 min</span>
+      <span class="lecture-hero-meta-item">✏️ 6 exercices</span>
+      <span class="lecture-hero-meta-item">📊 ★ → ★★★</span>
+      <span class="lecture-hero-meta-item">🎓 Terminale C&D</span>
+    </div>
+  </header>
+
+  <!-- ===== MODE D'EMPLOI ===== -->
+  <div class="lecture-callout lecture-callout-key">
+    <strong>Mode d'emploi :</strong> cherche chaque exercice AVANT d'ouvrir <span class="math">corr_p1.html</span>. Difficulté : ★ lecture directe · ★★ exploitation de l'oscillogramme · ★★★ comparaison et bilan. Tous les résultats doivent porter leur unité.
+  </div>
+
+  <!-- ===== SOMMAIRE ===== -->
+  <nav class="lecture-toc">
+    <div class="lecture-toc-header">
+      <span>Dans cette partie</span>
+      <span class="lecture-toc-count">6 exercices · 2 thèmes</span>
+    </div>
+    <ol class="lecture-toc-list">
+      <li><a href="#t01"><span class="toc-num">01</span><span>Décharge amortie d'un circuit RLC — exercices 1 à 3</span></a></li>
+      <li><a href="#t02"><span class="toc-num">02</span><span>Énergie et régimes d'oscillation — exercices 4 à 6</span></a></li>
+    </ol>
+  </nav>
+
+  <!-- ============================================================ -->
+  <!-- SECTION t01                                                  -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="t01">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">01</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Thème 01 · Applications de cours</span>
+        <h2 class="lecture-section-title">Décharge amortie d'un circuit RLC</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Dispositif commun : un condensateur de capacité <span class="math">C = 10 μF</span>, chargé sous la tension <span class="math">U₀ = 6,0 V</span>, se décharge à la date <span class="math">t = 0</span> (fermeture de K) dans le dipôle série formé par un résistor de résistance <span class="math">R = 10 Ω</span> et une bobine d'inductance <span class="math">L = 0,10 H</span>. La grandeur <span class="math">u</span> désigne la tension aux bornes du condensateur.
+      </p>
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 420 200" role="img" aria-label="Circuit RLC série de décharge">
+          <path d="M60,150 V110 M60,90 V50 H92 M122,50 H180 M234,50 H360 V72 M360,72 a11,11 0 0 1 0,22 a11,11 0 0 1 0,22 a11,11 0 0 1 0,22 M360,138 V150 H60" style="stroke:var(--accent-bright)" stroke-width="2" fill="none"/>
+          <rect x="180" y="42" width="54" height="16" style="fill:rgba(96,165,250,0.15);stroke:var(--accent-bright)" stroke-width="2"/>
+          <path d="M46,90 H74 M46,110 H74" style="stroke:var(--accent-bright)" stroke-width="3"/>
+          <path d="M92,50 L120,32 M206,150 H252 M244,144 L256,150 L244,156" style="stroke:var(--accent-bright)" stroke-width="2" fill="none"/>
+          <path d="M28,90 V110 M28,90 l-4,9 M28,90 l4,9 M28,110 l-4,-9 M28,110 l4,-9" style="stroke:var(--accent-bright)" stroke-width="1.5" fill="none"/>
+          <circle cx="92" cy="50" r="2.5" style="fill:var(--accent-bright)"/>
+          <circle cx="120" cy="50" r="2.5" style="fill:var(--accent-bright)"/>
+          <g style="fill:currentColor" font-size="15" font-style="italic">
+            <text x="82" y="106">C</text>
+            <text x="380" y="108">L</text>
+            <text x="198" y="34">R</text>
+            <text x="124" y="30">K</text>
+            <text x="218" y="138">i</text>
+            <text x="12" y="104">u</text>
+          </g>
+        </svg>
+        <figcaption class="lecture-figure-caption">Figure 1 — Circuit RLC série : à t = 0 (K fermé), le condensateur chargé sous U₀ se décharge dans R et L.</figcaption>
+      </figure>
+
+      <div class="lecture-text">
+        <div class="lecture-exercise-label">✏️ Exercice 1 — De LC à RLC : la résistance change tout (★)</div>
+        <ol class="lecture-list">
+          <li>1) Rappeler et calculer la période propre <span class="math">T₀ = 2π·√(L·C)</span> du circuit LC correspondant (lorsque R = 0).</li>
+          <li>2) On appelle résistance critique <span class="math">R_c = 2·√(L/C)</span> : calculer <span class="math">R_c</span> en ohm.</li>
+          <li>3) Comparer <span class="math">R = 10 Ω</span> et <span class="math">R_c</span> : le circuit est-il en régime pseudo-périodique, critique ou apériodique ?</li>
+          <li>4) Quand <span class="math">R</span> est très inférieur à <span class="math">R_c</span>, on admet que la pseudo-période vaut <span class="math">T ≈ T₀</span> : cette condition est-elle vérifiée ici ? Donner l'ordre de grandeur de <span class="math">T</span>.</li>
+        </ol>
+      </div>
+
+      <div class="lecture-text">
+        <div class="lecture-exercise-label">✏️ Exercice 2 — Lire une pseudo-période sur l'oscillogramme (★)</div>
+        <p class="lecture-text">On visualise la tension <span class="math">u</span> pendant la décharge (circuit de la figure 1). Sensibilités : <span class="math">2,0 V/div</span> verticalement ; <span class="math">1,0 ms/div</span> horizontalement.</p>
+        <figure class="lecture-figure">
+          <svg viewBox="0 0 640 400" role="img" aria-label="Oscillogramme de la décharge amortie R égale 10 ohm">
+            <path d="M90,40 V360 M110,40 V360 M130,40 V360 M150,40 V360 M170,40 V360 M190,40 V360 M210,40 V360 M230,40 V360 M250,40 V360 M270,40 V360 M290,40 V360 M310,40 V360 M330,40 V360 M350,40 V360 M370,40 V360 M390,40 V360 M410,40 V360 M430,40 V360 M450,40 V360 M470,40 V360 M490,40 V360 M510,40 V360 M530,40 V360 M550,40 V360" style="stroke:rgba(96,165,250,0.15)" stroke-width="1.5"/>
+            <path d="M70,40 H574 M70,80 H574 M70,120 H574 M70,160 H574 M70,240 H574 M70,280 H574 M70,320 H574 M70,360 H574" style="stroke:rgba(96,165,250,0.15)" stroke-width="1.5"/>
+            <path d="M70,360 V40 M70,200 H574" style="stroke:var(--accent-bright)" stroke-width="2" fill="none"/>
+            <path d="M66,48 L70,40 L74,48 M566,196 L574,200 L566,204" style="stroke:var(--accent-bright)" stroke-width="2" fill="none"/>
+            <polyline points="70,80 110,91.4 150,101.8 190,111.1 230,119.6 270,127.2 310,134.1 350,140.4 390,146.1 430,151.2 470,155.9 510,160.1 550,163.9 574,165.9" style="stroke:var(--accent-bright)" stroke-width="1.5" fill="none" stroke-dasharray="6 4"/>
+            <polyline points="70,320 110,308.6 150,298.2 190,288.9 230,280.4 270,272.8 310,265.9 350,259.6 390,253.9 430,248.8 470,244.1 510,239.9 550,236.1 574,234.1" style="stroke:var(--accent-bright)" stroke-width="1.5" fill="none" stroke-dasharray="6 4"/>
+            <polyline points="70,80 77.9,91.3 85.8,118.4 93.6,156.7 101.5,200 109.4,241.6 117.3,275.4 125.1,296.6 133,302.5 140.9,292.9 148.8,269.7 156.6,237 164.5,200 172.4,164.5 180.3,135.6 188.1,117.5 196,112.4 203.9,120.7 211.8,140.5 219.6,168.4 227.5,200 235.4,230.4 243.3,255 251.1,270.5 259,274.8 266.9,267.8 274.8,250.9 282.6,227 290.5,200 298.4,174.1 306.3,153 314.1,139.8 322,136.1 329.9,142.1 337.8,156.5 345.6,176.9 353.5,200 361.4,222.2 369.3,240.2 377.1,251.4 385,254.6 392.9,249.5 400.8,237.1 408.6,219.7 416.5,200 424.4,181.1 432.3,165.7 440.1,156.1 448,153.4 455.9,157.7 463.8,168.3 471.6,183.2 479.5,200 487.4,216.2 495.3,229.3 503.1,237.5 511,239.8 518.9,236.1 526.8,227.1 534.6,214.4 542.5,200 550.4,186.2 558.3,175 566.1,167.9 574,166" style="stroke:var(--accent-bright)" stroke-width="2.5" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+            <path d="M70,80 H196 M196,80 V200" style="stroke:var(--accent-bright)" stroke-width="1.2" stroke-dasharray="5 4" fill="none"/>
+            <path d="M74,56 H192 M78,50 L70,56 L78,62 M188,50 L196,56 L188,62" style="stroke:var(--accent-bright)" stroke-width="1.2" fill="none"/>
+            <g style="fill:currentColor" font-size="14">
+              <text x="20" y="52" font-style="italic">u (V)</text>
+              <text x="596" y="382" text-anchor="end" font-style="italic">t (ms)</text>
+              <text x="133" y="46" text-anchor="middle" font-style="italic">T</text>
+              <text x="62" y="45" text-anchor="end">8</text>
+              <text x="62" y="85" text-anchor="end">6</text>
+              <text x="62" y="125" text-anchor="end">4</text>
+              <text x="62" y="165" text-anchor="end">2</text>
+              <text x="62" y="205" text-anchor="end">0</text>
+              <text x="62" y="245" text-anchor="end">−2</text>
+              <text x="62" y="285" text-anchor="end">−4</text>
+              <text x="62" y="325" text-anchor="end">−6</text>
+              <text x="62" y="365" text-anchor="end">−8</text>
+              <text x="70" y="382" text-anchor="middle">0</text>
+              <text x="170" y="382" text-anchor="middle">5</text>
+              <text x="270" y="382" text-anchor="middle">10</text>
+              <text x="370" y="382" text-anchor="middle">15</text>
+              <text x="470" y="382" text-anchor="middle">20</text>
+              <text x="570" y="382" text-anchor="middle">25</text>
+            </g>
+          </svg>
+          <figcaption class="lecture-figure-caption">Figure 2 — Décharge (R = 10 Ω) : 2,0 V/div ; 1,0 ms/div. Les pointillés représentent l'enveloppe des sommets.</figcaption>
+        </figure>
+        <ol class="lecture-list">
+          <li>1) Décrire l'allure de la courbe : comment y reconnaît-on un amortissement ?</li>
+          <li>2) Lire <span class="math">U₀</span> (premier sommet, à <span class="math">t = 0</span>).</li>
+          <li>3) Mesurer la pseudo-période <span class="math">T</span> (distance entre deux sommets consécutifs de même signe) et la comparer à <span class="math">T₀</span>.</li>
+          <li>4) En déduire la pseudo-fréquence <span class="math">f = 1/T</span>.</li>
+        </ol>
+      </div>
+
+      <div class="lecture-text">
+        <div class="lecture-exercise-label">✏️ Exercice 3 — L'enveloppe exponentielle (★★)</div>
+        <p class="lecture-text">Les sommets de <span class="math">u(t)</span> restent touchés par une courbe enveloppe d'équation <span class="math">u_max(t) = U₀·exp(−t/τ)</span>, avec <span class="math">τ = 2L/R</span> pour un circuit RLC série.</p>
+        <ol class="lecture-list">
+          <li>1) Calculer <span class="math">τ</span> pour <span class="math">L = 0,10 H</span> et <span class="math">R = 10 Ω</span>, en s puis en ms.</li>
+          <li>2) Calculer <span class="math">u_max</span> à la date <span class="math">t = τ</span>, puis à <span class="math">t = 2τ</span> (données : <span class="math">exp(−1) ≈ 0,37</span> ; <span class="math">exp(−2) ≈ 0,135</span>).</li>
+          <li>3) Combien de pseudo-périodes s'écoulent pendant la durée <span class="math">2τ</span> ?</li>
+          <li>4) À partir de quelle durée l'amplitude devient-elle inférieure à 1,0 % de <span class="math">U₀</span> (donnée : <span class="math">ln(100) ≈ 4,6</span>) ? Exprimer cette durée en pseudo-périodes.</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION t02                                                  -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="t02">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">02</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Thème 01 · Applications de cours</span>
+        <h2 class="lecture-section-title">Énergie et régimes d'oscillation</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+
+      <div class="lecture-text">
+        <div class="lecture-exercise-label">✏️ Exercice 4 — Bilan d'énergie : où passe l'énergie perdue ? (★★)</div>
+        <p class="lecture-text">Circuit de la figure 1 : <span class="math">L = 0,10 H</span> ; <span class="math">C = 10 μF</span> ; <span class="math">R = 10 Ω</span> ; <span class="math">U₀ = 6,0 V</span>. Sur l'oscillogramme de la figure 2, le deuxième sommet positif vaut <span class="math">u₁ ≈ 4,4 V</span>.</p>
+        <ol class="lecture-list">
+          <li>1) Calculer l'énergie initiale <span class="math">E₀ = ½·C·U₀²</span>.</li>
+          <li>2) Calculer l'énergie restante <span class="math">E₁ = ½·C·u₁²</span> au deuxième sommet.</li>
+          <li>3) En déduire l'énergie dissipée pendant la première pseudo-période, en J puis en pourcentage de <span class="math">E₀</span>.</li>
+          <li>4) Sous quelle forme cette énergie s'est-elle dissipée ? Que vaut l'énergie totale du circuit lorsque la décharge est terminée ?</li>
+        </ol>
+      </div>
+
+      <div class="lecture-text">
+        <div class="lecture-exercise-label">✏️ Exercice 5 — Les trois régimes d'oscillation (★★)</div>
+        <p class="lecture-text">Un même circuit (<span class="math">L = 0,10 H</span> ; <span class="math">C = 10 μF</span>) est déchargé pour trois valeurs de la résistance : <span class="math">R₁ = 10 Ω</span> ; <span class="math">R₂ = 200 Ω</span> ; <span class="math">R₃ = 500 Ω</span>. On rappelle <span class="math">R_c = 2·√(L/C)</span>.</p>
+        <ol class="lecture-list">
+          <li>1) Calculer <span class="math">R_c</span>, puis classer les trois circuits par régime : pseudo-périodique, critique ou apériodique.</li>
+          <li>2) Décrire en une phrase l'allure de <span class="math">u(t)</span> pour chacun des trois régimes.</li>
+          <li>3) Que devient le régime si <span class="math">R</span> tend vers 0 ? Quelle expression retrouve-t-on alors pour la période ?</li>
+          <li>4) Citer un dispositif dans lequel on recherche volontairement le régime critique. Pourquoi ?</li>
+        </ol>
+      </div>
+
+      <div class="lecture-text">
+        <div class="lecture-exercise-label">✏️ Exercice 6 — Comparer deux décharges (★★★)</div>
+        <p class="lecture-text">On refait l'expérience de l'exercice 1 avec la même bobine et le même condensateur, mais <span class="math">R = 30 Ω</span>. Nouvel oscillogramme, mêmes sensibilités <span class="math">2,0 V/div</span> et <span class="math">1,0 ms/div</span>.</p>
+        <figure class="lecture-figure">
+          <svg viewBox="0 0 640 400" role="img" aria-label="Oscillogramme de la décharge amortie R égale 30 ohm">
+            <path d="M90,40 V360 M110,40 V360 M130,40 V360 M150,40 V360 M170,40 V360 M190,40 V360 M210,40 V360 M230,40 V360 M250,40 V360 M270,40 V360 M290,40 V360 M310,40 V360 M330,40 V360 M350,40 V360 M370,40 V360 M390,40 V360 M410,40 V360 M430,40 V360 M450,40 V360 M470,40 V360 M490,40 V360 M510,40 V360 M530,40 V360 M550,40 V360" style="stroke:rgba(96,165,250,0.15)" stroke-width="1.5"/>
+            <path d="M70,40 H574 M70,80 H574 M70,120 H574 M70,160 H574 M70,240 H574 M70,280 H574 M70,320 H574 M70,360 H574" style="stroke:rgba(96,165,250,0.15)" stroke-width="1.5"/>
+            <path d="M70,360 V40 M70,200 H574" style="stroke:var(--accent-bright)" stroke-width="2" fill="none"/>
+            <path d="M66,48 L70,40 L74,48 M566,196 L574,200 L566,204" style="stroke:var(--accent-bright)" stroke-width="2" fill="none"/>
+            <polyline points="70,120 110,140.7 150,156.1 190,167.5 230,175.9 270,182.1 310,186.8 350,190.2 390,192.7 430,194.6 470,196 510,197.1 550,197.8 574,198.2" style="stroke:var(--accent-bright)" stroke-width="1.5" fill="none" stroke-dasharray="6 4"/>
+            <polyline points="70,280 110,259.3 150,243.9 190,232.5 230,224.1 270,217.9 310,213.2 350,209.8 390,207.3 430,205.4 470,204 510,202.9 550,202.2 574,201.8" style="stroke:var(--accent-bright)" stroke-width="1.5" fill="none" stroke-dasharray="6 4"/>
+            <polyline points="70,120 77.9,130.3 85.8,149.7 93.6,174.4 101.5,200 109.4,222.8 117.3,239.7 125.1,248.9 133,249.9 140.9,243.4 148.8,231.3 156.6,216 164.5,200 172.4,185.8 180.3,175.3 188.1,169.5 196,168.9 203.9,172.9 211.8,180.5 219.6,190 227.5,200 235.4,208.9 243.3,215.4 251.1,219 259,219.4 266.9,216.9 274.8,212.2 282.6,206.2 290.5,200 298.4,194.5 306.3,190.4 314.1,188.2 322,187.9 329.9,189.5 337.8,192.4 345.6,196.1 353.5,200 361.4,203.4 369.3,206 377.1,207.3 385,207.5 392.9,206.5 400.8,204.7 408.6,202.4 416.5,200 424.4,197.9 432.3,196.3 440.1,195.4 448,195.3 455.9,196 463.8,197.1 471.6,198.5 479.5,200 487.4,201.3 495.3,202.3 503.1,202.8 511,202.9 518.9,202.2 526.8,201.6 534.6,200.8 542.5,200 550.4,199.2 558.3,198.5 566.1,198.2 574,198.2" style="stroke:var(--accent-bright)" stroke-width="2.5" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+            <path d="M70,120 H196 M196,120 V200" style="stroke:var(--accent-bright)" stroke-width="1.2" stroke-dasharray="5 4" fill="none"/>
+            <path d="M74,96 H192 M78,90 L70,96 L78,102 M188,90 L196,96 L188,102" style="stroke:var(--accent-bright)" stroke-width="1.2" fill="none"/>
+            <g style="fill:currentColor" font-size="14">
+              <text x="20" y="52" font-style="italic">u (V)</text>
+              <text x="596" y="382" text-anchor="end" font-style="italic">t (ms)</text>
+              <text x="133" y="86" text-anchor="middle" font-style="italic">T</text>
+              <text x="62" y="45" text-anchor="end">8</text>
+              <text x="62" y="85" text-anchor="end">6</text>
+              <text x="62" y="125" text-anchor="end">4</text>
+              <text x="62" y="165" text-anchor="end">2</text>
+              <text x="62" y="205" text-anchor="end">0</text>
+              <text x="62" y="245" text-anchor="end">−2</text>
+              <text x="62" y="285" text-anchor="end">−4</text>
+              <text x="62" y="325" text-anchor="end">−6</text>
+              <text x="62" y="365" text-anchor="end">−8</text>
+              <text x="70" y="382" text-anchor="middle">0</text>
+              <text x="170" y="382" text-anchor="middle">5</text>
+              <text x="270" y="382" text-anchor="middle">10</text>
+              <text x="370" y="382" text-anchor="middle">15</text>
+              <text x="470" y="382" text-anchor="middle">20</text>
+              <text x="570" y="382" text-anchor="middle">25</text>
+            </g>
+          </svg>
+          <figcaption class="lecture-figure-caption">Figure 3 — Décharge (R = 30 Ω) : 2,0 V/div ; 1,0 ms/div ; pointillés = enveloppe.</figcaption>
+        </figure>
+        <ol class="lecture-list">
+          <li>1) Vérifier que le régime reste pseudo-périodique (comparer <span class="math">R</span> à <span class="math">R_c = 200 Ω</span>).</li>
+          <li>2) Lire <span class="math">T</span> et le comparer à celui de l'exercice 2 : la pseudo-période dépend-elle de <span class="math">R</span> ?</li>
+          <li>3) Lire <span class="math">U₀</span> et <span class="math">u₁</span> (deuxième sommet), puis calculer le rapport <span class="math">u₁/U₀</span>.</li>
+          <li>4) Calculer le rapport <span class="math">R·T/(2L)</span> (avec <span class="math">T ≈ 6,3 ms</span>) et vérifier que <span class="math">u₁/U₀ = exp(−R·T/(2L))</span> (donnée : <span class="math">exp(−0,95) ≈ 0,39</span>).</li>
+          <li>5) Calculer l'énergie dissipée pendant la première pseudo-période et la comparer, en pourcentage, à celle de l'exercice 4. Conclure sur le rôle de <span class="math">R</span>.</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FIN ===== -->
+  <div class="lecture-end">
+    <div class="lecture-end-icon">🎯</div>
+    <div class="lecture-end-text">Exercices 01 terminés !</div>
+    <div class="lecture-end-sub">Régime identifié, pseudo-période lue, énergie dissipée : l'amortissement n'a plus de secret. Passe aux exercices 02 (synthèse type Bac) pour la résonance et le poste de radio.</div>
+    <div class="lecture-end-divider"></div>
+  </div>
+</div>

@@ -1,0 +1,643 @@
+<!-- ============================================================ -->
+<!-- PARTIE 1 : MOUVEMENT RECTILIGNE UNIFORME — MRU                -->
+<!-- (NOTION : mru)                                                -->
+<!-- Notion 1 : mru — MRU : droite + vitesse constante, équation    -->
+<!--            horaire x(t) = x₀ + v·t, graphes, rencontre        -->
+<!-- ============================================================ -->
+
+<div class="lecture-container">
+
+  <!-- Présentation : toutes les classes utilisées ici sont stylées par lecture.html
+       (seule source de vérité) — aucun style inline, conforme à la charte du projet. -->
+
+  <!-- ===== HERO ===== -->
+  <header class="lecture-hero">
+    <div class="lecture-hero-badge">
+      <span class="lecture-hero-icon">📘</span>
+      <span class="lecture-hero-label">Partie 01 · Le mouvement le plus simple</span>
+    </div>
+    <h1 class="lecture-hero-title">
+      Mouvement rectiligne <em>uniforme</em> (MRU)
+    </h1>
+    <p class="lecture-hero-intro">
+      Après le langage des vecteurs du chapitre Cinématique, voici le cas « calme » de la mécanique : un mobile qui avance <strong>en ligne droite</strong> à <strong>allure constante</strong> — comme le train de nuit Niamey-Maradi sur sa voie rectiligne. Cette partie construit <strong>1 notion</strong> (le <strong>mouvement rectiligne uniforme</strong>) autour d'un outil central : l'<strong>équation horaire</strong> <span class="math">x(t) = x₀ + v·t</span>. Tu apprendras à l'écrire, à la lire sur un graphe, à en tirer une position, une date de passage — et même à prévoir une <strong>rencontre</strong> entre deux mobiles.
+    </p>
+    <div class="lecture-hero-meta">
+      <span class="lecture-hero-meta-item">⏱ 20 min</span>
+      <span class="lecture-hero-meta-item">⚡ 1 notion</span>
+      <span class="lecture-hero-meta-item">📚 8 sections</span>
+      <span class="lecture-hero-meta-item">🎓 Terminale C&amp;D</span>
+    </div>
+  </header>
+
+  <!-- ===== SOMMAIRE ===== -->
+  <nav class="lecture-toc">
+    <div class="lecture-toc-header">
+      <span>Dans cette partie</span>
+      <span class="lecture-toc-count">1 notion · 8 sections</span>
+    </div>
+    <ol class="lecture-toc-list">
+      <li><a href="#s0"><span class="toc-num">00</span><span>Motivation — Le train de nuit Niamey-Maradi</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>Notion 1 · mru — MRU : une droite ET une vitesse constante</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>Notion 1 · mru — L'équation horaire et son graphe</span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>Notion 1 · mru — Lire un énoncé : les trois cas</span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>Notion 1 · mru — Exemple complet : le moto-taxi</span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>Notion 1 · mru — Deux mobiles : rattraper un piéton</span></a></li>
+      <li><a href="#s6"><span class="toc-num">06</span><span>Fiche méthode — Résoudre un MRU en 5 étapes</span></a></li>
+      <li><a href="#s7"><span class="toc-num">07</span><span>Exercices d'application</span></a></li>
+    </ol>
+  </nav>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 0 : MOTIVATION -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s0">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">00</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Motivation</span>
+        <h2 class="lecture-section-title">Le train de nuit Niamey-Maradi</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Il est 21 h, la gare de Niamey s'anime : le train de nuit s'élance vers Maradi. Après quelques kilomètres, la locomotive atteint son régime de croisière — et là, tout devient <strong>régulier</strong>. La voie est droite, le moteur pousse de façon constante, et chaque minute qui passe ajoute exactement le même nombre de mètres au compteur. À bord, tu ne sens plus aucun à-coups : c'est le cas « calme » de la mécanique, celui où tout se prévoit avec une simple multiplication.
+      </p>
+
+      <!-- SVG : train sur voie droite, vitesse constante, axe (Ox) -->
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 540 280" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Train sur une voie droite a trois dates egales, fleche v constante et axe Ox">
+          <text x="270" y="24" style="fill:var(--accent-bright)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle" letter-spacing="2">LE TRAIN DE NUIT, UN MOUVEMENT RÉGULIER</text>
+
+          <g style="fill:var(--success-light)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle"><text x="300" y="52">→v : même flèche à chaque instant</text></g>
+          <line x1="48" y1="98" x2="112" y2="98" style="stroke:var(--success-light)" stroke-width="2.5" marker-end="url(#arrowGreenMR1a)"/>
+          <line x1="198" y1="98" x2="262" y2="98" style="stroke:var(--success-light)" stroke-width="2.5" marker-end="url(#arrowGreenMR1a)"/>
+          <line x1="348" y1="98" x2="412" y2="98" style="stroke:var(--success-light)" stroke-width="2.5" marker-end="url(#arrowGreenMR1a)"/>
+
+          <g><rect x="40" y="120" width="72" height="24" rx="5" fill="rgba(96,165,250,0.15)" style="stroke:var(--info)" stroke-width="1.5"/><circle cx="56" cy="148" r="6" fill="none" style="stroke:var(--text-muted)" stroke-width="2"/><circle cx="96" cy="148" r="6" fill="none" style="stroke:var(--text-muted)" stroke-width="2"/></g>
+          <g><rect x="190" y="120" width="72" height="24" rx="5" fill="rgba(96,165,250,0.15)" style="stroke:var(--info)" stroke-width="1.5"/><circle cx="206" cy="148" r="6" fill="none" style="stroke:var(--text-muted)" stroke-width="2"/><circle cx="246" cy="148" r="6" fill="none" style="stroke:var(--text-muted)" stroke-width="2"/></g>
+          <g><rect x="340" y="120" width="72" height="24" rx="5" fill="rgba(96,165,250,0.15)" style="stroke:var(--info)" stroke-width="1.5"/><circle cx="356" cy="148" r="6" fill="none" style="stroke:var(--text-muted)" stroke-width="2"/><circle cx="396" cy="148" r="6" fill="none" style="stroke:var(--text-muted)" stroke-width="2"/></g>
+
+          <line x1="30" y1="158" x2="510" y2="158" style="stroke:var(--text-muted)" stroke-width="2"/>
+          <line x1="30" y1="164" x2="510" y2="164" stroke="rgba(224,184,74,0.4)" stroke-width="1" stroke-dasharray="8 6"/>
+
+          <g style="fill:var(--text-muted)" font-size="12" font-family="Inter, system-ui, sans-serif" text-anchor="middle"><text x="76" y="184">t = 0 s</text><text x="226" y="184">t = 20 s</text><text x="376" y="184">t = 40 s</text></g>
+
+          <line x1="76" y1="170" x2="76" y2="222" stroke="rgba(96,165,250,0.5)" stroke-width="1.2" stroke-dasharray="4 3"/>
+          <line x1="226" y1="170" x2="226" y2="222" stroke="rgba(96,165,250,0.5)" stroke-width="1.2" stroke-dasharray="4 3"/>
+          <line x1="376" y1="170" x2="376" y2="222" stroke="rgba(96,165,250,0.5)" stroke-width="1.2" stroke-dasharray="4 3"/>
+
+          <line x1="30" y1="222" x2="500" y2="222" style="stroke:var(--accent-bright)" stroke-width="2" marker-end="url(#arrowGoldMR1a)"/>
+          <text x="508" y="227" style="fill:var(--accent-bright)" font-size="13" font-family="Inter, system-ui, sans-serif">x</text>
+          <circle cx="76" cy="222" r="3.5" style="fill:var(--accent-bright)"/>
+          <text x="68" y="240" style="fill:var(--text-muted)" font-size="12" font-family="Inter, system-ui, sans-serif">x₀</text>
+          <text x="222" y="240" style="fill:var(--text-muted)" font-size="12" font-family="Inter, system-ui, sans-serif">x₁</text>
+          <text x="372" y="240" style="fill:var(--text-muted)" font-size="12" font-family="Inter, system-ui, sans-serif">x₂</text>
+
+          <text x="270" y="261" style="fill:var(--accent-bright)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">Voie droite, allure figée : les abscisses s'égrènent</text>
+          <text x="270" y="277" style="fill:var(--accent-bright)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">à intervalles égaux — c'est le MRU</text>
+          <defs>
+            <marker id="arrowGoldMR1a" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7" fill="none" style="stroke:var(--accent-bright)" stroke-width="1.3"/></marker>
+            <marker id="arrowGreenMR1a" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7" fill="none" style="stroke:var(--success-light)" stroke-width="1.3"/></marker>
+          </defs>
+        </svg>
+        <figcaption class="lecture-figure-caption">Filé toutes les 20 secondes, le train occupe des positions régulièrement espacées sur l'axe (Ox) : la même flèche →v raconte la vitesse constante. Tout le MRU tient dans cette régularité.</figcaption>
+      </figure>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">La grande idée du jour</div>
+          <p>Quand la trajectoire est une <strong>droite</strong> ET que la vitesse ne change plus, le mouvement porte un nom : <strong>mouvement rectiligne uniforme</strong> (MRU). Une seule équation le décrit entièrement — et elle suffit pour répondre aux trois questions de l'examen : <strong>où est le mobile ?</strong> (une position), <strong>quand passera-t-il ici ?</strong> (une date), <strong>quand rattrapera-t-il ce piéton ?</strong> (une rencontre). Cette partie la construit pas à pas.</p>
+        </div>
+      </div>
+
+      <p class="lecture-text">
+        Garde le train de nuit en tête tout au long de la partie : il sera notre fil rouge. Et retiens l'ambiance — pas d'à-coups, pas de virage, pas de freinage : la mécanique dans sa version la plus paisible.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 1 : NOTION 1 — DÉFINITION DU MRU -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s1">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">01</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1 · mru</span>
+        <h2 class="lecture-section-title">MRU : une droite ET une vitesse constante</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Rappel de la partie 2 du chapitre Cinématique : la vitesse moyenne se calcule en divisant la distance parcourue par la durée, <span class="math">v_moy = Δd/Δt</span>. Dans un MRU, ce quotient donne <strong>toujours le même nombre</strong>, quel que soit l'intervalle choisi — c'est précisément ce que veut dire « uniforme ».
+      </p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Définition officielle — mouvement rectiligne uniforme</div>
+          <p>Un mouvement est <strong>rectiligne uniforme</strong> si : <strong>1)</strong> sa trajectoire est une <strong>droite</strong>, et <strong>2)</strong> sa vitesse est <strong>constante</strong> — même <strong>norme</strong>, même <strong>direction</strong>, même <strong>sens</strong> à chaque instant. Les deux conditions sont obligatoires : rouler en ligne droite en accélérant n'est PAS un MRU. Conséquence : le vecteur vitesse ne change jamais, donc l'accélération est nulle, <span class="math">→a = →0</span>.</p>
+        </div>
+      </div>
+
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-main">Formule majeure — la vitesse constante</div>
+        <div class="lecture-formula-hero-main">v = d/t</div>
+        <div class="lecture-formula-hero-desc">d = distance parcourue <strong>le long de la droite</strong> (en m), t = durée du parcours (en s). Comme v ne change pas, on peut la calculer sur n'importe quel intervalle : sur 1 s, sur 20 s ou sur tout le trajet, le quotient donne la même valeur.</div>
+      </div>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">v[km·h⁻¹] = 3,6 × v[m·s⁻¹]</div>
+        <div class="lecture-formula-desc">Le rappel indispensable avant tout calcul (partie 2) : multiplier par 3,6 pour monter vers les km·h⁻¹, diviser par 3,6 pour redescendre. Repères : 36 km·h⁻¹ = 10 m·s⁻¹ ; 72 = 20 ; 90 = 25.</div>
+      </div>
+
+      <div class="lecture-table">
+        <table>
+          <thead>
+            <tr><th>Caractéristique</th><th>Valeur dans un MRU</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Trajectoire</td><td>une droite (un seul axe suffit : l'axe (Ox))</td></tr>
+            <tr><td>Vitesse</td><td>constante — norme, direction et sens figés</td></tr>
+            <tr><td>Accélération</td><td>nulle : <span class="math">→a = →0</span> (le vecteur →v ne change jamais)</td></tr>
+            <tr><td>Graphe x(t)</td><td>droite inclinée, de pente v (voir section 02)</td></tr>
+            <tr><td>Graphe v(t)</td><td>droite horizontale, à la hauteur v</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Piège d'examen n° 1</div>
+          <p>« Uniforme » veut dire <strong>vitesse CONSTANTE</strong> — ne confonds pas avec « <strong>uniformément varié</strong> » (objet de la partie 2 de ce chapitre), où la vitesse <em>change</em> régulièrement sous une accélération constante. Les deux noms se ressemblent, les mouvements n'ont rien à voir : MRU = vitesse figée ; MRUV = vitesse qui gagne (ou perd) le même montant à chaque seconde. Un énoncé qui dit « mouvement uniformément varié » interdit donc d'utiliser <span class="math">v = d/t</span> !</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 2 : L'ÉQUATION HORAIRE -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s2">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">02</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1 · mru</span>
+        <h2 class="lecture-section-title">L'équation horaire et son graphe</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Le MRU possède un super-pouvoir : <strong>une seule formule donne la position à TOUTES les dates</strong>. On l'appelle l'équation horaire — « horaire » parce qu'elle relie la position x au temps t.
+      </p>
+
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-main">Formule majeure — l'équation horaire du MRU</div>
+        <div class="lecture-formula-hero-main">x(t) = x₀ + v·t</div>
+        <div class="lecture-formula-hero-desc">x₀ = <strong>abscisse à l'origine des dates</strong> (position à t₀ = 0, en m) ; v = vitesse algébrique constante (en m·s⁻¹) ; t = la date (en s). Chaque seconde, l'abscisse gagne exactement v mètres : x(t) est une <strong>fonction affine du temps</strong>.</div>
+      </div>
+
+      <p class="lecture-text">
+        L'équation se lit en deux morceaux. <strong>D'abord</strong> le point de départ <span class="math">x₀</span>, la position au chronomètre zéro. <strong>Ensuite</strong> le chemin gagné depuis le départ : <span class="math">v·t</span>, c'est-à-dire vitesse × durée écoulée — des mètres par seconde multipliés par des secondes, donc bien des mètres. Priorité des opérations : on calcule le produit <span class="math">v·t</span> AVANT d'additionner <span class="math">x₀</span>.
+      </p>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">v &gt; 0 : vers les x croissants ; v &lt; 0 : vers les x décroissants</div>
+        <div class="lecture-formula-desc">Le signe de v dépend de l'<strong>orientation de l'axe</strong> choisie au départ : si (Ox) pointe vers l'est et que le mobile roule vers l'ouest, alors v est négative. La norme (valeur sans signe, affichée par un compteur) reste positive — le signe raconte le <strong>sens</strong>.</div>
+      </div>
+
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-main">Formule majeure — la date de passage</div>
+        <div class="lecture-formula-hero-main">t = (x − x₀)/v</div>
+        <div class="lecture-formula-hero-desc">La même équation, <strong>retournée</strong> : à quelle date le mobile passe-t-il à l'abscisse x ? On isole t. Attention à conserver le signe de v dans le calcul — c'est la formule vedette des questions « à quelle date… », utilisée dès la section 04.</div>
+      </div>
+
+      <!-- SVG : graphe x(t), droite de pente v, ordonnée à l'origine x₀ -->
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 540 300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Graphe x de t du MRU : droite montante, ordonnee a l'origine x0, pente egale a v">
+          <text x="270" y="24" style="fill:var(--accent-bright)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle" letter-spacing="2">GRAPHE x(t) DU MRU : UNE DROITE DE PENTE v</text>
+
+          <line x1="90" y1="250" x2="500" y2="250" style="stroke:var(--accent-bright)" stroke-width="2" marker-end="url(#arrowGoldMR1b)"/>
+          <line x1="90" y1="250" x2="90" y2="60" style="stroke:var(--accent-bright)" stroke-width="2" marker-end="url(#arrowGoldMR1b)"/>
+          <text x="508" y="256" style="fill:var(--accent-bright)" font-size="13" font-family="Inter, system-ui, sans-serif">t</text>
+          <text x="72" y="58" style="fill:var(--accent-bright)" font-size="13" font-family="Inter, system-ui, sans-serif">x</text>
+          <circle cx="90" cy="250" r="3.5" style="fill:var(--accent-bright)"/>
+          <text x="74" y="266" style="fill:var(--text-muted)" font-size="12" font-family="Inter, system-ui, sans-serif">O</text>
+
+          <line x1="90" y1="190" x2="460" y2="70" style="stroke:var(--success-light)" stroke-width="2.5"/>
+          <circle cx="90" cy="190" r="4.5" fill="rgba(74,222,128,0.2)" style="stroke:var(--success-light)" stroke-width="2"/>
+          <text x="62" y="194" style="fill:var(--success-light)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif">x₀</text>
+
+          <g stroke="rgba(224,184,74,0.6)" stroke-width="1.3" stroke-dasharray="4 3"><line x1="200" y1="154" x2="300" y2="154"/><line x1="300" y1="154" x2="300" y2="122"/></g>
+          <text x="242" y="170" style="fill:var(--accent-bright)" font-size="12" font-family="Inter, system-ui, sans-serif">Δt</text>
+          <text x="308" y="142" style="fill:var(--accent-bright)" font-size="12" font-family="Inter, system-ui, sans-serif">Δx = v·Δt</text>
+          <text x="330" y="92" style="fill:var(--success-light)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif">pente = v</text>
+
+          <circle cx="360" cy="103" r="5" fill="rgba(96,165,250,0.2)" style="stroke:var(--info)" stroke-width="2"/>
+          <text x="370" y="97" style="fill:var(--info)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif">M</text>
+          <g stroke="rgba(96,165,250,0.5)" stroke-width="1.2" stroke-dasharray="4 3"><line x1="360" y1="103" x2="360" y2="250"/><line x1="360" y1="103" x2="90" y2="103"/></g>
+          <text x="354" y="266" style="fill:var(--text-muted)" font-size="12" font-family="Inter, system-ui, sans-serif">t₁</text>
+          <text x="42" y="108" style="fill:var(--text-muted)" font-size="12" font-family="Inter, system-ui, sans-serif">x(t₁)</text>
+
+          <text x="270" y="283" style="fill:var(--text-muted)" font-size="12.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">Ordonnée à l'origine : x₀ (position à t = 0) ;</text>
+          <text x="270" y="297" style="fill:var(--text-muted)" font-size="12.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">pente : v (le gain de position à chaque seconde)</text>
+          <defs>
+            <marker id="arrowGoldMR1b" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7" fill="none" style="stroke:var(--accent-bright)" stroke-width="1.3"/></marker>
+          </defs>
+        </svg>
+        <figcaption class="lecture-figure-caption">La droite coupe l'axe vertical à x₀ (là où était le mobile à t = 0) et grimpe d'un pas régulier : sur chaque seconde, elle monte de v. Le point M se lit « à la date t₁ correspond l'abscisse x(t₁) ».</figcaption>
+      </figure>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Piège d'examen n° 2</div>
+          <p>Contrôle d'exactitude gratuit : remplace t par 0 dans ton équation. Tu dois retrouver <span class="math">x(0) = x₀</span>, rien d'autre. Si « ta » formule donne autre chose à t = 0, elle est fausse — le plus souvent, c'est le x₀ qui a été oublié ou le coefficient de t qui ne vaut pas la vitesse.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 3 : LIRE UN ÉNONCÉ — LES TROIS CAS -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s3">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">03</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1 · mru</span>
+        <h2 class="lecture-section-title">Lire un énoncé : les trois cas</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Écrire une équation horaire, c'est d'abord <strong>traduire l'énoncé</strong> : il contient toujours x₀ et v, parfois cachés sous d'autres mots. Voici les trois tournures qu'un énoncé de MRU utilise presque à chaque fois.
+      </p>
+
+      <div class="lecture-table">
+        <table>
+          <thead>
+            <tr><th>Ce que dit l'énoncé</th><th>Ce qu'on en tire</th><th>Équation obtenue</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>« À t = 0 s, le mobile est à 120 m »</td><td><span class="math">x₀ = 120 m</span></td><td><span class="math">x(t) = 120 + v·t</span></td></tr>
+            <tr><td>« Il part de l'origine » / « démarre de O »</td><td><span class="math">x₀ = 0 m</span></td><td><span class="math">x(t) = v·t</span></td></tr>
+            <tr><td>« Il revient vers l'origine » / « va vers les x décroissants »</td><td><span class="math">v &lt; 0</span></td><td><span class="math">x(t) = 800 − 20·t</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <ul class="lecture-list-elegant">
+        <li><strong>Cas 1 — x₀ donné</strong><span>on garde la valeur telle quelle dans l'équation. Oublier ce « capital de départ » fausse tout le reste.</span></li>
+        <li><strong>Cas 2</strong><span>départ de l'origine : le terme x₀ disparaît, l'équation s'allège en <span class="math">x(t) = v·t</span>. C'est le cas le plus courant dans les exercices de rencontre.</span></li>
+        <li><strong>Cas 3 — v négative</strong><span>on écrit le signe MOINS dans l'équation. Le mobile se déplace vers les x décroissants, il <strong>se rapproche de l'origine</strong> : son abscisse diminue avec le temps.</span></li>
+      </ul>
+
+      <!-- SVG : deux graphes x(t), v positive contre v négative -->
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 540 310" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Deux graphes x de t cote a cote : pente positive quand v est positive, pente negative quand v est negative">
+          <text x="270" y="24" style="fill:var(--accent-bright)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle" letter-spacing="2">LE SIGNE DE v SE LIT SUR LA PENTE</text>
+
+          <g style="stroke:var(--accent-bright)" stroke-width="2" marker-end="url(#arrowGoldMR1c)"><line x1="50" y1="240" x2="250" y2="240"/><line x1="50" y1="240" x2="50" y2="70"/></g>
+          <text x="258" y="246" style="fill:var(--accent-bright)" font-size="13" font-family="Inter, system-ui, sans-serif">t</text>
+          <text x="34" y="68" style="fill:var(--accent-bright)" font-size="13" font-family="Inter, system-ui, sans-serif">x</text>
+          <line x1="60" y1="195" x2="235" y2="95" style="stroke:var(--success-light)" stroke-width="2.5"/>
+          <text x="26" y="199" style="fill:var(--success-light)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif">x₀</text>
+          <text x="120" y="120" style="fill:var(--success-light)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif">v &gt; 0</text>
+          <text x="150" y="266" style="fill:var(--success-light)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">va vers les x croissants</text>
+
+          <g style="stroke:var(--accent-bright)" stroke-width="2" marker-end="url(#arrowGoldMR1c)"><line x1="310" y1="240" x2="510" y2="240"/><line x1="310" y1="240" x2="310" y2="70"/></g>
+          <text x="516" y="246" style="fill:var(--accent-bright)" font-size="13" font-family="Inter, system-ui, sans-serif">t</text>
+          <text x="294" y="68" style="fill:var(--accent-bright)" font-size="13" font-family="Inter, system-ui, sans-serif">x</text>
+          <line x1="320" y1="95" x2="495" y2="195" style="stroke:var(--danger-light)" stroke-width="2.5"/>
+          <text x="286" y="99" style="fill:var(--danger-light)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif">x₀</text>
+          <text x="410" y="120" style="fill:var(--danger-light)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif">v &lt; 0</text>
+          <text x="410" y="266" style="fill:var(--danger-light)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">va vers les x décroissants</text>
+
+          <text x="270" y="288" style="fill:var(--text-muted)" font-size="12.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">Même équation x(t) = x₀ + v·t : seule la pente</text>
+          <text x="270" y="303" style="fill:var(--text-muted)" font-size="12.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">change de signe — le mobile part à l'envers</text>
+          <defs>
+            <marker id="arrowGoldMR1c" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7" fill="none" style="stroke:var(--accent-bright)" stroke-width="1.3"/></marker>
+          </defs>
+        </svg>
+        <figcaption class="lecture-figure-caption">À gauche, v &gt; 0 : la droite monte, l'abscisse grandit. À droite, v &lt; 0 : la droite descend, l'abscisse fond — le mobile se rapproche de l'origine et la passera même à la date où x(t) = 0.</figcaption>
+      </figure>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Piège d'examen n° 3</div>
+          <p>Une vitesse négative n'est pas une vitesse « faible » : écrire <span class="math">v = −20 m·s⁻¹</span>, c'est rouler à <strong>20 m·s⁻¹</strong> (norme, ce qu'affiche le compteur) <strong>vers les x décroissants</strong> (le sens). Dans les calculs, garde le signe ; dans les conclusions, traduis-le en mots : « le mobile se dirige vers l'origine ».</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 4 : EXEMPLE COMPLET — LE MOTO-TAXI -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s4">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">04</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1 · mru</span>
+        <h2 class="lecture-section-title">Exemple complet : le moto-taxi</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Les deux questions classiques du MRU d'affilée : « où est-il à telle date ? » puis « à quelle date passe-t-il ici ? ». La première remplace t, la seconde isole t — les deux gestes de la section 02.
+      </p>
+
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">Exemple complet — le moto-taxi de l'avenue de la Mairie</div>
+        <div class="lecture-example-content">
+          <p><strong>Énoncé :</strong> sur l'axe (Ox) d'une avenue rectiligne, un moto-taxi roule en MRU. À <span class="math">t = 0 s</span>, il est à l'abscisse <span class="math">x₀ = 120 m</span> et sa vitesse vaut <span class="math">v = 10 m·s⁻¹</span>. a) Où est-il à <span class="math">t = 5 s</span> ? b) À quelle date passe-t-il à l'abscisse <span class="math">x = 220 m</span> ?</p>
+          <p><strong>Rédaction modèle :</strong></p>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Mise en équation :</strong> <span class="math">x(t) = x₀ + v·t = 120 + 10·t</span> (x en m, t en s) — les données de l'énoncé sont déjà en unités SI.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>a) Remplacer</strong> t par sa valeur : <span class="math">x(5) = 120 + 10 × 5</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>a) Calculer</strong> le produit d'abord : <span class="math">x(5) = 120 + 50 = 170 m</span> — le moto-taxi a gagné 50 m en 5 s, cohérent avec 10 m·s⁻¹ ✔</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>b) Formule de la date :</strong> on isole t dans l'équation horaire : <span class="math">t = (x − x₀)/v</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">5</div><div class="lecture-step-content"><p><strong>b) Remplacer :</strong> <span class="math">t = (220 − 120)/10 = 100/10</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">6</div><div class="lecture-step-content"><p><strong>b) Résultat :</strong> <span class="math">t = 10 s</span> — vérification : en 10 s à 10 m·s⁻¹, il parcourt 100 m, et 120 + 100 = 220 ✔</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-gold">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Réflexes Bac</div>
+          <ul class="lecture-list">
+            <li>Écrire l'équation horaire AVANT de remplacer — c'est la ligne qui rapporte les points de méthode ✔</li>
+            <li>Une question « où à t = … ? » → remplacer t ; une question « quand à x = … ? » → isoler t ✔</li>
+            <li>Terminer par une phrase : « le moto-taxi est à 170 m à t = 5 s » — pas un nombre nu ✔</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 5 : DEUX MOBILES — LA RENCONTRE -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s5">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">05</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1 · mru</span>
+        <h2 class="lecture-section-title">Deux mobiles : rattraper un piéton</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Deuxième grand classique : <strong>deux mobiles sur le même axe</strong> — un scooter qui démarre, un piéton déjà plus loin. La question « quand et où le premier rejoint-il le second ? » tient en une idée : la rencontre a lieu quand les deux occupent la <strong>même abscisse</strong> à la <strong>même date</strong>.
+      </p>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">Méthode de la rencontre : x_A(t) = x_B(t)</div>
+        <div class="lecture-formula-desc">On écrit la position de CHACUN en fonction de t (deux équations horaires), puis on égale. Il reste une équation à une inconnue t — on la résout, puis on remplace t dans l'une des deux équations pour trouver le lieu de la rencontre.</div>
+      </div>
+
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">Exemple travaillé — le scooter et le piéton de la route de l'université</div>
+        <div class="lecture-example-content">
+          <p><strong>Données :</strong> sur une voie droite, le scooter A part de l'origine à <span class="math">t = 0 s</span> et roule en MRU à <span class="math">v_A = 12 m·s⁻¹</span>. Le piéton B est <strong>immobile</strong> à l'abscisse <span class="math">x_B = 60 m</span>. Quand et où A rejoint-il B ?</p>
+          <p><strong>Résolution en 5 étapes :</strong></p>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p>Position de A : <span class="math">x_A(t) = 0 + 12·t = 12·t</span> (départ de l'origine — cas n°2 de la section 03).</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p>Position de B : B est immobile, son abscisse ne dépend pas du temps : <span class="math">x_B = 60 m</span>, une constante.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Égaler les positions :</strong> <span class="math">12·t = 60</span> — la rencontre a lieu quand A est exactement là où se trouve B.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p>On résout : <span class="math">t = 60/12 = 5 s</span> — la date de la rencontre.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">5</div><div class="lecture-step-content"><p><strong>Lieu :</strong> <span class="math">x_A(5) = 12 × 5 = 60 m</span> ✔ — A rejoint B à l'abscisse 60 m, à la date t = 5 s. Vérification : en 5 s à 12 m·s⁻¹, A parcourt exactement les 60 m qui le séparaient de B ✔</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SVG : schéma de rencontre A/B sur l'axe -->
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 540 270" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Scooter A part de l'origine et rejoint en 5 secondes le pieton B immobile a 60 metres">
+          <text x="270" y="24" style="fill:var(--accent-bright)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle" letter-spacing="2">LA RENCONTRE : ÉGALER LES POSITIONS</text>
+
+          <line x1="30" y1="150" x2="500" y2="150" style="stroke:var(--text-muted)" stroke-width="2"/>
+
+          <circle cx="70" cy="150" r="6" fill="rgba(74,222,128,0.2)" style="stroke:var(--success-light)" stroke-width="2"/>
+          <text x="58" y="176" style="fill:var(--success-light)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif">A (x = 0)</text>
+          <line x1="84" y1="118" x2="160" y2="118" style="stroke:var(--success-light)" stroke-width="2.5" marker-end="url(#arrowGreenMR1b)"/>
+          <text x="170" y="123" style="fill:var(--success-light)" font-size="12.5" font-family="Inter, system-ui, sans-serif">→v_A = 12 m·s⁻¹</text>
+
+          <circle cx="380" cy="150" r="6" fill="rgba(96,165,250,0.2)" style="stroke:var(--info)" stroke-width="2"/>
+          <text x="330" y="176" style="fill:var(--info)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif">B (x = 60 m, immobile)</text>
+          <text x="380" y="196" style="fill:var(--text-muted)" font-size="11.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">immobile : pas de flèche →v</text>
+
+          <line x1="380" y1="140" x2="380" y2="66" stroke="rgba(224,184,74,0.7)" stroke-width="1.5" stroke-dasharray="5 3"/>
+          <circle cx="380" cy="60" r="5" fill="rgba(224,184,74,0.25)" style="stroke:var(--accent-bright)" stroke-width="2"/>
+          <text x="370" y="56" style="fill:var(--accent-bright)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="end">rencontre : t = 5 s, x = 60 m</text>
+
+          <line x1="78" y1="204" x2="368" y2="204" style="stroke:var(--accent-bright)" stroke-width="2" stroke-dasharray="7 4" marker-end="url(#arrowGoldMR1d)"/>
+          <text x="150" y="224" style="fill:var(--accent-bright)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif">d = 12 × 5 = 60 m en 5 s</text>
+
+          <text x="270" y="252" style="fill:var(--text-muted)" font-size="12.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">La distance qui séparait A de B est exactement</text>
+          <text x="270" y="267" style="fill:var(--text-muted)" font-size="12.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">celle que A parcourt avant le contact des regards</text>
+          <defs>
+            <marker id="arrowGoldMR1d" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7" fill="none" style="stroke:var(--accent-bright)" stroke-width="1.3"/></marker>
+            <marker id="arrowGreenMR1b" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7" fill="none" style="stroke:var(--success-light)" stroke-width="1.3"/></marker>
+          </defs>
+        </svg>
+        <figcaption class="lecture-figure-caption">A couvre les 60 m qui le séparent de B à raison de 12 m chaque seconde : la rencontre a donc lieu à t = 5 s, à l'abscisse x = 60 m — là où B attendait.</figcaption>
+      </figure>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Piège d'examen n° 4</div>
+          <p>Ne confonds pas les deux équations : A a une équation horaire <span class="math">x_A(t) = 12·t</span>, B a une abscisse <strong>constante</strong> <span class="math">x_B = 60</span> — écrire « x_B(t) = 60·t » est la faute classique. Et après avoir trouvé t, n'oublie pas la deuxième moitié de la question : le <strong>lieu</strong> de la rencontre (on remplace t dans l'une des équations).</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 6 : FICHE MÉTHODE -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s6">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">06</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Fiche méthode</span>
+        <h2 class="lecture-section-title">Résoudre un MRU en 5 étapes</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        La recette qui réussit TOUS les exercices de MRU — apprends-la dans l'ordre, elle sert jusqu'au Bac et prépare toutes les parties suivantes.
+      </p>
+
+      <div class="lecture-steps">
+        <div class="lecture-step">
+          <div class="lecture-step-number">1</div>
+          <div class="lecture-step-content">
+            <p><strong>Annoncer système, référentiel, repère.</strong> « Le moto-taxi, assimilé à un point M, dans le référentiel terrestre ; axe (Ox) orienté dans le sens du mouvement, origine au poste de contrôle. » Sans cette phrase, pas de signe ni d'origine possibles.</p>
+          </div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">2</div>
+          <div class="lecture-step-content">
+            <p><strong>Écrire l'équation horaire.</strong> Traduire l'énoncé en <span class="math">x(t) = x₀ + v·t</span> avec les valeurs (et les unités SI : km·h⁻¹ ÷ 3,6, min × 60, etc.). Contrôle : à t = 0, x(0) doit valoir x₀.</p>
+          </div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">3</div>
+          <div class="lecture-step-content">
+            <p><strong>Identifier l'inconnue.</strong> Une position (on connaît la date) ? Une date (on connaît la position) ? Une vitesse ? La nature de l'inconnue décide du geste suivant.</p>
+          </div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">4</div>
+          <div class="lecture-step-content">
+            <p><strong>Isoler puis calculer.</strong> Position demandée → remplacer t par sa valeur. Date demandée → <span class="math">t = (x − x₀)/v</span>. Une transformation par ligne, sans sauter d'étape.</p>
+          </div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">5</div>
+          <div class="lecture-step-content">
+            <p><strong>Conclure : résultat + unité + vérification.</strong> Une phrase complète, l'unité (m, s, m·s⁻¹…), puis un contrôle d'ordre de grandeur : 10 m·s⁻¹ = 36 km·h⁻¹, allure de cycliste rapide ; 25 m·s⁻¹ = 90 km·h⁻¹, allure de voiture.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-gold">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Réflexes Bac</div>
+          <ul class="lecture-list">
+            <li>« Mouvement uniforme » dans un énoncé ⟹ tout de suite penser : <span class="math">x(t) = x₀ + v·t</span> et <span class="math">→a = →0</span> ✔</li>
+            <li>Toujours préciser l'orientation de l'axe : c'est elle qui décide du signe de v ✔</li>
+            <li>Une rencontre = égaler les positions ; un dépassement se vérifie en comparant les vitesses ✔</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 7 : EXERCICES D'APPLICATION -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s7">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">07</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Entraînement</span>
+        <h2 class="lecture-section-title">Exercices d'application</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Trois exercices gradués pour verrouiller la partie : lire une équation, calculer une distance, interpréter une vitesse négative. Cherche d'abord SANS les corrigés — la lutte construit le réflexe.
+      </p>
+
+      <div class="lecture-text">
+        <div class="lecture-exercise-label">✏️ Exercice d'application 1 — Le train de la ligne Niamey-Zinder</div>
+        <p class="lecture-text"><strong>Énoncé :</strong> sur une voie rectiligne, l'abscisse d'un train varie selon <span class="math">x(t) = 500 + 25·t</span> (t en s, x en m). a) Quelle est sa vitesse en m·s⁻¹ puis en km·h⁻¹ ? b) Où est-il à <span class="math">t = 2 min</span> ? c) À quelle date passe-t-il à l'abscisse <span class="math">x = 2 000 m</span> ?</p>
+        <details>
+          <summary>Voir la solution détaillée</summary>
+          <div class="lecture-quiz-answer">
+            <div class="lecture-steps">
+              <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>a)</strong> Dans x(t) = x₀ + v·t, le coefficient de t est la vitesse : <span class="math">v = 25 m·s⁻¹</span> (et x₀ = 500 m : à t = 0, il est déjà à 500 m) ✔</p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>a)</strong> Conversion : <span class="math">v = 25 × 3,6 = 90 km·h⁻¹</span> ✔</p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>b)</strong> 2 min = 120 s, donc <span class="math">x(120) = 500 + 25 × 120 = 500 + 3 000 = 3 500 m</span> ✔</p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>c)</strong> <span class="math">t = (x − x₀)/v = (2 000 − 500)/25 = 1 500/25 = 60 s</span> — le train passe à l'abscisse 2 000 m une minute après l'origine des dates ✔</p></div></div>
+            </div>
+            <p><strong>Bilan :</strong> 25 m·s⁻¹ = 90 km·h⁻¹ ; x(2 min) = 3 500 m ; passage à 2 000 m à t = 60 s. La lecture « coefficient de t = vitesse » a tout donné.</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="lecture-text">
+        <div class="lecture-exercise-label">✏️ Exercice d'application 2 — Le cycliste du marché Wadata</div>
+        <p class="lecture-text"><strong>Énoncé :</strong> un cycliste roule en MRU à <span class="math">36 km·h⁻¹</span> pendant <span class="math">15 min</span> sur la route du marché. Quelle distance parcourt-il ?</p>
+        <details>
+          <summary>Voir la solution détaillée</summary>
+          <div class="lecture-quiz-answer">
+            <div class="lecture-steps">
+              <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Convertir la vitesse :</strong> <span class="math">v = 36/3,6 = 10 m·s⁻¹</span> ✔</p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Convertir la durée :</strong> <span class="math">t = 15 × 60 = 900 s</span> ✔</p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Appliquer</strong> la formule du MRU : <span class="math">d = v·t = 10 × 900 = 9 000 m</span> ✔</p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Conclure :</strong> d = 9 000 m = 9 km — un quart d'heure de vélo à 36 km·h⁻¹, cela fait déjà 9 kilomètres ✔</p></div></div>
+            </div>
+            <p><strong>Bilan :</strong> d = v·t — mais SEULEMENT en MRU (vitesse constante), et après conversion en unités SI.</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="lecture-text">
+        <div class="lecture-exercise-label">✏️ Exercice d'application 3 — Retour vers l'origine (v négative)</div>
+        <p class="lecture-text"><strong>Énoncé :</strong> l'abscisse d'une camionnette varie selon <span class="math">x(t) = 800 − 20·t</span> (t en s, x en m). a) Quel est son mouvement ? b) Où est-elle à <span class="math">t = 10 s</span> ? c) À quelle date passe-t-elle à l'origine ? d) Interpréter le signe de v.</p>
+        <details>
+          <summary>Voir la solution détaillée</summary>
+          <div class="lecture-quiz-answer">
+            <div class="lecture-steps">
+              <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>a)</strong> Fonction affine du temps avec v = −20 m·s⁻¹ et x₀ = 800 m : MRU dont la vitesse est <strong>négative</strong> — la camionnette va vers les x décroissants ✔</p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>b)</strong> <span class="math">x(10) = 800 − 20 × 10 = 800 − 200 = 600 m</span> — l'abscisse a diminué, la camionnette se rapproche de l'origine ✔</p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>c)</strong> À l'origine, x = 0 : <span class="math">800 − 20·t = 0</span> donc <span class="math">t = 800/20 = 40 s</span> ✔</p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>d)</strong> v = −20 m·s⁻¹ : la norme vaut 20 m·s⁻¹ (72 km·h⁻¹, allure réaliste) et le signe moins indique le sens — vers les x décroissants, en retour vers le point O ✔</p></div></div>
+            </div>
+            <p><strong>Bilan :</strong> 800 − 20×10 = 600 m ; retour à l'origine à t = 40 s. Le signe de v raconte le sens, jamais la lenteur.</p>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== QCM ===== -->
+  <div class="lecture-quiz">
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q1. Un train roule en MRU à 72 km·h⁻¹. Quelle distance parcourt-il en 30 s ?</p>
+      <div class="lecture-quiz-options"><span>A) 600 m</span><span>B) 2 160 m</span><span>C) 240 m</span><span>D) 72 m</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><p><strong>Réponse : A.</strong> On convertit d'abord : 72 ÷ 3,6 = 20 m·s⁻¹, puis d = v·t = 20 × 30 = 600 m. L'option B multiplie 72 par 30 sans conversion (faute d'unités), la C oublie de diviser par 3,6 dans le bon sens.</p></div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q2. L'abscisse d'un mobile varie selon x(t) = 300 − 15·t (t en s, x en m). Que fait-il ?</p>
+      <div class="lecture-quiz-options"><span>A) il accélère depuis l'origine</span><span>B) il est immobile à 300 m</span><span>C) MRU vers les x décroissants, en partant de 300 m</span><span>D) MRU vers les x croissants à 15 m·s⁻¹</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><p><strong>Réponse : C.</strong> Fonction affine : MRU. x₀ = 300 m (position à t = 0) et v = −15 m·s⁻¹ : le signe moins indique le sens, vers les x décroissants — il se rapproche de l'origine (et il n'est pas immobile : à t = 20 s, il y sera !).</p></div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q3. Une moto part de x₀ = 50 m en MRU à v = 8 m·s⁻¹. Quand passe-t-elle à x = 170 m ?</p>
+      <div class="lecture-quiz-options"><span>A) t = 21 s</span><span>B) t = 15 s</span><span>C) t = 20 s</span><span>D) t = 12 s</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><p><strong>Réponse : B.</strong> t = (x − x₀)/v = (170 − 50)/8 = 120/8 = 15 s. L'option A oublie x₀ (170/8 ≈ 21), l'option D l'oubli à moitié (120/10) — toujours soustraire le point de départ d'abord.</p></div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q4. Dans un MRU, le vecteur accélération vaut…</p>
+      <div class="lecture-quiz-options"><span>A) v/t</span><span>B) g = 9,8 m·s⁻²</span><span>C) →a = →0</span><span>D) d/t²</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><p><strong>Réponse : C.</strong> « Uniforme » = le vecteur vitesse ne change jamais (ni norme, ni direction, ni sens) : →a = →0. C'est justement ce qui distingue le MRU du MRUV de la partie 2, où a est constante mais non nulle.</p></div></details>
+    </div>
+  </div>
+
+  <!-- ===== RÉCAP ===== -->
+  <div class="lecture-recap">
+    <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
+    <ul class="lecture-recap-list">
+      <li><strong>[definition_mru]</strong> MRU = trajectoire une droite ET vitesse constante (norme, direction, sens) ; l'accélération est nulle : →a = →0.</li>
+      <li><strong>[vocabulaire]</strong> « Uniforme » = vitesse CONSTANTE — à ne pas confondre avec « uniformément varié » (partie 2), où la vitesse change régulièrement.</li>
+      <li><strong>[vitesse]</strong> v = d/t : distance parcourue le long de la droite divisée par la durée — le même quotient sur n'importe quel intervalle ; conversion : v[km·h⁻¹] = 3,6 × v[m·s⁻¹].</li>
+      <li><strong>[equation_horaire]</strong> x(t) = x₀ + v·t : x₀ = abscisse à t₀ = 0 ; chaque seconde ajoute exactement v mètres ; contrôle : x(0) = x₀.</li>
+      <li><strong>[date_passage]</strong> t = (x − x₀)/v : la date de passage à une abscisse donnée — conserver le signe de v dans le calcul.</li>
+      <li><strong>[signe_de_v]</strong> v &gt; 0 : vers les x croissants ; v &lt; 0 : vers les x décroissants — le signe dépend de l'orientation de l'axe et raconte le sens, pas la lenteur.</li>
+      <li><strong>[graphes]</strong> Graphe x(t) : droite de pente v, ordonnée à l'origine x₀ — montante si v &gt; 0, descendante si v &lt; 0 ; graphe v(t) : horizontale à la hauteur v.</li>
+      <li><strong>[rencontre]</strong> Deux mobiles : écrire x_A(t) et x_B(t) (un immobile → abscisse constante), puis égaler les positions pour trouver la date, puis le lieu de la rencontre.</li>
+    </ul>
+  </div>
+
+  <!-- ===== FIN ===== -->
+  <div class="lecture-end">
+    <div class="lecture-end-icon">🎯</div>
+    <div class="lecture-end-text">Partie 1 terminée !</div>
+    <div class="lecture-end-sub">Tu sais maintenant écrire, lire et retourner l'équation horaire du MRU — position, date de passage et rencontre n'ont plus de secret. La partie 2 passe à la vitesse supérieure : quand la vitesse <strong>change régulièrement</strong> — démarrages, freinages, chutes — c'est le royaume du MRUV et de ses trois équations.</div>
+    <div class="lecture-end-divider"></div>
+  </div>
+
+</div>

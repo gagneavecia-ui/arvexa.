@@ -1,0 +1,708 @@
+<!-- ============================================================ -->
+<!-- PARTIE 2 : MOUVEMENT RECTILIGNE UNIFORMÉMENT VARIÉ — MRUV     -->
+<!-- (NOTION : mruv)                                               -->
+<!-- Notion 1 : mruv — MRUV : accélération constante, équations     -->
+<!--            horaires, chute libre, freinage et sécurité        -->
+<!-- ============================================================ -->
+
+<div class="lecture-container">
+
+  <!-- Présentation : toutes les classes utilisées ici sont stylées par lecture.html
+       (seule source de vérité) — aucun style inline, conforme à la charte du projet. -->
+
+  <!-- ===== HERO ===== -->
+  <header class="lecture-hero">
+    <div class="lecture-hero-badge">
+      <span class="lecture-hero-icon">📘</span>
+      <span class="lecture-hero-label">Partie 02 · Quand la vitesse change régulièrement</span>
+    </div>
+    <h1 class="lecture-hero-title">
+      Mouvement rectiligne <em>uniformément varié</em> (MRUV)
+    </h1>
+    <p class="lecture-hero-intro">
+      Dans un MRU, la vitesse ne bouge plus — mais la vraie vie est secouée : le car qui <strong>démarre</strong> à la gare de Niamey, la moto qui <strong>freine</strong> avant le rond-point, la pierre qu'on <strong>lâche</strong> au bord du fleuve. Cette partie construit <strong>1 notion</strong>, le <strong>mouvement rectiligne uniformément varié</strong> (MRUV) : trajectoire droite et <strong>accélération constante</strong> — la vitesse varie de la même quantité chaque seconde. Au programme : trois <strong>équations horaires</strong>, la <strong>chute libre</strong> comme cas célèbre, deux exemples complets (démarrage, freinage) et la grande leçon de <strong>sécurité routière</strong> cachée dans la formule sans le temps.
+    </p>
+    <div class="lecture-hero-meta">
+      <span class="lecture-hero-meta-item">⏱ 25 min</span>
+      <span class="lecture-hero-meta-item">⚡ 1 notion</span>
+      <span class="lecture-hero-meta-item">📚 9 sections</span>
+      <span class="lecture-hero-meta-item">🎓 Terminale C&amp;D</span>
+    </div>
+  </header>
+
+  <!-- ===== SOMMAIRE ===== -->
+  <nav class="lecture-toc">
+    <div class="lecture-toc-header">
+      <span>Dans cette partie</span>
+      <span class="lecture-toc-count">1 notion · 9 sections</span>
+    </div>
+    <ol class="lecture-toc-list">
+      <li><a href="#s0"><span class="toc-num">00</span><span>Motivation — Le car de la gare de Niamey</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>Notion 1 · mruv — MRUV : l'accélération constante</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>Notion 1 · mruv — Les trois équations horaires</span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>Notion 1 · mruv — La chute libre verticale</span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>Notion 1 · mruv — Accéléré ou ralenti : →v face à →a</span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>Notion 1 · mruv — Exemple complet n°1 : le démarrage</span></a></li>
+      <li><a href="#s6"><span class="toc-num">06</span><span>Notion 1 · mruv — Exemple complet n°2 : le freinage</span></a></li>
+      <li><a href="#s7"><span class="toc-num">07</span><span>Fiche méthode — Résoudre un MRUV en 6 étapes</span></a></li>
+      <li><a href="#s8"><span class="toc-num">08</span><span>Exercices d'application</span></a></li>
+    </ol>
+  </nav>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 0 : MOTIVATION -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s0">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">00</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Motivation</span>
+        <h2 class="lecture-section-title">Le car de la gare de Niamey</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Deux scènes vécues par tout passager nigérien. <strong>Scène 1 :</strong> au départ de la gare, le chauffeur enfonce la pédale — le car arrache, et chaque seconde qui passe te colle un peu plus au siège : la vitesse <strong>monte</strong>, et elle monte <strong>régulièrement</strong>. <strong>Scène 2 :</strong> à l'approche du rond-point, le chauffeur freine franchement — et la vitesse <strong>descend</strong>, là aussi de façon <strong>régulière</strong>. Dans les deux scènes, la vitesse change, mais elle change <strong>de la même quantité à chaque seconde</strong> : c'est cette régularité du changement que la physique sait calculer à la perfection.
+      </p>
+
+      <!-- SVG : chronophotographie du car qui démarre, écarts croissants -->
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 540 285" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Chronophotographie du car qui demarre : les ecarts entre positions grandissent, fleche a constante">
+          <text x="270" y="24" style="fill:var(--accent-bright)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle" letter-spacing="2">LE DÉMARRAGE DU CAR : LES ÉCARTS GRANDISSENT</text>
+
+          <text x="95" y="104" style="fill:var(--danger-light)" font-size="12" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">→a : même flèche partout</text>
+          <g style="stroke:var(--danger-light)" stroke-width="2.5"><line x1="36" y1="118" x2="86" y2="118" marker-end="url(#arrowRedMR2a)"/><line x1="136" y1="118" x2="186" y2="118" marker-end="url(#arrowRedMR2a)"/><line x1="266" y1="118" x2="316" y2="118" marker-end="url(#arrowRedMR2a)"/><line x1="416" y1="118" x2="466" y2="118" marker-end="url(#arrowRedMR2a)"/></g>
+
+          <g style="fill:var(--success-light)" font-size="12" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle"><text x="61" y="150">t = 0 s</text><text x="161" y="150">t = 1 s</text><text x="291" y="150">t = 2 s</text><text x="441" y="150">t = 3 s</text></g>
+
+          <g><rect x="32" y="162" width="58" height="24" rx="5" fill="rgba(96,165,250,0.15)" style="stroke:var(--info)" stroke-width="1.5"/><circle cx="45" cy="190" r="6" fill="none" style="stroke:var(--text-muted)" stroke-width="2"/><circle cx="75" cy="190" r="6" fill="none" style="stroke:var(--text-muted)" stroke-width="2"/></g>
+          <g><rect x="132" y="162" width="58" height="24" rx="5" fill="rgba(96,165,250,0.15)" style="stroke:var(--info)" stroke-width="1.5"/><circle cx="145" cy="190" r="6" fill="none" style="stroke:var(--text-muted)" stroke-width="2"/><circle cx="175" cy="190" r="6" fill="none" style="stroke:var(--text-muted)" stroke-width="2"/></g>
+          <g><rect x="262" y="162" width="58" height="24" rx="5" fill="rgba(96,165,250,0.15)" style="stroke:var(--info)" stroke-width="1.5"/><circle cx="275" cy="190" r="6" fill="none" style="stroke:var(--text-muted)" stroke-width="2"/><circle cx="305" cy="190" r="6" fill="none" style="stroke:var(--text-muted)" stroke-width="2"/></g>
+          <g><rect x="412" y="162" width="58" height="24" rx="5" fill="rgba(96,165,250,0.15)" style="stroke:var(--info)" stroke-width="1.5"/><circle cx="425" cy="190" r="6" fill="none" style="stroke:var(--text-muted)" stroke-width="2"/><circle cx="455" cy="190" r="6" fill="none" style="stroke:var(--text-muted)" stroke-width="2"/></g>
+
+          <line x1="25" y1="196" x2="515" y2="196" style="stroke:var(--text-muted)" stroke-width="2"/>
+          <line x1="25" y1="202" x2="515" y2="202" stroke="rgba(224,184,74,0.4)" stroke-width="1" stroke-dasharray="8 6"/>
+
+          <g font-size="11.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle"><text x="140" y="222" style="fill:var(--text-muted)">écart croissant</text><text x="255" y="222" style="fill:var(--accent-bright)" font-weight="700">encore plus grand</text><text x="395" y="222" style="fill:var(--accent-bright)" font-weight="700">encore plus grand</text></g>
+
+          <text x="270" y="250" style="fill:var(--accent-bright)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">Chaque seconde, le car gagne plus de distance :</text>
+          <text x="270" y="267" style="fill:var(--accent-bright)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">la vitesse change de façon régulière — a = constante</text>
+          <defs>
+            <marker id="arrowRedMR2a" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7" fill="none" style="stroke:var(--danger-light)" stroke-width="1.3"/></marker>
+          </defs>
+        </svg>
+        <figcaption class="lecture-figure-caption">Une photo chaque seconde : les écarts entre positions grandissent — le car accélère. Mais les flèches →a sont toutes identiques : l'accélération, elle, ne change pas. C'est le MRUV.</figcaption>
+      </figure>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">La grande idée du jour</div>
+          <p>Un <strong>changement régulier de vitesse</strong>, c'est une <strong>accélération constante</strong> — et une accélération constante, ça se calcule avec <strong>trois formules seulement</strong>. La partie 1 du chapitre traitait le cas calme (vitesse figée) ; cette partie traite le cas régulier (vitesse qui monte ou descend d'un même montant chaque seconde). À la fin, tu sauras prédire une vitesse, une position, une distance de freinage — et même la hauteur d'une pierre lancée vers le haut.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 1 : DÉFINITION DU MRUV -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s1">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">01</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1 · mruv</span>
+        <h2 class="lecture-section-title">MRUV : l'accélération constante</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Le nom complet dit tout : « rectiligne » (la trajectoire est une droite), « uniformément » (de façon régulière), « varié » (la vitesse varie). Rappel du chapitre Cinématique : l'accélération mesure la variation du vecteur vitesse, <span class="math">→a = Δ→v/Δt</span> — sa composante sur l'axe du mouvement vaut <span class="math">a = Δv/Δt</span>.
+      </p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Définition officielle — mouvement rectiligne uniformément varié</div>
+          <p>Un mouvement est <strong>rectiligne uniformément varié</strong> si : <strong>1)</strong> sa trajectoire est une <strong>droite</strong>, et <strong>2)</strong> son <strong>accélération est constante</strong> (a = cte). Conséquence : la vitesse varie <strong>de la même quantité chaque seconde</strong> — elle gagne +3 m·s⁻¹ par seconde, ou elle perd −4 m·s⁻¹ par seconde lors d'un freinage. C'est le cas du démarrage régulier, du freinage et de la chute libre.</p>
+        </div>
+      </div>
+
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-main">Formule majeure — la définition par le calcul</div>
+        <div class="lecture-formula-hero-main">a = Δv/Δt</div>
+        <div class="lecture-formula-hero-desc">Δv = variation de vitesse entre deux instants (en m·s⁻¹), Δt = durée écoulée (en s). Unité SI : le <strong>mètre par seconde carrée</strong>, <strong>m·s⁻²</strong>. a constante ⟹ le quotient Δv/Δt garde la même valeur quel que soit l'intervalle choisi : la vitesse change d'un même montant chaque seconde.</div>
+      </div>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">a = 2 m·s⁻² ⟹ la vitesse gagne 2 m·s⁻¹ chaque seconde</div>
+        <div class="lecture-formula-desc">Lecture de l'unité : 2 m·s⁻² = « 2 mètres par seconde, par seconde ». Les vitesses successives s'égrènent : 0 → 2 → 4 → 6 m·s⁻¹… Symétriquement, a = −4 m·s⁻² signifie que la vitesse PERD 4 m·s⁻¹ chaque seconde (freinage régulier).</div>
+      </div>
+
+      <!-- SVG : le car qui accélère, →v croissants et →a constant -->
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 540 270" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Car qui accelere sur trois positions : fleches v de plus en plus longues, fleche a de longueur constante">
+          <text x="270" y="24" style="fill:var(--accent-bright)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle" letter-spacing="2">→v GRANDIT, →a RESTE CONSTANT</text>
+
+          <g style="fill:var(--success-light)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle"><text x="91" y="130">→v₁</text><text x="271" y="130">→v₂</text><text x="447" y="130">→v₃</text></g>
+          <line x1="56" y1="138" x2="126" y2="138" style="stroke:var(--success-light)" stroke-width="2.5" marker-end="url(#arrowGreenMR2a)"/>
+          <line x1="216" y1="138" x2="326" y2="138" style="stroke:var(--success-light)" stroke-width="2.5" marker-end="url(#arrowGreenMR2a)"/>
+          <line x1="372" y1="138" x2="522" y2="138" style="stroke:var(--success-light)" stroke-width="2.5" marker-end="url(#arrowGreenMR2a)"/>
+
+          <g><rect x="42" y="158" width="58" height="22" rx="5" fill="rgba(96,165,250,0.15)" style="stroke:var(--info)" stroke-width="1.5"/><circle cx="56" cy="184" r="6" fill="none" style="stroke:var(--text-muted)" stroke-width="2"/><circle cx="86" cy="184" r="6" fill="none" style="stroke:var(--text-muted)" stroke-width="2"/></g>
+          <g><rect x="202" y="158" width="58" height="22" rx="5" fill="rgba(96,165,250,0.15)" style="stroke:var(--info)" stroke-width="1.5"/><circle cx="216" cy="184" r="6" fill="none" style="stroke:var(--text-muted)" stroke-width="2"/><circle cx="246" cy="184" r="6" fill="none" style="stroke:var(--text-muted)" stroke-width="2"/></g>
+          <g><rect x="362" y="158" width="58" height="22" rx="5" fill="rgba(96,165,250,0.15)" style="stroke:var(--info)" stroke-width="1.5"/><circle cx="376" cy="184" r="6" fill="none" style="stroke:var(--text-muted)" stroke-width="2"/><circle cx="406" cy="184" r="6" fill="none" style="stroke:var(--text-muted)" stroke-width="2"/></g>
+
+          <line x1="30" y1="192" x2="510" y2="192" style="stroke:var(--text-muted)" stroke-width="2"/>
+          <line x1="30" y1="198" x2="510" y2="198" stroke="rgba(224,184,74,0.4)" stroke-width="1" stroke-dasharray="8 6"/>
+
+          <g style="stroke:var(--danger-light)" stroke-width="2.5"><line x1="50" y1="222" x2="110" y2="222" marker-end="url(#arrowRedMR2b)"/><line x1="210" y1="222" x2="270" y2="222" marker-end="url(#arrowRedMR2b)"/><line x1="370" y1="222" x2="430" y2="222" marker-end="url(#arrowRedMR2b)"/></g>
+          <text x="180" y="242" style="fill:var(--danger-light)" font-size="12" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">→a : même flèche à chaque position</text>
+
+          <text x="270" y="262" style="fill:var(--text-muted)" font-size="12" font-family="Inter, system-ui, sans-serif" text-anchor="middle">→a dans le même sens que →v : le mouvement est accéléré</text>
+          <defs>
+            <marker id="arrowGreenMR2a" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7" fill="none" style="stroke:var(--success-light)" stroke-width="1.3"/></marker>
+            <marker id="arrowRedMR2b" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7" fill="none" style="stroke:var(--danger-light)" stroke-width="1.3"/></marker>
+          </defs>
+        </svg>
+        <figcaption class="lecture-figure-caption">Les flèches →v grandissent (la vitesse monte) mais les flèches →a sont rigoureusement identiques : accélération constante — la signature du MRUV.</figcaption>
+      </figure>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Piège d'examen n° 1</div>
+          <p>Deux confusions à bannir. <strong>Un :</strong> « a constante » ne veut PAS dire « v constante » — dans un MRUV la vitesse <strong>change</strong> forcément ; si elle ne changeait pas, ce serait un MRU (a = 0). <strong>Deux :</strong> ne mélange pas les unités : <span class="math">m·s⁻¹</span> = vitesse, <span class="math">m·s⁻²</span> = accélération. Une moto peut rouler très vite avec a = 0 (vitesse stabilisée) ou être presque arrêtée avec a très grand (au feu vert).</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 2 : LES TROIS ÉQUATIONS HORAIRES -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s2">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">02</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1 · mruv</span>
+        <h2 class="lecture-section-title">Les trois équations horaires</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Tout MRUV se résume à trois formules. Elles se déduisent l'une de l'autre, mais chaque exercice n'en demande qu'UNE à la fois — savoir <strong>laquelle choisir</strong> est la compétence de la section (le tableau vient juste après).
+      </p>
+
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-main">Formule majeure n°1 — la vitesse</div>
+        <div class="lecture-formula-hero-main">v(t) = v₀ + a·t</div>
+        <div class="lecture-formula-hero-desc">v₀ = vitesse initiale (à t₀ = 0, en m·s⁻¹) ; a = accélération algébrique constante (en m·s⁻²) ; t = date (en s). La vitesse est une <strong>fonction affine du temps</strong> : graphe v(t) = droite de pente a, coupant l'axe vertical à v₀.</div>
+      </div>
+
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-main">Formule majeure n°2 — la position</div>
+        <div class="lecture-formula-hero-main">x(t) = x₀ + v₀·t + (1/2)·a·t²</div>
+        <div class="lecture-formula-hero-desc">x₀ = abscisse à t₀ = 0 (en m) ; le terme <strong>(1/2)·a·t²</strong> est la signature du MRUV : la position devient une <strong>fonction du temps carré</strong> — graphe x(t) = parabole. On élève t au carré AVANT de multiplier, et le (1/2) ne porte que sur le terme en t².</div>
+      </div>
+
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-main">Formule majeure n°3 — la « formule sans le temps »</div>
+        <div class="lecture-formula-hero-main">v² = v₀² + 2·a·(x − x₀)</div>
+        <div class="lecture-formula-hero-desc">Elle relie la vitesse à la <strong>position</strong> sans jamais mentionner t : parfaite pour une <strong>distance de freinage</strong> (« quelle distance pour s'arrêter ? ») alors que la date d'arrêt est inconnue. Attention : elle mélange des carrés — v², v₀² — et le facteur 2, à ne pas oublier.</div>
+      </div>
+
+      <div class="lecture-table">
+        <table>
+          <thead>
+            <tr><th>Ce que donne / demande l'énoncé</th><th>Formule à utiliser</th><th>Exemple de question</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>une date t (connue ou cherchée)</td><td><span class="math">v(t) = v₀ + a·t</span> puis <span class="math">x(t)</span></td><td>« Où est-il à t = 3 s ? » / « Quand s'arrête-t-il ? » (poser v = 0)</td></tr>
+            <tr><td>une position à une date</td><td><span class="math">x(t) = x₀ + v₀·t + (1/2)·a·t²</span></td><td>« Quelle distance en 4 s ? »</td></tr>
+            <tr><td>une distance SANS connaître le temps</td><td><span class="math">v² = v₀² + 2·a·(x − x₀)</span></td><td>« Quelle distance de freinage ? »</td></tr>
+            <tr><td>vérifier un résultat</td><td>une DEUXIÈME formule (croisement)</td><td>vérifier x(5) calculé par x(t) grâce à v²</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Piège d'examen n° 2</div>
+          <p>Dans <span class="math">x(t) = x₀ + v₀·t + (1/2)·a·t²</span>, les deux fautes classiques : oublier d'élever t au carré, ou appliquer le (1/2) à toute l'expression. Rédige ligne par ligne — d'abord t², puis (1/2)·a·t², puis la somme — et n'utilise JAMAIS <span class="math">v = d/t</span> dans un MRUV : la vitesse n'y est pas constante, ce quotient ne vaut rien.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 3 : LA CHUTE LIBRE VERTICALE -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s3">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">03</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1 · mruv</span>
+        <h2 class="lecture-section-title">La chute libre verticale</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Le MRUV le plus célèbre tombe du ciel : la <strong>chute libre</strong>. On en fera un chapitre entier plus tard — ici, on la reconnaît comme un MRUV vertical dont l'accélération est l'intensité de la pesanteur.
+      </p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Définition officielle — chute libre</div>
+          <p>Un objet est en <strong>chute libre</strong> s'il n'est soumis qu'à son <strong>poids</strong>. Tout corps en chute libre verticale est un MRUV d'accélération <span class="math">a = g</span>, dirigée <strong>vers le bas</strong>, avec <span class="math">g = 9,8 m·s⁻²</span> (ou <span class="math">g = 10 m·s⁻²</span> pour simplifier — l'énoncé doit TOUJOURS préciser la valeur utilisée, et ta copie doit la rappeler).</p>
+        </div>
+      </div>
+
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-main">Formule majeure — la chute libre (axe vers le bas)</div>
+        <div class="lecture-formula-hero-main">v(t) = v₀ + g·t</div>
+        <div class="lecture-formula-hero-desc">C'est v(t) = v₀ + a·t avec a = g (axe orienté vers le bas). Pierre <strong>lâchée</strong> (sans impulsion) : v₀ = 0, donc v(t) = g·t — la vitesse gagne g mètres par seconde à chaque seconde, exactement comme promis par l'unité m·s⁻².</div>
+      </div>
+
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">Exemple travaillé — la pierre lâchée du pont</div>
+        <div class="lecture-example-content">
+          <p><strong>Données :</strong> une pierre est <strong>lâchée</strong> (v₀ = 0) du pont de Kollo ; on prend <span class="math">g = 9,8 m·s⁻²</span>, axe orienté vers le bas. Quelle est sa vitesse à <span class="math">t = 2 s</span> ?</p>
+          <p><strong>Résolution en 4 étapes :</strong></p>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Données :</strong> <span class="math">v₀ = 0 m·s⁻¹</span> (lâchée, pas lancée) ; axe vers le bas (sens de la chute) ; <span class="math">g = 9,8 m·s⁻²</span> — valeur précisée ✔</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Formule :</strong> <span class="math">v(t) = v₀ + g·t = 0 + 9,8·t</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Remplacer :</strong> <span class="math">v(2) = 9,8 × 2 = 19,6</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Résultat :</strong> <span class="math">v(2) = 19,6 m·s⁻¹</span> (soit environ 70,6 km·h⁻¹) — après 2 s de chute seulement ✔</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">Axe vers le haut ⟹ a = −g ; axe vers le bas ⟹ a = +g</div>
+        <div class="lecture-formula-desc">Le signe de a dépend de l'orientation de l'axe, décidée UNE fois pour toutes au début de l'exercice. Lance une pierre vers le haut avec un axe montuant : a = −g — son écriture change, pas la physique.</div>
+      </div>
+
+      <!-- SVG : pierre lancée vers le haut, →v diminue, →g vers le bas -->
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 540 290" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Pierre lancee vers le haut : fleche v qui raccourcit a trois hauteurs, fleche g constante vers le bas">
+          <text x="270" y="24" style="fill:var(--accent-bright)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle" letter-spacing="2">PIERRE LANCÉE VERS LE HAUT : MRUV VERTICAL</text>
+
+          <text x="270" y="58" style="fill:var(--accent-bright)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">sommet : v = 0</text>
+
+          <line x1="270" y1="225" x2="270" y2="70" style="stroke:var(--text-muted)" stroke-width="1.5" stroke-dasharray="6 4"/>
+
+          <circle cx="270" cy="215" r="7" fill="rgba(224,184,74,0.2)" style="stroke:var(--accent-bright)" stroke-width="2"/>
+          <circle cx="270" cy="140" r="7" fill="rgba(224,184,74,0.2)" style="stroke:var(--accent-bright)" stroke-width="2"/>
+          <circle cx="270" cy="88" r="7" fill="rgba(224,184,74,0.2)" style="stroke:var(--accent-bright)" stroke-width="2"/>
+
+          <line x1="245" y1="215" x2="245" y2="140" style="stroke:var(--success-light)" stroke-width="2.5" marker-end="url(#arrowGreenMR2b)"/>
+          <line x1="245" y1="140" x2="245" y2="98" style="stroke:var(--success-light)" stroke-width="2.5" marker-end="url(#arrowGreenMR2b)"/>
+          <line x1="245" y1="88" x2="245" y2="74" style="stroke:var(--success-light)" stroke-width="2.5" marker-end="url(#arrowGreenMR2b)"/>
+          <text x="222" y="170" style="fill:var(--success-light)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">→v</text>
+          <text x="222" y="188" style="fill:var(--text-muted)" font-size="11" font-family="Inter, system-ui, sans-serif" text-anchor="middle">diminue</text>
+
+          <line x1="330" y1="90" x2="330" y2="150" style="stroke:var(--danger-light)" stroke-width="2.5" marker-end="url(#arrowRedMR2c)"/>
+          <text x="342" y="126" style="fill:var(--danger-light)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif">→g (constant)</text>
+
+          <line x1="60" y1="232" x2="480" y2="232" style="stroke:var(--text-muted)" stroke-width="2"/>
+          <line x1="60" y1="238" x2="480" y2="238" stroke="rgba(224,184,74,0.4)" stroke-width="1" stroke-dasharray="8 6"/>
+
+          <text x="270" y="262" style="fill:var(--text-muted)" font-size="12.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">En montée : →v et →g opposés — ralenti. En chute :</text>
+          <text x="270" y="279" style="fill:var(--text-muted)" font-size="12.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">même sens — accéléré. a = g, constante dans les deux cas</text>
+          <defs>
+            <marker id="arrowGreenMR2b" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7" fill="none" style="stroke:var(--success-light)" stroke-width="1.3"/></marker>
+            <marker id="arrowRedMR2c" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7" fill="none" style="stroke:var(--danger-light)" stroke-width="1.3"/></marker>
+          </defs>
+        </svg>
+        <figcaption class="lecture-figure-caption">Lancée vers le haut, la pierre voit sa flèche →v raccourcir (→g s'y oppose), s'annule au sommet, puis grandit en redescendant. L'accélération, elle, ne change jamais : a = g vers le bas.</figcaption>
+      </figure>
+
+      <div class="lecture-callout lecture-callout-danger">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Erreur fréquente au Bac</div>
+          <p>Oublier de <strong>préciser la valeur de g</strong> (9,8 ou 10 m·s⁻²) — ou pire, mélanger les deux dans le même calcul. Règle : recopier la valeur de l'énoncé, la rappeler dans les données, et s'y tenir. Un résultat avec g = 10 alors que l'énoncé impose 9,8 est un résultat faux, même si la méthode est parfaite.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 4 : ACCÉLÉRÉ OU RALENTI -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s4">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">04</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1 · mruv</span>
+        <h2 class="lecture-section-title">Accéléré ou ralenti : →v face à →a</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        La partie 3 du chapitre Cinématique a posé la règle ; ici on l'approfondit avec les <strong>signes algébriques</strong>, car sur un axe orienté, « même sens » se traduit par « <strong>même signe</strong> ».
+      </p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Règle officielle — le classement</div>
+          <p>Sur un axe orienté : si <strong>v et a ont le même signe</strong> (→v et →a même sens), le mouvement est <strong>accéléré</strong> — la norme |v| augmente. Si <strong>v et a ont des signes opposés</strong> (→v et →a sens contraires), il est <strong>ralenti</strong> — la norme |v| diminue. Ce qui compte, c'est le sens <strong>relatif</strong> de →v et →a, jamais le signe de a tout seul.</p>
+        </div>
+      </div>
+
+      <div class="lecture-table">
+        <table>
+          <thead>
+            <tr><th>Mouvement</th><th>Sens de →v et →a</th><th>Signes de v et a</th><th>La norme |v|…</th><th>Exemple</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Accéléré</strong></td><td>même sens</td><td>v &gt; 0, a &gt; 0 <em>ou</em> v &lt; 0, a &lt; 0</td><td>augmente</td><td>démarrage du car à la gare</td></tr>
+            <tr><td><strong>Ralenti</strong></td><td>sens opposés</td><td>v &gt; 0, a &lt; 0 <em>ou</em> v &lt; 0, a &gt; 0</td><td>diminue</td><td>freinage avant le rond-point</td></tr>
+            <tr><td><strong>Uniforme</strong></td><td>—</td><td><span class="math">→a = →0</span></td><td>reste constante</td><td>train stabilisé (partie 1)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">Exemple travaillé — la marche arrière qui freine</div>
+        <div class="lecture-example-content">
+          <p><strong>Données :</strong> sur un axe orienté vers l'avant, une voiture recule : <span class="math">v₀ = −6 m·s⁻¹</span>. Le conducteur freine, ce qui donne <span class="math">a = +2 m·s⁻²</span> (l'accélération pointe vers l'avant). Le mouvement est-il accéléré ou ralenti entre t = 0 et t = 1 s ?</p>
+          <p><strong>Résolution en 3 étapes :</strong></p>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p>On calcule la nouvelle vitesse : <span class="math">v(1) = v₀ + a·t = −6 + 2 × 1 = −4 m·s⁻¹</span> — la voiture recule toujours (v reste négative), mais moins vite.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p>On compare les normes : <span class="math">|v₀| = 6 m·s⁻¹</span> puis <span class="math">|v(1)| = 4 m·s⁻¹</span> — la norme <strong>diminue</strong>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Conclusion :</strong> v &lt; 0 et a &gt; 0 — signes opposés, sens contraires → mouvement <strong>ralenti</strong> ✔ … alors que a est POSITIVE : le signe de a seul n'aurait rien dit !</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-danger">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Erreur fréquente au Bac — « a négative ≠ ralenti »</div>
+          <p>C'est LA confusion du chapitre. <strong>a négative peut être accéléré</strong> : une voiture qui recule de plus en plus vite a v &lt; 0 et a &lt; 0 — même signe → accéléré. <strong>a positive peut être ralenti</strong> : la marche arrière qui freine ci-dessus (v &lt; 0, a &gt; 0) → signes opposés → ralenti. La bonne question à se poser : « la NORME |v| grandit-elle ? » Oui → accéléré ; non → ralenti.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 5 : EXEMPLE COMPLET N°1 — LE DÉMARRAGE -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s5">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">05</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1 · mruv</span>
+        <h2 class="lecture-section-title">Exemple complet n°1 : le démarrage</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Premier exemple complet, celui du car qui arrache au feu vert : vitesse, position, et surtout la <strong>vérification croisée</strong> avec la formule sans le temps — le réflexe qui sauve des points.
+      </p>
+
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">Exemple complet n°1 — le moto-taxi au feu vert</div>
+        <div class="lecture-example-content">
+          <p><strong>Énoncé :</strong> un moto-taxi démarre au feu vert avec une accélération constante <span class="math">a = 2 m·s⁻²</span> ; on prend <span class="math">x₀ = 0</span> et <span class="math">v₀ = 0</span>. Calculer sa vitesse et sa position à <span class="math">t = 3 s</span>, puis vérifier le tout avec la formule sans le temps.</p>
+          <p><strong>Rédaction modèle :</strong></p>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Données :</strong> <span class="math">v₀ = 0 m·s⁻¹</span> ; <span class="math">a = 2 m·s⁻²</span> ; <span class="math">x₀ = 0 m</span> — unités SI, rien à convertir.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Équations du mouvement :</strong> <span class="math">v(t) = v₀ + a·t = 2·t</span> et <span class="math">x(t) = x₀ + v₀·t + (1/2)·a·t² = (1/2) × 2 × t² = t²</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Vitesse à 3 s :</strong> <span class="math">v(3) = 2 × 3 = 6 m·s⁻¹</span> (soit 21,6 km·h⁻¹) ✔</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Position à 3 s :</strong> <span class="math">x(3) = 0 + 0 + (1/2) × 2 × 9 = 9 m</span> — avec 3² = 9 calculé d'abord ✔</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">5</div><div class="lecture-step-content"><p><strong>Vérification par v² :</strong> <span class="math">v² = v₀² + 2·a·(x − x₀)</span> → <span class="math">2·2·9 = 36</span>, et <span class="math">v² = 6² = 36</span> ✔ — les deux formules se répondent.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">6</div><div class="lecture-step-content"><p><strong>Conclusion :</strong> à t = 3 s, la moto est à 9 m et roule à 6 m·s⁻¹ — cohérent avec la vitesse moyenne (0 + 6)/2 = 3 m·s⁻¹ sur 3 s, soit 9 m ✔</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SVG : graphe x(t) parabole du MRUV -->
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 540 290" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Graphe x de t du MRUV : parabole dont la pente, cest-a-dire la vitesse, augmente">
+          <text x="270" y="24" style="fill:var(--accent-bright)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle" letter-spacing="2">GRAPHE x(t) DU MRUV : UNE PARABOLE</text>
+
+          <line x1="80" y1="240" x2="500" y2="240" style="stroke:var(--accent-bright)" stroke-width="2" marker-end="url(#arrowGoldMR2a)"/>
+          <line x1="80" y1="240" x2="80" y2="60" style="stroke:var(--accent-bright)" stroke-width="2" marker-end="url(#arrowGoldMR2a)"/>
+          <text x="508" y="246" style="fill:var(--accent-bright)" font-size="13" font-family="Inter, system-ui, sans-serif">t</text>
+          <text x="62" y="58" style="fill:var(--accent-bright)" font-size="13" font-family="Inter, system-ui, sans-serif">x</text>
+          <circle cx="80" cy="240" r="3.5" style="fill:var(--accent-bright)"/>
+          <text x="66" y="258" style="fill:var(--text-muted)" font-size="12" font-family="Inter, system-ui, sans-serif">O</text>
+
+          <path d="M80,232 Q320,224 480,72" fill="none" style="stroke:var(--info)" stroke-width="2.5"/>
+
+          <circle cx="238" cy="212" r="5" fill="rgba(74,222,128,0.2)" style="stroke:var(--success-light)" stroke-width="2"/>
+          <line x1="190" y1="222" x2="286" y2="202" style="stroke:var(--success-light)" stroke-width="2"/>
+          <text x="238" y="188" style="fill:var(--success-light)" font-size="12" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">pente faible : v petite</text>
+
+          <circle cx="395" cy="142" r="5" fill="rgba(74,222,128,0.2)" style="stroke:var(--success-light)" stroke-width="2"/>
+          <line x1="340" y1="168" x2="450" y2="116" style="stroke:var(--success-light)" stroke-width="2"/>
+          <text x="400" y="100" style="fill:var(--success-light)" font-size="12" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">pente forte : v grande</text>
+
+          <text x="270" y="272" style="fill:var(--text-muted)" font-size="12.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">La pente de la parabole est la vitesse : elle grandit</text>
+          <text x="270" y="287" style="fill:var(--text-muted)" font-size="12.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">avec le temps — le mobile accélère de plus en plus</text>
+          <defs>
+            <marker id="arrowGoldMR2a" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7" fill="none" style="stroke:var(--accent-bright)" stroke-width="1.3"/></marker>
+          </defs>
+        </svg>
+        <figcaption class="lecture-figure-caption">En un MRUV accéléré, x(t) est une parabole dont les tangentes se redressent : la pente (la vitesse) passe de faible à forte. À l'inverse, un freinage donne une parabole qui s'aplatit.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 6 : EXEMPLE COMPLET N°2 — LE FREINAGE -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s6">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">06</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1 · mruv</span>
+        <h2 class="lecture-section-title">Exemple complet n°2 : le freinage</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Le grand classique des devoirs — et une question de vie ou de mort sur la route : quelle distance faut-il pour s'arrêter ? On résout, puis on vérifie le résultat <strong>trois fois</strong>, par trois méthodes indépendantes.
+      </p>
+
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">Exemple complet n°2 — la moto qui freine</div>
+        <div class="lecture-example-content">
+          <p><strong>Énoncé :</strong> une moto roule à <span class="math">v₀ = 20 m·s⁻¹</span> (soit 72 km·h⁻¹) ; le conducteur freine avec <span class="math">a = −4 m·s⁻²</span> (mouvement ralenti), origine des positions au début du freinage (<span class="math">x₀ = 0</span>). a) En combien de temps s'arrête-t-il ? b) Quelle distance parcourt-il pendant le freinage ? Vérifier trois fois.</p>
+          <p><strong>Rédaction modèle :</strong></p>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Données :</strong> <span class="math">v₀ = 20 m·s⁻¹</span> ; <span class="math">a = −4 m·s⁻²</span> ; <span class="math">x₀ = 0 m</span> — le signe de a annonce un mouvement <strong>ralenti</strong> (v &gt; 0, a &lt; 0 : sens opposés).</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Équations :</strong> <span class="math">v(t) = 20 − 4·t</span> et <span class="math">x(t) = 0 + 20·t + (1/2) × (−4) × t² = 20·t − 2·t²</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>a) Date d'arrêt :</strong> à l'arrêt, v = 0 → <span class="math">20 − 4·t = 0</span> → <span class="math">t = 20/4 = 5 s</span> ✔</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>b) Distance de freinage :</strong> <span class="math">x(5) = 20 × 5 − 2 × 25 = 100 − 50 = 50 m</span> ✔</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">5</div><div class="lecture-step-content"><p><strong>Vérification n°1 (v²)</strong> : à l'arrêt v² = 0, donc <span class="math">d = (0 − 400)/(2 × (−4)) = −400/(−8) = 50 m</span> ✔</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">6</div><div class="lecture-step-content"><p><strong>Vérification n°2 (aire du triangle v(t))</strong> : sous la droite de v(t), de 20 à 0 en 5 s : <span class="math">(1/2) × 5 × 20 = 50 m</span> ✔</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">7</div><div class="lecture-step-content"><p><strong>Vérification n°3 (vitesse moyenne)</strong> : de 20 à 0 m·s⁻¹, la moyenne vaut (20 + 0)/2 = 10 m·s⁻¹, d'où <span class="math">d = 10 × 5 = 50 m</span> ✔</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">8</div><div class="lecture-step-content"><p><strong>Conclusion :</strong> à 72 km·h⁻¹, cette moto a besoin de <strong>5 s et 50 m</strong> pour s'arrêter — trois méthodes, un seul résultat : le calcul est sûr ✔</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">d = v₀²/(2·|a|) — la distance pour s'ARRÊTER</div>
+        <div class="lecture-formula-desc">Version prête à l'emploi de la formule sans le temps quand v = 0 à la fin (mobile arrêté). Avec v₀ = 20 et |a| = 4 : d = 400/8 = 50 m. À connaître par cœur pour les questions de sécurité routière.</div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-danger">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Sécurité routière — la distance de freinage explose avec la vitesse</div>
+          <p>La formule dit <strong>d ∝ v₀²</strong> : la distance de freinage est proportionnelle au <strong>carré</strong> de la vitesse. <strong>Doubler la vitesse QUADRUPLE la distance.</strong> Même moto, mêmes freins : à 72 km·h⁻¹, 50 m suffisent ; à 144 km·h⁻¹ (v₀ = 40 m·s⁻¹), il faut <span class="math">d = 40²/(2 × 4) = 1 600/8 = 200 m</span> — quatre fois plus. La vitesse ne « double pas le risque » : elle le multiplie par quatre.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 7 : FICHE MÉTHODE -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s7">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">07</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Fiche méthode</span>
+        <h2 class="lecture-section-title">Résoudre un MRUV en 6 étapes</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        La recette complète, du texte de l'énoncé jusqu'à la conclusion vérifiée. Elle englobe celle du MRU (partie 1) — mêmes habitudes, une formule de plus.
+      </p>
+
+      <div class="lecture-section-sub">
+        <h3 class="lecture-subtitle">Les 6 étapes</h3>
+
+        <div class="lecture-steps">
+          <div class="lecture-step">
+            <div class="lecture-step-number">1</div>
+            <div class="lecture-step-content">
+              <p><strong>Système, référentiel, repère.</strong> Préciser le mobile (« la moto, assimilée à un point M »), le référentiel (terrestre), puis l'axe : origine, orientation — c'est elle qui fixe les signes de v₀ et de a.</p>
+            </div>
+          </div>
+          <div class="lecture-step">
+            <div class="lecture-step-number">2</div>
+            <div class="lecture-step-content">
+              <p><strong>Convertir en unités SI.</strong> km·h⁻¹ ÷ 3,6 ; min × 60 ; km × 1 000. Pour une chute libre, rappeler la valeur de g choisie (9,8 ou 10 m·s⁻²) et ne plus en changer.</p>
+            </div>
+          </div>
+          <div class="lecture-step">
+            <div class="lecture-step-number">3</div>
+            <div class="lecture-step-content">
+              <p><strong>Écrire les équations du temps.</strong> <span class="math">v(t) = v₀ + a·t</span> et <span class="math">x(t) = x₀ + v₀·t + (1/2)·a·t²</span>, avec les valeurs numériques simplifiées. Garder <span class="math">v² = v₀² + 2·a·(x − x₀)</span> en réserve.</p>
+            </div>
+          </div>
+          <div class="lecture-step">
+            <div class="lecture-step-number">4</div>
+            <div class="lecture-step-content">
+              <p><strong>Identifier l'inconnue et choisir la formule.</strong> Vitesse ou position à une date → v(t) / x(t). Date d'arrêt → v(t) = 0. Distance sans temps → v². (Arbre de décision ci-dessous.)</p>
+            </div>
+          </div>
+          <div class="lecture-step">
+            <div class="lecture-step-number">5</div>
+            <div class="lecture-step-content">
+              <p><strong>Résoudre ligne par ligne.</strong> Une transformation par ligne : t² d'abord, puis (1/2)·a·t², puis la somme. Surveiller le signe de a et l'ordre des soustractions dans v².</p>
+            </div>
+          </div>
+          <div class="lecture-step">
+            <div class="lecture-step-number">6</div>
+            <div class="lecture-step-content">
+              <p><strong>Conclure et vérifier.</strong> Résultat + unité + phrase (sens du mouvement, ralenti ou accéléré). Puis vérifier avec une DEUXIÈME formule (v², aire du graphe v(t) ou vitesse moyenne) et un ordre de grandeur.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-section-sub">
+        <h3 class="lecture-subtitle">Quelle formule choisir ? L'arbre de décision</h3>
+
+        <ul class="lecture-list-elegant">
+          <li><strong>Date ?</strong><span>l'énoncé donne t ou demande une date → les formules du temps : v(t) pour « à quelle allure », x(t) pour « où ».</span></li>
+          <li><strong>Arrêt ?</strong><span>« il s'immobilise », « s'arrête », « atteint le sommet » → poser <span class="math">v(t) = 0</span>, en tirer la date, puis calculer la position à cette date.</span></li>
+          <li><strong>Sans le temps</strong><span>l'énoncé demande une distance sans donner ni demander le temps → la formule sans le temps : <span class="math">v² = v₀² + 2·a·(x − x₀)</span>.</span></li>
+          <li><strong>Vitesse cherchée</strong><span>l'énoncé donne une distance et cherche la vitesse → la même formule v², en isolant v (racine carrée à la fin).</span></li>
+          <li><strong>Le doute persiste ?</strong><span> → le graphe v(t) dépanne toujours : sa pente vaut a, son aire vaut la distance parcourue.</span></li>
+        </ul>
+      </div>
+
+      <div class="lecture-callout lecture-callout-gold">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Réflexes Bac</div>
+          <ul class="lecture-list">
+            <li>Énoncé « uniformément varié » ⟹ tout de suite écrire les DEUX équations du temps ✔</li>
+            <li>Jamais v = d/t dans un MRUV — sauf pour la vitesse MOYENNE (v₀ + v)/2, en MRUV uniquement ✔</li>
+            <li>Trois vérifications gratuites : v², aire du triangle v(t), vitesse moyenne — un résultat confirmé deux fois est presque sûr ✔</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 8 : EXERCICES D'APPLICATION -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s8">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">08</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Entraînement</span>
+        <h2 class="lecture-section-title">Exercices d'application</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Trois exercices pour couvrir les trois visages du MRUV : démarrage, lancer vertical, freinage d'urgence. Cherche d'abord seul, puis déroule les corrigés ligne par ligne.
+      </p>
+
+      <div class="lecture-text">
+        <div class="lecture-exercise-label">✏️ Exercice d'application 1 — Le départ du car de la SOTRAN</div>
+        <p class="lecture-text"><strong>Énoncé :</strong> un car démarre de la gare avec une accélération constante <span class="math">a = 3 m·s⁻²</span> (<span class="math">v₀ = 0</span>, <span class="math">x₀ = 0</span>). a) Quelle est sa vitesse après <span class="math">4 s</span> ? La convertir en km·h⁻¹. b) Quelle distance a-t-il parcourue en ces 4 s ?</p>
+        <details>
+          <summary>Voir la solution détaillée</summary>
+          <div class="lecture-quiz-answer">
+            <div class="lecture-steps">
+              <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>a)</strong> <span class="math">v(t) = v₀ + a·t = 3·t</span>, donc <span class="math">v(4) = 3 × 4 = 12 m·s⁻¹</span> ✔</p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>a)</strong> Conversion : <span class="math">v = 12 × 3,6 = 43,2 km·h⁻¹</span> ✔</p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>b)</strong> <span class="math">x(4) = 0 + 0 + (1/2) × 3 × 16 = 24 m</span> (avec 4² = 16 calculé d'abord) ✔</p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Bilan :</strong> 12 m·s⁻¹ = 43,2 km·h⁻¹ et 24 m en 4 s — vérification : vitesse moyenne (0 + 12)/2 = 6 m·s⁻¹ × 4 s = 24 m ✔</p></div></div>
+            </div>
+            <p><strong>Bilan :</strong> v(t) pour la vitesse, x(t) pour la distance — et la moyenne (v₀ + v)/2 pour vérifier.</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="lecture-text">
+        <div class="lecture-exercise-label">✏️ Exercice d'application 2 — La pierre lancée vers le haut</div>
+        <p class="lecture-text"><strong>Énoncé :</strong> depuis le sol, un enfant lance une pierre verticalement vers le haut à <span class="math">v₀ = 15 m·s⁻¹</span> ; on prend <span class="math">g = 10 m·s⁻²</span> et l'axe vertical orienté <strong>vers le haut</strong>, origine au point de lancement. a) Écrire v(t). b) À quelle date la pierre atteint-elle son sommet ? c) Quelle est la hauteur maximale ? (Vérifier avec v².)</p>
+        <details>
+          <summary>Voir la solution détaillée</summary>
+          <div class="lecture-quiz-answer">
+            <div class="lecture-steps">
+              <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>a)</strong> Axe vers le haut et la pesanteur vers le bas : <span class="math">a = −g = −10 m·s⁻²</span>, d'où <span class="math">v(t) = v₀ + a·t = 15 − 10·t</span> (m·s⁻¹) ✔</p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>b)</strong> Au sommet, la pierre s'arrête un instant : <span class="math">v = 0</span> → <span class="math">15 − 10·t = 0</span> → <span class="math">t = 15/10 = 1,5 s</span> ✔</p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>c)</strong> <span class="math">x(t) = x₀ + v₀·t + (1/2)·a·t² = 0 + 15·t − 5·t²</span> (car (1/2) × 10 = 5)</p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>c)</strong> À t = 1,5 s : <span class="math">x(1,5) = 15 × 1,5 − 5 × 2,25 = 22,5 − 11,25 = 11,25 m</span> ✔</p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">5</div><div class="lecture-step-content"><p><strong>Vérification par v² :</strong> au sommet v² = 0, donc <span class="math">0 = 15² + 2 × (−10) × h</span> → <span class="math">h = 225/20 = 11,25 m</span> ✔ — même hauteur par deux chemins.</p></div></div>
+            </div>
+            <p><strong>Bilan :</strong> sommet à t = 1,5 s, hauteur maximale 11,25 m. « Sommet » se traduit toujours par v = 0.</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="lecture-text">
+        <div class="lecture-exercise-label">✏️ Exercice d'application 3 — Le freinage d'urgence</div>
+        <p class="lecture-text"><strong>Énoncé :</strong> roulant à <span class="math">90 km·h⁻¹</span> sur la route de Dosso, un automobiliste freine d'urgence avec <span class="math">a = −5 m·s⁻²</span>. a) Convertir la vitesse initiale en m·s⁻¹. b) Au bout de combien de temps s'arrête-t-il ? c) Quelle est sa distance d'arrêt ?</p>
+        <details>
+          <summary>Voir la solution détaillée</summary>
+          <div class="lecture-quiz-answer">
+            <div class="lecture-steps">
+              <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>a)</strong> <span class="math">v₀ = 90/3,6 = 25 m·s⁻¹</span> ✔</p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>b)</strong> <span class="math">v(t) = 25 − 5·t</span> ; à l'arrêt v = 0 → <span class="math">t = 25/5 = 5 s</span> ✔</p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>c)</strong> Sans le temps : <span class="math">d = (0 − 25²)/(2 × (−5)) = −625/(−10) = 62,5 m</span> ✔</p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>c)</strong> Vérification par x(t) : <span class="math">x(5) = 25 × 5 − (1/2) × 5 × 25 = 125 − 62,5 = 62,5 m</span> ✔ — deux méthodes, même réponse.</p></div></div>
+            </div>
+            <p><strong>Bilan :</strong> à 90 km·h⁻¹, l'arrêt demande 5 s et 62,5 m — presque le double du freinage à 72 km·h⁻¹ (50 m) : la distance grimpe vite avec la vitesse.</p>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== QCM ===== -->
+  <div class="lecture-quiz">
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q1. Un mobile a une accélération a = 3 m·s⁻². Cela signifie que sa vitesse…</p>
+      <div class="lecture-quiz-options"><span>A) vaut 3 m·s⁻¹</span><span>B) gagne 3 m·s⁻¹ à chaque seconde</span><span>C) triple à chaque seconde</span><span>D) reste constante</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><p><strong>Réponse : B.</strong> L'unité m·s⁻² se lit « (m·s⁻¹) par seconde » : la vitesse gagne 3 m·s⁻¹ chaque seconde (0, puis 3, puis 6…). L'option A confond vitesse et accélération, la C confond « gagner 3 » et « tripler », la D décrit un MRU (a = 0).</p></div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q2. Pour calculer une distance de freinage SANS connaître le temps d'arrêt, on utilise…</p>
+      <div class="lecture-quiz-options"><span>A) v(t) = v₀ + a·t</span><span>B) x(t) = x₀ + v₀·t + (1/2)·a·t²</span><span>C) v² = v₀² + 2·a·(x − x₀)</span><span>D) v = d/t</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><p><strong>Réponse : C.</strong> La formule sans le temps relie directement vitesse et position : on pose v = 0 (arrêt) et on isole x − x₀. Les formules A et B exigent t ; la D suppose une vitesse constante — faux dans un freinage.</p></div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q3. Une pierre est lâchée sans vitesse initiale (g = 10 m·s⁻²). Sa vitesse après 3 s vaut…</p>
+      <div class="lecture-quiz-options"><span>A) 3,3 m·s⁻¹</span><span>B) 10 m·s⁻¹</span><span>C) 30 m·s⁻¹</span><span>D) 90 m·s⁻¹</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><p><strong>Réponse : C.</strong> Chute libre : v(t) = g·t = 10 × 3 = 30 m·s⁻¹ (108 km·h⁻¹). L'option D triple au lieu d'ajouter (erreur type : penser « ×3 chaque seconde » au lieu de « +g chaque seconde »), la B recopie g sans multiplier.</p></div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q4. Une voiture recule à v = −8 m·s⁻¹ et freine avec a = +2 m·s⁻². Son mouvement est…</p>
+      <div class="lecture-quiz-options"><span>A) accéléré, car a est positive</span><span>B) ralenti, car v et a ont des signes opposés</span><span>C) uniforme</span><span>D) impossible à déterminer</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><p><strong>Réponse : B.</strong> v &lt; 0 et a &gt; 0 : sens opposés → la norme |v| diminue (de 8 vers 6, 4, 2, 0 m·s⁻¹) → mouvement ralenti, bien que a soit positive. Rappel d'or : on juge sur le sens RELATIF de →v et →a, jamais sur le signe de a seul.</p></div></details>
+    </div>
+  </div>
+
+  <!-- ===== RÉCAP ===== -->
+  <div class="lecture-recap">
+    <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
+    <ul class="lecture-recap-list">
+      <li><strong>[definition_mruv]</strong> MRUV = trajectoire une droite ET accélération constante : la vitesse varie de la même quantité chaque seconde ; a = Δv/Δt, en m·s⁻² (a = 2 ⟹ +2 m·s⁻¹ par seconde).</li>
+      <li><strong>[equation_vitesse]</strong> v(t) = v₀ + a·t : fonction affine du temps — graphe v(t) = droite de pente a, coupant l'axe vertical à v₀.</li>
+      <li><strong>[equation_position]</strong> x(t) = x₀ + v₀·t + (1/2)·a·t² : fonction du temps carré — graphe x(t) = parabole ; élever t² AVANT de multiplier, (1/2) ne porte que sur ce terme.</li>
+      <li><strong>[equation_sans_temps]</strong> v² = v₀² + 2·a·(x − x₀) : la formule des distances sans le temps — parfaite pour un freinage ; version arrêt : d = v₀²/(2·|a|).</li>
+      <li><strong>[chute_libre]</strong> Chute libre verticale = MRUV avec a = g vers le bas ; g = 9,8 m·s⁻² (ou 10 pour simplifier) — TOUJOURS préciser la valeur utilisée ; axe orienté vers le haut ⟹ a = −g.</li>
+      <li><strong>[accelere_ralenti]</strong> v et a de même signe (→v et →a même sens) = accéléré ; signes opposés = ralenti — on juge sur la norme |v|, jamais sur le signe de a seul.</li>
+      <li><strong>[verification]</strong> Trois vérifications croisées : la formule v², l'aire sous le graphe v(t) (triangle : (1/2) × base × hauteur), la vitesse moyenne (v₀ + v)/2 — en MRUV uniquement.</li>
+      <li><strong>[securite]</strong> d = v₀²/(2·|a|) ∝ v₀² : doubler la vitesse QUADRUPLE la distance de freinage (72 → 144 km·h⁻¹ : 50 m → 200 m) — la leçon physique la plus utile de l'année.</li>
+    </ul>
+  </div>
+
+  <!-- ===== FIN ===== -->
+  <div class="lecture-end">
+    <div class="lecture-end-icon">🎯</div>
+    <div class="lecture-end-text">Partie 2 terminée !</div>
+    <div class="lecture-end-sub">Tu tiens maintenant les trois équations du MRUV, la chute libre, le classement accéléré/ralenti et la distance de freinage — avec la discipline de la triple vérification. La partie 3 passe aux <strong>équations horaires &amp; diagrammes</strong> : lire et tracer les graphes x(t), v(t) et a(t) comme un pro du Bac.</div>
+    <div class="lecture-end-divider"></div>
+  </div>
+
+</div>

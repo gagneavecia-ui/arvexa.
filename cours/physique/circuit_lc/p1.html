@@ -1,0 +1,458 @@
+<!-- PARTIE 01 — Décharge d'un condensateur dans une bobine (Circuit LC) -->
+<div class="lecture-container">
+
+  <!-- ===== HERO ===== -->
+  <header class="lecture-hero">
+    <div class="lecture-hero-badge">
+      <span class="lecture-hero-icon">📘</span>
+      <span class="lecture-hero-label">Terminale C&D · Circuit LC · Partie 01</span>
+    </div>
+    <h1 class="lecture-hero-title">
+      Décharge d'un condensateur dans <em>une bobine</em>
+    </h1>
+    <p class="lecture-hero-intro">
+      Tu connais déjà le condensateur qui se charge et se décharge dans un circuit résistif. Ici, on remplace la résistance par une bobine, et tout change : la tension ne s'effondre plus, elle <strong>oscille</strong>. Le condensateur et la bobine se passent l'énergie comme deux joueurs qui se renvoient une balle, sans rien perdre. Objectif de cette partie : savoir calculer l'énergie de chaque composant et suivre cette navette d'énergie, clé de tous les oscillateurs électroniques.
+    </p>
+    <div class="lecture-hero-meta">
+      <span class="lecture-hero-meta-item">⏱ 20 min</span>
+      <span class="lecture-hero-meta-item">⚡ 4 notions</span>
+      <span class="lecture-hero-meta-item">📚 6 sections</span>
+      <span class="lecture-hero-meta-item">🎓 Terminale C&D</span>
+    </div>
+  </header>
+  <!-- ===== SOMMAIRE ===== -->
+  <nav class="lecture-toc">
+    <div class="lecture-toc-header">
+      <span>Dans cette partie</span>
+      <span class="lecture-toc-count">4 notions · 6 sections</span>
+    </div>
+    <ol class="lecture-toc-list">
+      <li><a href="#s0"><span class="toc-num">00</span><span>Pourquoi le circuit LC est partout</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>Le condensateur, réservoir d'énergie électrique</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>La bobine, réservoir d'énergie magnétique</span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>Le circuit LC : l'énergie fait la navette</span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>Charge et décharge du condensateur</span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>Exercices d'application + tableau d'analogie</span></a></li>
+    </ol>
+  </nav>
+  <!-- ============================================================ -->
+  <!-- SECTION s0 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s0">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">00</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Motivation</span>
+        <h2 class="lecture-section-title">Pourquoi le circuit LC est partout</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Tourne la molette d'une vieille radio : quand tu cherches une station FM, tu modifies en réalité la capacité d'un condensateur à l'intérieur du poste. Le circuit d'accord — un circuit LC — ne retient qu'une seule fréquence : celle de la station, et il ignore tout le reste. C'est ce réglage fin qui te sépare la voix du présentateur du crépitement des autres émetteurs.</p>
+      <p class="lecture-text">Ton téléphone fait la même chose en permanence, des dizaines de fois par seconde : ses circuits accordés sélectionnent le Wi-Fi, le Bluetooth, le GPS, chacun sur sa fréquence. Et quand tu poses le téléphone sur un chargeur sans fil, c'est encore un échange d'énergie entre deux bobines, orchestré par des circuits oscillants.</p>
+      <svg viewBox="0 0 640 220" style="width:100%;height:auto" role="img" aria-label="Radio à molette : le bouton d'accord change la capacité et donc la fréquence captée">
+        <rect width="640" height="220" rx="14" fill="rgba(96,165,250,0.06)"/>
+        <rect x="60" y="40" width="380" height="140" rx="16" fill="rgba(96,165,250,0.10)" style="stroke:var(--accent-bright)" stroke-width="2.5"/>
+        <circle cx="130" cy="110" r="36" fill="rgba(96,165,250,0.15)" style="stroke:var(--accent-bright)" stroke-width="2"/>
+        <circle cx="130" cy="110" r="22" fill="rgba(96,165,250,0.10)" style="stroke:var(--accent)" stroke-width="1.5"/>
+        <circle cx="130" cy="110" r="9" fill="rgba(96,165,250,0.15)" style="stroke:var(--accent)" stroke-width="1.5"/>
+        <path d="M200 120 H410" style="stroke:var(--accent)" stroke-width="2" fill="none"/>
+        <path d="M200 112 V128 M252 112 V128 M304 112 V128 M356 112 V128 M408 112 V128" style="stroke:var(--accent)" stroke-width="2" fill="none"/>
+        <text x="200" y="146" text-anchor="middle" fill="currentColor" style="font-size:12px">88</text>
+        <text x="252" y="146" text-anchor="middle" fill="currentColor" style="font-size:12px">92</text>
+        <text x="304" y="146" text-anchor="middle" fill="currentColor" style="font-size:12px">96</text>
+        <text x="356" y="146" text-anchor="middle" fill="currentColor" style="font-size:12px">100</text>
+        <text x="408" y="146" text-anchor="middle" fill="currentColor" style="font-size:12px">104</text>
+        <path d="M330 92 V132" style="stroke:rgba(251,191,36,1)" stroke-width="3.5" stroke-linecap="round"/>
+        <text x="330" y="80" text-anchor="middle" fill="rgba(251,191,36,1)" style="font-size:14px;font-weight:700">96 MHz</text>
+        <path d="M470 80 a45 45 0 0 1 0 60" style="stroke:rgba(251,191,36,0.9)" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M492 64 a68 68 0 0 1 0 92" style="stroke:rgba(251,191,36,0.65)" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M514 48 a90 90 0 0 1 0 124" style="stroke:rgba(251,191,36,0.4)" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <text x="320" y="204" text-anchor="middle" fill="currentColor" style="font-size:14px">Le bouton d'accord change C → le circuit LC ne retient qu'une fréquence</text>
+      </svg>
+      <p class="lecture-text">Dans cette partie, on ouvre le capot. Il te faut deux personnages : un stockeur d'énergie électrique (le condensateur) et un stockeur d'énergie magnétique (la bobine). Comprends chacun séparément, puis regarde-les s'échanger l'énergie.</p>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s1 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s1">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">01</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1</span>
+        <h2 class="lecture-section-title">Le condensateur, réservoir d'énergie électrique</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Commençons par le premier acteur. Un condensateur est formé de deux plaques métalliques face à face, séparées par un isolant. Branché à un générateur, il accumule des charges sur ses plaques : une tension <span class="math">u</span> apparaît entre elles, et de l'énergie se trouve stockée, prête à être rendue au circuit.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-title">🔑 Définition</div>
+        <p>Un <strong>condensateur</strong> de capacité <span class="math">C</span> (en farad, F) chargé sous la tension <span class="math">u</span> (en volt, V) stocke l'énergie électrique <span class="math">E_C = ½·C·u²</span> (en joule, J). La charge électrique accumulée sur ses plaques est <span class="math">q = C·u</span> (en coulomb, C).</p>
+      </div>
+      <p class="lecture-text"><strong>L'image qui reste :</strong> comprime un ressort. Plus tu appuies, plus tu stockes d'énergie élastique — mais l'énergie grandit comme le <strong>carré</strong> de la déformation. Ici, plus la tension <span class="math">u</span> est grande, plus l'énergie stockée est grande, et selon son carré aussi. La capacité <span class="math">C</span> joue le rôle de la souplesse du ressort : <span class="math">C ↔ 1/k</span> (un grand <span class="math">C</span> stocke beaucoup pour une petite tension, comme un ressort souple se déforme facilement).</p>
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-main"><span class="math">E_C = ½·C·u²</span></div>
+        <p class="lecture-formula-main"><span class="math">E_C</span> en joule (J) · <span class="math">C</span> en farad (F) · <span class="math">u</span> en volt (V) — l'énergie croît comme le carré de la tension</p>
+      </div>
+      <div class="lecture-formula-box">
+        <p>La même énergie s'écrit avec la charge : <span class="math">E_C = q²/(2·C)</span>. Les deux écritures sont équivalentes puisque <span class="math">q = C·u</span>. Face à un énoncé, choisis celle qui colle aux données.</p>
+      </div>
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">🎯 Exemple travaillé — Quelle énergie stocke ce condensateur ?</div>
+        <p class="lecture-example-content">Un condensateur de capacité <span class="math">C = 20 μF</span> est chargé sous la tension <span class="math">u = 12 V</span>. Calculer l'énergie stockée.</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step"><strong>Convertir la capacité.</strong> <span class="math">20 μF = 20·10⁻⁶ F = 2,0·10⁻⁵ F</span>. Sans cette conversion, le résultat serait 10⁶ fois trop grand !</li>
+          <li class="lecture-step"><strong>Écrire la formule.</strong> <span class="math">E_C = ½·C·u²</span>.</li>
+          <li class="lecture-step"><strong>Calculer le carré de la tension.</strong> <span class="math">u² = (12 V)² = 144 V²</span>.</li>
+          <li class="lecture-step"><strong>Conclure.</strong> <span class="math">E_C = 0,5 × 2,0·10⁻⁵ × 144 = 1,44·10⁻³ J</span>, soit environ 1,4 mJ. Vérification : <span class="math">0,5 × 2,0·10⁻⁵ = 1,0·10⁻⁵</span>, puis <span class="math">1,0·10⁻⁵ × 144 = 1,44·10⁻³ ✓</span></li>
+        </ol>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-title">⚠️ Piège d'examen</div>
+        <p>Piège n°1 : oublier de convertir <span class="math">μF</span> en <span class="math">F</span>. Piège n°2 : oublier le carré. Doubler <span class="math">u</span> <strong>quadruple</strong> <span class="math">E_C</span> — l'énergie n'est pas proportionnelle à la tension.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s2 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s2">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">02</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2</span>
+        <h2 class="lecture-section-title">La bobine, réservoir d'énergie magnétique</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Voici le deuxième acteur. Une bobine est un fil enroulé en spires ; traversée par un courant, elle crée un champ magnétique et stocke de l'énergie. Son caractère ? Elle déteste les changements : elle s'oppose à ce que le courant démarre trop vite… et à ce qu'il s'arrête trop vite.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-title">🔑 Définition</div>
+        <p>Une <strong>bobine</strong> d'inductance <span class="math">L</span> (en henry, H) parcourue par un courant d'intensité <span class="math">i</span> (en ampère, A) stocke l'énergie magnétique <span class="math">E_L = ½·L·i²</span> (en joule, J). Plus le courant est fort, plus le réservoir magnétique est plein.</p>
+      </div>
+      <p class="lecture-text"><strong>L'image qui reste :</strong> la bobine, c'est la <strong>masse</strong> du système : <span class="math">L ↔ m</span>. Un chariot lourd ne démarre ni ne s'arrête instantanément ; la bobine impose la même patience au courant. C'est précisément cette inertie qui transformera une simple décharge en oscillation.</p>
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-main"><span class="math">E_L = ½·L·i²</span></div>
+        <p class="lecture-formula-main"><span class="math">E_L</span> en joule (J) · <span class="math">L</span> en henry (H) · <span class="math">i</span> en ampère (A) — l'énergie croît comme le carré de l'intensité</p>
+      </div>
+      <div class="lecture-formula-box">
+        <p>L'énergie ne suit pas le courant, elle suit son <strong>carré</strong> : si le courant double, <span class="math">E_L</span> est multipliée par 4 ; si le courant est divisé par 10, <span class="math">E_L</span> est divisée par 100.</p>
+      </div>
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">🎯 Exemple travaillé — Quelle énergie stocke cette bobine ?</div>
+        <p class="lecture-example-content">Une bobine d'inductance <span class="math">L = 0,20 H</span> est traversée par un courant <span class="math">i = 0,30 A</span>. Calculer l'énergie stockée.</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step"><strong>Vérifier les unités.</strong> <span class="math">L = 0,20 H</span> ✓ et <span class="math">i = 0,30 A</span> ✓ : rien à convertir.</li>
+          <li class="lecture-step"><strong>Écrire la formule.</strong> <span class="math">E_L = ½·L·i²</span>.</li>
+          <li class="lecture-step"><strong>Calculer le carré du courant.</strong> <span class="math">i² = (0,30)² = 0,090 A²</span>.</li>
+          <li class="lecture-step"><strong>Conclure.</strong> <span class="math">E_L = 0,5 × 0,20 × 0,090 = 9,0·10⁻³ J = 9,0 mJ</span>. Vérification : <span class="math">0,5 × 0,20 = 0,10</span>, puis <span class="math">0,10 × 0,090 = 9,0·10⁻³ ✓</span></li>
+        </ol>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-title">⚠️ Piège d'examen</div>
+        <p>Ne confonds pas <span class="math">i</span> et <span class="math">i²</span> : un courant de <span class="math">0,30 A</span> donne <span class="math">i² = 0,090 A²</span>. Et convertis les millihenry : <span class="math">20 mH = 2,0·10⁻² H</span>.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s3 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s3">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">03</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 3</span>
+        <h2 class="lecture-section-title">Le circuit LC : l'énergie fait la navette</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Assemblons les deux réservoirs. On charge le condensateur, puis on le relie à la bobine : le condensateur se décharge, le courant s'installe, la bobine stocke ; puis elle rend l'énergie, le condensateur se recharge… à l'envers ! Et le cycle repart. C'est une <strong>oscillation libre</strong> : le système vibre tout seul, sans apport d'énergie extérieur.</p>
+      <svg viewBox="0 0 640 320" style="width:100%;height:auto" role="img" aria-label="Circuit LC idéal : condensateur C en haut, bobine L en bas, flèche de tension u et flèche de courant i">
+        <rect width="640" height="320" rx="14" fill="rgba(96,165,250,0.06)"/>
+        <path d="M180 60 H300 M320 60 H460 M460 60 V250 M460 250 H380 M260 250 H180 M180 250 V60" style="stroke:var(--accent-bright)" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M300 36 V84 M320 36 V84" style="stroke:var(--accent-bright)" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <path d="M260 250 a20 20 0 0 1 40 0 a20 20 0 0 1 40 0 a20 20 0 0 1 40 0" style="stroke:var(--accent-bright)" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <text x="280" y="66" fill="rgba(248,113,113,1)" style="font-size:18px;font-weight:700">+</text>
+        <text x="328" y="66" fill="rgba(96,165,250,1)" style="font-size:18px;font-weight:700">−</text>
+        <path d="M352 24 H306" style="stroke:rgba(248,113,113,1)" stroke-width="3" stroke-linecap="round"/>
+        <path d="M298 24 L316 17 L316 31 Z" fill="rgba(248,113,113,1)"/>
+        <text x="360" y="30" fill="rgba(248,113,113,1)" style="font-size:19px;font-style:italic;font-weight:700">u</text>
+        <path d="M180 110 V180" style="stroke:rgba(52,211,153,1)" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M172 174 L180 192 L188 174 Z" fill="rgba(52,211,153,1)"/>
+        <text x="148" y="152" fill="rgba(52,211,153,1)" style="font-size:19px;font-style:italic;font-weight:700">i</text>
+        <text x="298" y="110" fill="currentColor" style="font-size:18px;font-style:italic;font-weight:700">C</text>
+        <text x="320" y="288" text-anchor="middle" fill="currentColor" style="font-size:18px;font-style:italic;font-weight:700">L</text>
+      </svg>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-title">🔑 Définition</div>
+        <p><strong>Oscillations libres</strong> : évolution périodique d'un système laissé à lui-même après une excitation initiale (ici, un condensateur préalablement chargé). Dans un circuit LC idéal — sans résistance — elles sont sinusoïdales et d'amplitude constante.</p>
+      </div>
+      <p class="lecture-text"><strong>L'analogie totale avec le pendule élastique :</strong> la charge <span class="math">q</span> joue le rôle de l'élongation <span class="math">x</span>, le courant <span class="math">i</span> celui de la vitesse <span class="math">v</span>, l'inductance <span class="math">L</span> celui de la masse <span class="math">m</span>, et la capacité <span class="math">C</span> celui de l'inverse de la raideur <span class="math">1/k</span>. Le condensateur tendu comme un ressort comprimé se vide dans la bobine lancée comme une masse en mouvement… puis tout se retourne.</p>
+      <svg viewBox="0 0 640 260" style="width:100%;height:auto" role="img" aria-label="Analogie : pendule élastique (masse-ressort) et circuit LC, avec correspondances x-q, v-i, m-L, 1/k-C">
+        <rect width="640" height="260" rx="14" fill="rgba(96,165,250,0.06)"/>
+        <path d="M70 40 V190 M70 40 L58 52 M70 88 L58 100 M70 136 L58 148 M70 184 L58 196" style="stroke:var(--accent)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <path d="M70 115 L84 95 L98 135 L112 95 L126 135 L140 95 L154 135 L168 115" style="stroke:var(--accent-bright)" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <rect x="168" y="90" width="54" height="50" rx="8" fill="rgba(96,165,250,0.25)" style="stroke:var(--accent-bright)" stroke-width="2.5"/>
+        <path d="M240 115 H314" style="stroke:rgba(96,165,250,1)" stroke-width="2.5" stroke-dasharray="6 5"/>
+        <path d="M232 115 L246 108 L246 122 Z" fill="rgba(96,165,250,1)"/>
+        <path d="M322 115 L308 108 L308 122 Z" fill="rgba(96,165,250,1)"/>
+        <text x="278" y="100" fill="rgba(96,165,250,1)" style="font-size:18px;font-style:italic;font-weight:700">x</text>
+        <text x="150" y="232" text-anchor="middle" fill="currentColor" style="font-size:14px;font-weight:600">pendule élastique</text>
+        <text x="375" y="72" text-anchor="middle" fill="currentColor" style="font-size:15px;font-weight:600">x ↔ q</text>
+        <text x="375" y="104" text-anchor="middle" fill="currentColor" style="font-size:15px;font-weight:600">v ↔ i</text>
+        <text x="375" y="136" text-anchor="middle" fill="currentColor" style="font-size:15px;font-weight:600">m ↔ L</text>
+        <text x="375" y="168" text-anchor="middle" fill="currentColor" style="font-size:15px;font-weight:600">1/k ↔ C</text>
+        <path d="M430 60 H492 M508 60 H600 M600 60 V150 M600 150 H540 M480 150 H430 M430 150 V60" style="stroke:var(--accent-bright)" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M492 44 V76 M508 44 V76" style="stroke:var(--accent-bright)" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+        <path d="M480 150 a15 15 0 0 1 30 0 a15 15 0 0 1 30 0" style="stroke:var(--accent-bright)" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+        <text x="472" y="36" fill="rgba(248,113,113,1)" style="font-size:17px;font-style:italic;font-weight:700">q</text>
+        <path d="M600 80 V110" style="stroke:rgba(52,211,153,1)" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M593 104 L600 120 L607 104 Z" fill="rgba(52,211,153,1)"/>
+        <text x="612" y="102" fill="rgba(52,211,153,1)" style="font-size:17px;font-style:italic;font-weight:700">i</text>
+        <text x="515" y="232" text-anchor="middle" fill="currentColor" style="font-size:14px;font-weight:600">circuit LC</text>
+      </svg>
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-main"><span class="math">E_total = E_C + E_L = ½·C·u² + ½·L·i² = constante</span></div>
+        <p class="lecture-formula-main">circuit LC idéal (résistance nulle) : l'énergie totale se conserve — elle change de camp, elle ne disparaît pas</p>
+      </div>
+      <svg viewBox="0 0 640 320" style="width:100%;height:auto" role="img" aria-label="Transfert d'énergie en 4 phases : condensateur plein, décharge, tout dans la bobine, recharge à l'envers">
+        <rect width="640" height="320" rx="14" fill="rgba(96,165,250,0.06)"/>
+        <g transform="translate(10,0)">
+          <text x="75" y="24" text-anchor="middle" fill="currentColor" style="font-size:14px;font-weight:700">Phase 1</text>
+          <path d="M20 60 H62 M78 60 H130 M130 60 V130 M130 130 H105 M45 130 H20 M20 130 V60" style="stroke:var(--accent-bright)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <path d="M62 44 V76 M78 44 V76" style="stroke:var(--accent-bright)" stroke-width="4" fill="none" stroke-linecap="round"/>
+          <path d="M45 130 a15 15 0 0 1 30 0 a15 15 0 0 1 30 0" style="stroke:var(--accent-bright)" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+          <text x="50" y="66" fill="rgba(248,113,113,1)" style="font-size:15px;font-weight:700">+</text>
+          <text x="90" y="66" fill="rgba(96,165,250,1)" style="font-size:15px;font-weight:700">−</text>
+          <path d="M20 250 H130" style="stroke:rgba(96,165,250,0.35)" stroke-width="1.5"/>
+          <rect x="30" y="160" width="30" height="90" fill="rgba(96,165,250,0.45)" style="stroke:var(--accent-bright)" stroke-width="1.5"/>
+          <path d="M90 250 H120" style="stroke:rgba(52,211,153,1)" stroke-width="2.5"/>
+          <text x="45" y="272" text-anchor="middle" fill="rgba(96,165,250,1)" style="font-size:13px;font-style:italic;font-weight:700">E_C</text>
+          <text x="105" y="272" text-anchor="middle" fill="rgba(52,211,153,1)" style="font-size:13px;font-style:italic;font-weight:700">E_L</text>
+          <text x="75" y="296" text-anchor="middle" fill="currentColor" style="font-size:13px">u maximal · i nul</text>
+        </g>
+        <g transform="translate(170,0)">
+          <text x="75" y="24" text-anchor="middle" fill="currentColor" style="font-size:14px;font-weight:700">Phase 2</text>
+          <path d="M20 60 H62 M78 60 H130 M130 60 V130 M130 130 H105 M45 130 H20 M20 130 V60" style="stroke:var(--accent-bright)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <path d="M62 44 V76 M78 44 V76" style="stroke:var(--accent-bright)" stroke-width="4" fill="none" stroke-linecap="round"/>
+          <path d="M45 130 a15 15 0 0 1 30 0 a15 15 0 0 1 30 0" style="stroke:var(--accent-bright)" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+          <text x="50" y="66" fill="rgba(248,113,113,1)" style="font-size:15px;font-weight:700">+</text>
+          <text x="90" y="66" fill="rgba(96,165,250,1)" style="font-size:15px;font-weight:700">−</text>
+          <path d="M20 84 V114" style="stroke:rgba(52,211,153,1)" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <path d="M13 108 L20 124 L27 108 Z" fill="rgba(52,211,153,1)"/>
+          <path d="M20 250 H130" style="stroke:rgba(96,165,250,0.35)" stroke-width="1.5"/>
+          <rect x="30" y="205" width="30" height="45" fill="rgba(96,165,250,0.45)" style="stroke:var(--accent-bright)" stroke-width="1.5"/>
+          <rect x="90" y="205" width="30" height="45" fill="rgba(52,211,153,0.45)" style="stroke:rgba(52,211,153,1)" stroke-width="1.5"/>
+          <text x="75" y="296" text-anchor="middle" fill="currentColor" style="font-size:13px">u baisse · i monte</text>
+        </g>
+        <g transform="translate(330,0)">
+          <text x="75" y="24" text-anchor="middle" fill="currentColor" style="font-size:14px;font-weight:700">Phase 3</text>
+          <path d="M20 60 H62 M78 60 H130 M130 60 V130 M130 130 H105 M45 130 H20 M20 130 V60" style="stroke:var(--accent-bright)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <path d="M62 44 V76 M78 44 V76" style="stroke:var(--accent-bright)" stroke-width="4" fill="none" stroke-linecap="round"/>
+          <path d="M45 130 a15 15 0 0 1 30 0 a15 15 0 0 1 30 0" style="stroke:var(--accent-bright)" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+          <path d="M20 78 V118" style="stroke:rgba(52,211,153,1)" stroke-width="4" fill="none" stroke-linecap="round"/>
+          <path d="M12 110 L20 130 L28 110 Z" fill="rgba(52,211,153,1)"/>
+          <path d="M20 250 H130" style="stroke:rgba(96,165,250,0.35)" stroke-width="1.5"/>
+          <path d="M30 250 H60" style="stroke:rgba(96,165,250,1)" stroke-width="2.5"/>
+          <rect x="90" y="160" width="30" height="90" fill="rgba(52,211,153,0.45)" style="stroke:rgba(52,211,153,1)" stroke-width="1.5"/>
+          <text x="75" y="296" text-anchor="middle" fill="currentColor" style="font-size:13px">u nul · i maximal</text>
+        </g>
+        <g transform="translate(490,0)">
+          <text x="75" y="24" text-anchor="middle" fill="currentColor" style="font-size:14px;font-weight:700">Phase 4</text>
+          <path d="M20 60 H62 M78 60 H130 M130 60 V130 M130 130 H105 M45 130 H20 M20 130 V60" style="stroke:var(--accent-bright)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <path d="M62 44 V76 M78 44 V76" style="stroke:var(--accent-bright)" stroke-width="4" fill="none" stroke-linecap="round"/>
+          <path d="M45 130 a15 15 0 0 1 30 0 a15 15 0 0 1 30 0" style="stroke:var(--accent-bright)" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+          <text x="50" y="66" fill="rgba(96,165,250,1)" style="font-size:15px;font-weight:700">−</text>
+          <text x="90" y="66" fill="rgba(248,113,113,1)" style="font-size:15px;font-weight:700">+</text>
+          <path d="M20 84 V114" style="stroke:rgba(52,211,153,1)" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <path d="M13 108 L20 124 L27 108 Z" fill="rgba(52,211,153,1)"/>
+          <path d="M20 250 H130" style="stroke:rgba(96,165,250,0.35)" stroke-width="1.5"/>
+          <rect x="30" y="205" width="30" height="45" fill="rgba(96,165,250,0.45)" style="stroke:var(--accent-bright)" stroke-width="1.5"/>
+          <rect x="90" y="205" width="30" height="45" fill="rgba(52,211,153,0.45)" style="stroke:rgba(52,211,153,1)" stroke-width="1.5"/>
+          <text x="75" y="296" text-anchor="middle" fill="currentColor" style="font-size:13px">u repart à l'envers</text>
+        </g>
+        <text x="165" y="150" text-anchor="middle" fill="rgba(251,191,36,1)" style="font-size:24px;font-weight:700">→</text>
+        <text x="325" y="150" text-anchor="middle" fill="rgba(251,191,36,1)" style="font-size:24px;font-weight:700">→</text>
+        <text x="485" y="150" text-anchor="middle" fill="rgba(251,191,36,1)" style="font-size:24px;font-weight:700">→</text>
+        <text x="320" y="314" text-anchor="middle" fill="rgba(251,191,36,1)" style="font-size:14px;font-weight:600">↺ et ça recommence, indéfiniment dans un circuit idéal !</text>
+      </svg>
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">🎯 Exemple travaillé — De la tension initiale au courant maximal</div>
+        <p class="lecture-example-content">Notre circuit de référence : <span class="math">C = 10 μF</span>, <span class="math">L = 0,10 H</span>, condensateur chargé sous <span class="math">U₀ = 6,0 V</span>. Quelle est l'intensité maximale <span class="math">I₀</span> atteinte ?</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step"><strong>Énergie totale au départ</strong> (tout dans le condensateur) : <span class="math">E = ½·C·U₀² = 0,5 × 1,0·10⁻⁵ × 36 = 1,8·10⁻⁴ J</span>.</li>
+          <li class="lecture-step"><strong>Quand u = 0</strong>, toute l'énergie est magnétique : <span class="math">E_L = ½·L·I₀² = 1,8·10⁻⁴ J</span>.</li>
+          <li class="lecture-step"><strong>Isoler I₀.</strong> <span class="math">I₀ = √(2·E_L/L) = √(2 × 1,8·10⁻⁴ / 0,10) = √(3,6·10⁻³)</span>.</li>
+          <li class="lecture-step"><strong>Conclure.</strong> <span class="math">I₀ = 6,0·10⁻² A = 60 mA</span>. Vérification : <span class="math">(6,0·10⁻²)² = 3,6·10⁻³</span>, puis <span class="math">0,5 × 0,10 × 3,6·10⁻³ = 1,8·10⁻⁴ ✓</span></li>
+        </ol>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-title">⚠️ Piège d'examen</div>
+        <p>À l'instant où <span class="math">u = 0</span>, beaucoup écrivent « tout est nul ». Faux : c'est précisément l'instant où le courant est <strong>maximal</strong> ! Chaque réservoir a son moment de gloire, décalé d'un quart d'oscillation.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s4 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s4">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">04</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 4</span>
+        <h2 class="lecture-section-title">Charge et décharge du condensateur</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Voyons la mise en scène complète. Étape 1 : le commutateur relie le condensateur au générateur — c'est la <strong>charge</strong> : le générateur arrache des électrons d'une plaque pour les entasser sur l'autre, la tension <span class="math">u</span> monte. Étape 2 : on bascule le commutateur — le condensateur se décharge dans la bobine : c'est la <strong>décharge</strong>, et grâce à l'inertie de la bobine, elle est oscillante.</p>
+      <svg viewBox="0 0 640 300" style="width:100%;height:auto" role="img" aria-label="Étape 1 : charge du condensateur par un générateur ; étape 2 : décharge du condensateur dans la bobine">
+        <rect width="640" height="300" rx="14" fill="rgba(96,165,250,0.06)"/>
+        <path d="M320 20 V280" style="stroke:rgba(96,165,250,0.25)" stroke-width="2" stroke-dasharray="6 6"/>
+        <text x="160" y="42" text-anchor="middle" fill="currentColor" style="font-size:15px;font-weight:700">Étape 1 · charge</text>
+        <path d="M60 90 H150 M166 90 H270 M270 90 V230 M270 230 H60 M60 230 V186 M60 134 V90" style="stroke:var(--accent-bright)" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M150 74 V106 M166 74 V106" style="stroke:var(--accent-bright)" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <path d="M38 134 H82" style="stroke:var(--accent-bright)" stroke-width="4" stroke-linecap="round"/>
+        <path d="M48 162 H72" style="stroke:var(--accent-bright)" stroke-width="4" stroke-linecap="round"/>
+        <text x="88" y="141" fill="rgba(248,113,113,1)" style="font-size:15px;font-weight:700">+</text>
+        <text x="88" y="169" fill="rgba(96,165,250,1)" style="font-size:15px;font-weight:700">−</text>
+        <path d="M214 60 H172" style="stroke:rgba(248,113,113,1)" stroke-width="3" stroke-linecap="round"/>
+        <path d="M166 60 L182 53 L182 67 Z" fill="rgba(248,113,113,1)"/>
+        <text x="222" y="66" fill="rgba(248,113,113,1)" style="font-size:18px;font-style:italic;font-weight:700">u</text>
+        <path d="M196 90 H238" style="stroke:rgba(52,211,153,1)" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M246 90 L232 83 L232 97 Z" fill="rgba(52,211,153,1)"/>
+        <text x="214" y="78" fill="rgba(52,211,153,1)" style="font-size:17px;font-style:italic;font-weight:700">i</text>
+        <text x="160" y="272" text-anchor="middle" fill="currentColor" style="font-size:13px">le générateur stocke de l'énergie dans C</text>
+        <text x="490" y="42" text-anchor="middle" fill="currentColor" style="font-size:15px;font-weight:700">Étape 2 · décharge dans la bobine</text>
+        <path d="M400 90 H470 M486 90 H590 M590 90 V230 M590 230 H520 M460 230 H400 M400 230 V90" style="stroke:var(--accent-bright)" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M470 74 V106 M486 74 V106" style="stroke:var(--accent-bright)" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <path d="M460 230 a15 15 0 0 1 30 0 a15 15 0 0 1 30 0" style="stroke:var(--accent-bright)" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <text x="450" y="96" fill="rgba(248,113,113,1)" style="font-size:15px;font-weight:700">+</text>
+        <text x="498" y="96" fill="rgba(96,165,250,1)" style="font-size:15px;font-weight:700">−</text>
+        <path d="M534 60 H492" style="stroke:rgba(248,113,113,1)" stroke-width="3" stroke-linecap="round"/>
+        <path d="M486 60 L502 53 L502 67 Z" fill="rgba(248,113,113,1)"/>
+        <text x="542" y="66" fill="rgba(248,113,113,1)" style="font-size:18px;font-style:italic;font-weight:700">u</text>
+        <path d="M400 130 V170" style="stroke:rgba(52,211,153,1)" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M393 164 L400 180 L407 164 Z" fill="rgba(52,211,153,1)"/>
+        <text x="376" y="158" fill="rgba(52,211,153,1)" style="font-size:17px;font-style:italic;font-weight:700">i</text>
+        <text x="490" y="272" text-anchor="middle" fill="currentColor" style="font-size:13px">C se vide dans L : les oscillations commencent</text>
+      </svg>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-title">🔑 Définitions</div>
+        <p><strong>Charge</strong> : phase où le générateur accumule des charges sur les plaques — l'énergie vient du générateur. <strong>Décharge</strong> : phase où le condensateur restitue l'énergie stockée au circuit — ici, dans la bobine, ce qui lance les oscillations libres.</p>
+      </div>
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">🎯 Exemple travaillé — L'état de départ de la décharge</div>
+        <p class="lecture-example-content">Un condensateur de capacité <span class="math">C = 47 μF</span> est chargé sous une tension de <span class="math">6,0 V</span>, puis relié à une bobine. Calculer la charge <span class="math">q₀</span> et l'énergie <span class="math">E₀</span> au début de la décharge.</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step"><strong>Charge initiale.</strong> <span class="math">q₀ = C·U₀ = 47·10⁻⁶ × 6,0 = 2,8·10⁻⁴ C</span>, soit 282 μC.</li>
+          <li class="lecture-step"><strong>Formule de l'énergie.</strong> <span class="math">E₀ = ½·C·U₀²</span>.</li>
+          <li class="lecture-step"><strong>Application numérique.</strong> <span class="math">E₀ = 0,5 × 47·10⁻⁶ × 36 = 8,46·10⁻⁴ J</span>.</li>
+          <li class="lecture-step"><strong>Conclure et vérifier.</strong> La décharge part avec <span class="math">q₀ = 2,8·10⁻⁴ C</span> et <span class="math">E₀ ≈ 8,5·10⁻⁴ J</span>. Contrôle : <span class="math">47·10⁻⁶ × 36 = 1,69·10⁻³</span>, dont la moitié vaut bien <span class="math">8,46·10⁻⁴ ✓</span></li>
+        </ol>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-title">⚠️ Piège d'examen</div>
+        <p>Un condensateur chargé, même débranché, garde son énergie : gare à la décharge surprise ! Et une décharge à travers une <strong>résistance</strong> ne donne aucune oscillation — c'est la <strong>bobine</strong> qui les provoque.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s5 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s5">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">05</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Exercices</span>
+        <h2 class="lecture-section-title">Exercices d'application (corrigés pas à pas)</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <div class="lecture-text">
+        <div class="lecture-exercise-label">📝 Exercice 1 — L'énergie change de camp (niveau Bac)</div>
+        <p class="lecture-text">Un condensateur de capacité <span class="math">C = 20 μF</span>, chargé sous <span class="math">U₀ = 12 V</span>, est relié à une bobine d'inductance <span class="math">L = 0,20 H</span>. On néglige toute résistance. a) Calculer l'énergie totale du circuit. b) En déduire l'intensité maximale <span class="math">I₀</span> atteinte au cours des oscillations.</p>
+        <details>
+          <summary>Voir la solution détaillée</summary>
+          <ol class="lecture-steps">
+            <li class="lecture-step"><strong>a) Énergie au départ.</strong> Tout est dans le condensateur : <span class="math">E = ½·C·U₀² = 0,5 × 2,0·10⁻⁵ × 144</span>.</li>
+            <li class="lecture-step"><strong>Calcul.</strong> <span class="math">E = 1,44·10⁻³ J</span>. Vérification : <span class="math">0,5 × 2,0·10⁻⁵ = 1,0·10⁻⁵</span> puis <span class="math">1,0·10⁻⁵ × 144 = 1,44·10⁻³ ✓</span></li>
+            <li class="lecture-step"><strong>b) Condition d'intensité maximale.</strong> <span class="math">I₀</span> est atteinte quand toute l'énergie est magnétique : <span class="math">½·L·I₀² = E</span>.</li>
+            <li class="lecture-step"><strong>Isoler et calculer.</strong> <span class="math">I₀ = √(2·E/L) = √(2 × 1,44·10⁻³ / 0,20) = √(1,44·10⁻²) = 0,12 A</span>, soit 120 mA. Contrôle : <span class="math">0,5 × 0,20 × (0,12)² = 1,44·10⁻³ ✓</span></li>
+          </ol>
+        </details>
+      </div>
+      <div class="lecture-text">
+        <div class="lecture-exercise-label">📝 Exercice 2 — Énergie également répartie (niveau Bac)</div>
+        <p class="lecture-text">Un condensateur de capacité <span class="math">C = 5,0 μF</span> chargé sous <span class="math">U₀ = 8,0 V</span> est relié à une bobine d'inductance <span class="math">L = 0,50 H</span> (résistance négligeable). a) Calculer l'énergie totale. b) Déterminer la tension <span class="math">u</span> et l'intensité <span class="math">i</span> à l'instant où l'énergie est également répartie entre les deux composants.</p>
+        <details>
+          <summary>Voir la solution détaillée</summary>
+          <ol class="lecture-steps">
+            <li class="lecture-step"><strong>a) Énergie totale.</strong> <span class="math">E = ½·C·U₀² = 0,5 × 5,0·10⁻⁶ × 64 = 1,6·10⁻⁴ J</span>. Vérification : <span class="math">5,0·10⁻⁶ × 64 = 3,2·10⁻⁴</span>, moitié = <span class="math">1,6·10⁻⁴ ✓</span></li>
+            <li class="lecture-step"><strong>b) Également répartie</strong> signifie <span class="math">E_C = E_L = E/2 = 8,0·10⁻⁵ J</span>.</li>
+            <li class="lecture-step"><strong>Tension.</strong> <span class="math">½·C·u² = 8,0·10⁻⁵</span> → <span class="math">u = √(2 × 8,0·10⁻⁵ / 5,0·10⁻⁶) = √32 = 5,7 V</span>.</li>
+            <li class="lecture-step"><strong>Intensité.</strong> <span class="math">½·L·i² = 8,0·10⁻⁵</span> → <span class="math">i = √(2 × 8,0·10⁻⁵ / 0,50) = √(3,2·10⁻⁴) = 1,8·10⁻² A</span>.</li>
+            <li class="lecture-step"><strong>Contrôle de cohérence.</strong> <span class="math">E_C + E_L = 8,0·10⁻⁵ + 8,0·10⁻⁵ = 1,6·10⁻⁴ J</span> = énergie totale ✓</li>
+          </ol>
+        </details>
+      </div>
+      <p class="lecture-text">Pour finir, grave la table d'analogie : elle te permet de traduire n'importe quel résultat du pendule élastique en langage électrique, et inversement. Les correcteurs adorent quand tu t'en sers pour justifier une réponse.</p>
+      <div >
+        <table class="lecture-table">
+          <thead>
+            <tr><th>Pendule élastique (mécanique)</th><th>Circuit LC (électrique)</th><th>Rôle</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><span class="math">x</span> (élongation)</td><td><span class="math">q</span> (charge)</td><td>grandeur « stockée » qui oscille</td></tr>
+            <tr><td><span class="math">v</span> (vitesse)</td><td><span class="math">i</span> (intensité)</td><td>dérivée de la grandeur stockée</td></tr>
+            <tr><td><span class="math">m</span> (masse)</td><td><span class="math">L</span> (inductance)</td><td>l'inertie du système</td></tr>
+            <tr><td><span class="math">1/k</span></td><td><span class="math">C</span> (capacité)</td><td>la « souplesse » du stockage</td></tr>
+            <tr><td><span class="math">½·m·v²</span></td><td><span class="math">E_L = ½·L·i²</span></td><td>énergie « en mouvement »</td></tr>
+            <tr><td><span class="math">½·k·x²</span></td><td><span class="math">E_C = ½·C·u²</span></td><td>énergie « stockée »</td></tr>
+            <tr><td><span class="math">T₀ = 2π√(m/k)</span></td><td><span class="math">T₀ = 2π√(L·C)</span></td><td>période, indépendante de l'amplitude</td></tr>
+            <tr><td>frottements</td><td>résistance <span class="math">R</span></td><td>cause de l'amortissement</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+  <!-- ===== QCM ===== -->
+  <div class="lecture-quiz">
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Un condensateur de capacité <span class="math">C</span> est chargé sous la tension <span class="math">u</span>. Son énergie stockée vaut :</p>
+      <div class="lecture-quiz-options"><span>A) <span class="math">C·u</span></span><span>B) <span class="math">½·C·u</span></span><span>C) <span class="math">½·C·u²</span></span><span>D) <span class="math">C·u²</span></span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">Réponse C. L'énergie comporte le facteur ½ et le carré de la tension : <span class="math">E_C = ½·C·u²</span>. Contrôle : pour <span class="math">C = 20 μF</span> et <span class="math">u = 12 V</span>, on trouve <span class="math">1,44·10⁻³ J</span>, pas 0,24 J (réponse B, l'erreur du carré oublié).</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Dans un circuit LC idéal, à l'instant où la tension <span class="math">u</span> aux bornes du condensateur s'annule :</p>
+      <div class="lecture-quiz-options"><span>A) le courant est nul</span><span>B) le courant est maximal</span><span>C) la bobine ne stocke rien</span><span>D) les oscillations s'arrêtent</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">Réponse B. Quand <span class="math">u = 0</span>, <span class="math">E_C = 0</span> : toute l'énergie est magnétique, donc <span class="math">E_L = ½·L·I₀²</span> est maximale et le courant aussi. C'est le contraire à <span class="math">i = 0</span>, où <span class="math">u</span> est maximale.</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Au cours des oscillations libres d'un circuit LC idéal, l'énergie totale :</p>
+      <div class="lecture-quiz-options"><span>A) diminue jusqu'à zéro</span><span>B) reste constante</span><span>C) augmente</span><span>D) est tantôt positive, tantôt négative</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">Réponse B. Sans résistance, il n'y a aucune dissipation : <span class="math">E_C + E_L = constante</span>. Les énergies s'échangent, la somme ne bouge pas. Une énergie ne peut d'ailleurs jamais être négative.</div></details>
+    </div>
+  </div>
+  <!-- ===== RÉCAP ===== -->
+  <div class="lecture-recap">
+    <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
+    <ul class="lecture-recap-list">
+      <li><strong>Condensateur</strong> : il stocke l'énergie électrique <span class="math">E_C = ½·C·u²</span> — convertis toujours <span class="math">μF</span> en <span class="math">F</span>.</li>
+      <li><strong>Bobine</strong> : elle stocke l'énergie magnétique <span class="math">E_L = ½·L·i²</span> et freine les variations du courant (<span class="math">L ↔ m</span>).</li>
+      <li><strong>Oscillations libres</strong> : l'énergie fait la navette entre les deux réservoirs et <span class="math">E_C + E_L = constante</span> dans un circuit idéal.</li>
+    </ul>
+  </div>
+  <!-- ===== FIN ===== -->
+  <div class="lecture-end">
+    <div class="lecture-end-icon">🎯</div>
+    <div class="lecture-end-text">Partie 01 terminée !</div>
+    <div class="lecture-end-sub">Tu sais maintenant qui stocke quoi et comment l'énergie circule. Dans la partie 02, on sort les équations : tu vas démontrer la pulsation propre et la période propre du circuit — les deux stars du Bac.</div>
+    <div class="lecture-end-divider"></div>
+  </div>
+</div>

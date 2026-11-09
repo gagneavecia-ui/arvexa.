@@ -1,0 +1,751 @@
+<!-- ============================================================ -->
+<!-- PARTIE 3 : MOUVEMENTS RECTILIGNES & CIRCULAIRES               -->
+<!-- (NOTIONS : mru_mruv + mouvement_circulaire)                   -->
+<!-- Notion 1 : mru_mruv — MRU, MRUV, accéléré / ralenti / uniforme -->
+<!-- Notion 2 : mouvement_circulaire — T, f, ω, v = ω·R, aₙ = v²/R  -->
+<!-- ============================================================ -->
+
+<div class="lecture-container">
+
+  <!-- Présentation : toutes les classes utilisées ici sont stylées par lecture.html
+       (seule source de vérité) — aucun style inline, conforme à la charte du projet. -->
+
+  <!-- ===== HERO ===== -->
+  <header class="lecture-hero">
+    <div class="lecture-hero-badge">
+      <span class="lecture-hero-icon">📘</span>
+      <span class="lecture-hero-label">Partie 03 · Les grandes familles de mouvements</span>
+    </div>
+    <h1 class="lecture-hero-title">
+      Mouvements <em>rectilignes</em> &amp; circulaires
+    </h1>
+    <p class="lecture-hero-intro">
+      Le langage est prêt (partie 2), il faut maintenant <strong>classer les mouvements</strong> et leur associer leurs <strong>formules clés</strong>. Cette partie couvre <strong>2 notions</strong> : les mouvements <strong>rectilignes</strong> — uniforme (MRU) et uniformément varié (MRUV) — avec <span class="math">x(t) = x₀ + v·t</span> et <span class="math">v(t) = v₀ + a·t</span>, puis le <strong>mouvement circulaire uniforme</strong> avec période, fréquence, vitesse angulaire <span class="math">ω</span> et accélération centripète. Deux familles, une méthode : reconnaître, choisir la formule, calculer.
+    </p>
+    <div class="lecture-hero-meta">
+      <span class="lecture-hero-meta-item">⏱ 25 min</span>
+      <span class="lecture-hero-meta-item">⚡ 2 notions</span>
+      <span class="lecture-hero-meta-item">📚 8 sections</span>
+      <span class="lecture-hero-meta-item">🎓 Terminale C&amp;D</span>
+    </div>
+  </header>
+
+  <!-- ===== SOMMAIRE ===== -->
+  <nav class="lecture-toc">
+    <div class="lecture-toc-header">
+      <span>Dans cette partie</span>
+      <span class="lecture-toc-count">2 notions · 8 sections</span>
+    </div>
+    <ol class="lecture-toc-list">
+      <li><a href="#s0"><span class="toc-num">00</span><span>Motivation — Deux familles de trajectoires</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>Notion 1 · mru_mruv — Le mouvement rectiligne uniforme (MRU)</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>Notion 1 · mru_mruv — Le MRUV et ses formules du temps</span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>Notion 1 · mru_mruv — Accéléré, ralenti, uniforme</span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>Notion 2 · mouvement_circulaire — Le mouvement circulaire uniforme</span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>Notion 2 · mouvement_circulaire — L'accélération normale aₙ</span></a></li>
+      <li><a href="#s6"><span class="toc-num">06</span><span>Fiches méthode — Reconnaître un mouvement · traiter un cercle</span></a></li>
+      <li><a href="#s7"><span class="toc-num">07</span><span>Exercices d'application</span></a></li>
+    </ol>
+  </nav>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 0 : MOTIVATION -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s0">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">00</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Motivation</span>
+        <h2 class="lecture-section-title">La roue de la foire et le couloir d'aéroport</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Deux souvenirs pour ouvrir la partie. <strong>Un :</strong> la grande roue de la foire de Niamey — installée dans une cabine, tu parcours sans t'arrêter un <strong>cercle</strong> parfait, toujours à la même allure. <strong>Deux :</strong> le tapis roulant du couloir d'aéroport — tu avances en <strong>ligne droite</strong>, à vitesse constante, sans effort. Deux mouvements, deux géométries : et toute la mécanique de Terminale commence par distinguer ces <strong>familles de trajectoires</strong>.
+      </p>
+
+      <!-- SVG : les familles de trajectoires -->
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 540 275" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Trois familles de trajectoires : droite, cercle et courbe quelconque comme la parabole d'un ballon">
+          <text x="270" y="24" style="fill:var(--accent-bright)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle" letter-spacing="2">LES GRANDES FAMILLES DE TRAJECTOIRES</text>
+
+          <rect x="30" y="44" width="150" height="152" rx="12" fill="rgba(96,165,250,0.06)" style="stroke:var(--info)" stroke-width="1.5"/>
+          <line x1="48" y1="152" x2="162" y2="104" style="stroke:var(--info)" stroke-width="2.5" marker-end="url(#arrowBlueP3a)"/>
+          <circle cx="90" cy="136" r="7" fill="rgba(74,222,128,0.2)" style="stroke:var(--success-light)" stroke-width="2"/>
+          <g font-family="Inter, system-ui, sans-serif" text-anchor="middle"><text x="105" y="176" style="fill:var(--accent-bright)" font-size="13" font-weight="700">RECTILIGNE</text><g style="fill:var(--text-muted)" font-size="11.5"><text x="105" y="216">route droite, tapis</text><text x="105" y="232">d'aéroport, chute</text></g></g>
+
+          <rect x="200" y="44" width="150" height="152" rx="12" fill="rgba(224,184,74,0.06)" style="stroke:var(--accent-bright)" stroke-width="1.5"/>
+          <circle cx="275" cy="120" r="42" fill="none" style="stroke:var(--accent-bright)" stroke-width="2" stroke-dasharray="6 4"/>
+          <circle cx="275" cy="78" r="6" fill="rgba(74,222,128,0.2)" style="stroke:var(--success-light)" stroke-width="2"/>
+          <line x1="283" y1="78" x2="319" y2="78" style="stroke:var(--success-light)" stroke-width="2" marker-end="url(#arrowGreenP3a)"/>
+          <g font-family="Inter, system-ui, sans-serif" text-anchor="middle"><text x="275" y="176" style="fill:var(--accent-bright)" font-size="13" font-weight="700">CIRCULAIRE</text><g style="fill:var(--text-muted)" font-size="11.5"><text x="275" y="216">grande roue de la foire,</text><text x="275" y="232">manège, roue de vélo</text></g></g>
+
+          <rect x="370" y="44" width="140" height="152" rx="12" fill="rgba(239,68,68,0.05)" style="stroke:var(--danger-light)" stroke-width="1.5"/>
+          <path d="M382,168 Q440,60 498,168" fill="none" style="stroke:var(--danger-light)" stroke-width="2" stroke-dasharray="6 4"/>
+          <circle cx="440" cy="114" r="6" fill="rgba(74,222,128,0.2)" style="stroke:var(--success-light)" stroke-width="2"/>
+          <g font-family="Inter, system-ui, sans-serif" text-anchor="middle"><text x="440" y="176" style="fill:var(--accent-bright)" font-size="13" font-weight="700">AUTRE COURBE</text><g style="fill:var(--text-muted)" font-size="11.5"><text x="440" y="216">ballon lancé</text><text x="440" y="232">(parabole)</text></g></g>
+
+          <text x="270" y="251.0" style="fill:var(--text-muted)" font-size="12.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">La trajectoire est le PREMIER indice d'un exercice</text>
+          <text x="270" y="269.0" style="fill:var(--text-muted)" font-size="12.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">: droite ou cercle ? Puis la vitesse varie-t-elle ?</text>
+          <defs>
+            <marker id="arrowBlueP3a" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7" fill="none" style="stroke:var(--info)" stroke-width="1.3"/></marker>
+            <marker id="arrowGreenP3a" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7" fill="none" style="stroke:var(--success-light)" stroke-width="1.3"/></marker>
+          </defs>
+        </svg>
+        <figcaption class="lecture-figure-caption">Droite, cercle, ou courbe quelconque : identifier la trajectoire (dans le référentiel choisi, partie 1) oriente tout le reste de la résolution.</figcaption>
+      </figure>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">La grande idée du jour</div>
+          <p>En Terminale, deux familles concentrent l'essentiel des exercices : les mouvements <strong>rectilignes</strong> (la trajectoire est une droite — on y étudie MRU et MRUV avec les formules du temps) et le mouvement <strong>circulaire uniforme</strong> (la trajectoire est un cercle — on y introduit période, fréquence et vitesse angulaire). Dans les deux cas, la méthode reste la même : <strong>trajectoire → vitesse constante ou pas → formule adaptée → calcul en unités SI</strong>.</p>
+        </div>
+      </div>
+
+      <p class="lecture-text">
+        Dans les deux familles, tu réutiliseras les vecteurs de la partie 2 : →v reste <strong>tangent</strong> à la trajectoire, et la comparaison entre →v et →a dira si le mobile accélère, freine ou tourne. C'est parti.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 1 : NOTION 1 — LE MRU -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s1">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">01</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1 · mru_mruv</span>
+        <h2 class="lecture-section-title">Le mouvement rectiligne uniforme (MRU)</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Le cas le plus simple du monde : un mobile qui avance <strong>en ligne droite</strong> et <strong>couvre la même distance à chaque seconde</strong> — le tapis d'aéroport, le train sur une voie rectiligne à régime stabilisé, le car sur l'autoroute à vitesse maintenue.
+      </p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Définition officielle — MRU</div>
+          <p>Un mouvement est <strong>rectiligne uniforme</strong> si : <strong>1)</strong> sa trajectoire est une <strong>droite</strong>, et <strong>2)</strong> sa vitesse reste <strong>constante</strong> (v = cte). Les deux conditions sont obligatoires — droite seule ne suffit pas (on peut accélérer en ligne droite !). Dans un MRU, l'accélération est <strong>nulle</strong> : <span class="math">→a = →0</span>.</p>
+        </div>
+      </div>
+
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-main">Formule majeure — l'équation horaire du MRU</div>
+        <div class="lecture-formula-hero-main">x(t) = x₀ + v·t</div>
+        <div class="lecture-formula-hero-desc">x₀ = abscisse à l'origine des dates (à t₀ = 0, en m) ; v = vitesse algébrique constante (en m·s⁻¹). La position croît régulièrement : chaque seconde ajoute exactement v mètres. Sur un graphe x(t) : une <strong>droite inclinée</strong> de pente v.</div>
+      </div>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">Δx = v·Δt</div>
+        <div class="lecture-formula-desc">La distance parcourue vaut vitesse × durée (MRU uniquement) — c'est la partie 2 qui revient : v = Δx/Δt se retourne en Δx = v·Δt. Utile pour les questions « quelle distance en 2 h ? ».</div>
+      </div>
+
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">Exemple travaillé — la moto sur l'axe</div>
+        <div class="lecture-example-content">
+          <p><strong>Données :</strong> une moto roule en MRU sur l'axe (Ox). À <span class="math">t = 0 s</span>, elle est à <span class="math">x₀ = 120 m</span> ; sa vitesse est <span class="math">v = 10 m·s⁻¹</span>. Où est-elle à <span class="math">t = 5 s</span> ?</p>
+          <p><strong>Résolution en 4 étapes :</strong></p>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p>On écrit l'équation horaire : <span class="math">x(t) = x₀ + v·t = 120 + 10·t</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p>On remplace t par sa valeur : <span class="math">x(5) = 120 + 10 × 5</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p>On calcule le produit d'abord : <span class="math">x(5) = 120 + 50</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Résultat :</strong> <span class="math">x(5) = 170 m</span> — la moto est passée de 120 m à 170 m, soit 50 m en 5 s, cohérent avec 10 m·s⁻¹ ✔</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-table">
+        <table>
+          <thead>
+            <tr><th>Caractéristique</th><th>Valeur dans un MRU</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Trajectoire</td><td>une droite (un seul axe suffit : x)</td></tr>
+            <tr><td>Vitesse</td><td>constante — même valeur à chaque instant</td></tr>
+            <tr><td>Accélération</td><td>nulle : <span class="math">→a = →0</span> (→v ne change jamais)</td></tr>
+            <tr><td>Graphe x(t)</td><td>droite inclinée, de pente v</td></tr>
+            <tr><td>Graphe v(t)</td><td>droite horizontale à la hauteur v</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Piège d'examen n° 1</div>
+          <p>« Uniforme » veut dire <strong>vitesse constante</strong>, pas <strong>position constante</strong> ! Un mobile immobile n'est pas un MRU (il ne parcourt rien). Et attention : <span class="math">x₀</span> n'est pas toujours 0 — si l'énoncé place la moto à 120 m au départ, il faut le garder dans la formule, sinon tout le résultat tombe.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 2 : NOTION 1 — LE MRUV -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s2">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">02</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1 · mru_mruv</span>
+        <h2 class="lecture-section-title">Le MRUV et ses formules du temps</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Que se passe-t-il si, en ligne droite, la vitesse <strong>change régulièrement</strong> — du même montant à chaque seconde ? C'est le <strong>mouvement rectiligne uniformément varié</strong> (MRUV) : le départ d'un moto-taxi, le freinage d'un car, la chute libre (que tu retrouveras au chapitre suivant).
+      </p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Définition officielle — MRUV</div>
+          <p>Un mouvement est <strong>rectiligne uniformément varié</strong> si : <strong>1)</strong> sa trajectoire est une <strong>droite</strong>, et <strong>2)</strong> son <strong>accélération est constante</strong> (a = cte). « Uniformément varié » = la vitesse varie <strong>uniformément</strong>, du même montant chaque seconde : +2 m·s⁻¹ par seconde, ou −4 m·s⁻¹ par seconde lors d'un freinage.</p>
+        </div>
+      </div>
+
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-main">Formule majeure n°1 — la vitesse du MRUV</div>
+        <div class="lecture-formula-hero-main">v(t) = v₀ + a·t</div>
+        <div class="lecture-formula-hero-desc">v₀ = vitesse initiale (à t₀ = 0) ; a = accélération algébrique constante (en m·s⁻²). La vitesse est une <strong>fonction affine du temps</strong> : graphe v(t) = droite de pente a.</div>
+      </div>
+
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-main">Formule majeure n°2 — la position du MRUV</div>
+        <div class="lecture-formula-hero-main">x(t) = x₀ + v₀·t + (1/2)·a·t²</div>
+        <div class="lecture-formula-hero-desc">Le terme (1/2)·a·t² est la « signature » du MRUV : la position devient une <strong>fonction du temps carré</strong> — graphe x(t) = parabole. On élève t au carré AVANT de multiplier.</div>
+      </div>
+
+      <!-- SVG : les deux graphes du MRUV -->
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 540 285" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Graphes du MRUV : v de t en droite inclinee et x de t en parabole">
+          <text x="270" y="24" style="fill:var(--accent-bright)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle" letter-spacing="2">LES DEUX GRAPHES DU MRUV (DÉPART ACCELERÉ)</text>
+
+          <g style="stroke:var(--accent-bright)" stroke-width="2" marker-end="url(#arrowGoldP3a)"><line x1="70" y1="230" x2="280" y2="230"/><line x1="70" y1="230" x2="70" y2="60"/></g>
+          <text x="288" y="236" style="fill:var(--accent-bright)" font-size="13" font-family="Inter, system-ui, sans-serif">t</text>
+          <text x="52" y="66" style="fill:var(--accent-bright)" font-size="13" font-family="Inter, system-ui, sans-serif">v</text>
+          <line x1="70" y1="190" x2="265" y2="80" style="stroke:var(--success-light)" stroke-width="2.5"/>
+          <line x1="70" y1="190" x2="82" y2="190" style="stroke:var(--success-light)" stroke-width="2"/>
+          <text x="40" y="194" style="fill:var(--success-light)" font-size="12" font-family="Inter, system-ui, sans-serif">v₀</text>
+          <text x="150" y="130" style="fill:var(--success-light)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif">pente = a</text>
+          <text x="175" y="260" style="fill:var(--success-light)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">v(t) : droite</text>
+
+          <g style="stroke:var(--accent-bright)" stroke-width="2" marker-end="url(#arrowGoldP3a)"><line x1="330" y1="230" x2="530" y2="230"/><line x1="330" y1="230" x2="330" y2="60"/></g>
+          <text x="536" y="236" style="fill:var(--accent-bright)" font-size="13" font-family="Inter, system-ui, sans-serif">t</text>
+          <text x="312" y="66" style="fill:var(--accent-bright)" font-size="13" font-family="Inter, system-ui, sans-serif">x</text>
+          <path d="M330,230 Q430,224 500,80" fill="none" style="stroke:var(--info)" stroke-width="2.5"/>
+          <text x="420" y="150" style="fill:var(--info)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif">courbure vers le haut</text>
+          <text x="430" y="260" style="fill:var(--info)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">x(t) : parabole</text>
+
+          <text x="270" y="277.0" style="fill:var(--text-muted)" font-size="12.0" font-family="Inter, system-ui, sans-serif" text-anchor="middle">même étude, deux visages : la vitesse</text>
+          <text x="270" y="280" style="fill:var(--text-muted)" font-size="12.0" font-family="Inter, system-ui, sans-serif" text-anchor="middle">monte en droite, la position en parabole</text>
+          <defs>
+            <marker id="arrowGoldP3a" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7" fill="none" style="stroke:var(--accent-bright)" stroke-width="1.3"/></marker>
+          </defs>
+        </svg>
+        <figcaption class="lecture-figure-caption">MRUV avec a positif : v(t) est une droite qui monte (pente a) et x(t) une parabole dont la pente — la vitesse — augmente avec le temps.</figcaption>
+      </figure>
+
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">Exemple travaillé — le départ du moto-taxi</div>
+        <div class="lecture-example-content">
+          <p><strong>Données :</strong> un moto-taxi démarre au feu vert : <span class="math">x₀ = 0 m</span>, <span class="math">v₀ = 0 m·s⁻¹</span>, <span class="math">a = 2 m·s⁻²</span> (constante). Calculer sa vitesse et sa position à <span class="math">t = 3 s</span>.</p>
+          <p><strong>Résolution en 6 étapes :</strong></p>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p>Formule de la vitesse : <span class="math">v(t) = v₀ + a·t</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p>On remplace : <span class="math">v(3) = 0 + 2 × 3</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Vitesse :</strong> <span class="math">v(3) = 6 m·s⁻¹</span> — après 3 s, il roule à 6 m·s⁻¹ ✔</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p>Formule de la position : <span class="math">x(t) = x₀ + v₀·t + (1/2)·a·t²</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">5</div><div class="lecture-step-content"><p>On remplace (t² = 9) : <span class="math">x(3) = 0 + 0 × 3 + (1/2) × 2 × 9</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">6</div><div class="lecture-step-content"><p><strong>Position :</strong> <span class="math">x(3) = 9 m</span> — vérification : distance moyenne ≈ 9 m en 3 s pour une vitesse montée de 0 à 6 m·s⁻¹ (moyenne 3 m·s⁻¹ × 3 s = 9 m) ✔</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Piège d'examen n° 2</div>
+          <p>Dans <span class="math">x(t) = x₀ + v₀·t + (1/2)·a·t²</span>, l'erreur n°1 est d'oublier d'élever t au carré avant de multiplier, ou de diviser par 2 seulement le terme en t². Rédige comme dans l'exemple : <strong>une ligne = une transformation</strong>. Et ne mélange pas les deux formules : v(t) pour « à quelle allure », x(t) pour « où ».</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 3 : NOTION 1 — ACCÉLÉRÉ / RALENTI / UNIFORME -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s3">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">03</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1 · mru_mruv</span>
+        <h2 class="lecture-section-title">Accéléré, ralenti, uniforme : comparer →v et →a</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Sur une droite, tout se joue sur <strong>une seule question</strong> : le vecteur accélération →a pointe-t-il <strong>dans le même sens</strong> que le vecteur vitesse →v, ou en <strong>sens opposé</strong> ? C'est la règle d'or pour classer un mouvement rectiligne sans calcul.
+      </p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Règle officielle — le classement</div>
+          <p>Sur une trajectoire rectiligne : si <strong>→v et →a ont le même sens</strong>, le mouvement est <strong>accéléré</strong> (la norme v augmente) ; si <strong>→v et →a ont des sens opposés</strong>, le mouvement est <strong>ralenti</strong> (la norme v diminue) ; si <strong>→a = →0</strong>, il est <strong>uniforme</strong> (v constante).</p>
+        </div>
+      </div>
+
+      <!-- SVG : accéléré et ralenti -->
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 540 310" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Mouvement accelere : v et a de meme sens ; mouvement ralenti : v et a de sens opposes">
+          <text x="270" y="24" style="fill:var(--accent-bright)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle" letter-spacing="2">LE SENS DE →a DÉCIDE TOUT</text>
+
+          <text x="60" y="56" style="fill:var(--success-light)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif">ACCÉLÉRÉ — →v et →a : même sens</text>
+          <line x1="50" y1="110" x2="500" y2="110" style="stroke:var(--text-muted)" stroke-width="2"/>
+          <g fill="rgba(74,222,128,0.2)" style="stroke:var(--success-light)" stroke-width="2"><circle cx="140" cy="110" r="5"/><circle cx="330" cy="110" r="5"/></g>
+          <line x1="140" y1="80" x2="215" y2="80" style="stroke:var(--success-light)" stroke-width="2.5" marker-end="url(#arrowGreenP3b)"/>
+          <line x1="330" y1="80" x2="445" y2="80" style="stroke:var(--success-light)" stroke-width="2.5" marker-end="url(#arrowGreenP3b)"/>
+          <g style="fill:var(--success-light)" font-size="12.5" font-family="Inter, system-ui, sans-serif"><text x="152" y="68">→v₁</text><text x="368" y="68">→v₂ (plus grand)</text></g>
+          <line x1="140" y1="142" x2="230" y2="142" style="stroke:var(--danger-light)" stroke-width="2.5" marker-end="url(#arrowRedP3)"/>
+          <text x="150" y="160" style="fill:var(--danger-light)" font-size="12.5" font-family="Inter, system-ui, sans-serif">→a</text>
+
+          <text x="60" y="206" style="fill:var(--info)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif">RALENTI — →v et →a : sens opposés</text>
+          <line x1="50" y1="256" x2="500" y2="256" style="stroke:var(--text-muted)" stroke-width="2"/>
+          <circle cx="140" cy="256" r="5" fill="rgba(96,165,250,0.2)" style="stroke:var(--info)" stroke-width="2"/>
+          <circle cx="330" cy="256" r="5" fill="rgba(96,165,250,0.2)" style="stroke:var(--info)" stroke-width="2"/>
+          <line x1="140" y1="226" x2="245" y2="226" style="stroke:var(--info)" stroke-width="2.5" marker-end="url(#arrowBlueP3b)"/>
+          <line x1="330" y1="226" x2="405" y2="226" style="stroke:var(--info)" stroke-width="2.5" marker-end="url(#arrowBlueP3b)"/>
+          <g style="fill:var(--info)" font-size="12.5" font-family="Inter, system-ui, sans-serif"><text x="152" y="214">→v₁ (grand)</text><text x="368" y="214">→v₂ (plus petit)</text></g>
+          <line x1="230" y1="288" x2="140" y2="288" style="stroke:var(--danger-light)" stroke-width="2.5" marker-end="url(#arrowRedP3)"/>
+          <text x="244" y="294" style="fill:var(--danger-light)" font-size="12.5" font-family="Inter, system-ui, sans-serif">→a (opposé)</text>
+          <defs>
+            <marker id="arrowGreenP3b" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7" fill="none" style="stroke:var(--success-light)" stroke-width="1.3"/></marker>
+            <marker id="arrowBlueP3b" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7" fill="none" style="stroke:var(--info)" stroke-width="1.3"/></marker>
+            <marker id="arrowRedP3" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7" fill="none" style="stroke:var(--danger-light)" stroke-width="1.3"/></marker>
+          </defs>
+        </svg>
+        <figcaption class="lecture-figure-caption">En haut : la moto accélère, →a pousse dans le sens du mouvement et →v₂ est plus long que →v₁. En bas : le car freine, →a pointe vers l'arrière et →v₂ raccourcit.</figcaption>
+      </figure>
+
+      <div class="lecture-table">
+        <table>
+          <thead>
+            <tr><th>Mouvement</th><th>→a face à →v</th><th>La norme v…</th><th>Exemple</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Accéléré</strong></td><td>même sens</td><td>augmente</td><td>départ du moto-taxi au feu vert</td></tr>
+            <tr><td><strong>Ralenti</strong></td><td>sens opposés</td><td>diminue</td><td>freinage du car à l'arrêt de bus</td></tr>
+            <tr><td><strong>Uniforme</strong></td><td><span class="math">→a = →0</span></td><td>reste constante</td><td>train stabilisé sur voie droite</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">Exemple travaillé — une accélération « négative » qui accélère</div>
+        <div class="lecture-example-content">
+          <p><strong>Données :</strong> sur un axe orienté vers la droite, une voiture recule : <span class="math">v₀ = −6 m·s⁻¹</span> et <span class="math">a = −2 m·s⁻²</span>. Accélère-t-elle ou freine-t-elle entre t = 0 et t = 2 s ?</p>
+          <p><strong>Résolution en 3 étapes :</strong></p>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p>On calcule la vitesse à t = 2 s : <span class="math">v(2) = v₀ + a·t = −6 + (−2) × 2 = −6 − 4 = −10 m·s⁻¹</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p>On compare les normes : <span class="math">|v₀| = 6 m·s⁻¹</span> puis <span class="math">|v(2)| = 10 m·s⁻¹</span> — la norme a <strong>augmenté</strong>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p>Conclusion : →v et →a sont tous deux négatifs — <strong>même sens</strong> — donc le mouvement est <strong>accéléré</strong>, malgré les signes « moins » ✔</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-danger">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Erreur fréquente au Bac</div>
+          <p><strong>« Ralenti » ne veut PAS dire « a négative » !</strong> Ce qui compte, c'est le <strong>sens relatif</strong> de →v et →a. Si v = −6 m·s⁻¹ et a = −2 m·s⁻², l'accélération est négative mais le mouvement est <strong>accéléré</strong> (la voiture va de plus en plus vite vers la gauche). Règle à graver : <strong>même signe = accéléré, signes opposés = ralenti</strong> (sur un axe unique).</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 4 : NOTION 2 — LE MOUVEMENT CIRCULAIRE UNIFORME -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s4">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">04</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2 · mouvement_circulaire</span>
+        <h2 class="lecture-section-title">Le mouvement circulaire uniforme</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        La grande roue, le manège, la roue du vélo, l'aiguille d'une montre : le point décrit un <strong>cercle</strong> et met <strong>le même temps à chaque tour</strong>. Deux nouvelles grandeurs décrivent ce « tour par tour » : la <strong>période</strong> et la <strong>fréquence</strong>.
+      </p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Définition officielle — MCU, période, fréquence</div>
+          <p>Un mouvement est <strong>circulaire uniforme</strong> si la trajectoire est un <strong>cercle</strong> de rayon R et si la vitesse (en norme) reste <strong>constante</strong>. La <strong>période T</strong> est la durée d'<strong>un tour complet</strong> (en s) ; la <strong>fréquence f</strong> est le <strong>nombre de tours effectués par seconde</strong> (en hertz, Hz). Attention : la direction de →v change sans cesse — seul son module est constant.</p>
+        </div>
+      </div>
+
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-main">Formule majeure n°1 — période et fréquence</div>
+        <div class="lecture-formula-hero-main">f = 1/T</div>
+        <div class="lecture-formula-hero-desc">T en secondes (s), f en hertz (Hz) — inversement T = 1/f. Une roue qui fait un tour en 0,5 s a une fréquence de 2 Hz : deux tours chaque seconde. Ce sont deux façons de dire la même chose.</div>
+      </div>
+
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-main">Formule majeure n°2 — la vitesse angulaire</div>
+        <div class="lecture-formula-hero-main">ω = 2π/T = 2π·f</div>
+        <div class="lecture-formula-hero-desc">La vitesse angulaire ω (omega) mesure l'<strong>angle parcouru par seconde</strong>, en <strong>rad·s⁻¹</strong> : un tour complet = 2π radians, divisés par la durée T du tour. ω est la même pour tous les points d'une même roue.</div>
+      </div>
+
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-main">Formule majeure n°3 — la vitesse sur le cercle</div>
+        <div class="lecture-formula-hero-main">v = ω·R</div>
+        <div class="lecture-formula-hero-desc">Un point situé à la distance R de l'axe parcourt, à chaque seconde, un arc de longueur ω·R — en <strong>m·s⁻¹</strong>. Plus R est grand, plus le point va vite sur le cercle : le centre de la roue « ne bouge pas », le bord file.</div>
+      </div>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">v = 2πR/T</div>
+        <div class="lecture-formula-desc">Version « tout en un » : la longueur d'un tour (circonférence 2πR) divisée par la durée d'un tour T. Retrouve-la en combinant v = ω·R et ω = 2π/T — bon réflexe de vérification.</div>
+      </div>
+
+      <!-- SVG : le cercle, R, le sens de rotation et la vitesse tangente -->
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 540 300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Cercle de rayon R, point M, vecteur vitesse tangent et sens de rotation">
+          <text x="270" y="24" style="fill:var(--accent-bright)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle" letter-spacing="2">LE CERCLE, SON RAYON ET SA VITESSE TANGENTE</text>
+
+          <circle cx="200" cy="165" r="85" fill="none" style="stroke:var(--text-muted)" stroke-width="2" stroke-dasharray="7 4"/>
+          <circle cx="200" cy="165" r="4" style="fill:var(--accent-bright)"/>
+          <text x="184" y="188" style="fill:var(--text-muted)" font-size="13" font-family="Inter, system-ui, sans-serif">O</text>
+          <line x1="200" y1="165" x2="285" y2="165" style="stroke:var(--accent-bright)" stroke-width="2" stroke-dasharray="5 3"/>
+          <text x="238" y="156" style="fill:var(--accent-bright)" font-size="13.5" font-weight="700" font-family="Inter, system-ui, sans-serif">R</text>
+          <circle cx="285" cy="165" r="6" fill="rgba(74,222,128,0.2)" style="stroke:var(--success-light)" stroke-width="2"/>
+          <text x="296" y="176" style="fill:var(--success-light)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif">M</text>
+          <line x1="285" y1="165" x2="285" y2="95" style="stroke:var(--success-light)" stroke-width="2.5" marker-end="url(#arrowGreenP3c)"/>
+          <text x="294" y="110" style="fill:var(--success-light)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif">→v</text>
+          <path d="M140,110 A85,85 0 0 1 205,81" fill="none" style="stroke:var(--accent-bright)" stroke-width="2" marker-end="url(#arrowGoldP3b)"/>
+          <text x="96" y="76" style="fill:var(--text-muted)" font-size="11.5" font-family="Inter, system-ui, sans-serif">sens de rotation</text>
+          <text x="200" y="276" style="fill:var(--text-muted)" font-size="12" font-family="Inter, system-ui, sans-serif" text-anchor="middle">→v reste tangent : il tourne avec M</text>
+
+          <g style="fill:var(--info)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif"><text x="365" y="105">T : durée d'UN tour (s)</text><text x="365" y="132">f : tours par seconde (Hz)</text><text x="365" y="159">ω : angle par seconde (rad·s⁻¹)</text></g>
+          <text x="365" y="186" style="fill:var(--text-muted)" font-size="12" font-family="Inter, system-ui, sans-serif">1 tour = 2π rad</text>
+          <defs>
+            <marker id="arrowGreenP3c" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7" fill="none" style="stroke:var(--success-light)" stroke-width="1.3"/></marker>
+            <marker id="arrowGoldP3b" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7" fill="none" style="stroke:var(--accent-bright)" stroke-width="1.3"/></marker>
+          </defs>
+        </svg>
+        <figcaption class="lecture-figure-caption">Le point M tourne sur le cercle de rayon R : sa vitesse →v est tangente au cercle et sa norme constante. T, f et ω décrivent la rotation ; v = ω·R la traduit en vitesse sur le cercle.</figcaption>
+      </figure>
+
+      <div class="lecture-table">
+        <table>
+          <thead>
+            <tr><th>Grandeur</th><th>Symbole</th><th>Unité SI</th><th>Ce qu'elle raconte</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Période</td><td><span class="math">T</span></td><td>seconde (s)</td><td>la durée d'un tour complet</td></tr>
+            <tr><td>Fréquence</td><td><span class="math">f</span></td><td>hertz (Hz)</td><td>le nombre de tours par seconde</td></tr>
+            <tr><td>Vitesse angulaire</td><td><span class="math">ω</span></td><td>rad·s⁻¹</td><td>l'angle balayé par seconde</td></tr>
+            <tr><td>Vitesse sur le cercle</td><td><span class="math">v</span></td><td>m·s⁻¹</td><td>la vitesse du point M sur l'arc</td></tr>
+            <tr><td>Rayon</td><td><span class="math">R</span></td><td>mètre (m)</td><td>la distance de M à l'axe de rotation</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">Exemple travaillé — le ventilateur de salon</div>
+        <div class="lecture-example-content">
+          <p><strong>Données :</strong> une pale de ventilateur fait un tour complet en <span class="math">T = 0,5 s</span>. Calculer f et ω.</p>
+          <p><strong>Résolution en 3 étapes :</strong></p>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p>Fréquence : <span class="math">f = 1/T = 1/0,5 = 2 Hz</span> — deux tours chaque seconde.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p>Vitesse angulaire : <span class="math">ω = 2π·f = 2π × 2</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Résultat :</strong> <span class="math">ω ≈ 12,6 rad·s⁻¹</span> (2π ≈ 6,28) — les pales balayent 12,6 radians chaque seconde ✔</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Piège d'examen n° 3</div>
+          <p>Ne confonds pas <strong>tr/min</strong> et <strong>Hz</strong> : 3 000 tr/min = 50 tours par seconde = 50 Hz (on divise les minutes par 60). Et n'oublie pas les unités dans la réponse : <span class="math">T</span> en s, <span class="math">f</span> en Hz, <span class="math">ω</span> en rad·s⁻¹, <span class="math">v</span> en m·s⁻¹ — quatre unités différentes pour quatre grandeurs différentes.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 5 : NOTION 2 — L'ACCÉLÉRATION NORMALE -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s5">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">05</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2 · mouvement_circulaire</span>
+        <h2 class="lecture-section-title">L'accélération normale (centripète) aₙ</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Sur un cercle, même à vitesse constante, le mouvement varie : la <strong>direction</strong> de →v change à chaque instant (partie 2, piège n°3). Il existe donc une accélération — et elle pointe d'une façon très précise : <strong>vers le centre</strong>.
+      </p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Définition officielle — accélération normale</div>
+          <p>Dans un mouvement circulaire uniforme, le vecteur accélération est dirigé <strong>vers le centre du cercle</strong> : on l'appelle <strong>accélération normale</strong> (ou <strong>centripète</strong>), notée <span class="math">aₙ</span>. Sa norme vaut <span class="math">aₙ = v²/R</span> (en m·s⁻²) — elle est <strong>perpendiculaire</strong> à →v à chaque instant.</p>
+        </div>
+      </div>
+
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-main">Formule majeure — l'accélération centripète</div>
+        <div class="lecture-formula-hero-main">aₙ = v²/R</div>
+        <div class="lecture-formula-hero-desc">v en m·s⁻¹, R en m, aₙ en m·s⁻². Plus le virage est serré (R petit) et plus la vitesse est grande, plus aₙ est forte : c'est elle qu'on ressent dans les virages du car. Variantes utiles : aₙ = ω²·R = 4π²·R/T².</div>
+      </div>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">aₜ = Δv/Δt (composante tangentielle)</div>
+        <div class="lecture-formula-desc">Si en PLUS la norme de la vitesse varie (manège qui démarre), il faut ajouter l'<strong>accélération tangentielle</strong> aₜ, le long de →v. Dans un MCU pur, aₜ = 0 : l'accélération est purement centripète.</div>
+      </div>
+
+      <!-- SVG : a_n vers le centre et a_t tangentielle -->
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 540 285" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Acceleration normale an dirigee vers le centre du cercle, perpendiculaire a v ; encart sur l'acceleration tangentielle at">
+          <text x="270" y="24" style="fill:var(--accent-bright)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle" letter-spacing="2">aₙ POINTE VERS LE CENTRE ; aₜ LE LONG DE →v</text>
+
+          <circle cx="200" cy="160" r="80" fill="none" style="stroke:var(--text-muted)" stroke-width="2" stroke-dasharray="7 4"/>
+          <circle cx="200" cy="160" r="4" style="fill:var(--accent-bright)"/>
+          <text x="186" y="182" style="fill:var(--text-muted)" font-size="13" font-family="Inter, system-ui, sans-serif">O</text>
+          <circle cx="257" cy="103" r="6" fill="rgba(74,222,128,0.2)" style="stroke:var(--success-light)" stroke-width="2"/>
+          <text x="266" y="92" style="fill:var(--success-light)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif">M</text>
+          <line x1="257" y1="103" x2="218" y2="64" style="stroke:var(--success-light)" stroke-width="2.5" marker-end="url(#arrowGreenP3d)"/>
+          <text x="196" y="54" style="fill:var(--success-light)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif">→v</text>
+          <line x1="257" y1="103" x2="218" y2="142" style="stroke:var(--danger-light)" stroke-width="2.5" marker-end="url(#arrowRedP3b)"/>
+          <text x="192" y="152" style="fill:var(--danger-light)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif">aₙ</text>
+          <text x="288" y="118" style="fill:var(--text-muted)" font-size="12" font-family="Inter, system-ui, sans-serif">aₙ ⊥ →v</text>
+          <path d="M132,115 A80,80 0 0 1 196,85" fill="none" style="stroke:var(--accent-bright)" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arrowGoldP3c)"/>
+
+          <rect x="370" y="56" width="145" height="136" rx="10" fill="rgba(96,165,250,0.05)" style="stroke:var(--info)" stroke-width="1.2"/>
+          <text x="442" y="76" style="fill:var(--text-muted)" font-size="11.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">si la vitesse varie :</text>
+          <path d="M385,175 Q445,165 495,110" fill="none" style="stroke:var(--text-muted)" stroke-width="2" stroke-dasharray="5 3"/>
+          <circle cx="443" cy="154" r="5" fill="rgba(74,222,128,0.2)" style="stroke:var(--success-light)" stroke-width="2"/>
+          <line x1="443" y1="154" x2="472" y2="135" style="stroke:var(--accent-bright)" stroke-width="2" stroke-dasharray="5 3" marker-end="url(#arrowGoldP3c)"/>
+          <text x="478" y="130" style="fill:var(--accent-bright)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif">aₜ</text>
+          <line x1="443" y1="154" x2="458" y2="180" style="stroke:var(--danger-light)" stroke-width="2" marker-end="url(#arrowRedP3b)"/>
+          <text x="464" y="186" style="fill:var(--danger-light)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif">aₙ</text>
+
+          <text x="270" y="261.0" style="fill:var(--text-muted)" font-size="12.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">MCU : aₜ = 0 (v constante) → accélération</text>
+          <text x="270" y="279.0" style="fill:var(--text-muted)" font-size="12.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">purement centripète, vers le centre</text>
+          <defs>
+            <marker id="arrowGreenP3d" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7" fill="none" style="stroke:var(--success-light)" stroke-width="1.3"/></marker>
+            <marker id="arrowRedP3b" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7" fill="none" style="stroke:var(--danger-light)" stroke-width="1.3"/></marker>
+            <marker id="arrowGoldP3c" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7" fill="none" style="stroke:var(--accent-bright)" stroke-width="1.3"/></marker>
+          </defs>
+        </svg>
+        <figcaption class="lecture-figure-caption">À chaque instant, aₙ est perpendiculaire à →v et pointe vers le centre O : c'est elle qui « courbe » la trajectoire. Si la vitesse varie en plus, une composante tangentielle aₜ s'ajoute le long de →v.</figcaption>
+      </figure>
+
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">Exemple travaillé complet — la bille d'un carrousel miniature</div>
+        <div class="lecture-example-content">
+          <p><strong>Données :</strong> une bille décrit un cercle horizontal de rayon <span class="math">R = 0,50 m</span> avec une période <span class="math">T = 2,0 s</span>. Calculer f, ω, v puis aₙ.</p>
+          <p><strong>Résolution en 6 étapes :</strong></p>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p>Fréquence : <span class="math">f = 1/T = 1/2,0 = 0,50 Hz</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p>Vitesse angulaire : <span class="math">ω = 2π/T = 6,28/2,0 = 3,14 rad·s⁻¹</span> (soit π rad·s⁻¹)</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p>Vitesse sur le cercle : <span class="math">v = ω·R = 3,14 × 0,50 = 1,57 m·s⁻¹</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p>Accélération normale : <span class="math">aₙ = v²/R = (1,57)²/0,50</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">5</div><div class="lecture-step-content"><p>On élève au carré : <span class="math">(1,57)² ≈ 2,46</span>, puis <span class="math">aₙ ≈ 2,46/0,50 ≈ 4,9 m·s⁻²</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">6</div><div class="lecture-step-content"><p><strong>Conclusion :</strong> la bille subit une accélération d'environ <span class="math">4,9 m·s⁻²</span> — soit la moitié de g — dirigée vers le centre, sans que sa vitesse (1,57 m·s⁻¹) ne change ✔</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-danger">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Erreur fréquente au Bac</div>
+          <p>Dire « mouvement uniforme donc aucune accélération » : <strong>faux</strong> en circulaire. Uniforme = la <strong>norme</strong> v ne change pas, mais la <strong>direction</strong> de →v change sans cesse — donc →a existe et vaut aₙ = v²/R, dirigée vers le centre. Oublier cette accélération est LA faute classique du chapitre.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 6 : FICHES MÉTHODE -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s6">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">06</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Fiches méthode</span>
+        <h2 class="lecture-section-title">Reconnaître un mouvement, traiter un cercle</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Deux fiches pour deux situations d'examen : classer un mouvement rectiligne, puis dérouler un exercice de cercle. Les deux commencent par la même discipline : <strong>unités SI</strong>.
+      </p>
+
+      <div class="lecture-section-sub">
+        <h3 class="lecture-subtitle">Fiche A — Reconnaître et traiter un mouvement rectiligne (4 étapes)</h3>
+
+        <div class="lecture-steps">
+          <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Regarder la trajectoire.</strong> Droite → famille rectiligne ; cercle → passe à la fiche B. Annoncer système et référentiel.</p></div></div>
+          <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Regarder la vitesse.</strong> Constante → MRU : <span class="math">x(t) = x₀ + v·t</span>. Variable (a = cte) → MRUV : <span class="math">v(t) = v₀ + a·t</span> et <span class="math">x(t) = x₀ + v₀·t + (1/2)·a·t²</span>.</p></div></div>
+          <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Convertir et comparer les sens.</strong> Unités SI (km·h⁻¹ ÷ 3,6, etc.) ; puis sens de →v face à →a : même sens = accéléré, opposés = ralenti.</p></div></div>
+          <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Calculer ligne par ligne.</strong> Une transformation par ligne, résultat + unité + phrase de conclusion.</p></div></div>
+        </div>
+      </div>
+
+      <div class="lecture-section-sub">
+        <h3 class="lecture-subtitle">Fiche B — Résoudre un exercice de cercle (5 étapes)</h3>
+
+        <div class="lecture-steps">
+          <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Lister les données</strong> : R, et l'un des deux « temps de rotation » — T (durée d'un tour) ou f (tours par seconde). Tout le reste s'en déduit.</p></div></div>
+          <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Compléter T ou f</strong> avec <span class="math">f = 1/T</span> — il manque toujours l'un des deux.</p></div></div>
+          <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Calculer ω</strong> : <span class="math">ω = 2π/T = 2π·f</span>, en rad·s⁻¹ (prendre 2π ≈ 6,28).</p></div></div>
+          <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Calculer la vitesse</strong> : <span class="math">v = ω·R</span>, en m·s⁻¹ — convertir en km·h⁻¹ (× 3,6) si demandé.</p></div></div>
+          <div class="lecture-step"><div class="lecture-step-number">5</div><div class="lecture-step-content"><p><strong>Terminer par aₙ si demandé</strong> : <span class="math">aₙ = v²/R</span>, en m·s⁻², dirigée vers le centre. Préciser TOUJOURS la direction dans la conclusion.</p></div></div>
+        </div>
+      </div>
+
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">Exemple complet — le carrousel de la foire de Niamey</div>
+        <div class="lecture-example-content">
+          <p><strong>Énoncé :</strong> un cheval de carrousel tourne sur un cercle de rayon <span class="math">R = 2,0 m</span> avec une période <span class="math">T = 60 s</span> (un tour par minute). Calculer ω, v et aₙ.</p>
+          <p><strong>Rédaction modèle :</strong></p>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Données :</strong> <span class="math">R = 2,0 m</span> ; <span class="math">T = 60 s</span> — unités SI, rien à convertir.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Vitesse angulaire :</strong> <span class="math">ω = 2π/T = 6,28/60 ≈ 0,105 rad·s⁻¹</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Vitesse sur le cercle :</strong> <span class="math">v = ω·R ≈ 0,105 × 2,0 ≈ 0,21 m·s⁻¹</span> — allure d'un pas tranquille, normal pour un carrousel d'enfants.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Accélération normale :</strong> <span class="math">aₙ = v²/R = (0,21)²/2,0 = 0,044/2,0 ≈ 0,022 m·s⁻²</span> — très faible : le mouvement est doux.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">5</div><div class="lecture-step-content"><p><strong>Conclusion :</strong> chaque point du carrousel tourne à <span class="math">0,105 rad·s⁻¹</span>, file à <span class="math">0,21 m·s⁻¹</span> sur le cercle et subit une accélération centripète de <span class="math">0,022 m·s⁻²</span>, dirigée vers l'axe ✔</p></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 7 : EXERCICES D'APPLICATION -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s7">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">07</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Entraînement</span>
+        <h2 class="lecture-section-title">Exercices d'application</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Un exercice par famille : MRU, MRUV, cercle. Cherche d'abord seul, puis déroule les corrigés ligne par ligne.
+      </p>
+
+      <div class="lecture-text">
+        <div class="lecture-exercise-label">✏️ Exercice d'application 1 — Le train Ouagadougou-Niamey (MRU)</div>
+        <p class="lecture-text"><strong>Énoncé :</strong> sur une voie rectiligne, l'abscisse d'un train varie selon <span class="math">x(t) = 500 + 25·t</span> (t en s, x en m). a) Quelle est la nature du mouvement ? b) Calculer sa vitesse en m·s⁻¹ puis en km·h⁻¹. c) Où est-il à <span class="math">t = 120 s</span> ?</p>
+        <details>
+          <summary>Voir la solution détaillée</summary>
+          <div class="lecture-quiz-answer">
+            <div class="lecture-steps">
+              <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>a)</strong> x(t) est une fonction affine du temps (droite) : mouvement <strong>rectiligne uniforme</strong>, de vitesse constante <span class="math">v = 25 m·s⁻¹</span> (le coefficient de t) ✔</p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>b)</strong> Conversion : <span class="math">v = 25 × 3,6 = 90 km·h⁻¹</span> ✔</p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>c)</strong> On remplace : <span class="math">x(120) = 500 + 25 × 120 = 500 + 3 000</span></p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>c)</strong> <span class="math">x(120) = 3 500 m</span> — le train a parcouru 3 000 m en 2 min, cohérent avec 25 m·s⁻¹ (25 × 120 = 3 000) ✔</p></div></div>
+            </div>
+            <p><strong>Bilan :</strong> dans x(t) = x₀ + v·t, le nombre sans t est la position initiale (500 m), le coefficient de t est la vitesse (25 m·s⁻¹).</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="lecture-text">
+        <div class="lecture-exercise-label">✏️ Exercice d'application 2 — Le freinage du car (MRUV)</div>
+        <p class="lecture-text"><strong>Énoncé :</strong> un car roule à <span class="math">v₀ = 20 m·s⁻¹</span> et freine avec une accélération constante <span class="math">a = −4 m·s⁻²</span>. a) Écrire v(t). b) Au bout de combien de temps s'arrête-t-il ? c) Quelle distance parcourt-il pendant le freinage (en partant de x₀ = 0) ?</p>
+        <details>
+          <summary>Voir la solution détaillée</summary>
+          <div class="lecture-quiz-answer">
+            <div class="lecture-steps">
+              <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>a)</strong> <span class="math">v(t) = v₀ + a·t = 20 − 4·t</span> (m·s⁻¹) ✔</p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>b)</strong> À l'arrêt, v = 0 : <span class="math">20 − 4t = 0</span> donc <span class="math">t = 20/4 = 5 s</span> ✔</p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>c)</strong> <span class="math">x(5) = x₀ + v₀·t + (1/2)·a·t² = 0 + 20 × 5 + (1/2) × (−4) × 25</span></p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>c)</strong> On calcule : <span class="math">x(5) = 100 − 50 = 50 m</span> ✔</p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">5</div><div class="lecture-step-content"><p><strong>c)</strong> Vérification : vitesse moyenne de 20 à 0 m·s⁻¹ ≈ 10 m·s⁻¹ pendant 5 s → 10 × 5 = 50 m ✔ — le mouvement est <strong>ralenti</strong> (→a opposé à →v).</p></div></div>
+            </div>
+            <p><strong>Bilan :</strong> à 72 km·h⁻¹, un freinage de 4 m·s⁻² demande 50 m — d'où l'importance des distances de sécurité.</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="lecture-text">
+        <div class="lecture-exercise-label">✏️ Exercice d'application 3 — La roue du vélo (cercle)</div>
+        <p class="lecture-text"><strong>Énoncé :</strong> une roue de vélo de rayon <span class="math">R = 0,34 m</span> tourne à la fréquence <span class="math">f = 2,5 Hz</span>. a) Calculer ω en rad·s⁻¹. b) Calculer la vitesse v d'un point du pneu en m·s⁻¹ puis en km·h⁻¹. c) Que peut-on dire de l'accélération de ce point ?</p>
+        <details>
+          <summary>Voir la solution détaillée</summary>
+          <div class="lecture-quiz-answer">
+            <div class="lecture-steps">
+              <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>a)</strong> <span class="math">ω = 2π·f = 2π × 2,5 = 6,28 × 2,5 ≈ 15,7 rad·s⁻¹</span> ✔</p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>b)</strong> <span class="math">v = ω·R ≈ 15,7 × 0,34 ≈ 5,34 m·s⁻¹</span> ✔</p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>b)</strong> Conversion : <span class="math">v ≈ 5,34 × 3,6 ≈ 19,2 km·h⁻¹</span> — allure réaliste d'un cycliste en ville ✔</p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>c)</strong> Le point est en <strong>MCU</strong> : sa norme de vitesse ne change pas mais sa direction tourne — il subit une accélération <strong>normale aₙ = v²/R</strong>, dirigée <strong>vers l'axe de la roue</strong> (valeur ≈ (5,34)²/0,34 ≈ 84 m·s⁻², énorme : c'est le prix des petites roues qui tournent vite) ✔</p></div></div>
+            </div>
+            <p><strong>Bilan :</strong> fiche B déroulée : f → ω → v = ω·R → aₙ. (Vérif : (5,34)² ≈ 28,5 et 28,5/0,34 ≈ 84.)</p>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== QCM ===== -->
+  <div class="lecture-quiz">
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q1. Dans un MRU, le graphe de la position x(t) est…</p>
+      <div class="lecture-quiz-options"><span>A) une parabole</span><span>B) une droite inclinée</span><span>C) une droite horizontale</span><span>D) un cercle</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><p><strong>Réponse : B.</strong> x(t) = x₀ + v·t est affine : droite inclinée de pente v. La parabole (A) est le graphe x(t) du MRUV, l'horizontale (C) décrirait une position fixe (mobile immobile), le cercle (D) est une trajectoire, pas un graphe x(t).</p></div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q2. Une voiture roule à v₀ = 10 m·s⁻¹ et freine avec a = −2 m·s⁻². Elle s'arrête à…</p>
+      <div class="lecture-quiz-options"><span>A) t = 2 s</span><span>B) t = 4 s</span><span>C) t = 5 s</span><span>D) t = 10 s</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><p><strong>Réponse : C.</strong> v(t) = 10 − 2t ; l'arrêt correspond à v = 0, donc t = 10/2 = 5 s. (Option A : confondre avec la valeur de a ; option D : oublier de diviser.)</p></div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q3. Une hélice tourne avec une période T = 0,25 s. Sa fréquence vaut…</p>
+      <div class="lecture-quiz-options"><span>A) 0,25 Hz</span><span>B) 2 Hz</span><span>C) 4 Hz</span><span>D) 25 Hz</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><p><strong>Réponse : C.</strong> f = 1/T = 1/0,25 = 4 Hz — quatre tours par seconde. L'option A recopie la période sans inverser ; se méfier aussi des conversions tr/min → Hz.</p></div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q4. Dans un mouvement circulaire uniforme, le vecteur accélération est dirigé…</p>
+      <div class="lecture-quiz-options"><span>A) dans le sens du mouvement</span><span>B) vers le centre du cercle</span><span>C) vers l'extérieur du cercle</span><span>D) verticalement vers le bas</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><p><strong>Réponse : B.</strong> L'accélération normale (centripète) pointe vers le centre, perpendiculaire à →v : c'est elle qui courbe la trajectoire, même quand la norme de la vitesse ne change pas (aₙ = v²/R).</p></div></details>
+    </div>
+  </div>
+
+  <!-- ===== RÉCAP ===== -->
+  <div class="lecture-recap">
+    <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
+    <ul class="lecture-recap-list">
+      <li><strong>[trajectoires]</strong> Premier réflexe de tout exercice : identifier la trajectoire dans le référentiel d'étude — droite (famille rectiligne) ou cercle (famille circulaire).</li>
+      <li><strong>[mru]</strong> MRU = droite + vitesse constante : x(t) = x₀ + v·t, accélération nulle, Δx = v·Δt ; graphe x(t) en droite inclinée.</li>
+      <li><strong>[mruv]</strong> MRUV = droite + accélération constante : v(t) = v₀ + a·t et x(t) = x₀ + v₀·t + (1/2)·a·t² ; graphe v(t) en droite, x(t) en parabole.</li>
+      <li><strong>[accelere_ralenti]</strong> Même sens de →v et →a = accéléré ; sens opposés = ralenti ; →a = →0 = uniforme. Ne JAMAIS juger sur le seul signe de a.</li>
+      <li><strong>[periode_frequence]</strong> T = durée d'un tour (s), f = tours par seconde (Hz), et f = 1/T (ou T = 1/f).</li>
+      <li><strong>[vitesse_angulaire]</strong> ω = 2π/T = 2π·f, en rad·s⁻¹ — un tour complet vaut 2π rad.</li>
+      <li><strong>[vitesse_circulaire]</strong> v = ω·R = 2πR/T, en m·s⁻¹ : à ω fixée, plus R est grand, plus le point va vite sur l'arc.</li>
+      <li><strong>[acceleration_normale]</strong> En MCU, l'accélération est centripète : aₙ = v²/R = ω²·R, en m·s⁻², perpendiculaire à →v, dirigée vers le centre ; aₜ = 0 si la vitesse est constante.</li>
+    </ul>
+  </div>
+
+  <!-- ===== FIN ===== -->
+  <div class="lecture-end">
+    <div class="lecture-end-icon">🎯</div>
+    <div class="lecture-end-text">Partie 3 terminée !</div>
+    <div class="lecture-end-sub">Tu sais maintenant classer un mouvement, écrire ses équations horaires et dérouler un exercice de cercle de la période jusqu'à l'accélération centripète. La partie 4 rassemble tout le chapitre dans une fiche complète de révision — formules, tableaux et réflexes Bac.</div>
+    <div class="lecture-end-divider"></div>
+  </div>
+
+</div>

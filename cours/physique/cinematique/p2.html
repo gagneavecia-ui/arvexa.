@@ -1,0 +1,754 @@
+<!-- ============================================================ -->
+<!-- PARTIE 2 : VECTEUR POSITION, VITESSE & ACCÉLÉRATION           -->
+<!-- (NOTION : cinematic_vectorielle)                              -->
+<!-- Notion 1 : cinematic_vectorielle — Vecteurs position, vitesse, -->
+<!--            accélération ; vitesse moyenne et instantanée      -->
+<!-- ============================================================ -->
+
+<div class="lecture-container">
+
+  <!-- Présentation : toutes les classes utilisées ici sont stylées par lecture.html
+       (seule source de vérité) — aucun style inline, conforme à la charte du projet. -->
+
+  <!-- ===== HERO ===== -->
+  <header class="lecture-hero">
+    <div class="lecture-hero-badge">
+      <span class="lecture-hero-icon">📘</span>
+      <span class="lecture-hero-label">Partie 02 · Le langage du mouvement</span>
+    </div>
+    <h1 class="lecture-hero-title">
+      Vecteur position, <em>vitesse</em> &amp; accélération
+    </h1>
+    <p class="lecture-hero-intro">
+      La partie 1 a installé le décor : un <strong>référentiel</strong>, un repère d'espace, une horloge. Il est temps de <strong>filmer le mouvement image par image</strong>. Cette partie construit autour d'<strong>1 notion</strong> (la <strong>cinématique vectorielle</strong>) les trois grandeurs qui décrivent tout mouvement : le <strong>vecteur position</strong> →OM(t), le <strong>vecteur vitesse</strong> →v et le <strong>vecteur accélération</strong> →a. À la fin, tu sauras calculer une vitesse moyenne, la convertir, et dire si un mobile accélère ou freine.
+    </p>
+    <div class="lecture-hero-meta">
+      <span class="lecture-hero-meta-item">⏱ 25 min</span>
+      <span class="lecture-hero-meta-item">⚡ 1 notion</span>
+      <span class="lecture-hero-meta-item">📚 8 sections</span>
+      <span class="lecture-hero-meta-item">🎓 Terminale C&amp;D</span>
+    </div>
+  </header>
+
+  <!-- ===== SOMMAIRE ===== -->
+  <nav class="lecture-toc">
+    <div class="lecture-toc-header">
+      <span>Dans cette partie</span>
+      <span class="lecture-toc-count">1 notion · 8 sections</span>
+    </div>
+    <ol class="lecture-toc-list">
+      <li><a href="#s0"><span class="toc-num">00</span><span>Motivation — Lire un mouvement comme un film</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>Notion 1 · cinematic_vectorielle — Le vecteur position →OM(t)</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>Notion 1 · cinematic_vectorielle — La vitesse moyenne</span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>Notion 1 · cinematic_vectorielle — La vitesse instantanée</span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>Notion 1 · cinematic_vectorielle — Le vecteur vitesse →v</span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>Notion 1 · cinematic_vectorielle — Le vecteur accélération →a</span></a></li>
+      <li><a href="#s6"><span class="toc-num">06</span><span>Fiche méthode — Calculer une vitesse moyenne en 4 étapes</span></a></li>
+      <li><a href="#s7"><span class="toc-num">07</span><span>Exercices d'application</span></a></li>
+    </ol>
+  </nav>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 0 : MOTIVATION -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s0">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">00</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Motivation</span>
+        <h2 class="lecture-section-title">Lire un mouvement comme un film</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Comment fait-on de la physique avec quelque chose qui bouge ? On fait ce que fait un réalisateur de film : on <strong>découpe le temps</strong>. Prends un téléphone, filme un coureur du marathon de Niamey ou un moto-taxi qui démarre, puis regarde la vidéo <strong>image par image</strong> en notant la position du mobile à chaque date : <span class="math">t = 0 s</span>, <span class="math">t = 1 s</span>, <span class="math">t = 2 s</span>… Cette suite de « photos » s'appelle une <strong>chronophotographie</strong> — c'est l'expérience fondatrice de toute la cinématique.
+      </p>
+
+      <!-- SVG : chronophotographie d'un moto-taxi -->
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 540 270" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Chronophotographie d'un moto-taxi filmé chaque seconde, les écarts entre positions grandissent">
+          <text x="270" y="24" style="fill:var(--accent-bright)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle" letter-spacing="2">CHRONOPHOTOGRAPHIE — UNE PHOTO CHAQUE SECONDE</text>
+
+          <line x1="30" y1="190" x2="510" y2="190" style="stroke:var(--text-muted)" stroke-width="2"/>
+          <line x1="30" y1="198" x2="510" y2="198" stroke="rgba(224,184,74,0.4)" stroke-width="1" stroke-dasharray="8 6"/>
+
+          <g><circle cx="70" cy="190" r="7" fill="none" style="stroke:var(--text-muted)" stroke-width="2"/><circle cx="94" cy="190" r="7" fill="none" style="stroke:var(--text-muted)" stroke-width="2"/><rect x="66" y="160" width="34" height="20" rx="6" fill="rgba(96,165,250,0.15)" style="stroke:var(--info)" stroke-width="1.5"/><line x1="96" y1="160" x2="106" y2="146" style="stroke:var(--info)" stroke-width="2"/></g>
+          <g><circle cx="160" cy="190" r="7" fill="none" style="stroke:var(--text-muted)" stroke-width="2"/><circle cx="184" cy="190" r="7" fill="none" style="stroke:var(--text-muted)" stroke-width="2"/><rect x="156" y="160" width="34" height="20" rx="6" fill="rgba(96,165,250,0.15)" style="stroke:var(--info)" stroke-width="1.5"/><line x1="186" y1="160" x2="196" y2="146" style="stroke:var(--info)" stroke-width="2"/></g>
+          <g><circle cx="255" cy="190" r="7" fill="none" style="stroke:var(--text-muted)" stroke-width="2"/><circle cx="279" cy="190" r="7" fill="none" style="stroke:var(--text-muted)" stroke-width="2"/><rect x="251" y="160" width="34" height="20" rx="6" fill="rgba(96,165,250,0.15)" style="stroke:var(--info)" stroke-width="1.5"/><line x1="281" y1="160" x2="291" y2="146" style="stroke:var(--info)" stroke-width="2"/></g>
+          <g><circle cx="360" cy="190" r="7" fill="none" style="stroke:var(--text-muted)" stroke-width="2"/><circle cx="384" cy="190" r="7" fill="none" style="stroke:var(--text-muted)" stroke-width="2"/><rect x="356" y="160" width="34" height="20" rx="6" fill="rgba(96,165,250,0.15)" style="stroke:var(--info)" stroke-width="1.5"/><line x1="386" y1="160" x2="396" y2="146" style="stroke:var(--info)" stroke-width="2"/></g>
+          <g><circle cx="475" cy="190" r="7" fill="none" style="stroke:var(--text-muted)" stroke-width="2"/><circle cx="499" cy="190" r="7" fill="none" style="stroke:var(--text-muted)" stroke-width="2"/><rect x="471" y="160" width="34" height="20" rx="6" fill="rgba(96,165,250,0.15)" style="stroke:var(--info)" stroke-width="1.5"/><line x1="501" y1="160" x2="511" y2="146" style="stroke:var(--info)" stroke-width="2"/></g>
+
+          <g stroke="rgba(74,222,128,0.5)" stroke-width="1" stroke-dasharray="3 3"><line x1="82" y1="140" x2="82" y2="232"/><line x1="172" y1="140" x2="172" y2="232"/><line x1="267" y1="140" x2="267" y2="232"/><line x1="372" y1="140" x2="372" y2="232"/><line x1="487" y1="140" x2="487" y2="232"/></g>
+
+          <g style="fill:var(--success-light)" font-size="12" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle"><text x="82" y="132">t = 0 s</text><text x="172" y="132">t = 1 s</text><text x="267" y="132">t = 2 s</text><text x="372" y="132">t = 3 s</text><text x="487" y="132">t = 4 s</text></g>
+
+          <g font-size="11.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle" style="fill:var(--text-muted)"><text x="122" y="252">même écart</text><text x="219" y="252">même écart</text></g><g font-size="11.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle" style="fill:var(--accent-bright)"><text x="322" y="252">écart plus grand !</text><text x="432" y="252">encore plus grand !</text></g>
+
+          <text x="270" y="215.0" style="fill:var(--accent-bright)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">Chaque seconde, la moto parcourt de plus</text>
+          <text x="270" y="233.0" style="fill:var(--accent-bright)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">en plus de distance : elle accélère</text>
+        </svg>
+        <figcaption class="lecture-figure-caption">Filmé une photo par seconde, le moto-taxi occupe des positions de plus en plus espacées : les écarts racontent l'accélération. Tout le langage de cette partie sert à traduire ces photos en nombres et en vecteurs.</figcaption>
+      </figure>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">La grande idée du jour</div>
+          <p>Décrire un mouvement, c'est répondre à trois questions à chaque date : <strong>où est le mobile ?</strong> (le vecteur position), <strong>à quelle allure et dans quelle direction se déplace-t-il ?</strong> (le vecteur vitesse), <strong>est-ce que cette allure change ?</strong> (le vecteur accélération). La partie 1 nous a donné le décor — référentiel et repères ; cette partie nous donne le <strong>langage</strong>.</p>
+        </div>
+      </div>
+
+      <p class="lecture-text">
+        Une remarque avant de commencer : position, vitesse et accélération seront des <strong>vecteurs</strong> — des objets qui portent une direction et un sens, pas seulement un nombre. C'est ce qui permettra, en partie 3, de classer les mouvements (rectilignes, circulaires, accélérés, ralentis) sans aucune ambiguïté.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 1 : NOTION 1 — LE VECTEUR POSITION -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s1">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">01</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1 · cinematic_vectorielle</span>
+        <h2 class="lecture-section-title">Le vecteur position →OM(t)</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Dans le repère <span class="math">(O ; →i , →j)</span> installé en partie 1, le point M change de place au fil du temps. Pour traduire « où est M à la date t », on trace à chaque instant le vecteur qui part de l'origine O et qui arrive sur M : ce vecteur <strong>change à chaque instant</strong>, on le note avec le temps entre parenthèses.
+      </p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Définition officielle — vecteur position</div>
+          <p>À chaque instant t, le <strong>vecteur position</strong> du point M est le vecteur <span class="math">→OM(t)</span> : il est <strong>issu de l'origine O</strong> du repère et son <strong>extrémité est la position de M</strong> à la date t. Ses composantes sont les coordonnées de M : <span class="math">x(t)</span> sur l'axe (Ox) et <span class="math">y(t)</span> sur l'axe (Oy).</p>
+        </div>
+      </div>
+
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-main">Formule majeure — la position dans le plan (2D)</div>
+        <div class="lecture-formula-hero-main">→OM(t) = x(t)·→i + y(t)·→j</div>
+        <div class="lecture-formula-hero-desc">La recette des deux pas : x(t) unités selon →i (horizontale), y(t) unités selon →j (verticale). Chaque composante est une <strong>fonction du temps</strong> : c'est le « film » de la coordonnée. Sur un seul axe (mouvement rectiligne), seul x(t) subsiste.</div>
+      </div>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">En 3D : →OM(t) = x(t)·→i + y(t)·→j + z(t)·→k</div>
+        <div class="lecture-formula-desc">Rappel de la partie 1 : si le mobile quitte le plan (avion qui vire, abeille), une troisième composante s'ajoute. Le principe reste identique : une composante par axe.</div>
+      </div>
+
+      <!-- SVG : vecteur position à deux instants -->
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 540 300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Vecteurs position OM a deux instants t1 et t2 dans un repere avec composantes x et y">
+          <text x="270" y="24" style="fill:var(--accent-bright)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle" letter-spacing="2">LE VECTEUR POSITION CHANGE À CHAQUE INSTANT</text>
+
+          <line x1="80" y1="240" x2="460" y2="240" style="stroke:var(--accent-bright)" stroke-width="2" marker-end="url(#arrowGoldP2a)"/>
+          <line x1="80" y1="240" x2="80" y2="70" style="stroke:var(--accent-bright)" stroke-width="2" marker-end="url(#arrowGoldP2a)"/>
+          <text x="468" y="246" style="fill:var(--accent-bright)" font-size="14" font-family="Inter, system-ui, sans-serif">x</text>
+          <text x="66" y="66" style="fill:var(--accent-bright)" font-size="14" font-family="Inter, system-ui, sans-serif">y</text>
+          <circle cx="80" cy="240" r="4" style="fill:var(--accent-bright)"/>
+          <text x="62" y="256" style="fill:var(--text-muted)" font-size="13" font-family="Inter, system-ui, sans-serif">O</text>
+
+          <path d="M140,235 C220,225 260,190 300,150 C330,120 360,105 420,95" fill="none" style="stroke:var(--text-muted)" stroke-width="2" stroke-dasharray="6 4"/>
+
+          <line x1="80" y1="240" x2="184" y2="226" style="stroke:var(--success-light)" stroke-width="2.5" marker-end="url(#arrowGreenP2a)"/>
+          <circle cx="184" cy="226" r="5" fill="rgba(74,222,128,0.2)" style="stroke:var(--success-light)" stroke-width="2"/>
+          <text x="196" y="246" style="fill:var(--success-light)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif">M₁ (t₁)</text>
+
+          <line x1="80" y1="240" x2="349" y2="115" style="stroke:var(--accent-bright)" stroke-width="2.5" marker-end="url(#arrowGoldP2b)"/>
+          <circle cx="349" cy="115" r="5" fill="rgba(224,184,74,0.2)" style="stroke:var(--accent-bright)" stroke-width="2"/>
+          <text x="360" y="104" style="fill:var(--accent-bright)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif">M₂ (t₂)</text>
+
+          <g stroke="rgba(96,165,250,0.6)" stroke-width="1.3" stroke-dasharray="4 3"><line x1="349" y1="115" x2="349" y2="240"/><line x1="349" y1="115" x2="80" y2="115"/></g>
+          <text x="352" y="258" style="fill:var(--info)" font-size="12" font-family="Inter, system-ui, sans-serif">x(t₂)</text>
+          <text x="52" y="112" style="fill:var(--info)" font-size="12" font-family="Inter, system-ui, sans-serif">y(t₂)</text>
+
+          <text x="150" y="196" style="fill:var(--success-light)" font-size="12.5" font-family="Inter, system-ui, sans-serif">→OM(t₁)</text>
+          <text x="236" y="158" style="fill:var(--accent-bright)" font-size="12.5" font-family="Inter, system-ui, sans-serif">→OM(t₂)</text>
+
+          <text x="270" y="281.0" style="fill:var(--text-muted)" font-size="12.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">La pointe du vecteur suit la trajectoire :</text>
+          <text x="270" y="295" style="fill:var(--text-muted)" font-size="12.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">→OM(t) « filme » la position image par image</text>
+          <defs>
+            <marker id="arrowGoldP2a" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7" fill="none" style="stroke:var(--accent-bright)" stroke-width="1.3"/></marker>
+            <marker id="arrowGoldP2b" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7" fill="none" style="stroke:var(--accent-bright)" stroke-width="1.3"/></marker>
+            <marker id="arrowGreenP2a" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7" fill="none" style="stroke:var(--success-light)" stroke-width="1.3"/></marker>
+          </defs>
+        </svg>
+        <figcaption class="lecture-figure-caption">À t₁ le vecteur position est court ; à t₂ il a grandi et pivoté. Ses composantes x(t) et y(t) se lisent sur les axes — ce sont elles que l'on relève sur la chronophotographie.</figcaption>
+      </figure>
+
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">Exemple travaillé — lire la position d'un moto-taxi</div>
+        <div class="lecture-example-content">
+          <p><strong>Données :</strong> sur l'avenue de la Mairie (axe Ox), un moto-taxi est repéré par un élève depuis un immeuble : à <span class="math">t = 0 s</span>, ses coordonnées sont <span class="math">(10 m ; 0 m)</span> ; à <span class="math">t = 2 s</span>, elles sont <span class="math">(30 m ; 20 m)</span> (il a monté un talus). Écrire les vecteurs position.</p>
+          <p><strong>Résolution en 4 étapes :</strong></p>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p>À <span class="math">t = 0 s</span> : <span class="math">x(0) = 10 m</span> et <span class="math">y(0) = 0 m</span> — on lit les coordonnées une par une.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p>On assemble le vecteur : <span class="math">→OM(0) = 10·→i + 0·→j</span> (horizontal, à 10 m de O).</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p>À <span class="math">t = 2 s</span> : <span class="math">→OM(2) = 30·→i + 20·→j</span> — les deux composantes ont grandi.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p>Conclusion : <span class="math">→OM</span> a changé entre les deux dates <span class="math">(x et y ont varié)</span> — le moto-taxi est en mouvement, et il s'est aussi élevé.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Piège d'examen n° 1</div>
+          <p><span class="math">→OM(t)</span> (avec flèche) est un <strong>vecteur</strong> : direction, sens, longueur. <span class="math">OM(t)</span> (sans flèche) est une <strong>distance</strong> en mètres. Et attention : les coordonnées s'écrivent <span class="math">(x(t) ; y(t))</span> — des nombres entre parenthèses, jamais avec une flèche. Enfin, n'oublie pas le <span class="math">(t)</span> : oublier de dater la position, c'est rendre une photo sans légende.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 2 : NOTION 1 — LA VITESSE MOYENNE -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s2">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">02</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1 · cinematic_vectorielle</span>
+        <h2 class="lecture-section-title">La vitesse moyenne</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Sur un long trajet — Niamey à Zinder par exemple — personne ne garde la même vitesse : on dépasse, on ralentit, on s'arrête. Pour résumer tout ce film en un seul nombre, on divise la <strong>distance totale parcourue</strong> par la <strong>durée totale</strong> du parcours.
+      </p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Définition officielle — vitesse moyenne</div>
+          <p>La <strong>vitesse moyenne</strong> <span class="math">v_moy</span> d'un mobile est le quotient de la <strong>distance parcourue</strong> par la <strong>durée</strong> du parcours : <span class="math">v_moy = distance parcourue ÷ durée</span>. Son unité SI est le <strong>mètre par seconde</strong> : <span class="math">m·s⁻¹</span>.</p>
+        </div>
+      </div>
+
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-main">Formule majeure — la vitesse moyenne</div>
+        <div class="lecture-formula-hero-main">v_moy = Δd/Δt</div>
+        <div class="lecture-formula-hero-desc">Δd = distance parcourue (en m), Δt = durée du parcours (en s), le tout en unités SI. Résultat : des <strong>m·s⁻¹</strong>. C'est la formule n°1 des exercices de conversion — et elle suppose distance et durée homogènes (tout en m et s, ou tout en km et h).</div>
+      </div>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">v[km·h⁻¹] = 3,6 × v[m·s⁻¹]</div>
+        <div class="lecture-formula-desc">Le rappel de la partie 1, indispensable ici : pour passer des m·s⁻¹ aux km·h⁻¹ on multiplie par 3,6 ; pour redescendre on divise par 3,6. Repères : 54 km·h⁻¹ = 15 m·s⁻¹ ; 72 km·h⁻¹ = 20 m·s⁻¹ ; 90 km·h⁻¹ = 25 m·s⁻¹.</div>
+      </div>
+
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">Exemple travaillé — le coureur du marathon de Niamey</div>
+        <div class="lecture-example-content">
+          <p><strong>Données :</strong> un coureur parcourt <span class="math">300 m</span> en <span class="math">50 s</span> sur le boulevard. Calculer sa vitesse moyenne en m·s⁻¹ puis en km·h⁻¹.</p>
+          <p><strong>Résolution en 4 étapes :</strong></p>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p>Données : <span class="math">Δd = 300 m</span> et <span class="math">Δt = 50 s</span> — déjà en unités SI, rien à convertir.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p>On pose la formule : <span class="math">v_moy = Δd/Δt</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p>On remplace puis on calcule : <span class="math">v_moy = 300/50 = 6 m·s⁻¹</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p>Conversion : <span class="math">v_moy = 6 × 3,6 = 21,6 km·h⁻¹</span> — allure réaliste d'un marathonien (environ 4 min 42 s par km).</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Piège d'examen n° 2</div>
+          <p>Deux fautes classiques. <strong>Un :</strong> mélanger les unités — diviser des km par des secondes donne un monstre sans sens ; convertis TOUT en SI avant de calculer. <strong>Deux :</strong> la vitesse moyenne porte sur la <strong>distance totale parcourue</strong> et la <strong>durée totale</strong>, arrêts compris — c'est exactement ce qui la distingue de la vitesse instantanée, objet de la section suivante.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 3 : NOTION 1 — LA VITESSE INSTANTANÉE -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s3">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">03</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1 · cinematic_vectorielle</span>
+        <h2 class="lecture-section-title">La vitesse instantanée</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Le compteur de la moto ne marque pas « vitesse moyenne depuis le départ » : il affiche la vitesse <strong>à cet instant précis</strong>. Il en va de même du radar de la gendarmerie : il flash une vitesse à une date, sur quelques mètres seulement. Cette vitesse « du moment » s'appelle la <strong>vitesse instantanée</strong>.
+      </p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Définition officielle — vitesse instantanée</div>
+          <p>La <strong>vitesse instantanée</strong> d'un mobile à la date t est la vitesse moyenne calculée sur une <strong>durée très courte</strong> encadrant t — en langage de Terminale : c'est la <strong>limite</strong> de la vitesse moyenne quand <span class="math">Δt</span> tend vers 0. C'est ce qu'indiquent le <strong>compteur</strong> d'un véhicule ou un <strong>radar</strong>.</p>
+        </div>
+      </div>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">Δt très court ⟹ v_moy ≈ v_instantanée</div>
+        <div class="lecture-formula-desc">Plus la durée de mesure est courte, plus la moyenne se rapproche de la vitesse « vraie » à l'instant t. Le radar chronomètre sur quelques mètres ; le compteur, sur quelques millièmes de seconde.</div>
+      </div>
+
+      <!-- SVG : graphique x(t), corde et tangente -->
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 540 300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Graphique x de t : la corde entre deux points donne la vitesse moyenne, la tangente donne la vitesse instantanee">
+          <text x="270" y="24" style="fill:var(--accent-bright)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle" letter-spacing="2">CORDE (MOYENNE) ET TANGENTE (INSTANTANÉE)</text>
+
+          <line x1="80" y1="250" x2="500" y2="250" style="stroke:var(--accent-bright)" stroke-width="2" marker-end="url(#arrowGoldP2c)"/>
+          <line x1="80" y1="250" x2="80" y2="50" style="stroke:var(--accent-bright)" stroke-width="2" marker-end="url(#arrowGoldP2c)"/>
+          <text x="508" y="256" style="fill:var(--accent-bright)" font-size="13" font-family="Inter, system-ui, sans-serif">t</text>
+          <text x="62" y="58" style="fill:var(--accent-bright)" font-size="13" font-family="Inter, system-ui, sans-serif">x</text>
+
+          <path d="M100,240 Q240,225 320,160 T480,60" fill="none" style="stroke:var(--text-muted)" stroke-width="2.5"/>
+
+          <circle cx="225" cy="212" r="5" fill="rgba(96,165,250,0.2)" style="stroke:var(--info)" stroke-width="2"/>
+          <circle cx="432" cy="84" r="5" fill="rgba(96,165,250,0.2)" style="stroke:var(--info)" stroke-width="2"/>
+          <text x="212" y="196" style="fill:var(--info)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif">A</text>
+          <text x="442" y="78" style="fill:var(--info)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif">B</text>
+
+          <line x1="225" y1="212" x2="432" y2="84" style="stroke:var(--info)" stroke-width="2" stroke-dasharray="7 4"/>
+          <text x="330" y="150" style="fill:var(--info)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif">corde AB : pente = v_moy</text>
+
+          <line x1="135" y1="245" x2="315" y2="180" style="stroke:var(--success-light)" stroke-width="2"/>
+          <text x="120" y="270" style="fill:var(--success-light)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif">tangente en A : pente = v à l'instant t₁</text>
+
+          <line x1="225" y1="212" x2="225" y2="250" stroke="rgba(224,184,74,0.5)" stroke-width="1" stroke-dasharray="3 3"/>
+          <line x1="432" y1="84" x2="432" y2="250" stroke="rgba(224,184,74,0.5)" stroke-width="1" stroke-dasharray="3 3"/>
+          <text x="222" y="266" style="fill:var(--text-muted)" font-size="12" font-family="Inter, system-ui, sans-serif">t₁</text>
+          <text x="428" y="266" style="fill:var(--text-muted)" font-size="12" font-family="Inter, system-ui, sans-serif">t₂</text>
+
+          <text x="270" y="285.0" style="fill:var(--text-muted)" font-size="12.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">Sur le graphique x(t), la pente joue le rôle de la vitesse :</text>
+          <text x="270" y="295" style="fill:var(--text-muted)" font-size="12.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">pente de la corde = moyenne, pente de la tangente = instantanée</text>
+          <defs>
+            <marker id="arrowGoldP2c" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7" fill="none" style="stroke:var(--accent-bright)" stroke-width="1.3"/></marker>
+          </defs>
+        </svg>
+        <figcaption class="lecture-figure-caption">Sur la courbe x(t) : la corde reliant A à B donne la vitesse moyenne entre t₁ et t₂ ; la tangente en A donne la vitesse instantanée à t₁. Plus B se rapproche de A, plus corde et tangente se confondent.</figcaption>
+      </figure>
+
+      <div class="lecture-section-sub">
+        <h3 class="lecture-subtitle">Moyenne contre instantanée : le trajet avec arrêts</h3>
+
+        <p class="lecture-text">
+          Un car fait Niamey → Dosso : <span class="math">120 km</span> de route en <span class="math">2 h</span> de roulage effectif, puis <span class="math">1 h</span> d'arrêt repas au bord de la route. Sa vitesse moyenne sur l'ensemble : <span class="math">120 km en 3 h, soit 40 km·h⁻¹</span>. Pourtant, pendant qu'il roulait, son compteur affichait autour de <span class="math">60 km·h⁻¹</span>. Les deux nombres sont vrais : la moyenne <strong>écrase</strong> les arrêts et les ralentissements, l'instantanée raconte le moment. Au Bac, lis bien ce que l'énoncé demande !
+        </p>
+
+        <div class="lecture-callout lecture-callout-gold">
+          <div class="lecture-callout-body">
+            <div class="lecture-callout-title">À retenir — le duel</div>
+            <ul class="lecture-list">
+              <li><strong>v_moy</strong> : sur TOUT le trajet (distance totale ÷ durée totale, arrêts compris) — un seul nombre pour tout le film.</li>
+              <li><strong>v_instantanée</strong> : à UNE date (compteur, radar) — la vitesse du photogramme.</li>
+              <li>Si le mouvement est parfaitement régulier, les deux coïncident — c'est le cas du MRU, héros de la partie 3.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 4 : NOTION 1 — LE VECTEUR VITESSE -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s4">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">04</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1 · cinematic_vectorielle</span>
+        <h2 class="lecture-section-title">Le vecteur vitesse →v</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Un nombre seul ne suffit pas à décrire un déplacement : entre Niamey et Zinder, aller vers l'est ou vers l'ouest n'est pas la même chose ! La vitesse devient donc un <strong>vecteur</strong> — elle hérite des composantes de la position.
+      </p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Définition officielle — vecteur vitesse</div>
+          <p>À l'instant t, le <strong>vecteur vitesse</strong> <span class="math">→v</span> du point M possède trois propriétés : sa <strong>direction</strong> est celle de la <strong>tangente à la trajectoire</strong> en M ; son <strong>sens</strong> est celui du <strong>mouvement</strong> ; sa <strong>norme</strong> (longueur) vaut la vitesse instantanée <span class="math">v</span>, en <span class="math">m·s⁻¹</span>.</p>
+        </div>
+      </div>
+
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-main">Formule majeure — les composantes du vecteur vitesse</div>
+        <div class="lecture-formula-hero-main">→v = (Δx/Δt)·→i + (Δy/Δt)·→j</div>
+        <div class="lecture-formula-hero-desc">Chaque composante compare la variation de la coordonnée à la durée : vₓ = Δx/Δt (sur Ox) et vᵥ = Δy/Δt (sur Oy), en m·s⁻¹. Le vecteur vitesse est le taux de variation du vecteur position.</div>
+      </div>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">Norme : v = √(vₓ² + vᵥ²)</div>
+        <div class="lecture-formula-desc">La norme du vecteur vitesse redonne la valeur de la vitesse (nombre positif, en m·s⁻¹) — celle qu'affiche le compteur. C'est le théorème de Pythagore appliqué aux composantes.</div>
+      </div>
+
+      <!-- SVG : vecteur vitesse tangent à la trajectoire -->
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 540 280" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Vecteurs vitesse tangents a la trajectoire en trois points, de longueur croissante">
+          <text x="270" y="24" style="fill:var(--accent-bright)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle" letter-spacing="2">→v EST TANGENT À LA TRAJECTOIRE</text>
+
+          <path d="M70,245 C160,230 210,185 265,148 C320,111 380,98 470,90" fill="none" style="stroke:var(--text-muted)" stroke-width="2.5" stroke-dasharray="7 4"/>
+
+          <circle cx="131" cy="229" r="5" fill="rgba(74,222,128,0.2)" style="stroke:var(--success-light)" stroke-width="2"/>
+          <text x="118" y="250" style="fill:var(--success-light)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif">M₁</text>
+          <line x1="131" y1="229" x2="174" y2="215" style="stroke:var(--success-light)" stroke-width="2.5" marker-end="url(#arrowGreenP2b)"/>
+          <text x="150" y="205" style="fill:var(--success-light)" font-size="12.5" font-family="Inter, system-ui, sans-serif">→v₁</text>
+
+          <circle cx="224" cy="177" r="5" fill="rgba(74,222,128,0.2)" style="stroke:var(--success-light)" stroke-width="2"/>
+          <text x="205" y="198" style="fill:var(--success-light)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif">M₂</text>
+          <line x1="224" y1="177" x2="292" y2="158" style="stroke:var(--success-light)" stroke-width="2.5" marker-end="url(#arrowGreenP2b)"/>
+          <text x="252" y="152" style="fill:var(--success-light)" font-size="12.5" font-family="Inter, system-ui, sans-serif">→v₂</text>
+
+          <circle cx="364" cy="106" r="5" fill="rgba(74,222,128,0.2)" style="stroke:var(--success-light)" stroke-width="2"/>
+          <text x="345" y="127" style="fill:var(--success-light)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif">M₃</text>
+          <line x1="364" y1="106" x2="456" y2="84" style="stroke:var(--success-light)" stroke-width="2.5" marker-end="url(#arrowGreenP2b)"/>
+          <text x="404" y="80" style="fill:var(--success-light)" font-size="12.5" font-family="Inter, system-ui, sans-serif">→v₃</text>
+
+          <text x="270" y="262" style="fill:var(--accent-bright)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">Chaque →v touche la courbe sans la couper : il est tangent</text>
+          <text x="270" y="217.0" style="fill:var(--text-muted)" font-size="12.0" font-family="Inter, system-ui, sans-serif" text-anchor="middle">la longueur grandit de M₁ à M₃ : la</text>
+          <text x="270" y="235.0" style="fill:var(--text-muted)" font-size="12.0" font-family="Inter, system-ui, sans-serif" text-anchor="middle">vitesse augmente (moto-taxi qui démarre)</text>
+          <defs>
+            <marker id="arrowGreenP2b" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7" fill="none" style="stroke:var(--success-light)" stroke-width="1.3"/></marker>
+          </defs>
+        </svg>
+        <figcaption class="lecture-figure-caption">Le vecteur vitesse est à chaque instant tangent à la trajectoire, orienté dans le sens du mouvement. Sa longueur dessinée à l'échelle compare les vitesses : ici la moto accélère.</figcaption>
+      </figure>
+
+      <div class="lecture-section-sub">
+        <h3 class="lecture-subtitle">Les trois propriétés, ligne par ligne</h3>
+
+        <ul class="lecture-list-elegant">
+          <li><strong>Direction</strong><span>la tangente à la trajectoire en M — sur une route droite, la direction reste la route ; dans un virage, elle change à chaque instant.</span></li>
+          <li><strong>Sens</strong><span>celui du mouvement — le vecteur « regarde » là où va le mobile, jamais derrière.</span></li>
+          <li><strong>Norme</strong><span>la vitesse instantanée <span class="math">v</span> en <span class="math">m·s⁻¹</span> — c'est elle qu'on convertit en km·h⁻¹.</span></li>
+        </ul>
+      </div>
+
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">Exemple travaillé — composantes d'une vitesse</div>
+        <div class="lecture-example-content">
+          <p><strong>Données :</strong> entre <span class="math">t₁ = 4 s</span> et <span class="math">t₂ = 6 s</span>, un cycliste passe de <span class="math">x(4) = 40 m</span> à <span class="math">x(6) = 60 m</span>, tandis que <span class="math">y</span> reste <span class="math">0 m</span>. Déterminer →v.</p>
+          <p><strong>Résolution en 4 étapes :</strong></p>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p>Composante horizontale : <span class="math">vₓ = Δx/Δt = (60 − 40)/(6 − 4) = 20/2 = 10 m·s⁻¹</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p>Composante verticale : <span class="math">vᵥ = Δy/Δt = 0/2 = 0 m·s⁻¹</span> (y ne bouge pas).</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p>On assemble : <span class="math">→v = 10·→i + 0·→j</span> — horizontal, dans le sens des x croissants.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p>Norme : <span class="math">v = √(10² + 0²) = 10 m·s⁻¹</span>, soit <span class="math">36 km·h⁻¹</span> ✔ (allure de cycliste confirmée).</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Piège d'examen n° 3</div>
+          <p>Sur une trajectoire <strong>courbe</strong>, la direction de →v change <strong>en permanence</strong>, même si la norme v reste constante. « Rouler à vitesse constante sur un rond-point » n'est pas un mouvement sans variation : la <strong>direction</strong> varie. C'est toute l'affaire de l'accélération, section suivante.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 5 : NOTION 1 — LE VECTEUR ACCÉLÉRATION -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s5">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">05</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1 · cinematic_vectorielle</span>
+        <h2 class="lecture-section-title">Le vecteur accélération →a</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Dernière grandeur du langage : l'accélération. Contrairement au langage courant (« accélérer » = rouler plus vite), la physique définit l'accélération comme <strong>toute variation du vecteur vitesse</strong> — en norme, en direction ou en sens.
+      </p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Définition officielle — vecteur accélération</div>
+          <p>Le <strong>vecteur accélération</strong> <span class="math">→a</span> mesure la variation du vecteur vitesse : entre deux instants <span class="math">t₁</span> et <span class="math">t₂</span>, <span class="math">→a = (→v₂ − →v₁)/Δt</span> avec <span class="math">Δt = t₂ − t₁</span>. Son unité SI est le <strong>mètre par seconde carrée</strong> : <span class="math">m·s⁻²</span> — des m·s⁻¹ gagnés (ou perdus) à chaque seconde.</p>
+        </div>
+      </div>
+
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-main">Formule majeure — les composantes du vecteur accélération</div>
+        <div class="lecture-formula-hero-main">→a = aₓ·→i + aᵥ·→j</div>
+        <div class="lecture-formula-hero-desc">avec aₓ = Δvₓ/Δt et aᵥ = Δvᵥ/Δt — chaque composante compare les vitesses <strong>sur le même axe</strong> entre deux instants, en m·s⁻². On ne mélange jamais les axes : aₓ regarde vₓ, aᵥ regarde vᵥ.</div>
+      </div>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">→a = Δ→v/Δt = (→v₂ − →v₁)/(t₂ − t₁)</div>
+        <div class="lecture-formula-desc">La recette vectorielle : on soustrait les deux vecteurs vitesse (composante par composante), puis on divise par la durée. Si →v ne change ni en norme ni en direction, →a = →0.</div>
+      </div>
+
+      <!-- SVG : variation du vecteur vitesse entre deux instants -->
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 540 280" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Le vecteur vitesse passe de v1 a v2 plus long, delta v relie les pointes et a est parallele a delta v">
+          <text x="270" y="24" style="fill:var(--accent-bright)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle" letter-spacing="2">DE →v₁ À →v₂ : LA VARIATION Δ→v</text>
+
+          <path d="M90,215 C180,205 250,180 320,155 C370,137 420,125 470,115" fill="none" style="stroke:var(--text-muted)" stroke-width="2.5" stroke-dasharray="7 4"/>
+
+          <circle cx="110" cy="210" r="5" fill="rgba(74,222,128,0.2)" style="stroke:var(--success-light)" stroke-width="2"/>
+          <text x="96" y="232" style="fill:var(--success-light)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif">M₁ (t₁)</text>
+          <circle cx="330" cy="150" r="5" fill="rgba(74,222,128,0.2)" style="stroke:var(--success-light)" stroke-width="2"/>
+          <text x="316" y="172" style="fill:var(--success-light)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif">M₂ (t₂)</text>
+
+          <line x1="110" y1="210" x2="215" y2="188" style="stroke:var(--info)" stroke-width="2.5" marker-end="url(#arrowBlueP2)"/>
+          <text x="140" y="178" style="fill:var(--info)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif">→v₁</text>
+
+          <line x1="330" y1="150" x2="452" y2="124" style="stroke:var(--info)" stroke-width="2.5" marker-end="url(#arrowBlueP2)"/>
+          <text x="384" y="118" style="fill:var(--info)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif">→v₂ (plus long)</text>
+
+          <line x1="215" y1="188" x2="452" y2="124" style="stroke:var(--success-light)" stroke-width="2" stroke-dasharray="6 3" marker-end="url(#arrowGreenP2c)"/>
+          <text x="300" y="176" style="fill:var(--success-light)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif">Δ→v = →v₂ − →v₁</text>
+
+          <line x1="110" y1="252" x2="220" y2="229" style="stroke:var(--danger-light)" stroke-width="2.5" marker-end="url(#arrowRedP2)"/>
+          <text x="150" y="272" style="fill:var(--danger-light)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif">→a (même direction que Δ→v)</text>
+
+          <text x="270" y="160" style="fill:var(--text-muted)" font-size="12" font-family="Inter, system-ui, sans-serif" text-anchor="middle">→v₂ = →v₁ + Δ→v : la moto accélère, →a est dans le sens du mouvement</text>
+          <defs>
+            <marker id="arrowBlueP2" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7" fill="none" style="stroke:var(--info)" stroke-width="1.3"/></marker>
+            <marker id="arrowGreenP2c" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7" fill="none" style="stroke:var(--success-light)" stroke-width="1.3"/></marker>
+            <marker id="arrowRedP2" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7" fill="none" style="stroke:var(--danger-light)" stroke-width="1.3"/></marker>
+          </defs>
+        </svg>
+        <figcaption class="lecture-figure-caption">Entre t₁ et t₂, le vecteur vitesse grandit : Δ→v = →v₂ − →v₁ relie les pointes des deux vecteurs. Le vecteur accélération →a a la même direction et le même sens que Δ→v.</figcaption>
+      </figure>
+
+      <div class="lecture-section-sub">
+        <h3 class="lecture-subtitle">Comment lire →a ? Trois cas</h3>
+
+        <ul class="lecture-list-elegant">
+          <li><strong>→a dans le sens de →v</strong><span>la norme de →v augmente — le mobile <strong>accélère</strong> (départ du moto-taxi).</span></li>
+          <li><strong>→a opposé à →v</strong><span>la norme diminue — le mobile <strong>freine</strong> (freinage du car).</span></li>
+          <li><strong>→a qui dévie →v</strong><span>la <strong>direction</strong> change — le mobile <strong>tourne</strong> (virage, cercle). C'est le cas du rond-point même à vitesse constante.</span></li>
+        </ul>
+      </div>
+
+      <div class="lecture-table">
+        <table>
+          <thead>
+            <tr><th>Grandeur</th><th>Symbole</th><th>Unité SI</th><th>Appareil de mesure</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Position</td><td><span class="math">→OM(t)</span>, <span class="math">x(t)</span></td><td>mètre (m)</td><td>règle, décamètre, chronophotographie</td></tr>
+            <tr><td>Vitesse</td><td><span class="math">→v</span> ; norme <span class="math">v</span></td><td>m·s⁻¹</td><td>compteur, radar, chronomètre + règle</td></tr>
+            <tr><td>Accélération</td><td><span class="math">→a</span> ; norme <span class="math">a</span></td><td>m·s⁻²</td><td>accéléromètre (smartphone), chronophotographie</td></tr>
+            <tr><td>Durée</td><td><span class="math">Δt</span></td><td>seconde (s)</td><td>chronomètre, horloge</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">Exemple travaillé — calculer une accélération</div>
+        <div class="lecture-example-content">
+          <p><strong>Données :</strong> un moto-taxi démarre sur l'axe Ox. À <span class="math">t₁ = 0 s</span> : <span class="math">→v₁ = 4·→i</span> (m·s⁻¹) ; à <span class="math">t₂ = 3 s</span> : <span class="math">→v₂ = 10·→i</span> (m·s⁻¹). Calculer →a.</p>
+          <p><strong>Résolution en 4 étapes :</strong></p>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p>Composante selon Ox : <span class="math">aₓ = Δvₓ/Δt = (10 − 4)/3</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p>On calcule : <span class="math">aₓ = 6/3 = 2 m·s⁻²</span> — la moto gagne 2 m·s⁻¹ à chaque seconde.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p>Composante selon Oy : <span class="math">aᵥ = 0 m·s⁻²</span> (les vitesses sont purement horizontales).</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p>Bilan : <span class="math">→a = 2·→i</span> (m·s⁻²) — même direction et même sens que →v : le mobile <strong>accélère</strong> ✔</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-danger">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Erreur fréquente au Bac</div>
+          <p>Ne jamais confondre <strong>vitesse et accélération</strong> : une moto peut avoir une vitesse énorme et une accélération nulle (autoroute, vitesse stabilisée), ou une vitesse quasi nulle et une accélération énorme (au feu vert, au démarrage). L'unité trahit tout : <span class="math">m·s⁻¹</span> = vitesse, <span class="math">m·s⁻²</span> = accélération. Et l'accélération peut être négative alors que le mobile roule vite : c'est un freinage.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 6 : FICHE MÉTHODE -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s6">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">06</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Fiche méthode</span>
+        <h2 class="lecture-section-title">Calculer une vitesse moyenne en 4 étapes</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Voici la recette qui réussit tous les exercices de vitesse. Elle tient en quatre gestes — apprends-la dans l'ordre, elle te servira jusqu'au Bac.
+      </p>
+
+      <div class="lecture-steps">
+        <div class="lecture-step">
+          <div class="lecture-step-number">1</div>
+          <div class="lecture-step-content">
+            <p><strong>Repérer les données.</strong> Distance parcourue Δd et durée Δt, avec leurs unités. Préciser le système et le référentiel (« le moto-taxi, point M, dans le référentiel terrestre »).</p>
+          </div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">2</div>
+          <div class="lecture-step-content">
+            <p><strong>Convertir en unités SI.</strong> km → m (× 1 000), min → s (× 60), h → s (× 3 600), km·h⁻¹ → m·s⁻¹ (÷ 3,6). Aucun calcul tant que les unités ne sont pas homogènes.</p>
+          </div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">3</div>
+          <div class="lecture-step-content">
+            <p><strong>Appliquer la formule.</strong> <span class="math">v_moy = Δd/Δt</span> — écrire la formule littérale AVANT de remplacer par les valeurs : c'est ça qui rapporte les points de méthode.</p>
+          </div>
+        </div>
+        <div class="lecture-step">
+          <div class="lecture-step-number">4</div>
+          <div class="lecture-step-content">
+            <p><strong>Conclure avec l'unité.</strong> Résultat + unité (m·s⁻¹), puis conversion en km·h⁻¹ (× 3,6) si l'énoncé la demande, et une phrase d'interprétation.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">Exemple complet — le moto-taxi de Niamey</div>
+        <div class="lecture-example-content">
+          <p><strong>Énoncé :</strong> un moto-taxi parcourt <span class="math">180 m</span> en <span class="math">9 s</span> sur une portion droite de l'avenue de la Mairie. Calculer sa vitesse moyenne en m·s⁻¹, puis en km·h⁻¹, et commenter.</p>
+          <p><strong>Rédaction modèle :</strong></p>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Données :</strong> <span class="math">Δd = 180 m</span> ; <span class="math">Δt = 9 s</span> — unités SI, rien à convertir.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Formule :</strong> <span class="math">v_moy = Δd/Δt</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Calcul :</strong> <span class="math">v_moy = 180 ÷ 9 = 20 m·s⁻¹</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Conversion :</strong> <span class="math">v_moy = 20 × 3,6 = 72 km·h⁻¹</span></p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">5</div><div class="lecture-step-content"><p><strong>Conclusion :</strong> le moto-taxi roule à <span class="math">20 m·s⁻¹</span>, soit <span class="math">72 km·h⁻¹</span> — plausible pour une grande avenue, mais au-dessus des limites en agglomération dense.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lecture-callout lecture-callout-gold">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Réflexes Bac</div>
+          <ul class="lecture-list">
+            <li>Formule littérale d'abord, valeurs ensuite — jamais l'inverse ✔</li>
+            <li>Résultat TOUJOURS suivi de son unité (un nombre nu ne vaut rien) ✔</li>
+            <li>Un ordre de grandeur de contrôle : 10 m·s⁻¹ = 36 km·h⁻¹, allure de cycliste rapide ✔</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 7 : EXERCICES D'APPLICATION -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s7">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">07</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Entraînement</span>
+        <h2 class="lecture-section-title">Exercices d'application</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Trois exercices gradués pour verrouiller la partie. Cherche d'abord SANS les corrigés : la lutte construit le réflexe.
+      </p>
+
+      <div class="lecture-text">
+        <div class="lecture-exercise-label">✏️ Exercice d'application 1 — Le radar de la route Niamey-Zinder</div>
+        <p class="lecture-text"><strong>Énoncé :</strong> sur la route Niamey-Zinder (limitée à <span class="math">80 km·h⁻¹</span>), un radar chronomètre un camion : il parcourt <span class="math">250 m</span> en <span class="math">10 s</span>. a) Calculer sa vitesse en m·s⁻¹. b) La convertir en km·h⁻¹. c) Le camion est-il en excès de vitesse ? De combien ?</p>
+        <details>
+          <summary>Voir la solution détaillée</summary>
+          <div class="lecture-quiz-answer">
+            <div class="lecture-steps">
+              <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>a)</strong> Données SI : <span class="math">Δd = 250 m</span>, <span class="math">Δt = 10 s</span> — formule <span class="math">v_moy = Δd/Δt</span></p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>a)</strong> <span class="math">v = 250 ÷ 10 = 25 m·s⁻¹</span> ✔</p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>b)</strong> <span class="math">v = 25 × 3,6 = 90 km·h⁻¹</span> ✔</p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>c)</strong> <span class="math">90 − 80 = 10 km·h⁻¹</span> au-dessus de la limite : le camion est en <strong>excès de 10 km·h⁻¹</strong> — il sera verbalisé ✔</p></div></div>
+            </div>
+            <p><strong>Bilan :</strong> 25 m·s⁻¹ = 90 km·h⁻¹ — le trio « données → SI → formule → conversion » a tout donné.</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="lecture-text">
+        <div class="lecture-exercise-label">✏️ Exercice d'application 2 — Le bus de nuit : moyenne contre instantanée</div>
+        <p class="lecture-text"><strong>Énoncé :</strong> un bus de nuit roule <span class="math">2 h</span> à <span class="math">80 km·h⁻¹</span> constant, puis s'arrête <span class="math">30 min</span> à un poste de contrôle. a) Quelle distance a-t-il parcourue ? b) Quelle est sa vitesse moyenne sur la durée totale du trajet ? c) Comparer avec la vitesse instantanée pendant le roulage.</p>
+        <details>
+          <summary>Voir la solution détaillée</summary>
+          <div class="lecture-quiz-answer">
+            <div class="lecture-steps">
+              <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>a)</strong> Distance : <span class="math">Δd = 80 × 2 = 160 km</span> ✔</p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>b)</strong> Durée totale : <span class="math">2 h + 30 min = 2 h + 0,5 h = 2,5 h</span> ✔</p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>b)</strong> <span class="math">v_moy = 160/2,5 = 64 km·h⁻¹</span> ✔</p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>c)</strong> Pendant le roulage, la vitesse instantanée vaut <span class="math">80 km·h⁻¹</span> ; sur le total, la moyenne tombe à <span class="math">64 km·h⁻¹</span> car l'arrêt « gonfle » la durée sans ajouter de distance ✔</p></div></div>
+            </div>
+            <p><strong>Bilan :</strong> moyenne (64) et instantanée (80) diffèrent dès qu'il y a un arrêt — ne jamais les confondre.</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="lecture-text">
+        <div class="lecture-exercise-label">✏️ Exercice d'application 3 — Composantes du vecteur vitesse</div>
+        <p class="lecture-text"><strong>Énoncé :</strong> dans le repère <span class="math">(O ; →i , →j)</span>, un point M a pour abscisse <span class="math">x = 4 m</span> à <span class="math">t₁ = 0 s</span> et <span class="math">x = 10 m</span> à <span class="math">t₂ = 3 s</span> ; son ordonnée reste <span class="math">y = 0 m</span>. a) Calculer vₓ et vᵥ. b) Écrire →v. c) Quelle est la forme de la trajectoire ?</p>
+        <details>
+          <summary>Voir la solution détaillée</summary>
+          <div class="lecture-quiz-answer">
+            <div class="lecture-steps">
+              <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>a)</strong> <span class="math">vₓ = Δx/Δt = (10 − 4)/(3 − 0) = 6/3 = 2 m·s⁻¹</span> ✔</p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>a)</strong> <span class="math">vᵥ = Δy/Δt = 0/3 = 0 m·s⁻¹</span> (y ne change jamais) ✔</p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>b)</strong> <span class="math">→v = 2·→i + 0·→j</span> — horizontal, dans le sens des x croissants, norme <span class="math">v = 2 m·s⁻¹</span> ✔</p></div></div>
+              <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>c)</strong> y reste nul : tous les points occupés sont sur l'axe Ox — la trajectoire est une <strong>droite</strong> (segment de l'axe Ox) ✔</p></div></div>
+            </div>
+            <p><strong>Bilan :</strong> une seule composante non nulle ⟹ mouvement rectiligne selon l'axe correspondant.</p>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== QCM ===== -->
+  <div class="lecture-quiz">
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q1. Le compteur d'une moto affiche 45 km·h⁻¹. Il indique…</p>
+      <div class="lecture-quiz-options"><span>A) la vitesse moyenne depuis le départ</span><span>B) la vitesse instantanée à cet instant</span><span>C) l'accélération de la moto</span><span>D) la distance parcourue</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><p><strong>Réponse : B.</strong> Le compteur mesure la vitesse « du moment » : la vitesse instantanée, calculée sur une durée très courte. La vitesse moyenne (A) s'obtient par distance totale ÷ durée totale, et l'accélération (C) se mesure en m·s⁻².</p></div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q2. Un camion roule à 90 km·h⁻¹. En unités SI, cela vaut…</p>
+      <div class="lecture-quiz-options"><span>A) 9 m·s⁻¹</span><span>B) 32 m·s⁻¹</span><span>C) 25 m·s⁻¹</span><span>D) 90 m·s⁻¹</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><p><strong>Réponse : C.</strong> Pour convertir des km·h⁻¹ en m·s⁻¹, on DIVISE par 3,6 : 90 ÷ 3,6 = 25 m·s⁻¹. L'option B résulte d'une multiplication par 3,6 (sens inverse), l'option D oublie la conversion.</p></div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q3. Le vecteur vitesse →v d'un point M est toujours…</p>
+      <div class="lecture-quiz-options"><span>A) perpendiculaire à la trajectoire</span><span>B) dirigé vers l'origine O</span><span>C) tangent à la trajectoire, dans le sens du mouvement</span><span>D) horizontal</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><p><strong>Réponse : C.</strong> Les trois propriétés du vecteur vitesse : direction = tangente à la trajectoire, sens = celui du mouvement, norme = vitesse instantanée. Perpendiculaire (A), c'est plutôt l'accélération normale dans un mouvement circulaire.</p></div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q4. Un mobile passe de v = 5 m·s⁻¹ à v = 11 m·s⁻¹ en 2 s, en ligne droite. Son accélération vaut…</p>
+      <div class="lecture-quiz-options"><span>A) 3 m·s⁻²</span><span>B) 8 m·s⁻²</span><span>C) 16 m·s⁻²</span><span>D) 5,5 m·s⁻²</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><p><strong>Réponse : A.</strong> aₓ = Δvₓ/Δt = (11 − 5)/2 = 6/2 = 3 m·s⁻². L'option B soustrait sans diviser, l'option D fait une moyenne des vitesses — l'accélération compare une VARIATION de vitesse à une durée.</p></div></details>
+    </div>
+  </div>
+
+  <!-- ===== RÉCAP ===== -->
+  <div class="lecture-recap">
+    <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
+    <ul class="lecture-recap-list">
+      <li><strong>[position_vecteur]</strong> À chaque instant t, la position est le vecteur →OM(t) = x(t)·→i + y(t)·→j, issu de O et pointant vers M ; ses composantes sont les coordonnées de M (rappel 3D : + z(t)·→k).</li>
+      <li><strong>[vitesse_moyenne]</strong> v_moy = Δd/Δt : distance TOTALE parcourue divisée par la durée TOTALE (arrêts compris), en m·s⁻¹.</li>
+      <li><strong>[vitesse_instantanee]</strong> La vitesse instantanée (compteur, radar) est la limite de la moyenne quand Δt devient très courte ; sur un graphe x(t), c'est la pente de la tangente (la corde donne la moyenne).</li>
+      <li><strong>[vecteur_vitesse]</strong> →v = (Δx/Δt)·→i + (Δy/Δt)·→j ; direction = tangente à la trajectoire, sens = celui du mouvement, norme v = √(vₓ² + vᵥ²) en m·s⁻¹.</li>
+      <li><strong>[vecteur_acceleration]</strong> →a mesure la variation du vecteur vitesse : →a = (→v₂ − →v₁)/Δt, composantes aₓ = Δvₓ/Δt et aᵥ = Δvᵥ/Δt, unité m·s⁻². Même sens que →v : accélère ; sens opposé : freine ; dévie →v : tourne.</li>
+      <li><strong>[conversion]</strong> v[km·h⁻¹] = 3,6 × v[m·s⁻¹] — repères : 15 m·s⁻¹ = 54, 20 = 72, 25 = 90 km·h⁻¹ ; convertir AVANT tout calcul.</li>
+      <li><strong>[methode]</strong> Vitesse moyenne en 4 gestes : données → conversion SI → formule littérale → résultat + unité + interprétation.</li>
+    </ul>
+  </div>
+
+  <!-- ===== FIN ===== -->
+  <div class="lecture-end">
+    <div class="lecture-end-icon">🎯</div>
+    <div class="lecture-end-text">Partie 2 terminée !</div>
+    <div class="lecture-end-sub">Tu maîtrises maintenant le langage du mouvement : position, vitesse et accélération vectorielles. La partie 3 l'applique aux deux grandes familles de mouvements — les rectilignes (MRU, MRUV) et les circulaires — avec leurs formules clés en main.</div>
+    <div class="lecture-end-divider"></div>
+  </div>
+
+</div>

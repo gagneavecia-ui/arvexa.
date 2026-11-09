@@ -1,0 +1,363 @@
+<!-- PARTIE 03 — Calcul du pH d'une base forte (Acide fort, base forte) -->
+<div class="lecture-container">
+
+  <!-- ===== HERO ===== -->
+  <header class="lecture-hero">
+    <div class="lecture-hero-badge">
+      <span class="lecture-hero-icon">📘</span>
+      <span class="lecture-hero-label">Terminale C&D · Acide fort, base forte · Partie 03</span>
+    </div>
+    <h1 class="lecture-hero-title">
+      Calcul du pH d'une <em>base forte</em>
+    </h1>
+    <p class="lecture-hero-intro">
+      Le savon glisse entre tes doigts, le débouche-évier déloge les cheveux du lavabo : derrière ces sensations, il y a des ions OH⁻ en grande quantité. Dans cette partie, tu calcules le pH d'une base forte avec la formule pH = 14 + log C, tu découvres pourquoi les formules s'affolent dans les solutions très diluées, et tu apprends le rituel du chimiste : le titrage acide fort par base forte, avec son fameux saut de pH à l'équivalence.
+    </p>
+    <div class="lecture-hero-meta">
+      <span class="lecture-hero-meta-item">⏱ 25 min</span>
+      <span class="lecture-hero-meta-item">⚗️ 4 notions</span>
+      <span class="lecture-hero-meta-item">📚 6 sections</span>
+      <span class="lecture-hero-meta-item">🎓 Terminale C&D</span>
+    </div>
+  </header>
+  <!-- ===== SOMMAIRE ===== -->
+  <nav class="lecture-toc">
+    <div class="lecture-toc-header">
+      <span>Dans cette partie</span>
+      <span class="lecture-toc-count">4 notions · 6 sections</span>
+    </div>
+    <ol class="lecture-toc-list">
+      <li><a href="#s0"><span class="toc-num">00</span><span>La base forte dans ta cuisine et ton garage</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>[OH⁻] = C : l'inventaire d'une solution de base forte</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>La formule du jour : pH = 14 + log C</span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>Solutions très diluées : l'eau reprend ses droits</span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>Le titrage acide fort par base forte</span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>Exercice de synthèse : le titrage complet</span></a></li>
+    </ol>
+  </nav>
+  <!-- ============================================================ -->
+  <!-- SECTION s0 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s0">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">00</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Motivation</span>
+        <h2 class="lecture-section-title">La base forte dans ta cuisine et ton garage</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Le savon que l'on fabrique en mélangeant de l'huile et de la soude, le débouche-évier qui attaque les bouchons de cheveux, la chaux dont on badigeonne les murs : autant de produits basiques, et parfois de vraies bases fortes. Une solution de soude du commerce atteint couramment C = 1,0 mol·L⁻¹ : à la fin de cette partie, tu calculeras son pH de tête, sans calculatrice.</p>
+      <svg viewBox="0 0 560 145" role="img" aria-label="Zone basique de l'échelle de pH">
+        <text x="280" y="20" text-anchor="middle" font-size="13" fill="currentColor" opacity="0.8">L'échelle de pH côté basique (au-delà de 7)</text>
+        <rect x="40" y="76" width="240" height="24" fill="rgba(120,200,140,0.35)" style="stroke:var(--accent-bright)" stroke-width="0.8"/>
+        <rect x="280" y="76" width="240" height="24" fill="rgba(60,80,200,0.5)" style="stroke:var(--accent-bright)" stroke-width="0.8"/>
+        <text x="160" y="92" text-anchor="middle" font-size="10" fill="currentColor">milieu acide</text>
+        <text x="400" y="92" text-anchor="middle" font-size="10" fill="currentColor">milieu basique</text>
+        <line x1="280" y1="52" x2="280" y2="76" stroke="currentColor" opacity="0.4"/><text x="280" y="48" text-anchor="middle" font-size="10" fill="currentColor">eau pure (7)</text>
+        <line x1="383" y1="52" x2="383" y2="76" stroke="currentColor" opacity="0.4"/><text x="383" y="48" text-anchor="middle" font-size="10" fill="currentColor">savon (10)</text>
+        <line x1="451" y1="52" x2="451" y2="76" stroke="currentColor" opacity="0.4"/><text x="451" y="48" text-anchor="middle" font-size="10" fill="currentColor">javel (12)</text>
+        <line x1="503" y1="52" x2="503" y2="76" stroke="currentColor" opacity="0.4"/><text x="503" y="48" text-anchor="middle" font-size="10" fill="currentColor">débouche-évier (≈ 14)</text>
+        <text x="40" y="122" font-size="11" fill="currentColor" opacity="0.8">0</text>
+        <text x="280" y="122" font-size="11" fill="currentColor" opacity="0.8">7</text>
+        <text x="383" y="122" font-size="11" fill="currentColor" opacity="0.8">10</text>
+        <text x="520" y="122" font-size="11" fill="currentColor" opacity="0.8">14</text>
+      </svg>
+      <div class="lecture-callout lecture-callout-warning">
+        <p class="lecture-text"><strong>⚠️ Sécurité :</strong> les bases fortes saponifient la peau — elles la transforment littéralement en savon. Gants et lunettes obligatoires ; en cas de contact, rincer abondamment à l'eau.</p>
+      </div>
+      <p class="lecture-text">Programme de la partie : compter les ions OH⁻ d'une solution de base forte, en déduire son pH, comprendre ce qui se passe dans les solutions ultra-diluées, puis utiliser tout cela dans le grand classique du bac : le titrage.</p>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s1 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s1">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">01</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1</span>
+        <h2 class="lecture-section-title">[OH⁻] = C : l'inventaire d'une solution de base forte</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Tout part d'un constat de la partie 01 : la dissociation d'une base forte comme NaOH ou KOH est totale. Chaque mole de solide dissoute libère une mole d'ions hydroxyde dans la solution. L'inventaire des ions est donc immédiat, sans aucun calcul de réaction.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <p class="lecture-text"><strong>Définition officielle (rappel).</strong> Une <strong>base forte</strong> (NaOH, KOH…) se dissocie totalement dans l'eau. Pour une solution de concentration C_B : <span class="math">[OH⁻] = C_B</span> et, pour NaOH ou KOH, [Na⁺] = [K⁺] = C_B. La solution est électriquement neutre.</p>
+      </div>
+      <div class="lecture-formula-hero">
+        <span class="math">[OH⁻] = C_B</span>
+      </div>
+      <div class="lecture-formula-box">
+        <span class="math">[H₃O⁺] = 10⁻¹⁴ ÷ C_B (à 25 °C)</span>
+      </div>
+      <p class="lecture-text">La seconde relation vient du produit ionique de l'eau (partie 02) : même dans une solution très basique, il reste une trace d'ions H₃O⁺, imposée par le produit verrouillé à 10⁻¹⁴.</p>
+      <p class="lecture-text"><strong>Analogie.</strong> Tout ce que tu as appris côté acide se reflète côté base, comme une image dans l'eau du fleuve : on échange le rôle de H₃O⁺ et de OH⁻, et le pH monte au lieu de descendre. Même raisonnement, signes inversés.</p>
+      <div class="lecture-example-content">
+        <p class="lecture-text"><strong>🧪 Exemple travaillé — l'inventaire d'une solution de soude.</strong> Une solution de NaOH a pour concentration C = 1,0·10⁻² mol·L⁻¹. Fais l'inventaire complet des ions à 25 °C.</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step"><strong>Ions apportés par la base.</strong> Dissociation totale : [OH⁻] = [Na⁺] = C = 1,0·10⁻² mol·L⁻¹.</li>
+          <li class="lecture-step"><strong>Ions oxonium restants.</strong> [H₃O⁺] = 10⁻¹⁴ ÷ 1,0·10⁻² = 1,0·10⁻¹² mol·L⁻¹ : infime, mais non nul.</li>
+          <li class="lecture-step"><strong>Vérification.</strong> 1,0·10⁻² × 1,0·10⁻¹² = 1,0·10⁻¹⁴ ✓ : le produit ionique est respecté, l'inventaire est cohérent.</li>
+        </ol>
+      </div>
+      <div class="lecture-text">
+        <p class="lecture-text"><strong>🏋️ Exercice 1 — La potasse diluée.</strong> Une solution de KOH a pour concentration C = 2,0·10⁻³ mol·L⁻¹. Calcule [OH⁻] puis [H₃O⁺] à 25 °C, et vérifie le produit ionique.</p>
+        <details><summary>Voir la solution étape par étape</summary>
+          <ol class="lecture-steps">
+            <li class="lecture-step"><strong>Base forte.</strong> KOH → K⁺ + OH⁻ totalement : [OH⁻] = C = 2,0·10⁻³ mol·L⁻¹.</li>
+            <li class="lecture-step"><strong>Ion oxonium.</strong> [H₃O⁺] = 10⁻¹⁴ ÷ 2,0·10⁻³ = 5,0·10⁻¹² mol·L⁻¹.</li>
+            <li class="lecture-step"><strong>Vérification.</strong> 2,0·10⁻³ × 5,0·10⁻¹² = 10·10⁻¹⁵ = 1,0·10⁻¹⁴ ✓ : cohérent avec Ke.</li>
+          </ol>
+        </details>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <p class="lecture-text"><strong>⚠️ Piège :</strong> pour Ca(OH)₂, [OH⁻] = 2C (dibase). Et le volume de solution n'intervient jamais : [OH⁻] = C_B quel que soit le volume préparé.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s2 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s2">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">02</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2</span>
+        <h2 class="lecture-section-title">La formule du jour : pH = 14 + log C</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">La démonstration tient en trois lignes, en enchaînant l'inventaire de la section 01 avec le produit ionique de la partie 02. Écris-la une fois en entier : elle deviendra automatique.</p>
+      <ol class="lecture-steps">
+        <li class="lecture-step"><strong>Inventaire.</strong> Base forte ⇒ [OH⁻] = C.</li>
+        <li class="lecture-step"><strong>Produit ionique.</strong> [H₃O⁺] = Ke ÷ [OH⁻] = 10⁻¹⁴ ÷ C.</li>
+        <li class="lecture-step"><strong>Passer au pH.</strong> pH = −log(10⁻¹⁴ ÷ C) = −log(10⁻¹⁴) + log C = 14 + log C. C'est fini !</li>
+      </ol>
+      <div class="lecture-formula-hero">
+        <span class="math">pH = 14 + log C</span>
+      </div>
+      <p class="lecture-text">Conditions d'application : base forte, C en mol·L⁻¹, à 25 °C, et tant que C ≥ 10⁻⁶ mol·L⁻¹ (voir section 03 pour la limite).</p>
+      <div class="lecture-formula-box">
+        <span class="math">pOH = −log C ; pH = 14 − pOH</span>
+      </div>
+      <p class="lecture-text">Certains sujets utilisent le pOH : c'est l'équivalent du pH, mais pour les ions OH⁻. Les deux écritures disent la même chose.</p>
+      <svg viewBox="0 0 560 170" role="img" aria-label="Les deux formules de pH face à face">
+        <text x="280" y="20" text-anchor="middle" font-size="13" fill="currentColor" opacity="0.8">Deux familles, deux formules (à 25 °C)</text>
+        <rect x="40" y="45" width="200" height="70" rx="12" fill="rgba(220,80,80,0.14)" style="stroke:var(--accent-bright)" stroke-width="1.5"/>
+        <text x="140" y="72" text-anchor="middle" font-size="13" fill="currentColor">Acide fort ([H₃O⁺] = C)</text>
+        <text x="140" y="98" text-anchor="middle" font-size="17" style="fill:var(--accent-bright)">pH = −log C</text>
+        <rect x="320" y="45" width="200" height="70" rx="12" fill="rgba(60,80,200,0.16)" style="stroke:var(--accent-bright)" stroke-width="1.5"/>
+        <text x="420" y="72" text-anchor="middle" font-size="13" fill="currentColor">Base forte ([OH⁻] = C)</text>
+        <text x="420" y="98" text-anchor="middle" font-size="17" style="fill:var(--accent-bright)">pH = 14 + log C</text>
+        <text x="280" y="88" text-anchor="middle" font-size="13" fill="currentColor" opacity="0.8">pH 7</text>
+        <line x1="280" y1="42" x2="280" y2="118" stroke="currentColor" stroke-dasharray="4 4" opacity="0.5"/>
+        <text x="280" y="150" text-anchor="middle" font-size="12" fill="currentColor" opacity="0.85">Valables si C ≥ 10⁻⁶ mol·L⁻¹ : en dessous, l'eau ne se néglige plus (section 03).</text>
+      </svg>
+      <p class="lecture-text"><strong>Analogie.</strong> Le pOH, c'est un compte à rebours : il démarre de 14 et diminue quand les OH⁻ se multiplient. Convertir, c'est simplement faire 14 moins le compte à rebours.</p>
+      <div class="lecture-example-content">
+        <p class="lecture-text"><strong>🧪 Exemple travaillé — pH d'une solution de soude diluée.</strong> Calcule le pH à 25 °C d'une solution de NaOH de concentration C = 2,0·10⁻³ mol·L⁻¹.</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step"><strong>Identifier.</strong> NaOH est une base forte, C = 2,0·10⁻³ ≥ 10⁻⁶ : la formule pH = 14 + log C s'applique.</li>
+          <li class="lecture-step"><strong>Calculer.</strong> log(2,0·10⁻³) = log 2,0 − 3 = 0,30 − 3 = −2,70, donc pH = 14 − 2,70 = 11,30.</li>
+          <li class="lecture-step"><strong>Vérifier par les ions.</strong> [H₃O⁺] = 10⁻¹⁴ ÷ 2,0·10⁻³ = 5,0·10⁻¹² mol·L⁻¹, donc pH = −log(5,0·10⁻¹²) = 12 − 0,70 = 11,30 ✓.</li>
+          <li class="lecture-step"><strong>Contrôler la cohérence.</strong> Base ⇒ pH supérieur à 7 : 11,30 convient ✓.</li>
+        </ol>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <p class="lecture-text"><strong>⚠️ Piège :</strong> côté base, log C est négatif (car C inférieur à 1), donc pH = 14 + log C reste inférieur à 14. Si tu trouves pH = 15 ou pH = −1, une erreur de puissance de 10 s'est glissée : revérifie l'exposant.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s3 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s3">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">03</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 3</span>
+        <h2 class="lecture-section-title">Solutions très diluées : l'eau reprend ses droits</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Dilue, dilue encore… Pour une concentration de l'ordre de 10⁻⁷ mol·L⁻¹, les ions que tu ajoutes sont aussi peu nombreux que ceux que l'eau contient déjà naturellement. L'hypothèse « tout vient de l'acide ou de la base versée » s'effondre : il faut compter l'eau.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <p class="lecture-text"><strong>Règle officielle.</strong> Les formules pH = −log C et pH = 14 + log C ne sont valables que si <span class="math">C ≥ 10⁻⁶ mol·L⁻¹</span>. Pour C ≤ 10⁻⁶, les ions issus de l'autoprotolyse de l'eau ne sont plus négligeables : le pH se rapproche de 7, sans jamais le franchir du « mauvais côté » (un acide reste avec un pH inférieur à 7, une base avec un pH supérieur à 7, à 25 °C).</p>
+      </div>
+      <table class="lecture-table">
+        <thead><tr><th>C (mol·L⁻¹)</th><th>pH réel (acide fort)</th><th>pH réel (base forte)</th><th>Formule usuelle valable ?</th></tr></thead>
+        <tbody>
+          <tr><td>10⁻⁵</td><td>5,00</td><td>9,00</td><td>oui ✓</td></tr>
+          <tr><td>10⁻⁶</td><td>6,00</td><td>8,00</td><td>oui, à la limite</td></tr>
+          <tr><td>10⁻⁷</td><td>≈ 6,79</td><td>≈ 7,21</td><td>non ✗ (l'eau compte)</td></tr>
+          <tr><td>10⁻⁸</td><td>≈ 6,98</td><td>≈ 7,02</td><td>non ✗ (pH ≈ 7)</td></tr>
+        </tbody>
+      </table>
+      <p class="lecture-text"><strong>Analogie.</strong> Une goutte d'encre dans une piscine : à ce niveau de dilution, c'est l'eau — avec son pH de 7 — qui domine la couleur, pas l'encre. Ajouter 10⁻⁸ mol·L⁻¹ d'acide à l'eau ne la rend qu'à peine acide.</p>
+      <div class="lecture-text">
+        <p class="lecture-text"><strong>🏋️ Exercice 2 — Débusquer le piège.</strong> Un élève applique pH = −log C à une solution d'acide fort de concentration C = 10⁻⁸ mol·L⁻¹ et trouve pH = 8,00. Explique pourquoi ce résultat est impossible et donne la conclusion correcte.</p>
+        <details><summary>Voir la solution étape par étape</summary>
+          <ol class="lecture-steps">
+            <li class="lecture-step"><strong>Détecter l'absurdité.</strong> Une solution d'acide a un pH inférieur à 7 à 25 °C : pH = 8,00 est impossible pour un acide.</li>
+            <li class="lecture-step"><strong>Trouver la cause.</strong> L'eau pure apporte déjà [H₃O⁺] = 10⁻⁷ mol·L⁻¹, soit dix fois plus que C = 10⁻⁸ : on ne peut pas négliger l'eau.</li>
+            <li class="lecture-step"><strong>Conclure correctement.</strong> C ≤ 10⁻⁶ : la formule pH = −log C n'est pas applicable ; le calcul complet donne pH ≈ 6,98, légèrement acide, comme l'exige la logique.</li>
+          </ol>
+        </details>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <p class="lecture-text"><strong>⚠️ Le piège favori du bac :</strong> la question « la formule usuelle est-elle applicable ? » rapporte des points faciles si tu réponds : « C = 10⁻⁷ est inférieure à 10⁻⁶, donc l'autoprotolyse de l'eau n'est plus négligeable, la formule ne s'applique pas ».</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s4 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s4">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">04</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 4</span>
+        <h2 class="lecture-section-title">Le titrage acide fort par base forte</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Voici l'application reine du chapitre : déterminer la concentration inconnue d'un acide (celui d'un détartrant, par exemple) en le faisant réagir avec une base forte de concentration connue. On verse la base goutte à goutte à la burette et on suit le pH : c'est le titrage acido-basique.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <p class="lecture-text"><strong>Définition officielle.</strong> À l'<strong>équivalence</strong>, le versement est juste suffisant : les ions OH⁻ versés ont exactement consommé les ions H₃O⁺ initialement présents. On a <span class="math">n(OH⁻)versés = n(H₃O⁺)initiaux</span>, soit <span class="math">C_B·V_E = C_A·V_A</span>. La solution ne contient plus que Na⁺, Cl⁻ et de l'eau : elle est neutre, pH = 7 à 25 °C.</p>
+      </div>
+      <svg viewBox="0 0 560 270" role="img" aria-label="Montage de titrage : burette, bécher, pH-mètre et agitateur">
+        <text x="300" y="20" text-anchor="middle" font-size="13" fill="currentColor" opacity="0.8">Montage du titrage</text>
+        <line x1="60" y1="40" x2="60" y2="250" stroke="currentColor" stroke-width="3" opacity="0.6"/>
+        <line x1="35" y1="250" x2="95" y2="250" stroke="currentColor" stroke-width="3" opacity="0.6"/>
+        <rect x="190" y="35" width="30" height="115" rx="6" fill="rgba(224,184,74,0.12)" style="stroke:var(--accent-bright)" stroke-width="1.5"/>
+        <line x1="196" y1="60" x2="214" y2="60" stroke="currentColor" opacity="0.35"/>
+        <line x1="196" y1="85" x2="214" y2="85" stroke="currentColor" opacity="0.35"/>
+        <line x1="196" y1="110" x2="214" y2="110" stroke="currentColor" opacity="0.35"/>
+        <rect x="196" y="150" width="18" height="10" rx="2" fill="rgba(200,200,210,0.3)" style="stroke:var(--accent-bright)" stroke-width="1"/>
+        <polygon points="200,168 210,168 205,180" fill="rgba(224,184,74,0.5)"/>
+        <text x="232" y="52" font-size="11" fill="currentColor" opacity="0.85">burette graduée : NaOH (C_B connue)</text>
+        <path d="M 150 195 L 150 250 Q 150 265 168 265 L 252 265 Q 270 265 270 250 L 270 195" fill="none" stroke="currentColor" stroke-width="2" opacity="0.7"/>
+        <path d="M 156 210 L 156 248 Q 156 259 168 259 L 252 259 Q 264 259 264 248 L 264 210 Z" fill="rgba(224,184,74,0.12)"/>
+        <ellipse cx="210" cy="252" rx="20" ry="5" fill="rgba(200,200,210,0.3)" style="stroke:var(--accent-bright)" stroke-width="1"/>
+        <text x="286" y="228" font-size="11" fill="currentColor" opacity="0.85">bécher : acide (V_A, C_A inconnue)</text>
+        <text x="286" y="258" font-size="11" fill="currentColor" opacity="0.85">barreau aimanté + agitateur</text>
+        <rect x="30" y="50" width="115" height="44" rx="8" fill="rgba(224,184,74,0.15)" style="stroke:var(--accent-bright)" stroke-width="1.5"/>
+        <text x="87" y="68" text-anchor="middle" font-size="11" fill="currentColor">pH-mètre</text>
+        <text x="87" y="84" text-anchor="middle" font-size="12" style="fill:var(--accent-bright)">pH = f(V)</text>
+        <line x1="145" y1="72" x2="262" y2="72" stroke="currentColor" stroke-width="2" opacity="0.6"/>
+        <rect x="256" y="72" width="12" height="140" rx="5" fill="rgba(200,200,210,0.25)" style="stroke:var(--accent-bright)" stroke-width="1.2"/>
+        <text x="286" y="105" font-size="11" fill="currentColor" opacity="0.85">électrode du pH-mètre</text>
+      </svg>
+      <div class="lecture-formula-hero">
+        <span class="math">C_A·V_A = C_B·V_E</span>
+      </div>
+      <p class="lecture-text">La réaction support du titrage est totale : <span class="math">H₃O⁺ + OH⁻ → 2 H₂O</span>. Les ions Na⁺ et Cl⁻ ne participent pas : ce sont des ions spectateurs.</p>
+      <div class="lecture-formula-box">
+        <span class="math">C_A = C_B·V_E ÷ V_A</span>
+      </div>
+      <ol class="lecture-steps">
+        <li class="lecture-step"><strong>Avant l'équivalence.</strong> Il reste de l'acide en excès : le pH est inférieur à 7 et diminue lentement au fil du versement.</li>
+        <li class="lecture-step"><strong>À l'équivalence.</strong> n(OH⁻) = n(H₃O⁺) : plus aucun réactif en excès, la solution est neutre et pH = 7 à 25 °C.</li>
+        <li class="lecture-step"><strong>Après l'équivalence.</strong> La base versée s'accumule en excès : le pH grimpe vite au-delà de 7 puis se stabilise vers celui de la base ajoutée.</li>
+      </ol>
+      <p class="lecture-text">Comment repérer l'équivalence en pratique ? Par le <strong>saut de pH</strong> sur la courbe pH = f(V) (méthode des tangentes parallèles), par un <strong>indicateur coloré</strong> dont la zone de virage est incluse dans le saut, ou par <strong>conductimétrie</strong> : la conductance passe par un minimum à l'équivalence.</p>
+      <table class="lecture-table">
+        <thead><tr><th>Indicateur coloré</th><th>Zone de virage</th><th>Couleur côté acide</th><th>Couleur côté base</th></tr></thead>
+        <tbody>
+          <tr><td>Hélianthine</td><td>3,1 – 4,4</td><td>rouge</td><td>jaune</td></tr>
+          <tr><td>Bleu de bromothymol (BBT)</td><td>6,0 – 7,6</td><td>jaune</td><td>bleu</td></tr>
+          <tr><td>Phénolphtaléine</td><td>8,2 – 10,0</td><td>incolore</td><td>rose-violet</td></tr>
+        </tbody>
+      </table>
+      <p class="lecture-text">Pour un titrage acide fort/base forte, le saut de pH est immense (il va d'environ 3 à 11) : le BBT, qui vire précisément autour de 7, est le choix idéal ; la phénolphtaléine et l'hélianthine conviennent aussi.</p>
+      <div class="lecture-callout lecture-callout-warning">
+        <p class="lecture-text"><strong>⚠️ Piège :</strong> ne confonds pas V_E (volume versé à l'équivalence, repéré par le saut) avec le volume total versé en fin de manipulation. Et n'utilise jamais ⇌ pour la réaction support : H₃O⁺ + OH⁻ → 2 H₂O est totale.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s5 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s5">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">05</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Entraînement</span>
+        <h2 class="lecture-section-title">Exercice de synthèse : le titrage complet</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Dernière ligne droite : ce format d'exercice tombe presque chaque année. Fais-le entièrement seul avant d'ouvrir la solution.</p>
+      <div class="lecture-text">
+        <p class="lecture-text"><strong>🏋️ Exercice 3 — Doser un acide chlorhydrique.</strong> On titre V_A = 20,0 mL d'acide chlorhydrique par une solution de NaOH de concentration C_B = 0,050 mol·L⁻¹. L'équivalence est repérée pour V_E = 14,0 mL. 1) Écris l'équation de la réaction de titrage. 2) Calcule n(OH⁻) versé à l'équivalence. 3) En déduire C_A. 4) Calcule le pH initial de l'acide. 5) Quel est le pH à l'équivalence (25 °C) ?</p>
+        <details><summary>Voir la solution étape par étape</summary>
+          <ol class="lecture-steps">
+            <li class="lecture-step"><strong>Équation support.</strong> H₃O⁺ + OH⁻ → 2 H₂O : réaction totale (atomes : H 4 = 4 et O 2 = 2 ✓ ; charges : +1 − 1 = 0 ✓).</li>
+            <li class="lecture-step"><strong>Quantité versée.</strong> À l'équivalence, n(OH⁻) = C_B·V_E = 0,050 × 0,0140 = 7,0·10⁻⁴ mol (V_E = 14,0 mL = 0,0140 L ✓).</li>
+            <li class="lecture-step"><strong>Concentration cherchée.</strong> n(H₃O⁺)initial = n(OH⁻) = 7,0·10⁻⁴ mol, donc C_A = n ÷ V_A = 7,0·10⁻⁴ ÷ 0,0200 = 3,5·10⁻² mol·L⁻¹.</li>
+            <li class="lecture-step"><strong>pH initial.</strong> Acide fort, C_A = 3,5·10⁻² ≥ 10⁻⁶ : pH = −log(3,5·10⁻²) = 2 − 0,54 = 1,46.</li>
+            <li class="lecture-step"><strong>À l'équivalence.</strong> Solution de NaCl (ions spectateurs) dans l'eau : neutre, donc pH = 7,00 à 25 °C ✓.</li>
+          </ol>
+        </details>
+      </div>
+      <svg viewBox="0 0 560 300" role="img" aria-label="Courbe de titrage pH en fonction du volume de base versé">
+        <text x="300" y="20" text-anchor="middle" font-size="13" fill="currentColor" opacity="0.8">Courbe de titrage : le saut de pH repère l'équivalence</text>
+        <line x1="40" y1="280" x2="530" y2="280" stroke="currentColor" stroke-width="1.5" opacity="0.7"/>
+        <line x1="40" y1="280" x2="40" y2="30" stroke="currentColor" stroke-width="1.5" opacity="0.7"/>
+        <text x="300" y="296" text-anchor="middle" font-size="12" fill="currentColor" opacity="0.85">V de NaOH versé (mL)</text>
+        <text x="18" y="160" text-anchor="middle" font-size="12" fill="currentColor" opacity="0.85" transform="rotate(-90 18 160)">pH</text>
+        <text x="28" y="284" text-anchor="end" font-size="11" fill="currentColor" opacity="0.8">0</text>
+        <text x="34" y="158" text-anchor="end" font-size="11" fill="currentColor" opacity="0.8">7</text>
+        <text x="34" y="34" text-anchor="end" font-size="11" fill="currentColor" opacity="0.8">14</text>
+        <text x="40" y="296" font-size="11" fill="currentColor" opacity="0.8">0</text>
+        <text x="200" y="296" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.8">10</text>
+        <text x="360" y="296" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.8">20</text>
+        <text x="520" y="296" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.8">30</text>
+        <line x1="40" y1="154" x2="264" y2="154" stroke="currentColor" stroke-dasharray="5 4" opacity="0.5"/>
+        <line x1="264" y1="154" x2="264" y2="280" stroke="currentColor" stroke-dasharray="5 4" opacity="0.5"/>
+        <path d="M 40 254 L 120 249 L 200 241 L 248 229 L 262 211 L 264 154 L 266 97 L 280 79 L 360 66 L 488 61 L 520 60" fill="none" style="stroke:var(--accent-bright)" stroke-width="2.5"/>
+        <circle cx="264" cy="154" r="4" style="fill:var(--accent-bright)"/>
+        <text x="272" y="150" font-size="11" fill="currentColor">Équivalence : V_E = 14,0 mL, pH = 7</text>
+        <text x="60" y="238" font-size="11" fill="currentColor" opacity="0.85">côté acide (pH bas)</text>
+        <text x="300" y="92" font-size="11" fill="currentColor" opacity="0.85">côté base (pH haut)</text>
+      </svg>
+      <p class="lecture-text">Remarque sur la courbe : avant l'équivalence le pH monte doucement, il flèche brutalement autour de V_E (saut de plusieurs unités de pH pour quelques dixièmes de mL), puis il plafonne vers celui de la soude versée.</p>
+    </div>
+  </section>
+  <!-- ===== QCM ===== -->
+  <div class="lecture-quiz">
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">À 25 °C, le pH d'une solution de NaOH de concentration C = 0,010 mol·L⁻¹ vaut :</p>
+      <div class="lecture-quiz-options"><span>A) 2</span><span>B) 7</span><span>C) 10</span><span>D) 12</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">Réponse D. Base forte, C ≥ 10⁻⁶ : pH = 14 + log(0,010) = 14 − 2 = 12. L'option A est le piège miroir (c'est le pH d'un acide fort à cette concentration), la C confond pH et −log C appliqué aux OH⁻.</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">À l'équivalence d'un titrage d'acide chlorhydrique par de la soude, à 25 °C :</p>
+      <div class="lecture-quiz-options"><span>A) pH = 7 et n(OH⁻) versés = n(H₃O⁺) initiaux</span><span>B) pH = 14</span><span>C) [OH⁻] supérieur à [H₃O⁺]</span><span>D) il reste de l'acide en excès</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">Réponse A. À l'équivalence, les deux réactifs ont été mélangés en proportions stœchiométriques : il ne reste que Na⁺, Cl⁻ et l'eau, donc la solution est neutre (pH = 7 à 25 °C).</div></details>
+    </div>
+  </div>
+  <!-- ===== RÉCAP ===== -->
+  <div class="lecture-recap">
+    <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
+    <ul class="lecture-recap-list">
+      <li><strong>pH d'une base forte</strong> — dissociation totale donc [OH⁻] = C, d'où pH = 14 + log C à 25 °C (si C ≥ 10⁻⁶ mol·L⁻¹).</li>
+      <li><strong>Solutions très diluées</strong> — pour C ≤ 10⁻⁶, l'autoprotolyse de l'eau ne se néglige plus : le pH glisse vers 7 (acide ≈ 6,79 et base ≈ 7,21 pour C = 10⁻⁷).</li>
+      <li><strong>Titrage</strong> — à l'équivalence : C_A·V_A = C_B·V_E et pH = 7 ; on repère V_E par le saut de pH, un indicateur coloré ou la conductimétrie.</li>
+    </ul>
+  </div>
+  <!-- ===== FIN ===== -->
+  <div class="lecture-end">
+    <div class="lecture-end-icon">🎯</div>
+    <div class="lecture-end-text">Partie 03 terminée !</div>
+    <div class="lecture-end-sub">Acide ET base : tu as maintenant les deux faces du miroir. La partie 04 assemble tout en une fiche de révision ultime, à relire la veille de l'épreuve. Dernière ligne droite !</div>
+    <div class="lecture-end-divider"></div>
+  </div>
+</div>

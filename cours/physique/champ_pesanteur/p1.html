@@ -1,0 +1,417 @@
+<!-- PARTIE 01 — Chute libre sans vitesse initiale (Mouvement dans le champ de pesanteur) -->
+<div class="lecture-container">
+
+  <!-- ===== HERO ===== -->
+  <header class="lecture-hero">
+    <div class="lecture-hero-badge">
+      <span class="lecture-hero-icon">📘</span>
+      <span class="lecture-hero-label">Terminale C&D · Mouvement dans le champ de pesanteur · Partie 01</span>
+    </div>
+    <h1 class="lecture-hero-title">
+      Chute libre sans <em>vitesse initiale</em>
+    </h1>
+    <p class="lecture-hero-intro">
+      Pourquoi un objet lâché tombe-t-il toujours de la même façon ? Pourquoi une bille d'acier et une bille de bois touchent-elles le sol en même temps ? Dans cette première partie, tu découvres le champ de pesanteur <span class="math">→g</span>, la définition exacte de la chute libre et tes premières équations horaires. C'est la base de tout le chapitre : maîtrise-la, et la suite deviendra beaucoup plus simple.
+    </p>
+    <div class="lecture-hero-meta">
+      <span class="lecture-hero-meta-item">⏱ 20 min</span>
+      <span class="lecture-hero-meta-item">⚡ 4 notions</span>
+      <span class="lecture-hero-meta-item">📚 6 sections</span>
+      <span class="lecture-hero-meta-item">🎓 Terminale C&D</span>
+    </div>
+  </header>
+  <!-- ===== SOMMAIRE ===== -->
+  <nav class="lecture-toc">
+    <div class="lecture-toc-header">
+      <span>Dans cette partie</span>
+      <span class="lecture-toc-count">4 notions · 6 sections</span>
+    </div>
+    <ol class="lecture-toc-list">
+      <li><a href="#s0"><span class="toc-num">00</span><span>Pourquoi tout retombe ?</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>Le champ de pesanteur uniforme</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>La chute libre : définition</span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>Équations horaires de la chute</span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>Durée et vitesse de chute</span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>Tableau de synthèse & exercices</span></a></li>
+    </ol>
+  </nav>
+  <!-- ============================================================ -->
+  <!-- SECTION s0 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s0">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">00</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Motivation</span>
+        <h2 class="lecture-section-title">Pourquoi tout finit toujours par tomber ?</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Le moto-taxi qui frôle un dos-d'âne à pleine vitesse : le pilote et son passager quittent la selle un bref instant, « flottent », puis retombent durement. Le ballon du match du vendredi au stade : frappé vers le ciel, il ralentit, s'arrête une seconde, puis redescend. La pluie de la saison des pluies : des milliards de gouttes accélèrent depuis les nuages jusqu'au sol. Trois scènes de ta vie quotidienne, une seule explication physique : la Terre attire tout ce qui l'entoure, et cette attraction se décrit avec le champ de pesanteur. Dans cette partie, tu vas comprendre pourquoi tout retombe, et tu vas surtout apprendre à calculer deux choses que tout le monde veut connaître : combien de temps dure une chute, et à quelle vitesse l'objet frappe le sol.</p>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s1 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s1">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">01</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1</span>
+        <h2 class="lecture-section-title">Le champ de pesanteur uniforme</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Autour de nous, invisible mais bien réelle, la Terre attire tous les objets. Pour décrire cette action en tout point de l'espace, le physicien utilise un outil puissant : le champ de pesanteur. C'est lui qui explique la chute des corps, le fonctionnement des fontaines et même la trajectoire des balles. Commençons par le définir avec précision.</p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-title">📖 Définition officielle</div>
+        <p class="lecture-text">Le champ de pesanteur est la région de l'espace où toute masse est soumise à une force de pesanteur appelée poids. Il est caractérisé en chaque point par le vecteur champ de pesanteur <span class="math">→g</span> : direction : la verticale du lieu ; sens : vers le bas, vers le centre de la Terre ; norme (valeur) : <span class="math">g = 9,81 m·s⁻²</span> à la surface de la Terre (souvent arrondi à <span class="math">g ≈ 9,8 m·s⁻²</span> ; certains énoncés imposent <span class="math">g = 10 m·s⁻²</span> — lis toujours la consigne).</p>
+      </div>
+
+      <p class="lecture-text">Imagine que l'air soit semé de milliers de petites flèches invisibles, toutes verticales, toutes pointées vers le sol, toutes de la même longueur. Voilà l'image d'un champ uniforme : en tout point, <span class="math">→g</span> est identique — même direction, même sens, même valeur. Près du sol, sur quelques dizaines ou centaines de mètres, cette image est excellente. C'est pourquoi tout ce qui tombe autour de nous obéit aux mêmes équations.</p>
+
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-main">⚡ Le poids : la force associée au champ</div>
+        <div class="lecture-formula-hero"><span class="math">→P = m→g</span></div>
+        <p class="lecture-formula-hero">Norme : <span class="math">P = m·g</span> — m en kilogrammes (kg), P en newtons (N), g en m·s⁻².</p>
+      </div>
+
+      <svg viewBox="0 0 640 250" role="img" aria-label="Champ de pesanteur uniforme">
+        <defs>
+          <marker id="p1a-g" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" style="fill:var(--accent-bright)"/></marker>
+        </defs>
+        <text x="320" y="26" text-anchor="middle" font-size="13" style="fill:rgba(255,255,255,0.9)">Le champ de pesanteur est identique en tout point : champ uniforme</text>
+        <line x1="140" y1="55" x2="140" y2="165" style="stroke:var(--accent-bright);stroke-width:2.5" marker-end="url(#p1a-g)"/>
+        <line x1="260" y1="55" x2="260" y2="165" style="stroke:var(--accent-bright);stroke-width:2.5" marker-end="url(#p1a-g)"/>
+        <line x1="380" y1="55" x2="380" y2="165" style="stroke:var(--accent-bright);stroke-width:2.5" marker-end="url(#p1a-g)"/>
+        <line x1="500" y1="55" x2="500" y2="165" style="stroke:var(--accent-bright);stroke-width:2.5" marker-end="url(#p1a-g)"/>
+        <text x="152" y="120" font-size="13" style="fill:var(--accent-bright)">→g</text>
+        <line x1="40" y1="215" x2="600" y2="215" style="stroke:rgba(255,255,255,0.4);stroke-width:2"/>
+        <text x="570" y="235" font-size="11" style="fill:rgba(255,255,255,0.55)">sol</text>
+        <text x="320" y="245" text-anchor="middle" font-size="11.5" style="fill:rgba(255,255,255,0.65)">direction : verticale · sens : vers le bas · valeur : g = 9,81 m·s⁻² partout</text>
+      </svg>
+
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">🧪 Exemple travaillé — Le poids d'un élève</div>
+        <p class="lecture-text">Un élève de masse <span class="math">m = 60 kg</span> se tient debout dans la cour du lycée, où <span class="math">g = 9,81 m·s⁻²</span>. Quelle est la norme du poids qui s'exerce sur lui ?</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step"><strong>Étape 1 — Données.</strong> <span class="math">m = 60 kg</span> ; <span class="math">g = 9,81 m·s⁻²</span> (valeur donnée par l'énoncé).</li>
+          <li class="lecture-step"><strong>Étape 2 — Formule.</strong> Le poids a pour norme <span class="math">P = m·g</span>.</li>
+          <li class="lecture-step"><strong>Étape 3 — Substitution et résultat.</strong> <span class="math">P = 60 × 9,81 = 588,6 ≈ 589 N</span>.</li>
+          <li class="lecture-step"><strong>Étape 4 — Interprétation.</strong> Le sol exerce sur lui une force opposée de même valeur (il est en équilibre). Sa masse, elle, vaudrait toujours 60 kg même sur la Lune — seul le poids changerait.</li>
+        </ol>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-title">⚠️ Piège d'examen</div>
+        <p class="lecture-text">Masse ≠ poids ! La masse <span class="math">m</span> (en kg) mesure la quantité de matière et ne dépend pas du lieu ; le poids <span class="math">→P</span> (en N) dépend de <span class="math">g</span>. Sur la Lune, <span class="math">g = 1,62 m·s⁻²</span> : même masse, poids environ 6 fois plus faible. Et vérifie toujours la valeur de <span class="math">g</span> imposée par l'énoncé : 9,81, 9,8 ou 10 m·s⁻² changent le résultat numérique.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s2 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s2">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">02</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2</span>
+        <h2 class="lecture-section-title">La chute libre : définition</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Maintenant que le champ est défini, étudions le mouvement le plus simple qui s'y déroule : la chute libre. C'est le cas idéal que tu rencontreras dans presque tous les exercices de ce chapitre. Tout repose sur une définition très précise — apprends-la mot pour mot.</p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-title">📖 Définition officielle</div>
+        <p class="lecture-text">Un objet est en chute libre s'il n'est soumis qu'à une seule force : son poids <span class="math">→P</span>. Dans le vide, toute chute est libre. Dans l'air, on considère la chute libre lorsque les frottements de l'air et la poussée d'Archimède sont négligeables devant le poids.</p>
+      </div>
+
+      <p class="lecture-text">En 1971, sur la Lune — où il n'y a pas d'atmosphère — l'astronaute David Scott a lâché en même temps un marteau et une plume. Résultat spectaculaire : les deux ont touché le sol ensemble. Sans air, pas de frottements : marteau et plume ne subissent que leur poids, et la masse n'a aucune influence sur la chute. Chez nous, l'air freine la plume mais presque pas la bille d'acier : c'est pour cela que la définition exige des frottements négligeables.</p>
+
+      <p class="lecture-text">Que vaut l'accélération d'un objet en chute libre ? La deuxième loi de Newton donne <span class="math">→P = m·→a</span>. Or <span class="math">→P = m→g</span>. En simplifiant par <span class="math">m</span>, on obtient le résultat le plus important du chapitre :</p>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">Conséquence directe de la définition</div>
+        <p class="lecture-formula-box"><span class="math">→a = →g</span></p>
+        <p class="lecture-formula-desc">L'accélération vaut <span class="math">g = 9,81 m·s⁻²</span>, quelles que soient la masse et la forme de l'objet.</p>
+      </div>
+
+      <svg viewBox="0 0 420 330" role="img" aria-label="Repère Oz et poids d'un objet en chute">
+        <defs>
+          <marker id="p1b-w" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" style="fill:rgba(255,255,255,0.8)"/></marker>
+          <marker id="p1b-g" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" style="fill:var(--accent-bright)"/></marker>
+        </defs>
+        <line x1="60" y1="280" x2="60" y2="45" style="stroke:rgba(255,255,255,0.8);stroke-width:1.5" marker-end="url(#p1b-w)"/>
+        <line x1="60" y1="280" x2="390" y2="280" style="stroke:rgba(255,255,255,0.8);stroke-width:1.5" marker-end="url(#p1b-w)"/>
+        <text x="70" y="58" font-size="12" style="fill:rgba(255,255,255,0.8)">z</text>
+        <text x="396" y="292" font-size="12" style="fill:rgba(255,255,255,0.8)">x</text>
+        <text x="44" y="296" font-size="12" style="fill:rgba(255,255,255,0.8)">O</text>
+        <circle cx="250" cy="120" r="14" style="fill:rgba(224,184,74,0.15);stroke:var(--accent-bright);stroke-width:2"/>
+        <text x="272" y="116" font-size="12" style="fill:rgba(255,255,255,0.85)">M</text>
+        <line x1="250" y1="138" x2="250" y2="212" style="stroke:var(--accent-bright);stroke-width:2.5" marker-end="url(#p1b-g)"/>
+        <text x="262" y="185" font-size="13" style="fill:var(--accent-bright)">→P</text>
+        <line x1="250" y1="134" x2="250" y2="280" style="stroke:rgba(255,255,255,0.3);stroke-width:1" stroke-dasharray="4 4"/>
+        <text x="250" y="315" text-anchor="middle" font-size="11.5" style="fill:rgba(255,255,255,0.65)">Le poids →P = m→g est vertical, dirigé vers le bas — c'est la seule force</text>
+      </svg>
+
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">🧪 Exemple travaillé — La chute est-elle libre ?</div>
+        <p class="lecture-text">Méthode en 3 étapes pour vérifier si un énoncé décrit une chute libre.</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step"><strong>Étape 1 — Lister toutes les forces.</strong> Ici : le poids <span class="math">→P</span>, les frottements de l'air <span class="math">→f</span>, éventuellement la poussée d'Archimède <span class="math">→π</span>.</li>
+          <li class="lecture-step"><strong>Étape 2 — Comparer les intensités.</strong> Une bille d'acier de 50 g : <span class="math">P ≈ 0,49 N</span>, alors que les frottements à vitesse modérée sont de l'ordre de 0,001 N : négligeables.</li>
+          <li class="lecture-step"><strong>Étape 3 — Conclure.</strong> Si <span class="math">→f</span> et <span class="math">→π</span> sont négligeables devant <span class="math">→P</span>, la chute est libre : on appliquera <span class="math">→a = →g</span> et les équations de la section 03.</li>
+        </ol>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-title">⚠️ Piège d'examen</div>
+        <p class="lecture-text">Chute libre ne signifie PAS « aucune force » ! L'objet subit bien une force : son poids. « Libre » veut dire « rien d'autre que le poids ». Si l'énoncé mentionne des frottements non négligeables, la chute n'est plus libre et les équations de ce chapitre ne s'appliquent plus directement.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s3 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s3">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">03</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 3</span>
+        <h2 class="lecture-section-title">Équations horaires de la chute sans vitesse initiale</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Décrivons maintenant le mouvement avec des mathématiques. Il nous faut un repère : on choisit l'axe Oz vertical, orienté vers le haut ; l'axe Ox horizontal peut compléter le repère, mais il est inutile ici puisque le mouvement est rectiligne vertical. Une fois le repère posé, deux intégrations successives de <span class="math">→a = →g</span> donnent la vitesse, puis la position. C'est tout : deux équations qui résolvent 90 % des questions.</p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-title">📖 Montage officiel</div>
+        <p class="lecture-text">Repère <span class="math">(O ; →i ; →j ; →k)</span> avec l'axe Oz vertical vers le haut. Objet lâché à <span class="math">t = 0</span> de l'altitude <span class="math">z₀</span>, sans vitesse initiale : <span class="math">v₀ = 0</span>. Chute libre : <span class="math">→a = →g = −g·→k</span>. On intègre une fois : <span class="math">→v = (−g·t)·→k</span> ; puis une seconde fois : <span class="math">z(t) = z₀ − ½·g·t²</span>.</p>
+      </div>
+
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-main">⚡ Vitesse de chute (équation horaire)</div>
+        <div class="lecture-formula-hero"><span class="math">v(t) = −g·t</span></div>
+        <p class="lecture-formula-hero">v en m·s⁻¹, t en s. Le signe − traduit la descente (axe Oz orienté vers le haut).</p>
+      </div>
+
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-main">⚡ Position pendant la chute (équation horaire)</div>
+        <div class="lecture-formula-hero"><span class="math">z(t) = z₀ − ½·g·t²</span></div>
+        <p class="lecture-formula-hero">z en m. La courbe z(t) est une demi-parabole : la chute est uniformément accélérée.</p>
+      </div>
+
+      <p class="lecture-text">Concrètement : à chaque seconde qui passe, la norme de la vitesse augmente de <span class="math">g ≈ 9,81 m·s⁻¹</span>. Après 1 s, elle vaut déjà 9,81 m·s⁻¹ ; après 2 s, 19,62 m·s⁻¹. Et comme la vitesse grandit, l'espace parcouru pendant des durées égales devient de plus en plus grand : c'est le terme <span class="math">½·g·t²</span> qui traduit cette accélération.</p>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">Relation sans le temps</div>
+        <p class="lecture-formula-box"><span class="math">v² = 2·g·(z₀ − z)</span></p>
+        <p class="lecture-formula-desc">Pratique quand la durée est inconnue : elle relie directement la vitesse à l'altitude.</p>
+      </div>
+
+      <svg viewBox="0 0 420 440" role="img" aria-label="Positions successives d'une chute libre">
+        <defs>
+          <marker id="p1c-w" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" style="fill:rgba(255,255,255,0.85)"/></marker>
+        </defs>
+        <line x1="180" y1="40" x2="180" y2="320" style="stroke:rgba(255,255,255,0.3);stroke-width:1" stroke-dasharray="3 5"/>
+        <circle cx="180" cy="50" r="10" style="fill:rgba(224,184,74,0.15);stroke:var(--accent-bright);stroke-width:2"/>
+        <circle cx="180" cy="80" r="10" style="fill:rgba(224,184,74,0.15);stroke:var(--accent-bright);stroke-width:2"/>
+        <circle cx="180" cy="170" r="10" style="fill:rgba(224,184,74,0.15);stroke:var(--accent-bright);stroke-width:2"/>
+        <circle cx="180" cy="320" r="10" style="fill:rgba(224,184,74,0.15);stroke:var(--accent-bright);stroke-width:2"/>
+        <text x="215" y="55" font-size="11.5" style="fill:rgba(255,255,255,0.85)">v = 0</text>
+        <line x1="200" y1="77" x2="200" y2="102" style="stroke:rgba(255,255,255,0.85);stroke-width:2" marker-end="url(#p1c-w)"/>
+        <line x1="200" y1="167" x2="200" y2="217" style="stroke:rgba(255,255,255,0.85);stroke-width:2" marker-end="url(#p1c-w)"/>
+        <line x1="200" y1="317" x2="200" y2="392" style="stroke:rgba(255,255,255,0.85);stroke-width:2" marker-end="url(#p1c-w)"/>
+        <text x="215" y="95" font-size="11.5" style="fill:rgba(255,255,255,0.85)">→v₁</text>
+        <text x="215" y="200" font-size="11.5" style="fill:rgba(255,255,255,0.85)">→v₂</text>
+        <text x="215" y="360" font-size="11.5" style="fill:rgba(255,255,255,0.85)">→v₃</text>
+        <text x="150" y="55" text-anchor="end" font-size="11.5" style="fill:rgba(255,255,255,0.6)">t = 0</text>
+        <text x="150" y="85" text-anchor="end" font-size="11.5" style="fill:rgba(255,255,255,0.6)">t₁</text>
+        <text x="150" y="175" text-anchor="end" font-size="11.5" style="fill:rgba(255,255,255,0.6)">t₂ = 2·t₁</text>
+        <text x="150" y="325" text-anchor="end" font-size="11.5" style="fill:rgba(255,255,255,0.6)">t₃ = 3·t₁</text>
+        <text x="210" y="430" text-anchor="middle" font-size="11.5" style="fill:rgba(255,255,255,0.65)">Photos à intervalles égaux : les écarts suivent 1 : 3 : 5 — la chute est uniformément accélérée</text>
+      </svg>
+
+      <svg viewBox="0 0 640 330" role="img" aria-label="Graphes de la vitesse et de la position">
+        <defs>
+          <marker id="p1d-w" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" style="fill:rgba(255,255,255,0.8)"/></marker>
+          <marker id="p1d-g" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" style="fill:var(--accent-bright)"/></marker>
+        </defs>
+        <text x="175" y="30" text-anchor="middle" font-size="12.5" style="fill:rgba(255,255,255,0.85)">Vitesse</text>
+        <line x1="50" y1="300" x2="50" y2="40" style="stroke:rgba(255,255,255,0.8);stroke-width:1.5" marker-end="url(#p1d-w)"/>
+        <line x1="50" y1="170" x2="300" y2="170" style="stroke:rgba(255,255,255,0.8);stroke-width:1.5" marker-end="url(#p1d-w)"/>
+        <text x="306" y="175" font-size="11" style="fill:rgba(255,255,255,0.7)">t</text>
+        <text x="36" y="50" font-size="11" style="fill:rgba(255,255,255,0.7)">v</text>
+        <text x="36" y="186" font-size="11" style="fill:rgba(255,255,255,0.7)">0</text>
+        <line x1="50" y1="170" x2="280" y2="290" style="stroke:var(--accent-bright);stroke-width:2.5" marker-end="url(#p1d-g)"/>
+        <text x="140" y="240" font-size="12" style="fill:var(--accent-bright)">v(t) = −g·t</text>
+        <text x="480" y="30" text-anchor="middle" font-size="12.5" style="fill:rgba(255,255,255,0.85)">Position</text>
+        <line x1="360" y1="90" x2="610" y2="90" style="stroke:rgba(255,255,255,0.8);stroke-width:1.5" marker-end="url(#p1d-w)"/>
+        <line x1="360" y1="90" x2="360" y2="40" style="stroke:rgba(255,255,255,0.8);stroke-width:1.5" marker-end="url(#p1d-w)"/>
+        <text x="618" y="95" font-size="11" style="fill:rgba(255,255,255,0.7)">t</text>
+        <text x="348" y="46" font-size="11" style="fill:rgba(255,255,255,0.7)">z</text>
+        <text x="350" y="106" font-size="11" style="fill:rgba(255,255,255,0.7)">z₀</text>
+        <path d="M 360,90 Q 470,90 590,290" style="stroke:var(--accent-bright);stroke-width:2.5;fill:none" marker-end="url(#p1d-g)"/>
+        <text x="500" y="150" font-size="12" style="fill:var(--accent-bright)">z(t) = z₀ − ½·g·t²</text>
+      </svg>
+
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">🧪 Exemple travaillé — La bille de l'immeuble</div>
+        <p class="lecture-text">Une bille d'acier est lâchée sans vitesse initiale du toit d'un immeuble, à l'altitude <span class="math">z₀ = 20 m</span>. L'axe Oz est orienté vers le haut, l'origine O au sol, et on prend <span class="math">g = 9,81 m·s⁻²</span>. 1) Donner l'équation horaire z(t). 2) Déterminer la date d'impact au sol. 3) Calculer la vitesse à l'impact et l'exprimer en km·h⁻¹.</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step"><strong>Étape 1 — Données.</strong> <span class="math">z₀ = 20 m</span> ; <span class="math">v₀ = 0</span> ; <span class="math">g = 9,81 m·s⁻²</span> ; axe Oz vers le haut ; sol à <span class="math">z = 0</span>.</li>
+          <li class="lecture-step"><strong>Étape 2 — Formule.</strong> Chute libre sans vitesse initiale : <span class="math">z(t) = z₀ − ½·g·t² = 20 − 4,905·t²</span>.</li>
+          <li class="lecture-step"><strong>Étape 3 — Substitution (impact au sol : z = 0).</strong> <span class="math">4,905·t² = 20</span> donc <span class="math">t² = 4,08</span> et <span class="math">t = √4,08 = 2,02 ≈ 2,0 s</span>.</li>
+          <li class="lecture-step"><strong>Étape 4 — Résultat (vitesse).</strong> <span class="math">v(t) = −g·t = −9,81 × 2,02 = −19,8 m·s⁻¹</span> : la norme vaut 19,8 m·s⁻¹, soit <span class="math">19,8 × 3,6 ≈ 71 km·h⁻¹</span>.</li>
+          <li class="lecture-step"><strong>Étape 5 — Interprétation.</strong> En 2 s seulement, la bille atteint la vitesse d'une voiture en ville : la chute est très vite rapide car uniformément accélérée. Le signe − confirme que le mouvement se fait vers le bas.</li>
+        </ol>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-title">⚠️ Piège d'examen</div>
+        <p class="lecture-text">Le signe ! Si l'axe Oz est orienté vers le haut, la vitesse de chute est négative : <span class="math">v(t) = −g·t</span>. Écrire <span class="math">v = +19,8 m·s⁻¹</span> comme vitesse algébrique est une erreur classique. En revanche, la norme (la « vitesse » positive) vaut bien 19,8 m·s⁻¹. Sur ta copie, précise toujours : « vitesse algébrique négative, norme 19,8 m·s⁻¹ ».</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s4 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s4">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">04</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 4</span>
+        <h2 class="lecture-section-title">Durée et vitesse de chute : les formules express</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Dans la majorité des exercices, on te demande les mêmes deux choses : combien de temps dure la chute, et à quelle vitesse l'objet frappe le sol. Voici deux formules express, tirées directement des équations horaires. Elles ne marchent que pour une chute sans vitesse initiale — apprends leurs conditions par cœur avec la formule.</p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-title">📖 Définitions officielles</div>
+        <p class="lecture-text">Durée de chute : temps mis par l'objet pour atteindre le sol (<span class="math">z = 0</span>). Vitesse d'impact : norme de la vitesse au moment du contact avec le sol.</p>
+      </div>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">Durée de chute</div>
+        <p class="lecture-formula-box"><span class="math">t = √(2·h/g)</span></p>
+        <p class="lecture-formula-desc">Valable sans vitesse initiale, pour une chute depuis la hauteur <span class="math">h</span> (avec <span class="math">h = z₀</span> si l'axe Oz est posé au sol).</p>
+      </div>
+
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">Vitesse d'impact</div>
+        <p class="lecture-formula-box"><span class="math">v = √(2·g·h) = g·t</span></p>
+        <p class="lecture-formula-desc">Indépendante de la masse ! Conversion utile : <span class="math">1 m·s⁻¹ = 3,6 km·h⁻¹</span>.</p>
+      </div>
+
+      <div class="lecture-text">
+        <p class="lecture-exercise-label">🏋️ Exercice 1 — Le pont Kennedy</p>
+        <p class="lecture-text">Depuis le pont Kennedy de Niamey, situé à <span class="math">h = 45 m</span> au-dessus du fleuve, on lâche sans vitesse initiale un petit galet. On prend <span class="math">g = 10 m·s⁻²</span>. 1) Combien de temps dure la chute ? 2) À quelle vitesse le galet frappe-t-il l'eau ? Donne le résultat en m·s⁻¹ puis en km·h⁻¹.</p>
+        <details><summary>Voir la solution détaillée</summary>
+          <ol class="lecture-steps">
+            <li class="lecture-step"><strong>Étape 1 — Données.</strong> <span class="math">h = z₀ = 45 m</span> ; <span class="math">v₀ = 0</span> ; <span class="math">g = 10 m·s⁻²</span> (valeur imposée par l'énoncé) ; axe Oz vers le haut ; fleuve à <span class="math">z = 0</span>.</li>
+            <li class="lecture-step"><strong>Étape 2 — Formule de la durée.</strong> Chute sans vitesse initiale : <span class="math">t = √(2·h/g)</span>.</li>
+            <li class="lecture-step"><strong>Étape 3 — Substitution et résultat.</strong> <span class="math">t = √(2 × 45 / 10) = √9 = 3,0 s</span>.</li>
+            <li class="lecture-step"><strong>Étape 4 — Vitesse d'impact.</strong> <span class="math">v = √(2·g·h) = √(2 × 10 × 45) = √900 = 30 m·s⁻¹</span>, soit <span class="math">30 × 3,6 = 108 km·h⁻¹</span>.</li>
+            <li class="lecture-step"><strong>Étape 5 — Vérification et interprétation.</strong> Contrôle : <span class="math">v = g·t = 10 × 3,0 = 30 m·s⁻¹</span> ✓. En 3 s à peine, le galet atteint la vitesse d'une moto sur route nationale : la chute est rapide car uniformément accélérée.</li>
+          </ol>
+        </details>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-title">⚠️ Piège d'examen</div>
+        <p class="lecture-text"><span class="math">v = √(2·g·h)</span> et <span class="math">t = √(2·h/g)</span> supposent une chute SANS vitesse initiale. Si l'objet est lancé, ce n'est plus valable : il faut repartir des équations horaires générales, que tu verras en partie 02.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s5 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s5">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">05</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Synthèse</span>
+        <h2 class="lecture-section-title">Tableau de synthèse & exercices</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Avant de passer aux lancers, ancre bien ces résultats. Le tableau ci-dessous résume tout ce qui est utilisable dès maintenant. Cache la colonne du milieu et essaie de retrouver chaque formule, puis fais l'exercice final sans regarder la solution.</p>
+
+      <div class="lecture-table">
+        <table>
+          <thead>
+            <tr><th>Grandeur</th><th>Formule</th><th>Condition / remarque</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Poids</td><td><span class="math">P = m·g</span></td><td><span class="math">g = 9,81 m·s⁻²</span> (ou 10 si l'énoncé le précise)</td></tr>
+            <tr><td>Accélération (chute libre)</td><td><span class="math">→a = →g</span></td><td>quelle que soit la masse</td></tr>
+            <tr><td>Vitesse (sans v₀)</td><td><span class="math">v(t) = −g·t</span></td><td>axe Oz vers le haut</td></tr>
+            <tr><td>Position (sans v₀)</td><td><span class="math">z(t) = z₀ − ½·g·t²</span></td><td>mouvement uniformément accéléré</td></tr>
+            <tr><td>Durée de chute</td><td><span class="math">t = √(2·h/g)</span></td><td>sans vitesse initiale, depuis la hauteur h</td></tr>
+            <tr><td>Vitesse d'impact</td><td><span class="math">v = √(2·g·h) = g·t</span></td><td>indépendante de la masse</td></tr>
+            <tr><td>Conversion</td><td><span class="math">km·h⁻¹ = 3,6 × m·s⁻¹</span></td><td>pour interpréter (moto, voiture…)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="lecture-text">
+        <p class="lecture-exercise-label">🏋️ Exercice 2 — La mangue du manguier</p>
+        <p class="lecture-text">Une mangue mûre se détache d'une branche située à <span class="math">h = 5,0 m</span> au-dessus du sol et tombe en chute libre. On prend <span class="math">g = 10 m·s⁻²</span>. 1) Quelle est l'équation horaire z(t) si l'origine O est au sol ? 2) Au bout de combien de temps touche-t-elle le sol ? 3) À quelle vitesse ?</p>
+        <details><summary>Voir la solution détaillée</summary>
+          <ol class="lecture-steps">
+            <li class="lecture-step"><strong>Étape 1 — Données.</strong> <span class="math">z₀ = 5,0 m</span> ; <span class="math">v₀ = 0</span> ; <span class="math">g = 10 m·s⁻²</span> ; axe Oz vertical vers le haut, origine au sol.</li>
+            <li class="lecture-step"><strong>Étape 2 — Équation horaire.</strong> <span class="math">z(t) = z₀ − ½·g·t² = 5,0 − 5,0·t²</span>.</li>
+            <li class="lecture-step"><strong>Étape 3 — Durée.</strong> Au sol : <span class="math">z = 0</span> donc <span class="math">5,0·t² = 5,0</span>, d'où <span class="math">t² = 1,0</span> et <span class="math">t = 1,0 s</span>.</li>
+            <li class="lecture-step"><strong>Étape 4 — Vitesse et interprétation.</strong> <span class="math">v = −g·t = −10 m·s⁻¹</span> : norme 10 m·s⁻¹, soit 36 km·h⁻¹. La masse de la mangue n'intervient nulle part : une petite cerise lâchée de la même branche toucherait le sol en même temps.</li>
+          </ol>
+        </details>
+      </div>
+
+      <p class="lecture-text">Tu sais désormais tout de la chute la plus simple : droite, accélérée, sans impulsion au départ. La partie 02 va la rendre plus vivante : cette fois, on lance vraiment les objets.</p>
+    </div>
+  </section>
+  <!-- ===== QCM ===== -->
+  <div class="lecture-quiz">
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q1 — Un objet est en chute libre lorsque…</p>
+      <div class="lecture-quiz-options"><span>A) il ne subit aucune force</span><span>B) il ne subit que son poids</span><span>C) il ne subit que des frottements</span><span>D) sa vitesse est constante</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">B — « Libre » signifie « rien d'autre que le poids ». L'objet subit donc bien une force, et son accélération vaut <span class="math">g = 9,81 m·s⁻²</span>.</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q2 — Dans un tube à vide, une bille de 10 g et une bille de 100 g sont lâchées en même temps, sans vitesse initiale. Laquelle touche le sol en premier ?</p>
+      <div class="lecture-quiz-options"><span>A) la bille de 100 g</span><span>B) la bille de 10 g</span><span>C) les deux en même temps</span><span>D) impossible à prévoir</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">C — En chute libre, <span class="math">→a = →g</span> : l'accélération ne dépend pas de la masse. Les deux billes ont la même équation horaire <span class="math">z(t) = z₀ − ½·g·t²</span>.</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Q3 — Un objet tombe sans vitesse initiale de <span class="math">h = 5,0 m</span> avec <span class="math">g = 10 m·s⁻²</span>. La durée de la chute vaut…</p>
+      <div class="lecture-quiz-options"><span>A) 0,5 s</span><span>B) 1,0 s</span><span>C) 2,0 s</span><span>D) 2,5 s</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">B — <span class="math">t = √(2·h/g) = √(2 × 5,0 / 10) = √1,0 = 1,0 s</span>.</div></details>
+    </div>
+  </div>
+  <!-- ===== RÉCAP ===== -->
+  <div class="lecture-recap">
+    <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
+    <ul class="lecture-recap-list">
+      <li><strong>Champ uniforme</strong> : <span class="math">→g</span> est vertical, vers le bas, et vaut <span class="math">g = 9,81 m·s⁻²</span> en tout point près du sol.</li>
+      <li><strong>Chute libre</strong> : une seule force, le poids <span class="math">→P = m→g</span>, donc <span class="math">→a = →g</span> — indépendant de la masse.</li>
+      <li><strong>Sans vitesse initiale</strong> : <span class="math">v(t) = −g·t</span> et <span class="math">z(t) = z₀ − ½·g·t²</span> ; durée <span class="math">t = √(2·h/g)</span>, impact <span class="math">v = √(2·g·h)</span>.</li>
+      <li><strong>Unités et signes</strong> : vitesse en m·s⁻¹, conversion ×3,6 pour les km·h⁻¹, et signe − tant que l'axe Oz pointe vers le haut.</li>
+    </ul>
+  </div>
+  <!-- ===== FIN ===== -->
+  <div class="lecture-end">
+    <div class="lecture-end-icon">🎯</div>
+    <div class="lecture-end-text">Partie 01 terminée !</div>
+    <div class="lecture-end-sub">Tu maîtrises la chute la plus simple. Dans la partie 02, on cesse de lâcher : on lance. Vitesse initiale vers le bas, vers le haut, puis en biais — les projectiles arrivent !</div>
+    <div class="lecture-end-divider"></div>
+  </div>
+</div>

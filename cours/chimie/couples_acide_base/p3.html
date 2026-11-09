@@ -1,0 +1,391 @@
+<!-- PARTIE 03 — Classification des couples (force relative) (Couples acide/base et classification) -->
+<div class="lecture-container">
+
+  <!-- ===== HERO ===== -->
+  <header class="lecture-hero">
+    <div class="lecture-hero-badge">
+      <span class="lecture-hero-icon">📘</span>
+      <span class="lecture-hero-label">Terminale C&D · Couples acide/base et classification · Partie 03</span>
+    </div>
+    <h1 class="lecture-hero-title">
+      Classification des couples <em>(force relative)</em>
+    </h1>
+    <p class="lecture-hero-intro">
+      Dernière étape du chapitre : ranger les couples en familles — acides forts ou faibles, bases fortes ou faibles — et construire les deux cartes mentales du chapitre, l'échelle des pKa et le diagramme de prédominance. Avec ces deux schémas, tu sauras situer n'importe quelle espèce et prédire sa forme dominante à n'importe quel <span class="math">pH</span>.
+    </p>
+    <div class="lecture-hero-meta">
+      <span class="lecture-hero-meta-item">⏱ 25 min</span>
+      <span class="lecture-hero-meta-item">⚗️ 5 notions</span>
+      <span class="lecture-hero-meta-item">📚 6 sections</span>
+      <span class="lecture-hero-meta-item">🎓 Terminale C&D</span>
+    </div>
+  </header>
+  <!-- ===== SOMMAIRE ===== -->
+  <nav class="lecture-toc">
+    <div class="lecture-toc-header">
+      <span>Dans cette partie</span>
+      <span class="lecture-toc-count">5 notions · 6 sections</span>
+    </div>
+    <ol class="lecture-toc-list">
+      <li><a href="#s0"><span class="toc-num">00</span><span>Du citron au savon</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>Acides forts et acides faibles</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>Bases fortes et bases faibles</span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>L'échelle des pKa</span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>Diagramme de prédominance</span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>Tableau de classification</span></a></li>
+    </ol>
+  </nav>
+  <!-- ============================================================ -->
+  <!-- SECTION s0 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s0">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">00</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Motivation</span>
+        <h2 class="lecture-section-title">Du citron au savon</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text"> presse un citron : son jus pique la langue car il contient de l'acide citrique, un acide <em>faible</em>. Mais mange-toi les doigts avec du débouchoir de canalisation à l'acide chlorhydrique : brûlure immédiate, car cet acide-là est <em>fort</em>. Même mot « acide », deux réalités de terrain complètement différentes.</p>
+      <p class="lecture-text">À l'autre bout du goûter, le savon traditionnel du Niger, fabriqué à partir de cendres et de beurre de karité, doit son pouvoir dégraissant à des bases <em>faibles</em> — les ions carboxylate. Et le débouchoir « à la soude » contient de l'hydroxyde de sodium <span class="math">NaOH</span>, une base <em>forte</em> qui dissout les bouchons de graisse… et tout ce qu'elle touche.</p>
+      <p class="lecture-text">Entre le citron doux et la soude brutale, toute une gamme de forces existe, et le chimiste a besoin de la classer. Deux outils suffisent : la distinction fort/faible, mesurée par la réaction avec l'eau, et l'échelle des <span class="math">pKa</span>, qui ordonne tous les couples sur une même droite. C'est le programme de cette partie.</p>
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 560 220" role="img" aria-label="Gamme de force des acides et bases du quotidien">
+          <rect x="0" y="0" width="560" height="220" fill="rgba(224,184,74,0.05)"/>
+          <path d="M 60 110 L 500 110" style="stroke:rgba(224,184,74,0.9)" stroke-width="3"/>
+          <polygon points="500,103 516,110 500,117" fill="rgba(224,184,74,0.9)"/>
+          <circle cx="90" cy="90" r="24" style="stroke:rgba(224,184,74,0.9)" fill="rgba(224,184,74,0.15)" stroke-width="2"/>
+          <text x="90" y="97" text-anchor="middle" font-size="12" fill="currentColor" font-weight="bold">citron</text>
+          <text x="90" y="145" text-anchor="middle" font-size="12" fill="currentColor">acide faible</text>
+          <circle cx="230" cy="90" r="24" style="stroke:rgba(74,222,128,0.9)" fill="rgba(74,222,128,0.15)" stroke-width="2"/>
+          <text x="230" y="97" text-anchor="middle" font-size="12" fill="currentColor" font-weight="bold">savon</text>
+          <text x="230" y="145" text-anchor="middle" font-size="12" fill="currentColor">base faible</text>
+          <circle cx="380" cy="90" r="24" style="stroke:rgba(239,68,68,0.9)" fill="rgba(239,68,68,0.15)" stroke-width="2"/>
+          <text x="380" y="97" text-anchor="middle" font-size="12" fill="currentColor" font-weight="bold">HCl</text>
+          <text x="380" y="145" text-anchor="middle" font-size="12" fill="currentColor">acide fort</text>
+          <circle cx="480" cy="90" r="24" style="stroke:rgba(239,68,68,0.9)" fill="rgba(239,68,68,0.22)" stroke-width="2"/>
+          <text x="480" y="97" text-anchor="middle" font-size="12" fill="currentColor" font-weight="bold">NaOH</text>
+          <text x="480" y="145" text-anchor="middle" font-size="12" fill="currentColor">base forte</text>
+          <text x="280" y="200" text-anchor="middle" font-size="13" fill="currentColor">Du doux au brutal : il faut une classification rigoureuse</text>
+        </svg>
+        <figcaption>Les produits du quotidien couvrent toute la gamme de forces acido-basiques.</figcaption>
+      </figure>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s1 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s1">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">01</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1</span>
+        <h2 class="lecture-section-title">Acides forts et acides faibles</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">On met un acide dans l'eau et on observe : est-ce que la totalité des molécules cèdent leur proton, ou seulement une petite fraction ? Cette question simple définit deux familles. Le test se fait en laboratoire par la mesure du <span class="math">pH</span>, qui trahit immédiatement la catégorie.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-title">📖 Définition officielle</div>
+        <p>Un <strong>acide fort</strong> réagit <strong>totalement</strong> avec l'eau : toutes ses molécules cèdent leur proton, l'équation s'écrit avec la flèche simple <span class="math">AH + H₂O → A⁻ + H₃O⁺</span>. Un <strong>acide faible</strong> ne réagit que <strong>partiellement</strong> avec l'eau : un équilibre s'installe, noté <span class="math">AH + H₂O ⇌ A⁻ + H₃O⁺</span>.</p>
+      </div>
+      <p class="lecture-text">Visualise deux vendeurs de billets : le premier vide sa valise instantanément (acide fort, réaction totale), le second n'en lâche qu'une petite partie et garde l'essentiel (acide faible, équilibre). La proportion lâchée est mesurée par le <span class="math">pKa</span> : plus il est petit, plus l'acide est fort.</p>
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-main">Deux écritures à ne jamais confondre</div>
+        <div class="lecture-formula-hero"><span class="math">Acide fort : AH + H₂O → A⁻ + H₃O⁺</span></div>
+        <div class="lecture-formula-hero">Pour un acide faible, on remplace la flèche par le double chevron <span class="math">AH + H₂O ⇌ A⁻ + H₃O⁺</span>. La flèche seule est la signature d'une réaction totale.</div>
+      </div>
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">Les familles à connaître</div>
+        <p><strong>Acides forts dans l'eau :</strong> <span class="math">HCl</span>, <span class="math">HNO₃</span>, <span class="math">H₂SO₄</span> (premier proton). <strong>Acides faibles :</strong> <span class="math">CH₃—COOH</span>, <span class="math">H₂CO₃</span>, <span class="math">NH₄⁺</span>, <span class="math">H₂O</span>. Un acide plus fort que <span class="math">H₃O⁺</span> ne peut exister en tant que tel dans l'eau : il est aussitôt transformé en <span class="math">H₃O⁺</span>.</p>
+      </div>
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">🔍 Exemple travaillé — Le pH révèle la famille</div>
+        <p class="lecture-text">Une solution d'acide éthanoïque de concentration <span class="math">0,10 mol·L⁻¹</span> a un <span class="math">pH</span> mesuré égal à <span class="math">2,9</span>. Montrons qu'il s'agit d'un acide faible.</p>
+        <div class="lecture-steps">
+          <div class="lecture-step"><span class="lecture-step-number">1</span><div class="lecture-step-content"><p><strong>Hypothèse « acide fort » :</strong> toutes les molécules donneraient leur proton, donc la concentration en <span class="math">H₃O⁺</span> vaudrait <span class="math">0,10 mol·L⁻¹</span> et le <span class="math">pH</span> vaudrait <span class="math">1,0</span>.</p></div></div>
+          <div class="lecture-step"><span class="lecture-step-number">2</span><div class="lecture-step-content"><p><strong>Mesure :</strong> le <span class="math">pH</span> réel vaut <span class="math">2,9</span>, nettement supérieur à <span class="math">1,0</span> : la concentration en ions oxonium est bien plus faible que prévu.</p></div></div>
+          <div class="lecture-step"><span class="lecture-step-number">3</span><div class="lecture-step-content"><p><strong>Calcul de la fraction dissociée :</strong> la concentration en <span class="math">H₃O⁺</span> vaut <span class="math">10^(−2,9) ≈ 1,3 × 10^(−3) mol·L⁻¹</span>, soit environ 1,3 % de la concentration apportée.</p></div></div>
+          <div class="lecture-step"><span class="lecture-step-number">4</span><div class="lecture-step-content"><p><strong>Conclusion :</strong> seule une petite fraction des molécules réagit avec l'eau : l'acide éthanoïque est un <strong>acide faible</strong>, et son équation s'écrit avec <span class="math">⇌</span>.</p></div></div>
+        </div>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-title">⚠️ Piège d'examen</div>
+        <p><strong>Fort ne veut pas dire concentré !</strong> La force est une propriété <em>chimique</em> (réaction totale ou non avec l'eau), la concentration est une propriété de <em>préparation</em>. On peut avoir un acide fort très dilué, ou un acide faible très concentré : les deux notions sont indépendantes.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s2 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s2">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">02</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2</span>
+        <h2 class="lecture-section-title">Bases fortes et bases faibles</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">La classification se transpose mot pour mot aux bases, en inversant le rôle : on regarde maintenant la capacité de la base à capter le proton de l'eau. Une base forte arrache complètement ce proton et fabrique des ions <span class="math">OH⁻</span> ; une base faible se contente d'une poignée.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-title">📖 Définition officielle</div>
+        <p>Une <strong>base forte</strong> réagit <strong>totalement</strong> avec l'eau en la déprotonant : <span class="math">B + H₂O → BH⁺ + OH⁻</span>. Une <strong>base faible</strong> ne capte que partiellement le proton de l'eau : <span class="math">B + H₂O ⇌ BH⁺ + OH⁻</span>. Dans l'eau, la base la plus forte qui puisse exister est l'ion hydroxyde <span class="math">OH⁻</span>.</p>
+      </div>
+      <p class="lecture-text">Concrètement, la soude <span class="math">NaOH</span> se dissocie totalement et libère des ions <span class="math">OH⁻</span> : c'est une base forte. L'ammoniac <span class="math">NH₃</span>, lui, ne capte qu'une fraction infime des protons de l'eau : sa solution a un <span class="math">pH</span> modeste d'environ <span class="math">11</span> pour une concentration de <span class="math">0,10 mol·L⁻¹</span>, loin du <span class="math">13</span> attendu pour une base forte.</p>
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-main">Deux écritures, même logique</div>
+        <div class="lecture-formula-hero"><span class="math">Base forte : B + H₂O → BH⁺ + OH⁻</span></div>
+        <div class="lecture-formula-hero">Base faible : <span class="math">B + H₂O ⇌ BH⁺ + OH⁻</span>. On reconnaît la réaction d'une base avec l'eau, miroir de celle d'un acide avec l'eau.</div>
+      </div>
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">Les familles côté bases</div>
+        <p><strong>Bases fortes dans l'eau :</strong> <span class="math">OH⁻</span> (apporté par <span class="math">NaOH</span>, <span class="math">KOH</span>). <strong>Bases faibles :</strong> <span class="math">NH₃</span>, <span class="math">HCO₃⁻</span>, <span class="math">CH₃—COO⁻</span>, <span class="math">H₂O</span>. Toute base plus forte que <span class="math">OH⁻</span> est aussitôt transformée en <span class="math">OH⁻</span> par l'eau : c'est l'effet nivelant, côté bases.</p>
+      </div>
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">🔍 Exemple travaillé — Pourquoi l'ammoniac est une base faible</div>
+        <p class="lecture-text">Quantifions la réaction de l'ammoniac avec l'eau grâce aux pKa du couple <span class="math">NH₄⁺/NH₃</span> (<span class="math">9,2</span>) et de l'eau (<span class="math">14</span>).</p>
+        <div class="lecture-steps">
+          <div class="lecture-step"><span class="lecture-step-number">1</span><div class="lecture-step-content"><p><strong>Écrire la réaction :</strong> <span class="math">NH₃ + H₂O ⇌ NH₄⁺ + OH⁻</span> — l'ammoniac capte le proton que l'eau cède.</p></div></div>
+          <div class="lecture-step"><span class="lecture-step-number">2</span><div class="lecture-step-content"><p><strong>Identifier les acides :</strong> l'acide donneur est <span class="math">H₂O</span> (<span class="math">pKa₁ = 14</span>), l'acide formé est <span class="math">NH₄⁺</span> (<span class="math">pKa₂ = 9,2</span>).</p></div></div>
+          <div class="lecture-step"><span class="lecture-step-number">3</span><div class="lecture-step-content"><p><strong>Calculer K :</strong> <span class="math">K = 10^(pKa₂ − pKa₁) = 10^(9,2 − 14) = 10^(−4,8) ≈ 1,6 × 10^(−5)</span>.</p></div></div>
+          <div class="lecture-step"><span class="lecture-step-number">4</span><div class="lecture-step-content"><p><strong>Conclusion :</strong> <span class="math">K</span> très inférieur à 1 : très peu d'ions <span class="math">OH⁻</span> sont formés. L'ammoniac est une <strong>base faible</strong>, contrairement à la soude dont la dissociation est totale.</p></div></div>
+        </div>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-title">⚠️ Piège d'examen</div>
+        <p>L'ammoniac a une odeur très pénétrante et pique les yeux, mais reste une base <em>faible</em> : l'intensité de l'odeur n'a aucun lien avec la force chimique. À l'inverse, ne cite jamais <span class="math">NaOH</span> comme base faible sous prétexte qu'une solution diluée est peu agressive.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s3 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s3">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">03</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 3</span>
+        <h2 class="lecture-section-title">L'échelle des pKa</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Il ne manque plus qu'une carte pour tout ranger : l'échelle des <span class="math">pKa</span>. C'est une règle graduée, de l'acide le plus fort en bas au couple de l'eau en haut, sur laquelle on place chaque couple acide/base. Dans l'eau, seuls les couples de <span class="math">pKa</span> compris entre <span class="math">0</span> et <span class="math">14</span> sont observables tels quels.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-title">📖 Définition officielle</div>
+        <p>L'<strong>échelle des pKa</strong> classe les couples acide/base par <span class="math">pKa</span> croissant. Plus le <span class="math">pKa</span> d'un couple est petit, plus l'acide est fort et plus sa base conjuguée est faible. Dans l'eau, les couples utilisables ont un <span class="math">pKa</span> entre <span class="math">0</span> (couple <span class="math">H₃O⁺/H₂O</span>) et <span class="math">14</span> (couple <span class="math">H₂O/OH⁻</span>) : c'est le domaine d'acidité de l'eau.</p>
+      </div>
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 560 330" role="img" aria-label="Échelle verticale des pKa avec les couples positionnés">
+          <rect x="0" y="0" width="560" height="330" fill="rgba(96,165,250,0.05)"/>
+          <path d="M 200 25 L 200 305" style="stroke:rgba(96,165,250,0.9)" stroke-width="3"/>
+          <polygon points="193,25 200,10 207,25" fill="rgba(96,165,250,0.9)"/>
+          <text x="200" y="325" text-anchor="middle" font-size="12" fill="currentColor">pKa croissant (acides de plus en plus faibles)</text>
+          <line x1="192" y1="60" x2="208" y2="60" style="stroke:rgba(239,68,68,0.9)" stroke-width="2"/>
+          <text x="218" y="65" font-size="13" fill="currentColor">HCl : pKa ≈ −7 (hors eau, acide trop fort)</text>
+          <line x1="192" y1="105" x2="208" y2="105" style="stroke:rgba(239,68,68,0.9)" stroke-width="2"/>
+          <text x="218" y="110" font-size="13" fill="currentColor">H₃O⁺/H₂O : pKa = 0</text>
+          <line x1="192" y1="155" x2="208" y2="155" style="stroke:rgba(224,184,74,0.9)" stroke-width="2"/>
+          <text x="218" y="160" font-size="13" fill="currentColor">CH₃—COOH/CH₃—COO⁻ : pKa = 4,8</text>
+          <line x1="192" y1="205" x2="208" y2="205" style="stroke:rgba(224,184,74,0.9)" stroke-width="2"/>
+          <text x="218" y="210" font-size="13" fill="currentColor">NH₄⁺/NH₃ : pKa = 9,2</text>
+          <line x1="192" y1="255" x2="208" y2="255" style="stroke:rgba(74,222,128,0.9)" stroke-width="2"/>
+          <text x="218" y="260" font-size="13" fill="currentColor">H₂O/OH⁻ : pKa = 14</text>
+          <rect x="20" y="80" width="120" height="190" rx="12" style="stroke:rgba(74,222,128,0.85)" fill="rgba(74,222,128,0.07)" stroke-width="2"/>
+          <text x="80" y="170" text-anchor="middle" font-size="12" fill="currentColor">domaine</text>
+          <text x="80" y="188" text-anchor="middle" font-size="12" fill="currentColor">d'acidité</text>
+          <text x="80" y="206" text-anchor="middle" font-size="12" fill="currentColor">de l'eau</text>
+          <text x="430" y="65" font-size="12" fill="currentColor">au-delà de 14 :</text>
+          <text x="430" y="83" font-size="12" fill="currentColor">OH⁻ est la base</text>
+          <text x="430" y="101" font-size="12" fill="currentColor">la plus forte de l'eau</text>
+        </svg>
+        <figcaption>L'échelle des pKa : les couples se rangent du plus acide (en bas, petit pKa) au moins acide (en haut, grand pKa).</figcaption>
+      </figure>
+      <p class="lecture-text">Cette échelle explique l'<strong>effet nivelant</strong> de l'eau : tout acide plus fort que <span class="math">H₃O⁺</span> (comme <span class="math">HCl</span>, de <span class="math">pKa ≈ −7</span>) est immédiatement transformé en <span class="math">H₃O⁺</span> ; toute base plus forte que <span class="math">OH⁻</span> est transformée en <span class="math">OH⁻</span>. Dans l'eau, on ne voit jamais l'acide chlorhydrique « <span class="math">HCl</span> » : on ne voit que <span class="math">H₃O⁺</span> et <span class="math">Cl⁻</span>.</p>
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">Règle de lecture de l'échelle</div>
+        <p>Sur l'échelle, plus on descend, plus l'acide est fort et plus la base conjuguée est faible. Une réaction acido-basique favorisée fait « descendre » le proton : du couple au petit <span class="math">pKa</span> vers le couple au grand <span class="math">pKa</span>.</p>
+      </div>
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">🔍 Exemple travaillé — Placer les couples du bicarbonate</div>
+        <p class="lecture-text">Exercice de carte : situer les deux couples de l'ion hydrogénocarbonate sur l'échelle.</p>
+        <div class="lecture-steps">
+          <div class="lecture-step"><span class="lecture-step-number">1</span><div class="lecture-step-content"><p><strong>Couple <span class="math">H₂CO₃/HCO₃⁻</span> :</strong> <span class="math">pKa = 6,4</span>, donc placé entre <span class="math">CH₃—COOH/CH₃—COO⁻</span> (<span class="math">4,8</span>) et <span class="math">NH₄⁺/NH₃</span> (<span class="math">9,2</span>).</p></div></div>
+          <div class="lecture-step"><span class="lecture-step-number">2</span><div class="lecture-step-content"><p><strong>Couple <span class="math">HCO₃⁻/CO₃²⁻</span> :</strong> <span class="math">pKa = 10,3</span>, donc au-dessus de <span class="math">NH₄⁺/NH₃</span> et en dessous de <span class="math">H₂O/OH⁻</span> (<span class="math">14</span>).</p></div></div>
+          <div class="lecture-step"><span class="lecture-step-number">3</span><div class="lecture-step-content"><p><strong>Conclusion :</strong> les deux couples du bicarbonate sont dans le domaine <span class="math">0–14</span> : l'ion <span class="math">HCO₃⁻</span> peut coexister dans l'eau en tant qu'acide et en tant que base — c'est l'ampholyte de la partie 01.</p></div></div>
+        </div>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-title">⚠️ Piège d'examen</div>
+        <p>Le couple <span class="math">HCl/Cl⁻</span> de <span class="math">pKa ≈ −7</span> ne se place <em>pas</em> entre <span class="math">0</span> et <span class="math">14</span> : dans l'eau, il est représenté par le couple <span class="math">H₃O⁺/H₂O</span>. Citer « <span class="math">HCl</span> » comme espèce prédominante dans une solution aqueuse d'acide chlorhydrique est faux.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s4 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s4">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">04</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 4</span>
+        <h2 class="lecture-section-title">Diagramme de prédominance</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Dans une solution contenant un couple <span class="math">AH/A⁻</span>, les deux formes coexistent toujours, mais pas en quantités égales : selon le <span class="math">pH</span>, l'une domine largement. Le diagramme de prédominance est le schéma minimaliste qui dit laquelle, avec une seule frontière : le <span class="math">pH = pKa</span>.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-title">📖 Définition officielle</div>
+        <p>Une espèce <strong>prédomine</strong> lorsqu'elle est présente en concentration nettement supérieure à celle de l'autre forme du couple. Pour le couple <span class="math">AH/A⁻</span> de <span class="math">pKa</span> donné : si <span class="math">pH &lt; pKa</span>, la forme acide <span class="math">AH</span> prédomine ; si <span class="math">pH &gt; pKa</span>, la forme base <span class="math">A⁻</span> prédomine ; si <span class="math">pH = pKa</span>, les deux formes sont en quantités égales.</p>
+      </div>
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-main">La règle d'or de la prédominance</div>
+        <div class="lecture-formula-hero"><span class="math">pH &lt; pKa : AH prédomine ; pH &gt; pKa : A⁻ prédomine</span></div>
+        <div class="lecture-formula-hero">Milieu acide (petit pH) → forme acide. Milieu basique (grand pH) → forme base. À <span class="math">pH = pKa</span>, les deux formes coexistent à parts égales.</div>
+      </div>
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 560 230" role="img" aria-label="Diagramme de prédominance du couple AH sur A moins">
+          <rect x="0" y="0" width="560" height="230" fill="rgba(239,68,68,0.04)"/>
+          <rect x="60" y="50" width="230" height="90" style="stroke:rgba(239,68,68,0.85)" fill="rgba(239,68,68,0.10)" stroke-width="2"/>
+          <rect x="290" y="50" width="230" height="90" style="stroke:rgba(74,222,128,0.85)" fill="rgba(74,222,128,0.10)" stroke-width="2"/>
+          <text x="175" y="88" text-anchor="middle" font-size="15" fill="currentColor" font-weight="bold">AH prédomine</text>
+          <text x="175" y="115" text-anchor="middle" font-size="13" fill="currentColor">pH &lt; pKa</text>
+          <text x="405" y="88" text-anchor="middle" font-size="15" fill="currentColor" font-weight="bold">A⁻ prédomine</text>
+          <text x="405" y="115" text-anchor="middle" font-size="13" fill="currentColor">pH &gt; pKa</text>
+          <path d="M 290 40 L 290 150" style="stroke:rgba(224,184,74,0.95)" stroke-width="3"/>
+          <text x="290" y="28" text-anchor="middle" font-size="13" fill="currentColor" font-weight="bold">pH = pKa (50 % / 50 %)</text>
+          <path d="M 60 170 L 520 170" style="stroke:rgba(96,165,250,0.9)" stroke-width="3"/>
+          <polygon points="520,163 536,170 520,177" fill="rgba(96,165,250,0.9)"/>
+          <text x="290" y="195" text-anchor="middle" font-size="13" fill="currentColor">pH croissant →</text>
+          <text x="290" y="218" text-anchor="middle" font-size="12" fill="currentColor">Couple CH₃—COOH/CH₃—COO⁻ (pKa = 4,8) : à pH 7, l'ion éthanoate prédomine</text>
+        </svg>
+        <figcaption>Le diagramme de prédominance : une seule frontière, <span class="math">pH = pKa</span>, sépare les deux zones.</figcaption>
+      </figure>
+      <p class="lecture-text">Attention au vocabulaire : <em>prédominer</em> ne veut pas dire <em>être seule</em>. À <span class="math">pH = pKa</span>, les deux formes sont exactement à parts égales ; à un <span class="math">pH</span> d'une unité du <span class="math">pKa</span>, la forme dominante représente déjà environ 91 % du total ; à deux unités, environ 99 %. La bascule est progressive, pas brutale.</p>
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">🔍 Exemple travaillé — Les deux couples du sang</div>
+        <p class="lecture-text">Le sang humain maintient son <span class="math">pH</span> autour de <span class="math">7,4</span> grâce au couple du bicarbonate. Déterminons les formes prédominantes.</p>
+        <div class="lecture-steps">
+          <div class="lecture-step"><span class="lecture-step-number">1</span><div class="lecture-step-content"><p><strong>Couple <span class="math">H₂CO₃/HCO₃⁻</span> :</strong> <span class="math">pKa = 6,4</span>. Comme <span class="math">pH = 7,4 &gt; pKa</span>, la forme base <span class="math">HCO₃⁻</span> prédomine.</p></div></div>
+          <div class="lecture-step"><span class="lecture-step-number">2</span><div class="lecture-step-content"><p><strong>Couple <span class="math">HCO₃⁻/CO₃²⁻</span> :</strong> <span class="math">pKa = 10,3</span>. Comme <span class="math">pH = 7,4 &lt; pKa</span>, la forme acide <span class="math">HCO₃⁻</span> prédomine.</p></div></div>
+          <div class="lecture-step"><span class="lecture-step-number">3</span><div class="lecture-step-content"><p><strong>Synthèse :</strong> <span class="math">HCO₃⁻</span> est majoritaire dans les deux cas : c'est lui le tampon du sang, capable de capter ou de céder un proton selon les besoins.</p></div></div>
+          <div class="lecture-step"><span class="lecture-step-number">4</span><div class="lecture-step-content"><p><strong>Quantifier :</strong> l'écart <span class="math">pH − pKa = 1,0</span> pour le premier couple signifie environ 91 % de <span class="math">HCO₃⁻</span> — prédominance nette mais non exclusive.</p></div></div>
+        </div>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-title">⚠️ Piège d'examen</div>
+        <p>Ne confonds pas « prédomine » et « existe seul » : à <span class="math">pH = pKa + 2</span>, la forme dominante atteint environ 99 % du total, mais l'autre forme reste présente. Et surtout, le diagramme de prédominance concerne <em>un couple à la fois</em> : chaque couple a son propre diagramme.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s5 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s5">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">05</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 5</span>
+        <h2 class="lecture-section-title">Tableau de classification</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Tout le chapitre tient maintenant dans un tableau : récapitulons les définitions, les exemples et les tests rapides pour chaque catégorie. Ce tableau est le résumé de révision ultime avant les QCM et la fiche de la partie 04.</p>
+      <table class="lecture-table">
+        <thead>
+          <tr><th>Catégorie</th><th>Définition</th><th>Exemples</th><th>Test rapide</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Acide fort</td><td>réaction totale avec l'eau (<span class="math">→</span>)</td><td><span class="math">HCl</span>, <span class="math">HNO₃</span>, <span class="math">H₂SO₄</span></td><td><span class="math">pH</span> très bas pour une concentration donnée</td></tr>
+          <tr><td>Acide faible</td><td>équilibre avec l'eau (<span class="math">⇌</span>)</td><td><span class="math">CH₃—COOH</span>, <span class="math">H₂CO₃</span>, <span class="math">NH₄⁺</span></td><td><span class="math">pH</span> supérieur à celui d'un acide fort de même concentration</td></tr>
+          <tr><td>Base forte</td><td>réaction totale avec l'eau (<span class="math">→</span>)</td><td><span class="math">OH⁻</span> (via <span class="math">NaOH</span>, <span class="math">KOH</span>)</td><td><span class="math">pH</span> très élevé</td></tr>
+          <tr><td>Base faible</td><td>équilibre avec l'eau (<span class="math">⇌</span>)</td><td><span class="math">NH₃</span>, <span class="math">HCO₃⁻</span>, <span class="math">CH₃—COO⁻</span></td><td><span class="math">pH</span> modérément basique</td></tr>
+          <tr><td>Ampholyte</td><td>acide dans un couple, base dans l'autre</td><td><span class="math">H₂O</span>, <span class="math">HCO₃⁻</span></td><td>figure dans la notation de deux couples</td></tr>
+          <tr><td>Réaction favorisée</td><td><span class="math">pKa₂ &gt; pKa₁</span></td><td>vinaigre + ammoniac</td><td><span class="math">K &gt; 1</span></td></tr>
+          <tr><td>Réaction quasi totale</td><td><span class="math">K ≥ 10^(4)</span></td><td><span class="math">H₃O⁺ + OH⁻ → 2 H₂O</span></td><td>flèche simple <span class="math">→</span></td></tr>
+        </tbody>
+      </table>
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 560 170" role="img" aria-label="Schéma récapitulatif de la classification">
+          <rect x="0" y="0" width="560" height="170" fill="rgba(74,222,128,0.05)"/>
+          <rect x="40" y="35" width="220" height="40" rx="10" style="stroke:rgba(239,68,68,0.85)" fill="rgba(239,68,68,0.10)" stroke-width="2"/>
+          <text x="150" y="60" text-anchor="middle" font-size="13" fill="currentColor" font-weight="bold">Acide fort (pKa petit)</text>
+          <rect x="300" y="35" width="220" height="40" rx="10" style="stroke:rgba(74,222,128,0.85)" fill="rgba(74,222,128,0.10)" stroke-width="2"/>
+          <text x="410" y="60" text-anchor="middle" font-size="13" fill="currentColor" font-weight="bold">Acide faible (pKa grand)</text>
+          <path d="M 265 55 L 295 55" style="stroke:rgba(224,184,74,0.9)" stroke-width="3"/>
+          <polygon points="295,48 311,55 295,62" fill="rgba(224,184,74,0.9)"/>
+          <text x="280" y="100" text-anchor="middle" font-size="12" fill="currentColor">le proton voyage toujours vers l'acide le plus faible</text>
+          <rect x="40" y="112" width="220" height="40" rx="10" style="stroke:rgba(239,68,68,0.85)" fill="rgba(239,68,68,0.10)" stroke-width="2"/>
+          <text x="150" y="137" text-anchor="middle" font-size="13" fill="currentColor" font-weight="bold">Base forte (conjuguée d'un acide faible)</text>
+          <rect x="300" y="112" width="220" height="40" rx="10" style="stroke:rgba(74,222,128,0.85)" fill="rgba(74,222,128,0.10)" stroke-width="2"/>
+          <text x="410" y="137" text-anchor="middle" font-size="13" fill="currentColor" font-weight="bold">Base faible (conjuguée d'un acide fort)</text>
+        </svg>
+        <figcaption>Mémoire verticale : acide fort ↔ base faible, acide faible ↔ base forte, dans un même couple.</figcaption>
+      </figure>
+      <div class="lecture-text">
+        <div class="lecture-exercise-label">✏️ Exercice d'application 1 — Fort ou faible ? Le verdict du pH</div>
+        <p class="lecture-text">Deux solutions acides de concentration <span class="math">0,010 mol·L⁻¹</span> : la solution A a un <span class="math">pH</span> de <span class="math">2,0</span>, la solution B un <span class="math">pH</span> de <span class="math">3,4</span>. ① Calcule le <span class="math">pH</span> attendu si l'acide était fort. ② Classe A et B. ③ Cite un acide possible pour B. ④ Justifie avec le <span class="math">pKa</span>.</p>
+        <details><summary>Voir la solution pas à pas</summary>
+          <div class="lecture-steps">
+            <div class="lecture-step"><span class="lecture-step-number">1</span><div class="lecture-step-content"><p><strong>Acide fort :</strong> la concentration en <span class="math">H₃O⁺</span> serait <span class="math">0,010 mol·L⁻¹</span>, donc <span class="math">pH = 2,0</span>.</p></div></div>
+            <div class="lecture-step"><span class="lecture-step-number">2</span><div class="lecture-step-content"><p><strong>Classement :</strong> A a exactement le <span class="math">pH</span> d'un acide fort ; B a un <span class="math">pH</span> plus élevé : A est un acide fort, B un acide faible.</p></div></div>
+            <div class="lecture-step"><span class="lecture-step-number">3</span><div class="lecture-step-content"><p><strong>Candidat pour B :</strong> l'acide éthanoïque <span class="math">CH₃—COOH</span> convient très bien (ou l'acide carbonique <span class="math">H₂CO₃</span>).</p></div></div>
+            <div class="lecture-step"><span class="lecture-step-number">4</span><div class="lecture-step-content"><p><strong>Justification pKa :</strong> un acide faible a un <span class="math">pKa</span> supérieur à <span class="math">0</span> et n'est dissocié qu'en partie : moins d'ions <span class="math">H₃O⁺</span> que la concentration apportée, donc <span class="math">pH &gt; 2,0</span>. B satisfait ce critère.</p></div></div>
+          </div>
+        </details>
+      </div>
+      <div class="lecture-text">
+        <div class="lecture-exercise-label">✏️ Exercice d'application 2 — Prédominance à trois pH différents</div>
+        <p class="lecture-text">Considérons le couple <span class="math">NH₄⁺/NH₃</span> de <span class="math">pKa = 9,2</span>. ① Quelle forme prédomine à <span class="math">pH = 7,0</span> ? ② À <span class="math">pH = 11,0</span> ? ③ À <span class="math">pH = 9,2</span> ? ④ Compare les proportions à <span class="math">pH = 7,0</span> et <span class="math">pH = 11,0</span>.</p>
+        <details><summary>Voir la solution pas à pas</summary>
+          <div class="lecture-steps">
+            <div class="lecture-step"><span class="lecture-step-number">1</span><div class="lecture-step-content"><p><strong>À <span class="math">pH = 7,0</span> :</strong> <span class="math">pH &lt; pKa</span> donc la forme acide <span class="math">NH₄⁺</span> prédomine (milieu plus acide que la bascule).</p></div></div>
+            <div class="lecture-step"><span class="lecture-step-number">2</span><div class="lecture-step-content"><p><strong>À <span class="math">pH = 11,0</span> :</strong> <span class="math">pH &gt; pKa</span> donc la forme base <span class="math">NH₃</span> prédomine.</p></div></div>
+            <div class="lecture-step"><span class="lecture-step-number">3</span><div class="lecture-step-content"><p><strong>À <span class="math">pH = 9,2</span> :</strong> <span class="math">pH = pKa</span> : les deux formes sont en quantités égales, moitié <span class="math">NH₄⁺</span>, moitié <span class="math">NH₃</span>.</p></div></div>
+            <div class="lecture-step"><span class="lecture-step-number">4</span><div class="lecture-step-content"><p><strong>Comparaison :</strong> les deux <span class="math">pH</span> sont à la même distance du <span class="math">pKa</span> (2,2 unités) : les prédominances sont symétriques, environ 99 % pour la forme dominante dans chaque cas.</p></div></div>
+          </div>
+        </details>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-title">⚠️ Piège d'examen</div>
+        <p>Dans un même couple, l'acide et la base sont de <strong>forces opposées</strong> : un acide fort a une base conjuguée faible, un acide faible a une base conjuguée forte. Écrire que <span class="math">HCl</span> et <span class="math">Cl⁻</span> sont « tous les deux forts » est une erreur classique.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ===== QCM ===== -->
+  <div class="lecture-quiz">
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Parmi ces acides, lequel est un acide fort dans l'eau ?</p>
+      <div class="lecture-quiz-options"><span>A) <span class="math">CH₃—COOH</span></span><span>B) <span class="math">H₂CO₃</span></span><span>C) <span class="math">HCl</span></span><span>D) <span class="math">NH₄⁺</span></span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><strong>Réponse C.</strong> <span class="math">HCl</span> réagit totalement avec l'eau (<span class="math">HCl + H₂O → H₃O⁺ + Cl⁻</span>) : c'est un acide fort de <span class="math">pKa ≈ −7</span>. Les trois autres ont des <span class="math">pKa</span> compris entre 0 et 14 et s'écrivent avec <span class="math">⇌</span> : ce sont des acides faibles.</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Pour le couple <span class="math">NH₄⁺/NH₃</span> (<span class="math">pKa = 9,2</span>), quelle espèce prédomine à <span class="math">pH = 8,0</span> ?</p>
+      <div class="lecture-quiz-options"><span>A) <span class="math">NH₃</span></span><span>B) <span class="math">NH₄⁺</span></span><span>C) les deux à parts égales</span><span>D) impossible à savoir</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><strong>Réponse B.</strong> <span class="math">pH = 8,0 &lt; pKa = 9,2</span> : le milieu est plus acide que la frontière, donc la forme acide <span class="math">NH₄⁺</span> prédomine. La règle « pH inférieur à pKa : forme acide » répond en une seconde.</div></details>
+    </div>
+  </div>
+  <!-- ===== RÉCAP ===== -->
+  <div class="lecture-recap">
+    <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
+    <ul class="lecture-recap-list">
+      <li><strong>Fort ou faible :</strong> flèche simple <span class="math">→</span> pour une réaction totale avec l'eau, double chevron <span class="math">⇌</span> pour un équilibre — et « fort » n'a rien à voir avec « concentré ».</li>
+      <li><strong>Échelle des pKa :</strong> du couple <span class="math">H₃O⁺/H₂O</span> (0) au couple <span class="math">H₂O/OH⁻</span> (14) ; petit <span class="math">pKa</span> = acide fort, et effet nivelant de l'eau au-delà.</li>
+      <li><strong>Prédominance :</strong> <span class="math">pH &lt; pKa</span> → forme acide ; <span class="math">pH &gt; pKa</span> → forme base ; à <span class="math">pH = pKa</span>, cinquante-cinquante.</li>
+    </ul>
+  </div>
+  <!-- ===== FIN ===== -->
+  <div class="lecture-end">
+    <div class="lecture-end-icon">🎯</div>
+    <div class="lecture-end-text">Partie 03 terminée !</div>
+    <div class="lecture-end-sub">Couples, transferts de protons, constante <span class="math">K</span>, échelle des pKa et prédominance : tu as maintenant toutes les pièces. Direction la Partie 04 pour tout condenser en une fiche de révision prête pour l'examen !</div>
+    <div class="lecture-end-divider"></div>
+  </div>
+</div>

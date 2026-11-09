@@ -1,0 +1,390 @@
+<!-- PARTIE 03 — Calcul du pH et taux d'avancement (Acide faible, base faible) -->
+<div class="lecture-container">
+
+  <!-- ===== HERO ===== -->
+  <header class="lecture-hero">
+    <div class="lecture-hero-badge">
+      <span class="lecture-hero-icon">📘</span>
+      <span class="lecture-hero-label">Terminale C&D · Acide faible, base faible · Partie 03</span>
+    </div>
+    <h1 class="lecture-hero-title">
+      Calcul du pH et <em>taux d'avancement</em>
+    </h1>
+    <p class="lecture-hero-intro">
+      Voici la partie la plus calculatoire du chapitre : prédire le pH d'une solution d'acide faible ou de base faible avant même d'allumer le pH-mètre. Nous résoudrons d'abord l'équation du second degré, puis nous justifierons l'approximation <span class="math">C</span> très supérieure à <span class="math">[H₃O⁺]</span> qui donne la formule express <span class="math">√(Ka·C)</span>. Nous terminerons par le taux d'avancement final <span class="math">τ</span>, juge de paix de toute réaction limitée, et par le pH des bases faibles.
+    </p>
+    <div class="lecture-hero-meta">
+      <span class="lecture-hero-meta-item">⏱ 25 min</span>
+      <span class="lecture-hero-meta-item">⚗️ 4 notions</span>
+      <span class="lecture-hero-meta-item">📚 6 sections</span>
+      <span class="lecture-hero-meta-item">🎓 Terminale C&D</span>
+    </div>
+  </header>
+  <!-- ===== SOMMAIRE ===== -->
+  <nav class="lecture-toc">
+    <div class="lecture-toc-header">
+      <span>Dans cette partie</span>
+      <span class="lecture-toc-count">4 notions · 6 sections</span>
+    </div>
+    <ol class="lecture-toc-list">
+      <li><a href="#s0"><span class="toc-num">00</span><span>Prédire le pH du vinaigre</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>pH d'un acide faible : le second degré</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>L'approximation √(Ka·C)</span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>Taux d'avancement final τ</span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>pH d'une base faible</span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>Méthode générale et réflexes</span></a></li>
+    </ol>
+  </nav>
+  <!-- ============================================================ -->
+  <!-- SECTION s0 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s0">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">00</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Motivation</span>
+        <h2 class="lecture-section-title">Prédire le pH du vinaigre</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Un fabricant de vinaigre doit garantir une acidité conforme ; un laboratoire prépare une solution d'acide éthanoïque pour un dosage : quel pH attendre ? Répondre, c'est enchaîner l'équilibre <span class="math">⇌</span>, la constante <span class="math">Ka</span> de la partie 02 et un peu d'algèbre — exactement le programme de cette partie.</p>
+      <p class="lecture-text">La courbe de dosage ci-dessous montre déjà l'enjeu : titré par la soude, l'acide faible présente une équivalence basique, <span class="math">pH(É) ≈ 8,7</span>, supérieure à 7 — signature que le vinaigre n'est pas un acide fort. Savoir prévoir de tels pH, c'est comprendre la chimie des solutions avant la première goutte.</p>
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 560 310" role="img" aria-label="Courbe de dosage pH-métrique d'un acide faible par la soude">
+          <line x1="60" y1="250" x2="520" y2="250" style="stroke:var(--border-soft)"/>
+          <polygon points="520,245 532,250 520,255" fill="rgba(224,184,74,0.9)"/>
+          <line x1="60" y1="250" x2="60" y2="40" style="stroke:var(--border-soft)"/>
+          <polygon points="55,40 60,28 65,40" fill="rgba(224,184,74,0.9)"/>
+          <text x="290" y="284" text-anchor="middle" font-size="11.5" style="fill:var(--text-dim)">V de soude versé</text>
+          <text x="44" y="36" text-anchor="middle" font-size="12" style="fill:var(--text-dim)">pH</text>
+          <line x1="56" y1="190" x2="64" y2="190" style="stroke:var(--border-soft)"/>
+          <line x1="56" y1="145" x2="64" y2="145" style="stroke:var(--border-soft)"/>
+          <line x1="56" y1="100" x2="64" y2="100" style="stroke:var(--border-soft)"/>
+          <line x1="56" y1="40" x2="64" y2="40" style="stroke:var(--border-soft)"/>
+          <text x="48" y="194" text-anchor="end" font-size="10.5" style="fill:var(--text-dim)">4</text>
+          <text x="48" y="149" text-anchor="end" font-size="10.5" style="fill:var(--text-dim)">7</text>
+          <text x="48" y="104" text-anchor="end" font-size="10.5" style="fill:var(--text-dim)">10</text>
+          <text x="48" y="44" text-anchor="end" font-size="10.5" style="fill:var(--text-dim)">14</text>
+          <line x1="60" y1="145" x2="520" y2="145" style="stroke:var(--success-light)" stroke-dasharray="5 5"/>
+          <text x="512" y="138" text-anchor="end" font-size="10.5" fill="rgba(74,222,128,0.95)">pH = 7 (neutre)</text>
+          <path d="M 60 199 C 130 196 210 190 262 168 C 298 152 312 96 330 76 C 348 58 390 52 500 51" fill="none" style="stroke:var(--accent-bright)" stroke-width="2.5"/>
+          <line x1="330" y1="51" x2="330" y2="250" style="stroke:var(--warning-bright)" stroke-dasharray="6 4"/>
+          <text x="330" y="266" text-anchor="middle" font-size="12" font-weight="700" fill="rgba(224,184,74,0.95)">É</text>
+          <text x="345" y="90" text-anchor="start" font-size="12" font-weight="700" fill="rgba(74,222,128,0.95)">pH(É) ≈ 8,7 &gt; 7</text>
+          <text x="72" y="190" text-anchor="start" font-size="11.5" fill="rgba(224,184,74,0.95)">pH initial ≈ 3,4</text>
+        </svg>
+        <figcaption class="lecture-figure-caption">Dosage pH-métrique d'un acide faible CH₃—COOH par la soude : à l'équivalence, pH(É) ≈ 8,7 &gt; 7 — la signature d'un acide faible.</figcaption>
+      </figure>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s1 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s1">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">01</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1</span>
+        <h2 class="lecture-section-title">pH d'un acide faible : le second degré</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Muni de <span class="math">Ka</span>, transformons l'équilibre en équation. On note <span class="math">x = [H₃O⁺]</span> la concentration en ions oxonium à l'équilibre, pour un acide faible <span class="math">AH</span> de concentration <span class="math">C</span>, seul dissous dans l'eau.</p>
+      <p class="lecture-text">L'électroneutralité (autoprotolyse de l'eau négligeable) donne <span class="math">[A⁻] = x</span> ; la conservation de la matière donne <span class="math">[AH] = C − x</span>. En injectant dans <span class="math">Ka = [A⁻]·[H₃O⁺]/[AH]</span>, on obtient <span class="math">x²/(C − x) = Ka</span>, c'est-à-dire :</p>
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-main">Équation du second degré en x = [H₃O⁺]</div>
+        <div class="lecture-formula-hero-main"><span class="math">x² + Ka·x − Ka·C = 0</span></div>
+        <div class="lecture-formula-hero-desc">On ne garde que la racine positive : la concentration d'un ion ne peut pas être négative.</div>
+      </div>
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main"><span class="math">x = (−Ka + √(Ka² + 4·Ka·C)) / 2</span></div>
+        <div class="lecture-formula-desc">Discriminant Δ = Ka² + 4·Ka·C ; l'autre racine est négative et donc rejetée.</div>
+      </div>
+      <div class="lecture-example-content">
+        <span class="lecture-example-label">🔍 Exemple travaillé — pH du vinaigre dilué, calcul complet</span>
+        <div class="lecture-example-content">
+          <p>Une solution d'acide éthanoïque a pour concentration <span class="math">C = 0,010 mol·L⁻¹</span> ; on donne <span class="math">Ka = 1,6×10⁻⁵</span> (pKa = 4,8). Calculer <span class="math">[H₃O⁺]</span> puis le pH par le second degré, et vérifier.</p>
+        </div>
+        <div class="lecture-steps">
+          <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Données et inconnue.</strong> C = 0,010 mol·L⁻¹, Ka = 1,6×10⁻⁵ ; inconnue x = [H₃O⁺] à l'équilibre.</p></div></div>
+          <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Écrire l'équation.</strong> <span class="math">x² + 1,6×10⁻⁵·x − 1,6×10⁻⁷ = 0</span>, car <span class="math">Ka·C = 1,6×10⁻⁵ × 0,010 = 1,6×10⁻⁷</span>.</p></div></div>
+          <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Discriminant.</strong> <span class="math">Δ = Ka² + 4·Ka·C = (1,6×10⁻⁵)² + 4 × 1,6×10⁻⁷ = 2,56×10⁻¹⁰ + 6,40×10⁻⁷ ≈ 6,40×10⁻⁷</span>.</p></div></div>
+          <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Racine carrée.</strong> <span class="math">√Δ ≈ 8,0×10⁻⁴</span>, car <span class="math">(8,0×10⁻⁴)² = 6,4×10⁻⁷</span> ✔.</p></div></div>
+          <div class="lecture-step"><div class="lecture-step-number">5</div><div class="lecture-step-content"><p><strong>Racine positive.</strong> <span class="math">x = (−1,6×10⁻⁵ + 8,0×10⁻⁴)/2 = 7,84×10⁻⁴/2 = 3,9×10⁻⁴ mol·L⁻¹</span> (l'autre racine est négative, rejetée).</p></div></div>
+          <div class="lecture-step"><div class="lecture-step-number">6</div><div class="lecture-step-content"><p><strong>pH et double contrôle.</strong> <span class="math">pH = −log(3,92×10⁻⁴) = 4 − log 3,92 = 4 − 0,59 = 3,41 ≈ 3,4</span> ; report dans Ka : <span class="math">(3,92×10⁻⁴)² / (0,010 − 0,000392) = 1,54×10⁻⁷ / 9,61×10⁻³ = 1,6×10⁻⁵</span> ✔ on retrouve Ka.</p></div></div>
+        </div>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-title">⚠️ Piège d'examen</div>
+        <p>Deux racines, une seule valable : <span class="math">x</span> doit être <strong>positive</strong> et <strong>inférieure à C</strong>. Écrire les deux racines sans trier, ou perdre le signe « − » devant <span class="math">Ka</span> dans la formule, sont les deux erreurs les plus fréquentes.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s2 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s2">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">02</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2</span>
+        <h2 class="lecture-section-title">L'approximation √(Ka·C)</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Résoudre un second degré à chaque question, c'est long. Quand l'acide est « raisonnablement » faible, une approximation du programme donne le pH en une ligne — à condition de la justifier.</p>
+      <p class="lecture-text">Si l'acide est peu dissocié, alors <span class="math">x = [H₃O⁺]</span> est très inférieur à <span class="math">C</span> et l'on peut écrire <span class="math">C − x ≈ C</span>. L'équation <span class="math">x²/(C − x) = Ka</span> devient <span class="math">x²/C = Ka</span>, d'où la formule express :</p>
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-main">Formule express du pH d'un acide faible</div>
+        <div class="lecture-formula-hero-main"><span class="math">[H₃O⁺] ≈ √(Ka·C)</span></div>
+        <div class="lecture-formula-hero-desc">Valable seulement si l'acide est peu dissocié : la condition se vérifie après le calcul, jamais avant.</div>
+      </div>
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main"><span class="math">Condition : α = [H₃O⁺]/C ≤ 10 %</span></div>
+        <div class="lecture-formula-desc">En pratique : C ≥ 100·Ka. Si la condition échoue, retour au second degré de la section 01.</div>
+      </div>
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 560 240" role="img" aria-label="Comparaison second degré et approximation">
+          <text x="280" y="24" text-anchor="middle" font-size="13.5" font-weight="700" fill="rgba(224,184,74,0.95)">Deux méthodes, un même pH (HCOOH, 0,10 mol·L⁻¹)</text>
+          <line x1="90" y1="60" x2="90" y2="190" style="stroke:var(--border-soft)"/>
+          <line x1="90" y1="190" x2="500" y2="190" style="stroke:var(--border-soft)"/>
+          <line x1="84" y1="64" x2="96" y2="64" style="stroke:var(--border-soft)"/>
+          <line x1="84" y1="190" x2="96" y2="190" style="stroke:var(--border-soft)"/>
+          <text x="80" y="68" text-anchor="end" font-size="10.5" style="fill:var(--text-dim)">2,6</text>
+          <text x="80" y="194" text-anchor="end" font-size="10.5" style="fill:var(--text-dim)">2,0</text>
+          <rect x="150" y="104" width="120" height="86" rx="6" fill="rgba(96,165,250,0.55)"/>
+          <text x="210" y="96" text-anchor="middle" font-size="12" font-weight="700" fill="rgba(96,165,250,0.95)">second degré : pH = 2,41</text>
+          <rect x="330" y="106" width="120" height="84" rx="6" fill="rgba(224,184,74,0.55)"/>
+          <text x="390" y="98" text-anchor="middle" font-size="12" font-weight="700" fill="rgba(224,184,74,0.95)">√(Ka·C) : pH = 2,40</text>
+          <text x="280" y="222" text-anchor="middle" font-size="12" font-style="italic" style="fill:var(--text-dim)">Écart de 0,01 unité de pH : l'approximation est validée (α = 4,0 % ≤ 10 %).</text>
+        </svg>
+        <figcaption class="lecture-figure-caption">Sur l'acide méthanoïque, les deux méthodes coïncident à 0,01 unité de pH près : l'approximation fait gagner du temps sans nuire à la précision.</figcaption>
+      </figure>
+      <div class="lecture-example-content">
+        <span class="lecture-example-label">🔍 Exemple travaillé — l'acide méthanoïque de la fourmi</span>
+        <div class="lecture-example-content">
+          <p>L'acide méthanoïque <span class="math">HCOOH</span> (piqûre de fourmi) a pour constante <span class="math">Ka = 1,6×10⁻⁴</span>. Calculer le pH d'une solution à <span class="math">C = 0,10 mol·L⁻¹</span> par l'approximation, justifier celle-ci, puis contrôler au second degré.</p>
+        </div>
+        <div class="lecture-steps">
+          <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Formule express.</strong> <span class="math">[H₃O⁺] ≈ √(Ka·C) = √(1,6×10⁻⁴ × 0,10) = √(1,6×10⁻⁵) = 4,0×10⁻³ mol·L⁻¹</span>, car <span class="math">(4,0×10⁻³)² = 1,6×10⁻⁵</span> ✔.</p></div></div>
+          <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>pH.</strong> <span class="math">pH = −log(4,0×10⁻³) = 3 − log 4,0 = 3 − 0,60 = 2,40 ≈ 2,4</span>.</p></div></div>
+          <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Justifier l'approximation.</strong> <span class="math">α = [H₃O⁺]/C = 4,0×10⁻³/0,10 = 4,0×10⁻² = 4,0 %</span> : inférieur à 10 %, donc <span class="math">C</span> très supérieur à <span class="math">[H₃O⁺]</span> — approximation licite.</p></div></div>
+          <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Contrôle au second degré.</strong> <span class="math">Δ = Ka² + 4·Ka·C = 2,56×10⁻⁸ + 6,4×10⁻⁵ ≈ 6,40×10⁻⁵</span> → <span class="math">√Δ = 8,0×10⁻³</span> → <span class="math">x = (−1,6×10⁻⁴ + 8,0×10⁻³)/2 = 3,9×10⁻³ mol·L⁻¹</span> → pH = 2,41.</p></div></div>
+          <div class="lecture-step"><div class="lecture-step-number">5</div><div class="lecture-step-content"><p><strong>Conclure.</strong> 2,40 contre 2,41 : les deux méthodes coïncident ✔. On retiendra pH ≈ 2,4 pour la solution d'acide méthanoïque à 0,10 mol·L⁻¹.</p></div></div>
+        </div>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-title">⚠️ Piège d'examen</div>
+        <p>L'approximation se <strong>démontre</strong>, elle ne se décrète pas : termine toujours par le contrôle <span class="math">α ≤ 10 %</span>. Un candidat qui utilise <span class="math">√(Ka·C)</span> sans vérifier, ou qui oublie de conclure sur le pH après avoir calculé <span class="math">[H₃O⁺]</span>, perd la moitié des points.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s3 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s3">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">03</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 3</span>
+        <h2 class="lecture-section-title">Taux d'avancement final τ</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Après le calcul vient le contrôle : le taux d'avancement final <span class="math">τ</span> dit si la réaction a été totale ou limitée, et vérifie la cohérence de tout le calcul de pH.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-title">📌 Définition officielle</div>
+        <p>Le <strong>taux d'avancement final</strong> est <span class="math">τ = x_f / x_max</span>. Pour un acide faible <span class="math">AH</span> seul dissous dans l'eau : <span class="math">x_f = [H₃O⁺]_éq·V</span> et <span class="math">x_max = C·V</span>, d'où <span class="math">τ = [H₃O⁺]/C = α</span>. C'est LE contrôle de fin de calcul : si <span class="math">τ</span> ressort supérieur à 100 %, le calcul est faux.</p>
+      </div>
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-main">Taux d'avancement final d'un acide faible</div>
+        <div class="lecture-formula-hero-main"><span class="math">τ = x_f / x_max = [H₃O⁺]_éq / C</span></div>
+        <div class="lecture-formula-hero-desc">Acide faible monoprotique seul dans l'eau ; τ = 100 % pour un acide fort ; nombre sans unité.</div>
+      </div>
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main"><span class="math">τ (%) = 100 × [H₃O⁺] / C</span></div>
+        <div class="lecture-formula-desc">Exprimer τ en pourcentage pour le comparer directement à 100 %.</div>
+      </div>
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 560 245" role="img" aria-label="Taux d'avancement final selon la concentration">
+          <text x="280" y="24" text-anchor="middle" font-size="13.5" font-weight="700" fill="rgba(224,184,74,0.95)">Taux d'avancement final τ : l'effet de la dilution</text>
+          <rect x="170" y="52" width="300" height="18" rx="9" fill="rgba(224,184,74,0.10)"/>
+          <rect x="170" y="52" width="300" height="18" rx="9" fill="rgba(96,165,250,0.60)"/>
+          <text x="160" y="66" text-anchor="end" font-size="11.5" style="fill:var(--text-dim)">HCl — 0,10 mol·L⁻¹</text>
+          <text x="480" y="66" text-anchor="start" font-size="11.5" font-weight="700" fill="rgba(96,165,250,0.95)">100 %</text>
+          <rect x="170" y="116" width="300" height="18" rx="9" fill="rgba(224,184,74,0.10)"/>
+          <rect x="170" y="116" width="4" height="18" rx="2" fill="rgba(224,184,74,0.9)"/>
+          <text x="160" y="130" text-anchor="end" font-size="11.5" style="fill:var(--text-dim)">CH₃—COOH — 0,10 mol·L⁻¹</text>
+          <text x="200" y="130" text-anchor="start" font-size="11.5" font-weight="700" fill="rgba(224,184,74,0.95)">≈ 1,3 %</text>
+          <rect x="170" y="180" width="300" height="18" rx="9" fill="rgba(224,184,74,0.10)"/>
+          <rect x="170" y="180" width="12" height="18" rx="2" fill="rgba(224,184,74,0.7)"/>
+          <text x="160" y="194" text-anchor="end" font-size="11.5" style="fill:var(--text-dim)">CH₃—COOH — 0,010 mol·L⁻¹</text>
+          <text x="208" y="194" text-anchor="start" font-size="11.5" font-weight="700" fill="rgba(224,184,74,0.95)">≈ 3,9 %</text>
+          <text x="280" y="234" text-anchor="middle" font-size="12" font-style="italic" style="fill:var(--text-dim)">Concentration divisée par 10 : τ multiplié par ≈ 3. La dilution favorise la dissociation.</text>
+        </svg>
+        <figcaption class="lecture-figure-caption">Un acide fort est toujours à 100 % ; un acide faible reste en dessous, mais son τ remonte quand on dilue.</figcaption>
+      </figure>
+      <div class="lecture-text">
+        <div class="lecture-exercise-label">✏️ Exercice d'application 1 — pH et taux du vinaigre</div>
+        <p class="lecture-text">Une solution d'acide éthanoïque a pour concentration <span class="math">C = 0,10 mol·L⁻¹</span> et le couple <span class="math">CH₃—COOH/CH₃—COO⁻</span> a pour pKa = 4,8. Calculer <span class="math">[H₃O⁺]</span>, le pH, puis le taux d'avancement final <span class="math">τ</span>.</p>
+        <details><summary>Voir la solution</summary>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Données.</strong> C = 0,10 mol·L⁻¹ ; pKa = 4,8 → <span class="math">Ka = 10^(−4,8) = 1,6×10⁻⁵</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Approximation.</strong> <span class="math">[H₃O⁺] ≈ √(Ka·C) = √(1,6×10⁻⁵ × 0,10) = √(1,6×10⁻⁶) = 1,26×10⁻³ mol·L⁻¹</span>, car <span class="math">(1,26×10⁻³)² = 1,59×10⁻⁶ ≈ 1,6×10⁻⁶</span> ✔.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>pH.</strong> <span class="math">pH = −log(1,26×10⁻³) = 3 − log 1,26 = 3 − 0,10 = 2,90 ≈ 2,9</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Taux d'avancement.</strong> <span class="math">τ = [H₃O⁺]/C = 1,26×10⁻³/0,10 = 1,26×10⁻²</span>, soit <span class="math">τ ≈ 1,3 %</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">5</div><div class="lecture-step-content"><p><strong>Contrôles.</strong> α = τ = 1,3 % ≤ 10 % ✔ l'approximation était licite ; τ très inférieur à 100 % ✔ l'acide est bien faible. Deux vérifications, deux cohérences.</p></div></div>
+          </div>
+        </details>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-title">⚠️ Piège d'examen</div>
+        <p><span class="math">τ</span> et <span class="math">α</span> sont des nombres (ou des pourcentages) : jamais en <span class="math">mol·L⁻¹</span>. Et <span class="math">τ = α</span> uniquement pour un acide faible <strong>seul</strong> dans l'eau — pas dans un mélange.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s4 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s4">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">04</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 4</span>
+        <h2 class="lecture-section-title">pH d'une base faible</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Symétrie parfaite : pour une base faible <span class="math">B</span> de concentration <span class="math">C</span>, la constante de basicité <span class="math">Kb</span> joue le rôle de <span class="math">Ka</span>, et les ions hydroxyde <span class="math">OH⁻</span> jouent le rôle des <span class="math">H₃O⁺</span>.</p>
+      <p class="lecture-text">Le raisonnement est identique : <span class="math">Kb = [BH⁺]·[OH⁻]/[B]</span> avec <span class="math">[BH⁺] = [OH⁻] = x</span> (électroneutralité) et <span class="math">[B] = C − x</span>. On retrouve le second degré <span class="math">x² + Kb·x − Kb·C = 0</span>, d'où, si <span class="math">x</span> reste inférieur à 10 % de <span class="math">C</span> :</p>
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-main">Formule express du pH d'une base faible</div>
+        <div class="lecture-formula-hero-main"><span class="math">[OH⁻] ≈ √(Kb·C)</span></div>
+        <div class="lecture-formula-hero-desc">Puis pOH = −log[OH⁻] et pH = 14 − pOH à 25 °C ; condition de validité : [OH⁻]/C ≤ 10 %.</div>
+      </div>
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main"><span class="math">pH = 14 + log [OH⁻]</span></div>
+        <div class="lecture-formula-desc">À 25 °C, pH = 14 + log[OH⁻] : direct à partir de [OH⁻], sans passer par le pOH.</div>
+      </div>
+      <div class="lecture-example-content">
+        <span class="lecture-example-label">🔍 Exemple travaillé — une eau de nettoyage à l'ammoniac</span>
+        <div class="lecture-example-content">
+          <p>Une solution d'ammoniac a pour concentration <span class="math">C = 0,010 mol·L⁻¹</span> et <span class="math">Kb = 1,6×10⁻⁵</span>. Calculer <span class="math">[OH⁻]</span>, justifier l'approximation, puis en déduire le pH par deux méthodes.</p>
+        </div>
+        <div class="lecture-steps">
+          <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Formule express.</strong> <span class="math">[OH⁻] ≈ √(Kb·C) = √(1,6×10⁻⁵ × 0,010) = √(1,6×10⁻⁷) = 4,0×10⁻⁴ mol·L⁻¹</span>, car <span class="math">(4,0×10⁻⁴)² = 1,6×10⁻⁷</span> ✔.</p></div></div>
+          <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Justifier l'approximation.</strong> <span class="math">[OH⁻]/C = 4,0×10⁻⁴/0,010 = 4,0×10⁻² = 4,0 %</span> : inférieur à 10 % ✔.</p></div></div>
+          <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Méthode pOH.</strong> <span class="math">pOH = −log(4,0×10⁻⁴) = 4 − log 4,0 = 3,40</span> → <span class="math">pH = 14 − pOH = 14 − 3,40 = 10,60</span>.</p></div></div>
+          <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Méthode directe.</strong> <span class="math">pH = 14 + log[OH⁻] = 14 + log(4,0×10⁻⁴) = 14 − 3,40 = 10,60</span> ✔ : les deux calculs donnent le même résultat.</p></div></div>
+          <div class="lecture-step"><div class="lecture-step-number">5</div><div class="lecture-step-content"><p><strong>Interpréter.</strong> La soude à la même concentration donnerait pH = 12,0 : la base faible NH₃ donne un pH plus petit (10,6) car elle libère 25 fois moins d'ions OH⁻ (0,010/4,0×10⁻⁴ = 25).</p></div></div>
+        </div>
+      </div>
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 560 250" role="img" aria-label="Comparaison base forte et base faible à concentration égale">
+          <text x="280" y="24" text-anchor="middle" font-size="13.5" font-weight="700" fill="rgba(224,184,74,0.95)">Même concentration (0,010 mol·L⁻¹), deux pH</text>
+          <rect x="95" y="90" width="105" height="95" rx="10" fill="rgba(224,184,74,0.04)" style="stroke:var(--border-soft)"/>
+          <rect x="99" y="128" width="97" height="53" rx="6" fill="rgba(96,165,250,0.50)"/>
+          <text x="147" y="210" text-anchor="middle" font-size="11.5" style="fill:var(--text-dim)">NaOH — base forte</text>
+          <text x="147" y="230" text-anchor="middle" font-size="13" font-weight="700" fill="rgba(96,165,250,0.95)">pH = 12,0</text>
+          <rect x="360" y="90" width="105" height="95" rx="10" fill="rgba(224,184,74,0.04)" style="stroke:var(--border-soft)"/>
+          <rect x="364" y="128" width="97" height="53" rx="6" fill="rgba(74,222,128,0.45)"/>
+          <text x="412" y="210" text-anchor="middle" font-size="11.5" style="fill:var(--text-dim)">NH₃ — base faible</text>
+          <text x="412" y="230" text-anchor="middle" font-size="13" font-weight="700" fill="rgba(74,222,128,0.95)">pH = 10,6</text>
+          <text x="280" y="120" text-anchor="middle" font-size="11" style="fill:var(--text-dim)">[OH⁻] = 1,0×10⁻² mol·L⁻¹</text>
+          <text x="280" y="140" text-anchor="middle" font-size="11" style="fill:var(--text-dim)">contre 4,0×10⁻⁴ mol·L⁻¹</text>
+          <text x="280" y="166" text-anchor="middle" font-size="12.5" font-weight="700" fill="rgba(224,184,74,0.95)">25 fois moins d'ions OH⁻</text>
+        </svg>
+        <figcaption class="lecture-figure-caption">À concentration égale, la base faible libère 25 fois moins d'ions OH⁻ que la base forte : le pH le trahit.</figcaption>
+      </figure>
+      <div class="lecture-text">
+        <div class="lecture-exercise-label">✏️ Exercice d'application 2 — L'ammoniaque concentrée</div>
+        <p class="lecture-text">Une ammoniaque commerciale diluée a pour concentration <span class="math">C = 0,10 mol·L⁻¹</span> ; on donne <span class="math">Kb = 1,6×10⁻⁵</span>. Calculer <span class="math">[OH⁻]</span>, vérifier l'approximation, puis en déduire le pH par deux méthodes.</p>
+        <details><summary>Voir la solution</summary>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Formule express.</strong> <span class="math">[OH⁻] ≈ √(Kb·C) = √(1,6×10⁻⁵ × 0,10) = √(1,6×10⁻⁶) = 1,26×10⁻³ mol·L⁻¹</span> (valeur approchée 1,3×10⁻³).</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Justifier l'approximation.</strong> <span class="math">[OH⁻]/C = 1,26×10⁻³/0,10 = 1,26×10⁻² = 1,3 %</span> : très inférieur à 10 % ✔.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Méthode directe.</strong> <span class="math">pH = 14 + log[OH⁻] = 14 + log(1,26×10⁻³) = 14 − 3 + log 1,26 = 11 + 0,10 = 11,10 ≈ 11,1</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Méthode pOH.</strong> <span class="math">pOH = −log(1,26×10⁻³) = 3 − 0,10 = 2,90</span> → <span class="math">pH = 14 − 2,90 = 11,10</span> ✔ : même résultat par les deux voies.</p></div></div>
+          </div>
+        </details>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-title">⚠️ Piège d'examen</div>
+        <p>La formule « pH = 11 + log C » qui circule dans certains cahiers n'est <strong>pas</strong> une formule du cours : elle ne marche que dans un cas particulier et masque le raisonnement. La voie sûre, toujours acceptée : <span class="math">[OH⁻] = √(Kb·C)</span> puis <span class="math">pH = 14 + log[OH⁻]</span>.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s5 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s5">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">05</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 5</span>
+        <h2 class="lecture-section-title">Méthode générale et réflexes</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Face à un énoncé, tout se joue dans le choix de la méthode. Ce tableau d'aiguillage, appris par cœur, évite 90 % des faux départs.</p>
+      <table class="lecture-table">
+        <thead><tr><th>Situation</th><th>Méthode conseillée</th><th>Formule clé</th></tr></thead>
+        <tbody>
+          <tr><td>Acide fort de concentration C</td><td>directe</td><td><span class="math">pH = −log C</span></td></tr>
+          <tr><td>Base forte de concentration C</td><td>directe</td><td><span class="math">[OH⁻] = C</span> ; <span class="math">pH = 14 + log C</span></td></tr>
+          <tr><td>Acide faible, α attendu ≤ 10 %</td><td>express</td><td><span class="math">[H₃O⁺] ≈ √(Ka·C)</span></td></tr>
+          <tr><td>Acide faible, α &gt; 10 % ou contrôle exigé</td><td>second degré</td><td><span class="math">x² + Ka·x − Ka·C = 0</span></td></tr>
+          <tr><td>Base faible</td><td>express</td><td><span class="math">[OH⁻] ≈ √(Kb·C)</span> ; <span class="math">pH = 14 + log[OH⁻]</span></td></tr>
+          <tr><td>Fin de toute question</td><td>contrôle</td><td>recalculer <span class="math">τ = [H₃O⁺]/C</span> et reporter dans <span class="math">Ka</span> (ou <span class="math">Kb</span>)</td></tr>
+        </tbody>
+      </table>
+      <div class="lecture-steps">
+        <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Écrire l'équation bilan.</strong> Avec <span class="math">⇌</span> pour un acide ou une base faible, avec <span class="math">→</span> pour un acide ou une base forte : cette flèche conditionne toute la suite.</p></div></div>
+        <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Poser le tableau d'avancement.</strong> Noter <span class="math">x</span>, puis exprimer <span class="math">x_f</span>, <span class="math">x_max</span> et les concentrations à l'équilibre en fonction de <span class="math">C</span>.</p></div></div>
+        <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Écrire la constante.</strong> <span class="math">Ka = [A⁻]·[H₃O⁺]/[AH]</span> ou <span class="math">Kb = [BH⁺]·[OH⁻]/[B]</span>, avec les concentrations à l'éQUILIBRE.</p></div></div>
+        <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Choisir la méthode.</strong> Estimer si <span class="math">α</span> sera ≤ 10 % (alors <span class="math">√(Ka·C)</span> ou <span class="math">√(Kb·C)</span>) ; sinon, second degré complet.</p></div></div>
+        <div class="lecture-step"><div class="lecture-step-number">5</div><div class="lecture-step-content"><p><strong>Calculer proprement.</strong> Substituer, n'arrondir qu'à la dernière étape, et donner l'unité (<span class="math">mol·L⁻¹</span> pour les concentrations, rien pour pH, τ, Ka).</p></div></div>
+        <div class="lecture-step"><div class="lecture-step-number">6</div><div class="lecture-step-content"><p><strong>Contrôler deux fois.</strong> Recalculer <span class="math">τ</span> puis reporter la valeur trouvée dans <span class="math">Ka</span> ou <span class="math">Kb</span> : si l'on retrouve la constante de l'énoncé, le calcul est bouclé.</p></div></div>
+      </div>
+      <div class="lecture-callout lecture-callout-danger">
+        <div class="lecture-callout-title">🚨 Les quatre fautes qui coûtent cher</div>
+        <p>1) Une flèche <span class="math">→</span> pour un acide faible (au lieu de <span class="math">⇌</span>) ; 2) <span class="math">pH = −log C</span> appliqué à un acide faible ; 3) la formule folklorique <span class="math">pH = 11 + log C</span> pour une base faible (la bonne voie : <span class="math">[OH⁻] = √(Kb·C)</span> puis <span class="math">pH = 14 + log[OH⁻]</span>) ; 4) arrondir avant la dernière étape. Chacune coûte au moins la moitié de la question.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ===== QCM ===== -->
+  <div class="lecture-quiz">
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Un acide faible a pour Ka = 1,0×10⁻⁵ et C = 0,10 mol·L⁻¹. La concentration [H₃O⁺] vaut approximativement :</p>
+      <div class="lecture-quiz-options"><span>A) 1,0×10⁻⁵ mol·L⁻¹</span><span>B) 1,0×10⁻³ mol·L⁻¹</span><span>C) 1,0×10⁻² mol·L⁻¹</span><span>D) 3,2×10⁻³ mol·L⁻¹</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><p><strong>Réponse B.</strong> [H₃O⁺] ≈ √(Ka·C) = √(1,0×10⁻⁵ × 0,10) = √(1,0×10⁻⁶) = 1,0×10⁻³ mol·L⁻¹.</p><p>Vérification : α = 1,0×10⁻³/0,10 = 1,0 % ≤ 10 %, l'approximation est licite.</p></div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Une solution d'ammoniac a pour C = 0,10 mol·L⁻¹ et Kb = 1,6×10⁻⁵. Son pH vaut approximativement :</p>
+      <div class="lecture-quiz-options"><span>A) 2,9</span><span>B) 11,1</span><span>C) 12,0</span><span>D) 9,2</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><p><strong>Réponse B.</strong> [OH⁻] ≈ √(Kb·C) = √(1,6×10⁻⁶) = 1,26×10⁻³ mol·L⁻¹, puis pH = 14 + log(1,26×10⁻³) = 11,1.</p><p>La soude à 0,10 mol·L⁻¹ donnerait pH = 12,0 : la base faible se reconnaît à son pH plus petit.</p></div></details>
+    </div>
+  </div>
+  <!-- ===== RÉCAP ===== -->
+  <div class="lecture-recap">
+    <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
+    <ul class="lecture-recap-list">
+      <li><strong>Second degré</strong> — x² + Ka·x − Ka·C = 0 donne le [H₃O⁺] exact d'un acide faible ; on ne garde que la racine positive, et Δ = Ka² + 4·Ka·C.</li>
+      <li><strong>Approximation</strong> — si α ≤ 10 %, [H₃O⁺] ≈ √(Ka·C) pour un acide faible et [OH⁻] ≈ √(Kb·C) pour une base faible, puis pH = 14 + log[OH⁻] ; la condition se vérifie toujours après le calcul.</li>
+      <li><strong>Contrôle final</strong> — τ = [H₃O⁺]/C doit rester inférieur à 100 %, et le report de la valeur dans Ka (ou Kb) doit redonner la constante de l'énoncé : deux calculs minimum par question.</li>
+    </ul>
+  </div>
+  <!-- ===== FIN ===== -->
+  <div class="lecture-end">
+    <div class="lecture-end-icon">🎯</div>
+    <div class="lecture-end-text">Partie 03 terminée !</div>
+    <div class="lecture-end-sub">Tu sais désormais prédire et vérifier le pH d'une solution faible. Dans la fiche de révision (partie 04), tout le chapitre est condensé : définitions-éclair, formules, grande table de synthèse et réflexes Bac — parfait pour la veille de l'épreuve.</div>
+    <div class="lecture-end-divider"></div>
+  </div>
+</div>

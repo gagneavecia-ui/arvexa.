@@ -1,0 +1,455 @@
+<!-- PARTIE 02 — Oscillations forcées & Impédance (Circuit RLC) -->
+<div class="lecture-container">
+
+  <!-- ===== HERO ===== -->
+  <header class="lecture-hero">
+    <div class="lecture-hero-badge">
+      <span class="lecture-hero-icon">📘</span>
+      <span class="lecture-hero-label">Terminale C&D · Circuit RLC · Partie 02</span>
+    </div>
+    <h1 class="lecture-hero-title">
+      Oscillations forcées <em>& Impédance</em>
+    </h1>
+    <p class="lecture-hero-intro">
+      Pourquoi les oscillations du circuit RLC finissent-elles toujours par s'éteindre ? Où passe l'énergie perdue, et peut-on la remplacer ? Dans cette partie, tu vas suivre la trace : l'effet Joule prélève sa dîme à chaque oscillation, l'énergie totale s'érode, et selon la valeur de R le circuit oscille, revient vite ou rampe lentement. Tu découvriras aussi les oscillations forcées et l'impédance Z, deux outils indispensables pour comprendre la résonance de la partie 03.
+    </p>
+    <div class="lecture-hero-meta">
+      <span class="lecture-hero-meta-item">⏱ 25 min</span>
+      <span class="lecture-hero-meta-item">⚡ 4 notions</span>
+      <span class="lecture-hero-meta-item">📚 6 sections</span>
+      <span class="lecture-hero-meta-item">🎓 Terminale C&D</span>
+    </div>
+  </header>
+  <!-- ===== SOMMAIRE ===== -->
+  <nav class="lecture-toc">
+    <div class="lecture-toc-header">
+      <span>Dans cette partie</span>
+      <span class="lecture-toc-count">4 notions · 6 sections</span>
+    </div>
+    <ol class="lecture-toc-list">
+      <li><a href="#s0"><span class="toc-num">00</span><span>La balançoire et l'amortisseur</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>Oscillations forcées</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>L'impédance Z</span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>Effet Joule et énergie totale</span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>Les trois régimes</span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>Entretenir les oscillations</span></a></li>
+    </ol>
+  </nav>
+  <!-- ============================================================ -->
+  <!-- SECTION s0 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s0">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">00</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Motivation</span>
+        <h2 class="lecture-section-title">La balançoire et l'amortisseur</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Imagine une balançoire qu'on lâche d'en haut sans jamais la pousser : elle va et vient, mais chaque aller-retour est un peu plus petit, jusqu'à l'immobilité complète. Dans une voiture, ce rôle de frein est joué par l'amortisseur : sans lui, le moindre dos d'âne transformerait le trajet en trampoline interminable. Le circuit RLC raconte exactement la même histoire.</p>
+      <p class="lecture-text">Dans cette partie, tu vas apprendre à suivre l'énergie qui s'échappe du circuit, à classer les comportements en trois régimes selon la résistance, puis à découvrir comment imposer un rythme au circuit avec un GBF et comment compenser les pertes pour entretenir les oscillations. C'est la préparation directe de la résonance, qui t'attend en partie 03.</p>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s1 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s1">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">01</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1</span>
+        <h2 class="lecture-section-title">Oscillations forcées : imposer le rythme</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Laisser le circuit évoluer seul, c'est bien ; le diriger, c'est mieux. En branchant un GBF aux bornes du circuit RLC, on lui impose une tension sinusoïdale qui dicte son rythme. Le circuit devient un résonateur, le GBF un excitateur, et tout le chapitre de la résonance repose sur ce duo.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <p class="lecture-callout-label">📌 Définition — oscillations forcées</p>
+        <p class="lecture-text">Des oscillations forcées sont les oscillations d'un système (le résonateur) soumises à une excitation sinusoïdale de fréquence <span class="math">f</span> imposée par un appareil extérieur (l'excitateur). Le résonateur oscille alors à la fréquence <span class="math">f</span> de l'excitateur, et non à sa fréquence propre.</p>
+      </div>
+      <p class="lecture-text">🧠 Pousse la balançoire au rythme que TU choisis : elle suit ton rythme, même si ce n'est pas le sien. Mais tu sens bien que l'amplitude dépend de la proximité entre ton rythme et le sien — c'est exactement ce qui produira la résonance en partie 03.</p>
+      <div class="lecture-formula-hero">
+        <p class="lecture-formula-hero-main">La tension imposée par l'excitateur</p>
+        <p class="lecture-formula-hero-main"><span class="math">u(t) = U·cos(2π·f·t)</span></p>
+        <p class="lecture-formula-hero"><span class="math">U</span> est l'amplitude (V) et <span class="math">f</span> la fréquence imposée (Hz) : le résonateur dansera sur ce rythme-là.</p>
+      </div>
+      <div class="lecture-formula-box">
+        <p class="lecture-formula-desc">De la fréquence à la pulsation</p>
+        <p class="lecture-formula-main"><span class="math">ω = 2π·f</span></p>
+        <p class="lecture-formula-desc"><span class="math">f</span> en hertz (Hz), <span class="math">ω</span> en radians par seconde (rad·s⁻¹) : la pulsation est la fréquence « en radians ».</p>
+      </div>
+      <svg viewBox="0 0 640 320" role="img" aria-label="Montage d'oscillations forcées : le GBF excitateur impose sa fréquence au circuit RLC résonateur">
+        <rect x="0" y="0" width="640" height="320" style="fill:rgba(15,23,42,0.03)"/>
+        <rect x="40" y="110" width="150" height="80" rx="10" style="fill:rgba(59,130,246,0.10);stroke:var(--accent-bright)" stroke-width="2"/>
+        <text x="115" y="140" font-size="16" text-anchor="middle" style="fill:var(--text, rgba(15,23,42,0.85))">GBF</text>
+        <text x="115" y="168" font-size="11" text-anchor="middle" style="fill:var(--text, rgba(15,23,42,0.55))">excitateur</text>
+        <path d="M62,178 q10,-16 20,0 q10,16 20,0" style="stroke:var(--accent-bright);fill:none" stroke-width="2"/>
+        <path d="M190,130 H280" style="stroke:var(--accent-bright);fill:none" stroke-width="2.5"/>
+        <polygon points="284,130 272,124 272,136" style="fill:var(--accent-bright)"/>
+        <text x="235" y="110" font-size="11" text-anchor="middle" style="fill:var(--text, rgba(15,23,42,0.55))">tension sinusoïdale : f imposée</text>
+        <rect x="280" y="80" width="200" height="140" rx="10" style="fill:rgba(16,185,129,0.08);stroke:rgba(16,185,129,0.9)" stroke-width="2"/>
+        <text x="380" y="104" font-size="12" text-anchor="middle" style="fill:var(--text, rgba(15,23,42,0.85))">circuit RLC série — résonateur</text>
+        <polyline points="310,146 318,132 330,160 342,132 354,160 362,146" style="stroke:var(--accent-bright);fill:none" stroke-width="2.5"/>
+        <path d="M372,146 A12,12 0 0 1 396,146 A12,12 0 0 1 420,146" style="stroke:var(--accent-bright);fill:none" stroke-width="2.5"/>
+        <path d="M444,128 V164 M458,128 V164" style="stroke:var(--accent-bright);fill:none" stroke-width="2.5"/>
+        <text x="336" y="182" font-size="11" text-anchor="middle" style="fill:var(--text, rgba(15,23,42,0.85))">R</text>
+        <text x="396" y="182" font-size="11" text-anchor="middle" style="fill:var(--text, rgba(15,23,42,0.85))">L</text>
+        <text x="451" y="182" font-size="11" text-anchor="middle" style="fill:var(--text, rgba(15,23,42,0.85))">C</text>
+        <path d="M380,220 V260 H115 V190" style="stroke:var(--accent-bright);fill:none" stroke-width="2.5"/>
+        <polygon points="202,260 214,254 214,266" style="fill:var(--accent-bright)"/>
+        <text x="320" y="300" font-size="12" text-anchor="middle" style="fill:var(--text, rgba(15,23,42,0.55))">le résonateur oscille à la fréquence f de l'excitateur, et non à sa fréquence propre</text>
+      </svg>
+      <div class="lecture-example-content">
+        <p class="lecture-example-label">✍️ Exemple travaillé — le GBF dicte son rythme</p>
+        <p class="lecture-text">Un GBF impose au circuit RLC une tension sinusoïdale de fréquence <span class="math">f</span> = 100 Hz. Les oscillations libres du même circuit ont une pseudo-période <span class="math">T₀</span> = 20 ms. À quel rythme le circuit oscille-t-il ?</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step"><strong>Données.</strong> <span class="math">f</span> = 100 Hz (imposée) ; <span class="math">T₀</span> = 20 ms = 2,0·10⁻² s (propre au circuit).</li>
+          <li class="lecture-step"><strong>Règle.</strong> En régime forcé, le résonateur oscille à la fréquence de l'excitateur : ici 100 Hz.</li>
+          <li class="lecture-step"><strong>Conversion.</strong> La période correspondante vaut T = 1/f = 1/100 = 1,0·10⁻² s = 10 ms.</li>
+          <li class="lecture-step"><strong>Conclusion.</strong> Le circuit oscille à 100 Hz (T = 10 ms), deux fois plus vite que son rythme propre (T₀ = 20 ms) : c'est le GBF qui commande.</li>
+        </ol>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <p class="lecture-callout-label">⚠️ Piège d'examen</p>
+        <p class="lecture-text">Ne confonds pas la fréquence imposée <span class="math">f</span> (celle du GBF) et la fréquence propre <span class="math">f₀</span> (celle des oscillations libres) : cette confusion coûte des points chaque année. En régime forcé, c'est <span class="math">f</span> qui règle la période des oscillations.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s2 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s2">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">02</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2</span>
+        <h2 class="lecture-section-title">L'impédance Z : le frein total du circuit</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">En régime sinusoïdal, les trois composants freinent le courant, mais chacun à sa façon et surtout à sa fréquence. Pour mesurer ce freinage global, on remplace la simple résistance par une grandeur plus riche : l'impédance. C'est elle qui décidera de la hauteur du pic de résonance.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <p class="lecture-callout-label">📌 Définition — impédance</p>
+        <p class="lecture-text">L'impédance <span class="math">Z</span> du circuit est le rapport de la tension efficace <span class="math">U</span> aux bornes du circuit sur l'intensité efficace <span class="math">I</span> qui le traverse : <span class="math">Z = U/I</span>, en ohm (Ω). Elle généralise la résistance au régime sinusoïdal et dépend de la fréquence.</p>
+      </div>
+      <p class="lecture-text">🧠 Trois freins sur une même piste : la résistance freine toujours pareil ; la bobine freine d'autant plus que le rythme s'accélère (elle déteste le changement rapide) ; le condensateur freine d'autant plus que le rythme ralentit (il n'a pas le temps de se charger-décharger). Il existe donc une fréquence où leurs freins se compensent au mieux : c'est le secret de la résonance, révélé en partie 03.</p>
+      <div class="lecture-formula-hero">
+        <p class="lecture-formula-hero-main">La définition de l'impédance</p>
+        <p class="lecture-formula-hero-main"><span class="math">Z = U/I</span></p>
+        <p class="lecture-formula-hero"><span class="math">U</span> en V (efficace), <span class="math">I</span> en A (efficace), <span class="math">Z</span> en Ω : si Z est petite, le courant passe fort.</p>
+      </div>
+      <div class="lecture-formula-box">
+        <p class="lecture-formula-desc">Les deux réactances (en Ω)</p>
+        <p class="lecture-formula-main"><span class="math">bobine : L·ω ; condensateur : 1/(C·ω)</span></p>
+        <p class="lecture-formula-desc">avec <span class="math">ω = 2π·f</span>. La bobine freine d'autant plus que f est grande ; le condensateur, d'autant plus que f est petite.</p>
+      </div>
+      <svg viewBox="0 0 640 320" role="img" aria-label="Courbe de l'impédance en fonction de la fréquence : grande aux basses et aux hautes fréquences, minimale à f0">
+        <rect x="0" y="0" width="640" height="320" style="fill:rgba(15,23,42,0.03)"/>
+        <path d="M70,20 V270 M40,270 H620" style="stroke:var(--text, rgba(15,23,42,0.45));fill:none" stroke-width="1.5"/>
+        <path d="M90,40 C150,200 220,250 320,252 C420,250 500,180 600,60" style="stroke:var(--accent-bright);fill:none" stroke-width="3"/>
+        <path d="M320,60 V270" style="stroke:var(--text, rgba(15,23,42,0.25));fill:none" stroke-width="1.5" stroke-dasharray="5 5"/>
+        <path d="M70,252 H320" style="stroke:var(--text, rgba(15,23,42,0.25));fill:none" stroke-width="1.5" stroke-dasharray="5 5"/>
+        <circle cx="320" cy="252" r="5" style="fill:rgba(239,68,68,0.9)"/>
+        <text x="320" y="294" font-size="14" text-anchor="middle" style="fill:var(--accent-bright)">f₀</text>
+        <text x="195" y="242" font-size="12" style="fill:var(--text, rgba(15,23,42,0.85))">Z = R</text>
+        <text x="26" y="24" font-size="12" style="fill:var(--text, rgba(15,23,42,0.55))">Z (Ω)</text>
+        <text x="584" y="294" font-size="12" style="fill:var(--text, rgba(15,23,42,0.55))">f (Hz)</text>
+        <text x="120" y="70" font-size="13" style="fill:var(--accent-bright)">Z(f)</text>
+        <text x="452" y="120" font-size="12" text-anchor="middle" style="fill:var(--text, rgba(15,23,42,0.55))">Z minimale à la résonance</text>
+      </svg>
+      <div class="lecture-example-content">
+        <p class="lecture-example-label">✍️ Exemple travaillé — deux freins inégaux</p>
+        <p class="lecture-text">Pour <span class="math">L</span> = 0,10 H et <span class="math">C</span> = 1,0·10⁻⁵ F, compare les deux réactances à la fréquence <span class="math">f</span> = 50 Hz.</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step"><strong>Pulsation.</strong> ω = 2π·f = 2π × 50 = 314 rad·s⁻¹.</li>
+          <li class="lecture-step"><strong>Bobine.</strong> L·ω = 0,10 × 314 = 31,4 Ω ≈ 31 Ω.</li>
+          <li class="lecture-step"><strong>Condensateur.</strong> 1/(C·ω) = 1/(1,0·10⁻⁵ × 314) = 1/(3,14·10⁻³) = 318 Ω.</li>
+          <li class="lecture-step"><strong>Vérification.</strong> 3,14·10⁻³ × 318 = 0,998 ≈ 1 ✓.</li>
+          <li class="lecture-step"><strong>Conclusion.</strong> À 50 Hz, c'est le condensateur qui freine (318 Ω contre 31 Ω). Les deux réactances s'égaliseront à f₀ = 1/(2π·√(L·C)) ≈ 160 Hz.</li>
+        </ol>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <p class="lecture-callout-label">⚠️ Piège d'examen</p>
+        <p class="lecture-text">Ne déclare jamais que Z = R + L·ω + 1/(C·ω) : les décalages temporels de la bobine et du condensateur se compensent en partie, et c'est justement pourquoi Z passe par un minimum à la résonance au lieu de croître sans cesse.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s3 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s3">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">03</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 3</span>
+        <h2 class="lecture-section-title">Effet Joule : l'énergie totale s'érode</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">En oscillations libres, aucune énergie n'entre dans le circuit, mais il s'en échappe : la résistance convertit une partie de l'énergie électrique en chaleur, c'est la dissipation par effet Joule. Conséquence : l'énergie totale, somme de celle du condensateur et de celle de la bobine, décroît inlassablement. C'est la raison physique de l'enveloppe exponentielle vue en partie 01.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <p class="lecture-callout-label">📌 Définition — dissipation par effet Joule</p>
+        <p class="lecture-text">La dissipation par effet Joule est la transformation irréversible d'énergie électrique en chaleur dans la résistance. Dans un circuit RLC série sans générateur, c'est elle qui fait décroître l'énergie totale <span class="math">E = ½·L·i² + ½·C·u²</span> : la résistance est la seule à consommer de l'énergie.</p>
+      </div>
+      <p class="lecture-text">🧠 Vois l'énergie comme l'eau d'un bassin : le condensateur et la bobine se renvoient l'eau entre eux (elle reste dans le circuit), mais la résistance est une fuite au fond (l'eau part en chaleur). Le niveau global — l'énergie totale — descend à chaque tour, même si les vagues continuent un moment.</p>
+      <div class="lecture-formula-hero">
+        <p class="lecture-formula-hero-main">L'énergie totale du circuit</p>
+        <p class="lecture-formula-hero-main"><span class="math">E = ½·L·i² + ½·C·u²</span></p>
+        <p class="lecture-formula-hero">En joules (J). Sans générateur, E ne peut que décroître : la résistance convertit le surplus en chaleur.</p>
+      </div>
+      <div class="lecture-formula-hero">
+        <p class="lecture-formula-hero-main">La puissance perdue par effet Joule</p>
+        <p class="lecture-formula-hero-main"><span class="math">P = R·i²</span></p>
+        <p class="lecture-formula-hero"><span class="math">P</span> en watts (W), <span class="math">R</span> en Ω, <span class="math">i</span> en A : double le courant et tu quadruples la facture.</p>
+      </div>
+      <div class="lecture-formula-box">
+        <p class="lecture-formula-desc">Énergie électrique (condensateur)</p>
+        <p class="lecture-formula-main"><span class="math">Eₑ = ½·C·u²</span></p>
+        <p class="lecture-formula-desc"><span class="math">C</span> en F, <span class="math">u</span> en V, <span class="math">Eₑ</span> en J.</p>
+      </div>
+      <div class="lecture-formula-box">
+        <p class="lecture-formula-desc">Énergie magnétique (bobine)</p>
+        <p class="lecture-formula-main"><span class="math">Eₘ = ½·L·i²</span></p>
+        <p class="lecture-formula-desc"><span class="math">L</span> en H, <span class="math">i</span> en A, <span class="math">Eₘ</span> en J.</p>
+      </div>
+      <svg viewBox="0 0 640 340" role="img" aria-label="Énergies en oscillations libres : l'énergie du condensateur et celle de la bobine s'échangent pendant que l'énergie totale décroît">
+        <rect x="0" y="0" width="640" height="340" style="fill:rgba(15,23,42,0.03)"/>
+        <path d="M70,20 V300 M40,300 H620" style="stroke:var(--text, rgba(15,23,42,0.45));fill:none" stroke-width="1.5"/>
+        <path d="M80,80 C150,95 250,140 320,170 C390,198 500,225 560,235" style="stroke:rgba(239,68,68,0.9);fill:none" stroke-width="3"/>
+        <path d="M80,80 C100,80 120,300 140,300 C160,300 180,120 200,120 C220,120 240,300 260,300 C280,300 300,170 320,170 C340,170 360,300 380,300 C400,300 420,210 440,210 C460,210 480,300 500,300 C520,300 540,235 560,235" style="stroke:var(--accent-bright);fill:none" stroke-width="2.5"/>
+        <path d="M80,300 C104,300 124,92 140,92 C156,92 182,300 200,300 C218,300 244,145 260,145 C276,145 302,300 320,300 C338,300 364,186 380,186 C396,186 422,300 440,300 C458,300 484,222 500,222 C516,222 542,300 560,300" style="stroke:rgba(16,185,129,0.9);fill:none" stroke-width="2.5"/>
+        <path d="M420,40 H460" style="stroke:rgba(239,68,68,0.9);fill:none" stroke-width="3"/>
+        <text x="468" y="45" font-size="12" style="fill:var(--text, rgba(15,23,42,0.85))">E totale</text>
+        <path d="M420,64 H460" style="stroke:var(--accent-bright);fill:none" stroke-width="2.5"/>
+        <text x="468" y="69" font-size="12" style="fill:var(--text, rgba(15,23,42,0.85))">Eₑ (condensateur)</text>
+        <path d="M420,88 H460" style="stroke:rgba(16,185,129,0.9);fill:none" stroke-width="2.5"/>
+        <text x="468" y="93" font-size="12" style="fill:var(--text, rgba(15,23,42,0.85))">Eₘ (bobine)</text>
+        <text x="300" y="330" font-size="12" text-anchor="middle" style="fill:var(--text, rgba(15,23,42,0.55))">les deux énergies s'échangent, mais leur somme glisse vers zéro : c'est l'effet Joule</text>
+        <text x="26" y="24" font-size="12" style="fill:var(--text, rgba(15,23,42,0.55))">E (J)</text>
+        <text x="600" y="322" font-size="12" style="fill:var(--text, rgba(15,23,42,0.55))">t (ms)</text>
+      </svg>
+      <div class="lecture-example-content">
+        <p class="lecture-example-label">✍️ Exemple travaillé — suivre la décroissance</p>
+        <p class="lecture-text">Un circuit RLC série comprend <span class="math">C</span> = 2,0·10⁻⁵ F et <span class="math">L</span> = 0,10 H. À l'instant t₁ : u₁ = 6,0 V et i₁ = 40 mA. À l'instant t₂ (un peu plus tard) : u₂ = 4,0 V et i₂ = 30 mA. Montrer que l'énergie totale a diminué.</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step"><strong>Conversions.</strong> i₁ = 40 mA = 4,0·10⁻² A ; i₂ = 30 mA = 3,0·10⁻² A (indispensable avant d'élever au carré).</li>
+          <li class="lecture-step"><strong>À t₁.</strong> Eₑ = ½·C·u₁² = ½ × 2,0·10⁻⁵ × (6,0)² = 3,6·10⁻⁴ J ; Eₘ = ½·L·i₁² = ½ × 0,10 × (4,0·10⁻²)² = 8,0·10⁻⁵ J.</li>
+          <li class="lecture-step"><strong>Total à t₁.</strong> E₁ = 3,6·10⁻⁴ + 0,80·10⁻⁴ = 4,4·10⁻⁴ J.</li>
+          <li class="lecture-step"><strong>À t₂.</strong> Eₑ = ½ × 2,0·10⁻⁵ × (4,0)² = 1,6·10⁻⁴ J ; Eₘ = ½ × 0,10 × (3,0·10⁻²)² = 4,5·10⁻⁵ J ; E₂ = 1,6·10⁻⁴ + 0,45·10⁻⁴ = 2,05·10⁻⁴ J.</li>
+          <li class="lecture-step"><strong>Différence.</strong> E₁ − E₂ = 4,4·10⁻⁴ − 2,05·10⁻⁴ = 2,35·10⁻⁴ J ≈ 2,4·10⁻⁴ J.</li>
+          <li class="lecture-step"><strong>Conclusion.</strong> L'énergie totale a bien diminué : les 2,4·10⁻⁴ J manquants ont été dissipés par effet Joule dans la résistance.</li>
+        </ol>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <p class="lecture-callout-label">⚠️ Piège d'examen</p>
+        <p class="lecture-text">Si ton calcul montre que E augmente alors qu'il n'y a aucun générateur, ton calcul est faux : repasse les unités. Et souviens-toi : i doit être en A et u en V AVANT d'élever au carré.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s4 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s4">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">04</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 4</span>
+        <h2 class="lecture-section-title">Les trois régimes : pseudo-périodique, critique, apériodique</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Selon la valeur de la résistance, le même circuit L·C adopte trois comportements radicalement différents : il oscille en s'éteignant, il revient au plus vite sans osciller, ou il revient lentement sans osciller. Classer un circuit dans son régime est un grand classique des sujets de Bac — et c'est très rapide avec la bonne frontière.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <p class="lecture-callout-label">📌 Définition — régime critique</p>
+        <p class="lecture-text">Le régime critique est l'amortissement tel que le système revient à l'équilibre le plus vite possible sans osciller, obtenu pour <span class="math">R = 2·√(L/C)</span>. En deçà : régime pseudo-périodique (le circuit oscille) ; au-delà : régime apériodique (retour lent, sans oscillation).</p>
+      </div>
+      <p class="lecture-text">🧠 Marche dans trois fluides : dans l'eau, poussé, tu oscillerais ; dans la boue, tu reviens à ta place sans osciller, et vite ; dans le miel, tu reviens aussi, mais lentement. Eau = pseudo-périodique, boue = critique, miel = apériodique. La viscosité du fluide, c'est <span class="math">R</span>.</p>
+      <div class="lecture-formula-hero">
+        <p class="lecture-formula-hero-main">La frontière entre les régimes</p>
+        <p class="lecture-formula-hero-main"><span class="math">R = 2·√(L/C)</span></p>
+        <p class="lecture-formula-hero">En deçà : pseudo-périodique. À cette valeur exacte : critique. Au-delà : apériodique.</p>
+      </div>
+      <div class="lecture-formula-box">
+        <p class="lecture-formula-desc">Classer un circuit en 10 secondes</p>
+        <p class="lecture-formula-main"><span class="math">R &lt; 2·√(L/C) → oscille ; R = 2·√(L/C) → critique ; R &gt; 2·√(L/C) → rampe</span></p>
+        <p class="lecture-formula-desc">Compare toujours R à la frontière, jamais à une autre valeur : c'est LE réflexe attendu par le correcteur.</p>
+      </div>
+      <svg viewBox="0 0 640 400" role="img" aria-label="Trois courbes superposées : régime pseudo-périodique qui oscille, régime critique rapide sans oscillation, régime apériodique lent">
+        <rect x="0" y="0" width="640" height="400" style="fill:rgba(15,23,42,0.03)"/>
+        <path d="M40,200 H620 M70,20 V360" style="stroke:var(--text, rgba(15,23,42,0.45));fill:none" stroke-width="1.5"/>
+        <path d="M90,60 C110,60 120,340 140,340 C160,340 170,110 190,110 C210,110 220,290 240,290 C260,290 270,145 290,145 C310,145 320,262 340,262 C360,262 370,168 390,168 C410,168 420,244 440,244" style="stroke:var(--accent-bright);fill:none" stroke-width="3"/>
+        <path d="M90,60 C130,60 160,150 210,182 C250,196 320,199 440,200" style="stroke:rgba(16,185,129,0.9);fill:none" stroke-width="2.5"/>
+        <path d="M90,60 C220,80 400,150 600,196" style="stroke:rgba(245,158,11,0.9);fill:none" stroke-width="2.5" stroke-dasharray="8 5"/>
+        <path d="M425,58 H458" style="stroke:var(--accent-bright);fill:none" stroke-width="3"/>
+        <text x="466" y="63" font-size="11" style="fill:var(--text, rgba(15,23,42,0.85))">pseudo-périodique</text>
+        <path d="M425,78 H458" style="stroke:rgba(16,185,129,0.9);fill:none" stroke-width="2.5"/>
+        <text x="466" y="83" font-size="11" style="fill:var(--text, rgba(15,23,42,0.85))">critique</text>
+        <path d="M425,98 H458" style="stroke:rgba(245,158,11,0.9);fill:none" stroke-width="2.5" stroke-dasharray="8 5"/>
+        <text x="466" y="103" font-size="11" style="fill:var(--text, rgba(15,23,42,0.85))">apériodique</text>
+        <text x="26" y="24" font-size="12" style="fill:var(--text, rgba(15,23,42,0.55))">u (V)</text>
+        <text x="600" y="222" font-size="12" style="fill:var(--text, rgba(15,23,42,0.55))">t (ms)</text>
+        <text x="240" y="386" font-size="12" text-anchor="middle" style="fill:var(--text, rgba(15,23,42,0.55))">même bobine et même condensateur : seule la résistance R change</text>
+      </svg>
+      <div class="lecture-example-content">
+        <p class="lecture-example-label">✍️ Exemple travaillé — classer trois circuits</p>
+        <p class="lecture-text">Un circuit comprend <span class="math">L</span> = 0,10 H et <span class="math">C</span> = 1,0·10⁻³ F. On teste trois valeurs de <span class="math">R</span> : 8,0 Ω, 20 Ω et 50 Ω. Classe les régimes observés.</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step"><strong>Frontière.</strong> 2·√(L/C) = 2·√(0,10/1,0·10⁻³) = 2·√100 = 2 × 10 = 20 Ω.</li>
+          <li class="lecture-step"><strong>Vérification.</strong> L/C = 0,10/1,0·10⁻³ = 100 ✓ et √100 = 10 ✓.</li>
+          <li class="lecture-step"><strong>R = 8,0 Ω.</strong> 8,0 &lt; 20 : amortissement faible → régime pseudo-périodique (il oscille).</li>
+          <li class="lecture-step"><strong>R = 20 Ω.</strong> R = 2·√(L/C) exactement → régime critique (retour le plus rapide sans osciller).</li>
+          <li class="lecture-step"><strong>R = 50 Ω.</strong> 50 &gt; 20 : amortissement fort → régime apériodique (retour lent).</li>
+        </ol>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <p class="lecture-callout-label">⚠️ Piège d'examen</p>
+        <p class="lecture-text">« Critique » ne veut pas dire « le plus amorti » : c'est le retour à l'équilibre LE PLUS RAPIDE sans oscillation. En régime apériodique, trop de résistance ralentit au contraire le retour — le miel est plus lent que la boue.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s5 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s5">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">05</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 5</span>
+        <h2 class="lecture-section-title">Entretenir les oscillations — et s'entraîner</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Si l'effet Joule éteint les oscillations, on peut aussi les raviver : il suffit de restituer au circuit, à chaque période, exactement l'énergie qu'il perd. C'est le principe de l'oscillateur entretenu, le cœur de tous les émetteurs radio et de tous les horloges électroniques.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <p class="lecture-callout-label">📌 Définition — oscillateur entretenu</p>
+        <p class="lecture-text">Un oscillateur entretenu est un oscillateur auquel un dispositif extérieur restitue, à chaque période, l'énergie dissipée par les frottements ou par effet Joule : l'amplitude des oscillations reste alors constante au lieu de décroître.</p>
+      </div>
+      <p class="lecture-text">🧠 Sur la balançoire, le pousseur compense exactement ce que les frottements volent : chaque poussée redonne l'énergie perdue depuis la précédente. Trop peu : ça s'éteint. Trop, ou au mauvais moment : ça désorganise le mouvement. Juste assez, au bon rythme : l'amplitude reste constante.</p>
+      <div class="lecture-formula-hero">
+        <p class="lecture-formula-hero-main">La condition d'entretien</p>
+        <p class="lecture-formula-hero-main"><span class="math">E apportée = R·I²·T</span></p>
+        <p class="lecture-formula-hero">À chaque période <span class="math">T</span> (s), le dispositif restitue l'énergie (J) que l'effet Joule a prélevée ; <span class="math">I</span> est l'intensité efficace (A).</p>
+      </div>
+      <div class="lecture-formula-box">
+        <p class="lecture-formula-desc">L'oscillateur de l'émetteur radio</p>
+        <p class="lecture-formula-main"><span class="math">f d'émission = f₀ = 1/(2π·√(L·C))</span></p>
+        <p class="lecture-formula-desc">Un amplificateur entretient le circuit LC : l'antenne rayonne alors une onde sinusoïdale stable — la porteuse de la station.</p>
+      </div>
+      <svg viewBox="0 0 640 340" role="img" aria-label="Oscillateur entretenu : un dispositif restitue à chaque période l'énergie dissipée par la résistance">
+        <rect x="0" y="0" width="640" height="340" style="fill:rgba(15,23,42,0.03)"/>
+        <path d="M120,60 H520 V240 H330 M300,240 H120 V60" style="stroke:var(--accent-bright);fill:none" stroke-width="2.5"/>
+        <path d="M180,60 A15,15 0 0 1 210,60 A15,15 0 0 1 240,60 A15,15 0 0 1 270,60" style="stroke:var(--accent-bright);fill:none" stroke-width="2.5"/>
+        <text x="225" y="34" font-size="14" text-anchor="middle" style="fill:var(--text, rgba(15,23,42,0.85))">L</text>
+        <polyline points="380,60 390,44 405,76 420,44 435,76 445,60" style="stroke:var(--accent-bright);fill:none" stroke-width="2.5"/>
+        <text x="413" y="34" font-size="14" text-anchor="middle" style="fill:var(--text, rgba(15,23,42,0.85))">R</text>
+        <path d="M300,220 V260 M330,220 V260" style="stroke:var(--accent-bright);fill:none" stroke-width="2.5"/>
+        <text x="315" y="210" font-size="14" text-anchor="middle" style="fill:var(--text, rgba(15,23,42,0.85))">C</text>
+        <text x="205" y="140" font-size="11" style="fill:var(--text, rgba(15,23,42,0.55))">à chaque période, le dispositif</text>
+        <text x="205" y="158" font-size="11" style="fill:var(--text, rgba(15,23,42,0.55))">restitue l'énergie dissipée</text>
+        <rect x="220" y="290" width="200" height="44" rx="8" style="fill:rgba(245,158,11,0.12);stroke:rgba(245,158,11,0.9)" stroke-width="2"/>
+        <text x="320" y="318" font-size="13" text-anchor="middle" style="fill:var(--text, rgba(15,23,42,0.85))">dispositif d'entretien</text>
+        <path d="M250,288 V254 M390,288 V254" style="stroke:rgba(245,158,11,0.9);fill:none" stroke-width="2" stroke-dasharray="5 4"/>
+        <polygon points="250,246 244,258 256,258" style="fill:rgba(245,158,11,0.9)"/>
+        <polygon points="390,246 384,258 396,258" style="fill:rgba(245,158,11,0.9)"/>
+      </svg>
+      <div class="lecture-example-content">
+        <p class="lecture-example-label">✍️ Exemple travaillé — la facture à régler chaque période</p>
+        <p class="lecture-text">Dans un émetteur, le circuit LC entretenu a <span class="math">R</span> = 10 Ω, une intensité efficace <span class="math">I</span> = 0,10 A et une période <span class="math">T</span> = 2,0 ms. Quelle énergie le dispositif d'entretien doit-il restituer à chaque période ?</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step"><strong>Données.</strong> <span class="math">R</span> = 10 Ω ; <span class="math">I</span> = 0,10 A ; <span class="math">T</span> = 2,0 ms = 2,0·10⁻³ s.</li>
+          <li class="lecture-step"><strong>Puissance dissipée.</strong> P = R·I² = 10 × (0,10)² = 10 × 0,010 = 0,10 W.</li>
+          <li class="lecture-step"><strong>Énergie par période.</strong> E = P·T = 0,10 × 2,0·10⁻³ = 2,0·10⁻⁴ J.</li>
+          <li class="lecture-step"><strong>Conclusion.</strong> Le dispositif d'entretien doit restituer 2,0·10⁻⁴ J à chaque période : l'amplitude reste alors constante.</li>
+        </ol>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <p class="lecture-callout-label">⚠️ Piège d'examen</p>
+        <p class="lecture-text">L'entretien doit être synchronisé avec les oscillations (bonne fréquence, bon moment) : une injection désynchronisée casse le rythme au lieu de l'entretenir. C'est pourquoi l'oscillateur entretenu se règle toujours sur <span class="math">f₀</span>.</p>
+      </div>
+      <div class="lecture-text">
+        <p class="lecture-exercise-label">🏋️ Exercice 1 — La facture de la résistance</p>
+        <p class="lecture-text">Dans un circuit RLC série en oscillations, la résistance vaut <span class="math">R</span> = 25 Ω et l'intensité efficace <span class="math">I</span> = 0,40 A. 1) Calculer la puissance dissipée par effet Joule. 2) Quelle énergie le circuit perd-il en 10 s ? 3) Que devient cette énergie ?</p>
+        <details>
+          <summary>Voir la solution détaillée</summary>
+          <ol class="lecture-steps">
+            <li class="lecture-step"><strong>Données.</strong> <span class="math">R</span> = 25 Ω ; <span class="math">I</span> = 0,40 A ; Δt = 10 s.</li>
+            <li class="lecture-step"><strong>Puissance.</strong> P = R·I² = 25 × (0,40)² = 25 × 0,16 = 4,0 W.</li>
+            <li class="lecture-step"><strong>Vérification.</strong> (0,40)² = 0,16 ✓ et 25 × 0,16 = 4,0 ✓.</li>
+            <li class="lecture-step"><strong>Énergie.</strong> E = P·Δt = 4,0 × 10 = 40 J.</li>
+            <li class="lecture-step"><strong>Bilan.</strong> Cette énergie part en chaleur : sans compensation, les oscillations s'éteignent progressivement.</li>
+          </ol>
+          <p class="lecture-text"><strong>Réponse :</strong> P = 4,0 W ; E = 40 J dissipés en chaleur par effet Joule.</p>
+        </details>
+      </div>
+      <div class="lecture-text">
+        <p class="lecture-exercise-label">🏋️ Exercice 2 — Quel régime pour ce circuit ?</p>
+        <p class="lecture-text">Un circuit RLC série comprend <span class="math">L</span> = 2,0 H, <span class="math">C</span> = 2,0·10⁻³ F et <span class="math">R</span> = 100 Ω. 1) Calculer <span class="math">T₀</span>. 2) Déterminer la valeur de <span class="math">R</span> qui marque la frontière critique. 3) Conclure sur le régime.</p>
+        <details>
+          <summary>Voir la solution détaillée</summary>
+          <ol class="lecture-steps">
+            <li class="lecture-step"><strong>Produit.</strong> L·C = 2,0 × 2,0·10⁻³ = 4,0·10⁻³ s².</li>
+            <li class="lecture-step"><strong>Racine.</strong> √(4,0·10⁻³) = 6,3·10⁻² s. Vérification : (6,3·10⁻²)² = 3,97·10⁻³ ≈ 4,0·10⁻³ ✓.</li>
+            <li class="lecture-step"><strong>T₀.</strong> T₀ = 2π × 6,3·10⁻² = 0,397 s ≈ 0,40 s.</li>
+            <li class="lecture-step"><strong>Frontière.</strong> L/C = 2,0/2,0·10⁻³ = 1,0·10³ ; √(1,0·10³) = 31,6 ; R frontière = 2 × 31,6 = 63 Ω.</li>
+            <li class="lecture-step"><strong>Comparaison.</strong> R = 100 Ω &gt; 63 Ω : l'amortissement est trop fort.</li>
+            <li class="lecture-step"><strong>Conclusion.</strong> Régime apériodique : le circuit revient à l'équilibre lentement, sans osciller.</li>
+          </ol>
+          <p class="lecture-text"><strong>Réponse :</strong> T₀ ≈ 0,40 s ; frontière à R = 63 Ω ; avec R = 100 Ω, le régime est apériodique.</p>
+        </details>
+      </div>
+      <div class="lecture-table">
+        <table>
+          <thead>
+            <tr><th>Régime</th><th>Condition sur R</th><th>Allure de u(t)</th><th>À retenir</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Pseudo-périodique</td><td><span class="math">R &lt; 2·√(L/C)</span></td><td>oscillations amorties sous une enveloppe</td><td>il oscille, puis s'éteint</td></tr>
+            <tr><td>Critique</td><td><span class="math">R = 2·√(L/C)</span></td><td>retour rapide, sans oscillation</td><td>le « juste amorti »</td></tr>
+            <tr><td>Apériodique</td><td><span class="math">R &gt; 2·√(L/C)</span></td><td>retour lent, sans oscillation</td><td>trop de frein tue le rythme</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+  <!-- ===== QCM ===== -->
+  <div class="lecture-quiz">
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">QCM 1 — En régime forcé, la fréquence des oscillations du résonateur est imposée par :</p>
+      <div class="lecture-quiz-options"><span>A) les valeurs de L et C</span><span>B) l'excitateur (le GBF)</span><span>C) la résistance R</span><span>D) l'énergie initiale</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">B — En régime forcé, le résonateur oscille à la fréquence f de l'excitateur ; L et C n'influencent que l'amplitude de la réponse.</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">QCM 2 — Dans un circuit RLC série sans générateur, l'énergie totale :</p>
+      <div class="lecture-quiz-options"><span>A) reste constante</span><span>B) décroît à cause de l'effet Joule</span><span>C) croît</span><span>D) s'annule dès la première oscillation</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">B — La résistance dissipe l'énergie en chaleur (P = R·i²) : E = ½·L·i² + ½·C·u² décroît jusqu'à zéro.</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">QCM 3 — Pour <span class="math">L</span> = 0,10 H et <span class="math">C</span> = 1,0·10⁻³ F, la résistance critique vaut environ :</p>
+      <div class="lecture-quiz-options"><span>A) 2,0 Ω</span><span>B) 20 Ω</span><span>C) 200 Ω</span><span>D) 0,020 Ω</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">B — 2·√(L/C) = 2·√(0,10/1,0·10⁻³) = 2·√100 = 2 × 10 = 20 Ω.</div></details>
+    </div>
+  </div>
+  <!-- ===== RÉCAP ===== -->
+  <div class="lecture-recap">
+    <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
+    <ul class="lecture-recap-list">
+      <li><strong>Oscillations forcées</strong> — l'excitateur (GBF) impose sa fréquence f au résonateur ; l'impédance Z = U/I mesure le freinage global et dépend de f.</li>
+      <li><strong>Énergie</strong> — E = ½·L·i² + ½·C·u² décroît toujours sans générateur : la résistance dissipe par effet Joule (P = R·i²).</li>
+      <li><strong>Trois régimes</strong> — pseudo-périodique (R petit), critique (R = 2·√(L/C), retour le plus rapide), apériodique (R grand) ; l'oscillateur entretenu compense les pertes à chaque période.</li>
+    </ul>
+  </div>
+  <!-- ===== FIN ===== -->
+  <div class="lecture-end">
+    <div class="lecture-end-icon">🎯</div>
+    <div class="lecture-end-text">Partie 02 terminée !</div>
+    <div class="lecture-end-sub">Tu as le freinage et l'énergie sous contrôle. Partie 03 : balayons la fréquence du GBF et traquons le pic de résonance, là où le courant explose.</div>
+    <div class="lecture-end-divider"></div>
+  </div>
+</div>

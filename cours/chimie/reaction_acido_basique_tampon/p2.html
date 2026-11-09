@@ -1,0 +1,449 @@
+<!-- PARTIE 02 — Pouvoir tampon et pH d'une solution tampon (Réaction acido-basique et solution tampon) -->
+<div class="lecture-container">
+
+  <!-- ===== HERO ===== -->
+  <header class="lecture-hero">
+    <div class="lecture-hero-badge">
+      <span class="lecture-hero-icon">📘</span>
+      <span class="lecture-hero-label">Terminale C&amp;D · Réaction acido-basique et solution tampon · Partie 02</span>
+    </div>
+    <h1 class="lecture-hero-title">
+      Pouvoir tampon et pH d'une <em>solution tampon</em>
+    </h1>
+    <p class="lecture-hero-intro">
+      La partie 01 t'a montré la zone plate de la courbe de titrage, là où <span class="math">pH = pKa</span>. Cette partie en tire l'arme : la <strong>solution tampon</strong>, ce mélange d'acide faible et de base conjuguée qui s'oppose aux variations de pH. Au programme : sa <strong>définition</strong> et sa composition, la formule de <strong>Henderson-Hasselbalch</strong> pour calculer son pH, son <strong>pouvoir tampon</strong>, sa <strong>préparation par demi-neutralisation</strong> — et le plus beau des tampons, celui qui maintient ton <strong>sang à pH 7,4</strong>.
+    </p>
+    <div class="lecture-hero-meta">
+      <span class="lecture-hero-meta-item">⏱ 25 min</span>
+      <span class="lecture-hero-meta-item">⚗️ 3 notions</span>
+      <span class="lecture-hero-meta-item">📚 6 sections</span>
+      <span class="lecture-hero-meta-item">🎓 Terminale C&amp;D</span>
+    </div>
+  </header>
+  <!-- ===== SOMMAIRE ===== -->
+  <nav class="lecture-toc">
+    <div class="lecture-toc-header">
+      <span>Dans cette partie</span>
+      <span class="lecture-toc-count">3 notions · 6 sections</span>
+    </div>
+    <ol class="lecture-toc-list">
+      <li><a href="#s0"><span class="toc-num">00</span><span>Motivation — Fabriquer un pH sur mesure</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>Notion 1 · définition — Solution tampon : définition et composition</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>Notion 2 · Henderson — Le pH d'un tampon : Henderson-Hasselbalch</span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>Notion 3 · pouvoir tampon — Le pouvoir tampon : résister aux ajouts</span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>Notion 4 · préparation — Préparer un tampon par demi-neutralisation</span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>Notion 5 · tampon sanguin — Les tampons du sang : une question de vie</span></a></li>
+    </ol>
+  </nav>
+  <!-- ============================================================ -->
+  <!-- SECTION s0 : MOTIVATION -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s0">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">00</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Motivation</span>
+        <h2 class="lecture-section-title">Fabriquer un pH sur mesure</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">À l'hôpital de Niamey comme partout, une perfusion intraveineuse ne peut pas avoir n'importe quel pH : trop acide ou trop basique, elle brûle la veine et détruit les globules rouges. En laboratoire, les milieux de culture des bactéries exigent un pH fixé à <span class="math">0,1</span> près — sinon les micro-organismes meurent. Et le shampoing « pH neutre » du commerce est en réalité réglé autour de <span class="math">5,5</span> pour respecter la peau : aucun de ces produits n'existe par hasard.</p>
+      <p class="lecture-text">Dans tous ces cas, le chimiste ne « mesure » pas un pH : il le <strong>fabrique</strong>, puis il le <strong>verrouille</strong>. Son outil s'appelle une solution tampon : un mélange savant d'un acide faible et de sa base conjuguée, dont le pH se calcule et résiste aux petits accidents — goutte d'acide, goutte de base, dilution.</p>
+      <p class="lecture-text">La nature a inventé la même astuce bien avant l'industrie : ton sang, ta salive, le liquide intérieur de tes cellules sont des solutions tampon. Comprendre cette partie, c'est comprendre pourquoi tu peux manger un citron sans que ton sang vire à l'orange.</p>
+      <div class="lecture-callout lecture-callout-gold">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Le fil conducteur de la partie</div>
+          <p><strong>Comment fabriquer une solution dont le pH refuse de bouger — et comment calculer ce pH ?</strong> La réponse tient en une formule, <span class="math">pH = pKa + log ([A⁻]/[AH])</span>, et en un geste de laboratoire : s'arrêter à la demi-équivalence du titrage.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s1 : NOTION 1 — DÉFINITION D'UNE SOLUTION TAMPON -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s1">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">01</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1 · définition</span>
+        <h2 class="lecture-section-title">Solution tampon : définition et composition</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Après le titrage de la partie 01, tu sais qu'un couple acide faible / base conjuguée peut coexister en solution — c'est ce qui se passe à la demi-équivalence. Rassemblons délibérément les deux partenaires dans le même bécher : le résultat est remarquable.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">📖 Définition officielle — solution tampon</div>
+          <p>Une <strong>solution tampon</strong> est une solution qui <strong>s'oppose aux variations de pH</strong> : son pH varie peu quand on ajoute une <strong>petite quantité d'acide fort ou de base forte</strong>, ou quand on la <strong>dilue</strong>. Elle est constituée du mélange d'un <strong>acide faible <span class="math">AH</span></strong> et de sa <strong>base conjuguée <span class="math">A⁻</span></strong> en <strong>quantités de matière comparables</strong>. Exemple type : acide éthoïque <span class="math">CH₃—COOH</span> + ion éthanoate <span class="math">CH₃—COO⁻</span>.</p>
+        </div>
+      </div>
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-main">La recette d'un tampon</div>
+        <div class="lecture-formula-hero-main">acide faible AH + base conjuguée A⁻ · quantités comparables</div>
+        <div class="lecture-formula-hero-desc">Les deux partenaires doivent venir du <strong>même couple</strong> <span class="math">AH/A⁻</span> et être présents en quantités du même ordre de grandeur. Si l'un des deux manque, il n'y a plus de défense — donc plus de tampon.</div>
+      </div>
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 540 300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Bécher d'une solution tampon contenant autant de molécules AH que d'ions A, les deux espèces du même couple mélangées en quantités comparables">
+          <text x="270" y="22" style="fill:var(--accent-bright)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle" letter-spacing="2">DANS UN BÉCHER TAMPON : LES DEUX DÉFENSEURS</text>
+          <text x="170" y="55" style="fill:rgba(74,222,128,1)" font-size="11.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">● AH : acide du couple</text>
+          <text x="385" y="55" style="fill:rgba(96,165,250,1)" font-size="11.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">■ A⁻ : base conjuguée</text>
+          <path d="M120,88 L120,240 Q120,248 130,248 L410,248 Q420,248 420,240 L420,88" fill="none" style="stroke:var(--text-muted)" stroke-width="2"/>
+          <rect x="122" y="118" width="296" height="128" rx="4" fill="rgba(96,165,250,0.14)"/>
+          <circle cx="170" cy="150" r="12" fill="rgba(74,222,128,0.18)" style="stroke:rgba(74,222,128,0.9)" stroke-width="1.6"/><text x="170" y="154" style="fill:rgba(74,222,128,1)" font-size="9.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">AH</text><circle cx="290" cy="150" r="12" fill="rgba(74,222,128,0.18)" style="stroke:rgba(74,222,128,0.9)" stroke-width="1.6"/><text x="290" y="154" style="fill:rgba(74,222,128,1)" font-size="9.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">AH</text>
+          <circle cx="390" cy="170" r="12" fill="rgba(74,222,128,0.18)" style="stroke:rgba(74,222,128,0.9)" stroke-width="1.6"/><text x="390" y="174" style="fill:rgba(74,222,128,1)" font-size="9.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">AH</text><circle cx="200" cy="210" r="12" fill="rgba(74,222,128,0.18)" style="stroke:rgba(74,222,128,0.9)" stroke-width="1.6"/><text x="200" y="214" style="fill:rgba(74,222,128,1)" font-size="9.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">AH</text>
+          <circle cx="320" cy="210" r="12" fill="rgba(74,222,128,0.18)" style="stroke:rgba(74,222,128,0.9)" stroke-width="1.6"/><text x="320" y="214" style="fill:rgba(74,222,128,1)" font-size="9.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">AH</text><circle cx="250" cy="170" r="12" fill="rgba(74,222,128,0.18)" style="stroke:rgba(74,222,128,0.9)" stroke-width="1.6"/><text x="250" y="174" style="fill:rgba(74,222,128,1)" font-size="9.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">AH</text>
+          <rect x="218" y="128" width="24" height="24" rx="4" fill="rgba(96,165,250,0.18)" style="stroke:rgba(96,165,250,0.9)" stroke-width="1.6"/><text x="230" y="144" style="fill:rgba(96,165,250,1)" font-size="9.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">A⁻</text><rect x="338" y="128" width="24" height="24" rx="4" fill="rgba(96,165,250,0.18)" style="stroke:rgba(96,165,250,0.9)" stroke-width="1.6"/><text x="350" y="144" style="fill:rgba(96,165,250,1)" font-size="9.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">A⁻</text>
+          <rect x="138" y="178" width="24" height="24" rx="4" fill="rgba(96,165,250,0.18)" style="stroke:rgba(96,165,250,0.9)" stroke-width="1.6"/><text x="150" y="194" style="fill:rgba(96,165,250,1)" font-size="9.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">A⁻</text><rect x="258" y="178" width="24" height="24" rx="4" fill="rgba(96,165,250,0.18)" style="stroke:rgba(96,165,250,0.9)" stroke-width="1.6"/><text x="270" y="194" style="fill:rgba(96,165,250,1)" font-size="9.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">A⁻</text>
+          <rect x="368" y="208" width="24" height="24" rx="4" fill="rgba(96,165,250,0.18)" style="stroke:rgba(96,165,250,0.9)" stroke-width="1.6"/><text x="380" y="224" style="fill:rgba(96,165,250,1)" font-size="9.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">A⁻</text><rect x="218" y="218" width="24" height="24" rx="4" fill="rgba(96,165,250,0.18)" style="stroke:rgba(96,165,250,0.9)" stroke-width="1.6"/><text x="230" y="234" style="fill:rgba(96,165,250,1)" font-size="9.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">A⁻</text>
+          <text x="270" y="282" style="fill:rgba(74,222,128,1)" font-size="12" font-style="italic" font-family="Inter, system-ui, sans-serif" text-anchor="middle">6 AH et 6 A⁻ : quantités comparables → pH stable</text>
+        </svg>
+      </figure>
+      <p class="lecture-text">Pourquoi ça marche ? Parce que le tampon possède une <strong>double équipe de défense</strong> : si tu ajoutes un acide fort, ses ions <span class="math">H₃O⁺</span> sont capturés par la base conjuguée ; si tu ajoutes une base forte, ses ions <span class="math">OH⁻</span> sont neutralisés par l'acide. Les deux équations de défense, parfaitement équilibrées :</p>
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">CH₃—COO⁻ + H₃O⁺ → CH₃—COOH + H₂O · CH₃—COOH + OH⁻ → CH₃—COO⁻ + H₂O</div>
+        <div class="lecture-formula-desc">À gauche, l'ion éthanoate piège l'acide ajouté (charges : <span class="math">−1 + 1 = 0</span>) ; à droite, l'acide éthoïque piège la base ajoutée (charges : <span class="math">−1</span> des deux côtés). Dans les deux cas, le pH ne bouge presque pas.</div>
+      </div>
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">Exemple travaillé — reconnaître un tampon parmi des mélanges</div>
+        <div class="lecture-example-content">
+          <p><strong>Données :</strong> quatre béchers — ① <span class="math">0,10 mol</span> de <span class="math">CH₃—COOH</span> + <span class="math">0,10 mol</span> de <span class="math">CH₃—COONa</span> ; ② <span class="math">0,10 mol</span> de <span class="math">HCl</span> + <span class="math">0,10 mol</span> de <span class="math">NaCl</span> ; ③ <span class="math">0,05 mol</span> de <span class="math">NH₃</span> + <span class="math">0,05 mol</span> de <span class="math">NH₄Cl</span> ; ④ eau pure.</p>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Bécher ① :</strong> acide faible <span class="math">CH₃—COOH</span> et sa base conjuguée <span class="math">CH₃—COO⁻</span> en quantités égales → <strong>tampon</strong> ✔.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Bécher ② :</strong> <span class="math">HCl</span> est un acide <strong>fort</strong> (totalement dissocié) et <span class="math">Cl⁻</span> ne capte pas <span class="math">H₃O⁺</span> → <strong>pas un tampon</strong> ✔.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Bécher ③ :</strong> couple ammoniac / ion ammonium <span class="math">NH₄⁺/NH₃</span>, quantités égales → <strong>tampon</strong> ✔ (c'est un tampon basique).</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Bécher ④ :</strong> l'eau pure passe de <span class="math">pH 7</span> à <span class="math">pH 2</span> dès la première goutte d'acide → <strong>pas un tampon</strong> ✔.</p></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ Piège d'examen n° 1</div>
+          <p>Un mélange <strong>acide fort + sa base conjuguée</strong> (<span class="math">HCl/Cl⁻</span>) n'est <strong>jamais</strong> un tampon : l'acide fort est totalement dissocié, les deux espèces ne coexistent pas en équilibre. De même, <span class="math">NH₄Cl</span> seul n'est pas un tampon — il lui manque son partenaire <span class="math">NH₃</span>. Vérifie toujours les <strong>trois</strong> conditions : acide faible, base conjuguée du même couple, quantités comparables.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s2 : NOTION 2 — HENDERSON-HASSELBALCH -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s2">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">02</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2 · Henderson</span>
+        <h2 class="lecture-section-title">Le pH d'un tampon : Henderson-Hasselbalch</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Le pH d'un tampon ne se devine pas : il se calcule. Tout part de la constante d'acidité du couple <span class="math">AH/A⁻</span>, qu'on retourne comme une gant pour faire apparaître le pH. Deux lignes de calcul, et la formule la plus célèbre du chapitre apparaît.</p>
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">Ka = ([A⁻] × [H₃O⁺]) / [AH] → [H₃O⁺] = Ka × [AH]/[A⁻]</div>
+        <div class="lecture-formula-desc">On isole <span class="math">[H₃O⁺]</span> dans l'expression de <span class="math">Ka</span>, puis on prend le logarithme des deux côtés : <span class="math">−log [H₃O⁺] = −log Ka + log ([A⁻]/[AH])</span>. Or <span class="math">−log [H₃O⁺] = pH</span> et <span class="math">−log Ka = pKa</span>.</div>
+      </div>
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-main">Formule majeure — relation de Henderson-Hasselbalch</div>
+        <div class="lecture-formula-hero-main">pH = pKa + log ([A⁻]/[AH])</div>
+        <div class="lecture-formula-hero-desc">Valable pour tout couple <strong>acide faible / base conjuguée</strong> en solution. Le pH ne dépend que du <strong>rapport</strong> <span class="math">[A⁻]/[AH]</span>, pas des concentrations absolues : doubler les deux concentrations laisse le pH intact.</div>
+      </div>
+      <p class="lecture-text">Lis la formule comme une règle à calcul : si la base conjuguée domine (<span class="math">[A⁻] &gt; [AH]</span>), le log est positif et le pH dépasse <span class="math">pKa</span> ; si l'acide domine, le pH descend sous <span class="math">pKa</span> ; si les deux sont égaux, <span class="math">log 1 = 0</span> et <span class="math">pH = pKa</span>. Chaque fois que le rapport est multiplié par <span class="math">10</span>, le pH gagne exactement <span class="math">1,0</span> unité.</p>
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 540 260" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Droite de Henderson-Hasselbalch : le pH augmente d'une unité chaque fois que le rapport A sur AH est multiplié par dix">
+          <defs><marker id="arP2a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="rgba(224,184,74,0.9)"/></marker></defs>
+          <text x="270" y="22" style="fill:var(--accent-bright)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle" letter-spacing="2">LA DROITE DE HENDERSON-HASSELBALCH</text>
+          <line x1="60" y1="180" x2="500" y2="180" style="stroke:rgba(224,184,74,0.9)" stroke-width="2" marker-end="url(#arP2a)"/>
+          <line x1="60" y1="180" x2="60" y2="45" style="stroke:rgba(224,184,74,0.9)" stroke-width="2"/>
+          <text x="496" y="202" style="fill:var(--text-muted)" font-size="11.5" font-family="Inter, system-ui, sans-serif" text-anchor="end">[A⁻]/[AH] (échelle des rapports)</text>
+          <text x="46" y="42" style="fill:var(--text-muted)" font-size="11.5" font-family="Inter, system-ui, sans-serif" text-anchor="end">pH</text>
+          <line x1="100" y1="150" x2="460" y2="55" style="stroke:rgba(74,222,128,0.95)" stroke-width="2.5"/>
+          <circle cx="120" cy="143" r="5" fill="rgba(96,165,250,0.95)"/><line x1="120" y1="143" x2="120" y2="180" style="stroke:rgba(96,165,250,0.6)" stroke-width="1.4" stroke-dasharray="4 3"/>
+          <text x="120" y="198" style="fill:rgba(96,165,250,1)" font-size="11" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">0,1</text>
+          <text x="132" y="150" style="fill:var(--text-muted)" font-size="10.5" font-family="Inter, system-ui, sans-serif">pH = pKa − 1</text>
+          <circle cx="280" cy="103" r="5" fill="rgba(224,184,74,1)"/><line x1="280" y1="103" x2="280" y2="180" style="stroke:rgba(224,184,74,0.6)" stroke-width="1.4" stroke-dasharray="4 3"/>
+          <text x="280" y="198" style="fill:var(--accent-bright)" font-size="11" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">1</text>
+          <text x="292" y="98" style="fill:var(--accent-bright)" font-size="11.5" font-weight="700" font-family="Inter, system-ui, sans-serif">pH = pKa</text>
+          <circle cx="440" cy="63" r="5" fill="rgba(74,222,128,0.95)"/><line x1="440" y1="63" x2="440" y2="180" style="stroke:rgba(74,222,128,0.6)" stroke-width="1.4" stroke-dasharray="4 3"/>
+          <text x="440" y="198" style="fill:rgba(74,222,128,1)" font-size="11" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">10</text>
+          <text x="428" y="55" style="fill:rgba(74,222,128,1)" font-size="10.5" font-family="Inter, system-ui, sans-serif" text-anchor="end">pH = pKa + 1</text>
+          <text x="270" y="238" style="fill:var(--text-muted)" font-size="11.5" font-style="italic" font-family="Inter, system-ui, sans-serif" text-anchor="middle">rapport × 10 → pH augmente de 1,0 unité</text>
+        </svg>
+      </figure>
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">Exemple travaillé — calculer le pH d'un tampon</div>
+        <div class="lecture-example-content">
+          <p><strong>Données :</strong> un tampon acide éthoïque / ion éthanoate contient <span class="math">[CH₃—COO⁻] = 0,20 mol·L⁻¹</span> et <span class="math">[CH₃—COOH] = 0,10 mol·L⁻¹</span> ; <span class="math">pKa = 4,8</span> et <span class="math">log 2 ≈ 0,30</span>.</p>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Données réunies :</strong> <span class="math">pKa = 4,8</span> ; <span class="math">[A⁻] = 0,20 mol·L⁻¹</span> ; <span class="math">[AH] = 0,10 mol·L⁻¹</span> ✔.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Formule :</strong> <span class="math">pH = pKa + log ([A⁻]/[AH])</span> ✔.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Substitution :</strong> <span class="math">pH = 4,8 + log (0,20/0,10) = 4,8 + log 2</span> ✔.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Résultat :</strong> <span class="math">pH = 4,8 + 0,30 = 5,1</span> ✔.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">5</div><div class="lecture-step-content"><p><strong>Vérification (autre voie) :</strong> le rapport vaut <span class="math">2</span>, donc le pH dépasse <span class="math">pKa</span> de moins d'une unité (<span class="math">log 2 = 0,30 &lt; 1,0</span>) — <span class="math">4,8 &lt; 5,1 &lt; 5,8</span> ✔ cohérent.</p></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ Piège d'examen n° 2</div>
+          <p>Ne <strong>renverse jamais le rapport</strong> : <span class="math">log ([AH]/[A⁻]) = −log ([A⁻]/[AH])</span>, donc l'inversion change le signe de la correction et fait perdre une unité entière de pH. Mémorise : la <strong>base conjuguée</strong> <span class="math">A⁻</span> se place <strong>en haut</strong> (au numérateur), comme elle est « au-dessus » dans l'équation <span class="math">AH ⇌ A⁻ + H⁺</span> quand on lit de gauche à droite.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s3 : NOTION 3 — POUVOIR TAMPON -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s3">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">03</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 3 · pouvoir tampon</span>
+        <h2 class="lecture-section-title">Le pouvoir tampon : résister aux ajouts</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Deux tampons de même pH ne se défendent pas forcément aussi bien : l'un peut absorber des gouttes d'acide à la pelle, l'autre plier après trois gouttes. Cette robustesse porte un nom : le <strong>pouvoir tampon</strong>.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">📖 Définition officielle — pouvoir tampon</div>
+          <p>Le <strong>pouvoir tampon</strong> mesure la capacité d'une solution tampon à <strong>absorber des ajouts d'acide ou de base</strong> sans variation notable de pH. Il est <strong>maximal quand <span class="math">[A⁻] = [AH]</span></strong> (c'est-à-dire quand <span class="math">pH = pKa</span>) et reste efficace tant que <span class="math">pH ≈ pKa ± 1</span>. Plus les concentrations <span class="math">[A⁻]</span> et <span class="math">[AH]</span> sont élevées, plus le pouvoir tampon est grand.</p>
+        </div>
+      </div>
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-main">Formule majeure — la zone de travail d'un tampon</div>
+        <div class="lecture-formula-hero-main">efficacité maximale pour pH ≈ pKa ± 1</div>
+        <div class="lecture-formula-hero-desc">En dehors de cette bande, l'un des deux défenseurs est épuisé : le tampon « déborde » et le pH s'emballe. Pour préparer un tampon de pH voulu, on choisit donc un couple dont le <span class="math">pKa</span> est <strong>proche du pH désiré</strong>.</div>
+      </div>
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 540 300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Graphique comparant l'eau pure, dont le pH s'effondre dès les premiers ajouts d'acide, et la solution tampon, dont le pH reste quasi constant">
+          <defs><marker id="arP2b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="rgba(224,184,74,0.9)"/></marker></defs>
+          <text x="270" y="20" style="fill:var(--accent-bright)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle" letter-spacing="2">EAU PURE OU SOLUTION TAMPON ?</text>
+          <line x1="70" y1="250" x2="500" y2="250" style="stroke:rgba(224,184,74,0.9)" stroke-width="2" marker-end="url(#arP2b)"/>
+          <line x1="70" y1="250" x2="70" y2="40" style="stroke:rgba(224,184,74,0.9)" stroke-width="2"/>
+          <text x="496" y="270" style="fill:var(--text-muted)" font-size="11.5" font-family="Inter, system-ui, sans-serif" text-anchor="end">quantité d'acide fort ajouté →</text>
+          <text x="56" y="38" style="fill:var(--text-muted)" font-size="11.5" font-family="Inter, system-ui, sans-serif" text-anchor="end">pH</text>
+          <path d="M70,120 C110,170 150,230 190,242" fill="none" style="stroke:rgba(239,68,68,0.95)" stroke-width="2.5"/>
+          <path d="M70,110 C200,104 350,100 480,98" fill="none" style="stroke:rgba(74,222,128,0.95)" stroke-width="2.5"/>
+          <text x="196" y="228" style="fill:rgba(239,68,68,1)" font-size="11.5" font-weight="700" font-family="Inter, system-ui, sans-serif">eau pure : pH s'effondre</text>
+          <text x="250" y="92" style="fill:rgba(74,222,128,1)" font-size="11.5" font-weight="700" font-family="Inter, system-ui, sans-serif">solution tampon : pH quasi constant</text>
+          <path d="M480,98 C502,112 512,160 516,210" fill="none" style="stroke:rgba(239,68,68,0.8)" stroke-width="2" stroke-dasharray="5 4"/>
+          <text x="300" y="170" style="fill:rgba(239,68,68,0.95)" font-size="11" font-style="italic" font-family="Inter, system-ui, sans-serif">trop d'acide : le tampon finit par déborder</text>
+        </svg>
+      </figure>
+      <p class="lecture-text">Pourquoi le maximum a-t-il lieu à <span class="math">[A⁻] = [AH]</span> ? Parce que les deux défenseurs y sont en nombre <strong>égal</strong> : ni l'acide ajouté, ni la base ajoutée ne risquent de tomber à court de partenaire. Dès que l'un des deux devient minoritaire (pH trop loin de <span class="math">pKa</span>), la défense s'affaiblit d'un côté. Et retiens le paradoxe de la dilution : diluer un tampon ne change pas son pH (le rapport ne bouge pas), mais <strong>diminue son pouvoir tampon</strong> (il y a moins de défenseurs par litre).</p>
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">Exemple travaillé — le pH d'un tampon résiste à la dilution</div>
+        <div class="lecture-example-content">
+          <p><strong>Données :</strong> tampon avec <span class="math">[A⁻] = [AH] = 0,10 mol·L⁻¹</span> et <span class="math">pKa = 4,8</span>. On prélève <span class="math">10,0 mL</span> de ce tampon et on complète à <span class="math">100,0 mL</span> (dilution <span class="math">10</span> fois).</p>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Avant dilution :</strong> <span class="math">pH = 4,8 + log (0,10/0,10) = 4,8 + log 1 = 4,8</span> ✔.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Après dilution ×10 :</strong> chaque concentration est divisée par <span class="math">10</span> : <span class="math">[A⁻] = [AH] = 0,010 mol·L⁻¹</span> ✔.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Henderson après dilution :</strong> <span class="math">pH = 4,8 + log (0,010/0,010) = 4,8 + 0 = 4,8</span> ✔.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Vérification (autre voie) :</strong> le rapport <span class="math">[A⁻]/[AH]</span> vaut <span class="math">1</span> avant comme après (les deux concentrations sont multipliées par la même facteur <span class="math">1/10</span>) → le pH ne peut pas changer ✔.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">5</div><div class="lecture-step-content"><p><strong>Conclusion :</strong> <span class="math">pH = 4,8</span> dans les deux cas — la dilution conserve le pH mais réduit le stock de défenseurs, donc le pouvoir tampon.</p></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ Piège d'examen n° 3</div>
+          <p>« Le pH <strong>varie peu</strong> » ne veut pas dire « ne varie pas » et surtout pas « résiste à tout » : au-delà d'une certaine quantité d'acide ou de base ajoutée, tout le <span class="math">A⁻</span> (ou tout le <span class="math">AH</span>) est consommé — c'est le <strong>débordement</strong> du tampon, et le pH chute ou grimpe alors comme dans de l'eau pure. Un tampon est un amortisseur, pas un mur.</p>
+        </div>
+      </div>
+      <p class="lecture-text">Le tableau ci-dessous donne les couples les plus utilisés : pour viser un pH donné, on choisit celui dont le <span class="math">pKa</span> est le plus proche.</p>
+      <div class="lecture-table">
+        <table>
+          <thead>
+            <tr><th>Couple tampon</th><th>pKa</th><th>pH visé</th><th>Usage typique</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><span class="math">CH₃—COOH / CH₃—COO⁻</span></td><td><span class="math">4,8</span></td><td>acide (environ <span class="math">3,8 – 5,8</span>)</td><td>laboratoire, conserves alimentaires</td></tr>
+            <tr><td><span class="math">H₂CO₃ / HCO₃⁻</span></td><td><span class="math">6,4</span></td><td>faiblement acide (environ <span class="math">5,4 – 7,4</span>)</td><td>sang humain</td></tr>
+            <tr><td><span class="math">H₂PO₄⁻ / HPO₄²⁻</span></td><td><span class="math">7,2</span></td><td>quasi neutre (environ <span class="math">6,2 – 8,2</span>)</td><td>cellules, milieux biologiques</td></tr>
+            <tr><td><span class="math">NH₄⁺ / NH₃</span></td><td><span class="math">9,2</span></td><td>basique (environ <span class="math">8,2 – 10,2</span>)</td><td>produits d'entretien, analyses</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s4 : NOTION 4 — PRÉPARATION PAR DEMI-NEUTRALISATION -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s4">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">04</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 4 · préparation</span>
+        <h2 class="lecture-section-title">Préparer un tampon par demi-neutralisation</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Il y a deux façons d'obtenir un mélange <span class="math">AH/A⁻</span> en quantités comparables : <strong>mélanger</strong> directement l'acide faible et un sel de sa base conjuguée, ou <strong>neutraliser à moitié</strong> un acide faible avec une base forte. La deuxième méthode est la plus élégante : elle utilise la demi-équivalence de la partie 01.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">📖 Définition officielle — demi-neutralisation</div>
+          <p>Neutraliser un acide faible <strong>à moitié</strong>, c'est verser dans le titrage exactement <strong>la moitié du volume d'équivalence</strong> de base forte. La moitié de l'acide <span class="math">AH</span> est transformée en <span class="math">A⁻</span> : on obtient <span class="math">[A⁻] = [AH]</span>, donc un tampon de pH égal à <span class="math">pKa</span>. C'est la <strong>préparation d'un tampon par demi-neutralisation</strong>.</p>
+        </div>
+      </div>
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-main">Formule majeure — le repère de la demi-équivalence</div>
+        <div class="lecture-formula-hero-main">à la demi-neutralisation : pH = pKa</div>
+        <div class="lecture-formula-hero-desc">À <span class="math">Vb = VE/2</span> : la quantité d'acide restante égale la quantité de base conjuguée formée (<span class="math">n(AH) = n(A⁻)</span>), le rapport vaut <span class="math">1</span> et Henderson donne <span class="math">pH = pKa</span>. C'est le raccourci le plus payant du chapitre au Bac.</div>
+      </div>
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 540 330" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Courbe de titrage d'un acide faible : pour préparer un tampon, on s'arrête à la demi-équivalence, à la moitié du volume d'équivalence, où pH est égal à pKa">
+          <defs>
+            <marker id="arP2c" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="rgba(224,184,74,0.9)"/></marker>
+            <marker id="arP2d" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="rgba(239,68,68,0.9)"/></marker>
+          </defs>
+          <text x="270" y="20" style="fill:var(--accent-bright)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle" letter-spacing="2">PRÉPARER UN TAMPON : S'ARRÊTER À LA DEMI-ÉQUIVALENCE</text>
+          <line x1="60" y1="290" x2="500" y2="290" style="stroke:rgba(224,184,74,0.9)" stroke-width="2" marker-end="url(#arP2c)"/>
+          <line x1="60" y1="290" x2="60" y2="30" style="stroke:rgba(224,184,74,0.9)" stroke-width="2"/>
+          <text x="496" y="310" style="fill:var(--text-muted)" font-size="11.5" font-family="Inter, system-ui, sans-serif" text-anchor="end">Vb (mL de soude versée)</text>
+          <text x="46" y="28" style="fill:var(--text-muted)" font-size="11.5" font-family="Inter, system-ui, sans-serif" text-anchor="end">pH</text>
+          <path d="M60,232 C110,226 160,212 200,194 C240,176 290,150 320,118 C338,100 344,80 350,66 C358,50 390,45 430,43 C460,41 485,40 500,40" fill="none" style="stroke:rgba(96,165,250,0.95)" stroke-width="2.6"/>
+          <line x1="340" y1="290" x2="340" y2="60" style="stroke:rgba(224,184,74,0.85)" stroke-width="1.6" stroke-dasharray="6 4"/>
+          <text x="340" y="52" style="fill:var(--accent-bright)" font-size="12" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">É : VE</text>
+          <line x1="200" y1="290" x2="200" y2="194" style="stroke:rgba(74,222,128,0.85)" stroke-width="1.5" stroke-dasharray="4 4"/>
+          <circle cx="200" cy="194" r="5" fill="rgba(74,222,128,0.95)"/>
+          <text x="210" y="186" style="fill:rgba(74,222,128,1)" font-size="12" font-weight="700" font-family="Inter, system-ui, sans-serif">½É : pH = pKa</text>
+          <line x1="286" y1="244" x2="214" y2="202" style="stroke:rgba(239,68,68,0.9)" stroke-width="2" marker-end="url(#arP2d)"/>
+          <text x="292" y="256" style="fill:rgba(239,68,68,1)" font-size="11.5" font-weight="700" font-family="Inter, system-ui, sans-serif">STOP : moitié seulement !</text>
+          <text x="270" y="326" style="fill:var(--text-muted)" font-size="11" font-style="italic" font-family="Inter, system-ui, sans-serif" text-anchor="middle">verser VE au complet = tout l'acide consommé : plus de tampon !</text>
+        </svg>
+      </figure>
+      <p class="lecture-text">La méthode complète, du choix du couple à la vérification :</p>
+      <div class="lecture-steps">
+        <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Choisir le couple</strong> dont le <span class="math">pKa</span> est le plus proche du pH voulu (section 03).</p></div></div>
+        <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Verser</strong> un volume <span class="math">Va</span> de l'acide faible <span class="math">AH</span> dans un bécher.</p></div></div>
+        <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Ajouter</strong> exactement <span class="math">VE/2</span> de base forte : à la demi-équivalence, <span class="math">n(A⁻) formée = n(AH) restante</span> → tampon de <span class="math">pH = pKa</span>.</p></div></div>
+        <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Vérifier</strong> le pH au pH-mètre et l'ajuster si nécessaire (demi-neutralisation légèrement différente si l'on veut un pH autre que <span class="math">pKa</span>).</p></div></div>
+      </div>
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">Exemple travaillé — fabriquer 100,0 mL de tampon à pH 4,8</div>
+        <div class="lecture-example-content">
+          <p><strong>Données :</strong> on mélange <span class="math">50,0 mL</span> d'acide éthoïque à <span class="math">0,20 mol·L⁻¹</span> et <span class="math">50,0 mL</span> d'éthanoate de sodium à <span class="math">0,20 mol·L⁻¹</span> ; <span class="math">pKa = 4,8</span>.</p>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Choix du couple :</strong> pH voulu <span class="math">4,8</span> = <span class="math">pKa</span> du couple <span class="math">CH₃—COOH/CH₃—COO⁻</span> : bon couple ✔.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Quantités de matière :</strong> <span class="math">n(AH) = 0,20 × 50,0×10⁻³ = 1,0×10⁻² mol</span> ; <span class="math">n(A⁻) = 0,20 × 50,0×10⁻³ = 1,0×10⁻² mol</span> ✔.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Après mélange (100,0 mL) :</strong> <span class="math">[AH] = 1,0×10⁻² ÷ 0,100 = 0,10 mol·L⁻¹</span> et de même <span class="math">[A⁻] = 0,10 mol·L⁻¹</span> ✔.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Henderson :</strong> <span class="math">pH = 4,8 + log (0,10/0,10) = 4,8 + 0 = 4,8</span> ✔.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">5</div><div class="lecture-step-content"><p><strong>Vérification (autre voie) :</strong> chaque concentration a été divisée par <span class="math">2</span> au mélange, mais le <strong>rapport</strong> reste <span class="math">1</span> → <span class="math">pH = pKa = 4,8</span> ✔ cohérent.</p></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ Piège d'examen n° 4</div>
+          <p>Au mélange, le volume <strong>double</strong> : chaque concentration est divisée par <span class="math">2</span>. Beaucoup d'élèves paniquent (« le pH va changer ! ») — non : Henderson ne dépend que du <strong>rapport</strong>, qui reste <span class="math">1</span>. Et si tu prépares le tampon par neutralisation, ne verse <strong>jamais</strong> <span class="math">VE</span> entier : à l'équivalence, l'acide est épuisé et il ne reste quasiment que <span class="math">A⁻</span> — ce n'est plus un tampon.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s5 : NOTION 5 — TAMPON SANGUIN -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s5">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">05</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 5 · tampon sanguin</span>
+        <h2 class="lecture-section-title">Les tampons du sang : une question de vie</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Nous voici au sommet du chapitre : le plus vital des tampons est celui qui circule dans tes artères. Son pH est si étroitement surveillé que deux équations de défense fonctionnent en permanence, coordinées par la respiration.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">📖 Définition officielle — équilibre acido-basique du sang</div>
+          <p>Le pH du sang est maintenu entre <span class="math">7,35</span> et <span class="math">7,45</span> (environ <span class="math">7,4</span>) principalement par le couple tampon <strong>acide carbonique / ion hydrogénocarbonate</strong> <span class="math">H₂CO₃/HCO₃⁻</span> (avec <span class="math">pKa ≈ 6,4</span>, valeur simplifiée). Un pH inférieur à <span class="math">7,35</span> définit l'<strong>acidose</strong>, un pH supérieur à <span class="math">7,45</span> l'<strong>alcalose</strong> — deux situations médicales graves.</p>
+        </div>
+      </div>
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 540 320" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Schéma du tampon sanguin : les poumons éliminent le CO2, le couple acide carbonique et ion hydrogénocarbonate piège les excès d ions H et d ions OH">
+          <defs>
+            <marker id="arP2e" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="rgba(224,184,74,0.9)"/></marker>
+            <marker id="arP2f" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="rgba(239,68,68,0.9)"/></marker>
+            <marker id="arP2g" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="rgba(96,165,250,0.9)"/></marker>
+          </defs>
+          <text x="270" y="22" style="fill:var(--accent-bright)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle" letter-spacing="2">LE TAMPON DU SANG : H₂CO₃ ⇌ HCO₃⁻ + H⁺</text>
+          <rect x="40" y="48" width="130" height="62" rx="9" fill="none" style="stroke:rgba(96,165,250,0.9)" stroke-width="2"/>
+          <text x="105" y="73" style="fill:rgba(96,165,250,1)" font-size="12" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">POUMONS</text>
+          <text x="105" y="94" style="fill:var(--text-muted)" font-size="10.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">CO₂ expiré</text>
+          <rect x="222" y="48" width="170" height="62" rx="9" fill="none" style="stroke:rgba(239,68,68,0.9)" stroke-width="2"/>
+          <text x="307" y="73" style="fill:rgba(239,68,68,1)" font-size="12" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">SANG</text>
+          <text x="307" y="94" style="fill:rgba(74,222,128,1)" font-size="10.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">pH = 7,4</text>
+          <line x1="172" y1="79" x2="220" y2="79" style="stroke:rgba(224,184,74,0.9)" stroke-width="2" marker-start="url(#arP2e)" marker-end="url(#arP2e)"/>
+          <text x="196" y="68" style="fill:var(--text-muted)" font-size="10.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">CO₂</text>
+          <text x="270" y="150" style="fill:var(--accent-bright)" font-size="14" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">H₂CO₃ ⇌ HCO₃⁻ + H⁺</text>
+          <text x="270" y="170" style="fill:var(--text-muted)" font-size="10.5" font-style="italic" font-family="Inter, system-ui, sans-serif" text-anchor="middle">acide carbonique / ion hydrogénocarbonate (pKa ≈ 6,4)</text>
+          <rect x="55" y="212" width="175" height="46" rx="9" fill="rgba(239,68,68,0.10)" style="stroke:rgba(239,68,68,0.85)" stroke-width="1.6"/>
+          <text x="142" y="240" style="fill:rgba(239,68,68,1)" font-size="11.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">EXCÈS DE H⁺ (acide)</text>
+          <rect x="315" y="212" width="175" height="46" rx="9" fill="rgba(96,165,250,0.10)" style="stroke:rgba(96,165,250,0.85)" stroke-width="1.6"/>
+          <text x="402" y="240" style="fill:rgba(96,165,250,1)" font-size="11.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">EXCÈS D'OH⁻ (base)</text>
+          <line x1="232" y1="208" x2="296" y2="176" style="stroke:rgba(239,68,68,0.9)" stroke-width="2" marker-end="url(#arP2f)"/>
+          <text x="150" y="196" style="fill:var(--text-muted)" font-size="10.5" font-style="italic" font-family="Inter, system-ui, sans-serif" text-anchor="middle">HCO₃⁻ capte H⁺ → H₂CO₃</text>
+          <line x1="312" y1="208" x2="248" y2="176" style="stroke:rgba(96,165,250,0.9)" stroke-width="2" marker-end="url(#arP2g)"/>
+          <text x="392" y="196" style="fill:var(--text-muted)" font-size="10.5" font-style="italic" font-family="Inter, system-ui, sans-serif" text-anchor="middle">H₂CO₃ capte OH⁻ → HCO₃⁻</text>
+          <text x="270" y="296" style="fill:var(--accent-bright)" font-size="11.5" font-style="italic" font-family="Inter, system-ui, sans-serif" text-anchor="middle">respirer plus ou moins fort déplace l'équilibre : le sang « respire » son pH</text>
+        </svg>
+      </figure>
+      <p class="lecture-text">Le fonctionnement est exactement celui de la double équipe de défense : le <span class="math">CO₂</span> dissous s'hydrate en acide carbonique (<span class="math">CO₂ + H₂O ⇌ H₂CO₃</span>), qui se décompose en ion hydrogénocarbonate et proton (<span class="math">H₂CO₃ ⇌ HCO₃⁻ + H⁺</span>). Les acides du métabolisme (acide lactique du muscle, corps cétoniques du jeûne) sont captés par <span class="math">HCO₃⁻</span> ; une base excédentaire est neutralisée par <span class="math">H₂CO₃</span>. Et les poumons règlent le thermostat : expirer plus de <span class="math">CO₂</span> retire de l'acide du sang.</p>
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">H₂CO₃ + OH⁻ → HCO₃⁻ + H₂O · HCO₃⁻ + H₃O⁺ → H₂CO₃ + H₂O</div>
+        <div class="lecture-formula-desc">Les deux équations de défense du tampon sanguin : atomes et charges équilibrés (à gauche <span class="math">−1</span> des deux côtés ; à droite <span class="math">−1 + 1 = 0</span>). Elles sont le miroir exact de celles du tampon acide éthoïque de la section 01.</div>
+      </div>
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">Exemple travaillé — le rapport magique du sang</div>
+        <div class="lecture-example-content">
+          <p><strong>Données :</strong> <span class="math">pH(sang) = 7,4</span> ; <span class="math">pKa = 6,4</span> pour le couple <span class="math">H₂CO₃/HCO₃⁻</span> (valeurs simplifiées).</p>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Formule :</strong> <span class="math">pH = pKa + log ([HCO₃⁻]/[H₂CO₃])</span> ✔.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Substitution :</strong> <span class="math">7,4 = 6,4 + log ([HCO₃⁻]/[H₂CO₃])</span>, donc <span class="math">log ([HCO₃⁻]/[H₂CO₃]) = 7,4 − 6,4 = 1,0</span> ✔.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Résultat :</strong> <span class="math">[HCO₃⁻]/[H₂CO₃] = 10¹ = 10</span> : le sang contient environ <strong>dix fois plus</strong> d'hydrogénocarbonate que d'acide carbonique ✔.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Vérification (autre voie) :</strong> <span class="math">pH = 6,4 + log 10 = 6,4 + 1,0 = 7,4</span> ✔ on retrouve le pH du sang.</p></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ Piège d'examen n° 5</div>
+          <p>Ne confonds pas les partenaires : <span class="math">H₂CO₃</span> (acide carbonique) est l'<strong>acide</strong> du couple, <span class="math">HCO₃⁻</span> (ion hydrogénocarbonate) est la <strong>base</strong>. Inverser le rapport dans Henderson te ferait trouver un sang acide… Et garde les repères : <span class="math">pH &lt; 7,35</span> = acidose (par exemple lors d'un effort intense qui produit de l'acide lactique), <span class="math">pH &gt; 7,45</span> = alcalose (par exemple après une hyperventilation qui chasse le <span class="math">CO₂</span>).</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- ===== QCM ===== -->
+  <div class="lecture-quiz">
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Parmi ces mélanges, lequel constitue une solution tampon ?</p>
+      <div class="lecture-quiz-options"><span>A) HCl + NaCl</span><span>B) CH₃—COOH + CH₃—COONa en quantités comparables</span><span>C) CH₃—COOH seul</span><span>D) eau pure + une goutte de HCl</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">Réponse <strong>B</strong>. Un tampon exige un <strong>acide faible</strong> et <strong>sa base conjuguée du même couple</strong> en quantités comparables : <span class="math">CH₃—COOH/CH₃—COO⁻</span> coche les trois cases. A est un acide fort avec un spectator inutile ; C et D n'ont qu'un seul partenaire du couple — aucune double défense possible.</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">À la demi-équivalence du titrage d'un acide faible par une base forte :</p>
+      <div class="lecture-quiz-options"><span>A) pH = 7</span><span>B) pH = pKa</span><span>C) pH = 14 − pKa</span><span>D) [A⁻] = 2[AH]</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">Réponse <strong>B</strong>. À <span class="math">Vb = VE/2</span>, la moitié de l'acide a été transformée : <span class="math">[A⁻] = [AH]</span>, donc <span class="math">log ([A⁻]/[AH]) = log 1 = 0</span> et <span class="math">pH = pKa</span>. C'est précisément à ce point que le pouvoir tampon est maximal — et c'est là qu'on s'arrête pour préparer un tampon par demi-neutralisation.</div></details>
+    </div>
+  </div>
+  <!-- ===== RÉCAP ===== -->
+  <div class="lecture-recap">
+    <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
+    <ul class="lecture-recap-list">
+      <li><strong>Solution tampon</strong> — mélange d'un <strong>acide faible</strong> et de <strong>sa base conjuguée</strong> en quantités comparables : elle s'oppose aux variations de pH (ajouts d'acide ou de base, dilution).</li>
+      <li><strong>Henderson-Hasselbalch</strong> — <span class="math">pH = pKa + log ([A⁻]/[AH])</span> : le pH ne dépend que du rapport ; à <span class="math">[A⁻] = [AH]</span>, <span class="math">pH = pKa</span>.</li>
+      <li><strong>Pouvoir tampon et sang</strong> — efficacité maximale à <span class="math">pH = pKa</span>, zone utile <span class="math">pKa ± 1</span> ; dans le sang, le couple <span class="math">H₂CO₃/HCO₃⁻</span> maintient <span class="math">pH ≈ 7,4</span> avec un rapport d'environ <span class="math">10</span>.</li>
+    </ul>
+  </div>
+  <!-- ===== FIN ===== -->
+  <div class="lecture-end">
+    <div class="lecture-end-icon">🎯</div>
+    <div class="lecture-end-text">Partie 02 terminée !</div>
+    <div class="lecture-end-sub">Tu sais désormais définir, calculer et fabriquer une solution tampon — et tu as vu la plus importante d'entre elles battre dans tes veines. Direction la <strong>fiche complète de révision</strong> : définitions condensées, formules, grande table de synthèse et réflexes du jour du Bac.</div>
+    <div class="lecture-end-divider"></div>
+  </div>
+</div>

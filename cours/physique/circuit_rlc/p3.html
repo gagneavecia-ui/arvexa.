@@ -1,0 +1,426 @@
+<!-- PARTIE 03 — Résonance d'intensité & Facteur de qualité (Circuit RLC) -->
+<div class="lecture-container">
+
+  <!-- ===== HERO ===== -->
+  <header class="lecture-hero">
+    <div class="lecture-hero-badge">
+      <span class="lecture-hero-icon">📘</span>
+      <span class="lecture-hero-label">Terminale C&D · Circuit RLC · Partie 03</span>
+    </div>
+    <h1 class="lecture-hero-title">
+      Résonance d'intensité & Facteur <em>de qualité</em>
+    </h1>
+    <p class="lecture-hero-intro">
+      Il existe une fréquence magique où le courant devient maximal alors que tu n'as rien changé au circuit : c'est la résonance. Dans cette partie, tu vas balayer la fréquence d'un GBF, voir l'intensité monter jusqu'à un pic puis redescendre, et comprendre pourquoi ce pic se trouve exactement à f₀. Tu apprendras à calculer f₀, à mesurer la sélectivité avec le facteur de qualité Q, et à relier tout cela à l'accord d'un poste de radio.
+    </p>
+    <div class="lecture-hero-meta">
+      <span class="lecture-hero-meta-item">⏱ 25 min</span>
+      <span class="lecture-hero-meta-item">⚡ 4 notions</span>
+      <span class="lecture-hero-meta-item">📚 6 sections</span>
+      <span class="lecture-hero-meta-item">🎓 Terminale C&D</span>
+    </div>
+  </header>
+  <!-- ===== SOMMAIRE ===== -->
+  <nav class="lecture-toc">
+    <div class="lecture-toc-header">
+      <span>Dans cette partie</span>
+      <span class="lecture-toc-count">4 notions · 6 sections</span>
+    </div>
+    <ol class="lecture-toc-list">
+      <li><a href="#s0"><span class="toc-num">00</span><span>Accorder un poste de radio</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>Le phénomène de résonance</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>À la résonance : Z = R</span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>Calculer f₀</span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>Le facteur de qualité Q</span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>Les résonances autour de nous</span></a></li>
+    </ol>
+  </nav>
+  <!-- ============================================================ -->
+  <!-- SECTION s0 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s0">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">00</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Motivation</span>
+        <h2 class="lecture-section-title">Accorder un poste de radio</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Tu allumes un poste de radio et tu tournes le bouton d'accord : pendant quelques secondes, plusieurs voix se mélangent dans un brouhaha, puis soudain une seule station s'impose, nette et claire. À l'intérieur de la radio, un petit circuit électrique vient de trouver LA fréquence à laquelle il répond de toutes ses forces.</p>
+      <p class="lecture-text">Cette fréquence privilégiée, c'est la fréquence de résonance du circuit, et le bouton que tu tournes ne fait que changer une capacité. Dans cette partie, tu vas comprendre pourquoi un circuit RLC série répond plus fort à une fréquence qu'à une autre, et comment mesurer la finesse de ce tri avec le facteur de qualité Q. La physique de la partie 01 (T₀) et celle de la partie 02 (Z) vont enfin fusionner.</p>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s1 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s1">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">01</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1</span>
+        <h2 class="lecture-section-title">Le phénomène de résonance d'intensité</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">On applique aux bornes du circuit RLC série une tension sinusoïdale d'amplitude fixe, et on balaie la fréquence du GBF. Surprise : l'intensité ne reste pas constante. Elle grimpe, atteint un maximum bien marqué pour une fréquence précise, puis redescend. Ce pic, c'est la résonance d'intensité.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <p class="lecture-callout-label">📌 Définition — résonance d'intensité</p>
+        <p class="lecture-text">La résonance d'intensité est le phénomène par lequel, en régime forcé sinusoïdal, l'amplitude de l'intensité passe par un maximum lorsque la fréquence <span class="math">f</span> de l'excitateur est égale à la fréquence propre <span class="math">f₀ = 1/(2π·√(L·C))</span> du circuit.</p>
+      </div>
+      <p class="lecture-text">🧠 Pousse la balançoire exactement à son rythme à elle : chaque poussée arrive au bon moment et l'amplitude monte, monte… C'est le pic de résonance. Pousse à un autre rythme : tes poussées arrivent parfois en retard, et l'amplitude reste faible. Le circuit RLC fait exactement pareil avec la tension du GBF.</p>
+      <div class="lecture-formula-hero">
+        <p class="lecture-formula-hero-main">La signature de la résonance</p>
+        <p class="lecture-formula-hero-main"><span class="math">i max ⟺ f = f₀</span></p>
+        <p class="lecture-formula-hero">L'amplitude de i passe par un pic quand la fréquence imposée égale la fréquence propre : ni avant, ni après.</p>
+      </div>
+      <svg viewBox="0 0 640 340" role="img" aria-label="Courbe de résonance : intensité en fonction de la fréquence, pic maximal à f0">
+        <rect x="0" y="0" width="640" height="340" style="fill:rgba(15,23,42,0.03)"/>
+        <path d="M70,20 V290 M40,280 H620" style="stroke:var(--text, rgba(15,23,42,0.45));fill:none" stroke-width="1.5"/>
+        <path d="M80,278 C180,272 240,110 320,80 C400,110 460,272 580,278" style="stroke:var(--accent-bright);fill:none" stroke-width="3"/>
+        <path d="M320,80 V280" style="stroke:var(--text, rgba(15,23,42,0.25));fill:none" stroke-width="1.5" stroke-dasharray="5 5"/>
+        <path d="M70,80 H320" style="stroke:var(--text, rgba(15,23,42,0.25));fill:none" stroke-width="1.5" stroke-dasharray="5 5"/>
+        <circle cx="320" cy="80" r="6" style="fill:rgba(239,68,68,0.9)"/>
+        <text x="335" y="66" font-size="13" style="fill:rgba(239,68,68,0.9)">i max</text>
+        <text x="320" y="306" font-size="14" text-anchor="middle" style="fill:var(--accent-bright)">f₀</text>
+        <text x="26" y="24" font-size="12" style="fill:var(--text, rgba(15,23,42,0.55))">i (A)</text>
+        <text x="586" y="306" font-size="12" style="fill:var(--text, rgba(15,23,42,0.55))">f (Hz)</text>
+        <text x="140" y="140" font-size="12" style="fill:var(--text, rgba(15,23,42,0.55))">la réponse est faible loin de f₀</text>
+        <text x="480" y="150" font-size="12" text-anchor="middle" style="fill:var(--text, rgba(15,23,42,0.55))">…et faible au-delà</text>
+      </svg>
+      <div class="lecture-example-content">
+        <p class="lecture-example-label">✍️ Exemple travaillé — lire une courbe de résonance</p>
+        <p class="lecture-text">Sur la courbe i(f) d'un circuit RLC série, le pic culmine à 0,20 A pour f = f₀ = 500 Hz ; à f = 250 Hz, la courbe donne i ≈ 0,08 A.</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step"><strong>Lecture 1.</strong> Le sommet de la courbe vaut I max = 0,20 A, atteint pour f = f₀ = 500 Hz.</li>
+          <li class="lecture-step"><strong>Lecture 2.</strong> À f = 250 Hz (deux fois plus bas), l'intensité ne vaut plus que 0,08 A.</li>
+          <li class="lecture-step"><strong>Vérification.</strong> 0,20/0,08 = 2,5 : le pic domine nettement son voisinage ✓.</li>
+          <li class="lecture-step"><strong>Conclusion.</strong> Le circuit répond surtout à f₀ et ignore en partie les autres fréquences : c'est la résonance d'intensité.</li>
+        </ol>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <p class="lecture-callout-label">⚠️ Piège d'examen</p>
+        <p class="lecture-text">La résonance concerne l'AMPLITUDE de i, pas sa fréquence : i oscille toujours à la fréquence <span class="math">f</span> du GBF, même loin de <span class="math">f₀</span>. Ne mélange jamais les deux.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s2 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s2">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">02</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2</span>
+        <h2 class="lecture-section-title">À la résonance, le circuit devient un simple fil</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Pourquoi ce pic ? Parce qu'à la résonance, la bobine et le condensateur se compensent exactement. Leurs réactances s'annulent l'une l'autre, leurs tensions se neutralisent, et le GBF n'a plus qu'un seul adversaire : la résistance. Vue de l'extérieur, la chaîne R·L·C se comporte alors comme un simple résistor.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <p class="lecture-callout-label">📌 Définition — comportement à la résonance</p>
+        <p class="lecture-text">À la résonance d'intensité, l'impédance du circuit RLC série est minimale et vaut <span class="math">Z = R</span> : la bobine et le condensateur se compensent, et l'intensité efficace atteint <span class="math">I = U/R</span>, où <span class="math">U</span> est la tension efficace du GBF.</p>
+      </div>
+      <p class="lecture-text">🧠 À la résonance, la bobine et le condensateur se renvoient l'énergie entre eux comme deux compères qui se passent le ballon : le GBF n'a plus qu'à alimenter la résistance. C'est pour cela que le courant est maximal alors que la tension d'entrée n'a pas changé.</p>
+      <div class="lecture-formula-hero">
+        <p class="lecture-formula-hero-main">La hauteur du pic</p>
+        <p class="lecture-formula-hero-main"><span class="math">I = U/R</span></p>
+        <p class="lecture-formula-hero">À la résonance, avec <span class="math">U</span> la tension efficace du GBF (V) et <span class="math">R</span> en Ω : le pic monte d'autant plus haut que R est petite.</p>
+      </div>
+      <div class="lecture-formula-box">
+        <p class="lecture-formula-desc">L'impédance à la résonance</p>
+        <p class="lecture-formula-main"><span class="math">Z = R</span></p>
+        <p class="lecture-formula-desc">C'est le minimum de Z(f) vu en partie 02 : en deçà, le condensateur bloquait ; au-delà, la bobine bloquait.</p>
+      </div>
+      <div class="lecture-formula-box">
+        <p class="lecture-formula-desc">Les tensions à la résonance</p>
+        <p class="lecture-formula-main"><span class="math">uₗ = u</span></p>
+        <p class="lecture-formula-desc">Les tensions aux bornes de la bobine et du condensateur sont égales et opposées : elles s'annulent vues du GBF, qui ne « voit » plus que <span class="math">uᵣ</span>.</p>
+      </div>
+      <svg viewBox="0 0 640 300" role="img" aria-label="Circuit RLC série alimenté par un GBF avec les tensions aux bornes de la résistance, de la bobine et du condensateur indiquées par des flèches">
+        <rect x="0" y="0" width="640" height="300" style="fill:rgba(15,23,42,0.03)"/>
+        <path d="M90,100 H98 M142,100 H160 M250,100 H290 M380,100 H420 M450,100 H560 M560,100 V220 M560,220 H90 V178" style="stroke:var(--accent-bright);fill:none" stroke-width="2.5"/>
+        <circle cx="120" cy="100" r="22" style="fill:rgba(59,130,246,0.10);stroke:var(--accent-bright)" stroke-width="2.5"/>
+        <text x="120" y="107" font-size="16" text-anchor="middle" style="fill:var(--text, rgba(15,23,42,0.85))">~</text>
+        <text x="120" y="62" font-size="12" text-anchor="middle" style="fill:var(--text, rgba(15,23,42,0.55))">GBF (tension U)</text>
+        <polyline points="160,100 170,84 185,116 200,84 215,116 230,84 242,100" style="stroke:var(--accent-bright);fill:none" stroke-width="2.5"/>
+        <text x="200" y="70" font-size="14" text-anchor="middle" style="fill:var(--text, rgba(15,23,42,0.85))">R</text>
+        <path d="M290,100 A15,15 0 0 1 320,100 A15,15 0 0 1 350,100 A15,15 0 0 1 380,100" style="stroke:var(--accent-bright);fill:none" stroke-width="2.5"/>
+        <text x="335" y="70" font-size="14" text-anchor="middle" style="fill:var(--text, rgba(15,23,42,0.85))">L</text>
+        <path d="M420,80 V120 M450,80 V120" style="stroke:var(--accent-bright);fill:none" stroke-width="2.5"/>
+        <text x="435" y="66" font-size="14" text-anchor="middle" style="fill:var(--text, rgba(15,23,42,0.85))">C</text>
+        <path d="M170,146 H232" style="stroke:rgba(245,158,11,0.9);fill:none" stroke-width="2"/>
+        <polygon points="240,146 230,141 230,151" style="fill:rgba(245,158,11,0.9)"/>
+        <polygon points="162,146 172,141 172,151" style="fill:rgba(245,158,11,0.9)"/>
+        <text x="200" y="170" font-size="12" text-anchor="middle" style="fill:rgba(245,158,11,0.9)">uᵣ</text>
+        <path d="M300,146 H362" style="stroke:rgba(245,158,11,0.9);fill:none" stroke-width="2"/>
+        <polygon points="370,146 360,141 360,151" style="fill:rgba(245,158,11,0.9)"/>
+        <polygon points="292,146 302,141 302,151" style="fill:rgba(245,158,11,0.9)"/>
+        <text x="335" y="170" font-size="12" text-anchor="middle" style="fill:rgba(245,158,11,0.9)">uₗ</text>
+        <path d="M424,146 H442" style="stroke:rgba(245,158,11,0.9);fill:none" stroke-width="2"/>
+        <polygon points="448,146 438,141 438,151" style="fill:rgba(245,158,11,0.9)"/>
+        <polygon points="418,146 428,141 428,151" style="fill:rgba(245,158,11,0.9)"/>
+        <text x="435" y="170" font-size="12" text-anchor="middle" style="fill:rgba(245,158,11,0.9)">u</text>
+        <text x="320" y="240" font-size="12" text-anchor="middle" style="fill:var(--text, rgba(15,23,42,0.55))">À la résonance : uₗ = u (elles se compensent), donc U = uᵣ et I = U/R</text>
+        <text x="320" y="266" font-size="12" text-anchor="middle" style="fill:var(--text, rgba(15,23,42,0.55))">attention aux déphasages : on n'additionne pas les tensions comme des nombres simples</text>
+      </svg>
+      <div class="lecture-example-content">
+        <p class="lecture-example-label">✍️ Exemple travaillé — la hauteur du pic</p>
+        <p class="lecture-text">Un GBF délivre une tension efficace <span class="math">U</span> = 6,0 V aux bornes d'un circuit RLC série de résistance <span class="math">R</span> = 30 Ω, réglé à la résonance. Calculer l'intensité efficace.</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step"><strong>Données.</strong> <span class="math">U</span> = 6,0 V (efficace) ; <span class="math">R</span> = 30 Ω.</li>
+          <li class="lecture-step"><strong>À la résonance.</strong> Z = R = 30 Ω : bobine et condensateur se compensent.</li>
+          <li class="lecture-step"><strong>Calcul.</strong> I = U/R = 6,0/30 = 0,20 A.</li>
+          <li class="lecture-step"><strong>Espacement.</strong> Si R doublait (60 Ω), on aurait I = 6,0/60 = 0,10 A : le pic serait deux fois plus bas → c'est R qui règle la hauteur du pic.</li>
+        </ol>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <p class="lecture-callout-label">⚠️ Piège d'examen</p>
+        <p class="lecture-text">À la résonance, la tension aux bornes de la bobine (ou du condensateur) peut être bien plus grande que la tension du GBF : elle vaut environ Q fois U. Ne « vérifie » donc jamais la loi des mailles en additionnant les valeurs absolues des trois tensions sans tenir compte des déphasages !</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s3 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s3">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">03</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 3</span>
+        <h2 class="lecture-section-title">Calculer la fréquence de résonance f₀</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">La fréquence du pic ne se devine pas : elle se calcule, et tu la connais déjà. C'est exactement l'inverse de la pseudo-période T₀ des oscillations libres de la partie 01. Le circuit a une note naturelle, comme une corde de guitare : tapote-la à cette fréquence, elle chante fort ; ailleurs, elle bredouille.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <p class="lecture-callout-label">📌 Définition — fréquence de résonance</p>
+        <p class="lecture-text">La fréquence de résonance d'un circuit RLC série vaut <span class="math">f₀ = 1/(2π·√(L·C))</span>, avec <span class="math">L</span> en H et <span class="math">C</span> en F, résultat en Hz. C'est l'inverse de la période propre <span class="math">T₀ = 2π·√(L·C)</span> des oscillations libres.</p>
+      </div>
+      <div class="lecture-formula-hero">
+        <p class="lecture-formula-hero-main">La formule du chapitre (encore elle !)</p>
+        <p class="lecture-formula-hero-main"><span class="math">f₀ = 1/(2π·√(L·C))</span></p>
+        <p class="lecture-formula-hero"><span class="math">L</span> en H, <span class="math">C</span> en F, <span class="math">f₀</span> en Hz : calcule L·C, prends la racine, multiplie par 2π, inverse. C'est tout.</p>
+      </div>
+      <div class="lecture-formula-box">
+        <p class="lecture-formula-desc">Le lien avec la partie 01</p>
+        <p class="lecture-formula-main"><span class="math">f₀ = 1/T₀</span></p>
+        <p class="lecture-formula-desc">Même racine, même circuit : la fréquence de résonance en régime forcé est la fréquence propre des oscillations libres.</p>
+      </div>
+      <div class="lecture-example-content">
+        <p class="lecture-example-label">✍️ Exemple travaillé — la fréquence d'une station AM</p>
+        <p class="lecture-text">Le circuit d'accord d'un poste de radio comprend une bobine de <span class="math">L</span> = 1,0·10⁻³ H et un condensateur de <span class="math">C</span> = 1,0·10⁻⁹ F. Calculer sa fréquence de résonance.</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step"><strong>Données.</strong> <span class="math">L</span> = 1,0·10⁻³ H ; <span class="math">C</span> = 1,0·10⁻⁹ F (déjà en H et en F).</li>
+          <li class="lecture-step"><strong>Produit.</strong> L·C = 1,0·10⁻³ × 1,0·10⁻⁹ = 1,0·10⁻¹² s².</li>
+          <li class="lecture-step"><strong>Racine.</strong> √(1,0·10⁻¹²) = 1,0·10⁻⁶ s.</li>
+          <li class="lecture-step"><strong>Période.</strong> T₀ = 2π × 1,0·10⁻⁶ = 6,28·10⁻⁶ s.</li>
+          <li class="lecture-step"><strong>Fréquence.</strong> f₀ = 1/T₀ = 1/(6,28·10⁻⁶) = 1,59·10⁵ Hz ≈ 1,6·10⁵ Hz, soit 160 kHz : une fréquence typique de la bande AM.</li>
+        </ol>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <p class="lecture-callout-label">⚠️ Piège d'examen</p>
+        <p class="lecture-text">Les unités d'abord ! Si <span class="math">C</span> est donné en microfarads, convertis avant tout calcul (1 microfarad = 1,0·10⁻⁶ F). Et respecte l'ordre : racine de L·C AVANT de multiplier par 2π, puis seulement l'inverse.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s4 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s4">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">04</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 4</span>
+        <h2 class="lecture-section-title">L'influence de R : le facteur de qualité Q</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Deux circuits peuvent résonner à la même fréquence et pourtant se comporter très différemment : l'un trie les stations comme un couteau, l'autre avale tout le brouhaha comme une cuillère. Ce qui les distingue, c'est la résistance — résumée dans un nombre sans unité, le facteur de qualité Q.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <p class="lecture-callout-label">📌 Définition — facteur de qualité</p>
+        <p class="lecture-text">Le facteur de qualité <span class="math">Q</span> mesure la finesse de la résonance d'un circuit RLC série : <span class="math">Q = (1/R)·√(L/C)</span>, nombre sans unité. Plus Q est grand (résistance petite), plus le pic de résonance est haut, étroit et sélectif.</p>
+      </div>
+      <p class="lecture-text">🧠 Un circuit à grand Q est un couteau : il tranche une station précise et ignore le reste. Un circuit à petit Q est une cuillère : il ramasse tout. Le couteau coûte cher : il faut une résistance très petite, donc un câblage soigné.</p>
+      <div class="lecture-formula-hero">
+        <p class="lecture-formula-hero-main">Le facteur de qualité</p>
+        <p class="lecture-formula-hero-main"><span class="math">Q = (1/R)·√(L/C)</span></p>
+        <p class="lecture-formula-hero">Sans unité. Grand Q : résonance vive et sélective (R petit). Petit Q : pic écrasé, peu utile pour trier des fréquences.</p>
+      </div>
+      <div class="lecture-formula-box">
+        <p class="lecture-formula-desc">La largeur du pic (bande passante)</p>
+        <p class="lecture-formula-main"><span class="math">Δf = f₀/Q</span></p>
+        <p class="lecture-formula-desc">Q grand → Δf petit → le circuit ne retient qu'une fine bande de fréquences : il est sélectif.</p>
+      </div>
+      <svg viewBox="0 0 640 340" role="img" aria-label="Deux courbes de résonance : R faible donne un pic haut et fin, R grand un pic bas et large">
+        <rect x="0" y="0" width="640" height="340" style="fill:rgba(15,23,42,0.03)"/>
+        <path d="M70,20 V290 M40,280 H620" style="stroke:var(--text, rgba(15,23,42,0.45));fill:none" stroke-width="1.5"/>
+        <path d="M80,282 C200,278 265,70 320,64 C375,70 440,278 580,282" style="stroke:var(--accent-bright);fill:none" stroke-width="3"/>
+        <path d="M80,284 C180,268 250,196 320,188 C390,196 460,268 580,284" style="stroke:rgba(245,158,11,0.9);fill:none" stroke-width="2.5" stroke-dasharray="8 5"/>
+        <path d="M320,64 V280" style="stroke:var(--text, rgba(15,23,42,0.25));fill:none" stroke-width="1.5" stroke-dasharray="5 5"/>
+        <path d="M258,172 H382" style="stroke:rgba(239,68,68,0.9);fill:none" stroke-width="2"/>
+        <polygon points="252,172 262,167 262,177" style="fill:rgba(239,68,68,0.9)"/>
+        <polygon points="388,172 378,167 378,177" style="fill:rgba(239,68,68,0.9)"/>
+        <text x="320" y="160" font-size="12" text-anchor="middle" style="fill:rgba(239,68,68,0.9)">Δf</text>
+        <text x="320" y="306" font-size="14" text-anchor="middle" style="fill:var(--accent-bright)">f₀</text>
+        <text x="130" y="150" font-size="12" style="fill:var(--accent-bright)">R faible : pic haut et fin</text>
+        <text x="452" y="232" font-size="12" style="fill:rgba(245,158,11,0.9)">R grand : pic bas et large</text>
+        <text x="26" y="24" font-size="12" style="fill:var(--text, rgba(15,23,42,0.55))">i (A)</text>
+        <text x="586" y="306" font-size="12" style="fill:var(--text, rgba(15,23,42,0.55))">f (Hz)</text>
+      </svg>
+      <div class="lecture-example-content">
+        <p class="lecture-example-label">✍️ Exemple travaillé — mesurer la sélectivité</p>
+        <p class="lecture-text">Un circuit RLC série comprend <span class="math">L</span> = 0,10 H, <span class="math">C</span> = 1,0·10⁻⁵ F et <span class="math">R</span> = 5,0 Ω. Calculer Q, f₀ et la largeur du pic.</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step"><strong>Données.</strong> <span class="math">L</span> = 0,10 H ; <span class="math">C</span> = 1,0·10⁻⁵ F ; <span class="math">R</span> = 5,0 Ω.</li>
+          <li class="lecture-step"><strong>Racine.</strong> L/C = 0,10/1,0·10⁻⁵ = 1,0·10⁴ ; √(L/C) = 1,0·10² = 100 Ω.</li>
+          <li class="lecture-step"><strong>Q.</strong> Q = 100/5,0 = 20.</li>
+          <li class="lecture-step"><strong>f₀.</strong> √(L·C) = √(1,0·10⁻⁶) = 1,0·10⁻³ s ; f₀ = 1/(2π × 1,0·10⁻³) ≈ 160 Hz.</li>
+          <li class="lecture-step"><strong>Largeur.</strong> Δf = f₀/Q = 160/20 = 8,0 Hz → le pic est fin : le circuit ne laisse passer qu'une bande étroite de fréquences.</li>
+        </ol>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <p class="lecture-callout-label">⚠️ Piège d'examen</p>
+        <p class="lecture-text">Ne mélange pas les rôles : <span class="math">R</span> change la hauteur et la largeur du pic, mais pas sa position. Modifier <span class="math">L</span> ou <span class="math">C</span>, au contraire, déplace le pic (change <span class="math">f₀</span>) sans changer la hauteur.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s5 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s5">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">05</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 5</span>
+        <h2 class="lecture-section-title">Les résonances autour de nous — et tes exercices</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">La résonance n'est pas un privilège électrique : tout système capable d'osciller possède une fréquence propre et peut entrer en résonance. Une fois l'idée acquise, tu la vois partout — et tu comprends pourquoi les ingénieurs passent leur temps soit à l'éviter, soit à l'exploiter.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <p class="lecture-callout-label">📌 Définition — résonance (générale)</p>
+        <p class="lecture-text">La résonance est l'amplification des oscillations d'un système excité à une fréquence proche de sa fréquence propre. Elle est électrique (circuit RLC, radio), mécanique (balançoire, ailes d'avion, ponts) ou acoustique (caisse de résonance d'un instrument).</p>
+      </div>
+      <p class="lecture-text">🧠 Les haut-parleurs, les cloches, les cordes de guitare, les immeubles qui vibrent au passage du vent : même physique. On l'évite quand elle détruit (on rigidifie un pont), on la recherche quand elle est utile (on accorde une radio). Même équation, deux attitudes opposées.</p>
+      <div class="lecture-formula-box">
+        <p class="lecture-formula-desc">Choisir sa station</p>
+        <p class="lecture-formula-main"><span class="math">f₀ = 1/(2π·√(L·C))</span></p>
+        <p class="lecture-formula-desc"><span class="math">L</span> est fixe, <span class="math">C</span> est variable : tourner le bouton d'accord change C, donc change f₀, jusqu'à ce qu'elle tombe sur la fréquence de la station.</p>
+      </div>
+      <svg viewBox="0 0 640 300" role="img" aria-label="Chaîne d'un poste de radio : onde reçue par l'antenne, circuit d'accord LC, démodulateur, haut-parleur">
+        <rect x="0" y="0" width="640" height="300" style="fill:rgba(15,23,42,0.03)"/>
+        <path d="M60,150 q12,-12 24,0 q12,12 24,0" style="stroke:rgba(245,158,11,0.9);fill:none" stroke-width="2.5"/>
+        <path d="M60,180 q12,-12 24,0 q12,12 24,0" style="stroke:rgba(245,158,11,0.6);fill:none" stroke-width="2"/>
+        <path d="M110,210 V96" style="stroke:var(--accent-bright);fill:none" stroke-width="2.5"/>
+        <circle cx="110" cy="90" r="5" style="fill:var(--accent-bright)"/>
+        <text x="110" y="236" font-size="12" text-anchor="middle" style="fill:var(--text, rgba(15,23,42,0.55))">l'onde radio arrive</text>
+        <path d="M118,160 H172" style="stroke:var(--accent-bright);fill:none" stroke-width="2"/>
+        <polygon points="180,160 168,154 168,166" style="fill:var(--accent-bright)"/>
+        <rect x="184" y="120" width="130" height="80" rx="10" style="fill:rgba(59,130,246,0.10);stroke:var(--accent-bright)" stroke-width="2"/>
+        <text x="249" y="152" font-size="13" text-anchor="middle" style="fill:var(--text, rgba(15,23,42,0.85))">circuit d'accord</text>
+        <text x="249" y="172" font-size="13" text-anchor="middle" style="fill:var(--text, rgba(15,23,42,0.85))">LC (C variable)</text>
+        <path d="M314,160 H360" style="stroke:var(--accent-bright);fill:none" stroke-width="2"/>
+        <polygon points="368,160 356,154 356,166" style="fill:var(--accent-bright)"/>
+        <rect x="372" y="120" width="110" height="80" rx="10" style="fill:rgba(16,185,129,0.10);stroke:rgba(16,185,129,0.9)" stroke-width="2"/>
+        <text x="427" y="166" font-size="13" text-anchor="middle" style="fill:var(--text, rgba(15,23,42,0.85))">démodulateur</text>
+        <path d="M482,160 H528" style="stroke:var(--accent-bright);fill:none" stroke-width="2"/>
+        <polygon points="536,160 524,154 524,166" style="fill:var(--accent-bright)"/>
+        <rect x="540" y="128" width="66" height="64" rx="8" style="fill:rgba(239,68,68,0.10);stroke:rgba(239,68,68,0.9)" stroke-width="2"/>
+        <polygon points="552,148 568,148 586,136 586,184 568,172 552,172" style="fill:rgba(239,68,68,0.35);stroke:rgba(239,68,68,0.9)" stroke-width="2"/>
+        <text x="573" y="212" font-size="12" text-anchor="middle" style="fill:var(--text, rgba(15,23,42,0.55))">haut-parleur</text>
+        <text x="249" y="240" font-size="12" text-anchor="middle" style="fill:var(--text, rgba(15,23,42,0.55))">tourner le bouton change C, donc f₀</text>
+        <text x="427" y="240" font-size="12" text-anchor="middle" style="fill:var(--text, rgba(15,23,42,0.55))">on garde la musique</text>
+      </svg>
+      <div class="lecture-callout lecture-callout-warning">
+        <p class="lecture-callout-label">⚠️ Piège d'examen</p>
+        <p class="lecture-text">Une résonance n'amplifie pas à l'infini : l'amplitude est toujours limitée par la résistance (plus elle est petite, plus l'amplification est forte). Et méfie-toi des résonances mécaniques non désirées : elles ont fait s'effondrer des ponts.</p>
+      </div>
+      <div class="lecture-text">
+        <p class="lecture-exercise-label">🏋️ Exercice 1 — Résonance ou pas ?</p>
+        <p class="lecture-text">Un circuit RLC série comprend <span class="math">L</span> = 0,40 H et <span class="math">C</span> = 1,0·10⁻⁶ F. 1) Calculer sa fréquence de résonance <span class="math">f₀</span>. 2) Le GBF impose f = 500 Hz : y a-t-il résonance ? 3) À la résonance, le GBF délivre <span class="math">U</span> = 4,0 V et <span class="math">R</span> = 20 Ω : calculer <span class="math">I</span>.</p>
+        <details>
+          <summary>Voir la solution détaillée</summary>
+          <ol class="lecture-steps">
+            <li class="lecture-step"><strong>Données.</strong> <span class="math">L</span> = 0,40 H ; <span class="math">C</span> = 1,0·10⁻⁶ F ; <span class="math">U</span> = 4,0 V ; <span class="math">R</span> = 20 Ω.</li>
+            <li class="lecture-step"><strong>Produit.</strong> L·C = 0,40 × 1,0·10⁻⁶ = 4,0·10⁻⁷ s².</li>
+            <li class="lecture-step"><strong>Racine.</strong> √(4,0·10⁻⁷) = 6,3·10⁻⁴ s. Vérification : (6,3·10⁻⁴)² = 3,97·10⁻⁷ ≈ 4,0·10⁻⁷ ✓.</li>
+            <li class="lecture-step"><strong>T₀ puis f₀.</strong> T₀ = 2π × 6,3·10⁻⁴ = 3,97·10⁻³ s ≈ 4,0 ms ; f₀ = 1/T₀ ≈ 2,5·10² Hz (250 Hz).</li>
+            <li class="lecture-step"><strong>Comparaison.</strong> f = 500 Hz = 2·f₀ : on est loin du pic → l'intensité est faible, il n'y a pas de résonance.</li>
+            <li class="lecture-step"><strong>Si le GBF était à f₀.</strong> Z = R et I = U/R = 4,0/20 = 0,20 A.</li>
+          </ol>
+          <p class="lecture-text"><strong>Réponse :</strong> f₀ ≈ 250 Hz ; à 500 Hz, pas de résonance ; à la résonance, I = 0,20 A.</p>
+        </details>
+      </div>
+      <div class="lecture-text">
+        <p class="lecture-exercise-label">🏋️ Exercice 2 — Un circuit très sélectif</p>
+        <p class="lecture-text">Un circuit RLC série comprend <span class="math">L</span> = 0,20 H, <span class="math">C</span> = 5,0·10⁻⁸ F et <span class="math">R</span> = 40 Ω. 1) Calculer <span class="math">f₀</span>. 2) Calculer le facteur de qualité <span class="math">Q</span>. 3) En déduire la largeur du pic et conclure sur la sélectivité.</p>
+        <details>
+          <summary>Voir la solution détaillée</summary>
+          <ol class="lecture-steps">
+            <li class="lecture-step"><strong>Données.</strong> <span class="math">L</span> = 0,20 H ; <span class="math">C</span> = 5,0·10⁻⁸ F ; <span class="math">R</span> = 40 Ω.</li>
+            <li class="lecture-step"><strong>Fréquence.</strong> L·C = 1,0·10⁻⁸ s² ; √(L·C) = 1,0·10⁻⁴ s ; T₀ = 6,28·10⁻⁴ s ; f₀ = 1/T₀ ≈ 1,6·10³ Hz.</li>
+            <li class="lecture-step"><strong>Racine.</strong> L/C = 0,20/5,0·10⁻⁸ = 4,0·10⁶ ; √(L/C) = 2,0·10³ Ω.</li>
+            <li class="lecture-step"><strong>Q.</strong> Q = (1/R)·√(L/C) = 2,0·10³/40 = 50.</li>
+            <li class="lecture-step"><strong>Largeur.</strong> Δf = f₀/Q = 1,6·10³/50 = 32 Hz.</li>
+            <li class="lecture-step"><strong>Conclusion.</strong> Q = 50, pic fin de 32 Hz : circuit très sélectif, parfait pour trier des stations serrées.</li>
+          </ol>
+          <p class="lecture-text"><strong>Réponse :</strong> f₀ ≈ 1,6·10³ Hz ; Q = 50 ; Δf ≈ 32 Hz → résonance très sélective.</p>
+        </details>
+      </div>
+      <div class="lecture-table">
+        <table>
+          <thead>
+            <tr><th>Tu modifies…</th><th>f₀ ?</th><th>Le pic ?</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><span class="math">R</span> augmente</td><td>inchangée</td><td>plus bas et plus large (Q diminue)</td></tr>
+            <tr><td><span class="math">C</span> augmente</td><td>diminue</td><td>glisse vers les basses fréquences</td></tr>
+            <tr><td><span class="math">L</span> augmente</td><td>diminue</td><td>glisse vers les basses fréquences</td></tr>
+            <tr><td><span class="math">Q</span> augmente (R diminue)</td><td>inchangée</td><td>plus haut, plus fin, plus sélectif</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+  <!-- ===== QCM ===== -->
+  <div class="lecture-quiz">
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">QCM 1 — À la résonance d'intensité, l'impédance du circuit RLC série vaut :</p>
+      <div class="lecture-quiz-options"><span>A) Z = R</span><span>B) Z = 0</span><span>C) Z = L·ω</span><span>D) Z est maximale</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">A — La bobine et le condensateur se compensent exactement : il ne reste que la résistance, d'où I = U/R.</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">QCM 2 — La fréquence de résonance d'un circuit RLC série vaut :</p>
+      <div class="lecture-quiz-options"><span>A) f₀ = 1/(2π·√(L·C))</span><span>B) f₀ = 2π·√(L·C)</span><span>C) f₀ = 1/(2π·L·C)</span><span>D) f₀ = √(L·C)/(2π)</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">A — f₀ = 1/(2π·√(L·C)) = 1/T₀ : racine du produit L·C, fois 2π, puis inverse.</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">QCM 3 — Si on diminue <span class="math">R</span>, le pic de la courbe i(f) :</p>
+      <div class="lecture-quiz-options"><span>A) monte et se resserre</span><span>B) descend</span><span>C) s'élargit</span><span>D) se décale vers les hautes fréquences</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">A — Q = (1/R)·√(L/C) augmente quand R diminue : pic plus haut (I = U/R) et plus fin (Δf = f₀/Q), à f₀ inchangée.</div></details>
+    </div>
+  </div>
+  <!-- ===== RÉCAP ===== -->
+  <div class="lecture-recap">
+    <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
+    <ul class="lecture-recap-list">
+      <li><strong>Résonance d'intensité</strong> — en balayant f à amplitude fixe, i passe par un maximum quand f = f₀ = 1/(2π·√(L·C)).</li>
+      <li><strong>À la résonance</strong> — Z = R : la bobine et le condensateur se compensent, et I = U/R ; R règle la hauteur du pic.</li>
+      <li><strong>Facteur de qualité</strong> — Q = (1/R)·√(L/C) et Δf = f₀/Q : grand Q, pic fin et sélectif, comme le circuit d'accord d'une radio.</li>
+    </ul>
+  </div>
+  <!-- ===== FIN ===== -->
+  <div class="lecture-end">
+    <div class="lecture-end-icon">🎯</div>
+    <div class="lecture-end-text">Partie 03 terminée !</div>
+    <div class="lecture-end-sub">Tu tiens la résonance, le pic et le facteur Q. Partie 04 : ta fiche complète de révision pour tout condenser avant l'épreuve.</div>
+    <div class="lecture-end-divider"></div>
+  </div>
+</div>

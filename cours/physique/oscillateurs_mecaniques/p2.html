@@ -1,0 +1,455 @@
+<!-- PARTIE 02 — Équation différentielle & Solution (Oscillateurs mécaniques) -->
+<div class="lecture-container">
+
+  <!-- ===== HERO ===== -->
+  <header class="lecture-hero">
+    <div class="lecture-hero-badge">
+      <span class="lecture-hero-icon">📘</span>
+      <span class="lecture-hero-label">Terminale C&D · Oscillateurs mécaniques · Partie 02</span>
+    </div>
+    <h1 class="lecture-hero-title">
+      Équation différentielle <em>& Solution</em>
+    </h1>
+    <p class="lecture-hero-intro">
+      En partie 01, tu as décrit les oscillations avec des mots et deux formules de période admises sans preuve. Ici, on passe de l'autre côté du miroir : à partir des lois de Newton, tu vas bâtir toi-même l'équation qui gouverne le pendule élastique, puis vérifier que la solution sinusoïdale y répond parfaitement. Tu apprendras aussi à déterminer l'amplitude et la phase à partir des conditions de lâcher, et à retrouver la période du pendule simple. C'est la partie la plus « rédaction » du chapitre : celle qui rapporte le plus de points au Bac.
+    </p>
+    <div class="lecture-hero-meta">
+      <span class="lecture-hero-meta-item">⏱ 25 min</span>
+      <span class="lecture-hero-meta-item">⚡ 4 notions</span>
+      <span class="lecture-hero-meta-item">📚 6 sections</span>
+      <span class="lecture-hero-meta-item">🎓 Terminale C&D</span>
+    </div>
+  </header>
+  <!-- ===== SOMMAIRE ===== -->
+  <nav class="lecture-toc">
+    <div class="lecture-toc-header">
+      <span>Dans cette partie</span>
+      <span class="lecture-toc-count">4 notions · 6 sections</span>
+    </div>
+    <ol class="lecture-toc-list">
+      <li><a href="#s0"><span class="toc-num">00</span><span>Prédire le mouvement avant de le mesurer</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>Trouver l'équation différentielle</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>La solution sinusoïdale</span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>Pulsation et période propres</span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>Conditions initiales : amplitude et phase</span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>Et le pendule simple dans tout ça ?</span></a></li>
+    </ol>
+  </nav>
+  <!-- ============================================================ -->
+  <!-- SECTION s0 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s0">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">00</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Motivation</span>
+        <h2 class="lecture-section-title">Prédire le mouvement avant de le mesurer</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Un ingénieur qui conçoit la suspension d'une moto, une qui calcule la fréquence de sécurité d'un pont soumis au vent, ou un horloger qui règle un balancier : aucun ne peut se contenter de chronométrer après coup. Il lui faut prédire l'oscillation avant qu'elle n'existe. La physique dispose pour cela d'un outil redoutable : l'équation différentielle, une équation qui relie une grandeur à ses dérivées et dont la solution EST le mouvement.</p>
+      <p class="lecture-text">Pour le pendule élastique, cette équation tient en une ligne, se démontre en quatre étapes avec la deuxième loi de Newton, et se résout avec un simple cosinus. À la fin de cette partie, les formules <span class="math">T₀ = 2π√(m/k)</span> et <span class="math">T₀ = 2π√(l/g)</span> ne seront plus des recettes à réciter : tu sauras d'où elles sortent, et personne ne pourra te les faire inventer.</p>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s1 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s1">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">01</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1</span>
+        <h2 class="lecture-section-title">Trouver l'équation différentielle</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Reprenons notre pendule élastique horizontal : une masse <span class="math">m</span> sur un banc sans frottement, accrochée à un ressort de raideur <span class="math">k</span>, repérée par son élongation <span class="math">x(t)</span> mesurée depuis l'équilibre. Notre objectif : trouver l'équation que <span class="math">x(t)</span> vérifie obligatoirement. La méthode est toujours la même : bilan des forces, deuxième loi de Newton, projection sur l'axe du mouvement.</p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <p><strong>📖 Définitions officielles</strong></p>
+        <p>Une <strong>équation différentielle</strong> est une équation dont l'inconnue est une fonction (ici <span class="math">x(t)</span>) et qui fait intervenir ses dérivées.</p>
+        <p>On note <span class="math">x'(t)</span> la dérivée première de <span class="math">x</span> (la vitesse) et <span class="math">x''(t)</span> la <strong>dérivée seconde de <span class="math">x</span></strong> par rapport au temps — c'est-à-dire la dérivée de la dérivée, qui n'est autre que l'accélération.</p>
+      </div>
+
+      <p class="lecture-text">Fais le bilan sur la masse : le poids <span class="math">→P</span> (vertical, vers le bas), la réaction <span class="math">→R</span> du banc (verticale, vers le haut) et la tension du ressort <span class="math">→F</span> (horizontale, opposée à l'élongation). Verticalement, rien ne bouge : <span class="math">→P</span> et <span class="math">→R</span> se compensent. Toute l'action se joue sur l'axe horizontal, où la loi de Hooke donne <span class="math">F = k·x</span> en intensité, dirigée vers l'équilibre.</p>
+
+      <svg viewBox="0 0 560 215" width="100%" role="img" aria-label="Pendule élastique horizontal avec repère Ox, forces P, R et F et élongation x">
+        <text x="239" y="18" text-anchor="middle" style="fill:rgba(148,163,184,0.9);font-size:12px">position d'équilibre (x = 0)</text>
+        <line x1="239" y1="26" x2="239" y2="182" style="stroke:rgba(148,163,184,0.55);stroke-dasharray:5 5"/>
+        <rect x="34" y="35" width="10" height="130" style="fill:rgba(148,163,184,0.35)"/>
+        <line x1="34" y1="45" x2="24" y2="55" style="stroke:rgba(148,163,184,0.6);stroke-width:1.5"/>
+        <line x1="34" y1="75" x2="24" y2="85" style="stroke:rgba(148,163,184,0.6);stroke-width:1.5"/>
+        <line x1="34" y1="105" x2="24" y2="115" style="stroke:rgba(148,163,184,0.6);stroke-width:1.5"/>
+        <line x1="34" y1="135" x2="24" y2="145" style="stroke:rgba(148,163,184,0.6);stroke-width:1.5"/>
+        <text x="140" y="66" text-anchor="middle" style="fill:var(--accent-bright);font-size:12px">ressort (raideur k)</text>
+        <path d="M44,100 L64,100 L74,84 L92,116 L110,84 L128,116 L146,84 L164,116 L182,84 L200,116 L214,100 L250,100" style="stroke:var(--accent-bright);stroke-width:2.5;fill:none"/>
+        <rect x="250" y="70" width="76" height="60" style="fill:rgba(74,222,128,0.15);stroke:var(--accent-bright);stroke-width:2"/>
+        <text x="288" y="107" text-anchor="middle" style="fill:var(--accent-bright);font-size:17px;font-weight:bold">m</text>
+        <line x1="250" y1="88" x2="220" y2="88" style="stroke:var(--accent-bright);stroke-width:2"/>
+        <polygon points="212,88 222,83 222,93" style="fill:var(--accent-bright)"/>
+        <text x="222" y="76" style="fill:var(--accent-bright);font-size:13px">→F</text>
+        <line x1="268" y1="132" x2="268" y2="160" style="stroke:rgba(148,163,184,0.9);stroke-width:2"/>
+        <polygon points="268,166 264,157 272,157" style="fill:rgba(148,163,184,0.9)"/>
+        <text x="276" y="160" style="fill:rgba(148,163,184,0.9);font-size:13px">→P</text>
+        <line x1="308" y1="131" x2="308" y2="103" style="stroke:rgba(148,163,184,0.9);stroke-width:2"/>
+        <polygon points="308,97 304,106 312,106" style="fill:rgba(148,163,184,0.9)"/>
+        <text x="316" y="112" style="fill:rgba(148,163,184,0.9);font-size:13px">→R</text>
+        <text x="388" y="100" style="fill:rgba(148,163,184,0.9);font-size:12px">→P + →R = →0</text>
+        <line x1="242" y1="150" x2="284" y2="150" style="stroke:rgba(148,163,184,0.9);stroke-width:1.5"/>
+        <polygon points="290,150 281,146 281,154" style="fill:rgba(148,163,184,0.9)"/>
+        <text x="263" y="168" text-anchor="middle" style="fill:rgba(148,163,184,0.9);font-size:13px;font-style:italic">x</text>
+        <line x1="44" y1="195" x2="468" y2="195" style="stroke:rgba(148,163,184,0.7);stroke-width:1.5"/>
+        <polygon points="474,195 463,190 463,200" style="fill:rgba(148,163,184,0.7)"/>
+        <text x="480" y="199" style="fill:rgba(148,163,184,0.9);font-size:11.5px">axe (Ox)</text>
+      </svg>
+
+      <div class="lecture-example-content">
+        <p class="lecture-example-label">🧪 Démonstration guidée — naissance de l'équation</p>
+        <p>Établis l'équation différentielle du pendule élastique horizontal, pas à pas.</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step">Je définis le système (la masse <span class="math">m</span>) et le repère : axe (Ox) horizontal, origine à la position d'équilibre, <span class="math">x(t)</span> l'élongation.</li>
+          <li class="lecture-step">Je dresse le bilan des forces : <span class="math">→P</span>, <span class="math">→R</span> et la tension <span class="math">→F</span> du ressort, avec <span class="math">→F = −k·x·→i</span>.</li>
+          <li class="lecture-step">J'applique la deuxième loi de Newton : <span class="math">m·→a = →P + →R + →F</span>. Comme <span class="math">→P + →R = →0</span>, la projection sur (Ox) donne <span class="math">m·x''(t) = −k·x(t)</span> (l'accélération est la dérivée seconde de <span class="math">x</span>).</li>
+          <li class="lecture-step">Je regroupe tout dans le même membre : <span class="math">m·x''(t) + k·x(t) = 0</span>. C'est l'équation différentielle du pendule élastique non amorti.</li>
+          <li class="lecture-step">Vérification de cohérence : chaque terme est une force (kg × m·s⁻² et N·m⁻¹ × m = N) — l'équation est homogène.</li>
+        </ol>
+        <p><strong>✅ Résultat :</strong> toute oscillation du pendule élastique satisfait cette équation, quelles que soient la masse et la raideur.</p>
+      </div>
+
+      <div class="lecture-formula-hero">
+        <p class="lecture-formula-hero-main">Équation différentielle du pendule élastique</p>
+        <p class="lecture-formula-hero"><span class="math">m·x'' + k·x = 0</span></p>
+        <p class="lecture-formula-hero"><span class="math">x''</span> se lit « x seconde » : c'est la dérivée seconde de <span class="math">x</span> par rapport au temps, autrement dit l'accélération. Divisée par <span class="math">m</span>, la même équation s'écrit <span class="math">x'' + (k/m)·x = 0</span>.</p>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <p><strong>⚠️ Piège d'examen</strong></p>
+        <p>Erreur n°1 : écrire <span class="math">m·x'' − k·x = 0</span> en oubliant le signe − de la force de rappel — l'équation change de nature et ne décrit plus une oscillation. Erreur n°2 : oublier de projeter (garder les vecteurs dans l'équation finale). L'équation différentielle relie des grandeurs algébriques, pas des vecteurs.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s2 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s2">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">02</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2</span>
+        <h2 class="lecture-section-title">La solution sinusoïdale</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Une équation différentielle, cela se résout : on cherche la fonction <span class="math">x(t)</span> qui la vérifie. Pour le pendule élastique, la réponse tient en un cosinus — et on peut le vérifier sans astuce particulière, en dérivant deux fois. C'est exactement ce qu'on te demandera souvent : non pas d'inventer la solution, mais de vérifier qu'elle convient et d'exploiter sa courbe.</p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <p><strong>📖 Définition officielle</strong></p>
+        <p>La <strong>solution de l'équation différentielle</strong> <span class="math">m·x'' + k·x = 0</span> est une fonction sinusoïdale du temps : <span class="math">x(t) = xₘ·cos(ω₀·t + φ)</span>, où <span class="math">xₘ</span> est l'amplitude (en m), <span class="math">ω₀</span> la pulsation propre (en rad·s⁻¹) et <span class="math">φ</span> la phase à l'origine (en rad).</p>
+      </div>
+
+      <p class="lecture-text">Les trois constantes ont des rôles bien distincts : <span class="math">xₘ</span> règle la hauteur de la vague, <span class="math">ω₀</span> règle sa largeur (donc la rapidité des oscillations), et <span class="math">φ</span> décale la vague dans le temps — elle dit « où en est » l'oscillateur à l'instant t = 0. Deux oscillateurs identiques lâchés différemment n'ont pas le même <span class="math">φ</span>, mais ils battent au même rythme.</p>
+
+      <div class="lecture-formula-hero">
+        <p class="lecture-formula-hero-main">Solution de l'équation du pendule élastique</p>
+        <p class="lecture-formula-hero"><span class="math">x(t) = xₘ·cos(ω₀·t + φ)</span></p>
+        <p class="lecture-formula-hero">En dérivant une fois, on obtient la vitesse : <span class="math">v(t) = −xₘ·ω₀·sin(ω₀·t + φ)</span>. La vitesse est maximale quand <span class="math">x</span> s'annule — logique !</p>
+      </div>
+
+      <div class="lecture-formula-box">
+        <p><span class="math">v(t) = −xₘ·ω₀·sin(ω₀·t + φ)</span> — vitesse de l'oscillateur, en m·s⁻¹. La vitesse maximale vaut <span class="math">vₘₐₓ = ω₀·xₘ</span>, atteinte au passage à la position d'équilibre.</p>
+      </div>
+
+      <svg viewBox="0 0 580 235" width="100%" role="img" aria-label="Deux courbes x(t) sinusoïdales de même période, l'une avec phase nulle, l'autre en retard d'un quart de periode">
+        <line x1="70" y1="30" x2="70" y2="205" style="stroke:rgba(148,163,184,0.7);stroke-width:1.5"/>
+        <line x1="40" y1="120" x2="540" y2="120" style="stroke:rgba(148,163,184,0.7);stroke-width:1.5"/>
+        <polygon points="547,120 536,115 536,125" style="fill:rgba(148,163,184,0.7)"/>
+        <polygon points="70,23 65,34 75,34" style="fill:rgba(148,163,184,0.7)"/>
+        <text x="38" y="42" style="fill:rgba(148,163,184,0.9);font-size:13px;font-style:italic">x(t)</text>
+        <text x="552" y="136" style="fill:rgba(148,163,184,0.9);font-size:13px;font-style:italic">t</text>
+        <text x="58" y="137" style="fill:rgba(148,163,184,0.9);font-size:12px">0</text>
+        <line x1="430" y1="28" x2="458" y2="28" style="stroke:var(--accent-bright);stroke-width:2.5"/>
+        <text x="464" y="32" style="fill:rgba(148,163,184,0.9);font-size:12px">φ = 0</text>
+        <line x1="430" y1="48" x2="458" y2="48" style="stroke:rgba(148,163,184,0.9);stroke-width:2;stroke-dasharray:6 4"/>
+        <text x="464" y="52" style="fill:rgba(148,163,184,0.9);font-size:12px">φ = −π/2</text>
+        <line x1="70" y1="56" x2="70" y2="116" style="stroke:rgba(148,163,184,0.5);stroke-dasharray:3 3"/>
+        <line x1="125" y1="56" x2="125" y2="116" style="stroke:rgba(148,163,184,0.5);stroke-dasharray:3 3"/>
+        <line x1="76" y1="44" x2="119" y2="44" style="stroke:rgba(148,163,184,0.8);stroke-width:1.5"/>
+        <polygon points="70,44 80,39 80,49" style="fill:rgba(148,163,184,0.8)"/>
+        <polygon points="125,44 115,39 115,49" style="fill:rgba(148,163,184,0.8)"/>
+        <text x="84" y="36" style="fill:rgba(148,163,184,0.9);font-size:11.5px">T₀/4</text>
+        <path d="M70,60 C98,60 152,180 180,180 S262,60 290,60 S372,180 400,180 S482,60 510,60" style="stroke:var(--accent-bright);stroke-width:2.5;fill:none"/>
+        <path d="M70,120 C92,120 103,60 125,60 C152,60 208,180 235,180 C262,180 318,60 345,60 C372,60 428,180 455,180 C478,180 492,140 510,120" style="stroke:rgba(148,163,184,0.9);stroke-width:2;fill:none;stroke-dasharray:6 4"/>
+      </svg>
+
+      <p class="lecture-text">Les deux courbes ont la même amplitude et la même période : seule la phase les sépare. La courbe en pointillés décrit un oscillateur lancé depuis la position d'équilibre avec une vitesse vers le haut de l'axe, tandis que la courbe pleine décrit un oscillateur lâché au repos depuis <span class="math">xₘ</span>. Même musique, partitions décalées : c'est tout ce que mesure <span class="math">φ</span>.</p>
+
+      <div class="lecture-example-content">
+        <p class="lecture-example-label">🧪 Exemple travaillé — vérifier une solution</p>
+        <p>Montrer que <span class="math">x(t) = 2,0·cos(10·t)</span> (avec <span class="math">x</span> en cm et <span class="math">t</span> en s) est solution de l'équation différentielle <span class="math">x'' + 100·x = 0</span>.</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step">Je dérive une fois : <span class="math">x'(t) = −2,0 × 10 × sin(10·t) = −20·sin(10·t)</span> (cm·s⁻¹).</li>
+          <li class="lecture-step">Je dérive une seconde fois : <span class="math">x''(t) = −20 × 10 × cos(10·t) = −200·cos(10·t)</span> (cm·s⁻²).</li>
+          <li class="lecture-step">Je remplace dans l'équation : <span class="math">x'' + 100·x</span> = −200·cos(10·t) + 100 × 2,0·cos(10·t) = −200·cos(10·t) + 200·cos(10·t) = 0.</li>
+          <li class="lecture-step">La somme vaut 0 pour tout <span class="math">t</span> : la fonction proposée est bien solution. (Ici <span class="math">xₘ</span> = 2,0 cm et <span class="math">ω₀</span> = 10 rad·s⁻¹.)</li>
+        </ol>
+        <p><strong>✅ Résultat :</strong> vérification réussie — la dérivée seconde est bien proportionnelle à <span class="math">x</span>, avec le bon signe. C'est ce réflexe « dériver, remplacer, conclure » qui rapporte les points.</p>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <p><strong>⚠️ Piège d'examen</strong></p>
+        <p>Dans <span class="math">cos(ω₀·t + φ)</span>, l'argument est en radians : mets ta calculatrice en mode RAD, sinon tous tes points deviennent faux sans que la démarche soit fautive. Et garde la cohérence des unités : si <span class="math">x</span> est en cm dans la solution, elle est en cm partout.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s3 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s3">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">03</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 3</span>
+        <h2 class="lecture-section-title">Pulsation et période propres</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Remplaçons la solution candidate <span class="math">x(t) = xₘ·cos(ω₀·t + φ)</span> dans l'équation différentielle : en dérivant deux fois, on obtient <span class="math">x''(t) = −ω₀²·x(t)</span>, et l'équation <span class="math">x'' + (k/m)·x = 0</span> exige alors <span class="math">ω₀² = k/m</span>. La pulsation n'est donc pas libre : elle est imposée par le système lui-même, d'où son nom de pulsation propre.</p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <p><strong>📖 Définition officielle</strong></p>
+        <p>La <strong>pulsation propre</strong> <span class="math">ω₀</span> et la <strong>période propre</strong> <span class="math">T₀</span> caractérisent l'oscillateur lui-même, indépendamment de la façon dont on le lance : <span class="math">ω₀ = √(k/m)</span> et <span class="math">T₀ = 2π/ω₀</span> pour le pendule élastique.</p>
+      </div>
+
+      <div class="lecture-formula-hero">
+        <p class="lecture-formula-hero-main">Période propre du pendule élastique — démontrée !</p>
+        <p class="lecture-formula-hero"><span class="math">T₀ = 2π√(m/k)</span></p>
+        <p class="lecture-formula-hero">Elle ne dépend ni de l'amplitude, ni des conditions initiales : on dit que les oscillations libres sont isochrones. Doubler l'amplitude ne change pas la durée d'un aller-retour.</p>
+      </div>
+
+      <div class="lecture-formula-box">
+        <p><span class="math">ω₀ = 2π/T₀ = √(k/m)</span> — avec <span class="math">ω₀</span> en rad·s⁻¹. Plus le ressort est raide (<span class="math">k</span> grand) ou la masse légère (<span class="math">m</span> petite), plus l'oscillateur bat vite.</p>
+      </div>
+
+      <svg viewBox="0 0 580 250" width="100%" role="img" aria-label="Deux oscillogrammes superposés : ressort souple période grande, ressort raide période petite">
+        <text x="60" y="30" style="fill:var(--accent-bright);font-size:12.5px">ressort souple (k petit)</text>
+        <text x="550" y="50" text-anchor="end" style="fill:rgba(148,163,184,0.9);font-size:12px">T₀ grand</text>
+        <line x1="50" y1="70" x2="555" y2="70" style="stroke:rgba(148,163,184,0.5);stroke-width:1"/>
+        <path d="M55,42 C110,42 165,98 220,98 C275,98 330,42 385,42 C415,42 445,60 452,66" style="stroke:var(--accent-bright);stroke-width:2.5;fill:none"/>
+        <text x="60" y="170" style="fill:var(--accent-bright);font-size:12.5px">ressort raide (k grand)</text>
+        <text x="550" y="190" text-anchor="end" style="fill:rgba(148,163,184,0.9);font-size:12px">T₀ petit</text>
+        <line x1="50" y1="210" x2="555" y2="210" style="stroke:rgba(148,163,184,0.5);stroke-width:1"/>
+        <path d="M55,182 C75,182 95,238 115,238 C135,238 155,182 175,182 C195,182 215,238 235,238 C255,238 275,182 295,182 C315,182 335,238 355,238 C375,238 395,182 415,182 C435,182 465,238 495,220" style="stroke:var(--accent-bright);stroke-width:2.5;fill:none"/>
+      </svg>
+
+      <p class="lecture-text">Le graphique confirme la formule <span class="math">T₀ = 2π√(m/k)</span> : un grand <span class="math">k</span> raccourcit la période, et une grande masse l'allonge. Un ressort raide portant une petite masse vibre frénétiquement ; un ressort souple chargé lourdement bat paisiblement.</p>
+
+      <div class="lecture-example-content">
+        <p class="lecture-example-label">🧪 Exemple travaillé — l'influence de m et de k</p>
+        <p>Un pendule élastique a <span class="math">m</span> = 500 g et <span class="math">k</span> = 20 N·m⁻¹. Calculer <span class="math">T₀</span>, puis la nouvelle période si on quadruple <span class="math">k</span>, ou si on double <span class="math">m</span>.</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step">Conversion : <span class="math">m</span> = 500 g = 0,500 kg. Pulsation : <span class="math">ω₀</span> = √(20/0,500) = √40 ≈ 6,3 rad·s⁻¹.</li>
+          <li class="lecture-step">Période : <span class="math">T₀</span> = 2π/ω₀ = 6,283/6,325 ≈ 0,99 s, soit environ 1,0 s.</li>
+          <li class="lecture-step">Si <span class="math">k</span> est multipliée par 4 : <span class="math">T₀</span> est divisée par √4 = 2, donc <span class="math">T₀</span> ≈ 0,50 s.</li>
+          <li class="lecture-step">Si <span class="math">m</span> est doublée : <span class="math">T₀</span> est multipliée par √2 ≈ 1,41, donc <span class="math">T₀</span> ≈ 1,4 s.</li>
+        </ol>
+        <p><strong>✅ Résultat :</strong> 0,99 s ≈ 1,0 s ; puis 0,50 s (k ×4) ou 1,4 s (m ×2). Vérification directe : <span class="math">T₀</span> = 2π√(0,500/20) = 2π × 0,158 ≈ 0,99 s — cohérent.</p>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <p><strong>⚠️ Piège d'examen</strong></p>
+        <p>Les conditions initiales (<span class="math">x₀</span>, vitesse de lâcher) ne changent JAMAIS <span class="math">T₀</span> ni <span class="math">ω₀</span> : elles ne fixent que <span class="math">xₘ</span> et <span class="math">φ</span>. Si un énoncé te dit « on lâche d'une amplitude double », la période reste identique — c'est l'isochronisme.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s4 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s4">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">04</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 4</span>
+        <h2 class="lecture-section-title">Conditions initiales : amplitude et phase</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">La solution <span class="math">x(t) = xₘ·cos(ω₀·t + φ)</span> contient trois inconnues : <span class="math">ω₀</span> est fixée par le système (section 03), mais <span class="math">xₘ</span> et <span class="math">φ</span> dépendent de la manière dont on lance l'oscillateur — ce qu'on appelle les conditions initiales. C'est le moment de la rédaction où l'énoncé te murmure : « on écarte la masse de 3,0 cm et on la lâche sans vitesse ».</p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <p><strong>📖 Définition officielle</strong></p>
+        <p>Les <strong>conditions initiales</strong> sont la position <span class="math">x(0) = x₀</span> et la vitesse <span class="math">v(0) = v₀</span> de l'oscillateur à l'instant t = 0. Ce sont elles qui déterminent l'amplitude <span class="math">xₘ</span> et la phase <span class="math">φ</span> de la solution.</p>
+      </div>
+
+      <p class="lecture-text">Cas le plus fréquent au Bac : on écarte la masse de <span class="math">x₀</span> et on la lâche SANS vitesse. À t = 0, la solution donne <span class="math">x(0) = xₘ·cos φ</span> et la vitesse <span class="math">v(0) = −xₘ·ω₀·sin φ</span> doit être nulle : on prend donc <span class="math">φ = 0</span> et <span class="math">xₘ = x₀</span>, d'où la solution toute simple <span class="math">x(t) = x₀·cos(ω₀·t)</span>. La courbe démarre au sommet, comme dans nos oscillogrammes.</p>
+
+      <div class="lecture-example-content">
+        <p class="lecture-example-label">🧪 Exemple travaillé — écrire x(t) complète</p>
+        <p>Une masse <span class="math">m</span> = 100 g accrochée à un ressort de raideur <span class="math">k</span> = 10 N·m⁻¹ est écartée de <span class="math">x₀</span> = 2,0 cm puis lâchée sans vitesse. Déterminer <span class="math">x(t)</span>, puis la position à t = 0,157 s.</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step">Conversions : <span class="math">m</span> = 0,100 kg ; <span class="math">x₀</span> = 2,0 cm = 0,020 m (si je garde <span class="math">x</span> en cm, je le précise partout).</li>
+          <li class="lecture-step">Pulsation propre : <span class="math">ω₀</span> = √(k/m) = √(10/0,100) = √100 = 10 rad·s⁻¹, d'où <span class="math">T₀</span> = 2π/10 ≈ 0,63 s.</li>
+          <li class="lecture-step">Conditions initiales : lâché sans vitesse depuis <span class="math">x₀</span>, donc <span class="math">φ</span> = 0 et <span class="math">xₘ</span> = 2,0 cm.</li>
+          <li class="lecture-step">Solution : <span class="math">x(t) = 2,0·cos(10·t)</span> (cm) — ou <span class="math">x(t) = 0,020·cos(10·t)</span> (m).</li>
+          <li class="lecture-step">À t = 0,157 s : <span class="math">ω₀·t</span> = 10 × 0,157 = 1,57 rad ≈ π/2, donc cos(π/2) ≈ 0 et <span class="math">x</span> ≈ 0 : la masse passe par l'équilibre avec sa vitesse maximale.</li>
+        </ol>
+        <p><strong>✅ Résultat :</strong> <span class="math">x(t) = 2,0·cos(10·t)</span> (cm) ; à t = 0,157 s ≈ T₀/4, la masse traverse la position d'équilibre. Vérification : un quart de période après le sommet, la sinusoïde passe par zéro — cohérent.</p>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <p><strong>⚠️ Piège d'examen</strong></p>
+        <p>Le résultat <span class="math">φ = 0</span> n'est vrai QUE si la vitesse initiale est nulle. Si l'énoncé dit « on lance la masse depuis l'équilibre avec la vitesse <span class="math">v₀</span> », alors <span class="math">x(0) = 0</span> impose une phase non nulle. Lis deux fois les conditions initiales : elles décident de tout.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s5 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s5">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">05</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 5</span>
+        <h2 class="lecture-section-title">Et le pendule simple dans tout ça ?</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Appliquons la même méthode au pendule simple. On projette la deuxième loi de Newton sur la tangente à la trajectoire : la masse subit alors une force de rappel <span class="math">m·g·sin θ</span>. Pour de petits angles, l'approximation <span class="math">sin θ ≈ θ</span> (en radians) transforme l'équation en une cousine exacte de celle du pendule élastique. Même musique, autres instruments.</p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <p><strong>📖 Définition officielle</strong></p>
+        <p>Pour un <strong>pendule simple</strong> de faible amplitude, l'angle <span class="math">θ(t)</span> vérifie l'équation différentielle <span class="math">θ'' + (g/l)·θ = 0</span>, où <span class="math">θ''</span> est la dérivée seconde de <span class="math">θ</span> par rapport au temps. La solution est sinusoïdale et la période propre vaut <span class="math">T₀ = 2π√(l/g)</span>.</p>
+      </div>
+
+      <div class="lecture-formula-hero">
+        <p class="lecture-formula-hero-main">Période propre du pendule simple — démontrée !</p>
+        <p class="lecture-formula-hero"><span class="math">T₀ = 2π√(l/g)</span></p>
+        <p class="lecture-formula-hero">L'analogie est parfaite : à <span class="math">k/m</span> du pendule élastique correspond <span class="math">g/l</span> du pendule simple. On en tire même <span class="math">g = 4π²·l/T₀²</span> pour mesurer la pesanteur au laboratoire.</p>
+      </div>
+
+      <div class="lecture-formula-box">
+        <p><span class="math">θ'' + (g/l)·θ = 0</span> — équation différentielle du pendule simple (petits angles, <span class="math">θ</span> en radians). Elle a exactement la même forme que <span class="math">x'' + (k/m)·x = 0</span>.</p>
+      </div>
+
+      <svg viewBox="0 0 580 230" width="100%" role="img" aria-label="Mesure de g au pendule simple : chronometrage de 20 oscillations avec un chronometre">
+        <line x1="70" y1="28" x2="240" y2="28" style="stroke:rgba(148,163,184,0.8);stroke-width:3"/>
+        <line x1="140" y1="28" x2="140" y2="204" style="stroke:rgba(148,163,184,0.55);stroke-dasharray:5 5"/>
+        <line x1="140" y1="28" x2="200" y2="200" style="stroke:var(--accent-bright);stroke-width:2"/>
+        <circle cx="200" cy="200" r="13" style="fill:rgba(74,222,128,0.2);stroke:var(--accent-bright);stroke-width:2"/>
+        <text x="182" y="115" style="fill:var(--accent-bright);font-size:13px;font-style:italic">l = 1,00 m</text>
+        <text x="118" y="88" style="fill:var(--accent-bright);font-size:13px;font-style:italic">θ</text>
+        <circle cx="420" cy="120" r="55" style="fill:rgba(74,222,128,0.08);stroke:var(--accent-bright);stroke-width:2"/>
+        <line x1="420" y1="70" x2="420" y2="80" style="stroke:rgba(148,163,184,0.9);stroke-width:1.5"/>
+        <line x1="470" y1="120" x2="460" y2="120" style="stroke:rgba(148,163,184,0.9);stroke-width:1.5"/>
+        <line x1="420" y1="170" x2="420" y2="160" style="stroke:rgba(148,163,184,0.9);stroke-width:1.5"/>
+        <line x1="370" y1="120" x2="380" y2="120" style="stroke:rgba(148,163,184,0.9);stroke-width:1.5"/>
+        <circle cx="420" cy="62" r="4" style="fill:rgba(148,163,184,0.9)"/>
+        <line x1="420" y1="120" x2="420" y2="84" style="stroke:var(--accent-bright);stroke-width:2.5"/>
+        <circle cx="420" cy="120" r="3" style="fill:var(--accent-bright)"/>
+        <line x1="250" y1="120" x2="320" y2="120" style="stroke:rgba(148,163,184,0.7);stroke-width:1.5;stroke-dasharray:5 4"/>
+        <polygon points="328,120 317,115 317,125" style="fill:rgba(148,163,184,0.7)"/>
+        <text x="420" y="48" text-anchor="middle" style="fill:var(--accent-bright);font-size:12.5px">T₀ = 40,2/20 = 2,01 s</text>
+        <text x="420" y="196" text-anchor="middle" style="fill:rgba(148,163,184,0.9);font-size:12px">chrono</text>
+        <text x="420" y="216" text-anchor="middle" style="fill:rgba(148,163,184,0.9);font-size:11.5px">20 allers-retours en 40,2 s</text>
+      </svg>
+
+      <div class="lecture-example-content">
+        <p class="lecture-example-label">🧪 Exemple travaillé — mesurer g à Niamey</p>
+        <p>Avec un pendule simple de longueur <span class="math">l</span> = 1,00 m, un élève chronomètre 20 allers-retours en 40,2 s. En déduire la valeur de <span class="math">g</span>.</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step">Je calcule la période : <span class="math">T₀</span> = 40,2/20 = 2,01 s (chronométrer 20 allers-retours divise l'erreur de réaction par 20).</li>
+          <li class="lecture-step">J'isole <span class="math">g</span> dans la formule : <span class="math">T₀²</span> = 4π²·l/g, donc <span class="math">g = 4π²·l/T₀²</span>.</li>
+          <li class="lecture-step">J'applique : <span class="math">T₀²</span> = 2,01² = 4,04 s², et 4π² ≈ 39,5, d'où <span class="math">g</span> = 39,5 × 1,00/4,04 ≈ 9,8 m·s⁻².</li>
+          <li class="lecture-step">Je conclus avec unité et chiffres significatifs : <span class="math">g</span> ≈ 9,8 m·s⁻², valeur cohérente avec la pesanteur terrestre.</li>
+        </ol>
+        <p><strong>✅ Résultat :</strong> <span class="math">g</span> ≈ 9,8 m·s⁻². Une corde, un chronomètre, deux lignes de calcul : tu viens de mesurer la pesanteur comme au TP.</p>
+      </div>
+
+      <p class="lecture-text">Le tableau ci-dessous rassemble les deux oscillateurs : tu vois que l'analogie mathématique est totale, seule la signification des symboles change.</p>
+
+      <table class="lecture-table">
+        <thead>
+          <tr><th>Élément</th><th>Pendule élastique</th><th>Pendule simple</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Variable</td><td>élongation <span class="math">x</span> (m)</td><td>angle <span class="math">θ</span> (rad)</td></tr>
+          <tr><td>Équation différentielle</td><td><span class="math">m·x'' + k·x = 0</span></td><td><span class="math">θ'' + (g/l)·θ = 0</span></td></tr>
+          <tr><td>Pulsation propre <span class="math">ω₀</span></td><td><span class="math">√(k/m)</span></td><td><span class="math">√(g/l)</span></td></tr>
+          <tr><td>Solution</td><td><span class="math">x(t) = xₘ·cos(ω₀·t + φ)</span></td><td><span class="math">θ(t) = θₘ·cos(ω₀·t + φ)</span></td></tr>
+          <tr><td>Période propre <span class="math">T₀</span></td><td><span class="math">2π√(m/k)</span></td><td><span class="math">2π√(l/g)</span></td></tr>
+          <tr><td>Paramètres qui agissent sur <span class="math">T₀</span></td><td><span class="math">m</span> et <span class="math">k</span></td><td><span class="math">l</span> et <span class="math">g</span></td></tr>
+        </tbody>
+      </table>
+
+      <p class="lecture-text"><strong>🏋️ Entraînement — deux exercices complets</strong></p>
+
+      <div class="lecture-text">
+        <p class="lecture-text"><strong>Exercice 1 — Solution complète demandée.</strong> Un pendule élastique de masse <span class="math">m</span> = 200 g et de raideur <span class="math">k</span> = 5,0 N·m⁻¹ est écarté de <span class="math">x₀</span> = 3,0 cm puis lâché sans vitesse. Déterminer <span class="math">ω₀</span>, <span class="math">T₀</span>, puis écrire <span class="math">x(t)</span> et la position à t = 0,314 s.</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step">Conversions : <span class="math">m</span> = 0,200 kg ; <span class="math">x₀</span> = 0,030 m.</li>
+          <li class="lecture-step">Pulsation : <span class="math">ω₀</span> = √(k/m) = √(5,0/0,200) = √25 = 5,0 rad·s⁻¹.</li>
+          <li class="lecture-step">Période : <span class="math">T₀</span> = 2π/ω₀ = 6,283/5,0 ≈ 1,26 s.</li>
+          <li class="lecture-step">Conditions initiales (lâché sans vitesse) : <span class="math">φ</span> = 0 et <span class="math">xₘ</span> = 3,0 cm, donc <span class="math">x(t) = 3,0·cos(5,0·t)</span> (cm).</li>
+          <li class="lecture-step">À t = 0,314 s : <span class="math">ω₀·t</span> = 5,0 × 0,314 = 1,57 rad ≈ π/2, donc <span class="math">x</span> ≈ 0 : passage à l'équilibre (t = 0,314 s ≈ T₀/4).</li>
+        </ol>
+        <p><strong>✅ Réponse :</strong> <span class="math">ω₀</span> = 5,0 rad·s⁻¹ ; <span class="math">T₀</span> ≈ 1,26 s ; <span class="math">x(t) = 3,0·cos(5,0·t)</span> (cm) ; <span class="math">x</span>(0,314 s) ≈ 0.</p>
+      </div>
+
+      <div class="lecture-text">
+        <p class="lecture-text"><strong>Exercice 2 — Le pendule seconde.</strong> On veut un pendule simple de période propre <span class="math">T₀</span> = 1,0 s (un aller-retour par seconde). Quelle longueur <span class="math">l</span> faut-il choisir, avec <span class="math">g</span> = 9,8 m·s⁻² ?</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step">J'isole <span class="math">l</span> : <span class="math">T₀²</span> = 4π²·l/g donne <span class="math">l = g·T₀²/(4π²)</span>.</li>
+          <li class="lecture-step">J'applique : <span class="math">l</span> = 9,8 × 1,0²/39,5 = 9,8/39,5 ≈ 0,25 m.</li>
+          <li class="lecture-step">Je convertis : <span class="math">l</span> ≈ 25 cm.</li>
+          <li class="lecture-step">Vérification inverse : <span class="math">T₀</span> = 2π√(0,25/9,8) = 2π × 0,160 ≈ 1,0 s — on retombe sur la valeur demandée.</li>
+        </ol>
+        <p><strong>✅ Réponse :</strong> <span class="math">l</span> ≈ 25 cm : le fameux pendule seconde, exactement celui de l'exemple de la partie 01.</p>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <p><strong>⚠️ Piège d'examen</strong></p>
+        <p>Dans l'équation du pendule simple, l'angle <span class="math">θ</span> doit être exprimé en radians — l'approximation <span class="math">sin θ ≈ θ</span> est FAUSSE en degrés. Et pour mesurer <span class="math">g</span> ou <span class="math">T₀</span>, chronomètre toujours plusieurs allers-retours (10 ou 20) puis divise : une seule oscillation multiplie l'erreur de chronométrage par le nombre d'oscillations.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ===== QCM ===== -->
+  <div class="lecture-quiz">
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Pour un pendule élastique, la pulsation propre vaut :</p>
+      <div class="lecture-quiz-options"><span>A) √(m/k)</span><span>B) √(k/m)</span><span>C) k/m</span><span>D) 2π√(m/k)</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">Réponse B. L'identification de la solution dans <span class="math">x'' + (k/m)·x = 0</span> impose <span class="math">ω₀² = k/m</span>, donc <span class="math">ω₀ = √(k/m)</span>. L'option D est la période, pas la pulsation.</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Un pendule élastique oscille avec la période <span class="math">T₀</span>. Si on remplace le ressort par un ressort quatre fois plus raide (même masse), la nouvelle période vaut :</p>
+      <div class="lecture-quiz-options"><span>A) 2·T₀</span><span>B) T₀/2</span><span>C) 4·T₀</span><span>D) T₀ (inchangée)</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">Réponse B. <span class="math">T₀ = 2π√(m/k)</span> : multiplier <span class="math">k</span> par 4 divise le quotient <span class="math">m/k</span> par 4, donc la racine par 2 et <span class="math">T₀</span> par 2.</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">On écarte une masse de <span class="math">x₀</span> = 3,0 cm et on la lâche SANS vitesse. La phase à l'origine de <span class="math">x(t) = xₘ·cos(ω₀·t + φ)</span> vaut :</p>
+      <div class="lecture-quiz-options"><span>A) π/2</span><span>B) 0</span><span>C) π</span><span>D) −π/2</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">Réponse B. Sans vitesse initiale, <span class="math">v(0) = −xₘ·ω₀·sin φ = 0</span> impose <span class="math">φ = 0</span> (et <span class="math">xₘ = x₀</span> = 3,0 cm) : la courbe démarre au sommet.</div></details>
+    </div>
+  </div>
+  <!-- ===== RÉCAP ===== -->
+  <div class="lecture-recap">
+    <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
+    <ul class="lecture-recap-list">
+      <li><strong>Équation différentielle</strong> du pendule élastique : <span class="math">m·x'' + k·x = 0</span>, où <span class="math">x''(t)</span> est la dérivée seconde de <span class="math">x</span> (l'accélération), obtenue par bilan des forces + deuxième loi de Newton.</li>
+      <li><strong>Solution sinusoïdale</strong> : <span class="math">x(t) = xₘ·cos(ω₀·t + φ)</span>, avec la vitesse <span class="math">v(t) = −xₘ·ω₀·sin(ω₀·t + φ)</span>.</li>
+      <li><strong>Pulsation et période propres</strong> : <span class="math">ω₀ = √(k/m)</span> et <span class="math">T₀ = 2π√(m/k)</span> — imposées par le système, jamais par le lâcher.</li>
+      <li><strong>Analogie pendule simple</strong> : remplacer <span class="math">k/m</span> par <span class="math">g/l</span>, et on retrouve <span class="math">T₀ = 2π√(l/g)</span> ainsi que la mesure de <span class="math">g = 4π²·l/T₀²</span>.</li>
+    </ul>
+  </div>
+  <!-- ===== FIN ===== -->
+  <div class="lecture-end">
+    <div class="lecture-end-icon">🎯</div>
+    <div class="lecture-end-text">Partie 02 terminée !</div>
+    <div class="lecture-end-sub">Tu tiens maintenant la mécanique complète : équation, solution, conditions initiales. En partie 03, on suit l'énergie qui fait tout marcher — et on découvrira pourquoi la balançoire finit par s'arrêter si personne ne la pousse. C'est la partie la plus visuelle du chapitre !</div>
+    <div class="lecture-end-divider"></div>
+  </div>
+</div>

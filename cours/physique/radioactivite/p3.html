@@ -1,0 +1,494 @@
+<!-- PARTIE 03 — Loi de décroissance radioactive & Demi-vie (Radioactivité) -->
+<div class="lecture-container">
+
+  <!-- ===== HERO ===== -->
+  <header class="lecture-hero">
+    <div class="lecture-hero-badge">
+      <span class="lecture-hero-icon">📘</span>
+      <span class="lecture-hero-label">Terminale C&D · Radioactivité · Partie 03</span>
+    </div>
+    <h1 class="lecture-hero-title">
+      Loi de décroissance radioactive <em>&amp; Demi-vie</em>
+    </h1>
+    <p class="lecture-hero-intro">
+      Un échantillon radioactif ne s'éteint pas d'un coup : il est divisé par deux, encore par deux, encore par deux… Cette régularité surprenante porte un nom : la loi de décroissance radioactive. Tu apprends à calculer ce qui reste d'un échantillon, à manier la demi-vie t½, la constante de temps τ et l'activité en becquerels — puis tu appliques tout cela à la datation au carbone 14 et à la radioprotection, du radon des maisons à l'uranium d'Arlit.
+    </p>
+    <div class="lecture-hero-meta">
+      <span class="lecture-hero-meta-item">⏱ 25 min</span>
+      <span class="lecture-hero-meta-item">⚡ 4 notions</span>
+      <span class="lecture-hero-meta-item">📚 6 sections</span>
+      <span class="lecture-hero-meta-item">🎓 Terminale C&D</span>
+    </div>
+  </header>
+  <!-- ===== SOMMAIRE ===== -->
+  <nav class="lecture-toc">
+    <div class="lecture-toc-header">
+      <span>Dans cette partie</span>
+      <span class="lecture-toc-count">4 notions · 6 sections</span>
+    </div>
+    <ol class="lecture-toc-list">
+      <li><a href="#s0"><span class="toc-num">00</span><span>Dater un vestige : le défi</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>La loi de décroissance N(t) = N₀ × e^(−λ·t)</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>Constante de temps τ et demi-vie t½</span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>L'activité A = λ·N (becquerel)</span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>La datation au carbone 14</span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>Applications, dangers et radioprotection</span></a></li>
+    </ol>
+  </nav>
+  <!-- ============================================================ -->
+  <!-- SECTION s0 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s0">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">00</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Motivation</span>
+        <h2 class="lecture-section-title">Dater un vestige : le défi</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Un archéologue exhume un fragment de bois sur les bords du fleuve Niger : combien d'années depuis que l'arbre a été abattu ? Aucune étiquette, aucun témoin. Et pourtant, un compteur suffit : chaque gramme de carbone du bois émet des électrons à un rythme qui diminue avec le temps, comme un sablier nucléaire. En le mesurant, on obtient l'âge.</p>
+      <p class="lecture-text">Le même outil mathématique sert à l'hôpital pour savoir combien de temps un patient reste radioactive après une injection d'iode 131, et à l'ingénieur d'Arlit pour évaluer la radioactivité du radon dans une galerie de mine. Une seule loi, trois métiers : c'est le programme de cette partie.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-title">🎯 Objectif de la partie</div>
+        <p>Tu sauras prédire combien de noyaux (ou quel pourcentage) reste d'un échantillon au bout d'un temps donné, calculer une demi-vie, une constante radioactive ou une activité en Bq, et dater un vestige au carbone 14 (t½ = 5 730 ans).</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s1 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s1">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">01</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1</span>
+        <h2 class="lecture-section-title">La loi de décroissance N(t) = N₀ × e^(−λ·t)</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Pour UN noyau, la désintégration reste imprévisible (partie 01). Mais pour des milliards de noyaux, l'aléa s'efface : la proportion qui se désintègre chaque seconde est constante, et il en sort une loi mathématique d'une élégance remarquable — une décroissance exponentielle. C'est l'exemple parfait d'une loi statistique : le chaos individuel produit l'ordre collectif.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-title">📖 Définition officielle</div>
+        <p>Loi de décroissance radioactive : le nombre <span class="math">N(t)</span> de noyaux radioactifs restants à l'instant t décroît de façon exponentielle, selon <span class="math">N(t) = N₀ × e^(−λ·t)</span>. <span class="math">N₀</span> est le nombre de noyaux à t = 0 et <span class="math">λ</span> est la constante radioactive, propre à chaque nucléide : plus λ est grand, plus la décroissance est rapide.</p>
+      </div>
+      <p class="lecture-text">💡 Pour te le représenter : chaque noyau joue à une loterie dont la probabilité de gain par seconde est fixe — disons une chance sur mille. Au début, avec des milliards de participants, des millions gagnent chaque seconde. Mais plus la foule s'amincit, moins il y a de gagnants : le rythme ralentit avec la population elle-même. C'est exactement la signature d'une exponentielle.</p>
+      <div class="lecture-formula-hero">
+        <span class="math">N(t) = N₀ × e^(−λ·t)</span>
+        <p><span class="math">N₀</span> : nombre initial de noyaux · <span class="math">λ</span> : constante radioactive (en s⁻¹, an⁻¹, jour⁻¹…) · e ≈ 2,718 : la constante d'Euler. La constante λ mesure la probabilité de désintégration par unité de temps.</p>
+      </div>
+      <div class="lecture-formula-box">
+        <span class="math">fraction restante : N(t)/N₀ = e^(−λ·t)</span>
+        <p>Pour les pourcentages, tu n'as même pas besoin de <span class="math">N₀</span> : la fraction restante ne dépend que de <span class="math">λ</span> et de t. Pratique quand l'énoncé donne des pourcentages.</p>
+      </div>
+      <svg viewBox="0 0 560 336" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Courbe exponentielle décroissante du nombre de noyaux restants avec la demi-vie annotée à 50, 25 et 12,5 pour cent" style="width:100%;height:auto">
+        <text x="300" y="18" text-anchor="middle" font-size="13" fill="currentColor">La décroissance exponentielle : la moitié à chaque demi-vie</text>
+        <line x1="60" y1="280" x2="535" y2="280" style="stroke:rgba(148,163,184,0.8)" stroke-width="1.5"/>
+        <polygon points="535,274 547,280 535,286" style="fill:rgba(148,163,184,0.8)"/>
+        <line x1="60" y1="280" x2="60" y2="34" style="stroke:rgba(148,163,184,0.8)" stroke-width="1.5"/>
+        <polygon points="54,36 66,36 60,24" style="fill:rgba(148,163,184,0.8)"/>
+        <text x="540" y="302" text-anchor="end" font-size="12" fill="currentColor">temps t</text>
+        <text x="26" y="160" text-anchor="middle" font-size="12" fill="currentColor" transform="rotate(-90 26 160)">nombre N de noyaux restants</text>
+        <line x1="60" y1="60" x2="300" y2="60" style="stroke:rgba(148,163,184,0.4)" stroke-dasharray="4 4"/>
+        <text x="52" y="64" text-anchor="end" font-size="12" fill="currentColor">N₀</text>
+        <path d="M60,60 Q90,140 120,170 Q150,212 180,225 Q210,244 240,253 Q270,261 300,266 Q330,271 360,273 Q400,276 440,278 Q485,279 530,280" style="fill:none;stroke:var(--accent-bright)" stroke-width="2.5"/>
+        <line x1="120" y1="280" x2="120" y2="170" style="stroke:rgba(148,163,184,0.5)" stroke-dasharray="4 3"/>
+        <line x1="60" y1="170" x2="120" y2="170" style="stroke:rgba(148,163,184,0.5)" stroke-dasharray="4 3"/>
+        <circle cx="120" cy="170" r="4.5" style="fill:rgba(74,222,128,0.95)"/>
+        <text x="128" y="164" font-size="12" fill="currentColor">1 t½ → 50 %</text>
+        <line x1="180" y1="280" x2="180" y2="225" style="stroke:rgba(148,163,184,0.5)" stroke-dasharray="4 3"/>
+        <line x1="60" y1="225" x2="180" y2="225" style="stroke:rgba(148,163,184,0.5)" stroke-dasharray="4 3"/>
+        <circle cx="180" cy="225" r="4.5" style="fill:rgba(74,222,128,0.95)"/>
+        <text x="188" y="219" font-size="12" fill="currentColor">2 t½ → 25 %</text>
+        <line x1="240" y1="280" x2="240" y2="253" style="stroke:rgba(148,163,184,0.5)" stroke-dasharray="4 3"/>
+        <line x1="60" y1="253" x2="240" y2="253" style="stroke:rgba(148,163,184,0.5)" stroke-dasharray="4 3"/>
+        <circle cx="240" cy="253" r="4.5" style="fill:rgba(74,222,128,0.95)"/>
+        <text x="248" y="247" font-size="12" fill="currentColor">3 t½ → 12,5 %</text>
+        <line x1="120" y1="280" x2="120" y2="286" style="stroke:rgba(148,163,184,0.8)"/>
+        <line x1="180" y1="280" x2="180" y2="286" style="stroke:rgba(148,163,184,0.8)"/>
+        <line x1="240" y1="280" x2="240" y2="286" style="stroke:rgba(148,163,184,0.8)"/>
+        <line x1="300" y1="280" x2="300" y2="286" style="stroke:rgba(148,163,184,0.8)"/>
+        <line x1="360" y1="280" x2="360" y2="286" style="stroke:rgba(148,163,184,0.8)"/>
+        <text x="120" y="298" text-anchor="middle" font-size="11" fill="currentColor">1</text>
+        <text x="180" y="298" text-anchor="middle" font-size="11" fill="currentColor">2</text>
+        <text x="240" y="298" text-anchor="middle" font-size="11" fill="currentColor">3</text>
+        <text x="300" y="298" text-anchor="middle" font-size="11" fill="currentColor">4</text>
+        <text x="360" y="298" text-anchor="middle" font-size="11" fill="currentColor">5</text>
+        <text x="300" y="320" text-anchor="middle" font-size="12" fill="currentColor">temps (en demi-vies t½)</text>
+      </svg>
+      <div class="lecture-steps">
+        <div class="lecture-step"><span class="lecture-step-number">1</span>
+          <p>À t = 0, la courbe part de <span class="math">N₀</span> sur l'axe vertical : aucun noyau ne s'est encore désintégré.</p>
+        </div>
+        <div class="lecture-step"><span class="lecture-step-number">2</span>
+          <p>La courbe descend de plus en plus doucement, mais elle ne touche JAMAIS l'axe des temps : on ne dit jamais « zéro noyau », on dit « quantité négligeable ».</p>
+        </div>
+        <div class="lecture-step"><span class="lecture-step-number">3</span>
+          <p>Au bout d'une demi-vie t½, il reste exactement la moitié : N = N₀/2, soit 50 %.</p>
+        </div>
+        <div class="lecture-step"><span class="lecture-step-number">4</span>
+          <p>Au bout de deux demi-vies, il reste 25 % ; de trois, 12,5 % ; de quatre, 6,25 % : à chaque fois, on divise par 2.</p>
+        </div>
+      </div>
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">🧪 Exemple travaillé — le césium 137 après 90 ans</div>
+        <p>Un échantillon contient N₀ = 1,0 × 10¹² noyaux de césium 137, une demi-vie t½ = 30 ans (retombées accidentelles, déchets). Combien de noyaux reste-t-il après 90 ans ?</p>
+        <div class="lecture-steps">
+          <div class="lecture-step"><span class="lecture-step-number">1</span>
+            <p>Je compare la durée à la demi-vie : 90 ans = 3 × 30 ans, donc exactement 3 t½.</p>
+          </div>
+          <div class="lecture-step"><span class="lecture-step-number">2</span>
+            <p>J'applique la règle des moitiés : N = N₀ × (1/2)³ = 1,0 × 10¹² / 8.</p>
+          </div>
+          <div class="lecture-step"><span class="lecture-step-number">3</span>
+            <p>Calcul : 1,0 × 10¹² / 8 = 0,125 × 10¹² = 1,25 × 10¹¹ noyaux.</p>
+          </div>
+          <div class="lecture-step"><span class="lecture-step-number">4</span>
+            <p>Vérification par les pourcentages : 100 % → 50 % → 25 % → 12,5 %, et 12,5 % de 1,0 × 10¹² = 1,25 × 10¹¹ ✓.</p>
+          </div>
+          <div class="lecture-step"><span class="lecture-step-number">5</span>
+            <p>Conclusion : après 90 ans, il reste 1,25 × 10¹¹ noyaux de césium 137, soit 12,5 % de l'échantillon initial.</p>
+          </div>
+        </div>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-title">⚠️ Piège d'examen</div>
+        <p>Les unités de <span class="math">λ</span> et de t doivent correspondre : λ en an⁻¹ exige t en années, λ en s⁻¹ exige t en secondes. Convertis AVANT de calculer. Et n'écris jamais que la courbe « atteint zéro » : une exponentielle ne s'annule jamais.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s2 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s2">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">02</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2</span>
+        <h2 class="lecture-section-title">Constante de temps τ et demi-vie t½</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">La constante <span class="math">λ</span> est abstraite ; les physiciens lui préfèrent deux durées concrètes. La première, <span class="math">τ</span> (constante de temps), est l'horloge naturelle de l'exponentielle. La seconde, <span class="math">t½</span> (demi-vie), est la star des exercices : le temps au bout duquel la moitié des noyaux s'est désintégrée. Elles sont liées par une formule à connaître par cœur.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-title">📖 Définition officielle</div>
+        <p>La constante de temps est <span class="math">τ = 1/λ</span> : à l'instant t = τ, il reste N₀/e ≈ 37 % des noyaux initiaux. La demi-vie (ou période radioactive) est <span class="math">t½</span> : la durée au bout de laquelle la moitié des noyaux initiaux s'est désintégrée. On démontre que <span class="math">t½ = ln 2/λ ≈ 0,693 × τ</span>.</p>
+      </div>
+      <div class="lecture-formula-hero">
+        <span class="math">t½ = ln 2/λ ≈ 0,693 × τ</span>
+        <p>Avec ln 2 ≈ 0,693. C'est LA formule la plus utilisée du chapitre : elle relie la demi-vie (facile à mesurer) à la constante radioactive <span class="math">λ</span> (indispensable dans la loi exponentielle).</p>
+      </div>
+      <div class="lecture-formula-box">
+        <span class="math">τ = 1/λ</span>
+        <p>Même unité que t½ (secondes, jours, années…). Ordre de grandeur à retenir : τ est un peu plus grande que t½ (43 ans contre 30 ans pour le césium 137).</p>
+      </div>
+      <div class="lecture-formula-box">
+        <span class="math">N(t) = N₀ × 2^(−t/t½)</span>
+        <p>La loi de décroissance réécrite avec la demi-vie : parfaite quand l'énoncé donne t½ et des multiples de t½. Tu retrouves (1/2)³ = 1/8 pour trois demi-vies.</p>
+      </div>
+      <svg viewBox="0 0 560 210" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Escalier des moitiés : 100, 50, 25, 12,5 et 6,25 pour cent restants après chaque demi-vie" style="width:100%;height:auto">
+        <text x="280" y="20" text-anchor="middle" font-size="13" fill="currentColor">La règle des moitiés</text>
+        <line x1="40" y1="170" x2="530" y2="170" style="stroke:rgba(148,163,184,0.8)" stroke-width="1.5"/>
+        <rect x="70" y="40" width="60" height="130" style="fill:rgba(74,222,128,0.3);stroke:var(--accent-bright)"/>
+        <rect x="170" y="105" width="60" height="65" style="fill:rgba(74,222,128,0.3);stroke:var(--accent-bright)"/>
+        <rect x="270" y="138" width="60" height="32" style="fill:rgba(74,222,128,0.3);stroke:var(--accent-bright)"/>
+        <rect x="370" y="154" width="60" height="16" style="fill:rgba(74,222,128,0.3);stroke:var(--accent-bright)"/>
+        <rect x="470" y="162" width="60" height="8" style="fill:rgba(74,222,128,0.3);stroke:var(--accent-bright)"/>
+        <text x="100" y="32" text-anchor="middle" font-size="12" fill="currentColor">100 %</text>
+        <text x="200" y="97" text-anchor="middle" font-size="12" fill="currentColor">50 %</text>
+        <text x="300" y="130" text-anchor="middle" font-size="12" fill="currentColor">25 %</text>
+        <text x="400" y="146" text-anchor="middle" font-size="12" fill="currentColor">12,5 %</text>
+        <text x="500" y="154" text-anchor="middle" font-size="12" fill="currentColor">6,25 %</text>
+        <text x="100" y="190" text-anchor="middle" font-size="11" fill="currentColor">t = 0</text>
+        <text x="200" y="190" text-anchor="middle" font-size="11" fill="currentColor">1 t½</text>
+        <text x="300" y="190" text-anchor="middle" font-size="11" fill="currentColor">2 t½</text>
+        <text x="400" y="190" text-anchor="middle" font-size="11" fill="currentColor">3 t½</text>
+        <text x="500" y="190" text-anchor="middle" font-size="11" fill="currentColor">4 t½</text>
+        <text x="280" y="204" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.85">à chaque demi-vie, on divise par 2 : 100 → 50 → 25 → 12,5 → 6,25 %</text>
+      </svg>
+      <p class="lecture-text">💡 Pour te le représenter : la demi-vie est le « pas » de l'escalier (−50 % à chaque marche), la constante de temps est la pente générale de la descente. Les deux décrivent la même courbe, vue de deux façons.</p>
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">🧪 Exemple travaillé — passer de t½ à λ et τ</div>
+        <p>Le césium 137 a une demi-vie t½ = 30 ans. Calcule sa constante radioactive λ (en an⁻¹), puis sa constante de temps τ, et vérifie la cohérence.</p>
+        <div class="lecture-steps">
+          <div class="lecture-step"><span class="lecture-step-number">1</span>
+            <p>Formule : <span class="math">λ</span> = ln 2/t½ = 0,693/30 ans.</p>
+          </div>
+          <div class="lecture-step"><span class="lecture-step-number">2</span>
+            <p>Calcul : <span class="math">λ</span> = 0,693/30 = 0,0231 an⁻¹.</p>
+          </div>
+          <div class="lecture-step"><span class="lecture-step-number">3</span>
+            <p>Constante de temps : <span class="math">τ</span> = 1/<span class="math">λ</span> = 1/0,0231 ≈ 43,3 ans.</p>
+          </div>
+          <div class="lecture-step"><span class="lecture-step-number">4</span>
+            <p>Vérification : t½ ≈ 0,693 × τ = 0,693 × 43,3 ≈ 30 ans ✓ — on retrouve bien la demi-vie de départ.</p>
+          </div>
+          <div class="lecture-step"><span class="lecture-step-number">5</span>
+            <p>Conclusion : λ = 0,0231 an⁻¹ et τ ≈ 43 ans. Remarque bien que τ (43 ans) est plus grand que t½ (30 ans) : c'est normal, τ correspond à 37 % restants, t½ à 50 % restants.</p>
+          </div>
+        </div>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-title">⚠️ Piège d'examen</div>
+        <p>Ne confonds pas t½ (il reste 50 %) et τ (il reste 37 %) : deux durées différentes pour le même nucléide ! Et attention au sens de la formule : t½ = ln 2/λ, PAS λ/ln 2. Si ton λ est plus grand que ta demi-vie, re-check.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s3 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s3">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">03</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 3</span>
+        <h2 class="lecture-section-title">L'activité A = λ·N (becquerel)</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Quand un médecin manipule une source ou qu'un agent de radioprotection surveille la galerie d'une mine, il ne compte pas des noyaux : il mesure combien de désintégrations se produisent chaque seconde. C'est l'activité, la grandeur qui se lit sur les compteurs Geiger, exprimée en becquerels.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-title">📖 Définition officielle</div>
+        <p>L'activité <span class="math">A</span> d'une source radioactive est le nombre de désintégrations par seconde. Elle est proportionnelle au nombre de noyaux radioactifs présents : <span class="math">A = λ·N</span>. Son unité est le becquerel (Bq) : 1 Bq = 1 désintégration par seconde.</p>
+      </div>
+      <p class="lecture-text">💡 Pour te le représenter : plus la foule de noyaux est nombreuse, plus il y a de « gagnants » à la loterie chaque seconde. Double le nombre de noyaux, tu doubles l'activité. Et comme <span class="math">N</span> décroît, l'activité décroît selon la même exponentielle : <span class="math">A(t) = A₀ × e^(−λ·t)</span>.</p>
+      <div class="lecture-formula-hero">
+        <span class="math">A = λ·N   avec   A(t) = A₀ × e^(−λ·t)</span>
+        <p><span class="math">A</span> en becquerels (Bq), <span class="math">λ</span> en s⁻¹ et <span class="math">N</span> sans unité (un nombre de noyaux). L'activité suit la même décroissance exponentielle que le nombre de noyaux.</p>
+      </div>
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">🧪 Exemple travaillé — l'activité d'un échantillon de radon 222</div>
+        <p>Dans une cave mal ventilée, on mesure N = 5,0 × 10¹⁰ noyaux de radon 222, un gaz radioactif dont la constante radioactive vaut λ = 2,1 × 10⁻⁶ s⁻¹. Quelle est l'activité de cet échantillon ?</p>
+        <div class="lecture-steps">
+          <div class="lecture-step"><span class="lecture-step-number">1</span>
+            <p>Données : <span class="math">λ</span> = 2,1 × 10⁻⁶ s⁻¹ et <span class="math">N</span> = 5,0 × 10¹⁰ noyaux. Les unités sont cohérentes (temps en secondes) ✓.</p>
+          </div>
+          <div class="lecture-step"><span class="lecture-step-number">2</span>
+            <p>Formule : <span class="math">A</span> = <span class="math">λ</span> × <span class="math">N</span> = 2,1 × 10⁻⁶ × 5,0 × 10¹⁰.</p>
+          </div>
+          <div class="lecture-step"><span class="lecture-step-number">3</span>
+            <p>Puissances de dix : 2,1 × 5,0 = 10,5 et 10⁻⁶ × 10¹⁰ = 10⁴, donc <span class="math">A</span> = 10,5 × 10⁴ = 1,05 × 10⁵ Bq.</p>
+          </div>
+          <div class="lecture-step"><span class="lecture-step-number">4</span>
+            <p>Conclusion : A ≈ 1,1 × 10⁵ Bq (soit environ 105 000 désintégrations par seconde). Vérification d'ordre de grandeur : λ petit × N grand donne bien une activité de l'ordre de 10⁵ ✓.</p>
+          </div>
+        </div>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-title">⚠️ Piège d'examen</div>
+        <p>L'activité dépend du nombre de noyaux PRÉSENTS : elle baisse avec le temps, même si <span class="math">λ</span> ne change jamais. Un même nucléide peut avoir une activité énorme (beaucoup de noyaux) ou minuscule (peu de noyaux). Et pour l'anecdote : ton propre corps émet quelques milliers de becquerels, à cause du potassium 40 naturel !</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s4 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s4">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">04</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 4</span>
+        <h2 class="lecture-section-title">La datation au carbone 14</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Voici l'application la plus célèbre de la loi de décroissance. Dans la haute atmosphère, le rayonnement cosmique fabrique en continu du carbone 14 (A = 14, Z = 6), un émetteur β⁻ (son équation : carbone 14 → azote 14 + électron e⁻, vue en partie 02). Tous les êtres vivants échangent du carbone avec l'atmosphère : leur proportion de carbone 14 reste constante. À la mort, les échanges cessent — et le sablier se retourne.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-title">📖 Définition officielle</div>
+        <p>La datation au carbone 14 repose sur la décroissance radioactive du carbone 14 (A = 14, Z = 6), dont la demi-vie vaut t½ = 5 730 ans. Tant qu'un organisme vit, sa proportion de carbone 14 est constante (échanges avec l'atmosphère). Après la mort, plus d'échanges : la quantité de carbone 14 décroît selon la loi exponentielle. En comparant la quantité restante (ou l'activité) à celle d'un organisme vivant, on calcule la durée écoulée depuis la mort.</p>
+      </div>
+      <div class="lecture-formula-box">
+        <span class="math">t = (t½/0,693) × ln(N₀/N)</span>
+        <p>Formule de datation : <span class="math">N₀</span> est la quantité de carbone 14 à la mort (celle du vivant), <span class="math">N</span> la quantité restante aujourd'hui. Avec l'activité, même raisonnement : remplace N₀/N par A₀/A.</p>
+      </div>
+      <svg viewBox="0 0 560 224" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Trois étapes de la datation au carbone 14 : arbre vivant, mort de l arbre, puis mesure de l activité au laboratoire" style="width:100%;height:auto">
+        <text x="280" y="22" text-anchor="middle" font-size="13" fill="currentColor">La datation au carbone 14 : un sablier nucléaire</text>
+        <circle cx="71" cy="100" r="26" style="fill:rgba(74,222,128,0.3);stroke:var(--accent-bright)"/>
+        <rect x="64" y="118" width="14" height="46" style="fill:rgba(148,163,184,0.5)"/>
+        <text x="75" y="186" text-anchor="middle" font-size="11.5" fill="currentColor">arbre vivant : échanges permanents</text>
+        <text x="75" y="202" text-anchor="middle" font-size="11" fill="currentColor">proportion de carbone 14 constante</text>
+        <line x1="140" y1="140" x2="190" y2="140" style="stroke:rgba(148,163,184,0.9)" stroke-width="2"/>
+        <polygon points="190,134 202,140 190,146" style="fill:rgba(148,163,184,0.9)"/>
+        <rect x="215" y="134" width="76" height="12" rx="5" style="fill:rgba(148,163,184,0.5)"/>
+        <text x="255" y="186" text-anchor="middle" font-size="11.5" fill="currentColor">mort : les échanges cessent</text>
+        <text x="255" y="202" text-anchor="middle" font-size="11" fill="currentColor">le carbone 14 décroît : N(t) = N₀ × e^(−λ·t)</text>
+        <line x1="330" y1="140" x2="380" y2="140" style="stroke:rgba(148,163,184,0.9)" stroke-width="2"/>
+        <polygon points="380,134 392,140 380,146" style="fill:rgba(148,163,184,0.9)"/>
+        <rect x="430" y="116" width="28" height="48" rx="6" style="fill:rgba(96,165,250,0.25);stroke:var(--accent-bright)"/>
+        <circle cx="440" cy="150" r="3" style="fill:rgba(96,165,250,0.6)"/>
+        <circle cx="450" cy="140" r="3" style="fill:rgba(96,165,250,0.6)"/>
+        <line x1="444" y1="108" x2="436" y2="94" style="stroke:rgba(250,204,21,0.8)" stroke-width="2"/>
+        <line x1="446" y1="108" x2="450" y2="92" style="stroke:rgba(250,204,21,0.8)" stroke-width="2"/>
+        <line x1="448" y1="110" x2="458" y2="100" style="stroke:rgba(250,204,21,0.8)" stroke-width="2"/>
+        <circle cx="515" cy="105" r="17" style="fill:none;stroke:rgba(148,163,184,0.8)"/>
+        <line x1="515" y1="105" x2="515" y2="93" style="stroke:rgba(148,163,184,0.8)" stroke-width="2"/>
+        <line x1="515" y1="105" x2="524" y2="109" style="stroke:rgba(148,163,184,0.8)" stroke-width="2"/>
+        <text x="480" y="186" text-anchor="middle" font-size="11.5" fill="currentColor">au laboratoire : mesure de</text>
+        <text x="480" y="202" text-anchor="middle" font-size="11" fill="currentColor">l'activité restante → âge du vestige</text>
+      </svg>
+      <p class="lecture-text">💡 Pour te le représenter : un sablier dont tu connais parfaitement la vitesse d'écoulement (c'est λ, ou t½ = 5 730 ans pour une moitié). Tu mesures le sable restant en haut, et tu en déduis depuis combien de temps le sablier a été retourné — c'est-à-dire depuis la mort de l'organisme.</p>
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">🧪 Exemple travaillé — l'âge d'une pirogue du fleuve Niger</div>
+        <p>Un fragment de bois d'ancienne pirogue émet 8 désintégrations par minute et par gramme de carbone. Un arbre vivant actuel en émet 16 dans les mêmes conditions. Quel âge a le bois ?</p>
+        <div class="lecture-steps">
+          <div class="lecture-step"><span class="lecture-step-number">1</span>
+            <p>Je compare au vivant : N₀/N = 16/8 = 2. La moitié du carbone 14 initiale reste.</p>
+          </div>
+          <div class="lecture-step"><span class="lecture-step-number">2</span>
+            <p>Une moitié restante = exactement UNE demi-vie : t = t½ = 5 730 ans.</p>
+          </div>
+          <div class="lecture-step"><span class="lecture-step-number">3</span>
+            <p>Vérification par la formule : <span class="math">λ</span> = 0,693/5 730 ≈ 1,21 × 10⁻⁴ an⁻¹, puis t = ln 2/<span class="math">λ</span> = 0,693/(1,21 × 10⁻⁴) ≈ 5 730 ans ✓.</p>
+          </div>
+          <div class="lecture-step"><span class="lecture-step-number">4</span>
+            <p>Pour aller plus loin : si l'échantillon avait donné 4 (au lieu de 16), le rapport serait 4 = 2², soit deux demi-vies : t = 2 × 5 730 = 11 460 ans.</p>
+          </div>
+          <div class="lecture-step"><span class="lecture-step-number">5</span>
+            <p>Conclusion : le bois de la pirogue a environ 5 730 ans. On date la MORT de l'arbre, donc la fabrication de la pirogue.</p>
+          </div>
+        </div>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-title">⚠️ Piège d'examen</div>
+        <p>La méthode au carbone 14 ne fonctionne que jusqu'à environ 50 000 ans : au-delà, il reste trop peu de carbone 14 pour une mesure fiable. Et on date toujours la MORT de l'organisme (l'abattage de l'arbre), pas la fabrication de l'objet ni sa découverte.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s5 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s5">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">05</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Synthèse</span>
+        <h2 class="lecture-section-title">Applications, dangers et radioprotection</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">La radioactivité n'est pas qu'un sujet d'examen : elle soigne, elle éclaire des villes, elle date notre passé — et elle impose des précautions réelles, du service de médecine nucléaire aux mines d'uranium d'Arlit. Faisons le tour des quatre visages du phénomène, puis entraîne-toi sur deux exercices.</p>
+      <svg viewBox="0 0 560 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Quatre applications de la radioactivité : médecine, énergie, datation et radioprotection" style="width:100%;height:auto">
+        <text x="280" y="20" text-anchor="middle" font-size="13" fill="currentColor">La radioactivité au quotidien</text>
+        <rect x="30" y="36" width="170" height="64" rx="10" style="fill:rgba(74,222,128,0.12);stroke:var(--accent-bright)"/>
+        <text x="115" y="60" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">Médecine</text>
+        <text x="115" y="80" text-anchor="middle" font-size="11" fill="currentColor">iode 131 (thyroïde),</text>
+        <text x="115" y="94" text-anchor="middle" font-size="11" fill="currentColor">imagerie TEP au fluor 18 (β⁺)</text>
+        <rect x="360" y="36" width="170" height="64" rx="10" style="fill:rgba(250,204,21,0.12);stroke:var(--accent-bright)"/>
+        <text x="445" y="60" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">Énergie</text>
+        <text x="445" y="80" text-anchor="middle" font-size="11" fill="currentColor">uranium 235 : réacteurs ;</text>
+        <text x="445" y="94" text-anchor="middle" font-size="11" fill="currentColor">mines d'Arlit au Niger</text>
+        <rect x="30" y="206" width="170" height="64" rx="10" style="fill:rgba(96,165,250,0.12);stroke:var(--accent-bright)"/>
+        <text x="115" y="230" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">Datation</text>
+        <text x="115" y="250" text-anchor="middle" font-size="11" fill="currentColor">carbone 14 : âge des vestiges</text>
+        <text x="115" y="264" text-anchor="middle" font-size="11" fill="currentColor">t½ = 5 730 ans</text>
+        <rect x="360" y="206" width="170" height="64" rx="10" style="fill:rgba(148,163,184,0.15);stroke:var(--accent-bright)"/>
+        <text x="445" y="230" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">Radioprotection</text>
+        <text x="445" y="250" text-anchor="middle" font-size="11" fill="currentColor">radon, écrans, dosimètres,</text>
+        <text x="445" y="264" text-anchor="middle" font-size="11" fill="currentColor">durée d'exposition</text>
+        <circle cx="280" cy="153" r="52" style="fill:rgba(250,204,21,0.12);stroke:var(--accent-bright)"/>
+        <text x="280" y="149" text-anchor="middle" font-size="14" font-weight="600" fill="currentColor">Radioactivité</text>
+        <text x="280" y="169" text-anchor="middle" font-size="11" fill="currentColor">une même physique</text>
+        <line x1="243" y1="127" x2="205" y2="96" style="stroke:rgba(148,163,184,0.5)"/>
+        <line x1="317" y1="127" x2="355" y2="96" style="stroke:rgba(148,163,184,0.5)"/>
+        <line x1="243" y1="179" x2="205" y2="210" style="stroke:rgba(148,163,184,0.5)"/>
+        <line x1="317" y1="179" x2="355" y2="210" style="stroke:rgba(148,163,184,0.5)"/>
+        <text x="280" y="290" text-anchor="middle" font-size="12" fill="currentColor" opacity="0.85">quatre visages concrets d'un même phénomène nucléaire</text>
+      </svg>
+      <p class="lecture-text">Le revers de la médaille : les rayonnements α, β et γ sont ionisants — ils arrachent des électrons aux molécules du vivant et peuvent endommager l'ADN. Deux dangers concrets : le radon 222, gaz radioactif naturel issu de la chaîne de l'uranium, qui s'accumule dans les maisons et caves mal ventilées ; et les poussières d'uranium autour des sites miniers, comme à Arlit, où les travailleurs portent des dosimètres et où la ventilation des galeries est contrôlée.</p>
+      <p class="lecture-text">Les trois leviers de la radioprotection sont simples : la DISTANCE (l'intensité baisse quand on s'éloigne de la source), la DURÉE (limiter le temps d'exposition) et l'ÉCRAN (papier contre α, aluminium contre β, plomb contre γ — tu connais déjà le classement, partie 01). Les déchets, eux, se gèrent grâce aux demi-vies : le césium 137 (t½ = 30 ans) demande une surveillance de plusieurs siècles, le temps que son activité s'effondre.</p>
+      <div class="lecture-text">
+        <div class="lecture-exercise-label">✏️ Exercice 1 — l'iode 131 en médecine nucléaire</div>
+        <p class="lecture-text">Pour traiter une hyperthyroïdie, un patient reçoit de l'iode 131 (t½ = 8 jours), qui se fixe sur la thyroïde. Quelle fraction de l'activité initiale reste-t-il dans le corps du patient après 24 jours ?</p>
+        <div class="lecture-steps">
+          <div class="lecture-step"><span class="lecture-step-number">1</span>
+            <p>Je compare la durée à la demi-vie : 24 jours = 3 × 8 jours, donc 3 t½.</p>
+          </div>
+          <div class="lecture-step"><span class="lecture-step-number">2</span>
+            <p>Règle des moitiés : fraction restante = (1/2)³ = 1/8 = 0,125, soit 12,5 %.</p>
+          </div>
+          <div class="lecture-step"><span class="lecture-step-number">3</span>
+            <p>Vérification : 100 % → 50 % (8 j) → 25 % (16 j) → 12,5 % (24 j) ✓.</p>
+          </div>
+          <div class="lecture-step"><span class="lecture-step-number">4</span>
+            <p>Conclusion : après 24 jours, il ne reste que 12,5 % de l'activité initiale. C'est précisément pourquoi la médecine choisit des nucléides de demi-vie courte : le traitement agit fort, puis l'activité retombe vite.</p>
+          </div>
+        </div>
+      </div>
+      <div class="lecture-text">
+        <div class="lecture-exercise-label">✏️ Exercice 2 — dater un tesson de poterie</div>
+        <p class="lecture-text">Un tesson contient du carbone dont l'activité due au carbone 14 vaut 4 désintégrations par minute et par gramme. Un organisme vivant actuel affiche 16 désintégrations par minute et par gramme dans les mêmes conditions. Quel est l'âge du tesson ?</p>
+        <div class="lecture-steps">
+          <div class="lecture-step"><span class="lecture-step-number">1</span>
+            <p>Rapport vivant/tesson : N₀/N = 16/4 = 4. Il ne reste qu'un quart du carbone 14 initial.</p>
+          </div>
+          <div class="lecture-step"><span class="lecture-step-number">2</span>
+            <p>Un quart = (1/2)² : le bois a traversé exactement 2 demi-vies.</p>
+          </div>
+          <div class="lecture-step"><span class="lecture-step-number">3</span>
+            <p>Calcul : t = 2 × t½ = 2 × 5 730 = 11 460 ans.</p>
+          </div>
+          <div class="lecture-step"><span class="lecture-step-number">4</span>
+            <p>Vérification par la formule : <span class="math">λ</span> = 0,693/5 730 ≈ 1,21 × 10⁻⁴ an⁻¹ ; t = ln 4/<span class="math">λ</span> = 1,386/(1,21 × 10⁻⁴) ≈ 11 460 ans ✓.</p>
+          </div>
+          <div class="lecture-step"><span class="lecture-step-number">5</span>
+            <p>Conclusion : le tesson date d'environ 11 460 ans — la datation compare toujours l'échantillon à l'activité du vivant actuel.</p>
+          </div>
+        </div>
+      </div>
+      <table class="lecture-table">
+        <thead>
+          <tr><th>Nucléide</th><th>Demi-vie t½</th><th>Usage ou danger</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>fluor 18 (A = 18, Z = 9)</td><td>110 min</td><td>imagerie médicale TEP (émetteur β⁺)</td></tr>
+          <tr><td>iode 131 (A = 131, Z = 53)</td><td>8 jours</td><td>médecine nucléaire : diagnostics et traitements de la thyroïde</td></tr>
+          <tr><td>radon 222 (A = 222, Z = 86)</td><td>3,8 jours</td><td>gaz naturel radioactif : danger dans les habitations mal ventilées</td></tr>
+          <tr><td>césium 137 (A = 137, Z = 55)</td><td>30 ans</td><td>retombées accidentelles et déchets : surveillance de plusieurs siècles</td></tr>
+          <tr><td>carbone 14 (A = 14, Z = 6)</td><td>5 730 ans</td><td>datation archéologique des restes organiques</td></tr>
+          <tr><td>uranium 238 (A = 238, Z = 92)</td><td>4,5 milliards d'années</td><td>minerai d'Arlit ; tête de la chaîne qui produit le radon</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+  <!-- ===== QCM ===== -->
+  <div class="lecture-quiz">
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">QCM 1 — Après 3 demi-vies, la proportion de noyaux radioactifs restante est :</p>
+      <div class="lecture-quiz-options"><span>A) 33 %</span><span>B) 25 %</span><span>C) 12,5 %</span><span>D) 50 %</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><strong>C) 12,5 %.</strong> À chaque demi-vie on divise par 2 : 100 % → 50 % → 25 % → 12,5 %, soit (1/2)³ = 1/8.</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">QCM 2 — Si la constante radioactive λ double, la demi-vie t½ :</p>
+      <div class="lecture-quiz-options"><span>A) double</span><span>B) reste identique</span><span>C) est divisée par 2</span><span>D) est multipliée par 4</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><strong>C.</strong> t½ = ln 2/λ : la demi-vie est inversement proportionnelle à λ. Si λ double, t½ est divisée par 2 — plus λ est grand, plus le nucléide se désintègre vite.</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">QCM 3 — L'unité de l'activité d'une source radioactive est :</p>
+      <div class="lecture-quiz-options"><span>A) le gray</span><span>B) le becquerel</span><span>C) le sievert</span><span>D) le joule</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><strong>B.</strong> L'activité A = λ·N se mesure en becquerels (Bq) : 1 Bq = 1 désintégration par seconde. Le gray et le sievert mesurent les doses absorbée et équivalente, pas l'activité.</div></details>
+    </div>
+  </div>
+  <!-- ===== RÉCAP ===== -->
+  <div class="lecture-recap">
+    <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
+    <ul class="lecture-recap-list">
+      <li><strong>Loi de décroissance</strong> : <span class="math">N(t) = N₀ × e^(−λ·t)</span> — exponentielle, jamais nulle, régulière.</li>
+      <li><strong>Demi-vie</strong> : t½ = ln 2/λ ≈ 0,693 × τ ; à chaque t½, 100 → 50 → 25 → 12,5 %.</li>
+      <li><strong>Activité</strong> : A = λ·N, en becquerels ; elle décroît comme N.</li>
+      <li><strong>Carbone 14</strong> : t½ = 5 730 ans, on date la mort de l'organisme en comparant au vivant ; la radioprotection, elle, repose sur distance, durée et écran.</li>
+    </ul>
+  </div>
+  <!-- ===== FIN ===== -->
+  <div class="lecture-end">
+    <div class="lecture-end-icon">🎯</div>
+    <div class="lecture-end-text">Partie 03 terminée !</div>
+    <div class="lecture-end-sub">Des équations de Soddy à la datation au carbone 14, tu as fait le tour du chapitre. Direction la partie 04 : la fiche complète de révision, avec la grande table de formules, le vocabulaire condensé et les réflexes Bac pour tout verrouiller avant l'épreuve.</div>
+    <div class="lecture-end-divider"></div>
+  </div>
+</div>

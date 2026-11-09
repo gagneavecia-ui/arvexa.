@@ -1,0 +1,440 @@
+<!-- PARTIE 03 — Énergie de l'oscillateur & Amortissement (Oscillateurs mécaniques) -->
+<div class="lecture-container">
+
+  <!-- ===== HERO ===== -->
+  <header class="lecture-hero">
+    <div class="lecture-hero-badge">
+      <span class="lecture-hero-icon">📘</span>
+      <span class="lecture-hero-label">Terminale C&D · Oscillateurs mécaniques · Partie 03</span>
+    </div>
+    <h1 class="lecture-hero-title">
+      Énergie de l'oscillateur <em>& Amortissement</em>
+    </h1>
+    <p class="lecture-hero-intro">
+      Une balançoire lâchée finit toujours par s'arrêter, une corde pincée se tait, une aiguille se cale : pourquoi ? Dans cette dernière partie de cours, tu suis l'énergie de l'oscillateur pas à pas : elle se cache tantôt dans le ressort, tantôt dans la vitesse, et elle fuit dès qu'un frottement s'invite. Tu découvriras les trois régimes de l'amortissement — pseudo-périodique, critique, apériodique — et l'art d'entretenir une oscillation, de l'horloge à balancier au quartz de ton téléphone.
+    </p>
+    <div class="lecture-hero-meta">
+      <span class="lecture-hero-meta-item">⏱ 20 min</span>
+      <span class="lecture-hero-meta-item">⚡ 4 notions</span>
+      <span class="lecture-hero-meta-item">📚 6 sections</span>
+      <span class="lecture-hero-meta-item">🎓 Terminale C&D</span>
+    </div>
+  </header>
+  <!-- ===== SOMMAIRE ===== -->
+  <nav class="lecture-toc">
+    <div class="lecture-toc-header">
+      <span>Dans cette partie</span>
+      <span class="lecture-toc-count">4 notions · 6 sections</span>
+    </div>
+    <ol class="lecture-toc-list">
+      <li><a href="#s0"><span class="toc-num">00</span><span>Où passe l'énergie de la balançoire ?</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>Énergie cinétique et potentielle élastique</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>L'énergie mécanique : un trésor bien gardé</span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>Quand le frottement s'en mêle</span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>Les trois régimes de l'amortissement</span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>Entretenir les oscillations</span></a></li>
+    </ol>
+  </nav>
+  <!-- ============================================================ -->
+  <!-- SECTION s0 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s0">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">00</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Motivation</span>
+        <h2 class="lecture-section-title">Où passe l'énergie de la balançoire ?</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Lâche une balançoire au sommet de son arc : elle fond vers le bas en accélérant, remonte de l'autre côté en ralentissant, et le cycle recommence. Rien ne disparaît : l'énergie se déguise, passant de l'énergie potentielle (la hauteur, ou le ressort comprimé) à l'énergie cinétique (la vitesse), puis inversement. Mais laisse-la seule quelques minutes et le silence s'installe : l'amplitude meurt, l'énergie s'est enfuie.</p>
+      <p class="lecture-text">Cette fuite porte un nom : l'amortissement. C'est lui qui fait rouler douce la suspension d'une moto, qui éteint la vibration d'une corde de kora, et que les ingénieurs dosent avec soin pour qu'un pont ne se mette jamais à vibrer dangereusement. Dans cette partie, tu apprends à calculer l'énergie d'un oscillateur, à dire comment elle s'échappe, et à la ravitailler quand il faut.</p>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s1 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s1">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">01</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1</span>
+        <h2 class="lecture-section-title">Énergie cinétique et potentielle élastique</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Deux coffres accueillent l'énergie de notre oscillateur. Le premier, l'énergie cinétique, dépend de la vitesse : plus la masse fonce, plus il est plein. Le second, l'énergie potentielle élastique, dépend de l'élongation : plus le ressort est déformé, plus il est plein. À chaque instant de l'oscillation, les deux coffres se remplissent et se vident l'un l'autre.</p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <p><strong>📖 Définitions officielles</strong></p>
+        <p>L'<strong>énergie cinétique</strong> d'un solide de masse <span class="math">m</span> animé de la vitesse <span class="math">v</span> est <span class="math">Ec = ½m·v²</span>.</p>
+        <p>L'<strong>énergie potentielle élastique</strong> d'un ressort de raideur <span class="math">k</span> déformé de <span class="math">x</span> (mesuré depuis sa longueur au repos) est <span class="math">Eₚ = ½k·x²</span>.</p>
+      </div>
+
+      <p class="lecture-text">Une image pour retenir : un ressort comprimé, c'est un arc bandé — de l'énergie en attente, prête à jaillir. La position d'équilibre (<span class="math">x = 0</span>), elle, est le coffre du mouvement : c'est là que la vitesse est maximale et que l'énergie potentielle élastique est nulle. Attention : pour un pendule élastique horizontal, on choisit l'origine de <span class="math">Eₚ</span> à l'équilibre, ce qui donne exactement la formule ci-dessus.</p>
+
+      <div class="lecture-formula-hero">
+        <p class="lecture-formula-hero-main">Énergie cinétique</p>
+        <p class="lecture-formula-hero"><span class="math">Ec = ½m·v²</span></p>
+        <p class="lecture-formula-hero"><span class="math">m</span> en kg, <span class="math">v</span> en m·s⁻¹, <span class="math">Ec</span> en joules (J). Elle ne dépend que de la vitesse : au maximum au passage à l'équilibre, nulle aux extrémités.</p>
+      </div>
+
+      <div class="lecture-formula-hero">
+        <p class="lecture-formula-hero-main">Énergie potentielle élastique</p>
+        <p class="lecture-formula-hero"><span class="math">Eₚ = ½k·x²</span></p>
+        <p class="lecture-formula-hero"><span class="math">k</span> en N·m⁻¹, <span class="math">x</span> en m, <span class="math">Eₚ</span> en J. Elle est maximale aux extrémités (<span class="math">x = ±xₘ</span>) et nulle à l'équilibre.</p>
+      </div>
+
+      <div class="lecture-example-content">
+        <p class="lecture-example-label">🧪 Exemple travaillé — remplir les deux coffres</p>
+        <p>Une masse de 500 g se déplace à 2,0 m·s⁻¹ ; un ressort de raideur 20 N·m⁻¹ est étiré de 5,0 cm. Calculer les deux énergies.</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step">Je convertis : <span class="math">m</span> = 0,500 kg ; <span class="math">x</span> = 5,0 cm = 0,050 m.</li>
+          <li class="lecture-step">Énergie cinétique : <span class="math">Ec</span> = ½ × 0,500 × (2,0)² = 0,25 × 4,0 = 1,0 J.</li>
+          <li class="lecture-step">Énergie potentielle élastique : <span class="math">Eₚ</span> = ½ × 20 × (0,050)² = 10 × 0,0025 = 0,025 J.</li>
+          <li class="lecture-step">Les deux résultats s'expriment en joules (J) : 1,0 J contre 0,025 J — la vitesse pèse bien plus lourd que la déformation ici.</li>
+        </ol>
+        <p><strong>✅ Résultat :</strong> <span class="math">Ec</span> = 1,0 J et <span class="math">Eₚ</span> = 0,025 J. Vérification des carrés : (2,0)² = 4,0 et (0,050)² = 0,0025 — recompte-les, ils sont sûrs.</p>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <p><strong>⚠️ Piège d'examen</strong></p>
+        <p>Avant toute formule d'énergie : masses en kg, vitesses en m·s⁻¹, élongations en m. Un 200 g laissé tel quel gonfle tes énergies d'un facteur 1000, et un 5,0 cm non converti te coûte encore un facteur 100. La conversion est la moitié du point.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s2 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s2">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">02</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2</span>
+        <h2 class="lecture-section-title">L'énergie mécanique : un trésor bien gardé</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Additionnons les deux coffres : la somme s'appelle l'énergie mécanique. Pour un pendule élastique qui oscille SANS frottement, la physique nous réserve un résultat magnifique : cette somme reste constante au cours du temps. L'énergie ne fait que changer de coffre — c'est l'échange permanent entre <span class="math">Ec</span> et <span class="math">Eₚ</span> que tu observes quand la balançoire descend puis remonte.</p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <p><strong>📖 Définition officielle</strong></p>
+        <p>L'<strong>énergie mécanique</strong> d'un oscillateur est la somme de son énergie cinétique et de son énergie potentielle : <span class="math">Eₘ = Ec + Eₚ</span>. Pour un pendule élastique en oscillations libres sans frottement, <span class="math">Eₘ</span> reste constante.</p>
+      </div>
+
+      <div class="lecture-formula-hero">
+        <p class="lecture-formula-hero-main">Conservation de l'énergie mécanique</p>
+        <p class="lecture-formula-hero"><span class="math">Eₘ = Ec + Eₚ = constante</span></p>
+        <p class="lecture-formula-hero">Quand <span class="math">Ec</span> monte, <span class="math">Eₚ</span> descend d'autant, et réciproquement. Le total se calcule une seule fois, à la position la plus pratique.</p>
+      </div>
+
+      <div class="lecture-formula-box">
+        <p><span class="math">Eₘ = ½k·xₘ² = ½m·vₘₐₓ²</span> — deux positions malines pour calculer le total : aux extrémités (<span class="math">x = ±xₘ</span>, où <span class="math">Ec</span> = 0) ou au passage à l'équilibre (<span class="math">x = 0</span>, où <span class="math">Eₚ</span> = 0).</p>
+      </div>
+
+      <svg viewBox="0 0 580 232" width="100%" role="img" aria-label="Courbes des énergies au cours du temps : Em constante, Ep et Ec qui s'echangent">
+        <line x1="75" y1="30" x2="105" y2="30" style="stroke:var(--accent-bright);stroke-width:2.5"/>
+        <text x="111" y="34" style="fill:rgba(148,163,184,0.9);font-size:12px">Eₘ (constante)</text>
+        <line x1="255" y1="30" x2="285" y2="30" style="stroke:rgba(74,222,128,0.45);stroke-width:2.5"/>
+        <text x="291" y="34" style="fill:rgba(148,163,184,0.9);font-size:12px">Eₚ</text>
+        <line x1="350" y1="30" x2="380" y2="30" style="stroke:rgba(148,163,184,0.9);stroke-width:2.5"/>
+        <text x="386" y="34" style="fill:rgba(148,163,184,0.9);font-size:12px">Ec</text>
+        <line x1="60" y1="35" x2="60" y2="200" style="stroke:rgba(148,163,184,0.7);stroke-width:1.5"/>
+        <line x1="40" y1="190" x2="555" y2="190" style="stroke:rgba(148,163,184,0.7);stroke-width:1.5"/>
+        <polygon points="562,190 551,185 551,195" style="fill:rgba(148,163,184,0.7)"/>
+        <line x1="60" y1="55" x2="545" y2="55" style="stroke:var(--accent-bright);stroke-width:2"/>
+        <path d="M60,55 Q87.5,325 115,190 Q142.5,325 170,55 Q197.5,325 225,190 Q252.5,325 280,55 Q307.5,325 335,190 Q362.5,325 390,55 Q417.5,325 445,190 Q472.5,325 500,55" style="stroke:rgba(74,222,128,0.45);stroke-width:2.5;fill:none"/>
+        <path d="M60,190 Q87.5,-80 115,55 Q142.5,-80 170,190 Q197.5,-80 225,55 Q252.5,-80 280,190 Q307.5,-80 335,55 Q362.5,-80 390,190 Q417.5,-80 445,55 Q472.5,-80 500,190" style="stroke:rgba(148,163,184,0.9);stroke-width:2.5;fill:none"/>
+        <text x="560" y="206" style="fill:rgba(148,163,184,0.9);font-size:13px;font-style:italic">t</text>
+        <text x="60" y="210" text-anchor="middle" style="fill:rgba(148,163,184,0.9);font-size:11px">x = xₘ</text>
+        <text x="115" y="210" text-anchor="middle" style="fill:rgba(148,163,184,0.9);font-size:11px">x = 0</text>
+        <text x="170" y="210" text-anchor="middle" style="fill:rgba(148,163,184,0.9);font-size:11px">x = −xₘ</text>
+      </svg>
+
+      <p class="lecture-text">Lis le graphique : la courbe pleine grise (<span class="math">Ec</span>) et la courbe claire (<span class="math">Eₚ</span>) se croisent à mi-hauteur et se partagent toujours le même total, matérialisé par la ligne <span class="math">Eₘ</span>. Quand l'une touche zéro, l'autre culmine : les extrémités sont tout potentiel, le passage à l'équilibre est tout cinétique. Le total ne bouge jamais d'un millijoule.</p>
+
+      <div class="lecture-example-content">
+        <p class="lecture-example-label">🧪 Exemple travaillé — la chasse au total</p>
+        <p>Un pendule élastique horizontal : <span class="math">m</span> = 200 g, <span class="math">k</span> = 80 N·m⁻¹, amplitude <span class="math">xₘ</span> = 5,0 cm. Calculer <span class="math">Eₘ</span>, la vitesse maximale, puis la vitesse au passage où <span class="math">x</span> = 3,0 cm.</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step">Conversions : <span class="math">m</span> = 0,200 kg ; <span class="math">xₘ</span> = 0,050 m.</li>
+          <li class="lecture-step">Total à l'extrémité (où <span class="math">Ec</span> = 0) : <span class="math">Eₘ</span> = ½ × 80 × (0,050)² = 40 × 0,0025 = 0,100 J.</li>
+          <li class="lecture-step">Vitesse maximale à l'équilibre (où <span class="math">Eₚ</span> = 0) : <span class="math">½m·vₘₐₓ²</span> = 0,100 J donne <span class="math">vₘₐₓ</span> = √(2 × 0,100/0,200) = √1,0 = 1,0 m·s⁻¹.</li>
+          <li class="lecture-step">À <span class="math">x</span> = 3,0 cm : <span class="math">Eₚ</span> = ½ × 80 × (0,030)² = 40 × 0,0009 = 0,036 J.</li>
+          <li class="lecture-step">Donc <span class="math">Ec</span> = 0,100 − 0,036 = 0,064 J, et <span class="math">v</span> = √(2 × 0,064/0,200) = √0,64 = 0,80 m·s⁻¹.</li>
+          <li class="lecture-step">Contrôle de cohérence : 0,036 + 0,064 = 0,100 J — le total est bien resté constant, sinon j'aurais fait une erreur.</li>
+        </ol>
+        <p><strong>✅ Résultat :</strong> <span class="math">Eₘ</span> = 0,100 J ; <span class="math">vₘₐₓ</span> = 1,0 m·s⁻¹ ; <span class="math">v</span>(x = 3,0 cm) = 0,80 m·s⁻¹.</p>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <p><strong>⚠️ Piège d'examen</strong></p>
+        <p>L'énergie potentielle élastique se mesure TOUJOURS depuis la position d'équilibre (<span class="math">x = 0</span>), pas depuis une extrémité. Et pour trouver <span class="math">Eₘ</span>, place-toi aux positions clés (extrémité ou équilibre) : une des deux énergies y est nulle, le calcul devient trivial.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s3 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s3">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">03</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 3</span>
+        <h2 class="lecture-section-title">Quand le frottement s'en mêle : oscillations amorties</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Dans le monde réel, personne n'oscille éternellement : l'air et les supports opposent des frottements, souvent de type fluide — proportionnels à la vitesse. À chaque aller-retour, une partie de l'énergie mécanique part en chaleur, et l'amplitude décroît peu à peu. On parle alors d'oscillations libres amorties : « libres » parce que rien ne relance l'oscillateur de l'extérieur, « amorties » parce que leur amplitude meurt.</p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <p><strong>📖 Définition officielle</strong></p>
+        <p>Un oscillateur effectue des <strong>oscillations libres amorties</strong> lorsqu'aucune excitation extérieure n'entretient son mouvement et qu'une force de frottement fluide <span class="math">→f = −λ·→v</span> dissipe son énergie. Son amplitude décroît et son mouvement n'est plus rigoureusement périodique.</p>
+      </div>
+
+      <div class="lecture-formula-box">
+        <p><span class="math">m·x'' + λ·x' + k·x = 0</span> — l'équation du pendule élastique amorti : le nouveau terme <span class="math">λ·x'</span> traduit le frottement, avec <span class="math">λ</span> le coefficient de frottement (en kg·s⁻¹). Plus <span class="math">λ</span> est grand, plus le mouvement meurt vite.</p>
+      </div>
+
+      <svg viewBox="0 0 580 245" width="100%" role="img" aria-label="Oscillations libres amorties : courbe pseudo-sinusoidale d'amplitude decroissante avec enveloppe">
+        <line x1="70" y1="30" x2="70" y2="225" style="stroke:rgba(148,163,184,0.7);stroke-width:1.5"/>
+        <line x1="70" y1="130" x2="560" y2="130" style="stroke:rgba(148,163,184,0.55);stroke-dasharray:5 5"/>
+        <path d="M70,50 C180,66 360,104 560,126" style="stroke:rgba(148,163,184,0.6);stroke-width:1.5;fill:none;stroke-dasharray:5 4"/>
+        <path d="M70,210 C180,194 360,156 560,134" style="stroke:rgba(148,163,184,0.6);stroke-width:1.5;fill:none;stroke-dasharray:5 4"/>
+        <path d="M70,50 C100,52 90,208 120,210 C150,212 140,70 170,72 C200,74 190,186 220,188 C250,190 240,90 270,92 C300,94 290,168 320,170 C350,172 340,102 370,104 C400,106 390,152 420,154 C450,156 440,112 470,114 C500,116 490,140 520,141 C540,142 552,134 560,132" style="stroke:var(--accent-bright);stroke-width:2.5;fill:none"/>
+        <line x1="76" y1="30" x2="164" y2="30" style="stroke:rgba(148,163,184,0.8);stroke-width:1.5"/>
+        <polygon points="70,30 80,25 80,35" style="fill:rgba(148,163,184,0.8)"/>
+        <polygon points="170,30 160,25 160,35" style="fill:rgba(148,163,184,0.8)"/>
+        <text x="120" y="20" text-anchor="middle" style="fill:var(--accent-bright);font-size:12px">T ≈ T₀ (pseudo-période)</text>
+        <text x="310" y="60" text-anchor="middle" style="fill:rgba(148,163,184,0.9);font-size:12px;font-style:italic">l'amplitude diminue</text>
+        <text x="34" y="62" style="fill:rgba(148,163,184,0.9);font-size:12px;font-style:italic">x(t)</text>
+        <text x="548" y="148" text-anchor="middle" style="fill:rgba(148,163,184,0.9);font-size:11px">x = 0</text>
+        <text x="564" y="152" style="fill:rgba(148,163,184,0.9);font-size:13px;font-style:italic">t</text>
+      </svg>
+
+      <p class="lecture-text">La courbe raconte tout : les sommets s'alignent sur une enveloppe qui plonge vers zéro, tandis que les zéros de passage restent à peu près régulièrement espacés. Cet espacement s'appelle la pseudo-période <span class="math">T</span>, très proche de <span class="math">T₀</span> quand le frottement est faible. L'énergie, elle, ne se fait pas prier pour partir.</p>
+
+      <div class="lecture-example-content">
+        <p class="lecture-example-label">🧪 Exemple travaillé — l'énergie qui fuit</p>
+        <p>Un pendule amorti possède au départ <span class="math">Eₘ</span> = 0,090 J. Cinq pseudo-périodes plus tard, il ne lui reste que 0,010 J. Que s'est-il passé ?</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step">Je calcule la perte : ΔE = 0,090 − 0,010 = 0,080 J.</li>
+          <li class="lecture-step">Pourcentage dissipé : 0,080/0,090 ≈ 0,89, soit environ 89 % de l'énergie initiale.</li>
+          <li class="lecture-step">Cette énergie a été convertie en chaleur par les frottements (et une petite part en bruit).</li>
+          <li class="lecture-step">Conséquence visible : comme <span class="math">Eₘ = ½k·xₘ²</span>, une énergie divisée par 9 correspond à une amplitude divisée par √9 = 3 — l'oscillateur « rétrécit ».</li>
+        </ol>
+        <p><strong>✅ Résultat :</strong> 0,080 J dissipés (≈ 89 %) ; l'amplitude a chuté d'un facteur 3. Vérification : (1/3)² = 1/9 et 0,090/9 = 0,010 J — exactement l'énergie restante.</p>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <p><strong>⚠️ Piège d'examen</strong></p>
+        <p>« Oscillations libres » ne signifie pas « sans frottement » : cela signifie SANS excitation extérieure. Un oscillateur libre peut très bien être amorti. Et ne confonds pas l'amplitude (qui décroît) avec la pseudo-période (qui reste quasi constante).</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s4 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s4">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">04</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 4</span>
+        <h2 class="lecture-section-title">Les trois régimes de l'amortissement</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Tout dépend maintenant de la force du frottement, mesurée par le coefficient <span class="math">λ</span>. Faible, il laisse l'oscillateur vibrer en s'éteignant : c'est le régime pseudo-périodique. Très fort, il étouffe le mouvement avant toute oscillation : c'est le régime apériodique. Et entre les deux existe une valeur miraculeuse, le régime critique, où le système rejoint l'équilibre le plus vite possible sans jamais dépasser.</p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <p><strong>📖 Définitions officielles</strong></p>
+        <p><strong>Régime pseudo-périodique</strong> (frottement faible) : le système oscille en dépassant l'équilibre, avec une amplitude qui décroît et une pseudo-période <span class="math">T</span> ≈ <span class="math">T₀</span>.</p>
+        <p><strong>Régime critique</strong> (frottement bien dosé) : le système revient à l'équilibre le plus rapidement possible SANS osciller.</p>
+        <p><strong>Régime apériodique</strong> (frottement fort) : le système revient à l'équilibre sans osciller, mais lentement.</p>
+      </div>
+
+      <svg viewBox="0 0 580 262" width="100%" role="img" aria-label="Trois courbes de retour a l'equilibre superposees : regimes pseudo-periodique, critique et aperiodique">
+        <line x1="60" y1="45" x2="60" y2="235" style="stroke:rgba(148,163,184,0.7);stroke-width:1.5"/>
+        <line x1="60" y1="210" x2="555" y2="210" style="stroke:rgba(148,163,184,0.55);stroke-dasharray:5 5"/>
+        <polygon points="567,210 556,205 556,215" style="fill:rgba(148,163,184,0.7)"/>
+        <line x1="368" y1="46" x2="392" y2="46" style="stroke:var(--accent-bright);stroke-width:2.5"/>
+        <text x="398" y="50" style="fill:rgba(148,163,184,0.9);font-size:12px">pseudo-périodique</text>
+        <line x1="368" y1="66" x2="392" y2="66" style="stroke:rgba(251,191,36,0.9);stroke-width:2.5"/>
+        <text x="398" y="70" style="fill:rgba(148,163,184,0.9);font-size:12px">critique</text>
+        <line x1="368" y1="86" x2="392" y2="86" style="stroke:rgba(148,163,184,0.9);stroke-width:2.5"/>
+        <text x="398" y="90" style="fill:rgba(148,163,184,0.9);font-size:12px">apériodique</text>
+        <path d="M60,60 C90,62 80,243 110,245 C140,247 130,183 160,185 C190,187 180,230 210,232 C240,234 230,198 260,200 C290,202 280,216 310,218 C340,220 330,206 360,207 C390,208 420,208 450,209 C480,210 510,210 540,210" style="stroke:var(--accent-bright);stroke-width:2.5;fill:none"/>
+        <path d="M60,60 C120,64 160,180 210,196 C250,207 300,210 340,210 C400,210 480,210 540,210" style="stroke:rgba(251,191,36,0.9);stroke-width:2.5;fill:none"/>
+        <path d="M60,60 C150,64 260,150 360,185 C420,202 490,208 540,209" style="stroke:rgba(148,163,184,0.9);stroke-width:2.5;fill:none"/>
+        <text x="30" y="60" style="fill:rgba(148,163,184,0.9);font-size:12px;font-style:italic">x(t)</text>
+        <text x="520" y="226" text-anchor="middle" style="fill:rgba(148,163,184,0.9);font-size:11px">x = 0 (équilibre)</text>
+        <text x="562" y="230" style="fill:rgba(148,163,184,0.9);font-size:13px;font-style:italic">t</text>
+      </svg>
+
+      <div class="lecture-example-content">
+        <p class="lecture-example-label">🧪 Exemple travaillé — lire les trois courbes</p>
+        <p>Les trois systèmes ci-dessus partent de la même élongation initiale. Décris le retour à l'équilibre de chacun.</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step">Courbe verte (pseudo-périodique) : elle traverse plusieurs fois l'équilibre en dépassant, avec des sommets de plus en plus bas — elle oscille en s'éteignant.</li>
+          <li class="lecture-step">Courbe ambre (critique) : elle plonge directement vers l'équilibre sans aucun dépassement, et y arrive la première — c'est le retour le plus rapide.</li>
+          <li class="lecture-step">Courbe grise (apériodique) : elle aussi ne dépasse jamais, mais elle rampe lentement vers l'équilibre — le frottement trop fort a tout freiné.</li>
+          <li class="lecture-step">Leçon d'ingénieur : pour une suspension de véhicule ou un galvanomètre, on règle l'amortissement au voisinage du régime critique — ni oscillations, ni mollesse.</li>
+        </ol>
+        <p><strong>✅ Résultat :</strong> pseudo-périodique = oscille en décroissant ; critique = retour le plus rapide sans osciller ; apériodique = retour lent sans osciller.</p>
+      </div>
+
+      <table class="lecture-table">
+        <thead>
+          <tr><th>Régime</th><th>Frottement</th><th>Allure de x(t)</th><th>Exemple réel</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Pseudo-périodique</td><td>faible</td><td>oscille, amplitude décroissante (<span class="math">T</span> ≈ <span class="math">T₀</span>)</td><td>cloche de vélo pincée</td></tr>
+          <tr><td>Critique</td><td>bien réglé</td><td>retour le plus rapide, sans osciller</td><td>aiguille d'un appareil de mesure</td></tr>
+          <tr><td>Apériodique</td><td>fort</td><td>retour lent, sans osciller</td><td>porte à ferme-porte</td></tr>
+        </tbody>
+      </table>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <p><strong>⚠️ Piège d'examen</strong></p>
+        <p>Le piège classique : croire que le régime critique est le plus lent parce qu'il est « bien amorti ». C'est l'inverse ! Critique = retour le PLUS RAPIDE sans oscillation ; apériodique = retour lent. Apprends la phrase : « le critique gagne la course, l'apériodique traîne des pieds ».</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s5 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s5">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">05</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 5</span>
+        <h2 class="lecture-section-title">Entretenir les oscillations</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Si le frottement épuise l'oscillateur, la solution est de le ravitailler : on dit qu'on entretient les oscillations. L'idée est simple et géniale : apporter, à chaque cycle, exactement l'énergie qui vient d'être perdue. Celui qui pousse une balançoire au bon moment le fait instinctivement — et celui qui pousse au mauvais moment sent immédiatement que tout se dérègle.</p>
+
+      <div class="lecture-callout lecture-callout-key">
+        <p><strong>📖 Définition officielle</strong></p>
+        <p>Les <strong>oscillations entretenues</strong> sont des oscillations dont l'amplitude reste constante parce qu'une excitation extérieure périodique compense, cycle après cycle, l'énergie dissipée par les frottements. L'entretien est le plus efficace lorsque l'excitation suit la période propre du système.</p>
+      </div>
+
+      <p class="lecture-text">Tu côtoies des oscillateurs entretenus toute la journée : le balancier d'une horloge (un ressort moteur compense les frottements), le quartz de ton téléphone qui vibre des millions de fois par seconde sous tension électrique, la corde d'un violon tenue par l'archet, ou la balançoire relayée par un parent attentionné. Et quand l'excitation extérieure coïncide exactement avec la fréquence propre, le système répond avec une amplitude maximale : c'est la résonance — merveilleuse dans une horloge, dangereuse sur un pont.</p>
+
+      <svg viewBox="0 0 380 250" width="100%" role="img" aria-label="Balançoire entretenue : poussées synchronisees appliquees au bon rythme propre">
+        <line x1="70" y1="30" x2="310" y2="30" style="stroke:rgba(148,163,184,0.8);stroke-width:3"/>
+        <line x1="90" y1="30" x2="80" y2="18" style="stroke:rgba(148,163,184,0.6);stroke-width:1.5"/>
+        <line x1="130" y1="30" x2="120" y2="18" style="stroke:rgba(148,163,184,0.6);stroke-width:1.5"/>
+        <line x1="170" y1="30" x2="160" y2="18" style="stroke:rgba(148,163,184,0.6);stroke-width:1.5"/>
+        <line x1="210" y1="30" x2="200" y2="18" style="stroke:rgba(148,163,184,0.6);stroke-width:1.5"/>
+        <line x1="250" y1="30" x2="240" y2="18" style="stroke:rgba(148,163,184,0.6);stroke-width:1.5"/>
+        <line x1="190" y1="30" x2="190" y2="200" style="stroke:rgba(148,163,184,0.55);stroke-dasharray:5 5"/>
+        <path d="M113,176 A165,165 0 0 0 267,176" style="stroke:rgba(148,163,184,0.6);stroke-width:1.5;fill:none;stroke-dasharray:5 4"/>
+        <line x1="190" y1="30" x2="113" y2="176" style="stroke:rgba(148,163,184,0.9);stroke-width:1.5"/>
+        <line x1="190" y1="30" x2="267" y2="176" style="stroke:rgba(148,163,184,0.9);stroke-width:1.5"/>
+        <circle cx="113" cy="176" r="13" style="fill:rgba(74,222,128,0.2);stroke:var(--accent-bright);stroke-width:2"/>
+        <circle cx="267" cy="176" r="13" style="fill:rgba(74,222,128,0.2);stroke:var(--accent-bright);stroke-width:2"/>
+        <circle cx="190" cy="195" r="13" style="fill:none;stroke:rgba(148,163,184,0.7);stroke-width:1.5;stroke-dasharray:4 3"/>
+        <line x1="330" y1="150" x2="296" y2="163" style="stroke:var(--accent-bright);stroke-width:2"/>
+        <polygon points="288,168 296,159 299,169" style="fill:var(--accent-bright)"/>
+        <text x="372" y="20" text-anchor="end" style="fill:var(--accent-bright);font-size:12px">poussée au bon rythme</text>
+        <text x="190" y="244" text-anchor="middle" style="fill:rgba(148,163,184,0.9);font-size:11.5px">une poussée par aller-retour, toujours au même endroit de la course</text>
+      </svg>
+
+      <div class="lecture-example-content">
+        <p class="lecture-example-label">🧪 Exemple travaillé — le bon rythme du pousseur</p>
+        <p>Une balançoire a une période propre <span class="math">T₀</span> = 2,4 s. À quel rythme faut-il pousser pour l'entretenir efficacement ?</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step">Je rappelle le principe : l'entretien est maximal quand l'excitation suit la période propre du système.</li>
+          <li class="lecture-step">Il faut donc une poussée par aller-retour, soit toutes les 2,4 s, toujours dans le sens du mouvement.</li>
+          <li class="lecture-step">Si on pousse deux fois trop vite ou au mauvais endroit, l'apport d'énergie arrive en opposition et freine la balançoire au lieu de l'aider.</li>
+        </ol>
+        <p><strong>✅ Résultat :</strong> une poussée toutes les 2,4 s — la fréquence d'entretien doit égaler la fréquence propre <span class="math">f₀ = 1/T₀</span> ≈ 0,42 Hz.</p>
+      </div>
+
+      <p class="lecture-text">Le bilan final de tout le chapitre tient en trois situations, résumées dans ce tableau de synthèse :</p>
+
+      <table class="lecture-table">
+        <thead>
+          <tr><th>Situation</th><th>Énergie mécanique Eₘ</th><th>Ce qui se passe</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Oscillation sans frottement</td><td>constante</td><td>échange pur <span class="math">Ec ↔ Eₚ</span>, amplitude conservée</td></tr>
+          <tr><td>Oscillation amortie (libre)</td><td>diminue</td><td>dissipation en chaleur, amplitude qui décroît</td></tr>
+          <tr><td>Oscillation entretenue</td><td>constante</td><td>apport extérieur compensant exactement les pertes</td></tr>
+        </tbody>
+      </table>
+
+      <p class="lecture-text"><strong>🏋️ Entraînement — deux exercices complets</strong></p>
+
+      <div class="lecture-text">
+        <p class="lecture-text"><strong>Exercice 1 — Bilan énergétique complet.</strong> Un pendule élastique horizontal de masse <span class="math">m</span> = 500 g et de raideur <span class="math">k</span> = 50 N·m⁻¹ oscille sans frottement avec une amplitude <span class="math">xₘ</span> = 6,0 cm. Calculer <span class="math">Eₘ</span>, puis <span class="math">Eₚ</span>, <span class="math">Ec</span> et <span class="math">v</span> au passage où <span class="math">x</span> = 4,0 cm.</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step">Conversions : <span class="math">m</span> = 0,500 kg ; <span class="math">xₘ</span> = 0,060 m ; <span class="math">x</span> = 0,040 m.</li>
+          <li class="lecture-step">Énergie totale : <span class="math">Eₘ</span> = ½ × 50 × (0,060)² = 25 × 0,0036 = 0,090 J.</li>
+          <li class="lecture-step">À <span class="math">x</span> = 4,0 cm : <span class="math">Eₚ</span> = ½ × 50 × (0,040)² = 25 × 0,0016 = 0,040 J.</li>
+          <li class="lecture-step">Donc <span class="math">Ec</span> = 0,090 − 0,040 = 0,050 J.</li>
+          <li class="lecture-step">Vitesse : <span class="math">v</span> = √(2 × 0,050/0,500) = √0,20 ≈ 0,45 m·s⁻¹.</li>
+        </ol>
+        <p><strong>✅ Réponse :</strong> <span class="math">Eₘ</span> = 0,090 J ; <span class="math">Eₚ</span> = 0,040 J ; <span class="math">Ec</span> = 0,050 J ; <span class="math">v</span> ≈ 0,45 m·s⁻¹. Contrôle : 0,040 + 0,050 = 0,090 J — le total est bien conservé.</p>
+      </div>
+
+      <div class="lecture-text">
+        <p class="lecture-text"><strong>Exercice 2 — Le pendule qui s'épuise.</strong> Un pendule amorti possède une énergie mécanique initiale de 0,090 J. Après 20 s, il ne lui en reste que 0,022 J. Calculer l'énergie dissipée et son pourcentage, puis dire où elle est passée et ce que devient l'amplitude.</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step">Énergie dissipée : ΔE = 0,090 − 0,022 = 0,068 J.</li>
+          <li class="lecture-step">Pourcentage : 0,068/0,090 ≈ 0,76, soit environ 76 % de l'énergie initiale.</li>
+          <li class="lecture-step">Cette énergie a été convertie en chaleur par les frottements de l'air et du support (et une très faible part en son).</li>
+          <li class="lecture-step">Comme <span class="math">Eₘ = ½k·xₘ²</span>, une énergie multipliée par 0,022/0,090 ≈ 0,24 correspond à une amplitude multipliée par √0,24 ≈ 0,49 : l'amplitude a presque diminué de moitié.</li>
+        </ol>
+        <p><strong>✅ Réponse :</strong> 0,068 J dissipés, soit ≈ 76 % ; l'amplitude a chuté d'environ 51 % (elle vaut ≈ 49 % de sa valeur initiale). Pour maintenir l'amplitude, il faudrait entretenir l'oscillateur.</p>
+      </div>
+
+      <div class="lecture-callout lecture-callout-warning">
+        <p><strong>⚠️ Piège d'examen</strong></p>
+        <p>Entretenir ne veut pas dire pousser fort : cela veut dire pousser AU BON RYTHME, celui de la fréquence propre. Une excitation mal synchronisée peut même réduire l'oscillation. Et au Bac, cite toujours OÙ va l'énergie perdue : en chaleur par frottement — jamais « disparue ».</p>
+      </div>
+    </div>
+  </section>
+  <!-- ===== QCM ===== -->
+  <div class="lecture-quiz">
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Un pendule élastique oscille sans frottement. Son énergie mécanique :</p>
+      <div class="lecture-quiz-options"><span>A) augmente puis diminue</span><span>B) diminue régulièrement</span><span>C) reste constante</span><span>D) s'annule au passage à l'équilibre</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">Réponse C. Sans frottement, <span class="math">Eₘ = Ec + Eₚ</span> se conserve : l'énergie passe d'un coffre à l'autre sans perte. Au passage à l'équilibre, elle est tout entière sous forme cinétique.</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Lequel de ces régimes ramène le système à l'équilibre le plus vite, sans osciller ?</p>
+      <div class="lecture-quiz-options"><span>A) pseudo-périodique</span><span>B) critique</span><span>C) apériodique</span><span>D) entretenu</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">Réponse B. Le régime critique est le compromis optimal : frottement assez fort pour éviter tout dépassement, mais assez faible pour ne pas freiner le retour. L'apériodique est lent, le pseudo-périodique oscille.</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">À l'élongation <span class="math">x</span> = <span class="math">xₘ</span>/2, l'énergie potentielle élastique vaut :</p>
+      <div class="lecture-quiz-options"><span>A) Eₘ/2</span><span>B) Eₘ/4</span><span>C) Eₘ/√2</span><span>D) Eₘ</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">Réponse B. <span class="math">Eₚ = ½k·(xₘ/2)²</span> = (1/4) × ½k·xₘ² = <span class="math">Eₘ</span>/4, car l'énergie potentielle est proportionnelle au CARRÉ de l'élongation. Les trois quarts restants sont alors cinétiques.</div></details>
+    </div>
+  </div>
+  <!-- ===== RÉCAP ===== -->
+  <div class="lecture-recap">
+    <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
+    <ul class="lecture-recap-list">
+      <li><strong>Deux coffres</strong> : <span class="math">Ec = ½m·v²</span> (maximale à l'équilibre) et <span class="math">Eₚ = ½k·x²</span> (maximale aux extrémités).</li>
+      <li><strong>Conservation</strong> : sans frottement, <span class="math">Eₘ = Ec + Eₚ = ½k·xₘ²</span> reste constante — calcule-la à une position clé.</li>
+      <li><strong>Amortissement</strong> : le frottement dissipe l'énergie en chaleur ; trois régimes — pseudo-périodique (oscille en décroissant), critique (retour le plus rapide sans osciller), apériodique (retour lent).</li>
+      <li><strong>Entretien</strong> : une excitation périodique synchronisée sur la fréquence propre compense les pertes (horloge, quartz, balançoire) — et donne la résonance quand elle coïncide exactement.</li>
+    </ul>
+  </div>
+  <!-- ===== FIN ===== -->
+  <div class="lecture-end">
+    <div class="lecture-end-icon">🎯</div>
+    <div class="lecture-end-text">Partie 03 terminée !</div>
+    <div class="lecture-end-sub">Le cours est complet : tu connais le mouvement, l'équation et l'énergie des oscillateurs. En partie 04, tout se condense en une fiche de révision — grande table des formules, vocabulaire éclair et réflexes Bac — à relire la veille de l'examen. Une dernière ligne droite et tu es prêt !</div>
+    <div class="lecture-end-divider"></div>
+  </div>
+</div>

@@ -1,0 +1,440 @@
+<!-- PARTIE 01 — Définition et propriétés d'une solution tampon (Réaction acido-basique et solution tampon) -->
+<div class="lecture-container">
+
+  <!-- ===== HERO ===== -->
+  <header class="lecture-hero">
+    <div class="lecture-hero-badge">
+      <span class="lecture-hero-icon">📘</span>
+      <span class="lecture-hero-label">Terminale C&amp;D · Réaction acido-basique et solution tampon · Partie 01</span>
+    </div>
+    <h1 class="lecture-hero-title">
+      Définition et propriétés d'une <em>solution tampon</em>
+    </h1>
+    <p class="lecture-hero-intro">
+      Ton estomac contient un acide assez fort pour attaquer la viande, ton sang en contient à peine plus qu'une trace — et pourtant c'est le sang qui décide de tout. Pour comprendre <strong>pourquoi certains liquides résistent au pH</strong> quand d'autres s'effondrent, il faut d'abord maîtriser la réaction acido-basique et le titrage : équation support, équivalence, suivi par pH-métrie ou conductimétrie. Au bout du chemin, une découverte : sur la courbe de titrage d'un acide faible, il existe une zone où le pH refuse de bouger — c'est le berceau des <strong>solutions tampon</strong>.
+    </p>
+    <div class="lecture-hero-meta">
+      <span class="lecture-hero-meta-item">⏱ 20 min</span>
+      <span class="lecture-hero-meta-item">⚗️ 3 notions</span>
+      <span class="lecture-hero-meta-item">📚 6 sections</span>
+      <span class="lecture-hero-meta-item">🎓 Terminale C&amp;D</span>
+    </div>
+  </header>
+  <!-- ===== SOMMAIRE ===== -->
+  <nav class="lecture-toc">
+    <div class="lecture-toc-header">
+      <span>Dans cette partie</span>
+      <span class="lecture-toc-count">3 notions · 6 sections</span>
+    </div>
+    <ol class="lecture-toc-list">
+      <li><a href="#s0"><span class="toc-num">00</span><span>Motivation — Un estomac à pH 2, un sang à pH 7,4</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>Notion 1 · réaction support — La réaction d'un titrage acido-basique</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>Notion 2 · équivalence — L'équivalence : n(acide) = n(base)</span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>Notion 3 · pH-métrie — Suivre le titrage par pH-métrie</span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>Notion 4 · conductimétrie — Suivre le titrage par conductimétrie</span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>Notion 5 · demi-équivalence — La demi-équivalence : quand pH = pKa</span></a></li>
+    </ol>
+  </nav>
+  <!-- ============================================================ -->
+  <!-- SECTION s0 : MOTIVATION -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s0">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">00</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Motivation</span>
+        <h2 class="lecture-section-title">Un estomac à pH 2, un sang à pH 7,4</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Ton estomac fabrique de l'acide chlorhydrique si concentré que son pH descend entre <span class="math">1,5</span> et <span class="math">2</span> : de quoi digérer la viande… et de quoi brûler quand ça remonte. Le remède du pharmacien, l'antiacide (lait de magnésie, <span class="math">Mg(OH)₂</span>), piège cet excès d'acide selon <span class="math">Mg(OH)₂ + 2 H₃O⁺ → Mg²⁺ + 4 H₂O</span> : une base qui <strong>consomme</strong> les ions <span class="math">H₃O⁺</span>.</p>
+      <p class="lecture-text">Maintenant regarde ton sang : tu bois du citron, du tamarin, un soda (tous acides), tu produis sans arrêt du <span class="math">CO₂</span> (acide en solution)… et pourtant son pH reste rangé entre <span class="math">7,35</span> et <span class="math">7,45</span>. Une variation de plus de <span class="math">0,4</span> unité suffit à mettre la vie en danger. Le sang, lui, <strong>s'oppose</strong> aux variations de pH : c'est l'exemple parfait de ce qu'on appellera une <strong>solution tampon</strong>.</p>
+      <p class="lecture-text">Même combat chez l'aquariophile de Niamey : si l'eau de l'aquarium change brutalement de pH au moment du renouvellement, les poissons meurent. D'où les gouttes « stabilisatrices de pH » vendues en animalerie… des solutions tampon, encore.</p>
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 540 290" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Deux béchers côte à côte : l'eau pure passe de pH 7 à pH 2 après une goutte d'acide, le sang tamponné reste à pH 7,4">
+          <defs>
+            <marker id="arP1a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="rgba(239,68,68,0.9)"/></marker>
+            <marker id="arP1b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="rgba(74,222,128,0.9)"/></marker>
+          </defs>
+          <text x="270" y="22" style="fill:var(--accent-bright)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle" letter-spacing="2">DEUX LIQUIDES, UNE MÊME GOUTTE D'ACIDE FORT</text>
+          <line x1="125" y1="38" x2="125" y2="82" style="stroke:rgba(239,68,68,0.85)" stroke-width="2" marker-end="url(#arP1a)"/>
+          <text x="138" y="58" style="fill:rgba(239,68,68,0.95)" font-size="11.5" font-family="Inter, system-ui, sans-serif">+ H₃O⁺</text>
+          <path d="M70,92 L70,215 Q70,223 78,223 L172,223 Q180,223 180,215 L180,92" fill="none" style="stroke:var(--text-muted)" stroke-width="2"/>
+          <rect x="73" y="150" width="104" height="70" rx="4" fill="rgba(96,165,250,0.25)"/>
+          <text x="125" y="80" style="fill:rgba(96,165,250,0.95)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">EAU PURE</text>
+          <text x="125" y="140" style="fill:var(--text-muted)" font-size="12" font-family="Inter, system-ui, sans-serif" text-anchor="middle">pH = 7</text>
+          <line x1="125" y1="228" x2="125" y2="254" style="stroke:rgba(239,68,68,0.85)" stroke-width="2" marker-end="url(#arP1a)"/>
+          <text x="138" y="252" style="fill:rgba(239,68,68,1)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif">pH = 2</text>
+          <line x1="425" y1="38" x2="425" y2="82" style="stroke:rgba(239,68,68,0.85)" stroke-width="2" marker-end="url(#arP1a)"/>
+          <text x="438" y="58" style="fill:rgba(239,68,68,0.95)" font-size="11.5" font-family="Inter, system-ui, sans-serif">+ H₃O⁺</text>
+          <path d="M370,92 L370,215 Q370,223 378,223 L472,223 Q480,223 480,215 L480,92" fill="none" style="stroke:var(--text-muted)" stroke-width="2"/>
+          <rect x="373" y="150" width="104" height="70" rx="4" fill="rgba(239,68,68,0.22)"/>
+          <text x="425" y="80" style="fill:rgba(239,68,68,0.95)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">SANG TAMPONNÉ</text>
+          <text x="425" y="140" style="fill:var(--text-muted)" font-size="12" font-family="Inter, system-ui, sans-serif" text-anchor="middle">pH = 7,4</text>
+          <line x1="425" y1="228" x2="425" y2="254" style="stroke:rgba(74,222,128,0.9)" stroke-width="2" marker-end="url(#arP1b)"/>
+          <text x="438" y="252" style="fill:rgba(74,222,128,1)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif">pH ≈ 7,4</text>
+          <text x="270" y="130" style="fill:var(--text-muted)" font-size="12" font-style="italic" font-family="Inter, system-ui, sans-serif" text-anchor="middle">La même goutte tombe</text>
+          <text x="270" y="150" style="fill:var(--text-muted)" font-size="12" font-style="italic" font-family="Inter, system-ui, sans-serif" text-anchor="middle">dans les deux liquides…</text>
+          <text x="270" y="278" style="fill:var(--accent-bright)" font-size="12" font-style="italic" font-family="Inter, system-ui, sans-serif" text-anchor="middle">l'eau s'effondre, le sang résiste : pourquoi ? C'est l'objet du chapitre.</text>
+        </svg>
+      </figure>
+      <div class="lecture-callout lecture-callout-gold">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">Le fil conducteur de la partie</div>
+          <p>Pour percer ce secret, il faut d'abord la règle du jeu : la <strong>réaction acido-basique</strong> d'un titrage et sa <strong>réaction support</strong>, puis la notion d'<strong>équivalence</strong> et les deux façons de suivre un dosage (pH-métrie, conductimétrie). Tout cela mène à une zone très particulière de la courbe de titrage : la <strong>demi-équivalence</strong>, où <span class="math">pH = pKa</span> — et où naissent les tampons.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s1 : NOTION 1 — RÉACTION SUPPORT -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s1">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">01</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1 · réaction support</span>
+        <h2 class="lecture-section-title">La réaction d'un titrage acido-basique</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Un <strong>titrage</strong> (ou dosage) consiste à déterminer la concentration inconnue d'une solution en la faisant réagir avec une solution de concentration connue, versée goutte à goutte avec une burette. La chimie du titrage repose entièrement sur une seule réaction, choisie une fois pour toutes : la <strong>réaction support</strong>.
+      </p>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">📖 Définition officielle — réaction support d'un titrage</div>
+          <p>La <strong>réaction support</strong> d'un titrage acido-basique est la réaction de <strong>neutralisation</strong> entre l'acide et la base mis en présence : l'acide cède un proton <span class="math">H⁺</span> à la base. Pour servir de support, elle doit être <strong>rapide</strong> et <strong>quasi totale</strong> : son équation bilan s'écrit alors avec une flèche simple <span class="math">→</span>, et non avec <span class="math">⇌</span>.</p>
+        </div>
+      </div>
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-main">Réaction support — acide éthoïque dosé par la soude</div>
+        <div class="lecture-formula-hero-main">CH₃—COOH + OH⁻ → CH₃—COO⁻ + H₂O</div>
+        <div class="lecture-formula-hero-desc">Équilibrée sur les atomes (C : 2 et 2 ; H : 5 et 5 ; O : 3 et 3) et sur les charges (<span class="math">−1</span> à gauche, <span class="math">−1</span> à droite). L'ion <span class="math">OH⁻</span> de la soude arrache le proton de l'acide éthoïque : il ne reste que sa base conjuguée, l'ion éthanoate.</div>
+      </div>
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">Cas particulier acide fort / base forte : H₃O⁺ + OH⁻ → 2 H₂O</div>
+        <div class="lecture-formula-desc">Ici l'acide n'est pas une molécule mais l'ion oxonium <span class="math">H₃O⁺</span> : la réaction s'écrit entre deux ions et l'eau est le seul produit. Équilibrée aussi bien du côté des charges : <span class="math">+1 − 1 = 0</span>.</div>
+      </div>
+      <p class="lecture-text">Imagine un compteur de gouttes : chaque goutte de soude apporte un paquet d'ions <span class="math">OH⁻</span>, et chacun de ces ions trouve immédiatement une molécule d'acide à neutraliser, sans en laisser la moitié derrière lui. Doser, c'est donc <strong>compter des ions</strong> goutte par goutte — à condition que la réaction n'en laisse rien au hasard.</p>
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">Exemple travaillé — combien d'acide une goutte de soude neutralise-t-elle ?</div>
+        <div class="lecture-example-content">
+          <p><strong>Données :</strong> on prélève <span class="math">V = 5,0 mL</span> de soude de concentration <span class="math">C = 0,10 mol·L⁻¹</span>. La réaction support est quasi totale. Quelle quantité d'acide éthoïque ces 5,0 mL neutralisent-ils ?</p>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Données converties :</strong> <span class="math">C = 0,10 mol·L⁻¹</span> ; <span class="math">V = 5,0 mL = 5,0×10⁻³ L</span> ; relation <span class="math">n = C·V</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Substitution :</strong> <span class="math">n(OH⁻) = 0,10 × 5,0×10⁻³ = 5,0×10⁻⁴ mol</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Vérification (autre voie) :</strong> en millimoles, <span class="math">n = 0,10 mmol·mL⁻¹ × 5,0 mL = 0,50 mmol = 5,0×10⁻⁴ mol</span> ✔ même valeur.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Résultat :</strong> comme la réaction est quasi totale et que l'équation se lit <span class="math">1</span> pour <span class="math">1</span>, ces <span class="math">5,0×10⁻⁴ mol</span> d'ions <span class="math">OH⁻</span> neutralisent exactement <span class="math">5,0×10⁻⁴ mol</span> de <span class="math">CH₃—COOH</span> ✔.</p></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ Piège d'examen n° 1</div>
+          <p><strong>« Quasi totale » ne dit pas « instantanée »</strong> : une réaction de titrage doit être les deux à la fois (totale <em>et</em> rapide), sinon le point d'équivalence est flou. Deuxième piège : écrire la réaction support avec <span class="math">⇌</span> est <strong>faux</strong> — on réserve la double flèche aux équilibres comme <span class="math">AH + H₂O ⇌ A⁻ + H₃O⁺</span>. Enfin, toute équation bilan doit être équilibrée <strong>sur les atomes ET sur les charges</strong> : c'est la première ligne vérifiée par le correcteur.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s2 : NOTION 2 — ÉQUIVALENCE -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s2">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">02</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2 · équivalence</span>
+        <h2 class="lecture-section-title">L'équivalence : n(acide) = n(base)</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Pendant le titrage, on verse la soude et l'acide du bécher disparaît. Il arrive un instant précis où l'on a versé <em>exactement ce qu'il faut</em> : ni trop, ni trop peu. Cet instant est le cœur de tout titrage — on l'appelle l'<strong>équivalence</strong>.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-title">📖 Définition officielle — équivalence</div>
+        <p>À l'<strong>équivalence</strong> d'un titrage, le réactif titrant (dans la burette) et le réactif titré (dans le bécher) ont été introduits dans les <strong>proportions stœchiométriques</strong> de la réaction support : ils sont tous deux <strong>entièrement consommés</strong>. En termes de quantités de matière, pour un monoacide dosé par une monobase : <span class="math">n(acide)initial = n(base)versée</span>.</p>
+      </div>
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-main">Formule majeure — la relation à l'équivalence</div>
+        <div class="lecture-formula-hero-main">Ca·Va = Cb·Vb</div>
+        <div class="lecture-formula-hero-desc">Avec <span class="math">Ca</span>, <span class="math">Va</span> : concentration et volume de la solution dosée ; <span class="math">Cb</span>, <span class="math">Vb</span> : ceux du titrant, <span class="math">Vb</span> étant mesuré <strong>à l'équivalence</strong> (<span class="math">Vb = VE</span>). Les volumes peuvent rester en mL si les deux le sont : l'unité s'élimine.</div>
+      </div>
+      <p class="lecture-text">Image : des invités (les ions <span class="math">OH⁻</span>) arrivent un à un dans une salle de chaises (les molécules d'acide). Avant l'équivalence, il reste des chaises libres (acide en excès). À l'équivalence, chaque invité a sa chaise : plus aucun des deux en surnombre. Après l'équivalence, les invités s'entassent debout (base en excès) : le pH bascule, et c'est ce basculement qu'on repère à l'écran du pH-mètre ou par un changement de couleur de l'indicateur.</p>
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">Exemple travaillé — déterminer la concentration d'un acide</div>
+        <div class="lecture-example-content">
+          <p><strong>Données :</strong> on dose <span class="math">Va = 20,0 mL</span> d'acide chlorhydrique (concentration <span class="math">Ca</span> inconnue) par de la soude de concentration <span class="math">Cb = 0,10 mol·L⁻¹</span>. L'indicateur bleu de bromothymol vire pour <span class="math">VE = 18,0 mL</span> de soude versée.</p>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>À l'équivalence :</strong> <span class="math">n(acide) = n(base)</span>, soit <span class="math">Ca·Va = Cb·VE</span> (réaction support <span class="math">H₃O⁺ + OH⁻ → 2 H₂O</span>, stœchiométrie 1 pour 1).</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Substitution :</strong> <span class="math">Ca = (Cb·VE)/Va = (0,10 × 18,0)/20,0</span> (les mL s'éliminent).</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Résultat :</strong> <span class="math">Ca = 1,8/20,0 = 0,090 mol·L⁻¹</span> ✔.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Vérification (autre voie) :</strong> <span class="math">n(base) = 0,10 × 18,0×10⁻³ = 1,8×10⁻³ mol</span> ; puis <span class="math">Ca = 1,8×10⁻³ ÷ 20,0×10⁻³ = 0,090 mol·L⁻¹</span> ✔ même valeur.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">5</div><div class="lecture-step-content"><p><strong>Conclusion :</strong> l'acide chlorhydrique dosé a pour concentration <span class="math">0,090 mol·L⁻¹</span> ; à l'équivalence, acide et base sont tous deux épuisés.</p></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ Piège d'examen n° 2</div>
+          <p>À l'équivalence, les <strong>réactifs</strong> sont épuisés, mais la solution n'est pas forcément neutre : <span class="math">pH(É) = 7</span> seulement pour un <strong>acide fort / base forte</strong>. Si on titre l'acide éthoïque par la soude, il se forme de l'ion éthanoate (une base) et le pH à l'équivalence est <strong>basique</strong> (environ <span class="math">8,7</span>). Ne jamais justifier « la réaction est à l'équivalence car le pH vaut 7 » sans préciser la nature des réactifs.</p>
+        </div>
+      </div>
+      <p class="lecture-text">Quand on titre avec un <strong>indicateur coloré</strong> au lieu d'un pH-mètre, il faut choisir un indicateur dont la <strong>zone de virage contient le pH attendu à l'équivalence</strong> :</p>
+      <div class="lecture-table">
+        <table>
+          <thead>
+            <tr><th>Indicateur</th><th>Zone de virage</th><th>Couleur côté acide</th><th>Couleur côté basique</th><th>Titrage adapté</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Hélianthine</td><td><span class="math">3,1 – 4,4</span></td><td>rouge</td><td>jaune</td><td>acide fort / base forte à É acide</td></tr>
+            <tr><td>Bleu de bromothymol (BBT)</td><td><span class="math">6,0 – 7,6</span></td><td>jaune</td><td>bleu</td><td>acide fort / base forte (É neutre, pH ≈ 7)</td></tr>
+            <tr><td>Phénolphtaléine</td><td><span class="math">8,2 – 10,0</span></td><td>incolore</td><td>rose</td><td>acide faible / base forte (É basique)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s3 : NOTION 3 — pH-MÉTRIE -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s3">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">03</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 3 · pH-métrie</span>
+        <h2 class="lecture-section-title">Suivre le titrage par pH-métrie</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">
+        Quand la solution est incolore, on peut se passer d'indicateur : on plonge la <strong>sonde d'un pH-mètre</strong> dans le bécher et on note le pH après chaque ajout de soude. En traçant <span class="math">pH = f(Vb)</span>, on obtient la courbe de titrage — le document le plus riche du chapitre, à savoir lire ligne par ligne.
+      </p>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">📖 Définition officielle — suivi pH-métrique</div>
+          <p>Le <strong>suivi pH-métrique</strong> d'un titrage consiste à mesurer le <strong>pH du mélange</strong> en fonction du volume <span class="math">Vb</span> de titrant versé. L'équivalence est repérée par le <strong>saut brusque de pH</strong> : on la détermine par la <strong>méthode des tangentes</strong> (deux tangentes aux parties quasi rectilignes, puis une parallèle équidistante qui coupe la courbe à l'équivalence).</p>
+        </div>
+      </div>
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 540 350" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Courbe de titrage pH-métrique d'un acide faible par la soude : palier acide, saut de pH à l'équivalence VÉ, point de demi-équivalence à pH égal à pKa">
+          <defs><marker id="arP1c" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="rgba(224,184,74,0.9)"/></marker></defs>
+          <text x="270" y="20" style="fill:var(--accent-bright)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle" letter-spacing="2">COURBE DE TITRAGE : pH = f(Vb)</text>
+          <line x1="60" y1="310" x2="510" y2="310" style="stroke:rgba(224,184,74,0.9)" stroke-width="2" marker-end="url(#arP1c)"/>
+          <line x1="60" y1="310" x2="60" y2="30" style="stroke:rgba(224,184,74,0.9)" stroke-width="2" marker-end="url(#arP1c)"/>
+          <text x="508" y="330" style="fill:var(--text-muted)" font-size="11.5" font-family="Inter, system-ui, sans-serif" text-anchor="end">Vb (mL de soude versée)</text>
+          <text x="46" y="28" style="fill:var(--text-muted)" font-size="11.5" font-family="Inter, system-ui, sans-serif" text-anchor="end">pH</text>
+          <text x="52" y="274" style="fill:var(--text-muted)" font-size="10" font-family="Inter, system-ui, sans-serif" text-anchor="end">2</text>
+          <text x="52" y="234" style="fill:var(--text-muted)" font-size="10" font-family="Inter, system-ui, sans-serif" text-anchor="end">4</text>
+          <text x="52" y="194" style="fill:var(--text-muted)" font-size="10" font-family="Inter, system-ui, sans-serif" text-anchor="end">6</text>
+          <text x="52" y="154" style="fill:var(--text-muted)" font-size="10" font-family="Inter, system-ui, sans-serif" text-anchor="end">8</text>
+          <text x="52" y="114" style="fill:var(--text-muted)" font-size="10" font-family="Inter, system-ui, sans-serif" text-anchor="end">10</text>
+          <text x="52" y="74" style="fill:var(--text-muted)" font-size="10" font-family="Inter, system-ui, sans-serif" text-anchor="end">12</text>
+          <line x1="60" y1="270" x2="510" y2="270" style="stroke:rgba(148,163,184,0.18)" stroke-width="1" stroke-dasharray="3 4"/><line x1="60" y1="230" x2="510" y2="230" style="stroke:rgba(148,163,184,0.18)" stroke-width="1" stroke-dasharray="3 4"/><line x1="60" y1="190" x2="510" y2="190" style="stroke:rgba(148,163,184,0.18)" stroke-width="1" stroke-dasharray="3 4"/>
+          <line x1="60" y1="150" x2="510" y2="150" style="stroke:rgba(148,163,184,0.18)" stroke-width="1" stroke-dasharray="3 4"/><line x1="60" y1="110" x2="510" y2="110" style="stroke:rgba(148,163,184,0.18)" stroke-width="1" stroke-dasharray="3 4"/><line x1="60" y1="70" x2="510" y2="70" style="stroke:rgba(148,163,184,0.18)" stroke-width="1" stroke-dasharray="3 4"/>
+          <path d="M60,250 C110,246 140,236 170,214 C200,196 250,182 272,150 C278,138 280,110 284,95 C290,72 320,62 360,58 C420,53 480,52 510,51" fill="none" style="stroke:rgba(96,165,250,0.95)" stroke-width="2.6"/>
+          <line x1="280" y1="310" x2="280" y2="60" style="stroke:rgba(224,184,74,0.85)" stroke-width="1.6" stroke-dasharray="6 4"/>
+          <text x="280" y="52" style="fill:var(--accent-bright)" font-size="12.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">É (saut de pH)</text>
+          <text x="280" y="328" style="fill:var(--accent-bright)" font-size="11.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">VE</text>
+          <line x1="170" y1="214" x2="170" y2="310" style="stroke:rgba(74,222,128,0.8)" stroke-width="1.4" stroke-dasharray="4 4"/>
+          <line x1="60" y1="214" x2="170" y2="214" style="stroke:rgba(74,222,128,0.8)" stroke-width="1.4" stroke-dasharray="4 4"/>
+          <circle cx="170" cy="214" r="5" fill="rgba(74,222,128,0.9)"/>
+          <text x="182" y="206" style="fill:rgba(74,222,128,1)" font-size="12" font-weight="700" font-family="Inter, system-ui, sans-serif">½É</text>
+          <text x="66" y="208" style="fill:rgba(74,222,128,1)" font-size="11" font-family="Inter, system-ui, sans-serif">pH = pKa</text>
+          <text x="100" y="292" style="fill:var(--text-muted)" font-size="10.5" font-style="italic" font-family="Inter, system-ui, sans-serif">acide en excès</text>
+          <text x="420" y="80" style="fill:var(--text-muted)" font-size="10.5" font-style="italic" font-family="Inter, system-ui, sans-serif">base en excès</text>
+          <text x="305" y="128" style="fill:rgba(224,184,74,0.95)" font-size="10.5" font-style="italic" font-family="Inter, system-ui, sans-serif">saut de pH</text>
+        </svg>
+      </figure>
+      <ul class="lecture-list-elegant">
+        <li><strong>Avant l'équivalence</strong> : le pH monte doucement — chaque goutte de base est consommée par l'acide restant.</li>
+        <li><strong>À l'équivalence</strong> : <strong>saut de pH</strong> très raide ; on y lit <span class="math">VE</span> sur l'axe horizontal.</li>
+        <li><strong>Après l'équivalence</strong> : la soude versée s'accumule sans plus rien à neutraliser — le pH se stabilise vers celui de la base.</li>
+      </ul>
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">Exploitation : Ca = (Cb × VE) / Va</div>
+        <div class="lecture-formula-desc">C'est la relation d'équivalence <span class="math">Ca·Va = Cb·VE</span> réarrangée. <span class="math">VE</span> se lit sur la courbe ; <span class="math">Va</span> et <span class="math">Cb</span> sont connus avant de commencer.</div>
+      </div>
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">Exemple travaillé — exploiter une courbe pH-métrique</div>
+        <div class="lecture-example-content">
+          <p><strong>Données :</strong> on titre <span class="math">Va = 10,0 mL</span> d'une solution d'acide éthoïque par de la soude à <span class="math">Cb = 0,050 mol·L⁻¹</span>. La méthode des tangentes donne <span class="math">VE = 12,0 mL</span>.</p>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Repérage :</strong> le saut de pH se produit à <span class="math">VE = 12,0 mL</span> (lu par la méthode des tangentes) ✔.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Formule :</strong> à l'équivalence <span class="math">Ca·Va = Cb·VE</span>, donc <span class="math">Ca = (Cb·VE)/Va</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Substitution :</strong> <span class="math">Ca = (0,050 × 12,0)/10,0 = 0,60/10,0 = 0,060 mol·L⁻¹</span> ✔.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Vérification (autre voie) :</strong> <span class="math">n(base) = 0,050 × 12,0×10⁻³ = 6,0×10⁻⁴ mol</span> ; <span class="math">Ca = 6,0×10⁻⁴ ÷ 10,0×10⁻³ = 0,060 mol·L⁻¹</span> ✔ même valeur.</p></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ Piège d'examen n° 3</div>
+          <p><span class="math">VE</span> se lit <strong>au saut de pH</strong> (méthode des tangentes), <strong>pas</strong> là où la courbe coupe <span class="math">pH = 7</span> ! Et surtout, ne confonds pas l'équivalence avec la <strong>demi-équivalence</strong> : celle-ci se situe à <span class="math">Vb = VE/2</span>, bien <em>avant</em> le saut — c'est l'objet de la section 05, et le point de départ des solutions tampon.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s4 : NOTION 4 — CONDUCTIMÉTRIE -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s4">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">04</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 4 · conductimétrie</span>
+        <h2 class="lecture-section-title">Suivre le titrage par conductimétrie</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Que faire quand la solution est <strong>colorée</strong> (vin rouge, jus de fruits, sang dilué) ou quand le pH-mètre n'est pas assez sensible ? On suit alors les <strong>ions</strong> eux-mêmes : plus une solution contient d'ions, mieux elle conduit le courant. C'est le principe de la <strong>conductimétrie</strong>.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">📖 Définition officielle — suivi conductimétrique</div>
+          <p>Le <strong>suivi conductimétrique</strong> d'un titrage consiste à mesurer la <strong>conductance <span class="math">G</span></strong> (ou la conductivité <span class="math">σ</span>) de la solution à l'aide d'un <strong>conductimètre</strong> — deux plaques métalliques plongées dans le bécher, reliées à un générateur de tension alternative. La courbe <span class="math">G = f(Vb)</span> est formée de <strong>deux segments de droite</strong> dont l'<strong>intersection</strong> indique l'équivalence.</p>
+        </div>
+      </div>
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 540 300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Montage de conductimétrie : burette de soude au-dessus du bécher contenant l'acide à doser, deux électrodes reliées au conductimètre qui affiche la conductance">
+          <text x="270" y="20" style="fill:var(--accent-bright)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle" letter-spacing="2">MONTAGE DE CONDUCTIMÉTRIE</text>
+          <text x="261" y="40" style="fill:rgba(96,165,250,0.95)" font-size="11.5" font-family="Inter, system-ui, sans-serif" text-anchor="middle">soude (titrant)</text>
+          <rect x="250" y="44" width="22" height="78" fill="none" style="stroke:var(--text-muted)" stroke-width="2"/>
+          <rect x="252" y="122" width="18" height="8" fill="rgba(224,184,74,0.35)" style="stroke:rgba(224,184,74,0.9)" stroke-width="1.5"/>
+          <line x1="261" y1="130" x2="261" y2="156" style="stroke:var(--text-muted)" stroke-width="2"/>
+          <circle cx="261" cy="168" r="3" fill="rgba(96,165,250,0.55)"/>
+          <circle cx="261" cy="182" r="2.5" fill="rgba(96,165,250,0.4)"/>
+          <path d="M180,168 L180,250 Q180,258 190,258 L350,258 Q360,258 360,250 L360,168" fill="none" style="stroke:var(--text-muted)" stroke-width="2"/>
+          <rect x="182" y="212" width="176" height="44" rx="4" fill="rgba(96,165,250,0.18)"/>
+          <text x="270" y="276" style="fill:var(--text-muted)" font-size="11.5" font-style="italic" font-family="Inter, system-ui, sans-serif" text-anchor="middle">acide à doser + électrodes</text>
+          <rect x="228" y="192" width="6" height="56" fill="rgba(224,184,74,0.35)" style="stroke:rgba(224,184,74,0.9)" stroke-width="1.4"/>
+          <rect x="306" y="192" width="6" height="56" fill="rgba(224,184,74,0.35)" style="stroke:rgba(224,184,74,0.9)" stroke-width="1.4"/>
+          <path d="M231,192 L231,78 L400,78" fill="none" style="stroke:rgba(96,165,250,0.85)" stroke-width="2"/>
+          <path d="M309,192 L309,98 L400,98" fill="none" style="stroke:rgba(96,165,250,0.85)" stroke-width="2"/>
+          <rect x="400" y="62" width="112" height="52" rx="7" fill="none" style="stroke:rgba(74,222,128,0.9)" stroke-width="2"/>
+          <text x="456" y="84" style="fill:rgba(74,222,128,1)" font-size="10.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">CONDUCTIMÈTRE</text>
+          <text x="456" y="103" style="fill:var(--text-muted)" font-size="11" font-family="Inter, system-ui, sans-serif" text-anchor="middle">G = … mS</text>
+          <text x="120" y="130" style="fill:var(--text-muted)" font-size="10.5" font-style="italic" font-family="Inter, system-ui, sans-serif" text-anchor="middle">deux plaques</text>
+          <text x="120" y="145" style="fill:var(--text-muted)" font-size="10.5" font-style="italic" font-family="Inter, system-ui, sans-serif" text-anchor="middle">face à face</text>
+        </svg>
+      </figure>
+      <p class="lecture-text">Pourquoi deux segments de droite ? Prenons le dosage d'un acide fort <span class="math">H₃O⁺</span> par la soude <span class="math">Na⁺ + OH⁻</span>. Avant l'équivalence, chaque ion <span class="math">OH⁻</span> ajouté détruit un ion <span class="math">H₃O⁺</span> (très conducteur) et le remplace par un ion <span class="math">Na⁺</span> (moins conducteur) : la conductance <strong>baisse</strong>. Après l'équivalence, les ions <span class="math">OH⁻</span> et <span class="math">Na⁺</span> s'accumulent sans plus rien à neutraliser : la conductance <strong>remonte</strong>. Le point où les deux droites se croisent, c'est l'équivalence.</p>
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">Exemple travaillé — l'intersection des deux droites</div>
+        <div class="lecture-example-content">
+          <p><strong>Données :</strong> on dose <span class="math">Va = 25,0 mL</span> d'acide chlorhydrique par de la soude à <span class="math">Cb = 0,020 mol·L⁻¹</span>. Les deux droites de la courbe <span class="math">G = f(Vb)</span> se coupent à <span class="math">VE = 15,0 mL</span>.</p>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Repérage :</strong> l'équivalence correspond à l'<strong>intersection</strong> des prolongements des deux segments : <span class="math">VE = 15,0 mL</span> ✔.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Formule :</strong> <span class="math">Ca·Va = Cb·VE</span>, donc <span class="math">Ca = (Cb·VE)/Va</span>.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Substitution :</strong> <span class="math">Ca = (0,020 × 15,0)/25,0 = 0,30/25,0 = 0,012 mol·L⁻¹</span> ✔.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Vérification (autre voie) :</strong> <span class="math">n(base) = 0,020 × 15,0×10⁻³ = 3,0×10⁻⁴ mol</span> ; <span class="math">Ca = 3,0×10⁻⁴ ÷ 25,0×10⁻³ = 0,012 mol·L⁻¹</span> ✔ même valeur.</p></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ Piège d'examen n° 4</div>
+          <p>L'équivalence n'est pas toujours le <strong>minimum</strong> de la courbe de conductance : ce minimum n'est franc que pour un acide fort dosé par une base forte. La méthode sûre, c'est de tracer les <strong>deux droites</strong> (avant et après le point de courbure) et de lire l'abscisse de leur <strong>intersection</strong>. Un rapport de brouillon bien tracé vaut mieux qu'une lecture au pifomètre.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s5 : NOTION 5 — DEMI-ÉQUIVALENCE -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s5">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">05</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 5 · demi-équivalence</span>
+        <h2 class="lecture-section-title">La demi-équivalence : quand pH = pKa</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Relis la courbe de la section 03 : avant le grand saut, il y a une <strong>zone presque plate</strong>, où le pH monte à peine alors qu'on verse pourtant de la soude. Cette zone est le plus grand secret de la courbe. Zoomons dessus : c'est là que se cache le <span class="math">pKa</span> du couple, et c'est là que vivront les solutions tampon.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">📖 Définition officielle — demi-équivalence</div>
+          <p>La <strong>demi-équivalence</strong> d'un titrage est le point où l'on a versé <strong>la moitié du volume d'équivalence</strong> : <span class="math">Vb = VE/2</span>. La moitié de l'acide faible a alors été transformée en sa base conjuguée, si bien que <span class="math">[A⁻] = [AH]</span>. Pour le titrage d'un <strong>acide faible</strong> par une base forte : <span class="math">pH(demi-équivalence) = pKa</span> du couple <span class="math">AH/A⁻</span>.</p>
+        </div>
+      </div>
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-main">Formule majeure — le pH à la demi-équivalence</div>
+        <div class="lecture-formula-hero-main">À la demi-équivalence : pH = pKa</div>
+        <div class="lecture-formula-hero-desc">Pourquoi ? À <span class="math">Vb = VE/2</span>, on a transformé autant d'acide qu'il en reste : <span class="math">[A⁻] = [AH]</span>, donc le rapport <span class="math">[A⁻]/[AH] = 1</span> et <span class="math">log 1 = 0</span> — la formule de Henderson-Hasselbalch (partie 02) donne alors <span class="math">pH = pKa + 0</span>.</div>
+      </div>
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 540 300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Zoom sur la zone tampon de la courbe de titrage : pente faible avant l'équivalence, point de demi-équivalence où pH est égal à pKa, puis saut de pH">
+          <defs><marker id="arP1d" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="rgba(239,68,68,0.9)"/></marker></defs>
+          <text x="270" y="20" style="fill:var(--accent-bright)" font-size="13" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle" letter-spacing="2">ZOOM SUR LA ZONE TAMPON</text>
+          <line x1="70" y1="260" x2="500" y2="260" style="stroke:rgba(224,184,74,0.9)" stroke-width="2" marker-end="url(#arP1d)"/>
+          <line x1="70" y1="260" x2="70" y2="40" style="stroke:rgba(224,184,74,0.9)" stroke-width="2"/>
+          <text x="498" y="280" style="fill:var(--text-muted)" font-size="11.5" font-family="Inter, system-ui, sans-serif" text-anchor="end">Vb (mL)</text>
+          <text x="56" y="38" style="fill:var(--text-muted)" font-size="11.5" font-family="Inter, system-ui, sans-serif" text-anchor="end">pH</text>
+          <rect x="110" y="150" width="180" height="75" fill="rgba(74,222,128,0.10)" style="stroke:rgba(74,222,128,0.6)" stroke-width="1.2" stroke-dasharray="5 4"/>
+          <path d="M70,210 C150,202 240,186 310,158 C340,146 360,110 370,80 C376,60 385,55 400,52 C440,48 470,47 500,46" fill="none" style="stroke:rgba(96,165,250,0.95)" stroke-width="2.6"/>
+          <text x="200" y="142" style="fill:rgba(74,222,128,1)" font-size="11.5" font-weight="700" font-family="Inter, system-ui, sans-serif" text-anchor="middle">ZONE TAMPON : pente faible</text>
+          <line x1="140" y1="172" x2="260" y2="172" style="stroke:rgba(74,222,128,0.9)" stroke-width="2"/>
+          <text x="200" y="188" style="fill:rgba(74,222,128,1)" font-size="10.5" font-style="italic" font-family="Inter, system-ui, sans-serif" text-anchor="middle">pH quasi constant</text>
+          <line x1="220" y1="260" x2="220" y2="190" style="stroke:rgba(74,222,128,0.85)" stroke-width="1.5" stroke-dasharray="4 4"/>
+          <circle cx="220" cy="188" r="5" fill="rgba(74,222,128,0.95)"/>
+          <text x="230" y="248" style="fill:rgba(74,222,128,1)" font-size="12" font-weight="700" font-family="Inter, system-ui, sans-serif">½É : pH = pKa</text>
+          <line x1="370" y1="80" x2="370" y2="150" style="stroke:rgba(239,68,68,0.9)" stroke-width="2" marker-end="url(#arP1d)"/>
+          <text x="382" y="120" style="fill:rgba(239,68,68,0.95)" font-size="11" font-style="italic" font-family="Inter, system-ui, sans-serif">saut à l'É</text>
+        </svg>
+      </figure>
+      <p class="lecture-text">Ce qui se joue à la demi-équivalence : on a versé assez de soude pour <strong>casser la moitié</strong> des molécules d'acide <span class="math">AH</span>. Il coexiste alors, en quantités égales, l'acide <span class="math">AH</span> et sa base conjuguée <span class="math">A⁻</span> — exactement la recette d'un couple <strong>acide faible / base conjuguée</strong>. Retiens cette coexistence : dans la partie 02, ce mélange précis portera un nom — <strong>solution tampon</strong>.</p>
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">Exemple travaillé — mesurer un pKa avec une burette</div>
+        <div class="lecture-example-content">
+          <p><strong>Données :</strong> on titre <span class="math">10,0 mL</span> d'acide éthoïque par la soude ; la courbe pH-métrique donne <span class="math">VE = 12,0 mL</span> et le pH-mètre affiche <span class="math">pH = 4,8</span> quand <span class="math">Vb = 6,0 mL</span>.</p>
+          <div class="lecture-steps">
+            <div class="lecture-step"><div class="lecture-step-number">1</div><div class="lecture-step-content"><p><strong>Comparaison :</strong> <span class="math">Vb = 6,0 mL = 12,0/2 = VE/2</span> : on est exactement à la <strong>demi-équivalence</strong> ✔.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">2</div><div class="lecture-step-content"><p><strong>Propriété :</strong> à la demi-équivalence d'un acide faible, <span class="math">pH = pKa</span>, donc <span class="math">pKa = 4,8</span> ✔.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">3</div><div class="lecture-step-content"><p><strong>Vérification (autre voie) :</strong> à <span class="math">VE/2</span>, <span class="math">[CH₃—COO⁻] = [CH₃—COOH]</span>, donc le rapport vaut <span class="math">1</span> et <span class="math">log 1 = 0</span> : le pH ne peut être que <span class="math">pKa</span> ✔ cohérent.</p></div></div>
+            <div class="lecture-step"><div class="lecture-step-number">4</div><div class="lecture-step-content"><p><strong>Conclusion :</strong> le couple acide éthoïque / ion éthanoate a pour constante <span class="math">pKa = 4,8</span> — valeur obtenue par simple lecture de courbe.</p></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-body">
+          <div class="lecture-callout-title">⚠️ Piège d'examen n° 5</div>
+          <p><span class="math">pH(½É) = pKa</span> n'est vrai que pour un couple <strong>acide faible / base conjuguée</strong> titré par une base forte. Et ne confonds plus jamais les deux points clés : à la <strong>½É</strong> il reste autant d'acide qu'il s'est formé de base (<span class="math">pH = pKa</span>) ; à l'<strong>É</strong> l'acide est épuisé (le pH vaut alors environ <span class="math">8,7</span> pour l'acide éthoïque — pas <span class="math">4,8</span> !).</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- ===== QCM ===== -->
+  <div class="lecture-quiz">
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">À l'équivalence d'un titrage acido-basique, quelle égalité est toujours vérifiée ?</p>
+      <div class="lecture-quiz-options"><span>A) pH = 7, quel que soit le couple</span><span>B) n(acide)initial = n(base)versée</span><span>C) V(acide) = V(base)</span><span>D) la réaction support s'arrête</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">Réponse <strong>B</strong>. À l'équivalence, titrant et titré ont été introduits dans les proportions stœchiométriques : leurs quantités de matière (mises en jeu) sont égales, d'où <span class="math">Ca·Va = Cb·VE</span> pour un monoacide et une monobase. A est faux (le pH à l'É ne vaut 7 que pour acide fort/base forte) ; C est faux (ce sont les quantités qui s'égalisent, pas forcément les volumes) ; D est faux (la réaction est quasi totale et rapide, elle se poursuit tant qu'il y a des réactifs).</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Quelle condition une réaction support de titrage doit-elle remplir ?</p>
+      <div class="lecture-quiz-options"><span>A) lente et équilibrée</span><span>B) rapide et quasi totale</span><span>C) rapide et limitée</span><span>D) endothermique et réversible</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">Réponse <strong>B</strong>. Il faut qu'elle soit <strong>rapide</strong> (le saut de pH se voit à chaque goutte) et <strong>quasi totale</strong> (chaque ion ajouté est consommé, l'équation bilan s'écrit avec <span class="math">→</span>). Une réaction limitée (<span class="math">⇌</span>) laisserait des réactifs mélangés en tout point : le repérage de l'équivalence serait impossible.</div></details>
+    </div>
+  </div>
+  <!-- ===== RÉCAP ===== -->
+  <div class="lecture-recap">
+    <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
+    <ul class="lecture-recap-list">
+      <li><strong>Réaction support</strong> — le titrage repose sur une réaction acido-basique <strong>rapide et quasi totale</strong>, équilibrée sur les atomes et les charges, notée avec une flèche simple <span class="math">→</span>.</li>
+      <li><strong>Équivalence</strong> — instant où <span class="math">n(acide) = n(base)</span> : réactifs épuisés, relation <span class="math">Ca·Va = Cb·VE</span>, repérée par le saut de pH (pH-métrie) ou l'intersection des deux droites (conductimétrie).</li>
+      <li><strong>Demi-équivalence</strong> — à <span class="math">Vb = VE/2</span>, <span class="math">[A⁻] = [AH]</span> et <span class="math">pH = pKa</span> : cette zone plate est le berceau des solutions tampon, objet de la partie 02.</li>
+    </ul>
+  </div>
+  <!-- ===== FIN ===== -->
+  <div class="lecture-end">
+    <div class="lecture-end-icon">🎯</div>
+    <div class="lecture-end-text">Partie 01 terminée !</div>
+    <div class="lecture-end-sub">Tu sais désormais lire une courbe de titrage comme un livre ouvert : saut, intersection, demi-équivalence. La partie 02 te donne la <strong>formule de la zone plate</strong> — Henderson-Hasselbalch — puis tu fabriqueras ton propre tampon, jusqu'au tampon qui maintient ton sang à <span class="math">7,4</span>.</div>
+    <div class="lecture-end-divider"></div>
+  </div>
+</div>

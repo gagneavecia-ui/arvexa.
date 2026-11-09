@@ -1,0 +1,358 @@
+<!-- PARTIE 01 — Définition d'un acide fort et d'une base forte (Acide fort, base forte) -->
+<div class="lecture-container">
+
+  <!-- ===== HERO ===== -->
+  <header class="lecture-hero">
+    <div class="lecture-hero-badge">
+      <span class="lecture-hero-icon">📘</span>
+      <span class="lecture-hero-label">Terminale C&D · Acide fort, base forte · Partie 01</span>
+    </div>
+    <h1 class="lecture-hero-title">
+      Définition d'un acide fort et d'une <em>base forte</em>
+    </h1>
+    <p class="lecture-hero-intro">
+      Pourquoi l'eau de javel décolore le linge pendant que le citron relève le goût du poisson braisé ? Pourquoi la solution d'acide chlorhydrique du laboratoire attaque-t-elle le zinc ? Dans cette première partie, tu vas donner un sens précis aux mots « acide » et « base » grâce à Brønsted, puis découvrir pourquoi certains d'entre eux réagissent totalement avec l'eau. C'est la fondation de tout le chapitre : sans elle, aucun calcul de pH ne tient debout.
+    </p>
+    <div class="lecture-hero-meta">
+      <span class="lecture-hero-meta-item">⏱ 20 min</span>
+      <span class="lecture-hero-meta-item">⚗️ 4 notions</span>
+      <span class="lecture-hero-meta-item">📚 6 sections</span>
+      <span class="lecture-hero-meta-item">🎓 Terminale C&D</span>
+    </div>
+  </header>
+  <!-- ===== SOMMAIRE ===== -->
+  <nav class="lecture-toc">
+    <div class="lecture-toc-header">
+      <span>Dans cette partie</span>
+      <span class="lecture-toc-count">4 notions · 6 sections</span>
+    </div>
+    <ol class="lecture-toc-list">
+      <li><a href="#s0"><span class="toc-num">00</span><span>Des acides et des bases autour de toi</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>La théorie de Brønsted : donneur et accepteur de protons</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>Acide fort : une réaction TOTALE avec l'eau</span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>Base forte : des ions OH⁻ libérés en masse</span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>Acides et bases forts usuels : la liste du programme</span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>Exercice de synthèse : dissoudre et compter les ions</span></a></li>
+    </ol>
+  </nav>
+  <!-- ============================================================ -->
+  <!-- SECTION s0 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s0">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">00</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Motivation</span>
+        <h2 class="lecture-section-title">Des acides et des bases autour de toi</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Regarde autour de toi : l'eau de javel qui blanchit le linge, la soude cachée dans le savon noir de ta grand-mère, l'acide sulfurique enfermé dans la batterie de la voiture familiale, l'acide citrique du citron qui pique la langue. En chimie, ces produits se rangent en deux grandes familles : les <strong>acides</strong>, au goût aigre, qui tournent le bleu de tournesol au rouge, et les <strong>bases</strong>, glissantes au toucher, qui le font revenir au bleu. Tu connais déjà leur juge de paix : le pH, inférieur à 7 en milieu acide, égal à 7 pour l'eau pure, supérieur à 7 en milieu basique.</p>
+      <svg viewBox="0 0 560 150" role="img" aria-label="Échelle de pH avec des produits du quotidien">
+        <text x="40" y="20" font-size="13" fill="currentColor" opacity="0.8">Échelle de pH : de la batterie au débouche-évier</text>
+        <rect x="40" y="76" width="69" height="24" fill="rgba(220,80,80,0.55)" style="stroke:var(--accent-bright)" stroke-width="0.8"/>
+        <rect x="109" y="76" width="137" height="24" fill="rgba(230,160,90,0.4)" style="stroke:var(--accent-bright)" stroke-width="0.8"/>
+        <rect x="246" y="76" width="68" height="24" fill="rgba(120,200,140,0.55)" style="stroke:var(--accent-bright)" stroke-width="0.8"/>
+        <rect x="314" y="76" width="137" height="24" fill="rgba(90,150,220,0.4)" style="stroke:var(--accent-bright)" stroke-width="0.8"/>
+        <rect x="451" y="76" width="69" height="24" fill="rgba(60,80,200,0.55)" style="stroke:var(--accent-bright)" stroke-width="0.8"/>
+        <text x="74" y="92" text-anchor="middle" font-size="10" fill="currentColor">acide fort</text>
+        <text x="177" y="92" text-anchor="middle" font-size="10" fill="currentColor">acide faible</text>
+        <text x="280" y="92" text-anchor="middle" font-size="10" fill="currentColor">neutre</text>
+        <text x="383" y="92" text-anchor="middle" font-size="10" fill="currentColor">basique</text>
+        <text x="485" y="92" text-anchor="middle" font-size="10" fill="currentColor">base forte</text>
+        <line x1="57" y1="52" x2="57" y2="76" stroke="currentColor" opacity="0.4"/><text x="57" y="48" text-anchor="middle" font-size="10" fill="currentColor">batterie</text>
+        <line x1="119" y1="52" x2="119" y2="76" stroke="currentColor" opacity="0.4"/><text x="119" y="48" text-anchor="middle" font-size="10" fill="currentColor">citron</text>
+        <line x1="280" y1="52" x2="280" y2="76" stroke="currentColor" opacity="0.4"/><text x="280" y="48" text-anchor="middle" font-size="10" fill="currentColor">eau pure</text>
+        <line x1="383" y1="52" x2="383" y2="76" stroke="currentColor" opacity="0.4"/><text x="383" y="48" text-anchor="middle" font-size="10" fill="currentColor">savon</text>
+        <line x1="451" y1="52" x2="451" y2="76" stroke="currentColor" opacity="0.4"/><text x="451" y="48" text-anchor="middle" font-size="10" fill="currentColor">javel</text>
+        <line x1="503" y1="52" x2="503" y2="76" stroke="currentColor" opacity="0.4"/><text x="503" y="48" text-anchor="middle" font-size="10" fill="currentColor">débouche-évier</text>
+        <text x="40" y="122" font-size="11" fill="currentColor" opacity="0.8">0</text>
+        <text x="177" y="122" font-size="11" fill="currentColor" opacity="0.8">4</text>
+        <text x="280" y="122" font-size="11" fill="currentColor" opacity="0.8">7</text>
+        <text x="383" y="122" font-size="11" fill="currentColor" opacity="0.8">10</text>
+        <text x="520" y="122" font-size="11" fill="currentColor" opacity="0.8">14</text>
+      </svg>
+      <div class="lecture-callout lecture-callout-warning">
+        <p class="lecture-text"><strong>⚠️ Sécurité au labo :</strong> ne jamais mélanger eau de javel et détartrant (acide) — il se dégage du dichlore, un gaz vert toxique. Blouse, gants et lunettes sont obligatoires dès qu'on manipule ces solutions.</p>
+      </div>
+      <p class="lecture-text">Dans ce chapitre, on s'intéresse aux plus « puissantes » de ces espèces : les acides forts et les bases fortes. Objectif final : savoir ce qu'elles deviennent dans l'eau, puis calculer le pH de leurs solutions, et enfin les utiliser pour doser.</p>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s1 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s1">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">01</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1</span>
+        <h2 class="lecture-section-title">La théorie de Brønsted : donneur et accepteur de protons</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Pendant longtemps, on a défini un acide comme une substance qui libère des ions H⁺ et une base comme une substance qui libère des ions OH⁻. En 1923, le Danois Johannes Brønsted a proposé une définition plus générale, fondée sur l'échange d'un seul petit objet : le proton H⁺. Cette définition explique toutes les réactions acide-base, même celles qui ne se font pas dans l'eau. Elle est aujourd'hui la référence officielle du programme.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <p class="lecture-text"><strong>Définition officielle (Brønsted).</strong> Un <strong>acide</strong> est une espèce chimique capable de <strong>céder</strong> un proton H⁺. Une <strong>base</strong> est une espèce chimique capable de <strong>capter</strong> un proton H⁺. Le proton H⁺ est simplement un atome d'hydrogène qui a perdu son unique électron.</p>
+      </div>
+      <div class="lecture-formula-box">
+        <span class="math">acide₁ ⇌ base₁ + H⁺</span>
+      </div>
+      <p class="lecture-text">Cette demi-équation définit un <strong>couple acide/base</strong>, par exemple HCl/Cl⁻ (HCl ⇌ Cl⁻ + H⁺) ou H₃O⁺/H₂O (H₃O⁺ ⇌ H₂O + H⁺). Une réaction acide-base est alors un échange de proton entre deux couples : l'acide du premier cède H⁺ à la base du second.</p>
+      <svg viewBox="0 0 560 175" role="img" aria-label="Transfert du proton de HCl vers H2O">
+        <text x="280" y="20" text-anchor="middle" font-size="13" fill="currentColor" opacity="0.8">Le proton H⁺ passe de l'acide à la base</text>
+        <rect x="40" y="70" width="90" height="46" rx="10" fill="rgba(224,184,74,0.15)" style="stroke:var(--accent-bright)" stroke-width="1.5"/>
+        <text x="85" y="99" text-anchor="middle" font-size="20" fill="currentColor">HCl</text>
+        <rect x="180" y="70" width="90" height="46" rx="10" fill="rgba(224,184,74,0.15)" style="stroke:var(--accent-bright)" stroke-width="1.5"/>
+        <text x="225" y="99" text-anchor="middle" font-size="20" fill="currentColor">H₂O</text>
+        <path d="M 85 62 C 120 28 190 28 222 60" fill="none" style="stroke:var(--accent-bright)" stroke-width="2"/>
+        <polygon points="222,60 210,52 214,64" style="fill:var(--accent-bright)"/>
+        <text x="152" y="26" text-anchor="middle" font-size="12" fill="currentColor">H⁺</text>
+        <text x="150" y="116" text-anchor="middle" font-size="16" fill="currentColor" opacity="0.8">+</text>
+        <path d="M 286 93 L 320 93" style="stroke:var(--accent-bright)" stroke-width="2"/>
+        <polygon points="328,93 316,88 316,98" style="fill:var(--accent-bright)"/>
+        <rect x="340" y="70" width="100" height="46" rx="10" fill="rgba(224,184,74,0.15)" style="stroke:var(--accent-bright)" stroke-width="1.5"/>
+        <text x="390" y="99" text-anchor="middle" font-size="20" fill="currentColor">H₃O⁺</text>
+        <text x="452" y="99" text-anchor="middle" font-size="16" fill="currentColor" opacity="0.8">+</text>
+        <rect x="468" y="70" width="52" height="46" rx="10" fill="rgba(224,184,74,0.15)" style="stroke:var(--accent-bright)" stroke-width="1.5"/>
+        <text x="494" y="99" text-anchor="middle" font-size="20" fill="currentColor">Cl⁻</text>
+        <text x="280" y="152" text-anchor="middle" font-size="12" fill="currentColor" opacity="0.85">HCl cède un proton H⁺ à l'eau : il se forme l'ion oxonium H₃O⁺ et l'ion chlorure Cl⁻.</text>
+      </svg>
+      <p class="lecture-text"><strong>Analogie.</strong> Pense à un passeur de ballon au football : l'acide fait la passe (il cède le proton), la base la reçoit. Une passe n'existe pas sans receveur : de même, un acide ne réagit jamais seul, il a toujours besoin d'une base en face.</p>
+      <div class="lecture-example-content">
+        <p class="lecture-text"><strong>🧪 Exemple travaillé — l'ammoniac dans l'eau.</strong> Que se passe-t-il quand on dissout du gaz ammoniac NH₃ dans l'eau ? Repérons le transfert de proton.</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step"><strong>Identifier les couples.</strong> NH₃ peut capter un proton : c'est une base (couple NH₄⁺/NH₃). L'eau peut en céder un : c'est un acide (couple H₂O/OH⁻).</li>
+          <li class="lecture-step"><strong>Écrire les demi-équations.</strong> H₂O ⇌ OH⁻ + H⁺ (l'eau cède) et NH₃ + H⁺ ⇌ NH₄⁺ (l'ammoniac capte).</li>
+          <li class="lecture-step"><strong>Additionner pour le bilan.</strong> NH₃ + H₂O ⇌ NH₄⁺ + OH⁻ : l'eau s'est comportée en acide ici. Vérification : atomes H (2 + 3 = 4 + 1 ✓) et charges (0 = 0 ✓).</li>
+        </ol>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <p class="lecture-text"><strong>⚠️ Piège :</strong> le proton H⁺ nu n'existe jamais librement dans l'eau : il est aussitôt capté par une molécule d'eau, qui devient ion oxonium H₃O⁺. Dans une solution aqueuse, écris toujours H₃O⁺, jamais H⁺ seul.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s2 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s2">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">02</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2</span>
+        <h2 class="lecture-section-title">Acide fort : une réaction TOTALE avec l'eau</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Tous les acides ne cèdent pas leur proton avec la même facilité : certains le donnent en totalité, d'autres à contrecœur. Ceux qui le donnent en totalité sont les acides forts : ce sont eux, avec les bases fortes, les stars de ce chapitre.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <p class="lecture-text"><strong>Définition officielle.</strong> Un <strong>acide fort</strong> est un acide qui réagit de façon <strong>totale</strong> avec l'eau : chaque molécule AH cède son proton à une molécule d'eau. La réaction est quantitative (taux d'avancement final τ = 1), quasi instantanée et irréversible : son équation s'écrit avec une flèche simple →, jamais avec le symbole ⇌.</p>
+      </div>
+      <div class="lecture-formula-hero">
+        <span class="math">AH + H₂O → A⁻ + H₃O⁺</span>
+      </div>
+      <p class="lecture-text">Exemple de référence, à connaître par cœur : <span class="math">HCl + H₂O → H₃O⁺ + Cl⁻</span>. Vérifie l'équilibrage : 3 H et 1 O de chaque côté, et la charge totale vaut 0 sur chaque flanc (+1 − 1 = 0).</p>
+      <svg viewBox="0 0 560 235" role="img" aria-label="Ions présents dans une solution d'acide chlorhydrique">
+        <text x="250" y="24" text-anchor="middle" font-size="13" fill="currentColor" opacity="0.8">Solution d'acide chlorhydrique : plus aucune molécule HCl</text>
+        <path d="M 160 40 L 160 200 Q 160 218 178 218 L 322 218 Q 340 218 340 200 L 340 40" fill="none" stroke="currentColor" stroke-width="2" opacity="0.7"/>
+        <path d="M 166 115 L 166 198 Q 166 212 180 212 L 320 212 Q 334 212 334 198 L 334 115 Z" fill="rgba(224,184,74,0.12)"/>
+        <circle cx="210" cy="150" r="13" fill="rgba(224,184,74,0.3)" style="stroke:var(--accent-bright)" stroke-width="1.2"/>
+        <text x="210" y="155" text-anchor="middle" font-size="11" fill="currentColor">+</text>
+        <circle cx="262" cy="132" r="13" fill="rgba(120,150,255,0.25)" style="stroke:rgba(150,180,255,0.9)" stroke-width="1.2"/>
+        <text x="262" y="137" text-anchor="middle" font-size="11" fill="currentColor">−</text>
+        <circle cx="250" cy="185" r="13" fill="rgba(224,184,74,0.3)" style="stroke:var(--accent-bright)" stroke-width="1.2"/>
+        <text x="250" y="190" text-anchor="middle" font-size="11" fill="currentColor">+</text>
+        <circle cx="300" cy="165" r="13" fill="rgba(120,150,255,0.25)" style="stroke:rgba(150,180,255,0.9)" stroke-width="1.2"/>
+        <text x="300" y="170" text-anchor="middle" font-size="11" fill="currentColor">−</text>
+        <circle cx="308" cy="196" r="13" fill="rgba(224,184,74,0.3)" style="stroke:var(--accent-bright)" stroke-width="1.2"/>
+        <text x="308" y="201" text-anchor="middle" font-size="11" fill="currentColor">+</text>
+        <circle cx="212" cy="192" r="13" fill="rgba(120,150,255,0.25)" style="stroke:rgba(150,180,255,0.9)" stroke-width="1.2"/>
+        <text x="212" y="197" text-anchor="middle" font-size="11" fill="currentColor">−</text>
+        <circle cx="395" cy="80" r="10" fill="rgba(224,184,74,0.3)" style="stroke:var(--accent-bright)" stroke-width="1.2"/><text x="395" y="84" text-anchor="middle" font-size="10" fill="currentColor">+</text>
+        <text x="412" y="84" font-size="12" fill="currentColor">H₃O⁺ : ion oxonium</text>
+        <circle cx="395" cy="115" r="10" fill="rgba(120,150,255,0.25)" style="stroke:rgba(150,180,255,0.9)" stroke-width="1.2"/><text x="395" y="119" text-anchor="middle" font-size="10" fill="currentColor">−</text>
+        <text x="412" y="119" font-size="12" fill="currentColor">Cl⁻ : ion chlorure</text>
+        <text x="440" y="170" text-anchor="middle" font-size="14" fill="currentColor">[H₃O⁺] = [Cl⁻] = C</text>
+        <text x="250" y="232" text-anchor="middle" font-size="12" fill="currentColor" opacity="0.85">Réaction totale : chaque HCl donne un H₃O⁺ et un Cl⁻ (électroneutralité).</text>
+      </svg>
+      <p class="lecture-text"><strong>Analogie.</strong> La réaction totale, c'est un tramway à sens unique : tout le monde descend au terminus, personne ne remonte. Une fois HCl versé dans l'eau, il n'existe plus une seule molécule de HCl : tout est devenu ions.</p>
+      <div class="lecture-example-content">
+        <p class="lecture-text"><strong>🧪 Exemple travaillé — préparer une solution d'acide chlorhydrique.</strong> On dissout n = 5,0·10⁻³ mol de gaz chlorhydrique dans de l'eau, puis on complète à V = 500 mL. Que contient la solution ?</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step"><strong>Écrire l'équation de dissolution.</strong> HCl + H₂O → H₃O⁺ + Cl⁻ (réaction totale, flèche simple).</li>
+          <li class="lecture-step"><strong>Compter les ions formés.</strong> Réaction totale donc n(H₃O⁺) = n(Cl⁻) = n(HCl) = 5,0·10⁻³ mol ; [H₃O⁺] = 5,0·10⁻³ ÷ 0,500 = 1,0·10⁻² mol·L⁻¹ (vérification : 5,0 ÷ 500 = 0,010 ✓).</li>
+          <li class="lecture-step"><strong>Conclure.</strong> [Cl⁻] = 1,0·10⁻² mol·L⁻¹ aussi : à chaque ion oxonium correspond un ion chlorure, la solution est électriquement neutre.</li>
+        </ol>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <p class="lecture-text"><strong>⚠️ Piège :</strong> n'écris jamais « HCl + H₂O ⇌ H₃O⁺ + Cl⁻ » : la double flèche est réservée aux réactions limitées, et un acide fort est 100 % dissocié. N'oublie pas non plus l'eau dans l'équation : sans elle, il n'y a personne pour recevoir le proton !</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s3 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s3">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">03</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 3</span>
+        <h2 class="lecture-section-title">Base forte : des ions OH⁻ libérés en masse</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Côté base, la logique est la même mais l'objet échangé change : la soude NaOH est un solide ionique qui, versé dans l'eau, se sépare entièrement en ions. La solution obtenue ne contient alors que des ions Na⁺, des ions OH⁻ et de l'eau. C'est ce stock d'ions hydroxyde qui rend la solution très basique.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <p class="lecture-text"><strong>Définition officielle.</strong> Une <strong>base forte</strong> est une base qui libère <strong>totalement</strong> ses ions hydroxyde OH⁻ dans l'eau (dissociation ionique complète). Pour la soude : <span class="math">NaOH → Na⁺ + OH⁻</span>. La solution contient autant d'ions Na⁺ que d'ions OH⁻, quelle que soit la quantité dissoute.</p>
+      </div>
+      <div class="lecture-formula-hero">
+        <span class="math">M(OH)ₙ → Mⁿ⁺ + n OH⁻</span>
+      </div>
+      <svg viewBox="0 0 560 235" role="img" aria-label="Ions présents dans une solution de soude">
+        <text x="250" y="24" text-anchor="middle" font-size="13" fill="currentColor" opacity="0.8">Solution de soude : que des ions Na⁺ et OH⁻</text>
+        <path d="M 160 40 L 160 200 Q 160 218 178 218 L 322 218 Q 340 218 340 200 L 340 40" fill="none" stroke="currentColor" stroke-width="2" opacity="0.7"/>
+        <path d="M 166 115 L 166 198 Q 166 212 180 212 L 320 212 Q 334 212 334 198 L 334 115 Z" fill="rgba(90,150,220,0.14)"/>
+        <circle cx="210" cy="150" r="13" fill="rgba(224,184,74,0.3)" style="stroke:var(--accent-bright)" stroke-width="1.2"/>
+        <text x="210" y="155" text-anchor="middle" font-size="11" fill="currentColor">+</text>
+        <circle cx="262" cy="132" r="13" fill="rgba(120,150,255,0.25)" style="stroke:rgba(150,180,255,0.9)" stroke-width="1.2"/>
+        <text x="262" y="137" text-anchor="middle" font-size="11" fill="currentColor">−</text>
+        <circle cx="250" cy="185" r="13" fill="rgba(224,184,74,0.3)" style="stroke:var(--accent-bright)" stroke-width="1.2"/>
+        <text x="250" y="190" text-anchor="middle" font-size="11" fill="currentColor">+</text>
+        <circle cx="300" cy="165" r="13" fill="rgba(120,150,255,0.25)" style="stroke:rgba(150,180,255,0.9)" stroke-width="1.2"/>
+        <text x="300" y="170" text-anchor="middle" font-size="11" fill="currentColor">−</text>
+        <circle cx="308" cy="196" r="13" fill="rgba(224,184,74,0.3)" style="stroke:var(--accent-bright)" stroke-width="1.2"/>
+        <text x="308" y="201" text-anchor="middle" font-size="11" fill="currentColor">+</text>
+        <circle cx="212" cy="192" r="13" fill="rgba(120,150,255,0.25)" style="stroke:rgba(150,180,255,0.9)" stroke-width="1.2"/>
+        <text x="212" y="197" text-anchor="middle" font-size="11" fill="currentColor">−</text>
+        <circle cx="395" cy="80" r="10" fill="rgba(224,184,74,0.3)" style="stroke:var(--accent-bright)" stroke-width="1.2"/><text x="395" y="84" text-anchor="middle" font-size="10" fill="currentColor">+</text>
+        <text x="412" y="84" font-size="12" fill="currentColor">Na⁺ : ion sodium</text>
+        <circle cx="395" cy="115" r="10" fill="rgba(120,150,255,0.25)" style="stroke:rgba(150,180,255,0.9)" stroke-width="1.2"/><text x="395" y="119" text-anchor="middle" font-size="10" fill="currentColor">−</text>
+        <text x="412" y="119" font-size="12" fill="currentColor">OH⁻ : ion hydroxyde</text>
+        <text x="440" y="170" text-anchor="middle" font-size="14" fill="currentColor">[Na⁺] = [OH⁻] = C</text>
+        <text x="250" y="232" text-anchor="middle" font-size="12" fill="currentColor" opacity="0.85">Dissociation totale : NaOH → Na⁺ + OH⁻ (charges : 0 = +1 − 1 ✓).</text>
+      </svg>
+      <p class="lecture-text"><strong>Analogie.</strong> Les ions OH⁻ sont des aspirateurs à protons : dès qu'un ion H₃O⁺ traîne dans la solution, ils le happent pour reformer de l'eau. Plus il y a d'OH⁻, plus la solution « avale » les protons — et plus le pH grimpe.</p>
+      <div class="lecture-example-content">
+        <p class="lecture-text"><strong>🧪 Exemple travaillé — préparer une solution de soude.</strong> On dissout m = 0,40 g de NaOH (M = 40 g·mol⁻¹) dans de l'eau distillée et on complète à V = 100 mL. Que vaut la concentration en ions hydroxyde ?</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step"><strong>Compter les moles.</strong> n = m ÷ M = 0,40 ÷ 40 = 1,0·10⁻² mol (vérification : 40 × 0,010 = 0,40 g ✓).</li>
+          <li class="lecture-step"><strong>Convertir le volume.</strong> V = 100 mL = 0,100 L : ne verse jamais des mL dans une formule de concentration !</li>
+          <li class="lecture-step"><strong>Conclure grâce à la dissociation totale.</strong> C = n ÷ V = 1,0·10⁻² ÷ 0,100 = 0,10 mol·L⁻¹, donc [OH⁻] = [Na⁺] = 0,10 mol·L⁻¹.</li>
+        </ol>
+      </div>
+      <div class="lecture-text">
+        <p class="lecture-text"><strong>🏋️ Exercice 1 — La potasse.</strong> On dissout m = 1,40 g de KOH (M = 56 g·mol⁻¹) dans une fiole jaugée de 250,0 mL. Écris l'équation de dissociation, puis calcule C, [K⁺] et [OH⁻].</p>
+        <details><summary>Voir la solution étape par étape</summary>
+          <ol class="lecture-steps">
+            <li class="lecture-step"><strong>Équation.</strong> KOH → K⁺ + OH⁻ : dissolution totale d'un solide ionique (charges équilibrées ✓).</li>
+            <li class="lecture-step"><strong>Quantité de matière.</strong> n = m ÷ M = 1,40 ÷ 56 = 2,5·10⁻² mol.</li>
+            <li class="lecture-step"><strong>Concentration.</strong> C = n ÷ V = 2,5·10⁻² ÷ 0,250 = 0,10 mol·L⁻¹ (V = 250,0 mL = 0,250 L).</li>
+            <li class="lecture-step"><strong>Ions.</strong> Dissociation totale donc [K⁺] = [OH⁻] = C = 0,10 mol·L⁻¹. Vérification d'électroneutralité : +0,10 − 0,10 = 0 ✓.</li>
+          </ol>
+        </details>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <p class="lecture-text"><strong>⚠️ Piège :</strong> dans l'eau, « NaOH » n'existe pas en tant que molécule : ne parle que d'ions Na⁺ et OH⁻. Et attention à Ca(OH)₂, la chaux éteinte : chaque unité libère 2 ions OH⁻, donc [OH⁻] = 2C.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s4 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s4">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">04</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 4</span>
+        <h2 class="lecture-section-title">Acides et bases forts usuels : la liste du programme</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Le jour du bac, tu dois reconnaître les acides forts et les bases fortes « de mémoire », sans démonstration. Voici la liste officielle du programme, à connaître comme tes tables de multiplication, avec leur équation de dissociation.</p>
+      <table class="lecture-table">
+        <thead><tr><th>Espèce</th><th>Nom usuel</th><th>Équation de dissociation</th><th>Particularité</th></tr></thead>
+        <tbody>
+          <tr><td>HCl</td><td>acide chlorhydrique</td><td><span class="math">HCl + H₂O → H₃O⁺ + Cl⁻</span></td><td>acide fort de référence</td></tr>
+          <tr><td>HNO₃</td><td>acide nitrique</td><td><span class="math">HNO₃ + H₂O → H₃O⁺ + NO₃⁻</span></td><td>acide fort</td></tr>
+          <tr><td>H₂SO₄</td><td>acide sulfurique</td><td><span class="math">H₂SO₄ + 2 H₂O → 2 H₃O⁺ + SO₄²⁻</span></td><td>diacide : [H₃O⁺] = 2C</td></tr>
+          <tr><td>NaOH</td><td>soude</td><td><span class="math">NaOH → Na⁺ + OH⁻</span></td><td>base forte de référence</td></tr>
+          <tr><td>KOH</td><td>potasse</td><td><span class="math">KOH → K⁺ + OH⁻</span></td><td>base forte</td></tr>
+          <tr><td>Ca(OH)₂</td><td>chaux éteinte</td><td><span class="math">Ca(OH)₂ → Ca²⁺ + 2 OH⁻</span></td><td>dibase : [OH⁻] = 2C</td></tr>
+        </tbody>
+      </table>
+      <div class="lecture-formula-hero">
+        <span class="math">[H₃O⁺] = C_A (acide fort) ; [OH⁻] = C_B (base forte)</span>
+      </div>
+      <p class="lecture-text">Ces deux égalités sont la conséquence directe de la réaction totale : tout ce qu'on verse se retrouve en ions. La quantité dissoute se calcule toujours avec la même relation entre quantité, concentration et volume.</p>
+      <div class="lecture-formula-box">
+        <span class="math">n = C·V</span>
+      </div>
+      <p class="lecture-text">avec n en mol, C en mol·L⁻¹ et V en litres. C'est elle qui relie « ce que je pèse » à « ce que contient la solution ».</p>
+      <div class="lecture-callout lecture-callout-warning">
+        <p class="lecture-text"><strong>⚠️ Piège H₂SO₄ :</strong> l'acide sulfurique est un diacide fort, donc [H₃O⁺] = 2C et non C. Vérifie toujours combien de protons (ou d'OH⁻) l'espèce libère avant d'appliquer [H₃O⁺] = C_A ou [OH⁻] = C_B.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s5 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s5">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">05</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Entraînement</span>
+        <h2 class="lecture-section-title">Exercice de synthèse : dissoudre et compter les ions</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">À toi de jouer : cet exercice enchaîne équation de dissociation, dilution et bilan des ions. Chronomètre-toi : 5 minutes, montre en main.</p>
+      <div class="lecture-text">
+        <p class="lecture-text"><strong>🏋️ Exercice 2 — Dilution d'acide chlorhydrique.</strong> On prélève V₁ = 10,0 mL d'acide chlorhydrique de concentration C₁ = 0,10 mol·L⁻¹ et on les verse dans une fiole jaugée de 100,0 mL, que l'on complète avec de l'eau distillée. 1) Écris l'équation de dissociation. 2) Calcule la quantité de HCl prélevée. 3) Calcule la concentration finale C₂. 4) Donne [H₃O⁺] et [Cl⁻]. 5) Quel est le facteur de dilution ?</p>
+        <details><summary>Voir la solution étape par étape</summary>
+          <ol class="lecture-steps">
+            <li class="lecture-step"><strong>Équation.</strong> HCl + H₂O → H₃O⁺ + Cl⁻ : réaction totale, donc tout le HCl prélevé devient des ions.</li>
+            <li class="lecture-step"><strong>Quantité prélevée.</strong> n = C₁·V₁ = 0,10 × 0,0100 = 1,0·10⁻³ mol (V₁ = 10,0 mL = 0,0100 L ✓).</li>
+            <li class="lecture-step"><strong>Concentration finale.</strong> C₂ = n ÷ V₂ = 1,0·10⁻³ ÷ 0,100 = 1,0·10⁻² mol·L⁻¹.</li>
+            <li class="lecture-step"><strong>Bilan des ions.</strong> Dissociation totale : [H₃O⁺] = [Cl⁻] = C₂ = 1,0·10⁻² mol·L⁻¹ (électroneutralité vérifiée ✓).</li>
+            <li class="lecture-step"><strong>Facteur de dilution.</strong> F = V₂ ÷ V₁ = 100 ÷ 10 = 10 : la concentration est bien divisée par 10 (0,10 → 1,0·10⁻² ✓).</li>
+          </ol>
+        </details>
+      </div>
+      <p class="lecture-text">Si tout est juste : bravo, tu sais désormais ce que contient vraiment une solution d'acide fort ou de base forte. La partie 02 transforme ces concentrations en pH.</p>
+    </div>
+  </section>
+  <!-- ===== QCM ===== -->
+  <div class="lecture-quiz">
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Selon Brønsted, une base est une espèce chimique qui…</p>
+      <div class="lecture-quiz-options"><span>A) libère des ions OH⁻ dans l'eau</span><span>B) capte un proton H⁺</span><span>C) cède un proton H⁺</span><span>D) capte un électron</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">Réponse B. Selon Brønsted, une base capte un proton H⁺ (l'acide le cède). L'option A décrit l'ancienne définition d'Arrhenius, la C décrit un acide, la D une réaction d'oxydoréduction.</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Quelle équation décrit correctement la dissolution de HCl dans l'eau ?</p>
+      <div class="lecture-quiz-options"><span>A) HCl + H₂O ⇌ H₃O⁺ + Cl⁻</span><span>B) HCl + H₂O → H₃O⁺ + Cl⁻</span><span>C) HCl → H⁺ + Cl⁻</span><span>D) HCl + H₂O ⇌ Cl⁻ + OH⁻</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">Réponse B. Acide fort = réaction totale : flèche simple →. L'option A utilise ⇌ (réservé aux réactions limitées), la C laisse le proton H⁺ nu (impossible dans l'eau), la D est fausse (HCl ne capte pas de proton).</div></details>
+    </div>
+  </div>
+  <!-- ===== RÉCAP ===== -->
+  <div class="lecture-recap">
+    <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
+    <ul class="lecture-recap-list">
+      <li><strong>Acide / base (Brønsted)</strong> — un acide cède un proton H⁺, une base le capte : toute réaction acide-base est un échange de proton entre deux couples.</li>
+      <li><strong>Réaction totale</strong> — acide fort et base forte réagissent entièrement avec l'eau : flèche simple →, τ = 1, jamais ⇌.</li>
+      <li><strong>Concentrations des ions</strong> — acide fort monoacide : [H₃O⁺] = C_A ; base forte : [OH⁻] = C_B (et ×2 pour H₂SO₄ ou Ca(OH)₂).</li>
+    </ul>
+  </div>
+  <!-- ===== FIN ===== -->
+  <div class="lecture-end">
+    <div class="lecture-end-icon">🎯</div>
+    <div class="lecture-end-text">Partie 01 terminée !</div>
+    <div class="lecture-end-sub">Tu sais maintenant QUI se cache vraiment dans ta solution. Dans la partie 02, on transforme cette connaissance en chiffres : le pH d'un acide fort, calculé en une ligne. À tout de suite !</div>
+    <div class="lecture-end-divider"></div>
+  </div>
+</div>

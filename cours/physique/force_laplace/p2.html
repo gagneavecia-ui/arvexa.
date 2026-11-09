@@ -1,0 +1,404 @@
+<!-- PARTIE 02 — Règle des trois doigts & Application (Force de Laplace) -->
+<div class="lecture-container">
+
+  <!-- ===== HERO ===== -->
+  <header class="lecture-hero">
+    <div class="lecture-hero-badge">
+      <span class="lecture-hero-icon">📘</span>
+      <span class="lecture-hero-label">Terminale C&D · Force de Laplace · Partie 02</span>
+    </div>
+    <h1 class="lecture-hero-title">
+      Règle des trois doigts <em>& Application</em>
+    </h1>
+    <p class="lecture-hero-intro">
+      Au Bac, la question qui coûte le plus de points n'est pas le calcul de la norme : c'est le SENS de la force. Cette partie te donne l'outil infaillible — la règle des trois doigts de la main droite — puis montre comment le sens du courant gouverne tout. Enfin, tu passeras au cas général avec un angle θ entre la tige et le champ.
+    </p>
+    <div class="lecture-hero-meta">
+      <span class="lecture-hero-meta-item">⏱ 25 min</span>
+      <span class="lecture-hero-meta-item">⚡ 4 notions</span>
+      <span class="lecture-hero-meta-item">📚 6 sections</span>
+      <span class="lecture-hero-meta-item">🎓 Terminale C&D</span>
+    </div>
+  </header>
+  <!-- ===== SOMMAIRE ===== -->
+  <nav class="lecture-toc">
+    <div class="lecture-toc-header">
+      <span>Dans cette partie</span>
+      <span class="lecture-toc-count">4 notions · 6 sections</span>
+    </div>
+    <ol class="lecture-toc-list">
+      <li><a href="#s0"><span class="toc-num">00</span><span>Trouver le sens sans hésiter</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>La direction : toujours perpendiculaire</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>La règle des trois doigts (main droite)</span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>Le sens du courant commande le sens de →F</span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>Le cas général : la formule avec sin θ</span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>Méthode complète et exercice type Bac</span></a></li>
+    </ol>
+  </nav>
+  <!-- ============================================================ -->
+  <!-- SECTION s0 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s0">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">00</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Motivation</span>
+        <h2 class="lecture-section-title">Trouver le sens sans hésiter</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Imagine la scène de l'examen : un schéma de rail de Laplace, un courant, un aimant, et la question « donner le sens de la force de Laplace ». Sans méthode, on répond au hasard ; avec la règle des trois doigts, il faut dix secondes. C'est exactement ce que fait le haut-parleur de ton téléphone : le courant audio change de sens des centaines à des milliers de fois par seconde, et la force suit à chaque instant.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <p class="lecture-text"><strong>🔑 L'idée clé de la partie.</strong> Une force est un VECTEUR : pour la décrire complètement, il faut sa norme (le calcul), sa direction (perpendiculaire au plan formé par <span class="math">→l</span> et <span class="math">→B</span>) et son sens (la règle des trois doigts). Les trois, toujours.</p>
+      </div>
+      <p class="lecture-text"><strong>Intuition :</strong> la norme se calcule avec un stylo, mais le sens se « voit » avec ta main droite. Une fois la règle installée dans tes réflexes, plus aucune configuration ne pourra te piéger.</p>
+      <div class="lecture-callout lecture-callout-warning">
+        <p class="lecture-text"><strong>⚠️ Piège d'examen.</strong> Répondre seulement « F = 0,40 N » est une réponse incomplète : sans direction ni sens, tu perds la moitié des points, même si le calcul est juste.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s1 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s1">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">01</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1</span>
+        <h2 class="lecture-section-title">La direction : toujours perpendiculaire</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Première bonne nouvelle : la force de Laplace ne pousse jamais le conducteur dans le sens du courant, ni dans le sens du champ. Elle sort du plan formé par <span class="math">→l</span> et <span class="math">→B</span>. C'est une conséquence directe du produit vectoriel de la loi de Laplace.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <p class="lecture-text"><strong>🔑 Définition officielle.</strong> La force de Laplace est toujours perpendiculaire au plan contenant le conducteur (<span class="math">→l</span>) et le champ magnétique (<span class="math">→B</span>).</p>
+      </div>
+      <div class="lecture-formula-box">
+        <p><span class="math">→F ⊥ →l</span> et <span class="math">→F ⊥ →B</span></p>
+        <p class="lecture-text">Autrement dit : <span class="math">→F</span> est perpendiculaire au plan (<span class="math">→l</span>, <span class="math">→B</span>). Cette propriété est vraie quel que soit l'angle θ entre <span class="math">→l</span> et <span class="math">→B</span>.</p>
+      </div>
+      <p class="lecture-text"><strong>Intuition :</strong> deux directions dessinent un plan, comme deux crayons posés sur une table ; la force agit comme une flèche qui sortirait de la table, ni le long d'un crayon, ni à plat sur la table.</p>
+      <div class="lecture-example-content">
+        <p class="lecture-text"><strong>✏️ Exemple travaillé — boussole et conducteur</strong></p>
+        <p class="lecture-text">Un conducteur horizontal est orienté vers l'est (<span class="math">→l</span> vers l'est) et plonge dans un champ horizontal <span class="math">→B</span> dirigé vers le nord. On donne <span class="math">I</span> = 2,0 A, <span class="math">l</span> = 0,50 m, <span class="math">B</span> = 0,40 T. Quelle est la direction de la force, et sa norme ?</p>
+        <div class="lecture-steps">
+          <div class="lecture-step"><p class="lecture-text"><strong>Étape 1 — Identifier le plan :</strong> <span class="math">→l</span> (est) et <span class="math">→B</span> (nord) sont tous les deux horizontaux : le plan (<span class="math">→l</span>, <span class="math">→B</span>) est le plan horizontal.</p></div>
+          <div class="lecture-step"><p class="lecture-text"><strong>Étape 2 — Direction :</strong> <span class="math">→F</span> est perpendiculaire à ce plan, donc verticale.</p></div>
+          <div class="lecture-step"><p class="lecture-text"><strong>Étape 3 — Sens :</strong> main droite — pouce vers l'est (<span class="math">I</span>), index vers le nord (<span class="math">→B</span>) : le majeur pointe vers le haut. Donc <span class="math">→F</span> verticale, vers le haut.</p></div>
+          <div class="lecture-step"><p class="lecture-text"><strong>Étape 4 — Norme :</strong> <span class="math">F</span> = 2,0 × 0,50 × 0,40 : 2,0 × 0,50 = 1,0 ; puis 1,0 × 0,40 = 0,40 N ✓. Réponse : <span class="math">→F</span> verticale vers le haut, <span class="math">F</span> = 0,40 N.</p></div>
+        </div>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <p class="lecture-text"><strong>⚠️ Piège d'examen.</strong> Si <span class="math">→l</span> et <span class="math">→B</span> sont portés par la même droite (colinéaires), le « plan » disparaît et… la force est nulle, car sin 0° = 0. Tu le verras à la section 04.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s2 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s2">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">02</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2</span>
+        <h2 class="lecture-section-title">La règle des trois doigts (main droite)</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Voici l'outil officiel du chapitre, celui que le correcteur attend implicitement dans chaque question de sens. Il tient dans ta main — mais attention : de la main DROITE uniquement. Entraîne-toi dans l'air jusqu'à ce que le geste devienne automatique.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <p class="lecture-text"><strong>🔑 Définition officielle.</strong> Règle des trois doigts (main droite) : le pouce indique le sens du courant <span class="math">I</span> (donc le sens de <span class="math">→l</span>) ; l'index indique le sens du champ <span class="math">→B</span> ; le majeur, perpendiculaire aux deux, indique le sens de la force <span class="math">→F</span>.</p>
+      </div>
+      <svg viewBox="0 0 560 334" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Règle des trois doigts annotée sur une main">
+        <defs>
+          <marker id="ar2b1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="rgba(96,165,250,1)"/>
+          </marker>
+          <marker id="ar2a1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="rgba(251,191,36,1)"/>
+          </marker>
+          <marker id="ar2g1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="rgba(74,222,128,1)"/>
+          </marker>
+        </defs>
+        <rect x="8" y="8" width="544" height="318" rx="12" fill="rgba(255,255,255,0.03)"/>
+        <text x="280" y="26" text-anchor="middle" font-size="13.5" fill="rgba(255,255,255,0.85)">La règle des trois doigts — MAIN DROITE</text>
+        <text x="280" y="46" text-anchor="middle" font-size="12" fill="rgba(255,255,255,0.6)">Pouce → courant I · Index → champ →B · Majeur → force →F</text>
+        <rect x="200" y="150" width="100" height="140" rx="24" fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.45)" stroke-width="2"/>
+        <rect x="214" y="290" width="72" height="28" rx="10" fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+        <rect x="216" y="90" width="18" height="70" rx="9" fill="rgba(96,165,250,0.22)" stroke="rgba(96,165,250,0.95)" stroke-width="2"/>
+        <line x1="225" y1="86" x2="225" y2="52" stroke="rgba(96,165,250,1)" stroke-width="2.5" marker-end="url(#ar2b1)"/>
+        <text x="240" y="58" font-size="12.5" fill="rgba(96,165,250,1)">→B — INDEX</text>
+        <line x1="252" y1="150" x2="252" y2="108" stroke="rgba(74,222,128,1)" stroke-width="3"/>
+        <circle cx="252" cy="98" r="12" fill="rgba(74,222,128,0.15)" stroke="rgba(74,222,128,1)" stroke-width="2.5"/>
+        <circle cx="252" cy="98" r="3.5" fill="rgba(74,222,128,1)"/>
+        <text x="272" y="96" font-size="12" fill="rgba(74,222,128,1)">majeur : →F (vers vous ⊙)</text>
+        <rect x="300" y="180" width="70" height="18" rx="9" fill="rgba(251,191,36,0.22)" stroke="rgba(251,191,36,0.95)" stroke-width="2"/>
+        <line x1="374" y1="189" x2="410" y2="189" stroke="rgba(251,191,36,1)" stroke-width="2.5" marker-end="url(#ar2a1)"/>
+        <text x="306" y="170" font-size="12" fill="rgba(251,191,36,1)">pouce : sens de I</text>
+        <circle cx="435" cy="120" r="5" fill="rgba(96,165,250,1)"/>
+        <text x="447" y="125" font-size="13" fill="rgba(255,255,255,0.85)">Index → →B</text>
+        <circle cx="435" cy="150" r="5" fill="rgba(251,191,36,1)"/>
+        <text x="447" y="155" font-size="13" fill="rgba(255,255,255,0.85)">Pouce → I</text>
+        <circle cx="435" cy="180" r="5" fill="rgba(74,222,128,1)"/>
+        <text x="447" y="185" font-size="13" fill="rgba(255,255,255,0.85)">Majeur → →F</text>
+        <text x="447" y="215" font-size="13" fill="rgba(255,255,255,0.8)">⚠ MAIN DROITE !</text>
+        <text x="280" y="326" text-anchor="middle" font-size="11.5" fill="rgba(255,255,255,0.55)">Pouce à droite (I), index en haut (→B) : le majeur pointe vers toi — c'est bien la main droite.</text>
+      </svg>
+      <p class="lecture-text"><strong>Méthode de secours, avec la main droite à plat :</strong> les quatre doigts s'enroulent de la direction de <span class="math">→l</span> vers celle de <span class="math">→B</span> (par le plus court chemin), et le pouce tendu montre <span class="math">→F</span>. Les deux méthodes donnent toujours le même résultat — choisis la tienne et garde-la.</p>
+      <div class="lecture-example-content">
+        <p class="lecture-text"><strong>✏️ Exemple travaillé — le sens sur le rail</strong></p>
+        <p class="lecture-text">Sur un rail de Laplace vu de dessus, la tige est verticale sur la feuille et le courant <span class="math">I</span> = 2,0 A la parcourt du rail du haut vers le rail du bas. Le champ <span class="math">B</span> = 0,40 T rentre dans la feuille (⊗), avec <span class="math">l</span> = 0,25 m. Détermine le sens de <span class="math">→F</span> et sa norme.</p>
+        <div class="lecture-steps">
+          <div class="lecture-step"><p class="lecture-text"><strong>Étape 1 — Orienter <span class="math">→l</span> :</strong> dans le sens du courant, c'est-à-dire vers le bas de la feuille.</p></div>
+          <div class="lecture-step"><p class="lecture-text"><strong>Étape 2 — Orienter <span class="math">→B</span> :</strong> rentrant dans la feuille (⊗).</p></div>
+          <div class="lecture-step"><p class="lecture-text"><strong>Étape 3 — Main droite :</strong> pouce vers le bas, index rentrant dans la feuille : le majeur pointe vers la droite. Donc <span class="math">→F</span> est horizontale, vers la droite.</p></div>
+          <div class="lecture-step"><p class="lecture-text"><strong>Étape 4 — Norme :</strong> <span class="math">F</span> = 2,0 × 0,25 × 0,40 : 2,0 × 0,25 = 0,50 ; puis 0,50 × 0,40 = 0,20 N ✓. Réponse : <span class="math">→F</span> vers la droite, <span class="math">F</span> = 0,20 N.</p></div>
+        </div>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <p class="lecture-text"><strong>⚠️ Piège d'examen.</strong> MAIN DROITE, pas la gauche ! Avec la main gauche, le majeur indique exactement le sens contraire — c'est l'erreur la plus coûteuse de tout le chapitre.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s3 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s3">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">03</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 3</span>
+        <h2 class="lecture-section-title">Le sens du courant commande le sens de →F</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">L'expérience de la partie 01 l'a montré : change le sens du courant, et la tige repart en sens inverse. La loi de Laplace explique ce comportement en une ligne, et les conséquences sont géantes : c'est grâce à cette inversion que le moteur tourne et que le haut-parleur vibre.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <p class="lecture-text"><strong>🔑 Définition officielle.</strong> Si on inverse le sens de <span class="math">I</span>, le sens de <span class="math">→F</span> s'inverse. Si on inverse le sens de <span class="math">→B</span>, le sens de <span class="math">→F</span> s'inverse aussi. Si on inverse les DEUX en même temps, <span class="math">→F</span> garde le même sens.</p>
+      </div>
+      <div class="lecture-formula-box">
+        <p><span class="math">(-→l) ∧ (-→B) = →l ∧ →B</span></p>
+        <p class="lecture-text">Deux inversions se compensent, exactement comme (−1) × (−1) = +1. Une seule inversion change le signe du produit vectoriel, donc le sens de la force.</p>
+      </div>
+      <svg viewBox="0 0 620 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Inverser le courant inverse la force">
+        <defs>
+          <marker id="ar2a2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="rgba(251,191,36,1)"/>
+          </marker>
+          <marker id="ar2g2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="rgba(74,222,128,1)"/>
+          </marker>
+        </defs>
+        <rect x="8" y="8" width="604" height="234" rx="12" fill="rgba(255,255,255,0.03)"/>
+        <text x="310" y="30" text-anchor="middle" font-size="14" fill="rgba(255,255,255,0.85)">Inverse le courant → la force s'inverse</text>
+        <text x="150" y="54" text-anchor="middle" font-size="12" fill="rgba(255,255,255,0.75)">Situation 1 : I vers le bas</text>
+        <rect x="40" y="84" width="220" height="7" rx="3.5" fill="rgba(255,255,255,0.3)"/>
+        <rect x="40" y="176" width="220" height="7" rx="3.5" fill="rgba(255,255,255,0.3)"/>
+        <rect x="135" y="72" width="11" height="122" rx="5" fill="rgba(74,222,128,0.35)" stroke="rgba(74,222,128,1)" stroke-width="1.5"/>
+        <line x1="140" y1="98" x2="140" y2="152" stroke="rgba(251,191,36,1)" stroke-width="2.5" marker-end="url(#ar2a2)"/>
+        <text x="152" y="130" font-size="13" fill="rgba(251,191,36,1)">I</text>
+        <circle cx="85" cy="110" r="9" fill="rgba(96,165,250,0.12)" stroke="rgba(96,165,250,0.85)" stroke-width="1.5"/>
+        <line x1="81" y1="106" x2="89" y2="114" stroke="rgba(96,165,250,0.85)" stroke-width="1.5"/>
+        <line x1="81" y1="114" x2="89" y2="106" stroke="rgba(96,165,250,0.85)" stroke-width="1.5"/>
+        <circle cx="85" cy="150" r="9" fill="rgba(96,165,250,0.12)" stroke="rgba(96,165,250,0.85)" stroke-width="1.5"/>
+        <line x1="81" y1="146" x2="89" y2="154" stroke="rgba(96,165,250,0.85)" stroke-width="1.5"/>
+        <line x1="81" y1="154" x2="89" y2="146" stroke="rgba(96,165,250,0.85)" stroke-width="1.5"/>
+        <circle cx="205" cy="110" r="9" fill="rgba(96,165,250,0.12)" stroke="rgba(96,165,250,0.85)" stroke-width="1.5"/>
+        <line x1="201" y1="106" x2="209" y2="114" stroke="rgba(96,165,250,0.85)" stroke-width="1.5"/>
+        <line x1="201" y1="114" x2="209" y2="106" stroke="rgba(96,165,250,0.85)" stroke-width="1.5"/>
+        <circle cx="205" cy="150" r="9" fill="rgba(96,165,250,0.12)" stroke="rgba(96,165,250,0.85)" stroke-width="1.5"/>
+        <line x1="201" y1="146" x2="209" y2="154" stroke="rgba(96,165,250,0.85)" stroke-width="1.5"/>
+        <line x1="201" y1="154" x2="209" y2="146" stroke="rgba(96,165,250,0.85)" stroke-width="1.5"/>
+        <line x1="150" y1="131" x2="228" y2="131" stroke="rgba(74,222,128,1)" stroke-width="3" marker-end="url(#ar2g2)"/>
+        <text x="185" y="121" font-size="13" fill="rgba(74,222,128,1)">→F</text>
+        <text x="310" y="140" text-anchor="middle" font-size="12" fill="rgba(96,165,250,1)">même →B ⊗</text>
+        <text x="470" y="54" text-anchor="middle" font-size="12" fill="rgba(255,255,255,0.75)">Situation 2 : I vers le haut</text>
+        <rect x="360" y="84" width="220" height="7" rx="3.5" fill="rgba(255,255,255,0.3)"/>
+        <rect x="360" y="176" width="220" height="7" rx="3.5" fill="rgba(255,255,255,0.3)"/>
+        <rect x="455" y="72" width="11" height="122" rx="5" fill="rgba(74,222,128,0.35)" stroke="rgba(74,222,128,1)" stroke-width="1.5"/>
+        <line x1="460" y1="152" x2="460" y2="98" stroke="rgba(251,191,36,1)" stroke-width="2.5" marker-end="url(#ar2a2)"/>
+        <text x="472" y="130" font-size="13" fill="rgba(251,191,36,1)">I</text>
+        <circle cx="415" cy="110" r="9" fill="rgba(96,165,250,0.12)" stroke="rgba(96,165,250,0.85)" stroke-width="1.5"/>
+        <line x1="411" y1="106" x2="419" y2="114" stroke="rgba(96,165,250,0.85)" stroke-width="1.5"/>
+        <line x1="411" y1="114" x2="419" y2="106" stroke="rgba(96,165,250,0.85)" stroke-width="1.5"/>
+        <circle cx="415" cy="150" r="9" fill="rgba(96,165,250,0.12)" stroke="rgba(96,165,250,0.85)" stroke-width="1.5"/>
+        <line x1="411" y1="146" x2="419" y2="154" stroke="rgba(96,165,250,0.85)" stroke-width="1.5"/>
+        <line x1="411" y1="154" x2="419" y2="146" stroke="rgba(96,165,250,0.85)" stroke-width="1.5"/>
+        <circle cx="525" cy="110" r="9" fill="rgba(96,165,250,0.12)" stroke="rgba(96,165,250,0.85)" stroke-width="1.5"/>
+        <line x1="521" y1="106" x2="529" y2="114" stroke="rgba(96,165,250,0.85)" stroke-width="1.5"/>
+        <line x1="521" y1="114" x2="529" y2="106" stroke="rgba(96,165,250,0.85)" stroke-width="1.5"/>
+        <circle cx="525" cy="150" r="9" fill="rgba(96,165,250,0.12)" stroke="rgba(96,165,250,0.85)" stroke-width="1.5"/>
+        <line x1="521" y1="146" x2="529" y2="154" stroke="rgba(96,165,250,0.85)" stroke-width="1.5"/>
+        <line x1="521" y1="154" x2="529" y2="146" stroke="rgba(96,165,250,0.85)" stroke-width="1.5"/>
+        <line x1="450" y1="131" x2="372" y2="131" stroke="rgba(74,222,128,1)" stroke-width="3" marker-end="url(#ar2g2)"/>
+        <text x="400" y="121" font-size="13" fill="rgba(74,222,128,1)">→F</text>
+        <text x="310" y="224" text-anchor="middle" font-size="11.5" fill="rgba(255,255,255,0.55)">Le champ ne change pas : seul I s'inverse, et le sens de →F s'inverse avec lui.</text>
+      </svg>
+      <p class="lecture-text"><strong>Intuition :</strong> le sens du produit vectoriel est un multiplicateur de signes. Une inversion = un signe changé ; deux inversions = signe conservé. C'est ce va-et-vient que le haut-parleur exploite : le courant audio s'inverse sans arrêt, et la force de Laplace fait danser la bobine (on y revient en partie 03).</p>
+      <div class="lecture-example-content">
+        <p class="lecture-text"><strong>✏️ Exemple travaillé — trois inversions à classer</strong></p>
+        <p class="lecture-text">Dans une configuration donnée, la tige subit une force <span class="math">→F</span> de norme 0,20 N dirigée vers la droite. Que devient cette force si : a) on inverse <span class="math">I</span> ; b) on inverse <span class="math">→B</span> ; c) on inverse les deux ?</p>
+        <div class="lecture-steps">
+          <div class="lecture-step"><p class="lecture-text"><strong>Étape 1 — a) :</strong> <span class="math">I</span> inversé → <span class="math">→F</span> inversée : elle passe vers la gauche, norme inchangée 0,20 N.</p></div>
+          <div class="lecture-step"><p class="lecture-text"><strong>Étape 2 — b) :</strong> <span class="math">→B</span> inversé → même conséquence : vers la gauche, norme 0,20 N.</p></div>
+          <div class="lecture-step"><p class="lecture-text"><strong>Étape 3 — c) :</strong> deux inversions se compensent : <span class="math">→F</span> reste vers la droite, norme 0,20 N.</p></div>
+          <div class="lecture-step"><p class="lecture-text"><strong>Étape 4 — À retenir :</strong> dans ces inversions, la NORME ne bouge jamais — seule l'orientation change ✓.</p></div>
+        </div>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <p class="lecture-text"><strong>⚠️ Piège d'examen.</strong> Inverser un sens ne change JAMAIS la valeur de <span class="math">F</span>. Écrire « F = 0,10 N » après une inversion est une erreur : la norme reste 0,20 N, seul le sens bascule.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s4 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s4">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">04</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 4</span>
+        <h2 class="lecture-section-title">Le cas général : la formule avec sin θ</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Et si la tige n'est pas perpendiculaire au champ ? Rien de compliqué : seule la composante du champ perpendiculaire au conducteur agit. La formule gagne un facteur <span class="math">sin θ</span>, où θ est l'angle entre <span class="math">→l</span> et <span class="math">→B</span> — à préciser en degrés ou en radians dans ta réponse.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <p class="lecture-text"><strong>🔑 Définition officielle.</strong> Si l'angle entre <span class="math">→l</span> et <span class="math">→B</span> vaut θ, la norme de la force de Laplace vaut <span class="math">F = I·l·B·sin θ</span>. Le cas θ = 90° redonne <span class="math">F = I·l·B</span> ; le cas θ = 0° donne <span class="math">F</span> = 0 : un conducteur aligné avec le champ ne subit aucune force de Laplace.</p>
+      </div>
+      <div class="lecture-formula-hero">
+        <p class="lecture-text"><strong>Norme dans le cas général</strong></p>
+        <p><span class="math">F = I·l·B·sin θ</span></p>
+        <p class="lecture-text">θ = angle entre <span class="math">→l</span> et <span class="math">→B</span>, en degrés ou en radians (précise !). Maximum pour θ = 90°, force nulle pour θ = 0° ou 180°.</p>
+      </div>
+      <p class="lecture-text"><strong>Intuition :</strong> imagine tirer une porte avec une corde : seule la part de l'effort perpendiculaire à la porte compte vraiment. Ici, seul <span class="math">B·sin θ</span>, la part du champ perpendiculaire à <span class="math">→l</span>, pousse le conducteur.</p>
+      <div class="lecture-table">
+        <table>
+          <thead>
+            <tr><th>Angle θ entre →l et →B</th><th>sin θ</th><th>Force F</th><th>Lecture</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>0°</td><td>0</td><td>0</td><td><span class="math">→l</span> aligné avec <span class="math">→B</span> : aucune force</td></tr>
+            <tr><td>30°</td><td>0,50</td><td><span class="math">I·l·B</span> / 2</td><td>la moitié du maximum</td></tr>
+            <tr><td>90°</td><td>1</td><td><span class="math">I·l·B</span></td><td>maximum : cas des rails classiques</td></tr>
+            <tr><td>180°</td><td>0</td><td>0</td><td><span class="math">→l</span> opposé à <span class="math">→B</span> : aucune force</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="lecture-example-content">
+        <p class="lecture-text"><strong>✏️ Exemple travaillé — quand l'angle s'invite</strong></p>
+        <p class="lecture-text">Une tige de longueur <span class="math">l</span> = 25 cm porte un courant <span class="math">I</span> = 4,0 A et fait un angle θ = 30° (soit ≈ 0,52 rad) avec un champ <span class="math">B</span> = 0,80 T. Calcule la norme de la force de Laplace, puis compare au cas θ = 90°.</p>
+        <div class="lecture-steps">
+          <div class="lecture-step"><p class="lecture-text"><strong>Étape 1 — Convertir :</strong> <span class="math">l</span> = 25 cm = 0,25 m.</p></div>
+          <div class="lecture-step"><p class="lecture-text"><strong>Étape 2 — Formule :</strong> <span class="math">F = I·l·B·sin θ</span> = 4,0 × 0,25 × 0,80 × sin 30°.</p></div>
+          <div class="lecture-step"><p class="lecture-text"><strong>Étape 3 — Calculer :</strong> 4,0 × 0,25 = 1,0 ; 1,0 × 0,80 = 0,80 ; sin 30° = 0,50 ; donc 0,80 × 0,50 = 0,40 N ✓.</p></div>
+          <div class="lecture-step"><p class="lecture-text"><strong>Étape 4 — Comparer :</strong> pour θ = 90°, <span class="math">F</span> = 0,80 N — exactement le double, car sin 90° = 1 ✓.</p></div>
+        </div>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <p class="lecture-text"><strong>⚠️ Piège d'examen.</strong> Mode de la calculatrice ! Si θ est en degrés, mets-la en mode DEG : sin 30° = 0,5. En mode RAD, elle lirait « 30 radians » et trouverait sin 30 ≈ −0,99 : une réponse catastrophiquement fausse.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s5 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s5">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">05</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Synthèse</span>
+        <h2 class="lecture-section-title">Méthode complète et exercice type Bac</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Voici la routine complète, celle qui rapporte tous les points sur un exercice de force de Laplace. Applique-la dans cet ordre, à chaque fois, même si la question semble simple.</p>
+      <div class="lecture-steps">
+        <div class="lecture-step"><p class="lecture-text"><strong>Étape 1 — Schéma :</strong> dessine la situation, place <span class="math">→l</span> (sens du courant) et <span class="math">→B</span>, et marque l'angle θ s'il existe.</p></div>
+        <div class="lecture-step"><p class="lecture-text"><strong>Étape 2 — Unités :</strong> convertis tout (cm → m, g → kg, mA → A). Ne calcule jamais avant d'avoir converti.</p></div>
+        <div class="lecture-step"><p class="lecture-text"><strong>Étape 3 — Norme :</strong> <span class="math">F = I·l·B·sin θ</span> (avec θ = 90° si la perpendicularité est annoncée).</p></div>
+        <div class="lecture-step"><p class="lecture-text"><strong>Étape 4 — Vecteur :</strong> direction perpendiculaire au plan (<span class="math">→l</span>, <span class="math">→B</span>), sens par la règle des trois doigts de la main droite.</p></div>
+      </div>
+      <div class="lecture-example-content">
+        <p class="lecture-text"><strong>✏️ Exercice type Bac — énoncé et correction</strong></p>
+        <p class="lecture-text">Une tige AB de longueur <span class="math">l</span> = 20 cm repose sur deux rails horizontaux ; A est en haut de la feuille, B en bas. Elle est parcourue par un courant <span class="math">I</span> = 2,5 A de A vers B. Un champ magnétique <span class="math">B</span> = 0,60 T, perpendiculaire à la tige, rentre dans la feuille (⊗). a) Calcule la norme de la force de Laplace. b) Détermine son sens. c) On incline l'aimant pour que θ = 30° : recalcule la norme.</p>
+        <div class="lecture-steps">
+          <div class="lecture-step"><p class="lecture-text"><strong>Étape 1 — Unités :</strong> <span class="math">l</span> = 20 cm = 0,20 m.</p></div>
+          <div class="lecture-step"><p class="lecture-text"><strong>Étape 2 — a) Norme :</strong> <span class="math">F = I·l·B</span> = 2,5 × 0,20 × 0,60 : 2,5 × 0,20 = 0,50 ; puis 0,50 × 0,60 = 0,30 N ✓.</p></div>
+          <div class="lecture-step"><p class="lecture-text"><strong>Étape 3 — b) Sens :</strong> <span class="math">→l</span> pointe vers le bas (de A vers B) ; main droite — pouce vers le bas, index rentrant (⊗) : le majeur pointe vers la droite. Donc <span class="math">→F</span> est horizontale, vers la droite.</p></div>
+          <div class="lecture-step"><p class="lecture-text"><strong>Étape 4 — c) Angle θ = 30° :</strong> <span class="math">F'</span> = <span class="math">F</span> × sin 30° = 0,30 × 0,50 = 0,15 N ✓.</p></div>
+          <div class="lecture-step"><p class="lecture-text"><strong>Étape 5 — Conclure :</strong> norme 0,15 N, direction perpendiculaire au plan (<span class="math">→l</span>, <span class="math">→B</span>), sens donné par la règle : les trois éléments attendus par le correcteur.</p></div>
+        </div>
+      </div>
+      <div class="lecture-text">
+        <p class="lecture-text"><strong>🏋️ Exercice — à toi de jouer</strong></p>
+        <p class="lecture-text">Même montage, autres valeurs : <span class="math">l</span> = 10 cm, <span class="math">I</span> = 0,80 A, <span class="math">B</span> = 0,50 T, tige perpendiculaire au champ. a) Calcule <span class="math">F</span>. b) On relève l'aimant pour que θ = 60° (sin 60° ≈ 0,87) : recalcule <span class="math">F</span>.</p>
+        <p class="lecture-text"><strong>Solution guidée :</strong></p>
+        <div class="lecture-steps">
+          <div class="lecture-step"><p class="lecture-text"><strong>Étape 1 — Convertir :</strong> <span class="math">l</span> = 10 cm = 0,10 m.</p></div>
+          <div class="lecture-step"><p class="lecture-text"><strong>Étape 2 — a) :</strong> <span class="math">F</span> = 0,80 × 0,10 × 0,50 : 0,80 × 0,10 = 0,080 ; puis 0,080 × 0,50 = 0,040 N ✓.</p></div>
+          <div class="lecture-step"><p class="lecture-text"><strong>Étape 3 — b) :</strong> <span class="math">F'</span> = 0,040 × 0,87 ≈ 0,035 N ✓.</p></div>
+          <div class="lecture-step"><p class="lecture-text"><strong>Étape 4 — Remarque :</strong> réduire l'angle réduit la force, car sin θ diminue — cohérent avec le tableau de la section 04.</p></div>
+        </div>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <p class="lecture-text"><strong>⚠️ Piège d'examen.</strong> Le sens de <span class="math">→F</span> indique le sens de départ du mouvement (celui de l'accélération), pas une position déjà acquise. Et souviens-toi : main droite, toujours.</p>
+      </div>
+      <div class="lecture-table">
+        <table>
+          <thead>
+            <tr><th>Ce que demande le correcteur</th><th>Ce que tu écris</th><th>Outil utilisé</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>La norme de <span class="math">→F</span> ?</td><td><span class="math">F = I·l·B·sin θ</span> avec les unités SI</td><td>formule + calcul détaillé</td></tr>
+            <tr><td>La direction ?</td><td>perpendiculaire au plan (<span class="math">→l</span>, <span class="math">→B</span>)</td><td>définition du produit vectoriel</td></tr>
+            <tr><td>Le sens ?</td><td>règle des trois doigts, main droite</td><td>pouce = <span class="math">I</span>, index = <span class="math">→B</span>, majeur = <span class="math">→F</span></td></tr>
+            <tr><td>L'effet d'une inversion ?</td><td><span class="math">→F</span> s'inverse (pour <span class="math">I</span> ou <span class="math">→B</span>), pas les deux</td><td>produit vectoriel</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+  <!-- ===== QCM ===== -->
+  <div class="lecture-quiz">
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Avec la règle des trois doigts de la main droite :</p>
+      <div class="lecture-quiz-options"><span>A) le pouce indique le sens de →B</span><span>B) l'index indique le sens de I</span><span>C) le pouce indique le sens de I</span><span>D) le majeur indique le sens de →B</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">Réponse C. Pouce = sens du courant <span class="math">I</span>, index = sens de <span class="math">→B</span>, majeur = sens de <span class="math">→F</span>.</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">On inverse à la fois le sens de <span class="math">I</span> et le sens de <span class="math">→B</span>. Que devient la force de Laplace ?</p>
+      <div class="lecture-quiz-options"><span>A) Elle s'inverse</span><span>B) Elle ne change pas</span><span>C) Elle est multipliée par 2</span><span>D) Elle devient nulle</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">Réponse B. <span class="math">(-→l) ∧ (-→B) = →l ∧ →B</span> : deux inversions se compensent.</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Si θ = 0° entre <span class="math">→l</span> et <span class="math">→B</span>, la force de Laplace vaut :</p>
+      <div class="lecture-quiz-options"><span>A) sa valeur maximale</span><span>B) I·l·B</span><span>C) zéro</span><span>D) la moitié du maximum</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">Réponse C. <span class="math">F = I·l·B·sin θ</span> avec sin 0° = 0 : le conducteur est aligné avec le champ, il ne subit aucune force de Laplace.</div></details>
+    </div>
+  </div>
+  <!-- ===== RÉCAP ===== -->
+  <div class="lecture-recap">
+    <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
+    <ul class="lecture-recap-list">
+      <li><strong>Direction</strong> : <span class="math">→F</span> est toujours perpendiculaire au plan formé par <span class="math">→l</span> et <span class="math">→B</span>.</li>
+      <li><strong>Règle des trois doigts</strong> : main droite — pouce = <span class="math">I</span>, index = <span class="math">→B</span>, majeur = <span class="math">→F</span>.</li>
+      <li><strong>Inversions</strong> : <span class="math">I</span> inversé ou <span class="math">→B</span> inversé → <span class="math">→F</span> inversée ; les deux inversés → <span class="math">→F</span> inchangée.</li>
+      <li><strong>Cas général</strong> : <span class="math">F = I·l·B·sin θ</span>, avec θ l'angle entre <span class="math">→l</span> et <span class="math">→B</span>.</li>
+    </ul>
+  </div>
+  <!-- ===== FIN ===== -->
+  <div class="lecture-end">
+    <div class="lecture-end-icon">🎯</div>
+    <div class="lecture-end-text">Partie 02 terminée !</div>
+    <div class="lecture-end-sub">Tu maîtrises maintenant le sens de la force ! En partie 03, on mesure son travail en joules, on tient une tige en équilibre sur un plan incliné, puis on ouvre le capot du moteur et du haut-parleur.</div>
+    <div class="lecture-end-divider"></div>
+  </div>
+</div>

@@ -1,0 +1,378 @@
+<!-- PARTIE 02 — Force électromotrice d'auto-induction (Auto-induction) -->
+<div class="lecture-container">
+
+  <!-- ===== HERO ===== -->
+  <header class="lecture-hero">
+    <div class="lecture-hero-badge">
+      <span class="lecture-hero-icon">📘</span>
+      <span class="lecture-hero-label">Terminale C&D · Auto-induction · Partie 02</span>
+    </div>
+    <h1 class="lecture-hero-title">
+      Force <em>électromotrice d'auto-induction</em>
+    </h1>
+    <p class="lecture-hero-intro">
+      La partie 01 t'a fait sentir le phénomène ; ici, on le met en équation. Tu vas écrire la loi <span class="math">e = −L·(Δi/Δt)</span>, apprendre à lire son signe, puis suivre le courant qui s'installe doucement dans un circuit résistance + bobine, réglé par la constante de temps <span class="math">τ = L/R</span>. En bonus : l'explication complète de l'étincelle d'interrupteur.
+    </p>
+    <div class="lecture-hero-meta">
+      <span class="lecture-hero-meta-item">⏱ 25 min</span>
+      <span class="lecture-hero-meta-item">⚡ 4 notions</span>
+      <span class="lecture-hero-meta-item">📚 6 sections</span>
+      <span class="lecture-hero-meta-item">🎓 Terminale C&D</span>
+    </div>
+  </header>
+  <!-- ===== SOMMAIRE ===== -->
+  <nav class="lecture-toc">
+    <div class="lecture-toc-header">
+      <span>Dans cette partie</span>
+      <span class="lecture-toc-count">4 notions · 6 sections</span>
+    </div>
+    <ol class="lecture-toc-list">
+      <li><a href="#s0"><span class="toc-num">00</span><span>L'étincelle qui révèle la loi</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>La f.é.m. d'auto-induction</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>Pourquoi ce signe « − » ?</span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>Fermeture : le courant prend son temps</span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>La courbe i(t) et la constante de temps</span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>Ouverture : étincelle et surtension</span></a></li>
+    </ol>
+  </nav>
+  <!-- ============================================================ -->
+  <!-- SECTION s0 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s0">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">00</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Motivation</span>
+        <h2 class="lecture-section-title">L'étincelle qui révèle la loi</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Replaçons-nous à l'atelier : un moteur tourne, alimenté par un circuit série. On ouvre l'interrupteur… crac ! Une étincelle jaillit entre les contacts, alors que le même interrupteur, ouvert sur un circuit de simple lampe, ne produit rien de tel. Pourquoi cette différence de comportement ?</p>
+      <p class="lecture-text">La réponse tient en une phrase : dans le moteur, il y a des bobines. À l'ouverture, le courant doit passer de quelques ampères à zéro en un temps minuscule. Or la bobine, tu le sais maintenant, s'oppose à cette disparition brutale — et elle le fait de manière spectaculaire.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <p class="lecture-text"><strong>Programme de cette partie :</strong> la loi quantitative de la f.é.m. d'auto-induction, la lecture de son signe, le régime transitoire à la fermeture (constante de temps <span class="math">τ = L/R</span>) et la surtension à l'ouverture.</p>
+      </div>
+      <p class="lecture-text">Garde l'image de l'étincelle en tête du début à la fin : tout ce qui suit sert à l'expliquer, chiffres à l'appui.</p>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s1 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s1">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">01</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1</span>
+        <h2 class="lecture-section-title">La f.é.m. d'auto-induction</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Passons au quantitatif. Quand l'intensité <span class="math">i</span> varie de <span class="math">Δi</span> pendant une durée <span class="math">Δt</span>, la bobine produit une f.é.m. proportionnelle à cette variation par unité de temps, et proportionnelle à son inductance <span class="math">L</span>. Plus le courant change vite, plus la réaction est forte : c'est la loi centrale du chapitre.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <p class="lecture-text"><strong>Définition :</strong> une bobine d'inductance <span class="math">L</span> traversée par un courant variable est le siège d'une f.é.m. d'auto-induction <span class="math">e = −L·(Δi/Δt)</span>, où <span class="math">Δi/Δt</span> désigne la variation de l'intensité par unité de temps.</p>
+      </div>
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero"><span class="math">e = −L·(Δi/Δt)</span></div>
+        <p class="lecture-formula-hero-desc"><span class="math">e</span> en volts (<span class="math">V</span>), <span class="math">L</span> en henrys (<span class="math">H</span>), <span class="math">Δi/Δt</span> en <span class="math">A</span>/<span class="math">s</span>. Le signe « − » traduit l'opposition : <span class="math">e</span> s'oppose toujours à la variation qui la crée.</p>
+      </div>
+      <div class="lecture-formula-box">
+        <p class="lecture-text"><strong>Pour les calculs numériques</strong>, on travaille en valeur : <span class="math">e = L·|Δi/Δt|</span>, puis on raisonne sur le sens à la main. Jamais de signe « − » recopié machinalement dans un nombre.</p>
+      </div>
+      <svg viewBox="0 0 520 210" width="100%" role="img" aria-label="Bobine : i augmente, la f.é.m. e s'y oppose" style="max-width:560px;margin:8px auto;display:block">
+        <text x="260" y="18" text-anchor="middle" style="fill:rgba(224,184,74,0.95);font-size:12.5px;font-family:Inter, system-ui, sans-serif">Ici i augmente : la bobine réagit</text>
+        <line x1="40" y1="105" x2="130" y2="105" style="stroke:rgba(255,255,255,0.6);stroke-width:2"/>
+        <path d="M130 105 q16 -32 32 0 q16 -32 32 0 q16 -32 32 0 q16 -32 32 0 q16 -32 32 0 q16 -32 32 0" style="fill:none;stroke:var(--accent-bright);stroke-width:3"/>
+        <line x1="322" y1="105" x2="480" y2="105" style="stroke:rgba(255,255,255,0.6);stroke-width:2"/>
+        <line x1="46" y1="64" x2="114" y2="64" style="stroke:var(--accent-bright);stroke-width:2"/>
+        <path d="M128 64 L114 59 L114 69 z" style="fill:var(--accent-bright)"/>
+        <text x="136" y="68" style="fill:rgba(224,184,74,0.95);font-size:12px;font-style:italic;font-family:Inter, system-ui, sans-serif">i augmente (Δi &gt; 0)</text>
+        <line x1="474" y1="64" x2="406" y2="64" style="stroke:rgba(255,255,255,0.85);stroke-width:2"/>
+        <path d="M392 64 L406 59 L406 69 z" style="fill:rgba(255,255,255,0.85)"/>
+        <text x="384" y="68" text-anchor="end" style="fill:rgba(255,255,255,0.85);font-size:12px;font-style:italic;font-family:Inter, system-ui, sans-serif">e s'y oppose</text>
+        <text x="260" y="150" text-anchor="middle" style="fill:rgba(255,255,255,0.75);font-size:11.5px;font-family:Inter, system-ui, sans-serif">e = −L·(Δi/Δt) : le signe « − » veut dire que e s'oppose à la hausse de i</text>
+        <text x="260" y="176" text-anchor="middle" style="fill:rgba(255,255,255,0.55);font-size:10.5px;font-family:Inter, system-ui, sans-serif">Si i diminue, e agit dans le même sens que i : toujours contre la variation.</text>
+      </svg>
+      <div class="lecture-example-content">
+        <p class="lecture-example-label">🧪 Exemple travaillé — Calculer une f.é.m. moyenne</p>
+        <p class="lecture-text">Une bobine d'inductance <span class="math">L</span> = 0,20 <span class="math">H</span> voit son courant passer de 1,0 <span class="math">A</span> à 3,0 <span class="math">A</span> en 0,40 <span class="math">s</span>. Calcule la f.é.m. moyenne d'auto-induction.</p>
+        <div class="lecture-steps">
+          <div class="lecture-step"><span class="lecture-step-number">1</span><p class="lecture-text">Données : <span class="math">Δi</span> = 3,0 − 1,0 = 2,0 <span class="math">A</span> ; <span class="math">Δt</span> = 0,40 <span class="math">s</span> ; <span class="math">L</span> = 0,20 <span class="math">H</span>.</p></div>
+          <div class="lecture-step"><span class="lecture-step-number">2</span><p class="lecture-text">Variation par unité de temps : <span class="math">Δi/Δt</span> = 2,0/0,40 = 5,0 <span class="math">A</span>/<span class="math">s</span>.</p></div>
+          <div class="lecture-step"><span class="lecture-step-number">3</span><p class="lecture-text">Valeur : <span class="math">e</span> = 0,20 × 5,0 = 1,0 <span class="math">V</span>.</p></div>
+          <div class="lecture-step"><span class="lecture-step-number">4</span><p class="lecture-text">Double vérification : 2,0/0,40 → 20/4 = 5 ; puis 0,20 × 5,0 → 2 × 5 = 10, deux décimales : 1,0. Le courant augmente, donc <span class="math">e</span> s'oppose à la hausse.</p></div>
+        </div>
+        <p class="lecture-text"><strong>Résultat :</strong> <span class="math">e</span> = 1,0 <span class="math">V</span> en valeur, orientée contre l'augmentation de <span class="math">i</span>.</p>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <p class="lecture-text"><strong>⚠️ Piège d'examen :</strong> le signe « − » ne veut pas dire « résultat négatif » : il code le sens. Écrire « <span class="math">e</span> = −1,0 <span class="math">V</span> » dans un calcul numérique sans convention d'orientation fait perdre des points. Calcule la valeur, puis explique le sens.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s2 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s2">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">02</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2</span>
+        <h2 class="lecture-section-title">Pourquoi ce signe « − » ?</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Le signe « − » de la loi est le cœur du raisonnement : c'est lui qui dit que la bobine résiste au changement, exactement comme une masse résiste au changement de vitesse. Une méthode en deux questions te permet de tout prévoir, sans jamais calculer de vecteur.</p>
+      <div class="lecture-steps">
+        <div class="lecture-step"><span class="lecture-step-number">1</span><p class="lecture-text">Question 1 : le courant augmente-t-il ? Oui → la f.é.m. agit en sens contraire du courant : elle freine son établissement. La montée est ralentie, comme un chariot qu'on lance.</p></div>
+        <div class="lecture-step"><span class="lecture-step-number">2</span><p class="lecture-text">Question 2 : le courant diminue-t-il ? → la f.é.m. agit dans le même sens que le courant : elle retarde sa disparition. La descente est ralentie, comme un chariot qu'on arrête.</p></div>
+        <div class="lecture-step"><span class="lecture-step-number">3</span><p class="lecture-text">Conclusion : dans les deux cas, <span class="math">e</span> s'oppose à la variation, jamais au courant lui-même. C'est la loi de Lenz appliquée à la bobine sur elle-même.</p></div>
+      </div>
+      <p class="lecture-text">La bobine est donc « conservatrice » : établie, elle défend le courant qui existe ; absente, elle défend le zéro. Elle veut garder le statu quo — voilà toute la physique du signe « − ».</p>
+      <div class="lecture-callout lecture-callout-warning">
+        <p class="lecture-text"><strong>⚠️ Piège d'examen :</strong> opposition n'est pas blocage. À la fermeture, le courant finit toujours par s'établir — sinon aucune lampe derrière une bobine ne s'allumerait jamais. L'opposition ralentit, elle n'annule pas.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s3 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s3">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">03</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 3</span>
+        <h2 class="lecture-section-title">Fermeture : le courant prend son temps</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Plaçons une bobine d'inductance <span class="math">L</span> en série avec une résistance <span class="math">R</span>, un générateur de tension <span class="math">E</span> et un interrupteur <span class="math">K</span>. Que se passe-t-il quand on ferme <span class="math">K</span> ? Le courant ne s'installe pas d'un coup : c'est le régime transitoire.</p>
+      <svg viewBox="0 0 520 260" width="100%" role="img" aria-label="Circuit série : générateur E, interrupteur K, résistance R et bobine L" style="max-width:560px;margin:8px auto;display:block">
+        <line x1="60" y1="45" x2="230" y2="45" style="stroke:rgba(255,255,255,0.6);stroke-width:2"/>
+        <circle cx="230" cy="45" r="3" style="fill:rgba(255,255,255,0.8)"/>
+        <circle cx="290" cy="45" r="3" style="fill:rgba(255,255,255,0.8)"/>
+        <line x1="230" y1="45" x2="286" y2="22" style="stroke:var(--accent-bright);stroke-width:2.5"/>
+        <line x1="290" y1="45" x2="460" y2="45" style="stroke:rgba(255,255,255,0.6);stroke-width:2"/>
+        <text x="250" y="16" style="fill:rgba(255,255,255,0.85);font-size:11px;font-style:italic;font-family:Inter, system-ui, sans-serif">K</text>
+        <line x1="460" y1="45" x2="460" y2="205" style="stroke:rgba(255,255,255,0.6);stroke-width:2"/>
+        <line x1="460" y1="205" x2="446" y2="205" style="stroke:rgba(255,255,255,0.6);stroke-width:2"/>
+        <path d="M446 205 l-8 -12 l-14 24 l-14 -24 l-14 24 l-14 -24 l-8 12" style="fill:none;stroke:rgba(255,255,255,0.8);stroke-width:2"/>
+        <line x1="374" y1="205" x2="352" y2="205" style="stroke:rgba(255,255,255,0.6);stroke-width:2"/>
+        <text x="410" y="238" text-anchor="middle" style="fill:rgba(255,255,255,0.9);font-size:12px;font-style:italic;font-family:Inter, system-ui, sans-serif">R</text>
+        <line x1="240" y1="205" x2="60" y2="205" style="stroke:rgba(255,255,255,0.6);stroke-width:2"/>
+        <path d="M240 205 q14 -26 28 0 q14 -26 28 0 q14 -26 28 0 q14 -26 28 0" style="fill:none;stroke:var(--accent-bright);stroke-width:3"/>
+        <text x="296" y="178" text-anchor="middle" style="fill:rgba(224,184,74,0.95);font-size:12px;font-style:italic;font-family:Inter, system-ui, sans-serif">L</text>
+        <text x="296" y="238" text-anchor="middle" style="fill:rgba(255,255,255,0.75);font-size:11px;font-family:Inter, system-ui, sans-serif">bobine</text>
+        <line x1="60" y1="205" x2="60" y2="140" style="stroke:rgba(255,255,255,0.6);stroke-width:2"/>
+        <line x1="45" y1="132" x2="75" y2="132" style="stroke:var(--accent-bright);stroke-width:3"/>
+        <line x1="52" y1="118" x2="68" y2="118" style="stroke:rgba(255,255,255,0.8);stroke-width:2"/>
+        <line x1="60" y1="116" x2="60" y2="45" style="stroke:rgba(255,255,255,0.6);stroke-width:2"/>
+        <text x="30" y="136" style="fill:rgba(255,255,255,0.85);font-size:12px;font-family:Inter, system-ui, sans-serif">+</text>
+        <text x="30" y="112" style="fill:rgba(255,255,255,0.85);font-size:12px;font-family:Inter, system-ui, sans-serif">−</text>
+        <text x="88" y="128" style="fill:rgba(224,184,74,0.95);font-size:12px;font-style:italic;font-family:Inter, system-ui, sans-serif">E</text>
+        <text x="260" y="252" text-anchor="middle" style="fill:rgba(255,255,255,0.6);font-size:11px;font-family:Inter, system-ui, sans-serif">On ferme K : l'intensité i met du temps à s'installer.</text>
+      </svg>
+      <div class="lecture-callout lecture-callout-key">
+        <p class="lecture-text"><strong>Définition :</strong> le régime transitoire est la période pendant laquelle l'intensité passe progressivement d'une valeur à une autre. Avec une bobine, toute fermeture et toute ouverture déclenchent un régime transitoire.</p>
+      </div>
+      <div class="lecture-steps">
+        <div class="lecture-step"><span class="lecture-step-number">1</span><p class="lecture-text">Juste après la fermeture : le courant démarre de zéro et veut croître. La bobine s'y oppose — <span class="math">e</span> freine l'établissement, l'intensité reste faible au début.</p></div>
+        <div class="lecture-step"><span class="lecture-step-number">2</span><p class="lecture-text">Ensuite : plus <span class="math">i</span> grandit, moins il varie vite. L'opposition de la bobine faiblit et <span class="math">e</span> décroît : l'intensité continue de monter, de plus en plus doucement.</p></div>
+        <div class="lecture-step"><span class="lecture-step-number">3</span><p class="lecture-text">Enfin : <span class="math">i</span> ne varie plus. On a <span class="math">e</span> = 0 : la bobine ne joue plus aucun rôle, seul <span class="math">R</span> limite le courant. C'est le régime permanent.</p></div>
+      </div>
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero"><span class="math">i → E/R</span></div>
+        <p class="lecture-formula-hero-desc">valeur finale de l'intensité : en régime permanent, la bobine est « transparente » et seule la résistance <span class="math">R</span> compte. Ici <span class="math">E</span> est la tension du générateur, <span class="math">R</span> la résistance du circuit.</p>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <p class="lecture-text"><strong>⚠️ Piège d'examen :</strong> à la fermeture, <span class="math">i</span> part de 0 et grimpe en douceur — jamais de saut instantané du courant dans une bobine. Et la valeur finale vaut <span class="math">E/R</span>, pas <span class="math">E/L</span> !</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s4 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s4">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">04</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 3 · suite</span>
+        <h2 class="lecture-section-title">La courbe i(t) et la constante de temps</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">La montée de <span class="math">i</span> suit une courbe bien précise, une exponentielle croissante, réglée par un seul nombre : la constante de temps <span class="math">τ</span>. C'est elle qui dit si le transitoire dure un éclair ou plusieurs secondes.</p>
+      <svg viewBox="0 0 540 268" width="100%" role="img" aria-label="Courbe exponentielle croissante de i(t) avec asymptote E/R et constante de temps" style="max-width:560px;margin:8px auto;display:block">
+        <line x1="70" y1="220" x2="490" y2="220" style="stroke:rgba(255,255,255,0.6);stroke-width:2"/>
+        <path d="M500 220 L486 215 L486 225 z" style="fill:rgba(255,255,255,0.6)"/>
+        <line x1="70" y1="220" x2="70" y2="40" style="stroke:rgba(255,255,255,0.6);stroke-width:2"/>
+        <path d="M70 32 L65 46 L75 46 z" style="fill:rgba(255,255,255,0.6)"/>
+        <text x="497" y="240" text-anchor="end" style="fill:rgba(255,255,255,0.8);font-size:11px;font-style:italic;font-family:Inter, system-ui, sans-serif">t</text>
+        <text x="55" y="50" text-anchor="end" style="fill:rgba(255,255,255,0.8);font-size:11px;font-style:italic;font-family:Inter, system-ui, sans-serif">i</text>
+        <line x1="70" y1="80" x2="480" y2="80" style="stroke:rgba(224,184,74,0.8);stroke-width:1.5;stroke-dasharray:6 5"/>
+        <text x="478" y="72" text-anchor="end" style="fill:rgba(224,184,74,0.95);font-size:11.5px;font-family:Inter, system-ui, sans-serif">asymptote : E/R</text>
+        <path d="M70 220 C110 218 135 175 170 132 C210 92 260 82 330 80.5 C380 80 430 80 470 80" style="fill:none;stroke:var(--accent-bright);stroke-width:3"/>
+        <line x1="170" y1="220" x2="170" y2="132" style="stroke:rgba(255,255,255,0.5);stroke-width:1.5;stroke-dasharray:4 4"/>
+        <line x1="70" y1="132" x2="170" y2="132" style="stroke:rgba(255,255,255,0.5);stroke-width:1.5;stroke-dasharray:4 4"/>
+        <circle cx="170" cy="132" r="4" style="fill:var(--accent-bright)"/>
+        <text x="170" y="240" text-anchor="middle" style="fill:rgba(224,184,74,0.95);font-size:11.5px;font-family:Inter, system-ui, sans-serif">τ = L/R</text>
+        <text x="64" y="136" text-anchor="end" style="fill:rgba(255,255,255,0.85);font-size:10.5px;font-family:Inter, system-ui, sans-serif">0,63·E/R</text>
+        <text x="260" y="262" text-anchor="middle" style="fill:rgba(255,255,255,0.6);font-size:11px;font-family:Inter, system-ui, sans-serif">Exponentielle croissante : montée rapide au début, puis asymptote E/R.</text>
+      </svg>
+      <div class="lecture-callout lecture-callout-key">
+        <p class="lecture-text"><strong>Définition :</strong> la constante de temps du circuit résistance + bobine vaut <span class="math">τ = L/R</span>. C'est la durée caractéristique du régime transitoire : à <span class="math">t</span> = <span class="math">τ</span>, l'intensité a atteint environ 63 % de sa valeur finale <span class="math">E/R</span> ; à <span class="math">t</span> = 5<span class="math">τ</span>, le régime permanent est pratiquement établi.</p>
+      </div>
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero"><span class="math">τ = L/R</span></div>
+        <p class="lecture-formula-hero-desc"><span class="math">L</span> en henrys (<span class="math">H</span>), <span class="math">R</span> en ohms (<span class="math">Ω</span>), <span class="math">τ</span> en secondes (<span class="math">s</span>). Grande bobine ou petite résistance → transitoire lent.</p>
+      </div>
+      <div class="lecture-formula-box">
+        <p class="lecture-text"><strong>Repères à connaître par cœur :</strong> à <span class="math">t</span> = <span class="math">τ</span> : <span class="math">i</span> ≈ 0,63·<span class="math">E/R</span> (63 %) ; à <span class="math">t</span> = 5<span class="math">τ</span> : <span class="math">i</span> ≈ 0,99·<span class="math">E/R</span> (99 %).</p>
+      </div>
+      <div class="lecture-example-content">
+        <p class="lecture-example-label">🧪 Exemple travaillé — Repères sur la courbe</p>
+        <p class="lecture-text">Un circuit série comporte un générateur <span class="math">E</span> = 12 <span class="math">V</span>, une résistance <span class="math">R</span> = 40 <span class="math">Ω</span> et une bobine <span class="math">L</span> = 2,0 <span class="math">H</span>. a) Quelle est l'intensité finale ? b) Quelle est la constante de temps ? c) Quelle est l'intensité à <span class="math">t</span> = <span class="math">τ</span> ?</p>
+        <div class="lecture-steps">
+          <div class="lecture-step"><span class="lecture-step-number">1</span><p class="lecture-text">a) Valeur finale : <span class="math">E/R</span> = 12/40 = 0,30 <span class="math">A</span>.</p></div>
+          <div class="lecture-step"><span class="lecture-step-number">2</span><p class="lecture-text">b) Constante de temps : <span class="math">τ</span> = <span class="math">L/R</span> = 2,0/40 = 0,050 <span class="math">s</span>.</p></div>
+          <div class="lecture-step"><span class="lecture-step-number">3</span><p class="lecture-text">c) À <span class="math">t</span> = <span class="math">τ</span> : <span class="math">i</span> ≈ 0,63 × 0,30 = 0,19 <span class="math">A</span>.</p></div>
+          <div class="lecture-step"><span class="lecture-step-number">4</span><p class="lecture-text">Vérifications : 12/40 → 12/4 = 3, donc 0,30 ; 2,0/40 = 2/40 = 0,05 ; 0,63 × 0,30 = 0,189 ≈ 0,19. Le transitoire durera environ 5<span class="math">τ</span> = 0,25 <span class="math">s</span>.</p></div>
+        </div>
+        <p class="lecture-text"><strong>Résultat :</strong> intensité finale 0,30 <span class="math">A</span> ; <span class="math">τ</span> = 0,050 <span class="math">s</span> ; intensité à <span class="math">t</span> = <span class="math">τ</span> : ≈ 0,19 <span class="math">A</span>.</p>
+      </div>
+      <div class="lecture-text">
+        <p class="lecture-exercise-label">💪 Exercice 1 — Le transitoire de bout en bout</p>
+        <p class="lecture-text"><strong>Énoncé.</strong> Un circuit résistance + bobine comporte <span class="math">E</span> = 6,0 <span class="math">V</span>, <span class="math">R</span> = 30 <span class="math">Ω</span> et <span class="math">L</span> = 0,90 <span class="math">H</span>. a) Calcule l'intensité finale. b) Calcule <span class="math">τ</span>. c) Au bout de combien de temps le régime permanent est-il pratiquement établi ?</p>
+        <p class="lecture-text"><strong>Solution pas à pas :</strong></p>
+        <div class="lecture-steps">
+          <div class="lecture-step"><span class="lecture-step-number">1</span><p class="lecture-text">a) Intensité finale : <span class="math">E/R</span> = 6,0/30 = 0,20 <span class="math">A</span>.</p></div>
+          <div class="lecture-step"><span class="lecture-step-number">2</span><p class="lecture-text">b) Constante de temps : <span class="math">τ</span> = <span class="math">L/R</span> = 0,90/30 = 0,030 <span class="math">s</span>.</p></div>
+          <div class="lecture-step"><span class="lecture-step-number">3</span><p class="lecture-text">c) Le régime permanent est pratiquement atteint à <span class="math">t</span> ≈ 5<span class="math">τ</span> = 5 × 0,030 = 0,15 <span class="math">s</span>.</p></div>
+          <div class="lecture-step"><span class="lecture-step-number">4</span><p class="lecture-text">Vérifications : 6,0/30 → 6/30 = 0,2 ; 0,90/30 → 90/30 = 3, donc 0,030 ; 5 × 0,030 → 5 × 3 = 15, trois décimales : 0,15. Tout est cohérent.</p></div>
+          <div class="lecture-step"><span class="lecture-step-number">5</span><p class="lecture-text">Lecture physique : en 0,15 <span class="math">s</span> — un clin d'œil — la bobine a « lâché prise » ; au-delà, seule la résistance commande le courant.</p></div>
+        </div>
+        <div class="lecture-callout lecture-callout-key">
+          <p class="lecture-text"><strong>Résultat :</strong> a) 0,20 <span class="math">A</span> ; b) <span class="math">τ</span> = 0,030 <span class="math">s</span> ; c) ≈ 0,15 <span class="math">s</span>.</p>
+        </div>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <p class="lecture-text"><strong>⚠️ Piège d'examen :</strong> <span class="math">τ = L/R</span> est une division ! L'erreur classique est d'écrire <span class="math">τ = L·R</span>. Contrôle rapide : <span class="math">L/R</span> doit donner des secondes, jamais des henry-ohms.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s5 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s5">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">05</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 4</span>
+        <h2 class="lecture-section-title">Ouverture : étincelle et surtension</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Maintenant, le moment dramatique : l'ouverture. À la fermeture, la bobine ralentissait une montée ; à l'ouverture, elle doit accepter une chute presque instantanée — et c'est là qu'elle frappe fort.</p>
+      <svg viewBox="0 0 520 250" width="100%" role="img" aria-label="Ouverture du circuit : étincelle à l'interrupteur et chute rapide du courant" style="max-width:560px;margin:8px auto;display:block">
+        <line x1="60" y1="60" x2="136" y2="60" style="stroke:rgba(255,255,255,0.6);stroke-width:2"/>
+        <circle cx="140" cy="60" r="3" style="fill:rgba(255,255,255,0.8)"/>
+        <circle cx="200" cy="60" r="3" style="fill:rgba(255,255,255,0.8)"/>
+        <line x1="140" y1="60" x2="196" y2="36" style="stroke:var(--accent-bright);stroke-width:2.5"/>
+        <line x1="204" y1="60" x2="250" y2="60" style="stroke:rgba(255,255,255,0.6);stroke-width:2"/>
+        <polyline points="198,50 210,42 202,36 220,38 212,30 228,32" style="fill:none;stroke:var(--accent-bright);stroke-width:2"/>
+        <text x="252" y="30" style="fill:rgba(224,184,74,0.95);font-size:11px;font-family:Inter, system-ui, sans-serif">étincelle !</text>
+        <text x="168" y="20" text-anchor="middle" style="fill:rgba(255,255,255,0.85);font-size:11px;font-style:italic;font-family:Inter, system-ui, sans-serif">K</text>
+        <line x1="250" y1="60" x2="250" y2="190" style="stroke:rgba(255,255,255,0.6);stroke-width:2"/>
+        <line x1="250" y1="190" x2="142" y2="190" style="stroke:rgba(255,255,255,0.6);stroke-width:2"/>
+        <line x1="128" y1="190" x2="60" y2="190" style="stroke:rgba(255,255,255,0.6);stroke-width:2"/>
+        <line x1="130" y1="175" x2="130" y2="205" style="stroke:var(--accent-bright);stroke-width:3"/>
+        <line x1="140" y1="182" x2="140" y2="198" style="stroke:rgba(255,255,255,0.8);stroke-width:2"/>
+        <text x="135" y="222" text-anchor="middle" style="fill:rgba(255,255,255,0.85);font-size:11px;font-style:italic;font-family:Inter, system-ui, sans-serif">E</text>
+        <line x1="60" y1="190" x2="60" y2="164" style="stroke:rgba(255,255,255,0.6);stroke-width:2"/>
+        <path d="M60 160 a10 10 0 1 0 0 20 a10 10 0 1 0 0 20" style="fill:none;stroke:var(--accent-bright);stroke-width:2.5"/>
+        <text x="38" y="132" text-anchor="end" style="fill:rgba(255,255,255,0.75);font-size:10.5px;font-family:Inter, system-ui, sans-serif">bobine</text>
+        <line x1="300" y1="190" x2="500" y2="190" style="stroke:rgba(255,255,255,0.6);stroke-width:2"/>
+        <path d="M508 190 L494 185 L494 195 z" style="fill:rgba(255,255,255,0.6)"/>
+        <line x1="300" y1="190" x2="300" y2="70" style="stroke:rgba(255,255,255,0.6);stroke-width:2"/>
+        <path d="M300 62 L295 76 L305 76 z" style="fill:rgba(255,255,255,0.6)"/>
+        <text x="290" y="80" text-anchor="end" style="fill:rgba(255,255,255,0.8);font-size:11px;font-style:italic;font-family:Inter, system-ui, sans-serif">i</text>
+        <path d="M300 95 C318 96 322 150 342 175 C365 187 400 190 430 190" style="fill:none;stroke:var(--accent-bright);stroke-width:3"/>
+        <text x="496" y="88" text-anchor="end" style="fill:rgba(255,255,255,0.7);font-size:10.5px;font-family:Inter, system-ui, sans-serif">avant ouverture</text>
+        <text x="400" y="212" text-anchor="middle" style="fill:rgba(255,255,255,0.65);font-size:10.5px;font-family:Inter, system-ui, sans-serif">à l'ouverture, i chute très vite</text>
+        <text x="400" y="232" text-anchor="middle" style="fill:rgba(224,184,74,0.95);font-size:11.5px;font-family:Inter, system-ui, sans-serif">Δt minuscule → e = L·|Δi/Δt| gigantesque</text>
+      </svg>
+      <p class="lecture-text">À l'ouverture, le courant doit passer de sa valeur à zéro en quelques millièmes de seconde. La variation de <span class="math">i</span> par unité de temps devient énorme, donc <span class="math">e = L·|Δi/Δt|</span> devient énorme aussi : c'est une surtension. C'est elle qui ionise l'air entre les contacts de l'interrupteur — l'étincelle.</p>
+      <div class="lecture-steps">
+        <div class="lecture-step"><span class="lecture-step-number">1</span><p class="lecture-text">Avant l'ouverture : <span class="math">i</span> = 2,0 <span class="math">A</span> circule tranquillement ; la bobine a accumulé quelque chose pendant l'établissement (on le chiffrera en partie 03).</p></div>
+        <div class="lecture-step"><span class="lecture-step-number">2</span><p class="lecture-text">On ouvre : le courant veut tomber à 0 en environ 1 <span class="math">ms</span>. La bobine s'oppose : elle génère une surtension de plusieurs centaines de volts.</p></div>
+        <div class="lecture-step"><span class="lecture-step-number">3</span><p class="lecture-text">Résultat : l'air claque, l'étincelle jaillit, et le courant s'annule quand même. La bobine a perdu la bataille finale, mais elle a marqué les esprits.</p></div>
+      </div>
+      <div class="lecture-text">
+        <p class="lecture-exercise-label">💪 Exercice 2 — Chiffrer la surtension</p>
+        <p class="lecture-text"><strong>Énoncé.</strong> Une bobine d'inductance <span class="math">L</span> = 0,50 <span class="math">H</span> est traversée par un courant de 2,0 <span class="math">A</span>. On ouvre le circuit et le courant tombe à zéro en 1,0 <span class="math">ms</span>. Calcule la f.é.m. moyenne d'auto-induction pendant l'ouverture.</p>
+        <p class="lecture-text"><strong>Solution pas à pas :</strong></p>
+        <div class="lecture-steps">
+          <div class="lecture-step"><span class="lecture-step-number">1</span><p class="lecture-text">Données : <span class="math">Δi</span> = 2,0 <span class="math">A</span> (de 2,0 <span class="math">A</span> à 0) ; <span class="math">Δt</span> = 1,0 <span class="math">ms</span> = 0,0010 <span class="math">s</span> ; <span class="math">L</span> = 0,50 <span class="math">H</span>.</p></div>
+          <div class="lecture-step"><span class="lecture-step-number">2</span><p class="lecture-text">Variation par unité de temps : <span class="math">Δi/Δt</span> = 2,0/0,0010 = 2000 <span class="math">A</span>/<span class="math">s</span>.</p></div>
+          <div class="lecture-step"><span class="lecture-step-number">3</span><p class="lecture-text">Valeur : <span class="math">e</span> = 0,50 × 2000 = 1000 <span class="math">V</span>.</p></div>
+          <div class="lecture-step"><span class="lecture-step-number">4</span><p class="lecture-text">Vérifications : 2,0/0,0010 → multiplier par 1000 donne 2000 ; 0,50 × 2000 → 5 × 200 = 1000. Deux fois le même résultat.</p></div>
+          <div class="lecture-step"><span class="lecture-step-number">5</span><p class="lecture-text">Conclusion : 1000 <span class="math">V</span> à partir d'un circuit de quelques volts ! Voilà la surtension d'ouverture — et l'étincelle expliquée.</p></div>
+        </div>
+        <div class="lecture-callout lecture-callout-key">
+          <p class="lecture-text"><strong>Résultat :</strong> <span class="math">e</span> ≈ 1000 <span class="math">V</span>.</p>
+        </div>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <p class="lecture-text"><strong>⚠️ Piège d'examen :</strong> conversion obligatoire : 1,0 <span class="math">ms</span> = 0,0010 <span class="math">s</span>. Calculer avec « 1,0 » au lieu de 0,0010 donne 1,0 <span class="math">V</span> au lieu de 1000 <span class="math">V</span> : mille fois faux !</p>
+      </div>
+      <table class="lecture-table">
+        <thead>
+          <tr><th>Moment</th><th>Ce que fait i</th><th>Rôle de la bobine</th><th>Effet visible</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Fermeture de K</td><td><span class="math">i</span> croît de 0 vers <span class="math">E/R</span></td><td>elle freine l'établissement</td><td>la lampe s'allume en retard</td></tr>
+          <tr><td>Régime établi</td><td><span class="math">i</span> = <span class="math">E/R</span>, constant</td><td>elle ne fait plus rien (<span class="math">e</span> = 0)</td><td>rien de visible</td></tr>
+          <tr><td>Ouverture de K</td><td><span class="math">i</span> chute vers 0 très vite</td><td>elle s'oppose à la chute : surtension</td><td>étincelle à l'interrupteur</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+  <!-- ===== QCM ===== -->
+  <div class="lecture-quiz">
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">La constante de temps d'un circuit résistance + bobine vaut :</p>
+      <div class="lecture-quiz-options"><span>A) τ = L·R</span><span>B) τ = R/L</span><span>C) τ = L/R</span><span>D) τ = L + R</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">C. <span class="math">τ = L/R</span>, avec <span class="math">L</span> en <span class="math">H</span> et <span class="math">R</span> en <span class="math">Ω</span>, donne bien des secondes. Vérifie toujours cette cohérence d'unités.</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">À t = τ après la fermeture, l'intensité atteint environ :</p>
+      <div class="lecture-quiz-options"><span>A) 0 % de sa valeur finale</span><span>B) 37 %</span><span>C) 63 %</span><span>D) 100 %</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">C. À <span class="math">t</span> = <span class="math">τ</span> : <span class="math">i</span> ≈ 0,63·<span class="math">E/R</span>. Et à 5<span class="math">τ</span>, le régime permanent est pratiquement atteint (≈ 99 %).</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">L'étincelle observée à l'ouverture d'un circuit bobiné s'explique par :</p>
+      <div class="lecture-quiz-options"><span>A) la résistance des fils</span><span>B) la surtension créée par la variation très rapide du courant</span><span>C) le générateur</span><span>D) l'usure de l'interrupteur</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">B. <span class="math">Δt</span> minuscule ⇒ <span class="math">Δi/Δt</span> énorme ⇒ <span class="math">e = L·|Δi/Δt|</span> gigantesque : l'air claque entre les contacts.</div></details>
+    </div>
+  </div>
+  <!-- ===== RÉCAP ===== -->
+  <div class="lecture-recap">
+    <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
+    <ul class="lecture-recap-list">
+      <li><strong>Loi</strong> : <span class="math">e = −L·(Δi/Δt)</span> ; le « − » signifie opposition à la variation ; en valeur : <span class="math">e = L·|Δi/Δt|</span>.</li>
+      <li><strong>Fermeture</strong> : <span class="math">i</span> croît de 0 vers <span class="math">E/R</span> avec <span class="math">τ = L/R</span> ; 63 % à <span class="math">t</span> = <span class="math">τ</span> ; transitoire fini à 5<span class="math">τ</span>.</li>
+      <li><strong>Ouverture</strong> : <span class="math">Δt</span> minuscule ⇒ <span class="math">e</span> gigantesque ⇒ surtension et étincelle.</li>
+    </ul>
+  </div>
+  <!-- ===== FIN ===== -->
+  <div class="lecture-end">
+    <div class="lecture-end-icon">🎯</div>
+    <div class="lecture-end-text">Partie 02 terminée !</div>
+    <div class="lecture-end-sub">La bobine tenait donc quelque chose pour résister si longtemps ? Partie 03 : on met un nom et un nombre sur ce trésor — l'énergie.</div>
+    <div class="lecture-end-divider"></div>
+  </div>
+</div>

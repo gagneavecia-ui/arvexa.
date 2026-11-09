@@ -1,0 +1,448 @@
+<!-- PARTIE 02 — Vecteur tournant & Représentations graphiques (Mouvement vibratoire) -->
+<div class="lecture-container">
+
+  <!-- ===== HERO ===== -->
+  <header class="lecture-hero">
+    <div class="lecture-hero-badge">
+      <span class="lecture-hero-icon">📘</span>
+      <span class="lecture-hero-label">Terminale C&D · Mouvement vibratoire · Partie 02</span>
+    </div>
+    <h1 class="lecture-hero-title">
+      Vecteur tournant <em>& Représentations graphiques</em>
+    </h1>
+    <p class="lecture-hero-intro">
+      Une équation ne suffit pas toujours : le physicien veut voir le mouvement. Dans cette partie, tu apprends à tracer et à lire la courbe x(t), à construire le vecteur tournant de Fresnel, à comparer deux oscillations déphasées, puis à calculer la vitesse et l'accélération du vibreur. Deux outils, une même mécanique : dériver pour passer de x à v, puis de v à a.
+    </p>
+    <div class="lecture-hero-meta">
+      <span class="lecture-hero-meta-item">⏱ 25 min</span>
+      <span class="lecture-hero-meta-item">⚡ 5 notions</span>
+      <span class="lecture-hero-meta-item">📚 6 sections</span>
+      <span class="lecture-hero-meta-item">🎓 Terminale C&D</span>
+    </div>
+  </header>
+  <!-- ===== SOMMAIRE ===== -->
+  <nav class="lecture-toc">
+    <div class="lecture-toc-header">
+      <span>Dans cette partie</span>
+      <span class="lecture-toc-count">5 notions · 6 sections</span>
+    </div>
+    <ol class="lecture-toc-list">
+      <li><a href="#s0"><span class="toc-num">00</span><span>Voir la vibration sur un écran</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>Lire la courbe x(t)</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>Le vecteur tournant (Fresnel)</span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>Déphasage et retard</span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>Vitesse du vibreur : v = dx/dt</span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>Accélération : a = −ω²·x</span></a></li>
+    </ol>
+  </nav>
+  <!-- ============================================================ -->
+  <!-- SECTION s0 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s0">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">00</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Motivation</span>
+        <h2 class="lecture-section-title">Voir la vibration sur un écran</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">À l'hôpital, l'infirmier ne compte pas les battements de ton cœur un par un : il regarde la courbe de l'électrocardiogramme et lit tout d'un coup d'œil — le rythme, la régularité, les anomalies. Le sismographe de Niamey fait pareil avec les secousses du sol, et l'oscilloscope du laboratoire avec ton vibreur : tous transforment une vibration en une courbe que l'œil comprend instantanément.</p>
+      <p class="lecture-text">Cette partie te rend capable de lire ces courbes comme un professionnel : repérer l'amplitude, la période, la phase, puis comparer deux courbes entre elles. Et quand une courbe ne suffit plus, tu disposeras d'une seconde représentation, le vecteur tournant, qui donne au mouvement vibratoire l'image d'un rayon qui tourne tranquillement.</p>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s1 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s1">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">01</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1</span>
+        <h2 class="lecture-section-title">Lire la courbe x(t)</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">La courbe de l'élongation est le portrait complet du mouvement : le temps en abscisse, la position en ordonnée. Trois informations s'y lisent directement, à condition de savoir où poser les yeux. C'est l'exercice le plus demandé du chapitre — maîtrise-le une fois pour toutes.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-title">📖 Définition officielle</div>
+        <p class="lecture-text">La <strong>représentation graphique de x(t)</strong> est une sinusoïde. On y lit : l'<strong>amplitude</strong> <span class="math">xₘ</span>, égale à l'ordonnée d'un sommet ; la <strong>période</strong> <span class="math">T</span>, égale à l'écart de temps entre deux sommets successifs ; la <strong>phase à l'origine</strong> <span class="math">φ</span>, déduite de la valeur initiale <span class="math">x(0) = xₘ·cos(φ)</span>.</p>
+      </div>
+      <p class="lecture-text">Intuition : le sommet te dit « jusqu'où » (xₘ), l'écart entre deux sommets te dit « en combien de temps le cycle recommence » (T), et la hauteur au départ te dit « où était le mobile quand on a allumé le chrono » (φ).</p>
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-main">🧭 La clé de la lecture de φ</div>
+        <div class="lecture-formula-hero-main"><span class="math">x(0) = xₘ·cos(φ)</span> donc <span class="math">cos(φ) = x(0)/xₘ</span></div>
+        <p class="lecture-formula-hero">Si deux candidats sont possibles pour <span class="math">φ</span>, tranche avec le sens du mouvement juste après <span class="math">t = 0</span> : courbe descendante → <span class="math">φ = +π/2</span>, courbe montante → <span class="math">φ = −π/2</span>.</p>
+      </div>
+      <svg viewBox="0 0 760 300" role="img" aria-label="Sinusoide annotee avec amplitude, periode et phase a l'origine" class="math">
+        <line x1="40" y1="150" x2="740" y2="150" style="stroke:rgba(148,163,184,0.8)" stroke-width="2"/>
+        <polygon points="740,150 728,144 728,156" fill="rgba(148,163,184,0.8)"/>
+        <line x1="60" y1="280" x2="60" y2="30" style="stroke:rgba(148,163,184,0.8)" stroke-width="2"/>
+        <polygon points="60,30 54,42 66,42" fill="rgba(148,163,184,0.8)"/>
+        <text x="726" y="172" font-size="13" fill="rgba(148,163,184,0.9)">t</text>
+        <text x="70" y="44" font-size="13" fill="rgba(148,163,184,0.9)">x</text>
+        <line x1="60" y1="70" x2="740" y2="70" style="stroke:rgba(148,163,184,0.4)" stroke-width="1.5" stroke-dasharray="4 5"/>
+        <line x1="60" y1="230" x2="740" y2="230" style="stroke:rgba(148,163,184,0.4)" stroke-width="1.5" stroke-dasharray="4 5"/>
+        <text x="676" y="62" font-size="12" fill="rgba(148,163,184,0.9)">+xₘ = 2,0 cm</text>
+        <text x="676" y="246" font-size="12" fill="rgba(148,163,184,0.9)">−xₘ</text>
+        <path d="M-20,70 C60,70 60,230 140,230 C220,230 220,70 300,70 C380,70 380,230 460,230 C540,230 540,70 620,70 C700,70 700,230 780,230" style="stroke:var(--accent-bright)" stroke-width="3" fill="none"/>
+        <line x1="48" y1="70" x2="48" y2="150" style="stroke:rgba(252,211,77,0.95)" stroke-width="2"/>
+        <polygon points="48,70 42,82 54,82" fill="rgba(252,211,77,0.95)"/>
+        <polygon points="48,150 42,138 54,138" fill="rgba(252,211,77,0.95)"/>
+        <text x="26" y="115" font-size="13" fill="rgba(252,211,77,0.95)">xₘ</text>
+        <line x1="300" y1="55" x2="300" y2="250" style="stroke:rgba(52,211,153,0.7)" stroke-width="1.5" stroke-dasharray="4 5"/>
+        <line x1="620" y1="55" x2="620" y2="250" style="stroke:rgba(52,211,153,0.7)" stroke-width="1.5" stroke-dasharray="4 5"/>
+        <line x1="300" y1="48" x2="620" y2="48" style="stroke:rgba(52,211,153,0.95)" stroke-width="2"/>
+        <polygon points="620,48 608,42 608,54" fill="rgba(52,211,153,0.95)"/>
+        <polygon points="300,48 312,42 312,54" fill="rgba(52,211,153,0.95)"/>
+        <text x="460" y="38" text-anchor="middle" font-size="13" fill="rgba(52,211,153,0.95)">T = 4,0 s</text>
+        <circle cx="60" cy="150" r="5" fill="rgba(248,113,113,0.95)"/>
+        <text x="72" y="262" font-size="12" fill="rgba(248,113,113,0.95)">x(0) = 0, la courbe descend → φ = +π/2</text>
+      </svg>
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">✍️ Exemple travaillé — de la courbe à l'équation</div>
+        <p class="lecture-example-content">Sur la courbe ci-dessus : le sommet atteint +2,0 cm, deux sommets successifs sont espacés de 4,0 s, et à <span class="math">t = 0</span> la courbe part de 0 en descendant. Retrouver <span class="math">xₘ</span>, <span class="math">T</span>, <span class="math">φ</span> et écrire <span class="math">x(t)</span>.</p>
+        <div class="lecture-steps">
+          <div class="lecture-step"><span class="lecture-step-number">1</span><p class="lecture-step-content">Amplitude : le sommet vaut <span class="math">+2,0 cm</span> et le creux <span class="math">−2,0 cm</span> → <span class="math">xₘ = 2,0 cm</span>.</p></div>
+          <div class="lecture-step"><span class="lecture-step-number">2</span><p class="lecture-step-content">Période : <span class="math">T = 4,0 s</span> → pulsation <span class="math">ω = 2π/T = 6,28/4,0 = 1,57 rad·s⁻¹</span>.</p></div>
+          <div class="lecture-step"><span class="lecture-step-number">3</span><p class="lecture-step-content">Phase : la courbe part de <span class="math">x(0) = 0</span> → <span class="math">cos(φ) = 0</span> → <span class="math">φ = +π/2</span> ou <span class="math">−π/2</span>.</p></div>
+          <div class="lecture-step"><span class="lecture-step-number">4</span><p class="lecture-step-content">Juste après <span class="math">t = 0</span>, la courbe descend → <span class="math">φ = +π/2</span>.</p></div>
+          <div class="lecture-step"><span class="lecture-step-number">5</span><p class="lecture-step-content">Équation : <span class="math">x(t) = 2,0·cos(1,57·t + π/2)</span> (x en cm, t en s). Vérification : à <span class="math">t = 1,0 s</span>, l'argument vaut <span class="math">1,57 + π/2 = π</span> → <span class="math">x = −2,0 cm</span> : le creux est bien à 1,0 s sur la courbe ✓.</p></div>
+        </div>
+        <p class="lecture-example-content">✔ Réponse : <span class="math">xₘ = 2,0 cm</span> ; <span class="math">T = 4,0 s</span> ; <span class="math">φ = +π/2</span> ; <span class="math">x(t) = 2,0·cos(1,57·t + π/2)</span> cm.</p>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-title">⚠️ Piège d'examen</div>
+        <p class="lecture-text">L'écart entre un sommet et le creux voisin vaut <span class="math">T/2</span>, pas <span class="math">T</span> ! Vérifie toujours que tes deux points de lecture sont « identiques » (deux sommets, ou deux passages par zéro dans le même sens). Et attention aux unités des axes : la période se lit en secondes de l'axe du temps, l'amplitude en cm ou mm de l'axe vertical.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s2 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s2">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">02</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2</span>
+        <h2 class="lecture-section-title">Le vecteur tournant (Fresnel)</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Voici une image qui simplifie tout : un cheval de manège qui tourne à vitesse constante. Vu de côté, il semble monter et descendre, aller et retour : exactement comme notre masse. Le vecteur tournant de Fresnel fait tourner ce manège au service du physicien.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-title">📖 Définition officielle</div>
+        <p class="lecture-text">Le <strong>vecteur tournant</strong> (méthode de Fresnel simplifiée) est un vecteur <span class="math">OM</span> de norme <span class="math">xₘ</span> qui tourne dans le sens trigonométrique à la vitesse angulaire constante <span class="math">ω</span>. À <span class="math">t = 0</span>, il fait un angle <span class="math">φ</span> avec l'axe (Ox). L'angle qu'il forme à l'instant t vaut <span class="math">θ = ω·t + φ</span>, et la projection de M sur (Ox) donne l'élongation : <span class="math">x = xₘ·cos(θ)</span>.</p>
+      </div>
+      <p class="lecture-text">Intuition : la projection écrase le cercle sur un axe. Le rayon passe de <span class="math">+xₘ</span> (horizontal à droite) à 0 (vertical) puis à <span class="math">−xₘ</span> (horizontal à gauche), exactement comme l'élongation du vibreur entre ses positions extrêmes et son équilibre.</p>
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">Le dictionnaire cercle ↔ mouvement</div>
+        <p class="lecture-formula-main"><span class="math">θ = ω·t + φ</span> et <span class="math">x = xₘ·cos(θ)</span></p>
+        <p class="lecture-formula-desc">Un tour complet du rayon (<span class="math">2π</span> rad) correspond à une période <span class="math">T</span> du vibreur. C'est pourquoi <span class="math">ω = 2π/T</span>.</p>
+      </div>
+      <svg viewBox="0 0 760 300" role="img" aria-label="Cercle vectoriel de Fresnel avec projection sur l'axe Ox" class="math">
+        <circle cx="200" cy="170" r="110" style="stroke:rgba(148,163,184,0.8)" stroke-width="2" fill="none"/>
+        <line x1="60" y1="170" x2="700" y2="170" style="stroke:rgba(148,163,184,0.8)" stroke-width="2"/>
+        <polygon points="700,170 688,164 688,176" fill="rgba(148,163,184,0.8)"/>
+        <text x="686" y="192" font-size="13" fill="rgba(148,163,184,0.9)">(Ox)</text>
+        <line x1="200" y1="170" x2="310" y2="170" style="stroke:rgba(148,163,184,0.6)" stroke-width="2" stroke-dasharray="5 5"/>
+        <text x="318" y="174" font-size="12" fill="rgba(148,163,184,0.9)">t = 0 : θ = φ</text>
+        <line x1="200" y1="170" x2="255" y2="75" style="stroke:var(--accent-bright)" stroke-width="3"/>
+        <polygon points="255,75 252,92 243,79" fill="var(--accent-bright)"/>
+        <circle cx="255" cy="75" r="5" fill="rgba(252,211,77,0.95)"/>
+        <text x="262" y="70" font-size="13" fill="rgba(252,211,77,0.95)">M</text>
+        <line x1="255" y1="75" x2="255" y2="170" style="stroke:rgba(148,163,184,0.6)" stroke-width="1.5" stroke-dasharray="4 4"/>
+        <circle cx="255" cy="170" r="4" fill="rgba(52,211,153,0.95)"/>
+        <path d="M235,170 A35,35 0 0 0 218,140" style="stroke:rgba(252,211,77,0.95)" stroke-width="2" fill="none"/>
+        <text x="244" y="150" font-size="13" fill="rgba(252,211,77,0.95)">θ</text>
+        <line x1="200" y1="188" x2="255" y2="188" style="stroke:rgba(52,211,153,0.95)" stroke-width="2"/>
+        <text x="228" y="208" text-anchor="middle" font-size="12" fill="rgba(52,211,153,0.95)">x = xₘ·cos(θ)</text>
+        <text x="150" y="40" text-anchor="middle" font-size="12" fill="rgba(148,163,184,0.9)">rotation ↺ à ω constante</text>
+        <text x="430" y="86" font-size="13" fill="rgba(226,232,240,0.9)">M tourne à la vitesse angulaire ω</text>
+        <text x="430" y="110" font-size="13" fill="rgba(226,232,240,0.9)">sa projection sur (Ox) oscille :</text>
+        <text x="430" y="138" font-size="14" fill="rgba(252,211,77,0.95)">x(t) = xₘ·cos(ω·t + φ)</text>
+      </svg>
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">✍️ Exemple travaillé — suivre le rayon sur un cycle</div>
+        <p class="lecture-example-content">Un vibreur de période <span class="math">T = 0,80 s</span> et de phase à l'origine <span class="math">φ = 0</span> est représenté par un vecteur tournant. Où pointe le vecteur, et que vaut l'élongation, à <span class="math">t = 0</span>, <span class="math">t = 0,20 s</span> et <span class="math">t = 0,40 s</span> ?</p>
+        <div class="lecture-steps">
+          <div class="lecture-step"><span class="lecture-step-number">1</span><p class="lecture-step-content">À <span class="math">t = 0</span> : <span class="math">θ = φ = 0</span> → vecteur horizontal à droite → <span class="math">x(0) = +xₘ</span> ✓ (cohérent avec <span class="math">cos(0) = 1</span>).</p></div>
+          <div class="lecture-step"><span class="lecture-step-number">2</span><p class="lecture-step-content">À <span class="math">t = 0,20 s = T/4</span> : <span class="math">θ = ω·t = (2π/0,80)×0,20 = π/2 rad</span> → vecteur vertical vers le haut → projection <span class="math">x = 0</span> : passage à l'équilibre ✓.</p></div>
+          <div class="lecture-step"><span class="lecture-step-number">3</span><p class="lecture-step-content">À <span class="math">t = 0,40 s = T/2</span> : <span class="math">θ = π rad</span> → vecteur horizontal à gauche → <span class="math">x = −xₘ</span> : position opposée ✓.</p></div>
+          <div class="lecture-step"><span class="lecture-step-number">4</span><p class="lecture-step-content">Vérification par l'équation : <span class="math">x(0,20) = xₘ·cos(π/2) = 0</span> ✓ et <span class="math">x(0,40) = xₘ·cos(π) = −xₘ</span> ✓ — le cercle et le cosinus racontent la même histoire.</p></div>
+        </div>
+        <p class="lecture-example-content">✔ Réponse : +xₘ puis 0 puis −xₘ ; le vecteur a tourné de 0, puis π/2 rad, puis π rad.</p>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-title">⚠️ Piège d'examen</div>
+        <p class="lecture-text">Le sens de rotation est TOUJOURS le sens trigonométrique (anti-horaire), et l'angle se mesure depuis l'axe (Ox). Tourner dans l'autre sens revient à changer le signe de <span class="math">φ</span> : ton dessin décrirait alors un autre mouvement, et la question suivante s'effondrerait.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s3 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s3">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">03</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 3</span>
+        <h2 class="lecture-section-title">Déphasage et retard</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Deux tam-tameurs jouent le même rythme, mais le second frappe un temps plus tard : leurs courbes sont identiques, simplement glissées l'une par rapport à l'autre. Ce glissement se mesure en temps (le retard) ou en angle (le déphasage). Les deux mesures sont liées par la période.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-title">📖 Définition officielle</div>
+        <p class="lecture-text">Deux oscillations sinusoïdales de même fréquence sont <strong>déphasées</strong> d'un angle constant <span class="math">Δφ = φ₂ − φ₁</span> (en rad). Le <strong>retard</strong> temporel <span class="math">Δt</span> de la seconde sur la première vérifie <span class="math">Δφ = 2π·Δt/T = ω·Δt</span>. Si <span class="math">x₂</span> atteint ses états après <span class="math">x₁</span>, alors <span class="math">x₂</span> est en retard et <span class="math">φ₂ − φ₁ &lt; 0</span>.</p>
+      </div>
+      <p class="lecture-text">Intuition : un retard d'un quart de période (<span class="math">Δt = T/4</span>) correspond à un déphasage d'un quart de tour (<span class="math">2π/4 = π/2 rad</span>). La règle de proportionnalité est simple : un cycle complet <span class="math">T</span> vaut toujours <span class="math">2π</span> rad.</p>
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-main">🧭 Formule à retenir</div>
+        <div class="lecture-formula-hero-main"><span class="math">Δφ = φ₂ − φ₁ = 2π·Δt/T = ω·Δt</span></div>
+        <p class="lecture-formula-hero">Précise toujours l'unité demandée : radians (rad) ou degrés (<span class="math">180° = π rad</span>). Retard → signe négatif, avance → signe positif.</p>
+      </div>
+      <svg viewBox="0 0 780 300" role="img" aria-label="Deux sinusoides de meme periode dephasees d'un quart de periode" class="math">
+        <line x1="40" y1="150" x2="750" y2="150" style="stroke:rgba(148,163,184,0.8)" stroke-width="2"/>
+        <polygon points="750,150 738,144 738,156" fill="rgba(148,163,184,0.8)"/>
+        <line x1="60" y1="280" x2="60" y2="30" style="stroke:rgba(148,163,184,0.8)" stroke-width="2"/>
+        <polygon points="60,30 54,42 66,42" fill="rgba(148,163,184,0.8)"/>
+        <text x="736" y="172" font-size="13" fill="rgba(148,163,184,0.9)">t</text>
+        <text x="70" y="44" font-size="13" fill="rgba(148,163,184,0.9)">x</text>
+        <path d="M60,70 C135,70 135,230 210,230 C285,230 285,70 360,70 C435,70 435,230 510,230 C585,230 585,70 660,70" style="stroke:var(--accent-bright)" stroke-width="3" fill="none"/>
+        <path d="M135,70 C210,70 210,230 285,230 C360,230 360,70 435,70 C510,70 510,230 585,230 C660,230 660,70 735,70" style="stroke:rgba(52,211,153,0.95)" stroke-width="3" fill="none"/>
+        <line x1="60" y1="55" x2="60" y2="250" style="stroke:rgba(148,163,184,0.5)" stroke-width="1.5" stroke-dasharray="4 5"/>
+        <line x1="135" y1="55" x2="135" y2="250" style="stroke:rgba(148,163,184,0.5)" stroke-width="1.5" stroke-dasharray="4 5"/>
+        <line x1="60" y1="45" x2="135" y2="45" style="stroke:rgba(252,211,77,0.95)" stroke-width="2"/>
+        <polygon points="135,45 123,39 123,51" fill="rgba(252,211,77,0.95)"/>
+        <polygon points="60,45 72,39 72,51" fill="rgba(252,211,77,0.95)"/>
+        <text x="97" y="35" text-anchor="middle" font-size="13" fill="rgba(252,211,77,0.95)">Δt = T/4</text>
+        <line x1="60" y1="268" x2="100" y2="268" style="stroke:var(--accent-bright)" stroke-width="3"/>
+        <text x="108" y="272" font-size="12" fill="rgba(226,232,240,0.9)">x₁(t)</text>
+        <line x1="60" y1="288" x2="100" y2="288" style="stroke:rgba(52,211,153,0.95)" stroke-width="3"/>
+        <text x="108" y="292" font-size="12" fill="rgba(226,232,240,0.9)">x₂(t), en retard de π/2 rad</text>
+      </svg>
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">✍️ Exemple travaillé — traduire un retard en équation</div>
+        <p class="lecture-example-content">Deux vibreurs identiques ont une période <span class="math">T = 0,80 s</span>. Le second atteint son maximum 0,20 s après le premier. Calculer le déphasage, puis écrire les deux équations si <span class="math">φ₁ = 0</span> et <span class="math">xₘ = 2,0 cm</span>.</p>
+        <div class="lecture-steps">
+          <div class="lecture-step"><span class="lecture-step-number">1</span><p class="lecture-step-content">Retard : <span class="math">Δt = 0,20 s = T/4</span> (car <span class="math">0,20/0,80 = 1/4</span>).</p></div>
+          <div class="lecture-step"><span class="lecture-step-number">2</span><p class="lecture-step-content">Déphasage : <span class="math">Δφ = 2π·Δt/T = 2π×0,20/0,80 = π/2 rad = 90°</span>.</p></div>
+          <div class="lecture-step"><span class="lecture-step-number">3</span><p class="lecture-step-content">Le second est en retard : <span class="math">φ₂ − φ₁ = −π/2</span>, donc <span class="math">φ₂ = −π/2</span>.</p></div>
+          <div class="lecture-step"><span class="lecture-step-number">4</span><p class="lecture-step-content">Équations : <span class="math">x₁(t) = 2,0·cos(7,85·t)</span> et <span class="math">x₂(t) = 2,0·cos(7,85·t − π/2)</span> (x en cm, t en s, avec <span class="math">ω = 2π/0,80 = 7,85 rad·s⁻¹</span>).</p></div>
+          <div class="lecture-step"><span class="lecture-step-number">5</span><p class="lecture-step-content">Vérification : à <span class="math">t = 0</span>, <span class="math">x₁ = +2,0 cm</span> (sommet) tandis que <span class="math">x₂ = 2,0·cos(−π/2) = 0</span> — et <span class="math">x₂</span> n'atteindra son sommet qu'à <span class="math">t = 0,20 s</span> ✓.</p></div>
+        </div>
+        <p class="lecture-example-content">✔ Réponse : <span class="math">Δφ = π/2 rad</span> (90°), <span class="math">x₂</span> en retard ; <span class="math">x₂(t) = 2,0·cos(7,85·t − π/2)</span> cm.</p>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-title">⚠️ Piège d'examen</div>
+        <p class="lecture-text">Retard ⇒ signe « − » dans l'équation ; avance ⇒ signe « + ». Écrire <span class="math">x₂ = xₘ·cos(ω·t + π/2)</span> pour un retard est une inversion classique. Et souviens-toi : <span class="math">Δφ = ω·Δt</span> n'a de sens que si les deux courbes ont la même fréquence.</p>
+      </div>
+      <div class="lecture-text">
+        <div class="lecture-exercise-label">📝 Exercice 1 — déphasage entre deux courbes</div>
+        <p class="lecture-text">Deux vibreurs identiques ont une période <span class="math">T = 20 ms</span>. Sur l'écran, le maximum de la courbe 2 arrive <span class="math">5,0 ms</span> après celui de la courbe 1. Calculer <span class="math">Δφ</span> en rad et en degrés, préciser qui est en retard, et écrire <span class="math">x₂(t)</span> si <span class="math">φ₁ = 0</span>.</p>
+        <details>
+          <summary>Voir la solution détaillée</summary>
+          <div class="lecture-steps">
+            <div class="lecture-step"><span class="lecture-step-number">1</span><p class="lecture-step-content">Rapport : <span class="math">Δt/T = 5,0/20 = 1/4</span> → le retard vaut un quart de période.</p></div>
+            <div class="lecture-step"><span class="lecture-step-number">2</span><p class="lecture-step-content">Déphasage : <span class="math">Δφ = 2π×(1/4) = π/2 rad</span>, soit <span class="math">90°</span>.</p></div>
+            <div class="lecture-step"><span class="lecture-step-number">3</span><p class="lecture-step-content">La courbe 2 arrive après → elle est en retard : <span class="math">φ₂ − φ₁ = −π/2</span>, donc <span class="math">φ₂ = −π/2</span>.</p></div>
+            <div class="lecture-step"><span class="lecture-step-number">4</span><p class="lecture-step-content">Équation : <span class="math">x₂(t) = xₘ·cos(2π·f·t − π/2)</span> avec <span class="math">f = 1/0,020 = 50 Hz</span>, soit <span class="math">x₂(t) = xₘ·cos(314·t − π/2)</span> (x en m, t en s).</p></div>
+            <div class="lecture-step"><span class="lecture-step-number">5</span><p class="lecture-step-content">Vérification : <span class="math">Δφ/(2π) = Δt/T = 0,25</span> ✓ — le décalage en angle et en temps racontent la même proportion.</p></div>
+          </div>
+          <p class="lecture-text">✔ Réponses : <span class="math">Δφ = π/2 rad = 90°</span> ; la courbe 2 est en retard ; <span class="math">x₂(t) = xₘ·cos(314·t − π/2)</span>.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s4 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s4">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">04</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 4</span>
+        <h2 class="lecture-section-title">Vitesse du vibreur : v = dx/dt</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Où la masse va-t-elle le plus vite ? Pas aux extrémités : là, elle s'immobilise un instant avant de repartir. C'est au passage par l'équilibre qu'elle file à toute vitesse. La dérivée de l'élongation traduit exactement cela.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-title">📖 Définition officielle</div>
+        <p class="lecture-text">La <strong>vitesse instantanée</strong> du vibreur est la dérivée de l'élongation par rapport au temps : <span class="math">v(t) = dx/dt = −xₘ·ω·sin(ω·t + φ)</span>. Sa valeur maximale est <span class="math">vₘ = ω·xₘ</span>, atteinte au passage à la position d'équilibre (<span class="math">x = 0</span>). Aux positions extrêmes (<span class="math">x = ±xₘ</span>), la vitesse s'annule.</p>
+      </div>
+      <p class="lecture-text">Intuition : le cosinus et le sinus sont décalés d'un quart de période. Résultat : quand <span class="math">x</span> est au sommet, <span class="math">v</span> est nulle ; quand <span class="math">x</span> passe par zéro, <span class="math">v</span> est à son maximum. Les deux courbes se répondent comme un écho décalé de <span class="math">T/4</span>.</p>
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-main">🧭 Formules à retenir</div>
+        <div class="lecture-formula-hero-main"><span class="math">v(t) = dx/dt = −xₘ·ω·sin(ω·t + φ)</span> et <span class="math">vₘ = ω·xₘ</span></div>
+        <p class="lecture-formula-hero"><span class="math">v</span> en m·s⁻¹ : convertis <span class="math">xₘ</span> en mètres avant de calculer <span class="math">vₘ</span> ! Le signe « − » indique que <span class="math">v</span> et <span class="math">x</span> n'évoluent pas ensemble.</p>
+      </div>
+      <svg viewBox="0 0 760 300" role="img" aria-label="Courbes de l'elongation et de la vitesse, decalees d'un quart de periode" class="math">
+        <line x1="40" y1="150" x2="740" y2="150" style="stroke:rgba(148,163,184,0.8)" stroke-width="2"/>
+        <polygon points="740,150 728,144 728,156" fill="rgba(148,163,184,0.8)"/>
+        <line x1="60" y1="280" x2="60" y2="30" style="stroke:rgba(148,163,184,0.8)" stroke-width="2"/>
+        <polygon points="60,30 54,42 66,42" fill="rgba(148,163,184,0.8)"/>
+        <text x="726" y="172" font-size="13" fill="rgba(148,163,184,0.9)">t</text>
+        <text x="70" y="44" font-size="13" fill="rgba(148,163,184,0.9)">x, v</text>
+        <path d="M60,80 C135,80 135,220 210,220 C285,220 285,80 360,80 C435,80 435,220 510,220 C585,220 585,80 660,80" style="stroke:var(--accent-bright)" stroke-width="3" fill="none"/>
+        <path d="M60,150 C97,150 97,220 135,220 C172,220 172,150 210,150 C247,150 247,80 285,80 C322,80 322,150 360,150 C397,150 397,220 435,220 C472,220 472,150 510,150 C547,150 547,80 585,80 C622,80 622,150 660,150" style="stroke:rgba(52,211,153,0.95)" stroke-width="2.5" fill="none"/>
+        <line x1="60" y1="50" x2="60" y2="250" style="stroke:rgba(148,163,184,0.5)" stroke-width="1.5" stroke-dasharray="4 5"/>
+        <line x1="135" y1="50" x2="135" y2="250" style="stroke:rgba(148,163,184,0.5)" stroke-width="1.5" stroke-dasharray="4 5"/>
+        <text x="72" y="62" font-size="12" fill="rgba(252,211,77,0.95)">x = +xₘ → v = 0</text>
+        <text x="135" y="262" text-anchor="middle" font-size="12" fill="rgba(52,211,153,0.95)">x = 0 → v = −vₘ</text>
+        <text x="648" y="66" font-size="13" fill="rgba(148,163,184,0.9)">x(t)</text>
+        <text x="588" y="66" font-size="13" fill="rgba(52,211,153,0.95)">v(t)</text>
+      </svg>
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">✍️ Exemple travaillé — calculer une vitesse maximale</div>
+        <p class="lecture-example-content">Un vibreur a une amplitude <span class="math">xₘ = 2,0 cm</span> et une fréquence <span class="math">f = 50 Hz</span>. Calculer sa pulsation puis sa vitesse maximale <span class="math">vₘ</span>, et préciser où elle est atteinte.</p>
+        <div class="lecture-steps">
+          <div class="lecture-step"><span class="lecture-step-number">1</span><p class="lecture-step-content">Conversion : <span class="math">xₘ = 2,0 cm = 0,020 m</span> (indispensable pour obtenir des m·s⁻¹).</p></div>
+          <div class="lecture-step"><span class="lecture-step-number">2</span><p class="lecture-step-content">Pulsation : <span class="math">ω = 2π·f = 6,28×50 = 314 rad·s⁻¹</span>.</p></div>
+          <div class="lecture-step"><span class="lecture-step-number">3</span><p class="lecture-step-content">Vitesse maximale : <span class="math">vₘ = ω·xₘ = 314×0,020 = 6,28 ≈ 6,3 m·s⁻¹</span>.</p></div>
+          <div class="lecture-step"><span class="lecture-step-number">4</span><p class="lecture-step-content">Localisation : <span class="math">vₘ</span> est atteinte au passage à l'équilibre (<span class="math">x = 0</span>) ✓, tandis qu'aux extrêmes (<span class="math">x = ±xₘ</span>) la vitesse s'annule ✓.</p></div>
+        </div>
+        <p class="lecture-example-content">✔ Réponse : <span class="math">vₘ ≈ 6,3 m·s⁻¹</span>, atteinte à chaque passage par la position d'équilibre.</p>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-title">⚠️ Piège d'examen</div>
+        <p class="lecture-text">Avant <span class="math">vₘ = ω·xₘ</span>, convertis toujours <span class="math">xₘ</span> en mètres : avec <span class="math">xₘ = 2,0 cm</span> non converti, tu trouverais 628 cm·s⁻¹ au lieu de 6,3 m·s⁻¹. Et re-dis-le clairement : vitesse maximale à l'équilibre, vitesse nulle aux extrêmes — beaucoup d'élèves écrivent l'inverse.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s5 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s5">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">05</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 5</span>
+        <h2 class="lecture-section-title">Accélération : a = −ω²·x</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Dernière dérivation, et la plus belle : l'accélération du vibreur se ramène à son élongation. Une relation aussi simple qu'un miroir inversé — et c'est elle qui définit un oscillateur harmonique.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-title">📖 Définition officielle</div>
+        <p class="lecture-text">L'<strong>accélération</strong> du vibreur est la dérivée de la vitesse : <span class="math">a(t) = dv/dt = −xₘ·ω²·cos(ω·t + φ)</span>, soit <span class="math">a(t) = −ω²·x(t)</span>. L'accélération est proportionnelle à l'élongation et de signe contraire : c'est le critère d'un oscillateur harmonique. Sa valeur maximale est <span class="math">aₘ = ω²·xₘ</span>, atteinte aux positions extrêmes.</p>
+      </div>
+      <p class="lecture-text">Intuition : le ressort tire d'autant plus fort que la masse est loin de l'équilibre, et il tire toujours vers l'équilibre. D'où le signe « − » : quand <span class="math">x</span> est maximale à droite, <span class="math">a</span> est maximale (en valeur) mais pointe à gauche.</p>
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-main">🧭 La formule signature de l'oscillateur harmonique</div>
+        <div class="lecture-formula-hero-main"><span class="math">a(t) = −ω²·x(t)</span> et <span class="math">aₘ = ω²·xₘ</span></div>
+        <p class="lecture-formula-hero">Si tu peux écrire <span class="math">a = −ω²·x</span> avec <span class="math">ω² &gt; 0</span>, le mouvement est harmonique : c'est la conclusion attendue dans presque tout exercice de Bac.</p>
+      </div>
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">Le raccourci de vérification</div>
+        <p class="lecture-formula-main"><span class="math">aₘ = ω·vₘ = ω²·xₘ</span></p>
+        <p class="lecture-formula-desc">Enchaîne les deux dérivations : <span class="math">vₘ = ω·xₘ</span> puis <span class="math">aₘ = ω·vₘ</span>. Si tes deux calculs ne coïncident pas, une conversion a sauté en route.</p>
+      </div>
+      <svg viewBox="0 0 760 300" role="img" aria-label="Courbes de l'elongation et de l'acceleration, toujours opposees" class="math">
+        <line x1="40" y1="150" x2="740" y2="150" style="stroke:rgba(148,163,184,0.8)" stroke-width="2"/>
+        <polygon points="740,150 728,144 728,156" fill="rgba(148,163,184,0.8)"/>
+        <line x1="60" y1="280" x2="60" y2="30" style="stroke:rgba(148,163,184,0.8)" stroke-width="2"/>
+        <polygon points="60,30 54,42 66,42" fill="rgba(148,163,184,0.8)"/>
+        <text x="726" y="172" font-size="13" fill="rgba(148,163,184,0.9)">t</text>
+        <text x="70" y="44" font-size="13" fill="rgba(148,163,184,0.9)">x, a</text>
+        <path d="M60,80 C135,80 135,220 210,220 C285,220 285,80 360,80 C435,80 435,220 510,220 C585,220 585,80 660,80" style="stroke:rgba(148,163,184,0.6)" stroke-width="2" stroke-dasharray="6 5" fill="none"/>
+        <path d="M60,220 C135,220 135,80 210,80 C285,80 285,220 360,220 C435,220 435,80 510,80 C585,80 585,220 660,220" style="stroke:rgba(248,113,113,0.95)" stroke-width="3" fill="none"/>
+        <line x1="60" y1="50" x2="60" y2="250" style="stroke:rgba(148,163,184,0.5)" stroke-width="1.5" stroke-dasharray="4 5"/>
+        <text x="70" y="62" font-size="12" fill="rgba(148,163,184,0.9)">x = +xₘ</text>
+        <text x="70" y="248" font-size="12" fill="rgba(248,113,113,0.95)">a = −ω²·xₘ &lt; 0</text>
+        <text x="648" y="66" font-size="13" fill="rgba(148,163,184,0.9)">x(t)</text>
+        <text x="500" y="66" font-size="13" fill="rgba(248,113,113,0.95)">a(t)</text>
+        <text x="400" y="272" text-anchor="middle" font-size="12" fill="rgba(252,211,77,0.95)">a(t) = −ω²·x(t) : toujours opposée à x</text>
+      </svg>
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">✍️ Exemple travaillé — une accélération qui donne le vertige</div>
+        <p class="lecture-example-content">Reprends le vibreur d'amplitude <span class="math">xₘ = 0,020 m</span> et de fréquence <span class="math">f = 50 Hz</span> (<span class="math">ω = 314 rad·s⁻¹</span>). Calculer <span class="math">aₘ</span>, donner <span class="math">a</span> quand <span class="math">x = +xₘ</span>, et comparer <span class="math">aₘ</span> à <span class="math">g = 9,8 m·s⁻²</span>.</p>
+        <div class="lecture-steps">
+          <div class="lecture-step"><span class="lecture-step-number">1</span><p class="lecture-step-content">Pulsation au carré : <span class="math">ω² = 314² ≈ 9,87×10⁴ s⁻²</span>.</p></div>
+          <div class="lecture-step"><span class="lecture-step-number">2</span><p class="lecture-step-content">Accélération maximale : <span class="math">aₘ = ω²·xₘ = 9,87×10⁴×0,020 = 1,97×10³ m·s⁻²</span>.</p></div>
+          <div class="lecture-step"><span class="lecture-step-number">3</span><p class="lecture-step-content">À <span class="math">x = +xₘ</span> : <span class="math">a = −ω²·xₘ = −1,97×10³ m·s⁻²</span> — maximale en valeur, mais négative (rappel vers l'équilibre) ✓.</p></div>
+          <div class="lecture-step"><span class="lecture-step-number">4</span><p class="lecture-step-content">Comparaison : <span class="math">aₘ/g = 1,97×10³/9,8 ≈ 200</span> → l'accélération maximale vaut environ 200 fois <span class="math">g</span> : normal pour une membrane vibrant 50 fois par seconde !</p></div>
+          <div class="lecture-step"><span class="lecture-step-number">5</span><p class="lecture-step-content">Cohérence : <span class="math">aₘ</span> est atteinte quand <span class="math">v = 0</span> (aux extrêmes) et <span class="math">a = 0</span> quand <span class="math">v = ±vₘ</span> (à l'équilibre) ✓.</p></div>
+        </div>
+        <p class="lecture-example-content">✔ Réponse : <span class="math">aₘ ≈ 1,97×10³ m·s⁻²</span> ≈ 200·g ; à <span class="math">x = +xₘ</span>, <span class="math">a ≈ −1,97×10³ m·s⁻²</span>.</p>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-title">⚠️ Piège d'examen</div>
+        <p class="lecture-text">Le signe « − » de <span class="math">a = −ω²·x</span> n'est pas décoratif : il traduit le rappel vers l'équilibre. Quand <span class="math">x = +xₘ</span>, <span class="math">a = −ω²·xₘ</span> est maximale en valeur mais négative. Oublier ce signe, ou écrire <span class="math">a = ω²·x</span>, invalide toute la démonstration du caractère harmonique.</p>
+      </div>
+      <div class="lecture-text">
+        <div class="lecture-exercise-label">📝 Exercice 2 — bilan complet d'une équation</div>
+        <p class="lecture-text">L'élongation d'un vibreur s'écrit <span class="math">x(t) = 5,0·cos(10π·t + π/3)</span>, avec x en cm et t en s. Donner <span class="math">xₘ</span>, <span class="math">ω</span>, <span class="math">f</span>, <span class="math">T</span>, <span class="math">x(0)</span>, puis calculer <span class="math">vₘ</span> et <span class="math">aₘ</span> en unités SI.</p>
+        <details>
+          <summary>Voir la solution détaillée</summary>
+          <div class="lecture-steps">
+            <div class="lecture-step"><span class="lecture-step-number">1</span><p class="lecture-step-content">Lecture : <span class="math">xₘ = 5,0 cm</span>, <span class="math">ω = 10π = 31,4 rad·s⁻¹</span>, <span class="math">φ = π/3 rad</span>.</p></div>
+            <div class="lecture-step"><span class="lecture-step-number">2</span><p class="lecture-step-content">Fréquence et période : <span class="math">f = ω/(2π) = 10π/(2π) = 5,0 Hz</span> et <span class="math">T = 1/f = 0,20 s</span>.</p></div>
+            <div class="lecture-step"><span class="lecture-step-number">3</span><p class="lecture-step-content">Élongation initiale : <span class="math">x(0) = 5,0·cos(π/3) = 5,0×0,50 = 2,5 cm</span>.</p></div>
+            <div class="lecture-step"><span class="lecture-step-number">4</span><p class="lecture-step-content">Conversion : <span class="math">xₘ = 5,0 cm = 0,050 m</span>.</p></div>
+            <div class="lecture-step"><span class="lecture-step-number">5</span><p class="lecture-step-content">Vitesse maximale : <span class="math">vₘ = ω·xₘ = 31,4×0,050 = 1,57 ≈ 1,6 m·s⁻¹</span>.</p></div>
+            <div class="lecture-step"><span class="lecture-step-number">6</span><p class="lecture-step-content">Accélération maximale : <span class="math">aₘ = ω²·xₘ = 31,4²×0,050 ≈ 987×0,050 = 49 m·s⁻²</span>. Vérification : <span class="math">aₘ = ω·vₘ = 31,4×1,57 ≈ 49 m·s⁻²</span> ✓.</p></div>
+          </div>
+          <p class="lecture-text">✔ Réponses : <span class="math">xₘ = 5,0 cm</span> ; <span class="math">ω = 31,4 rad·s⁻¹</span> ; <span class="math">f = 5,0 Hz</span> ; <span class="math">T = 0,20 s</span> ; <span class="math">x(0) = 2,5 cm</span> ; <span class="math">vₘ ≈ 1,6 m·s⁻¹</span> ; <span class="math">aₘ ≈ 49 m·s⁻²</span>.</p>
+        </details>
+      </div>
+      <div >
+        <table class="lecture-table">
+          <thead>
+            <tr><th>Sur la courbe…</th><th>…conclusion sur le mouvement</th><th>Formule associée</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>la courbe atteint un sommet</td><td><span class="math">x = ±xₘ</span> ; <span class="math">v = 0</span> ; <span class="math">|a| = aₘ</span></td><td><span class="math">a = −ω²·x</span></td></tr>
+            <tr><td>la courbe coupe l'axe en descendant</td><td><span class="math">x = 0</span> ; <span class="math">v = −vₘ</span> ; <span class="math">a = 0</span></td><td><span class="math">vₘ = ω·xₘ</span></td></tr>
+            <tr><td>deux sommets successifs</td><td>période <span class="math">T</span>, donc <span class="math">f = 1/T</span></td><td><span class="math">f = 1/T</span></td></tr>
+            <tr><td>départ au sommet</td><td><span class="math">φ = 0</span></td><td><span class="math">x(0) = xₘ·cos(φ)</span></td></tr>
+            <tr><td>départ à zéro, en descendant</td><td><span class="math">φ = +π/2</span></td><td><span class="math">cos(φ) = x(0)/xₘ</span></td></tr>
+            <tr><td>seconde courbe retardée de <span class="math">Δt</span></td><td><span class="math">Δφ = 2π·Δt/T</span> (retard si &lt; 0)</td><td><span class="math">Δφ = ω·Δt</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+  <!-- ===== QCM ===== -->
+  <div class="lecture-quiz">
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Deux courbes de même période <span class="math">T = 0,040 s</span> : la seconde atteint son maximum <span class="math">0,010 s</span> après la première. Le déphasage vaut :</p>
+      <div class="lecture-quiz-options"><span>A) π/6 rad</span><span>B) π/4 rad</span><span>C) π/2 rad</span><span>D) π rad</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">C) <span class="math">Δφ = 2π·Δt/T = 2π×0,010/0,040 = π/2 rad</span> (90°), la seconde étant en retard.</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">À pulsation <span class="math">ω</span> constante, si on double l'amplitude <span class="math">xₘ</span>, la vitesse maximale <span class="math">vₘ</span> :</p>
+      <div class="lecture-quiz-options"><span>A) double</span><span>B) quadruple</span><span>C) ne change pas</span><span>D) est divisée par 2</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">A) <span class="math">vₘ = ω·xₘ</span> est proportionnelle à <span class="math">xₘ</span> : doubler <span class="math">xₘ</span> double <span class="math">vₘ</span>.</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Quand l'élongation vaut <span class="math">x = +xₘ</span>, la vitesse et l'accélération valent :</p>
+      <div class="lecture-quiz-options"><span>A) v = vₘ ; a = 0</span><span>B) v = 0 ; a = −ω²·xₘ</span><span>C) v = 0 ; a = +ω²·xₘ</span><span>D) v = −vₘ ; a = 0</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">B) Aux extrêmes, la vitesse s'annule et l'accélération est maximale, dirigée vers l'équilibre : <span class="math">a = −ω²·xₘ</span>.</div></details>
+    </div>
+  </div>
+  <!-- ===== RÉCAP ===== -->
+  <div class="lecture-recap">
+    <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
+    <ul class="lecture-recap-list">
+      <li><strong>Lire une sinusoïde</strong> : sommet → <span class="math">xₘ</span> ; deux sommets successifs → <span class="math">T</span> ; hauteur au départ → <span class="math">φ</span> via <span class="math">x(0) = xₘ·cos(φ)</span>.</li>
+      <li><strong>Vecteur tournant</strong> : un rayon de longueur <span class="math">xₘ</span> tourne à <span class="math">ω</span> dans le sens trigonométrique ; sa projection sur (Ox) donne <span class="math">x = xₘ·cos(ω·t + φ)</span>.</li>
+      <li><strong>Déphasage</strong> : <span class="math">Δφ = 2π·Δt/T</span> ; retard → signe « − » dans l'équation.</li>
+      <li><strong>Dériver deux fois</strong> : <span class="math">v = dx/dt</span> avec <span class="math">vₘ = ω·xₘ</span> (max à l'équilibre) ; <span class="math">a = −ω²·x</span> avec <span class="math">aₘ = ω²·xₘ</span> (max aux extrêmes).</li>
+    </ul>
+  </div>
+  <!-- ===== FIN ===== -->
+  <div class="lecture-end">
+    <div class="lecture-end-icon">🎯</div>
+    <div class="lecture-end-text">Partie 02 terminée !</div>
+    <div class="lecture-end-sub">Tu lis désormais une vibration comme une carte et tu dérives sans trembler. Cap sur la partie 03 : chronomètre et oscilloscope pour mesurer T, f et xₘ comme un vrai expérimentateur.</div>
+    <div class="lecture-end-divider"></div>
+  </div>
+</div>

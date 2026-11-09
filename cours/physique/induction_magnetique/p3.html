@@ -1,0 +1,404 @@
+<!-- PARTIE 03 — Force électromotrice induite & Applications (Induction magnétique) -->
+<div class="lecture-container">
+
+  <!-- ===== HERO ===== -->
+  <header class="lecture-hero">
+    <div class="lecture-hero-badge">
+      <span class="lecture-hero-icon">📘</span>
+      <span class="lecture-hero-label">Terminale C&D · Induction magnétique · Partie 03</span>
+    </div>
+    <h1 class="lecture-hero-title">
+      Force électromotrice induite <em>& Applications</em>
+    </h1>
+    <p class="lecture-hero-intro">
+      Regarde une prise murale : le courant qui en sort est alternatif, il change de sens 50 fois par seconde. D'où vient cette forme si particulière ? D'une simple spire qui tourne dans un champ magnétique. Dans cette partie, tu vas calculer la f.é.m. sinusoïdale d'une spire rotative, découvrir l'alternateur et la dynamo, puis suivre le courant depuis la turbine jusqu'au réseau — et jusqu'au futur barrage de Kandadji sur le fleuve Niger.
+    </p>
+    <div class="lecture-hero-meta">
+      <span class="lecture-hero-meta-item">⏱ 25 min</span>
+      <span class="lecture-hero-meta-item">⚡ 4 notions</span>
+      <span class="lecture-hero-meta-item">📚 6 sections</span>
+      <span class="lecture-hero-meta-item">🎓 Terminale C&D</span>
+    </div>
+  </header>
+  <!-- ===== SOMMAIRE ===== -->
+  <nav class="lecture-toc">
+    <div class="lecture-toc-header">
+      <span>Dans cette partie</span>
+      <span class="lecture-toc-count">4 notions · 6 sections</span>
+    </div>
+    <ol class="lecture-toc-list">
+      <li><a href="#s0"><span class="toc-num">00</span><span>Une spire qui tourne alimente le monde</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>La spire tournante : une f.é.m. sinusoïdale</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>Alternateur et dynamo</span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>Produire l'électricité : la chaîne de l'induction</span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>Et au Niger ? Kandadji et le mix électrique</span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>Synthèse : machines et exercice</span></a></li>
+    </ol>
+  </nav>
+  <!-- ============================================================ -->
+  <!-- SECTION s0 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s0">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">00</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Motivation</span>
+        <h2 class="lecture-section-title">Une spire qui tourne alimente le monde</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">La quasi-totalité de l'électricité produite sur Terre — barrages, centrales au gaz, centrales nucléaires, éoliennes — naît du même geste : faire tourner un aimant ou une bobine. Le courant alternatif du réseau, avec ses 50 hertz en Afrique de l'Ouest, est la signature directe de cette rotation.</p>
+      <p class="lecture-text">Tu connais déjà une version miniature de ce mécanisme : le groupe électrogène qu'on lance lors des coupures de courant à Niamey, ou la dynamo du vélo qui s'éteint quand on s'arrête de pédaler. Dans les deux cas, un mouvement de rotation est converti en électricité par induction.</p>
+      <p class="lecture-text">Le programme de cette partie : comprendre pourquoi la rotation donne une tension sinusoïdale, nommer les organes de la machine (rotor, stator), puis replacer tout cela dans la grande chaîne de production de l'électricité — celle qui, un jour, reliera la chute d'eau de Kandadji aux lampes de Maradi.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <p><strong>🔑 Le fil rouge de la partie —</strong> Une rotation uniforme impose <span class="math">θ = ω·t</span> : le flux devient sinusoïdal, et Faraday transforme cette sinusoïde en une f.é.m. sinusoïdale. C'est toute l'histoire de l'alternateur.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s1 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s1">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">01</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1</span>
+        <h2 class="lecture-section-title">La spire tournante : une f.é.m. sinusoïdale</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Le dispositif : une spire de surface <span class="math">S</span> tourne à vitesse angulaire constante <span class="math">ω</span> dans un champ uniforme <span class="math">→B</span>. À l'instant <span class="math">t = 0</span>, la normale <span class="math">→n</span> est alignée avec <span class="math">→B</span>. Comme la rotation est uniforme, l'angle entre <span class="math">→n</span> et <span class="math">→B</span> croît régulièrement : <span class="math">θ = ω·t</span>.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <p><strong>🔑 Définition officielle —</strong> Spire tournante dans un champ uniforme : le flux varie selon <span class="math">Φ(t) = B·S·cos(ω·t)</span>, et la f.é.m. induite est <strong>sinusoïdale</strong> : <span class="math">e(t) = B·S·ω·|sin(ω·t)|</span>. Elle change de signe à chaque alternance, ce qui produit un courant alternatif.</p>
+      </div>
+      <div class="lecture-formula-hero">
+        <p class="lecture-formula-hero-main">F.é.m. induite dans une spire qui tourne</p>
+        <p class="lecture-formula-hero"><span class="math">e(t) = B·S·ω·|sin(ω·t)|</span></p>
+        <p class="lecture-formula-hero"><span class="math">e</span> en V · <span class="math">B</span> en T · <span class="math">S</span> en m² · <span class="math">ω</span> en rad/s avec <span class="math">ω = 2π·f</span>. La valeur maximale est <span class="math">B·S·ω</span>.</p>
+      </div>
+      <p class="lecture-text">D'où vient cette formule ? Trois lignes suffisent : l'angle vaut <span class="math">θ = ω·t</span>, donc le flux vaut <span class="math">Φ(t) = B·S·cos(ω·t)</span>. Or la loi de Faraday dit que <span class="math">e</span> mesure la vitesse de variation du flux : la dérivée d'un cosinus est un sinus, multiplié par <span class="math">B·S·ω</span>. Le facteur <span class="math">ω</span> dans le résultat est logique : plus la spire tourne vite, plus le flux varie vite, plus la tension est grande.</p>
+      <svg viewBox="0 0 640 330" role="img" aria-label="À gauche, une spire tourne dans un champ B uniforme avec sa normale n faisant un angle theta égal à omega fois t ; à droite, la f.é.m. induite e(t) est une sinusoïde de période T">
+        <line x1="70" y1="280" x2="70" y2="56" style="stroke:rgba(251,191,36,0.85);stroke-width:2.5"/>
+        <polygon points="70,48 64,62 76,62" style="fill:rgba(251,191,36,0.9)"/>
+        <line x1="270" y1="280" x2="270" y2="56" style="stroke:rgba(251,191,36,0.85);stroke-width:2.5"/>
+        <polygon points="270,48 264,62 276,62" style="fill:rgba(251,191,36,0.9)"/>
+        <text x="170" y="38" text-anchor="middle" font-size="14" style="fill:rgba(251,191,36,0.95)">→B</text>
+        <circle cx="170" cy="160" r="46" style="fill:rgba(74,222,128,0.12);stroke:var(--accent-bright);stroke-width:3"/>
+        <line x1="170" y1="160" x2="170" y2="96" style="stroke:currentColor;stroke-opacity:0.4;stroke-dasharray:4 5"/>
+        <line x1="170" y1="160" x2="207" y2="95" style="stroke:currentColor;stroke-opacity:0.9;stroke-width:2.5;stroke-dasharray:8 5"/>
+        <polygon points="212,85 202,93 213,100" style="fill:currentColor;fill-opacity:0.9"/>
+        <text x="224" y="88" font-size="13" style="fill:currentColor;fill-opacity:0.9">→n</text>
+        <path d="M 220,130 A 58 58 0 0 1 228,175" style="fill:none;stroke:var(--accent-bright);stroke-width:2"/>
+        <polygon points="231,187 219,177 231,171" style="fill:var(--accent-bright)"/>
+        <text x="244" y="162" font-size="15" style="fill:var(--accent-bright)">ω</text>
+        <text x="170" y="240" text-anchor="middle" font-size="12" style="fill:currentColor;fill-opacity:0.75">spire vue de face : θ = ω·t</text>
+        <text x="170" y="262" text-anchor="middle" font-size="12" style="fill:currentColor;fill-opacity:0.75">Φ(t) = B·S·cos(ω·t)</text>
+        <line x1="350" y1="170" x2="620" y2="170" style="stroke:currentColor;stroke-opacity:0.5;stroke-width:2"/>
+        <polygon points="628,170 614,164 614,176" style="fill:currentColor;fill-opacity:0.6"/>
+        <text x="610" y="192" font-size="13" style="fill:currentColor;fill-opacity:0.8">t</text>
+        <line x1="360" y1="60" x2="360" y2="280" style="stroke:currentColor;stroke-opacity:0.5;stroke-width:2"/>
+        <text x="344" y="56" text-anchor="end" font-size="13" style="fill:currentColor;fill-opacity:0.8">e</text>
+        <path d="M 360,170 Q 397,0 435,170 T 510,170 T 585,170" style="fill:none;stroke:var(--accent-bright);stroke-width:3"/>
+        <line x1="360" y1="85" x2="585" y2="85" style="stroke:currentColor;stroke-opacity:0.35;stroke-dasharray:5 5"/>
+        <line x1="360" y1="255" x2="585" y2="255" style="stroke:currentColor;stroke-opacity:0.35;stroke-dasharray:5 5"/>
+        <text x="592" y="90" font-size="12" style="fill:currentColor;fill-opacity:0.8">e max</text>
+        <text x="592" y="260" font-size="12" style="fill:currentColor;fill-opacity:0.8">−e max</text>
+        <line x1="435" y1="170" x2="435" y2="290" style="stroke:currentColor;stroke-opacity:0.35;stroke-dasharray:5 5"/>
+        <line x1="585" y1="170" x2="585" y2="290" style="stroke:currentColor;stroke-opacity:0.35;stroke-dasharray:5 5"/>
+        <line x1="435" y1="302" x2="585" y2="302" style="stroke:currentColor;stroke-opacity:0.8;stroke-width:2"/>
+        <polygon points="435,302 447,296 447,308" style="fill:currentColor;fill-opacity:0.8"/>
+        <polygon points="585,302 573,296 573,308" style="fill:currentColor;fill-opacity:0.8"/>
+        <text x="510" y="322" text-anchor="middle" font-size="12" style="fill:currentColor;fill-opacity:0.8">T (une période)</text>
+      </svg>
+      <p class="lecture-text" style="text-align:center;opacity:0.75;font-size:0.9rem">Schéma 1 — La spire tourne (<span class="math">θ = ω·t</span>) et la f.é.m. induite est une sinusoïde d'amplitude <span class="math">B·S·ω</span>.</p>
+      <p class="lecture-text">Explication intuitive : quand le plan de la spire est <em>perpendiculaire</em> au champ (<span class="math">θ = 0°</span>), le flux est maximal mais il ne change pas à cet instant précis — il « stagne » au sommet de son cosinus — donc <span class="math">e = 0</span>. Un quart de tour plus tard, le plan de la spire est <em>parallèle</em> au champ : le flux passe par zéro en changeant le plus vite possible, et c'est justement là que <span class="math">e</span> est maximale. La tension et le flux sont décalés d'un quart de tour, comme un posé sur un balancier.</p>
+      <div class="lecture-callout lecture-callout-warning">
+        <p><strong>⚠️ Piège d'examen —</strong> On croit souvent que <span class="math">e</span> est maximale quand <span class="math">Φ</span> est maximal. C'est <strong>faux</strong> : <span class="math">e</span> est maximale quand <span class="math">Φ = 0</span> (le plan de la spire est parallèle à <span class="math">→B</span>), et <span class="math">e = 0</span> quand <span class="math">Φ</span> est extrémal. Sur ta copie, les sommets de <span class="math">e(t)</span> correspondent aux passages de <span class="math">Φ(t)</span> par zéro.</p>
+      </div>
+      <div class="lecture-example-content">
+        <p class="lecture-example-label">📝 Exemple travaillé — un mini alternateur de laboratoire</p>
+        <p class="lecture-text">Énoncé : une bobine plate de <span class="math">N = 100</span> spires rectangulaires de dimensions <span class="math">10 cm × 20 cm</span> tourne à <span class="math">f = 50 Hz</span> dans un champ uniforme <span class="math">B = 0,5 T</span>, perpendiculaire à l'axe de rotation. Calculer l'expression de la f.é.m. induite.</p>
+        <div class="lecture-steps">
+          <div class="lecture-step">
+            <span class="lecture-step-number">1</span>
+            <div class="lecture-step-content">
+              <p class="lecture-subtitle">Je convertis et calcule la surface</p>
+              <p class="lecture-text"><span class="math">S = 0,10 × 0,20 = 0,02 m²</span>. Les dimensions sont bien converties en mètres avant d'élever ou de multiplier.</p>
+            </div>
+          </div>
+          <div class="lecture-step">
+            <span class="lecture-step-number">2</span>
+            <div class="lecture-step-content">
+              <p class="lecture-subtitle">Je passe de la fréquence à la vitesse angulaire</p>
+              <p class="lecture-text"><span class="math">ω = 2π·f = 2 × 3,14 × 50 = 314 rad/s</span> (soit <span class="math">100π</span> rad/s).</p>
+            </div>
+          </div>
+          <div class="lecture-step">
+            <span class="lecture-step-number">3</span>
+            <div class="lecture-step-content">
+              <p class="lecture-subtitle">Valeur maximale par spire</p>
+              <p class="lecture-text"><span class="math">B·S·ω = 0,5 × 0,02 × 314 = 3,14 V</span>. Vérification : 0,5 × 0,02 = 0,01, puis 0,01 × 314 = 3,14 ✔</p>
+            </div>
+          </div>
+          <div class="lecture-step">
+            <span class="lecture-step-number">4</span>
+            <div class="lecture-step-content">
+              <p class="lecture-subtitle">Je multiplie par le nombre de spires</p>
+              <p class="lecture-text">Les spires sont en série : <span class="math">e max = N·B·S·ω = 100 × 3,14 = 314 V</span>.</p>
+            </div>
+          </div>
+          <div class="lecture-step">
+            <span class="lecture-step-number">5</span>
+            <div class="lecture-step-content">
+              <p class="lecture-subtitle">J'écris l'expression complète</p>
+              <p class="lecture-text"><span class="math">e(t) = 314·|sin(314·t)| V</span> : une tension sinusoïdale de 50 Hz dont la valeur maximale vaut 314 V — même ordre de grandeur que la tension du réseau que l'on trouve derrière une prise avant abaissement.</p>
+            </div>
+          </div>
+        </div>
+        <p class="lecture-example-content">✅ Résultat : <span class="math">e(t) = 314·|sin(314·t)| V</span>, avec <span class="math">e max = N·B·S·ω = 314 V</span>.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s2 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s2">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">02</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2</span>
+        <h2 class="lecture-section-title">Alternateur et dynamo</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">La spire qui tourne de la section précédente n'est pas une expérience de laboratoire : c'est le cœur d'une machine industrielle, l'alternateur. On l'organise pour qu'un électroaimant tourne à l'intérieur d'un jeu de bobines fixes, et on entraîne l'ensemble avec une turbine, un moteur ou le pédalier d'un vélo.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <p><strong>🔑 Définitions officielles —</strong> <strong>Alternateur</strong> : machine qui convertit l'énergie mécanique en énergie électrique <em>alternative</em> par induction. Il comprend un <strong>rotor</strong> (partie tournante, souvent un électroaimant qui crée le champ) et un <strong>stator</strong> (partie fixe portant les bobines où naît la f.é.m. induite). <strong>Dynamo</strong> : machine similaire dont le collecteur tournant redresse le courant pour fournir du courant <em>continu</em>.</p>
+      </div>
+      <svg viewBox="0 0 640 300" role="img" aria-label="Coupe d'un alternateur : un rotor électroaimant tourne à l'intérieur d'un stator à bobines fixes ; à droite, la chaîne de conversion de l'énergie en quatre étapes">
+        <circle cx="160" cy="150" r="95" style="fill:rgba(226,232,240,0.04);stroke:currentColor;stroke-opacity:0.75;stroke-width:5"/>
+        <rect x="222" y="143" width="26" height="14" rx="3" style="fill:rgba(74,222,128,0.25);stroke:var(--accent-bright);stroke-width:1.5"/>
+        <rect x="184" y="208" width="26" height="14" rx="3" style="fill:rgba(74,222,128,0.25);stroke:var(--accent-bright);stroke-width:1.5"/>
+        <rect x="109" y="208" width="26" height="14" rx="3" style="fill:rgba(74,222,128,0.25);stroke:var(--accent-bright);stroke-width:1.5"/>
+        <rect x="72" y="143" width="26" height="14" rx="3" style="fill:rgba(74,222,128,0.25);stroke:var(--accent-bright);stroke-width:1.5"/>
+        <rect x="109" y="78" width="26" height="14" rx="3" style="fill:rgba(74,222,128,0.25);stroke:var(--accent-bright);stroke-width:1.5"/>
+        <rect x="184" y="78" width="26" height="14" rx="3" style="fill:rgba(74,222,128,0.25);stroke:var(--accent-bright);stroke-width:1.5"/>
+        <circle cx="160" cy="150" r="42" style="fill:rgba(251,191,36,0.18);stroke:rgba(251,191,36,0.9);stroke-width:2.5"/>
+        <text x="141" y="156" font-size="15" style="fill:rgba(248,113,113,1)">N</text>
+        <text x="169" y="156" font-size="15" style="fill:rgba(96,165,250,1)">S</text>
+        <path d="M 160,96 A 54 54 0 1 1 106,150" style="fill:none;stroke:var(--accent-bright);stroke-width:2.5"/>
+        <polygon points="106,138 99,152 113,152" style="fill:var(--accent-bright)"/>
+        <text x="160" y="44" text-anchor="middle" font-size="12" style="fill:currentColor;fill-opacity:0.8">rotation mécanique</text>
+        <text x="160" y="106" text-anchor="middle" font-size="12" style="fill:currentColor;fill-opacity:0.85">Rotor</text>
+        <text x="160" y="200" text-anchor="middle" font-size="12" style="fill:currentColor;fill-opacity:0.85">électroaimant</text>
+        <text x="160" y="272" text-anchor="middle" font-size="12" style="fill:currentColor;fill-opacity:0.75">Stator : bobines fixes (en vert)</text>
+        <rect x="345" y="42" width="272" height="42" rx="8" style="fill:rgba(226,232,240,0.05);stroke:currentColor;stroke-opacity:0.5;stroke-width:1.5"/>
+        <text x="357" y="68" font-size="12.5" style="fill:currentColor;fill-opacity:0.9">1 · Énergie mécanique (turbine, pédalier…)</text>
+        <line x1="481" y1="88" x2="481" y2="100" style="stroke:currentColor;stroke-opacity:0.7;stroke-width:2"/>
+        <polygon points="481,106 475,94 487,94" style="fill:currentColor;fill-opacity:0.7"/>
+        <rect x="345" y="108" width="272" height="42" rx="8" style="fill:rgba(226,232,240,0.05);stroke:currentColor;stroke-opacity:0.5;stroke-width:1.5"/>
+        <text x="357" y="134" font-size="12.5" style="fill:currentColor;fill-opacity:0.9">2 · Le rotor (électroaimant) tourne</text>
+        <line x1="481" y1="154" x2="481" y2="166" style="stroke:currentColor;stroke-opacity:0.7;stroke-width:2"/>
+        <polygon points="481,172 475,160 487,160" style="fill:currentColor;fill-opacity:0.7"/>
+        <rect x="345" y="174" width="272" height="42" rx="8" style="fill:rgba(226,232,240,0.05);stroke:currentColor;stroke-opacity:0.5;stroke-width:1.5"/>
+        <text x="357" y="200" font-size="12.5" style="fill:currentColor;fill-opacity:0.9">3 · Le flux Φ à travers le stator varie</text>
+        <line x1="481" y1="220" x2="481" y2="232" style="stroke:currentColor;stroke-opacity:0.7;stroke-width:2"/>
+        <polygon points="481,238 475,226 487,226" style="fill:currentColor;fill-opacity:0.7"/>
+        <rect x="345" y="240" width="272" height="42" rx="8" style="fill:rgba(74,222,128,0.12);stroke:var(--accent-bright);stroke-width:1.5"/>
+        <text x="357" y="266" font-size="12.5" style="fill:var(--accent-bright)">4 · F.é.m. sinusoïdale e(t) induite</text>
+      </svg>
+      <p class="lecture-text" style="text-align:center;opacity:0.75;font-size:0.9rem">Schéma 2 — L'alternateur : un rotor électroaimant fait varier le flux à travers les bobines fixes du stator.</p>
+      <p class="lecture-text">Pourquoi préférer un électroaimant tournant à un simple aimant ? Parce qu'on peut régler son courant d'alimentation, donc régler la tension produite. Et pourquoi des bobines fixes ? Parce qu'il est plus facile de récupérer le courant d'une partie immobile que d'une partie qui tourne — c'est l'ingéniosité essentielle de l'alternateur : le courant naît là où on ne tourne pas.</p>
+      <div class="lecture-formula-box">
+        <p>Fréquence de la tension produite (1 paire de pôles) : <span class="math">f = N/60</span> avec <span class="math">N</span> en tr/min, et <span class="math">ω = 2π·f</span>. Le réseau africain de l'Ouest impose <span class="math">f = 50 Hz</span>, d'où <span class="math">N = 3 000 tr/min</span>.</p>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <p><strong>⚠️ Piège d'examen —</strong> Alternateur et dynamo utilisent tous deux l'induction, mais l'alternateur délivre du courant <strong>alternatif</strong> alors que la dynamo, grâce à son collecteur, délivre du courant <strong>continu</strong>. Confondre les deux à la question « justifiez la nature du courant obtenu » coûte la moitié de la question.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s3 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s3">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">03</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 3</span>
+        <h2 class="lecture-section-title">Produire l'électricité : la chaîne de l'induction</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Prends n'importe quelle centrale électrique de la planète — sauf les panneaux solaires photovoltaïques — et tu retrouveras la même colonne vertébrale : une source d'énergie, une turbine, un alternateur. La nature de l'énergie primaire change, jamais le principe de production du courant. Voici la chaîne, maillon par maillon :</p>
+      <div class="lecture-steps">
+        <div class="lecture-step">
+          <span class="lecture-step-number">1</span>
+          <div class="lecture-step-content">
+            <p class="lecture-subtitle">Une source d'énergie primaire</p>
+            <p class="lecture-text">Eau en hauteur derrière un barrage, vapeur d'eau d'une centrale au gaz ou au charbon, vent, marée : l'énergie existe sous forme mécanique ou thermique.</p>
+          </div>
+        </div>
+        <div class="lecture-step">
+          <span class="lecture-step-number">2</span>
+          <div class="lecture-step-content">
+            <p class="lecture-subtitle">La turbine</p>
+            <p class="lecture-text">L'eau ou la vapeur frappe les ailettes et met la turbine en rotation : l'énergie primaire devient une énergie mécanique de rotation, à vitesse aussi constante que possible.</p>
+          </div>
+        </div>
+        <div class="lecture-step">
+          <span class="lecture-step-number">3</span>
+          <div class="lecture-step-content">
+            <p class="lecture-subtitle">L'alternateur</p>
+            <p class="lecture-text">La turbine entraîne le rotor : le flux à travers les bobines du stator varie, et la f.é.m. sinusoïdale <span class="math">e(t) = B·S·ω·|sin(ω·t)|</span> naît par induction. C'est le maillon de ce chapitre.</p>
+          </div>
+        </div>
+        <div class="lecture-step">
+          <span class="lecture-step-number">4</span>
+          <div class="lecture-step-content">
+            <p class="lecture-subtitle">Le transformateur</p>
+            <p class="lecture-text">La tension est élevée à plusieurs centaines de milliers de volts pour le transport — et le transformateur fonctionne lui aussi par induction : un flux variable d'un enroulement à l'autre.</p>
+          </div>
+        </div>
+        <div class="lecture-step">
+          <span class="lecture-step-number">5</span>
+          <div class="lecture-step-content">
+            <p class="lecture-subtitle">Le réseau</p>
+            <p class="lecture-text">Lignes à haute tension, postes de distribution, et enfin ta prise murale. Chaque ampère qui circule chez toi a été « poussé » par une f.é.m. d'induction.</p>
+          </div>
+        </div>
+      </div>
+      <p class="lecture-text">Retiens la hiérarchie : <strong>turbine = mouvement, alternateur = induction, transformateur = induction encore</strong>. Une seule exception dans le paysage mondial : le solaire photovoltaïque, qui convertit directement la lumière en électricité dans des matériaux semi-conducteurs, sans champ magnétique ni pièce tournante. C'est pourquoi il est le grand absent des exercices d'induction — mais le grand présent des sujets sur l'énergie.</p>
+      <div class="lecture-callout lecture-callout-warning">
+        <p><strong>⚠️ Piège d'examen —</strong> À la question « citez les étapes de la production d'électricité dans un barrage », toujours nommer l'<strong>alternateur</strong> et préciser qu'il fonctionne par <strong>induction</strong>. Répondre seulement « le barrage produit l'électricité » est une réponse nulle en physique.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s4 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s4">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">04</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 4</span>
+        <h2 class="lecture-section-title">Et au Niger ? Kandadji et le mix électrique</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Aujourd'hui, une grande partie de l'électricité consommée au Niger est importée du Nigeria voisin, complétée par des centrales thermiques et par des centrales solaires comme celle de Gorou Banda, près de Niamey. Ce mix énergétique est géré par la NIGELEC, la société nationale d'électricité. Mais le chapitre des grandes centrales à induction est en train de s'écrire.</p>
+      <p class="lecture-text">Le projet de <strong>barrage de Kandadji</strong>, sur le fleuve Niger dans la région de Tillabéri (à environ 180 km en amont de Niamey), prévoit un grand barrage destiné à produire de l'hydroélectricité, à réguler le débit du fleuve et à développer l'irrigation agricole en aval. Son principe est exactement celui de ce chapitre : l'eau retenue en hauteur possède de l'énergie potentielle ; en tombant, elle entraîne une turbine ; la turbine fait tourner le rotor d'un alternateur ; et c'est la variation du flux magnétique dans le stator qui crée la f.é.m. <span class="math">e(t)</span> sinusoïdale.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <p><strong>🔑 À retenir —</strong> Chaîne de Kandadji : énergie potentielle de l'eau → turbine → alternateur (induction) → réseau nigérien. Si tu sais refaire cette chaîne avec les mots du chapitre — flux, variation, f.é.m. induite — tu as compris l'essentiel du lien entre la physique et le développement du pays.</p>
+      </div>
+      <p class="lecture-text">Et l'éolien ? Le vent du Sahel, lui aussi, pourrait faire tourner des alternateurs : une éolienne n'est rien d'autre qu'une hélice entraînant la machine de la section précédente. Quant au solaire photovoltaïque, il complète le mix sans passer par l'induction — deux chemins différents vers la même prise murale. Chaque fois que tu allumes une lampe à Niamey, à Zinder ou à Maradi, l'énergie a traversé l'une de ces chaînes : aucune n'échappe au principe de conservation de l'énergie que la loi de Lenz illustrait déjà en partie 01.</p>
+      <div class="lecture-callout lecture-callout-warning">
+        <p><strong>⚠️ Piège d'examen —</strong> Ne confonds pas <strong>hydroélectricité</strong> (l'eau entraîne une turbine reliée à un alternateur : induction) et <strong>solaire photovoltaïque</strong> (conversion directe de la lumière, sans induction). Les sujets adorent opposer les deux pour tester ta compréhension.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s5 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s5">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">05</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 5</span>
+        <h2 class="lecture-section-title">Synthèse : machines et exercice</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Pour terminer, range les machines du chapitre dans un même tableau : qui convertit quoi, par quel principe, et où le croiser dans la vie réelle. C'est le genre de tableau que le Bac transforme en question de cours à deux points — apprends à le reproduire.</p>
+      <table class="lecture-table">
+        <thead>
+          <tr><th>Machine</th><th>Conversion</th><th>Principe</th><th>Exemple</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Alternateur</td><td>Mécanique → électrique (alternatif)</td><td>Induction : rotor électroaimant + stator fixe, <span class="math">e(t)</span> sinusoïdale</td><td>Centrales, groupes électrogènes, dynamos de vélo modernes</td></tr>
+          <tr><td>Dynamo</td><td>Mécanique → électrique (continu)</td><td>Induction + collecteur qui redresse le courant</td><td>Dynamo de vélo ancienne</td></tr>
+          <tr><td>Transformateur</td><td>Électrique → électrique (change la tension)</td><td>Induction : flux variable d'un enroulement à l'autre</td><td>Postes de distribution du réseau</td></tr>
+          <tr><td>Moteur électrique</td><td>Électrique → mécanique</td><td>Inverse de l'induction : forces magnétiques sur un courant</td><td>Pompes, ventilateurs, démarreur</td></tr>
+          <tr><td>Plaque à induction</td><td>Électrique → thermique</td><td>Induction : champ variable ⇒ courants induits qui chauffent</td><td>Cuisine</td></tr>
+        </tbody>
+      </table>
+      <div class="lecture-text">
+        <p class="lecture-exercise-label">🎯 Exercice d'application — la dynamo d'un vélo nigérien</p>
+        <p class="lecture-text">Énoncé : l'alternateur d'une dynamo de vélo comporte <span class="math">N = 50</span> spires rectangulaires de <span class="math">10 cm × 20 cm</span> tournant dans un champ uniforme <span class="math">B = 0,5 T</span>. Le cycliste roule de sorte que la rotation se fait à <span class="math">N_r = 300 tr/min</span>, avec une paire de pôles. Calculer la fréquence de la tension produite, puis sa valeur maximale.</p>
+        <details>
+          <summary>Voir la solution pas à pas</summary>
+          <div class="lecture-steps">
+            <div class="lecture-step">
+              <span class="lecture-step-number">1</span>
+              <div class="lecture-step-content">
+                <p class="lecture-subtitle">Je passe des tours par minute aux hertz</p>
+                <p class="lecture-text">Avec une paire de pôles : <span class="math">f = N_r/60 = 300/60 = 5 Hz</span>. La tension change de sens 5 fois par seconde par alternance.</p>
+              </div>
+            </div>
+            <div class="lecture-step">
+              <span class="lecture-step-number">2</span>
+              <div class="lecture-step-content">
+                <p class="lecture-subtitle">Je calcule la vitesse angulaire</p>
+                <p class="lecture-text"><span class="math">ω = 2π·f = 2 × 3,14 × 5 = 31,4 rad/s</span>.</p>
+              </div>
+            </div>
+            <div class="lecture-step">
+              <span class="lecture-step-number">3</span>
+              <div class="lecture-step-content">
+                <p class="lecture-subtitle">Je convertis la surface</p>
+                <p class="lecture-text"><span class="math">S = 0,10 × 0,20 = 0,02 m²</span>. Toujours les mètres avant les calculs ✔</p>
+              </div>
+            </div>
+            <div class="lecture-step">
+              <span class="lecture-step-number">4</span>
+              <div class="lecture-step-content">
+                <p class="lecture-subtitle">J'applique la formule de la spire tournante</p>
+                <p class="lecture-text">Par spire : <span class="math">B·S·ω = 0,5 × 0,02 × 31,4 = 0,314 V</span>. Pour 50 spires : <span class="math">e max = N·B·S·ω = 50 × 0,314 = 15,7 V</span>. Vérification : 0,5 × 0,02 = 0,01 ; 0,01 × 31,4 = 0,314 ; × 50 = 15,7 ✔ Largement de quoi allumer une lampe de vélo.</p>
+              </div>
+            </div>
+          </div>
+        </details>
+      </div>
+      <p class="lecture-text">Le chapitre est maintenant complet : tu sais pourquoi l'induction se produit, comment mesurer le flux, comment calculer la f.é.m. — et tu sais d'où vient le courant alternatif du réseau. La partie 04 condense tout cela en une fiche de révision taillée pour la veille de l'examen.</p>
+    </div>
+  </section>
+  <!-- ===== QCM ===== -->
+  <div class="lecture-quiz">
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Une spire tourne à vitesse constante dans un champ uniforme. La f.é.m. induite est maximale quand :</p>
+      <div class="lecture-quiz-options"><span>A) Le flux Φ est maximal</span><span>B) Le plan de la spire est parallèle à →B</span><span>C) La spire est immobile</span><span>D) θ = 0°</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">Réponse B. <span class="math">e(t) = B·S·ω·|sin(ω·t)|</span> est maximale quand <span class="math">sin(ω·t)</span> l'est, c'est-à-dire quand <span class="math">cos(ω·t) = 0</span> : le flux est nul et le plan de la spire est parallèle à <span class="math">→B</span>. Quand le flux est maximal (options A et D), la f.é.m. est nulle.</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Dans un alternateur, le rôle du rotor est :</p>
+      <div class="lecture-quiz-options"><span>A) Créer le champ magnétique tournant</span><span>B) Recueillir le courant induit</span><span>C) Redresser le courant alternatif</span><span>D) Mesurer le flux Φ</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">Réponse A. Le rotor est la partie tournante, souvent un électroaimant : en tournant, il fait varier le flux à travers les bobines fixes du stator, où naît la f.é.m. induite. Le courant est recueilli au stator (option B fausse pour un alternateur).</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Quelle centrale ne produit PAS son électricité par induction (alternateur) ?</p>
+      <div class="lecture-quiz-options"><span>A) Le barrage hydroélectrique</span><span>B) La centrale au gaz</span><span>C) La centrale solaire photovoltaïque</span><span>D) L'éolienne</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">Réponse C. Le photovoltaïque convertit directement la lumière en électricité dans des semi-conducteurs, sans pièce tournante ni champ magnétique variable. Barrage, centrale au gaz et éolienne entraînent toutes une turbine reliée à un alternateur.</div></details>
+    </div>
+  </div>
+  <!-- ===== RÉCAP ===== -->
+  <div class="lecture-recap">
+    <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
+    <ul class="lecture-recap-list">
+      <li><strong>Spire tournante</strong> : <span class="math">Φ(t) = B·S·cos(ω·t)</span> et <span class="math">e(t) = B·S·ω·|sin(ω·t)|</span> ; <span class="math">e</span> est maximale quand le plan de la spire est parallèle à <span class="math">→B</span>.</li>
+      <li><strong>Alternateur et dynamo</strong> : rotor (électroaimant tournant) + stator (bobines fixes) ; l'alternateur donne de l'alternatif, la dynamo du continu ; <span class="math">f = N/60</span> pour 1 paire de pôles.</li>
+      <li><strong>Production d'électricité</strong> : source d'énergie → turbine → alternateur → réseau ; au Niger, le barrage de Kandadji suivra exactement cette chaîne.</li>
+    </ul>
+  </div>
+  <!-- ===== FIN ===== -->
+  <div class="lecture-end">
+    <div class="lecture-end-icon">🎯</div>
+    <div class="lecture-end-text">Partie 03 terminée !</div>
+    <div class="lecture-end-sub">Le chapitre est maintenant complet, de l'aimant qui s'approche au barrage qui produit des mégawatts. Direction la partie 04 : la fiche de révision complète qui condense tout en une table, un vocabulaire express et dix réflexes pour le jour J.</div>
+    <div class="lecture-end-divider"></div>
+  </div>
+</div>

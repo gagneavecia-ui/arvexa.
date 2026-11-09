@@ -1,0 +1,330 @@
+<!-- PARTIE 02 — Calcul du pH d'un acide fort (Acide fort, base forte) -->
+<div class="lecture-container">
+
+  <!-- ===== HERO ===== -->
+  <header class="lecture-hero">
+    <div class="lecture-hero-badge">
+      <span class="lecture-hero-icon">📘</span>
+      <span class="lecture-hero-label">Terminale C&D · Acide fort, base forte · Partie 02</span>
+    </div>
+    <h1 class="lecture-hero-title">
+      Calcul du pH d'un <em>acide fort</em>
+    </h1>
+    <p class="lecture-hero-intro">
+      Dans la partie 01, tu as vu que le HCl versé dans l'eau disparaît totalement pour laisser place aux ions H₃O⁺. Il est temps de transformer cette intuition en nombres : tu vas apprendre à calculer le pH de n'importe quelle solution d'acide fort avec une formule unique, à la démontrer toi-même, puis à repérer le seuil de concentration au-delà duquel elle cesse d'être valable. C'est l'une des formules les plus rentables de tout le programme de Terminale.
+    </p>
+    <div class="lecture-hero-meta">
+      <span class="lecture-hero-meta-item">⏱ 25 min</span>
+      <span class="lecture-hero-meta-item">⚗️ 4 notions</span>
+      <span class="lecture-hero-meta-item">📚 6 sections</span>
+      <span class="lecture-hero-meta-item">🎓 Terminale C&D</span>
+    </div>
+  </header>
+  <!-- ===== SOMMAIRE ===== -->
+  <nav class="lecture-toc">
+    <div class="lecture-toc-header">
+      <span>Dans cette partie</span>
+      <span class="lecture-toc-count">4 notions · 6 sections</span>
+    </div>
+    <ol class="lecture-toc-list">
+      <li><a href="#s0"><span class="toc-num">00</span><span>À quoi sert un calcul de pH ?</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>L'eau d'abord : autoprotolyse et produit ionique</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>La formule du jour : pH = −log C</span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>Exemple travaillé et entraînement</span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>Dilution, échelle de pH et limites de la formule</span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>Exercice de synthèse : du pH à la masse</span></a></li>
+    </ol>
+  </nav>
+  <!-- ============================================================ -->
+  <!-- SECTION s0 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s0">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">00</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Motivation</span>
+        <h2 class="lecture-section-title">À quoi sert un calcul de pH ?</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Imagine-toi au laboratoire : tu dois doser un détartrant ou préparer une solution d'attaque pour le cuivre. Le pH-mètre du lycée est en panne — ou le matériel manque. Un chimiste prévoit le pH sur le papier, à partir de la seule concentration, avant même de verser la première goutte. C'est ce réflexe que cette partie va t'installer.</p>
+      <svg viewBox="0 0 560 240" role="img" aria-label="Mesure de pH avec un pH-mètre">
+        <text x="300" y="22" text-anchor="middle" font-size="13" fill="currentColor" opacity="0.8">Le pH-mètre lit directement le pH de la solution</text>
+        <line x1="70" y1="40" x2="70" y2="215" stroke="currentColor" stroke-width="3" opacity="0.6"/>
+        <line x1="40" y1="215" x2="110" y2="215" stroke="currentColor" stroke-width="3" opacity="0.6"/>
+        <rect x="30" y="40" width="130" height="44" rx="8" fill="rgba(224,184,74,0.15)" style="stroke:var(--accent-bright)" stroke-width="1.5"/>
+        <text x="95" y="60" text-anchor="middle" font-size="12" fill="currentColor">pH-mètre</text>
+        <text x="95" y="76" text-anchor="middle" font-size="14" style="fill:var(--accent-bright)">pH = 2,30</text>
+        <line x1="160" y1="70" x2="272" y2="70" stroke="currentColor" stroke-width="3" opacity="0.6"/>
+        <rect x="266" y="70" width="14" height="95" rx="6" fill="rgba(200,200,210,0.25)" style="stroke:var(--accent-bright)" stroke-width="1.2"/>
+        <path d="M 240 130 L 240 205 Q 240 222 258 222 L 302 222 Q 320 222 320 205 L 320 130" fill="none" stroke="currentColor" stroke-width="2" opacity="0.7"/>
+        <path d="M 246 150 L 246 203 Q 246 216 260 216 L 300 216 Q 314 216 314 203 L 314 150 Z" fill="rgba(224,184,74,0.12)"/>
+        <text x="340" y="120" font-size="12" fill="currentColor" opacity="0.85">électrode</text>
+        <line x1="286" y1="100" x2="336" y2="115" stroke="currentColor" opacity="0.4"/>
+        <text x="280" y="238" text-anchor="middle" font-size="12" fill="currentColor" opacity="0.85">Solution d'acide fort : l'affichage doit retrouver la valeur calculée pH = −log C.</text>
+      </svg>
+      <p class="lecture-text">Et ce n'est pas qu'une affaire de laboratoire : le pH du sol conditionne le rendement du mil et de l'arachide, la chloration d'une piscine n'est efficace que si le pH reste entre 7,2 et 7,8, et l'industrie textile ou brassicole surveille ses bains en permanence. Calculer un pH, c'est économiser du matériel, du temps et des réactifs.</p>
+      <div class="lecture-callout lecture-callout-warning">
+        <p class="lecture-text"><strong>⚠️ Rappel de sécurité :</strong> un acide fort concentré provoque des brûlures graves. En cas de contact, rincer abondamment à l'eau et prévenir immédiatement le professeur.</p>
+      </div>
+      <p class="lecture-text">Le programme de la partie : on part de ce que tu verses dans l'eau (concentration C d'un acide fort) et on arrive au pH, sans mesurer. Un seul détour est nécessaire : comprendre ce que l'eau elle-même apporte comme ions.</p>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s1 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s1">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">01</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1</span>
+        <h2 class="lecture-section-title">L'eau d'abord : autoprotolyse et produit ionique</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Avant de calculer un pH, il faut connaître l'arbitre du match : l'eau elle-même. Même parfaitement pure, l'eau contient des ions H₃O⁺ et OH⁻, en quantité infime mais mesurable. C'est l'autoprotolyse : deux molécules d'eau échangent un proton, l'une jouant l'acide, l'autre la base.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <p class="lecture-text"><strong>Définition officielle.</strong> À 25 °C, dans <strong>toute</strong> solution aqueuse : <span class="math">[H₃O⁺] × [OH⁻] = Ke = 10⁻¹⁴</span> (produit ionique de l'eau). Dans l'eau pure : [H₃O⁺] = [OH⁻] = 10⁻⁷ mol·L⁻¹, d'où pH = 7,00 : l'eau pure est neutre.</p>
+      </div>
+      <div class="lecture-formula-hero">
+        <span class="math">[H₃O⁺] × [OH⁻] = 10⁻¹⁴ (à 25 °C)</span>
+      </div>
+      <div class="lecture-formula-box">
+        <span class="math">pH = −log[H₃O⁺] ; [H₃O⁺] = 10⁻ᵖᴴ</span>
+      </div>
+      <svg viewBox="0 0 560 140" role="img" aria-label="Autoprotolyse de l'eau">
+        <text x="280" y="20" text-anchor="middle" font-size="13" fill="currentColor" opacity="0.8">L'eau réagit avec elle-même (très faiblement)</text>
+        <rect x="40" y="50" width="80" height="44" rx="10" fill="rgba(224,184,74,0.15)" style="stroke:var(--accent-bright)" stroke-width="1.5"/>
+        <text x="80" y="78" text-anchor="middle" font-size="18" fill="currentColor">H₂O</text>
+        <text x="132" y="78" text-anchor="middle" font-size="16" fill="currentColor" opacity="0.8">+</text>
+        <rect x="144" y="50" width="80" height="44" rx="10" fill="rgba(224,184,74,0.15)" style="stroke:var(--accent-bright)" stroke-width="1.5"/>
+        <text x="184" y="78" text-anchor="middle" font-size="18" fill="currentColor">H₂O</text>
+        <text x="248" y="80" text-anchor="middle" font-size="20" style="fill:var(--accent-bright)">⇌</text>
+        <rect x="272" y="50" width="100" height="44" rx="10" fill="rgba(224,184,74,0.15)" style="stroke:var(--accent-bright)" stroke-width="1.5"/>
+        <text x="322" y="78" text-anchor="middle" font-size="18" fill="currentColor">H₃O⁺</text>
+        <text x="384" y="78" text-anchor="middle" font-size="16" fill="currentColor" opacity="0.8">+</text>
+        <rect x="396" y="50" width="100" height="44" rx="10" fill="rgba(224,184,74,0.15)" style="stroke:var(--accent-bright)" stroke-width="1.5"/>
+        <text x="446" y="78" text-anchor="middle" font-size="18" fill="currentColor">OH⁻</text>
+        <text x="280" y="126" text-anchor="middle" font-size="12" fill="currentColor" opacity="0.85">Une molécule cède un proton, l'autre le capte : 2 H₂O ⇌ H₃O⁺ + OH⁻.</text>
+      </svg>
+      <p class="lecture-text"><strong>Analogie.</strong> Le produit [H₃O⁺] × [OH⁻] est verrouillé à 10⁻¹⁴ : imagine une balançoire dont le produit des deux positions serait fixe. Quand un côté monte, l'autre descend forcément : plus il y a de H₃O⁺, moins il reste d'OH⁻, et inversement.</p>
+      <div class="lecture-example-content">
+        <p class="lecture-text"><strong>🧪 Exemple travaillé — l'eau et ses deux ions.</strong> Vérifions la neutralité de l'eau, puis le jeu de bascule entre les deux ions.</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step"><strong>Eau pure.</strong> [H₃O⁺] = 10⁻⁷ mol·L⁻¹, donc pH = −log(10⁻⁷) = 7,00 : l'eau pure est neutre ✓.</li>
+          <li class="lecture-step"><strong>On ajoute un acide.</strong> Si [H₃O⁺] = 10⁻² mol·L⁻¹, alors [OH⁻] = 10⁻¹⁴ ÷ 10⁻² = 10⁻¹² mol·L⁻¹ : les OH⁻ ont presque disparu.</li>
+          <li class="lecture-step"><strong>Vérification.</strong> 10⁻² × 10⁻¹² = 10⁻¹⁴ ✓ : le produit reste bien verrouillé, quelle que soit la solution.</li>
+        </ol>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <p class="lecture-text"><strong>⚠️ Piège :</strong> Ke = 10⁻¹⁴ n'est valable qu'à 25 °C. Si un énoncé mentionne une autre température, « pH = 7 ⇔ neutre » ne s'applique plus tel quel : signale-le dans ta copie.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s2 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s2">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">02</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2</span>
+        <h2 class="lecture-section-title">La formule du jour : pH = −log C</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Mettons bout à bout ce que tu sais déjà : le HCl réagit totalement avec l'eau (partie 01), et le pH traduit la concentration en ions H₃O⁺ (section précédente). Il ne reste qu'un pas à franchir — et il est court. Fais-le en trois gestes :</p>
+      <ol class="lecture-steps">
+        <li class="lecture-step"><strong>Réaction totale.</strong> Chaque mole de HCl donne une mole de H₃O⁺ : n(H₃O⁺) = n(HCl) = C·V.</li>
+        <li class="lecture-step"><strong>Diviser par le volume.</strong> [H₃O⁺] = n ÷ V = C·V ÷ V = C : la concentration en ions oxonium égale la concentration d'acide versé.</li>
+        <li class="lecture-step"><strong>Passer au pH.</strong> pH = −log[H₃O⁺] = −log C. Démonstration terminée !</li>
+      </ol>
+      <div class="lecture-formula-hero">
+        <span class="math">pH = −log C</span>
+      </div>
+      <p class="lecture-text">Conditions d'application : acide fort monoprotonique (HCl, HNO₃…), concentration C en mol·L⁻¹, à 25 °C, et tant que C ≥ 10⁻⁶ mol·L⁻¹ (cette limite est expliquée en section 04).</p>
+      <div class="lecture-formula-box">
+        <span class="math">n(H₃O⁺) = C·V</span>
+      </div>
+      <p class="lecture-text">avec V en litres : c'est la brique de départ de la démonstration, et le réflexe à écrire en première ligne de copie.</p>
+      <svg viewBox="0 0 560 235" role="img" aria-label="Concentration en ions oxonium d'une solution d'acide fort">
+        <text x="250" y="24" text-anchor="middle" font-size="13" fill="currentColor" opacity="0.8">Tout l'acide versé est devenu H₃O⁺</text>
+        <path d="M 160 40 L 160 200 Q 160 218 178 218 L 322 218 Q 340 218 340 200 L 340 40" fill="none" stroke="currentColor" stroke-width="2" opacity="0.7"/>
+        <path d="M 166 115 L 166 198 Q 166 212 180 212 L 320 212 Q 334 212 334 198 L 334 115 Z" fill="rgba(224,184,74,0.12)"/>
+        <circle cx="215" cy="150" r="13" fill="rgba(224,184,74,0.3)" style="stroke:var(--accent-bright)" stroke-width="1.2"/>
+        <text x="215" y="155" text-anchor="middle" font-size="11" fill="currentColor">+</text>
+        <circle cx="270" cy="135" r="13" fill="rgba(224,184,74,0.3)" style="stroke:var(--accent-bright)" stroke-width="1.2"/>
+        <text x="270" y="140" text-anchor="middle" font-size="11" fill="currentColor">+</text>
+        <circle cx="255" cy="188" r="13" fill="rgba(224,184,74,0.3)" style="stroke:var(--accent-bright)" stroke-width="1.2"/>
+        <text x="255" y="193" text-anchor="middle" font-size="11" fill="currentColor">+</text>
+        <circle cx="308" cy="168" r="13" fill="rgba(224,184,74,0.3)" style="stroke:var(--accent-bright)" stroke-width="1.2"/>
+        <text x="308" y="173" text-anchor="middle" font-size="11" fill="currentColor">+</text>
+        <circle cx="215" cy="192" r="13" fill="rgba(120,150,255,0.25)" style="stroke:rgba(150,180,255,0.9)" stroke-width="1.2"/>
+        <text x="215" y="197" text-anchor="middle" font-size="11" fill="currentColor">−</text>
+        <circle cx="308" cy="132" r="13" fill="rgba(120,150,255,0.25)" style="stroke:rgba(150,180,255,0.9)" stroke-width="1.2"/>
+        <text x="308" y="137" text-anchor="middle" font-size="11" fill="currentColor">−</text>
+        <text x="440" y="90" text-anchor="middle" font-size="15" fill="currentColor">[H₃O⁺] = C</text>
+        <text x="440" y="120" text-anchor="middle" font-size="14" fill="currentColor">[Cl⁻] = C</text>
+        <text x="440" y="155" text-anchor="middle" font-size="13" fill="currentColor" opacity="0.85">ici C = 1,0·10⁻² mol·L⁻¹</text>
+        <text x="250" y="232" text-anchor="middle" font-size="12" fill="currentColor" opacity="0.85">La concentration en ions oxonium égale la concentration d'acide dissous.</text>
+      </svg>
+      <p class="lecture-text"><strong>Analogie.</strong> Le logarithme, c'est un compteur de zéros : 10⁻¹ → 1 ; 10⁻² → 2 ; 0,001 → 3. La calculatrice fait le calcul, mais garde ce réflexe d'estimation pour repérer immédiatement un résultat aberrant.</p>
+      <div class="lecture-callout lecture-callout-warning">
+        <p class="lecture-text"><strong>⚠️ Piège :</strong> C doit être en mol·L⁻¹. Si l'énoncé donne des g·L⁻¹ ou des volumes en mL, convertis AVANT de calculer : 200 mL = 0,200 L, et jamais l'inverse.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s3 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s3">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">03</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 3</span>
+        <h2 class="lecture-section-title">Exemple travaillé et entraînement</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Appliquons la formule en conditions réelles d'exercice, avec la vérification inverse qui fait la différence entre une bonne copie et une excellente.</p>
+      <div class="lecture-example-content">
+        <p class="lecture-text"><strong>🧪 Exemple travaillé — pH d'une solution chlorhydrique.</strong> Une solution d'acide chlorhydrique a pour concentration C = 5,0·10⁻³ mol·L⁻¹. Calcule son pH à 25 °C.</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step"><strong>Identifier.</strong> HCl est un acide fort monoprotonique, C = 5,0·10⁻³ ≥ 10⁻⁶ : la formule pH = −log C s'applique.</li>
+          <li class="lecture-step"><strong>Concentration en ions.</strong> Réaction totale : [H₃O⁺] = C = 5,0·10⁻³ mol·L⁻¹.</li>
+          <li class="lecture-step"><strong>Calculer le pH.</strong> pH = −log(5,0·10⁻³) = 3 − log 5,0 = 3 − 0,70 = 2,30.</li>
+          <li class="lecture-step"><strong>Vérifier dans l'autre sens.</strong> 10⁻²,³⁰ = 10⁻³ × 10⁰,⁷⁰ = 5,0·10⁻³ mol·L⁻¹ ✓ : on retrouve bien C.</li>
+          <li class="lecture-step"><strong>Contrôler la cohérence.</strong> Acide ⇒ pH inférieur à 7 : 2,30 convient ✓.</li>
+        </ol>
+      </div>
+      <div class="lecture-text">
+        <p class="lecture-text"><strong>🏋️ Exercice 1 — L'acide nitrique.</strong> On dissout n = 2,0·10⁻³ mol d'acide nitrique HNO₃ (acide fort) dans de l'eau et on complète à V = 200 mL. Calcule la concentration C de la solution, puis son pH à 25 °C.</p>
+        <details><summary>Voir la solution étape par étape</summary>
+          <ol class="lecture-steps">
+            <li class="lecture-step"><strong>Équation de dissociation.</strong> HNO₃ + H₂O → H₃O⁺ + NO₃⁻ : réaction totale (acide fort).</li>
+            <li class="lecture-step"><strong>Concentration.</strong> C = n ÷ V = 2,0·10⁻³ ÷ 0,200 = 1,0·10⁻² mol·L⁻¹ (attention : 200 mL = 0,200 L !).</li>
+            <li class="lecture-step"><strong>Ions oxonium.</strong> [H₃O⁺] = C = 1,0·10⁻² mol·L⁻¹.</li>
+            <li class="lecture-step"><strong>pH.</strong> pH = −log(1,0·10⁻²) = 2,00, valeur cohérente pour un acide ✓ (vérification : 10⁻²,⁰⁰ = 1,0·10⁻² ✓).</li>
+          </ol>
+        </details>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <p class="lecture-text"><strong>⚠️ Piège classique :</strong> oublier le volume. Dissoudre 2,0·10⁻³ mol dans 200 mL ne donne PAS C = 2,0·10⁻³ mol·L⁻¹ mais C = 1,0·10⁻² mol·L⁻¹. Toujours diviser par le volume en litres.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s4 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s4">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">04</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 4</span>
+        <h2 class="lecture-section-title">Dilution, échelle de pH et limites de la formule</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Que devient le pH quand on dilue ? Chaque dilution d'un facteur 10 divise C par 10 et fait donc monter le pH d'une unité — tant que la formule reste valable. C'est un raccourci précieux pour contrôler tes résultats.</p>
+      <svg viewBox="0 0 560 210" role="img" aria-label="Dilution d'un facteur 10 avec pipette et fiole jaugées">
+        <text x="280" y="20" text-anchor="middle" font-size="13" fill="currentColor" opacity="0.8">Diluer 10 fois fait monter le pH d'une unité</text>
+        <rect x="80" y="50" width="18" height="95" rx="6" fill="rgba(224,184,74,0.15)" style="stroke:var(--accent-bright)" stroke-width="1.5"/>
+        <rect x="84" y="90" width="10" height="50" fill="rgba(224,184,74,0.4)"/>
+        <polygon points="80,145 98,145 89,168" fill="rgba(224,184,74,0.4)"/>
+        <text x="89" y="188" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.85">pipette : 10,0 mL</text>
+        <text x="89" y="40" text-anchor="middle" font-size="12" style="fill:var(--accent-bright)">pH = 2,00</text>
+        <path d="M 210 100 L 268 100" style="stroke:var(--accent-bright)" stroke-width="2"/>
+        <polygon points="276,100 264,95 264,105" style="fill:var(--accent-bright)"/>
+        <text x="244" y="88" text-anchor="middle" font-size="12" fill="currentColor">×10</text>
+        <rect x="360" y="40" width="20" height="18" fill="rgba(224,184,74,0.15)" style="stroke:var(--accent-bright)" stroke-width="1.5"/>
+        <path d="M 370 52 L 336 170 L 404 170 Z" fill="rgba(224,184,74,0.15)" style="stroke:var(--accent-bright)" stroke-width="1.5"/>
+        <text x="370" y="188" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.85">fiole jaugée : 100,0 mL</text>
+        <text x="370" y="158" text-anchor="middle" font-size="12" fill="currentColor">pH = 3,00</text>
+        <text x="280" y="205" text-anchor="middle" font-size="12" fill="currentColor" opacity="0.85">Même quantité d'acide, volume ×10 : concentration ÷10, donc pH + 1.</text>
+      </svg>
+      <p class="lecture-text">Le tableau suivant résume l'échelle des pH d'un acide fort. Observe la dernière ligne : elle annonce la limite.</p>
+      <table class="lecture-table">
+        <thead><tr><th>C (mol·L⁻¹)</th><th>[H₃O⁺] (mol·L⁻¹)</th><th>pH = −log C</th><th>Remarque</th></tr></thead>
+        <tbody>
+          <tr><td>10⁻¹</td><td>10⁻¹</td><td>1,0</td><td>solution très acide</td></tr>
+          <tr><td>10⁻²</td><td>10⁻²</td><td>2,0</td><td>dilution ×10 depuis la ligne du dessus</td></tr>
+          <tr><td>10⁻³</td><td>10⁻³</td><td>3,0</td><td></td></tr>
+          <tr><td>10⁻⁴</td><td>10⁻⁴</td><td>4,0</td><td></td></tr>
+          <tr><td>10⁻⁵</td><td>10⁻⁵</td><td>5,0</td><td></td></tr>
+          <tr><td>10⁻⁶</td><td>10⁻⁶</td><td>6,0</td><td>limite de validité de la formule</td></tr>
+          <tr><td>10⁻⁷</td><td>≈ 1,6·10⁻⁷</td><td>≈ 6,79</td><td>l'eau compte ! (voir partie 03)</td></tr>
+        </tbody>
+      </table>
+      <div class="lecture-formula-hero">
+        <span class="math">Dilution ×10 ⇒ pH₂ = pH₁ + 1</span>
+      </div>
+      <p class="lecture-text">Réciproquement, concentrer 10 fois un acide fort fait descendre le pH d'une unité. Et une dilution d'un facteur 100 fait monter le pH de 2 unités, etc.</p>
+      <div class="lecture-callout lecture-callout-warning">
+        <p class="lecture-text"><strong>⚠️ La limite à connaître :</strong> la formule pH = −log C n'est valable que si C ≥ 10⁻⁶ mol·L⁻¹. En dessous, les ions H₃O⁺ apportés par l'eau elle-même (10⁻⁷) ne sont plus négligeables. Exemple absurde : pour C = 10⁻⁸, la formule donnerait pH = 8,00 — or un acide ne peut jamais avoir un pH supérieur à 7 !</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s5 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s5">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">05</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Entraînement</span>
+        <h2 class="lecture-section-title">Exercice de synthèse : du pH à la masse</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Au bac, on te demande souvent de remonter la piste en sens inverse : du pH vers la concentration, puis vers la masse pesée. Entraîne-toi avec ce format classique.</p>
+      <div class="lecture-text">
+        <p class="lecture-text"><strong>🏋️ Exercice 2 — Identifier une solution.</strong> Une solution S d'acide chlorhydrique a un pH égal à 3,30 à 25 °C. 1) Calcule [H₃O⁺]. 2) En déduire la concentration C de la solution. 3) Calcule la quantité de matière n(HCl) contenue dans V = 500 mL. 4) Calcule la masse m de gaz chlorhydrique dissous (M(HCl) = 36,5 g·mol⁻¹).</p>
+        <details><summary>Voir la solution étape par étape</summary>
+          <ol class="lecture-steps">
+            <li class="lecture-step"><strong>De pH à la concentration.</strong> [H₃O⁺] = 10⁻ᵖᴴ = 10⁻³,³⁰ = 10⁻⁴ × 10⁰,⁷⁰ = 5,0·10⁻⁴ mol·L⁻¹.</li>
+            <li class="lecture-step"><strong>Concentration de l'acide.</strong> HCl est un acide fort (C ≥ 10⁻⁶ ici) : C = [H₃O⁺] = 5,0·10⁻⁴ mol·L⁻¹.</li>
+            <li class="lecture-step"><strong>Quantité de matière.</strong> n = C·V = 5,0·10⁻⁴ × 0,500 = 2,5·10⁻⁴ mol (V = 500 mL = 0,500 L ✓).</li>
+            <li class="lecture-step"><strong>Masse dissoute.</strong> m = n·M = 2,5·10⁻⁴ × 36,5 = 9,1·10⁻³ g = 9,1 mg (vérification : 2,5 × 36,5 = 91,25 ✓).</li>
+            <li class="lecture-step"><strong>Cohérence.</strong> pH = 3,30 acide ✓, et 9 mg de HCl dans un demi-litre : plausible pour une solution bien diluée ✓.</li>
+          </ol>
+        </details>
+      </div>
+      <p class="lecture-text">Tu sais maintenant naviguer dans les deux sens : C → pH et pH → C. La partie 03 retourne la jaquette : côté bases fortes.</p>
+    </div>
+  </section>
+  <!-- ===== QCM ===== -->
+  <div class="lecture-quiz">
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Un acide fort a une concentration C = 10⁻⁵ mol·L⁻¹ (à 25 °C). Son pH vaut :</p>
+      <div class="lecture-quiz-options"><span>A) 5</span><span>B) −5</span><span>C) 9</span><span>D) 7</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">Réponse A. Acide fort avec C ≥ 10⁻⁶ : pH = −log(10⁻⁵) = 5. L'option C est le piège miroir (ce serait le pH d'une base forte à C = 10⁻⁵), la B inverse le signe du log, la D ignore l'acide.</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">On dilue 100 fois une solution d'acide fort de pH = 2,00 (dilution restant dans le domaine de validité). Le nouveau pH vaut :</p>
+      <div class="lecture-quiz-options"><span>A) 0,02</span><span>B) 2,00</span><span>C) 4,00</span><span>D) 200</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer">Réponse C. Diluer 10 fois fait monter le pH de 1 : diluer 100 = 10² fois fait monter le pH de 2, donc pH = 4,00. Vérification : C passe de 10⁻² à 10⁻⁴ mol·L⁻¹, et 10⁻⁴ ≥ 10⁻⁶ donc la formule reste valable ✓.</div></details>
+    </div>
+  </div>
+  <!-- ===== RÉCAP ===== -->
+  <div class="lecture-recap">
+    <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
+    <ul class="lecture-recap-list">
+      <li><strong>Produit ionique</strong> — dans toute solution aqueuse à 25 °C : [H₃O⁺] × [OH⁻] = 10⁻¹⁴ ; l'eau pure a un pH de 7,00.</li>
+      <li><strong>pH d'un acide fort</strong> — réaction totale donc [H₃O⁺] = C, d'où pH = −log C, valable si C ≥ 10⁻⁶ mol·L⁻¹.</li>
+      <li><strong>Dilution</strong> — ×10 ⇒ pH + 1 (acide) ; et toujours vérifier C ≥ 10⁻⁶ avant d'appliquer la formule.</li>
+    </ul>
+  </div>
+  <!-- ===== FIN ===== -->
+  <div class="lecture-end">
+    <div class="lecture-end-icon">🎯</div>
+    <div class="lecture-end-text">Partie 02 terminée !</div>
+    <div class="lecture-end-sub">L'acide n'a plus de secret pour toi. La partie 03 retourne la situation : côté bases fortes, le pH dépasse 7 et la formule devient pH = 14 + log C. On s'y met !</div>
+    <div class="lecture-end-divider"></div>
+  </div>
+</div>

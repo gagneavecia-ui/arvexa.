@@ -1,0 +1,396 @@
+<!-- PARTIE 01 — Notion de couple acide/base (Couples acide/base et classification) -->
+<div class="lecture-container">
+
+  <!-- ===== HERO ===== -->
+  <header class="lecture-hero">
+    <div class="lecture-hero-badge">
+      <span class="lecture-hero-icon">📘</span>
+      <span class="lecture-hero-label">Terminale C&D · Couples acide/base et classification · Partie 01</span>
+    </div>
+    <h1 class="lecture-hero-title">
+      Notion de <em>couple acide/base</em>
+    </h1>
+    <p class="lecture-hero-intro">
+      Cette première partie pose la brique de base de toute la chimie acido-basique : le couple acide/base, deux espèces liées par un seul proton <span class="math">H⁺</span>. Tu y découvriras les deux couples de l'eau, les couples usuels avec leurs valeurs de <span class="math">pKa</span>, l'écriture des demi-équations et le cas particulier des ampholytes. Tout ce vocabulaire sera réutilisé sans arrêt dans les parties 02 et 03.
+    </p>
+    <div class="lecture-hero-meta">
+      <span class="lecture-hero-meta-item">⏱ 20 min</span>
+      <span class="lecture-hero-meta-item">⚗️ 5 notions</span>
+      <span class="lecture-hero-meta-item">📚 6 sections</span>
+      <span class="lecture-hero-meta-item">🎓 Terminale C&D</span>
+    </div>
+  </header>
+  <!-- ===== SOMMAIRE ===== -->
+  <nav class="lecture-toc">
+    <div class="lecture-toc-header">
+      <span>Dans cette partie</span>
+      <span class="lecture-toc-count">5 notions · 6 sections</span>
+    </div>
+    <ol class="lecture-toc-list">
+      <li><a href="#s0"><span class="toc-num">00</span><span>Pourquoi parler de couples ?</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>Le couple acide/base <span class="math">AH/A⁻</span></span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>Les deux couples de l'eau</span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>Couples usuels et échelle des pKa</span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>Demi-équations acido-basiques</span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>Les ampholytes : acide et base à la fois</span></a></li>
+    </ol>
+  </nav>
+  <!-- ============================================================ -->
+  <!-- SECTION s0 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s0">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">00</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Motivation</span>
+        <h2 class="lecture-section-title">Pourquoi parler de couples ?</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Après un repas trop épicé, l'estomac — qui fabrique de l'acide chlorhydrique — peut déborder vers l'œsophage : c'est la brûlure d'estomac. Le remède vendu en pharmacie, comme le bicarbonate de sodium, capte l'excès de protons <span class="math">H⁺</span> et le soulagement arrive en quelques minutes. Ce geste quotidien cache un échange de proton entre deux espèces chimiques parfaitement appariées.</p>
+      <p class="lecture-text">Autre exemple : l'eau de pluie est naturellement légèrement acide, car le dioxyde de carbone <span class="math">CO₂</span> de l'air s'y dissout et forme l'acide carbonique <span class="math">H₂CO₃</span>. C'est ainsi que la pluie, goutte après goutte, sculpte les statues de marbre et les toits de tôle au fil des années. Là encore, un proton voyage d'une espèce vers une autre.</p>
+      <p class="lecture-text">Enfin, dans la cuisine, le bicarbonate de soude moussant au contact du vinaigre réalise exactement la même chimie que l'antiacide dans l'estomac. Un même composé, des contextes différents, une même règle : les protons <span class="math">H⁺</span> se transfèrent toujours entre un donneur et un accepteur appariés en <strong>couple</strong>.</p>
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 560 230" role="img" aria-label="Neutralisation de l'acide de l'estomac par un antiacide">
+          <rect x="0" y="0" width="560" height="230" fill="rgba(239,68,68,0.05)"/>
+          <rect x="40" y="55" width="190" height="120" rx="18" style="stroke:rgba(239,68,68,0.85)" fill="rgba(239,68,68,0.10)" stroke-width="2"/>
+          <text x="135" y="95" text-anchor="middle" font-size="15" fill="currentColor" font-weight="bold">Estomac</text>
+          <text x="135" y="122" text-anchor="middle" font-size="14" fill="currentColor">H₃O⁺ en excès</text>
+          <text x="135" y="145" text-anchor="middle" font-size="13" fill="currentColor">(acide chlorhydrique)</text>
+          <text x="135" y="168" text-anchor="middle" font-size="12" fill="currentColor">brûlures…</text>
+          <path d="M 240 115 L 320 115" style="stroke:rgba(224,184,74,0.9)" stroke-width="3"/>
+          <polygon points="320,108 336,115 320,122" fill="rgba(224,184,74,0.9)"/>
+          <text x="288" y="100" text-anchor="middle" font-size="12" fill="currentColor">H⁺ capté</text>
+          <rect x="344" y="55" width="180" height="120" rx="18" style="stroke:rgba(74,222,128,0.85)" fill="rgba(74,222,128,0.10)" stroke-width="2"/>
+          <text x="434" y="95" text-anchor="middle" font-size="15" fill="currentColor" font-weight="bold">Antiacide</text>
+          <text x="434" y="122" text-anchor="middle" font-size="14" fill="currentColor">HCO₃⁻ (bicarbonate)</text>
+          <text x="434" y="145" text-anchor="middle" font-size="13" fill="currentColor">base du couple</text>
+          <text x="434" y="168" text-anchor="middle" font-size="12" fill="currentColor">H₂CO₃/HCO₃⁻</text>
+          <text x="280" y="212" text-anchor="middle" font-size="13" fill="currentColor">Un proton transféré = une douleur en moins !</text>
+        </svg>
+        <figcaption>La neutralisation de l'acidité gastrique : la base <span class="math">HCO₃⁻</span> capte les protons <span class="math">H⁺</span> excédentaires.</figcaption>
+      </figure>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s1 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s1">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">01</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1</span>
+        <h2 class="lecture-section-title">Le couple acide/base <span class="math">AH/A⁻</span></h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Observons l'acide éthanoïque du vinaigre : quand il perd un proton <span class="math">H⁺</span>, il devient l'ion éthanoate <span class="math">CH₃—COO⁻</span>. Ces deux espèces ne sont pas des inconnues indépendantes : elles forment une équipe, l'une pouvant se transformer en l'autre par simple échange d'un proton. C'est cette équipe que le programme appelle un <strong>couple acide/base</strong>.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-title">📖 Définition officielle</div>
+        <p>Un <strong>couple acide/base</strong>, noté <span class="math">AH/A⁻</span>, est formé de deux espèces chimiques qui se déduisent l'une de l'autre par transfert d'un proton <span class="math">H⁺</span> : l'<strong>acide</strong> <span class="math">AH</span> est l'espèce susceptible de <strong>céder</strong> un proton <span class="math">H⁺</span>, la <strong>base</strong> <span class="math">A⁻</span> est l'espèce susceptible de <strong>capter</strong> ce proton. La forme acide s'écrit toujours en premier.</p>
+      </div>
+      <p class="lecture-text">Retiens l'image du relais : l'acide est le porteur du bâton (le proton), la base est le relayeur prêt à le recevoir. Les deux espèces sont dites <em>conjuguées</em> : elles diffèrent exactement d'un proton <span class="math">H⁺</span>, ni plus, ni moins. Si tu vois deux formules qui diffèrent d'un <span class="math">H⁺</span>, tu as sous les yeux un couple.</p>
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 560 210" role="img" aria-label="Formation du couple AH sur A moins par échange d'un proton">
+          <rect x="0" y="0" width="560" height="210" fill="rgba(74,222,128,0.05)"/>
+          <rect x="50" y="55" width="170" height="70" rx="14" style="stroke:rgba(239,68,68,0.85)" fill="rgba(239,68,68,0.10)" stroke-width="2"/>
+          <text x="135" y="86" text-anchor="middle" font-size="16" fill="currentColor" font-weight="bold">AH</text>
+          <text x="135" y="110" text-anchor="middle" font-size="12" fill="currentColor">l'acide (donneur)</text>
+          <rect x="340" y="55" width="170" height="70" rx="14" style="stroke:rgba(74,222,128,0.85)" fill="rgba(74,222,128,0.10)" stroke-width="2"/>
+          <text x="425" y="86" text-anchor="middle" font-size="16" fill="currentColor" font-weight="bold">A⁻</text>
+          <text x="425" y="110" text-anchor="middle" font-size="12" fill="currentColor">la base (accepteur)</text>
+          <path d="M 230 70 L 330 70" style="stroke:rgba(224,184,74,0.95)" stroke-width="3"/>
+          <polygon points="328,63 344,70 328,77" fill="rgba(224,184,74,0.95)"/>
+          <text x="280" y="55" text-anchor="middle" font-size="12" fill="currentColor" font-weight="bold">− H⁺</text>
+          <path d="M 330 112 L 230 112" style="stroke:rgba(96,165,250,0.95)" stroke-width="3"/>
+          <polygon points="232,105 216,112 232,119" fill="rgba(96,165,250,0.95)"/>
+          <text x="280" y="134" text-anchor="middle" font-size="12" fill="currentColor" font-weight="bold">+ H⁺</text>
+          <text x="280" y="180" text-anchor="middle" font-size="13" fill="currentColor">Couple AH/A⁻ : les deux formes diffèrent d'un seul proton</text>
+        </svg>
+        <figcaption>Le couple <span class="math">AH/A⁻</span> : l'acide cède <span class="math">H⁺</span> (flèche du haut), la base le recapture (flèche du bas).</figcaption>
+      </figure>
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-main">Demi-équation d'un couple acide/base</div>
+        <div class="lecture-formula-hero"><span class="math">AH ⇌ A⁻ + H⁺</span></div>
+        <div class="lecture-formula-hero">Vers la droite : l'acide cède un proton. Vers la gauche : la base capte un proton. Les charges se conservent : <span class="math">0 = (−1) + (+1)</span>.</div>
+      </div>
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">🔍 Exemple travaillé — Trois couples à reconnaître</div>
+        <p class="lecture-text">Reconstruisons ensemble les couples les plus utiles du programme en vérifiant à chaque fois la différence d'un proton.</p>
+        <div class="lecture-steps">
+          <div class="lecture-step"><span class="lecture-step-number">1</span><div class="lecture-step-content"><p><strong>Couple du vinaigre :</strong> l'acide éthanoïque <span class="math">CH₃—COOH</span> cède <span class="math">H⁺</span> et donne l'ion éthanoate <span class="math">CH₃—COO⁻</span> : couple <span class="math">CH₃—COOH/CH₃—COO⁻</span>.</p></div></div>
+          <div class="lecture-step"><span class="lecture-step-number">2</span><div class="lecture-step-content"><p><strong>Couple de l'ammonium :</strong> l'ion ammonium <span class="math">NH₄⁺</span> cède <span class="math">H⁺</span> et donne l'ammoniac <span class="math">NH₃</span> : couple <span class="math">NH₄⁺/NH₃</span>. Ici la base est <em>neutre</em>, pas négative !</p></div></div>
+          <div class="lecture-step"><span class="lecture-step-number">3</span><div class="lecture-step-content"><p><strong>Vérification des charges :</strong> pour <span class="math">NH₄⁺ ⇌ NH₃ + H⁺</span> on a <span class="math">(+1) = (0) + (+1)</span> : les charges se conservent, le couple est correct.</p></div></div>
+        </div>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-title">⚠️ Piège d'examen</div>
+        <p>La base d'un couple n'est pas toujours un anion : <span class="math">NH₃</span> est une base <em>neutre</em>, tout comme <span class="math">H₂O</span>. Et n'écris jamais que <span class="math">H⁺</span> existe librement en solution : dans l'eau, tout proton s'hydrate aussitôt en ion oxonium <span class="math">H₃O⁺</span>.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s2 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s2">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">02</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2</span>
+        <h2 class="lecture-section-title">Les deux couples de l'eau</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">L'eau est la molécule la plus importante du chapitre, car toutes nos réactions ont lieu dans l'eau. Or l'eau peut céder un proton <span class="math">H⁺</span> comme elle peut en capter un : elle joue donc les deux rôles, selon le partenaire qui se présente. Elle apparaît ainsi dans <strong>deux couples différents</strong> qu'il faut savoir écrire sans hésiter.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-title">📖 Définition officielle</div>
+        <p>L'eau appartient à deux couples acide/base : le couple <span class="math">H₃O⁺/H₂O</span>, dans lequel l'eau est la <strong>base</strong> (elle capte <span class="math">H⁺</span> pour donner l'ion oxonium <span class="math">H₃O⁺</span>), et le couple <span class="math">H₂O/OH⁻</span>, dans lequel l'eau est l'<strong>acide</strong> (elle cède <span class="math">H⁺</span> pour donner l'ion hydroxyde <span class="math">OH⁻</span>).</p>
+      </div>
+      <p class="lecture-text">Imagine une même personne qui, selon son interlocuteur, prête ou emprunte la même pièce de monnaie. Avec un acide plus fort qu'elle, l'eau se comporte en base ; avec une base plus forte qu'elle, l'eau se comporte en acide. Deux molécules d'eau peuvent même échanger un proton <em>entre elles</em> : c'est l'autoprotolyse de l'eau.</p>
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 560 260" role="img" aria-label="Les deux couples de l'eau">
+          <rect x="0" y="0" width="560" height="260" fill="rgba(96,165,250,0.05)"/>
+          <rect x="60" y="30" width="440" height="70" rx="14" style="stroke:rgba(239,68,68,0.85)" fill="rgba(239,68,68,0.08)" stroke-width="2"/>
+          <text x="280" y="60" text-anchor="middle" font-size="15" fill="currentColor" font-weight="bold">Couple 1 : H₃O⁺/H₂O</text>
+          <text x="280" y="85" text-anchor="middle" font-size="13" fill="currentColor">H₂O est la BASE : H₂O + H⁺ ⇌ H₃O⁺</text>
+          <rect x="60" y="160" width="440" height="70" rx="14" style="stroke:rgba(74,222,128,0.85)" fill="rgba(74,222,128,0.08)" stroke-width="2"/>
+          <text x="280" y="190" text-anchor="middle" font-size="15" fill="currentColor" font-weight="bold">Couple 2 : H₂O/OH⁻</text>
+          <text x="280" y="215" text-anchor="middle" font-size="13" fill="currentColor">H₂O est l'ACIDE : H₂O ⇌ OH⁻ + H⁺</text>
+          <circle cx="280" cy="130" r="26" style="stroke:rgba(96,165,250,0.9)" fill="rgba(96,165,250,0.15)" stroke-width="2"/>
+          <text x="280" y="136" text-anchor="middle" font-size="14" fill="currentColor" font-weight="bold">H₂O</text>
+          <path d="M 280 104 L 280 100" style="stroke:rgba(239,68,68,0.9)" stroke-width="2"/>
+          <path d="M 280 156 L 280 160" style="stroke:rgba(74,222,128,0.9)" stroke-width="2"/>
+          <text x="452" y="134" text-anchor="middle" font-size="12" fill="currentColor">l'eau joue les deux rôles</text>
+        </svg>
+        <figcaption>L'eau, pivot de la chimie acido-basique : base du couple <span class="math">H₃O⁺/H₂O</span>, acide du couple <span class="math">H₂O/OH⁻</span>.</figcaption>
+      </figure>
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-main">Autoprotolyse de l'eau (somme des deux demi-équations)</div>
+        <div class="lecture-formula-hero"><span class="math">2 H₂O ⇌ H₃O⁺ + OH⁻</span></div>
+        <div class="lecture-formula-hero">Dans l'eau pure à 25 °C : concentration des ions oxonium égale à celle des ions hydroxyde, chacune valant <span class="math">10^(−7) mol·L⁻¹</span>.</div>
+      </div>
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">🔍 Exemple travaillé — Établir l'autoprotolyse</div>
+        <p class="lecture-text">Montrons pas à pas que deux molécules d'eau peuvent réagir ensemble.</p>
+        <div class="lecture-steps">
+          <div class="lecture-step"><span class="lecture-step-number">1</span><div class="lecture-step-content"><p>Une première molécule d'eau se comporte en <strong>base</strong> du couple <span class="math">H₃O⁺/H₂O</span> : elle capte un proton et devient <span class="math">H₃O⁺</span>.</p></div></div>
+          <div class="lecture-step"><span class="lecture-step-number">2</span><div class="lecture-step-content"><p>Une seconde molécule d'eau se comporte en <strong>acide</strong> du couple <span class="math">H₂O/OH⁻</span> : elle cède ce même proton et devient <span class="math">OH⁻</span>.</p></div></div>
+          <div class="lecture-step"><span class="lecture-step-number">3</span><div class="lecture-step-content"><p>En additionnant et en simplifiant le proton transféré : <span class="math">2 H₂O ⇌ H₃O⁺ + OH⁻</span>. Bilan vérifié : 4 atomes H et 2 atomes O de chaque côté, charges nulles de part et d'autre.</p></div></div>
+        </div>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-title">⚠️ Piège d'examen</div>
+        <p>Ne confonds pas les deux couples : dans <span class="math">H₃O⁺/H₂O</span> l'eau est la <em>base</em>, dans <span class="math">H₂O/OH⁻</span> elle est l'<em>acide</em>. Écrire « le couple H₂O/H₃O⁺ » (acide en second) est une erreur de notation sanctionnée au Bac.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s3 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s3">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">03</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 3</span>
+        <h2 class="lecture-section-title">Couples usuels et échelle des pKa</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Tous les couples ne transfèrent pas leurs protons avec la même facilité : l'acide chlorhydrique lâche son proton instantanément, tandis que l'eau le retient farouchement. Il faut donc un nombre pour mesurer cette « force ». C'est le rôle du <span class="math">pKa</span>, que l'on associe à chaque couple acide/base.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-title">📖 Définition officielle</div>
+        <p>À chaque couple acide/base on associe une constante d'acidité <span class="math">Ka</span> et son logarithme décimal changé de signe, le <strong>pKa</strong> : <span class="math">pKa = −log Ka</span>. Le <span class="math">pKa</span> est une <strong>constante caractéristique du couple</strong>, qui mesure sa force : plus le <span class="math">pKa</span> est <strong>petit</strong>, plus l'acide est <strong>fort</strong>.</p>
+      </div>
+      <p class="lecture-text">L'ordre logique est simple : un acide fort libère beaucoup de protons, sa constante <span class="math">Ka</span> est grande, et comme le <span class="math">pKa</span> vaut <span class="math">−log Ka</span>, un grand <span class="math">Ka</span> donne un petit <span class="math">pKa</span>. Les valeurs se lisent comme un classement sportif : la tête du classement (petits <span class="math">pKa</span>) regroupe les acides les plus forts.</p>
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">Relation pKa — Ka</div>
+        <p><span class="math">pKa = −log Ka</span>, soit <span class="math">Ka = 10^(−pKa)</span>. Exemple : pour le couple <span class="math">CH₃—COOH/CH₃—COO⁻</span>, <span class="math">pKa = 4,8</span>, donc <span class="math">Ka = 10^(−4,8) ≈ 1,6 × 10^(−5)</span>.</p>
+      </div>
+      <table class="lecture-table">
+        <thead>
+          <tr><th>Couple acide/base</th><th>Demi-équation</th><th>pKa (à 25 °C)</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="math">H₃O⁺/H₂O</span></td><td><span class="math">H₃O⁺ ⇌ H₂O + H⁺</span></td><td><span class="math">0</span></td></tr>
+          <tr><td><span class="math">CH₃—COOH/CH₃—COO⁻</span></td><td><span class="math">CH₃—COOH ⇌ CH₃—COO⁻ + H⁺</span></td><td><span class="math">4,8</span></td></tr>
+          <tr><td><span class="math">H₂CO₃/HCO₃⁻</span></td><td><span class="math">H₂CO₃ ⇌ HCO₃⁻ + H⁺</span></td><td><span class="math">6,4</span></td></tr>
+          <tr><td><span class="math">NH₄⁺/NH₃</span></td><td><span class="math">NH₄⁺ ⇌ NH₃ + H⁺</span></td><td><span class="math">9,2</span></td></tr>
+          <tr><td><span class="math">HCO₃⁻/CO₃²⁻</span></td><td><span class="math">HCO₃⁻ ⇌ CO₃²⁻ + H⁺</span></td><td><span class="math">10,3</span></td></tr>
+          <tr><td><span class="math">H₂O/OH⁻</span></td><td><span class="math">H₂O ⇌ OH⁻ + H⁺</span></td><td><span class="math">14</span></td></tr>
+        </tbody>
+      </table>
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">🔍 Exemple travaillé — Lire la table des couples</div>
+        <p class="lecture-text">Savoir exploiter cette table est un réflexe de Bac : les données y sont toujours fournies, l'essentiel est de les lire vite et juste.</p>
+        <div class="lecture-steps">
+          <div class="lecture-step"><span class="lecture-step-number">1</span><div class="lecture-step-content"><p>Repère la ligne du couple <span class="math">HCO₃⁻/CO₃²⁻</span> : l'acide est <span class="math">HCO₃⁻</span>, la base est <span class="math">CO₃²⁻</span>, le <span class="math">pKa</span> vaut <span class="math">10,3</span>.</p></div></div>
+          <div class="lecture-step"><span class="lecture-step-number">2</span><div class="lecture-step-content"><p>Compare avec <span class="math">H₃O⁺/H₂O</span> de <span class="math">pKa</span> égal à <span class="math">0</span> : <span class="math">0</span> est plus petit que <span class="math">10,3</span>, donc <span class="math">H₃O⁺</span> est un acide plus fort que <span class="math">HCO₃⁻</span>.</p></div></div>
+          <div class="lecture-step"><span class="lecture-step-number">3</span><div class="lecture-step-content"><p>Conclusion : sur cette table, la force des acides décroît quand le <span class="math">pKa</span> augmente : <span class="math">H₃O⁺</span>, puis <span class="math">CH₃—COOH</span>, puis <span class="math">NH₄⁺</span>, puis <span class="math">HCO₃⁻</span>, puis <span class="math">H₂O</span>.</p></div></div>
+        </div>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-title">⚠️ Piège d'examen</div>
+        <p>C'est l'inversion classique : <strong>petit pKa = acide fort</strong>, grand <span class="math">pKa</span> = acide faible. Beaucoup de candidats classent <span class="math">H₂O</span> comme acide fort parce que « 14 est grand » : faux, <span class="math">pKa = 14</span> en fait l'acide le plus faible de la table.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s4 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s4">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">04</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 4</span>
+        <h2 class="lecture-section-title">Demi-équations acido-basiques</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">La demi-équation est la « carte d'identité » d'un couple : une seule ligne qui montre l'acide, la base et le proton échangé. Elle ne représente pas une réaction complète — un proton cédé doit toujours être capté par quelqu'un — mais c'est l'outil d'écriture indispensable pour construire les équations bilan de la partie 02.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-title">📖 Définition officielle</div>
+        <p>La <strong>demi-équation acido-basique</strong> d'un couple <span class="math">AH/A⁻</span> traduit l'échange du proton : <span class="math">AH ⇌ A⁻ + H⁺</span>. En milieu aqueux, on l'écrit sous la forme où le proton est capté par l'eau : <span class="math">AH + H₂O ⇌ A⁻ + H₃O⁺</span>. Elle doit toujours être équilibrée en atomes <em>et</em> en charges.</p>
+      </div>
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero-main">Forme générale en milieu aqueux</div>
+        <div class="lecture-formula-hero"><span class="math">AH + H₂O ⇌ A⁻ + H₃O⁺</span></div>
+        <div class="lecture-formula-hero">L'eau joue ici le rôle de base du couple <span class="math">H₃O⁺/H₂O</span> : elle récupère le proton cédé par <span class="math">AH</span>.</div>
+      </div>
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">🔍 Exemple travaillé — La demi-équation du couple ammonium/ammoniac</div>
+        <p class="lecture-text">Écrivons soigneusement la demi-équation du couple <span class="math">NH₄⁺/NH₃</span>, d'abord sous forme simple, puis en milieu aqueux.</p>
+        <div class="lecture-steps">
+          <div class="lecture-step"><span class="lecture-step-number">1</span><div class="lecture-step-content"><p><strong>Identifier les formes :</strong> l'acide est <span class="math">NH₄⁺</span>, la base est <span class="math">NH₃</span> ; elles diffèrent bien d'un proton <span class="math">H⁺</span>.</p></div></div>
+          <div class="lecture-step"><span class="lecture-step-number">2</span><div class="lecture-step-content"><p><strong>Écrire la forme simple :</strong> <span class="math">NH₄⁺ ⇌ NH₃ + H⁺</span>.</p></div></div>
+          <div class="lecture-step"><span class="lecture-step-number">3</span><div class="lecture-step-content"><p><strong>Passer en milieu aqueux :</strong> le proton est capté par l'eau : <span class="math">NH₄⁺ + H₂O ⇌ NH₃ + H₃O⁺</span>.</p></div></div>
+          <div class="lecture-step"><span class="lecture-step-number">4</span><div class="lecture-step-content"><p><strong>Vérifier :</strong> atomes N : 1 et 1 ; atomes H : 4 + 2 = 6 à gauche, 3 + 3 = 6 à droite ; atomes O : 1 et 1 ; charges : <span class="math">(+1) + (0) = (0) + (+1)</span>. Équation équilibrée ✓.</p></div></div>
+        </div>
+      </div>
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">La vérification en 3 points</div>
+        <p>Avant de valider une demi-équation : ① même nombre de chaque atome des deux côtés ; ② même somme des charges ; ③ les deux formes diffèrent d'un seul <span class="math">H⁺</span>. Si un seul point échoue, l'équation est fausse.</p>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-title">⚠️ Piège d'examen</div>
+        <p>Oublier les charges est la faute n° 1 : <span class="math">NH₄⁺ ⇌ NH₃ + H⁺</span> est correct, mais écrire <span class="math">NH₄ ⇌ NH₃ + H</span> (sans charges) est faux et ruine toute la question suivante. Les charges se vérifient en trois secondes : fais-le systématiquement.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s5 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s5">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">05</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 5</span>
+        <h2 class="lecture-section-title">Les ampholytes : acide et base à la fois</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Certains ions appartiennent à <strong>deux couples à la fois</strong> : ils peuvent céder un proton comme des acides, ou en capter un comme des bases. L'eau en est l'exemple le plus célèbre, mais le bicarbonate <span class="math">HCO₃⁻</span> — star des antiacides et de la cuisine — est tout aussi doué. Ces espèces à double visage portent un nom : les <strong>ampholytes</strong>.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <div class="lecture-callout-title">📖 Définition officielle</div>
+        <p>Un <strong>ampholyte</strong> (ou espèce amphotère) est une espèce chimique qui peut se comporter à la fois comme un <strong>acide</strong>, dans un couple où elle cède <span class="math">H⁺</span>, et comme une <strong>base</strong>, dans un autre couple où elle capte <span class="math">H⁺</span>. Elle figure donc dans la notation de deux couples différents.</p>
+      </div>
+      <figure class="lecture-figure">
+        <svg viewBox="0 0 560 240" role="img" aria-label="La molécule d'ion hydrogénocarbonate, un ampholyte">
+          <rect x="0" y="0" width="560" height="240" fill="rgba(224,184,74,0.06)"/>
+          <circle cx="280" cy="120" r="30" style="stroke:rgba(96,165,250,0.9)" fill="rgba(96,165,250,0.15)" stroke-width="2"/>
+          <text x="280" y="127" text-anchor="middle" font-size="16" fill="currentColor" font-weight="bold">C</text>
+          <path d="M 262 105 L 235 80" style="stroke:rgba(239,68,68,0.9)" stroke-width="3"/>
+          <path d="M 268 108 L 241 83" style="stroke:rgba(239,68,68,0.9)" stroke-width="3"/>
+          <circle cx="222" cy="70" r="20" style="stroke:rgba(239,68,68,0.9)" fill="rgba(239,68,68,0.12)" stroke-width="2"/>
+          <text x="222" y="77" text-anchor="middle" font-size="14" fill="currentColor" font-weight="bold">O</text>
+          <path d="M 308 120 L 352 120" style="stroke:rgba(239,68,68,0.9)" stroke-width="3"/>
+          <circle cx="372" cy="120" r="20" style="stroke:rgba(239,68,68,0.9)" fill="rgba(239,68,68,0.12)" stroke-width="2"/>
+          <text x="372" y="127" text-anchor="middle" font-size="14" fill="currentColor" font-weight="bold">O⁻</text>
+          <path d="M 262 136 L 235 162" style="stroke:rgba(224,184,74,0.9)" stroke-width="3"/>
+          <circle cx="216" cy="175" r="20" style="stroke:rgba(224,184,74,0.9)" fill="rgba(224,184,74,0.12)" stroke-width="2"/>
+          <text x="216" y="182" text-anchor="middle" font-size="14" fill="currentColor" font-weight="bold">OH</text>
+          <text x="120" y="52" font-size="12" fill="currentColor">côté OH : peut céder H⁺</text>
+          <text x="120" y="70" font-size="12" fill="currentColor">→ ACIDE (couple H₂CO₃/HCO₃⁻)</text>
+          <text x="120" y="216" font-size="12" fill="currentColor">côté O⁻ : peut capter H⁺</text>
+          <text x="120" y="234" font-size="12" fill="currentColor">→ BASE (couple HCO₃⁻/CO₃²⁻)</text>
+        </svg>
+        <figcaption>L'ion hydrogénocarbonate <span class="math">HCO₃⁻</span> : ampholyte entre les couples <span class="math">H₂CO₃/HCO₃⁻</span> (<span class="math">pKa = 6,4</span>) et <span class="math">HCO₃⁻/CO₃²⁻</span> (<span class="math">pKa = 10,3</span>).</figcaption>
+      </figure>
+      <div class="lecture-formula-box">
+        <div class="lecture-formula-main">Les deux visages de l'ion hydrogénocarbonate</div>
+        <p>Comme base : <span class="math">HCO₃⁻ + H⁺ ⇌ H₂CO₃</span> (couple <span class="math">H₂CO₃/HCO₃⁻</span>). Comme acide : <span class="math">HCO₃⁻ ⇌ CO₃²⁻ + H⁺</span> (couple <span class="math">HCO₃⁻/CO₃²⁻</span>). De même, l'eau est l'ampholyte des couples <span class="math">H₃O⁺/H₂O</span> et <span class="math">H₂O/OH⁻</span>.</p>
+      </div>
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">🔍 Exemple travaillé — Le bicarbonate dans l'eau</div>
+        <p class="lecture-text">Que se passe-t-il quand on dissout du bicarbonate de sodium dans l'eau ? Les deux rôles de l'ampholyte entrent en compétition.</p>
+        <div class="lecture-steps">
+          <div class="lecture-step"><span class="lecture-step-number">1</span><div class="lecture-step-content"><p><strong>Rôle acide :</strong> <span class="math">HCO₃⁻</span> peut céder <span class="math">H⁺</span> à l'eau : <span class="math">HCO₃⁻ + H₂O ⇌ CO₃²⁻ + H₃O⁺</span>.</p></div></div>
+          <div class="lecture-step"><span class="lecture-step-number">2</span><div class="lecture-step-content"><p><strong>Rôle base :</strong> <span class="math">HCO₃⁻</span> peut capter <span class="math">H⁺</span> à l'eau : <span class="math">HCO₃⁻ + H₂O ⇌ H₂CO₃ + OH⁻</span>.</p></div></div>
+          <div class="lecture-step"><span class="lecture-step-number">3</span><div class="lecture-step-content"><p><strong>Expérience :</strong> la solution de bicarbonate a un <span class="math">pH</span> proche de <span class="math">8,4</span>, légèrement basique : le rôle de base l'emporte légèrement. C'est pourquoi le bicarbonate calme les brûlures d'estomac.</p></div></div>
+        </div>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <div class="lecture-callout-title">⚠️ Piège d'examen</div>
+        <p>Un ampholyte est <strong>une seule espèce</strong> avec deux rôles possibles, pas un mélange d'un acide et d'une base. Écrire que « l'eau contient <span class="math">H₃O⁺</span> et <span class="math">OH⁻</span> parce qu'on a ajouté un acide et une base » est faux : ces ions proviennent de l'autoprotolyse de l'eau elle-même.</p>
+      </div>
+      <div class="lecture-text">
+        <div class="lecture-exercise-label">✏️ Exercice d'application 1 — Le couple du vinaigre</div>
+        <p class="lecture-text">L'acide éthanoïque <span class="math">CH₃—COOH</span> est l'acide du vinaigre. ① Écris sa demi-équation sous forme simple. ② Réécris-la en milieu aqueux. ③ Vérifie la conservation des atomes et des charges. ④ Donne la formule de la base conjuguée.</p>
+        <details><summary>Voir la solution pas à pas</summary>
+          <div class="lecture-steps">
+            <div class="lecture-step"><span class="lecture-step-number">1</span><div class="lecture-step-content"><p><strong>Forme simple :</strong> <span class="math">CH₃—COOH ⇌ CH₃—COO⁻ + H⁺</span>.</p></div></div>
+            <div class="lecture-step"><span class="lecture-step-number">2</span><div class="lecture-step-content"><p><strong>Milieu aqueux :</strong> <span class="math">CH₃—COOH + H₂O ⇌ CH₃—COO⁻ + H₃O⁺</span>.</p></div></div>
+            <div class="lecture-step"><span class="lecture-step-number">3</span><div class="lecture-step-content"><p><strong>Vérification :</strong> atomes C : 2 et 2 ; atomes H : 4 + 2 = 6 à gauche, 3 + 3 = 6 à droite ; atomes O : 2 et 2 ; charges : <span class="math">0</span> à gauche, <span class="math">(−1) + (+1) = 0</span> à droite. Équilibrée ✓.</p></div></div>
+            <div class="lecture-step"><span class="lecture-step-number">4</span><div class="lecture-step-content"><p><strong>Base conjuguée :</strong> c'est la forme qui capte <span class="math">H⁺</span>, soit l'ion éthanoate <span class="math">CH₃—COO⁻</span>.</p></div></div>
+          </div>
+        </details>
+      </div>
+      <div class="lecture-text">
+        <div class="lecture-exercise-label">✏️ Exercice d'application 2 — Deux couples pour l'eau</div>
+        <p class="lecture-text">① Écris les deux demi-équations qui prouvent que l'eau <span class="math">H₂O</span> est un ampholyte. ② Somme-les pour retrouver l'autoprotolyse de l'eau. ③ Vérifie l'équilibre des charges du bilan. ④ Dans l'eau pure à 25 °C, compare les concentrations en ions oxonium et en ions hydroxyde.</p>
+        <details><summary>Voir la solution pas à pas</summary>
+          <div class="lecture-steps">
+            <div class="lecture-step"><span class="lecture-step-number">1</span><div class="lecture-step-content"><p><strong>Couple <span class="math">H₃O⁺/H₂O</span> (eau = base) :</strong> l'eau capte un proton, <span class="math">H₂O + H⁺ ⇌ H₃O⁺</span>.</p></div></div>
+            <div class="lecture-step"><span class="lecture-step-number">2</span><div class="lecture-step-content"><p><strong>Couple <span class="math">H₂O/OH⁻</span> (eau = acide) :</strong> l'eau cède un proton, <span class="math">H₂O ⇌ OH⁻ + H⁺</span>. L'eau apparaît bien dans deux couples : elle est ampholyte.</p></div></div>
+            <div class="lecture-step"><span class="lecture-step-number">3</span><div class="lecture-step-content"><p><strong>Somme :</strong> en additionnant les deux demi-équations, le proton se simplifie et reste <span class="math">2 H₂O ⇌ H₃O⁺ + OH⁻</span>. Charges : <span class="math">0 = (+1) + (−1)</span> ✓.</p></div></div>
+            <div class="lecture-step"><span class="lecture-step-number">4</span><div class="lecture-step-content"><p><strong>Eau pure :</strong> chaque ion se forme par paire, donc les concentrations sont égales : chacune vaut <span class="math">10^(−7) mol·L⁻¹</span> à 25 °C — l'eau pure est neutre.</p></div></div>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+  <!-- ===== QCM ===== -->
+  <div class="lecture-quiz">
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Quelle est la base conjuguée de l'acide éthanoïque <span class="math">CH₃—COOH</span> ?</p>
+      <div class="lecture-quiz-options"><span>A) <span class="math">CH₃—COO⁻</span></span><span>B) <span class="math">CH₃—COOH₂⁺</span></span><span>C) <span class="math">OH⁻</span></span><span>D) <span class="math">NH₃</span></span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><strong>Réponse A.</strong> La base conjuguée s'obtient en retirant un proton <span class="math">H⁺</span> à l'acide : <span class="math">CH₃—COOH − H⁺ → CH₃—COO⁻</span>. L'option B s'obtient au contraire en ajoutant un <span class="math">H⁺</span> (ce serait la forme acide d'un autre couple).</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Dans le couple <span class="math">H₂O/OH⁻</span>, l'eau <span class="math">H₂O</span> est :</p>
+      <div class="lecture-quiz-options"><span>A) la base</span><span>B) l'acide</span><span>C) un ampholyte</span><span>D) ni l'un ni l'autre</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><strong>Réponse B.</strong> Dans ce couple, l'eau cède un proton pour donner <span class="math">OH⁻</span> : <span class="math">H₂O ⇌ OH⁻ + H⁺</span>. Elle est donc l'acide. (Elle n'est ampholyte que si l'on considère aussi le couple <span class="math">H₃O⁺/H₂O</span> ; dans un couple donné, chaque espèce a un rôle unique.)</div></details>
+    </div>
+  </div>
+  <!-- ===== RÉCAP ===== -->
+  <div class="lecture-recap">
+    <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
+    <ul class="lecture-recap-list">
+      <li><strong>Couple acide/base :</strong> deux espèces qui diffèrent d'un seul proton <span class="math">H⁺</span> — l'acide le cède, la base le capte, selon <span class="math">AH ⇌ A⁻ + H⁺</span>.</li>
+      <li><strong>Couples de l'eau :</strong> l'eau est la base de <span class="math">H₃O⁺/H₂O</span> et l'acide de <span class="math">H₂O/OH⁻</span> ; la forme acide s'écrit toujours en premier.</li>
+      <li><strong>pKa et ampholytes :</strong> petit <span class="math">pKa</span> = acide fort ; un ampholyte comme <span class="math">HCO₃⁻</span> ou <span class="math">H₂O</span> appartient à deux couples à la fois.</li>
+    </ul>
+  </div>
+  <!-- ===== FIN ===== -->
+  <div class="lecture-end">
+    <div class="lecture-end-icon">🎯</div>
+    <div class="lecture-end-text">Partie 01 terminée !</div>
+    <div class="lecture-end-sub">Tu sais maintenant reconnaître les couples acide/base et écrire leurs demi-équations. Mais un proton cédé doit être capté : en Partie 02, tu vas assembler deux couples pour écrire de vraies réactions acido-basiques — et surtout prédire leur sens !</div>
+    <div class="lecture-end-divider"></div>
+  </div>
+</div>

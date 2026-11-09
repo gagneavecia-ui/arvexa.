@@ -1,0 +1,353 @@
+<!-- PARTIE 02 — Célérité & Retard d'une onde (Généralités sur les ondes) -->
+<div class="lecture-container">
+
+  <!-- ===== HERO ===== -->
+  <header class="lecture-hero">
+    <div class="lecture-hero-badge">
+      <span class="lecture-hero-icon">📘</span>
+      <span class="lecture-hero-label">Terminale C&D · Généralités sur les ondes · Partie 02</span>
+    </div>
+    <h1 class="lecture-hero-title">
+      Célérité & Retard <em>d'une onde</em>
+    </h1>
+    <p class="lecture-hero-intro">
+      L'éclair précède toujours le tonnerre : les ondes mettent du temps à voyager, et ce temps se calcule. Dans cette partie, tu apprends à déterminer la célérité <span class="math">v</span> d'une perturbation, à exploiter le retard <span class="math">τ</span> entre émission et réception, et tu découvres pourquoi l'air, l'eau ou l'acier changent complètement la vitesse du même signal. Sonar, échographie, orages : tu vas enfin comprendre les calculs derrière.
+    </p>
+    <div class="lecture-hero-meta">
+      <span class="lecture-hero-meta-item">⏱ 25 min</span>
+      <span class="lecture-hero-meta-item">⚡ 3 notions</span>
+      <span class="lecture-hero-meta-item">📚 6 sections</span>
+      <span class="lecture-hero-meta-item">🎓 Terminale C&D</span>
+    </div>
+  </header>
+  <!-- ===== SOMMAIRE ===== -->
+  <nav class="lecture-toc">
+    <div class="lecture-toc-header">
+      <span>Dans cette partie</span>
+      <span class="lecture-toc-count">3 notions · 6 sections</span>
+    </div>
+    <ol class="lecture-toc-list">
+      <li><a href="#s0"><span class="toc-num">00</span><span>L'éclair avant le tonnerre</span></a></li>
+      <li><a href="#s1"><span class="toc-num">01</span><span>La célérité v d'une onde</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span>Le retard τ : chronométrer la propagation</span></a></li>
+      <li><a href="#s3"><span class="toc-num">03</span><span>La célérité dépend du milieu</span></a></li>
+      <li><a href="#s4"><span class="toc-num">04</span><span>Exercice guidé : le sonar</span></a></li>
+      <li><a href="#s5"><span class="toc-num">05</span><span>Exercice bilan + tableau des célérités</span></a></li>
+    </ol>
+  </nav>
+  <!-- ============================================================ -->
+  <!-- SECTION s0 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s0">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">00</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Motivation</span>
+        <h2 class="lecture-section-title">L'éclair avant le tonnerre</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Un soir d'orage, tu vois l'éclair déchirer le ciel… puis tu comptes les secondes avant le tonnerre. La lumière, onde électromagnétique, arrive quasiment instantanément ; le son, onde mécanique, prend son temps : ce décalage est un retard, et il se mesure. Les grands-mères le savent depuis toujours : compter les secondes entre l'éclair et le tonnerre permet d'estimer la distance de l'orage.</p>
+      <p class="lecture-text">Dans cette partie, tu apprends à calculer la célérité <span class="math">v</span> d'une onde, à exploiter le retard <span class="math">τ</span>, et tu découvres qu'une même onde ne voyage pas à la même vitesse selon le milieu : l'air, l'eau ou l'acier changent tout.</p>
+      <svg viewBox="0 0 560 170" role="img" aria-label="L'éclair est vu immédiatement, le tonnerre arrive avec un retard égal à d sur v">
+        <ellipse cx="115" cy="32" rx="58" ry="17" fill="rgba(224,184,74,0.12)" style="stroke:rgba(224,184,74,0.5);stroke-width:1.5"/>
+        <polygon points="108,44 90,88 104,88 80,134 122,84 105,84 126,44" fill="rgba(224,184,74,0.5)" style="stroke:var(--accent-bright);stroke-width:1.5"/>
+        <line x1="150" y1="52" x2="440" y2="98" style="stroke:var(--accent-bright);stroke-width:1.5" stroke-dasharray="7 5"/>
+        <path d="M 440 98 l -10 -1 l 5 9 z" style="fill:var(--accent-bright)"/>
+        <text x="295" y="62" text-anchor="middle" style="fill:rgba(224,184,74,0.8);font-size:10px">lumière : quasi instantanée (c = 3,00 × 10⁸ m·s⁻¹)</text>
+        <path d="M 140 120 Q 158 106 176 120 T 212 120 T 248 120 T 284 120 T 320 120 T 356 120 T 392 120 T 428 120" fill="none" style="stroke:var(--accent-bright);stroke-width:2"/>
+        <text x="290" y="146" text-anchor="middle" style="fill:rgba(224,184,74,0.8);font-size:10px">son : lent (v ≈ 340 m·s⁻¹) → retard τ = d / v</text>
+        <circle cx="462" cy="104" r="9" fill="rgba(224,184,74,0.18)" style="stroke:var(--accent-bright);stroke-width:2"/>
+        <line x1="462" y1="113" x2="462" y2="146" style="stroke:var(--accent-bright);stroke-width:2"/>
+        <text x="462" y="162" text-anchor="middle" style="fill:rgba(224,184,74,0.75);font-size:10px">toi, observateur</text>
+        <line x1="20" y1="150" x2="540" y2="150" style="stroke:rgba(224,184,74,0.4);stroke-width:1.5"/>
+      </svg>
+      <p class="lecture-text">Objectif : à la fin de la partie, tu sauras résoudre n'importe quel exercice du type « émetteur — récepteur — retard », y compris les cas avec écho (sonar, ultrasons) et les trajets dans deux milieux différents.</p>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s1 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s1">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">01</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 1</span>
+        <h2 class="lecture-section-title">La célérité v d'une onde</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Toutes les perturbations ne voyagent pas à la même vitesse : la lumière file à 300 millions de mètres par seconde quand le son se traîne à 340 m·s⁻¹. Cette « vitesse de propagation » d'une onde porte un nom précis au Bac : la célérité. Utilise ce mot, le correcteur l'attend.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <strong>📖 Définition officielle —</strong> La <strong>célérité</strong> <span class="math">v</span> d'une onde est la vitesse à laquelle se propage la perturbation dans le milieu, exprimée en <strong>m·s⁻¹</strong>. C'est le <strong>milieu</strong> qui impose la célérité, pas la personne qui émet l'onde.
+      </div>
+      <p class="lecture-text">Attention au vocabulaire : on dit célérité plutôt que vitesse pour rappeler qu'il s'agit de la propagation d'une perturbation, pas du déplacement d'un objet. Tant que le milieu ne change pas, la célérité reste constante : la bosse d'une corde garde la même allure du départ à l'arrivée.</p>
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero"><span class="math">v</span> = <span class="math">d</span> / <span class="math">Δt</span></div>
+        <p class="lecture-formula-hero">La perturbation parcourt la distance <span class="math">d</span> pendant la durée <span class="math">Δt</span>. Unités : <span class="math">d</span> en m, <span class="math">Δt</span> en s, <span class="math">v</span> en m·s⁻¹ (point médian obligatoire).</p>
+      </div>
+      <svg viewBox="0 0 560 180" role="img" aria-label="Émetteur et récepteur séparés d'une distance d : l'onde arrive après le retard tau égal à d sur v">
+        <rect x="40" y="62" width="62" height="48" rx="6" fill="rgba(224,184,74,0.18)" style="stroke:var(--accent-bright);stroke-width:2"/>
+        <rect x="458" y="62" width="62" height="48" rx="6" fill="rgba(224,184,74,0.18)" style="stroke:var(--accent-bright);stroke-width:2"/>
+        <path d="M 102 86 Q 122 56 142 86 T 182 86 T 222 86 T 262 86 T 302 86 T 342 86 T 382 86 T 422 86 T 458 86" fill="none" style="stroke:var(--accent-bright);stroke-width:2"/>
+        <text x="71" y="128" text-anchor="middle" style="fill:var(--accent-bright);font-size:11px">émetteur</text>
+        <text x="489" y="128" text-anchor="middle" style="fill:var(--accent-bright);font-size:11px">récepteur</text>
+        <text x="71" y="52" text-anchor="middle" style="fill:rgba(224,184,74,0.8);font-size:10px">départ : t = 0</text>
+        <text x="489" y="52" text-anchor="middle" style="fill:rgba(224,184,74,0.8);font-size:10px">arrivée : t = τ</text>
+        <line x1="102" y1="150" x2="458" y2="150" style="stroke:var(--accent-bright);stroke-width:1.5"/>
+        <path d="M 102 150 l 9 -5 l 0 10 z" style="fill:var(--accent-bright)"/>
+        <path d="M 458 150 l -9 -5 l 0 10 z" style="fill:var(--accent-bright)"/>
+        <line x1="102" y1="144" x2="102" y2="156" style="stroke:var(--accent-bright);stroke-width:1.5"/>
+        <line x1="458" y1="144" x2="458" y2="156" style="stroke:var(--accent-bright);stroke-width:1.5"/>
+        <text x="280" y="170" text-anchor="middle" style="fill:var(--accent-bright);font-size:12px">distance d entre émetteur et récepteur → τ = d / v</text>
+      </svg>
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">🎯 Exemple travaillé — mesurer la célérité du son</div>
+        <p class="lecture-text">Un micro placé à <span class="math">d</span> = 680 m d'un pétard enregistre le son 2,0 s après le flash lumineux de l'explosion. Quelle célérité du son cette expérience donne-t-elle ?</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step"><strong>Étape 1 — Données.</strong> <span class="math">d</span> = 680 m ; <span class="math">Δt</span> = 2,0 s (le flash lumineux arrive en un temps négligeable : 680 m à <span class="math">c</span> = 3,00 × 10⁸ m·s⁻¹, c'est quasi instantané).</li>
+          <li class="lecture-step"><strong>Étape 2 — Formule.</strong> <span class="math">v</span> = <span class="math">d</span> / <span class="math">Δt</span>.</li>
+          <li class="lecture-step"><strong>Étape 3 — Application.</strong> <span class="math">v</span> = 680 / 2,0 = 340 m·s⁻¹.</li>
+          <li class="lecture-step"><strong>Étape 4 — Vérifier deux fois.</strong> 340 × 2,0 = 680 ✓ ; ordre de grandeur : c'est bien la célérité connue du son dans l'air à 20 °C ✓.</li>
+          <li class="lecture-step"><strong>Étape 5 — Conclure.</strong> L'expérience donne <span class="math">v</span> = 340 m·s⁻¹ : une méthode de mesure simple, à réutiliser dans un compte rendu de TP.</li>
+        </ol>
+        <div class="lecture-example-content">📌 <span class="math">v</span> = 340 m·s⁻¹ : distance parcourue divisée par la durée, avec la lumière comme « chrono ».</div>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <strong>⚠️ Piège d'examen —</strong> Ne confonds pas la célérité de l'onde et la vitesse des particules du milieu : le bouchon de la Partie 01 oscille sur place avec une vitesse bien plus faible que la célérité de la vague qui le traverse. Deux vitesses différentes, deux notions différentes.
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s2 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s2">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">02</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 2</span>
+        <h2 class="lecture-section-title">Le retard τ : chronométrer la propagation</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">L'éclair précède le tonnerre, le flash précède la détonation : une onde met toujours un certain temps pour aller de l'émetteur au récepteur. Ce temps porte un nom — le retard — et il devient une donnée précieuse : le chronométrer, c'est mesurer des distances sans mètre ruban.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <strong>📖 Définition officielle —</strong> Le <strong>retard</strong> <span class="math">τ</span> est la durée qui s'écoule entre le <strong>départ</strong> de la perturbation (émission) et son <strong>arrivée</strong> au point d'observation (réception). Unité : la seconde (s).
+      </div>
+      <p class="lecture-text">Le raisonnement est celui de la vitesse ordinaire : si l'onde avance à <span class="math">v</span> pendant <span class="math">τ</span> secondes, elle franchit <span class="math">d</span> = <span class="math">v</span> × <span class="math">τ</span>. Inversement, chronométrer <span class="math">τ</span> te donne la distance : c'est le principe du radar, du sonar, de l'échographie… et du compte à rebours éclair-tonnerre.</p>
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero"><span class="math">τ</span> = <span class="math">d</span> / <span class="math">v</span></div>
+        <p class="lecture-formula-hero"><span class="math">d</span> en m et <span class="math">v</span> en m·s⁻¹ donnent <span class="math">τ</span> en s. Variante à connaître aussi : <span class="math">d</span> = <span class="math">v</span> × <span class="math">τ</span> (distance franchie pendant le retard).</p>
+      </div>
+      <div class="lecture-formula-box">
+        <p class="lecture-formula-main">Réflexe du Sahel : entre l'éclair et le tonnerre, compte les secondes et divise par 3 → distance en km (car 340 × 3 ≈ 1 020 m ≈ 1 km).</p>
+        <p class="lecture-formula-main">Exemple : 6 s d'écart → orage à environ 2 km ; 9 s d'écart → environ 3 km.</p>
+      </div>
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">🎯 Exemple travaillé — localiser l'orage</div>
+        <p class="lecture-text">Tu comptes <span class="math">Δt</span> = 6,0 s entre l'éclair et le tonnerre. À quelle distance <span class="math">d</span> de toi l'orage a-t-il éclaté (donnée : <span class="math">v</span> = 340 m·s⁻¹) ?</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step"><strong>Étape 1 — Données.</strong> <span class="math">τ</span> = 6,0 s ; <span class="math">v</span> = 340 m·s⁻¹. Inconnue : <span class="math">d</span>.</li>
+          <li class="lecture-step"><strong>Étape 2 — Formule.</strong> <span class="math">d</span> = <span class="math">v</span> × <span class="math">τ</span>.</li>
+          <li class="lecture-step"><strong>Étape 3 — Appliquer.</strong> <span class="math">d</span> = 340 × 6,0 = 2 040 m.</li>
+          <li class="lecture-step"><strong>Étape 4 — Vérifier deux fois.</strong> 2 040 / 340 = 6,0 ✓ ; et la règle « 3 s ≈ 1 km » donne 6 s ≈ 2 km ✓.</li>
+          <li class="lecture-step"><strong>Étape 5 — Conclure.</strong> Orage à environ 2,0 km : pas de panique, mais tu sais déjà qu'il gronde juste après le prochain éclair.</li>
+        </ol>
+        <div class="lecture-example-content">📌 <span class="math">d</span> ≈ 2 040 m ≈ 2,0 km : le chronomètre remplace le mètre ruban.</div>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <strong>⚠️ Piège d'examen —</strong> Kilomètres et mètres ne se mélangent pas : convertis tout en mètres avant d'appliquer <span class="math">τ</span> = <span class="math">d</span> / <span class="math">v</span>. Erreur classique : écrire <span class="math">τ</span> = 3 / 340 avec <span class="math">d</span> = 3 km non converti → résultat faux d'un facteur 1 000.
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s3 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s3">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">03</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Notion 3</span>
+        <h2 class="lecture-section-title">La célérité dépend du milieu</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Même onde, milieux différents, célérités différentes : le son va plus de quatre fois plus vite dans l'eau que dans l'air, et quinze fois plus vite dans l'acier. La raison ? La structure du milieu : plus ses « briques » sont liées rigidement, plus elles transmettent vite la perturbation.</p>
+      <div class="lecture-callout lecture-callout-key">
+        <strong>📖 Définition officielle —</strong> La célérité d'une onde <strong>dépend de la nature du milieu</strong> (et parfois de sa température), mais elle ne dépend ni de la forme de la perturbation ni de sa fréquence, dans le cadre du programme.
+      </div>
+      <p class="lecture-text">Conséquence pratique : quand une onde change de milieu, sa célérité change, et l'énergie met plus ou moins de temps à franchir la même distance. C'est pour cela que l'on entend « deux fois » un coup frappé sur un rail : une fois par le rail, une fois par l'air (tu le calculeras en section 05).</p>
+      <div class="lecture-formula-hero">
+        <div class="lecture-formula-hero"><span class="math">v</span>(son, air) &lt; <span class="math">v</span>(son, eau) &lt; <span class="math">v</span>(son, acier)</div>
+        <p class="lecture-formula-hero">Ordre à mémoriser pour le son : gaz &lt; liquide &lt; solide. Et distance franchie pendant un retard <span class="math">τ</span> : <span class="math">d</span> = <span class="math">v</span> × <span class="math">τ</span>, avec le <span class="math">v</span> du milieu traversé.</p>
+      </div>
+      <svg viewBox="0 0 560 165" role="img" aria-label="Barres comparant la célérité du son dans l'air, l'eau et l'acier">
+        <text x="280" y="20" text-anchor="middle" style="fill:var(--accent-bright);font-size:12px">Célérité du son : elle dépend du milieu</text>
+        <text x="100" y="49" text-anchor="end" style="fill:rgba(224,184,74,0.8);font-size:11px">air (20 °C)</text>
+        <rect x="110" y="38" width="26" height="17" fill="rgba(224,184,74,0.45)" style="stroke:var(--accent-bright);stroke-width:1"/>
+        <text x="144" y="51" style="fill:var(--accent-bright);font-size:11px">≈ 340 m·s⁻¹</text>
+        <text x="100" y="83" text-anchor="end" style="fill:rgba(224,184,74,0.8);font-size:11px">eau</text>
+        <rect x="110" y="72" width="113" height="17" fill="rgba(224,184,74,0.45)" style="stroke:var(--accent-bright);stroke-width:1"/>
+        <text x="231" y="85" style="fill:var(--accent-bright);font-size:11px">≈ 1 480 m·s⁻¹</text>
+        <text x="100" y="117" text-anchor="end" style="fill:rgba(224,184,74,0.8);font-size:11px">acier</text>
+        <rect x="110" y="106" width="390" height="17" fill="rgba(224,184,74,0.45)" style="stroke:var(--accent-bright);stroke-width:1"/>
+        <text x="118" y="119" style="fill:rgba(255,246,214,0.95);font-size:11px">≈ 5 100 m·s⁻¹</text>
+        <text x="280" y="150" text-anchor="middle" style="fill:rgba(224,184,74,0.7);font-size:10px">même son, trois célérités : plus les liaisons du milieu sont rigides, plus v est grande</text>
+      </svg>
+      <div class="lecture-formula-box">
+        <p class="lecture-formula-main">Pour la lumière aussi : <span class="math">c</span> = 3,00 × 10⁸ m·s⁻¹ dans le vide, ≈ 2,25 × 10⁸ m·s⁻¹ dans l'eau, ≈ 2,0 × 10⁸ m·s⁻¹ dans le verre.</p>
+        <p class="lecture-formula-main">La lumière ralentit dans la matière : c'est l'indice de réfraction, que tu retrouveras en optique.</p>
+      </div>
+      <div class="lecture-example-content">
+        <div class="lecture-example-label">🎯 Exemple travaillé — le même son, deux milieux</div>
+        <p class="lecture-text">Deux plongeurs sont séparés de <span class="math">d</span> = 680 m dans le fleuve. L'un frappe un bloc de métal. Après combien de temps l'autre entend-il le son dans l'eau, comparé à l'air ? (données : <span class="math">v</span>(eau) ≈ 1 480 m·s⁻¹ ; <span class="math">v</span>(air) ≈ 340 m·s⁻¹)</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step"><strong>Étape 1 — Données.</strong> <span class="math">d</span> = 680 m ; <span class="math">v</span>(eau) = 1 480 m·s⁻¹ ; <span class="math">v</span>(air) = 340 m·s⁻¹.</li>
+          <li class="lecture-step"><strong>Étape 2 — Formule.</strong> Retard : <span class="math">τ</span> = <span class="math">d</span> / <span class="math">v</span>, avec la célérité du milieu traversé.</li>
+          <li class="lecture-step"><strong>Étape 3 — Dans l'eau.</strong> <span class="math">τ</span>(eau) = 680 / 1 480 = 0,46 s.</li>
+          <li class="lecture-step"><strong>Étape 4 — Vérifier deux fois.</strong> 1 480 × 0,46 = 680,8 ≈ 680 ✓ ; dans l'air : 680 / 340 = 2,0 s ✓ (valeur déjà validée en section 01).</li>
+          <li class="lecture-step"><strong>Étape 5 — Comparer.</strong> 1 480 / 340 ≈ 4,4 : le son va plus de quatre fois plus vite dans l'eau ; le plongeur entend le coup presque aussitôt.</li>
+        </ol>
+        <div class="lecture-example-content">📌 <span class="math">τ</span>(eau) ≈ 0,46 s contre 2,0 s dans l'air : même onde, même distance, deux durées très différentes.</div>
+      </div>
+      <div class="lecture-callout lecture-callout-warning">
+        <strong>⚠️ Piège d'examen —</strong> Ne dis jamais « le son va plus vite dans l'eau parce qu'il est plus fort » : la célérité ne dépend ni de l'intensité ni de la fréquence, seulement du milieu (et éventuellement de sa température).
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s4 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s4">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">04</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Entraînement</span>
+        <h2 class="lecture-section-title">Exercice guidé : le sonar du navire</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <p class="lecture-text">Le sonar est l'application reine du retard : on émet une salve, on attend l'écho, on en déduit une profondeur. Un seul piège guette : l'onde fait un aller-retour, donc elle parcourt la profondeur deux fois.</p>
+      <svg viewBox="0 0 560 170" role="img" aria-label="Un sonar émet une salve vers le fond : l'écho revient après tau, donc 2d égale v fois tau">
+        <path d="M 20 30 Q 45 20 70 30 T 120 30 T 170 30 T 220 30 T 270 30 T 320 30 T 370 30 T 420 30 T 470 30 T 520 30" fill="none" style="stroke:var(--accent-bright);stroke-width:1.5" stroke-opacity="0.6"/>
+        <path d="M 128 30 L 192 30 L 180 54 L 140 54 Z" fill="rgba(224,184,74,0.25)" style="stroke:var(--accent-bright);stroke-width:2"/>
+        <text x="160" y="70" text-anchor="middle" style="fill:rgba(224,184,74,0.8);font-size:10px">bateau sonar</text>
+        <line x1="20" y1="140" x2="540" y2="140" style="stroke:rgba(224,184,74,0.5);stroke-width:2"/>
+        <line x1="60" y1="140" x2="70" y2="150" style="stroke:rgba(224,184,74,0.4);stroke-width:1"/>
+        <line x1="290" y1="140" x2="300" y2="150" style="stroke:rgba(224,184,74,0.4);stroke-width:1"/>
+        <line x1="430" y1="140" x2="440" y2="150" style="stroke:rgba(224,184,74,0.4);stroke-width:1"/>
+        <line x1="510" y1="140" x2="520" y2="150" style="stroke:rgba(224,184,74,0.4);stroke-width:1"/>
+        <line x1="150" y1="58" x2="150" y2="132" style="stroke:var(--accent-bright);stroke-width:2"/>
+        <path d="M 150 134 l -5 -9 l 10 0 z" style="fill:var(--accent-bright)"/>
+        <text x="142" y="95" text-anchor="end" style="fill:rgba(224,184,74,0.8);font-size:10px">salve émise</text>
+        <line x1="176" y1="132" x2="176" y2="60" style="stroke:var(--accent-bright);stroke-width:2" stroke-dasharray="5 4"/>
+        <path d="M 176 58 l -5 9 l 10 0 z" style="fill:var(--accent-bright)"/>
+        <text x="186" y="95" style="fill:rgba(224,184,74,0.8);font-size:10px">écho reçu après τ</text>
+        <line x1="330" y1="58" x2="330" y2="140" style="stroke:var(--accent-bright);stroke-width:1.5"/>
+        <path d="M 330 58 l -5 9 l 10 0 z" style="fill:var(--accent-bright)"/>
+        <path d="M 330 140 l -5 -9 l 10 0 z" style="fill:var(--accent-bright)"/>
+        <text x="342" y="102" style="fill:var(--accent-bright);font-size:12px">d</text>
+        <text x="452" y="102" text-anchor="middle" style="fill:var(--accent-bright);font-size:13px">2d = v · τ</text>
+      </svg>
+      <div class="lecture-text">
+        <p class="lecture-text">📝 <strong>Énoncé.</strong> Un navire de recherche sonde le fond de l'océan : il émet une salve ultrasonore verticale (<span class="math">v</span>(son, eau) ≈ 1 480 m·s⁻¹) et reçoit l'écho après <span class="math">τ</span> = 0,60 s. Quelle est la profondeur <span class="math">d</span> du fond à cet endroit ?</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step"><strong>Étape 1 — Schéma mental.</strong> La salve descend (<span class="math">d</span>), se réfléchit sur le fond, remonte (<span class="math">d</span>) : l'onde parcourt au total 2<span class="math">d</span>.</li>
+          <li class="lecture-step"><strong>Étape 2 — Formule.</strong> 2<span class="math">d</span> = <span class="math">v</span> × <span class="math">τ</span>, donc <span class="math">d</span> = <span class="math">v</span> × <span class="math">τ</span> / 2.</li>
+          <li class="lecture-step"><strong>Étape 3 — Appliquer.</strong> <span class="math">d</span> = 1 480 × 0,60 / 2 = 888 / 2 = 444 m.</li>
+          <li class="lecture-step"><strong>Étape 4 — Vérifier deux fois.</strong> 444 × 2 = 888 m parcourus ; 888 / 1 480 = 0,60 s ✓.</li>
+          <li class="lecture-step"><strong>Étape 5 — Conclure.</strong> Le fond se trouve à <span class="math">d</span> = 444 m sous le navire : le sonar cartographie l'océan avec un simple chronomètre.</li>
+        </ol>
+        <p class="lecture-text">💡 <strong>Le piège n° 1 du sonar :</strong> oublier le facteur 2. L'onde fait un aller-retour, donc 2<span class="math">d</span> = <span class="math">v</span> × <span class="math">τ</span>, et pas <span class="math">d</span> = <span class="math">v</span> × <span class="math">τ</span>.</p>
+      </div>
+      <div class="lecture-formula-box">
+        <p class="lecture-formula-main">Formule écho à retenir : <strong>2<span class="math">d</span> = <span class="math">v</span> × <span class="math">τ</span></strong> — valable pour le sonar, l'échographie et la chauve-souris.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============================================================ -->
+  <!-- SECTION s5 -->
+  <!-- ============================================================ -->
+  <section class="lecture-section" id="s5">
+    <div class="lecture-section-header">
+      <div class="lecture-section-num">05</div>
+      <div class="lecture-section-heading">
+        <span class="lecture-section-eyebrow">Synthèse</span>
+        <h2 class="lecture-section-title">Exercice bilan et tableau des célérités</h2>
+      </div>
+    </div>
+
+    <div class="lecture-section-body">
+      <div class="lecture-text">
+        <p class="lecture-text">📝 <strong>Énoncé.</strong> Tu frappes l'extrémité d'un rail d'acier de longueur <span class="math">d</span> = 510 m. Ton camarade, l'oreille collée au rail à l'autre extrémité, entend deux sons successifs : d'abord par le rail (<span class="math">v</span>₁ ≈ 5 100 m·s⁻¹), puis par l'air (<span class="math">v</span>₂ ≈ 340 m·s⁻¹). Quel est l'écart de temps entre les deux sons ?</p>
+        <ol class="lecture-steps">
+          <li class="lecture-step"><strong>Étape 1 — Son par le rail.</strong> <span class="math">τ</span>₁ = <span class="math">d</span> / <span class="math">v</span>₁ = 510 / 5 100 = 0,10 s.</li>
+          <li class="lecture-step"><strong>Étape 2 — Son par l'air.</strong> <span class="math">τ</span>₂ = <span class="math">d</span> / <span class="math">v</span>₂ = 510 / 340 = 1,5 s.</li>
+          <li class="lecture-step"><strong>Étape 3 — Vérifier deux fois.</strong> 5 100 × 0,10 = 510 ✓ ; 340 × 1,5 = 510 ✓.</li>
+          <li class="lecture-step"><strong>Étape 4 — Calculer l'écart.</strong> <span class="math">Δt</span> = <span class="math">τ</span>₂ − <span class="math">τ</span>₁ = 1,5 − 0,10 = 1,4 s.</li>
+          <li class="lecture-step"><strong>Étape 5 — Conclure.</strong> Ton camarade entend un son « double » : quasi immédiat par le rail, puis 1,4 s plus tard par l'air. C'est la preuve directe que la célérité dépend du milieu.</li>
+        </ol>
+        <p class="lecture-text">💡 <strong>Grand classique de Bac.</strong> Deux milieux, deux célérités, même distance : le premier son entendu correspond toujours au milieu le plus rapide, et l'écart vaut <span class="math">d</span>/<span class="math">v</span>₂ − <span class="math">d</span>/<span class="math">v</span>₁.</p>
+      </div>
+      <p class="lecture-text">Synthèse de la partie : les célérités à connaître par cœur et la formule associée à chaque situation. Ce tableau est ton assurance-vie pour tous les exercices de propagation.</p>
+      <div >
+        <table class="lecture-table">
+          <thead><tr><th>Situation</th><th>Onde</th><th>Célérité</th><th>Formule à utiliser</th></tr></thead>
+          <tbody>
+            <tr><td>Espace (vide)</td><td>lumière (EM)</td><td><span class="math">c</span> = 3,00 × 10⁸ m·s⁻¹</td><td><span class="math">τ</span> = <span class="math">d</span> / <span class="math">c</span></td></tr>
+            <tr><td>Air (20 °C)</td><td>son (mécanique)</td><td>≈ 340 m·s⁻¹</td><td><span class="math">τ</span> = <span class="math">d</span> / <span class="math">v</span></td></tr>
+            <tr><td>Eau</td><td>son</td><td>≈ 1 480 m·s⁻¹</td><td><span class="math">τ</span> = <span class="math">d</span> / <span class="math">v</span></td></tr>
+            <tr><td>Acier (rail)</td><td>son</td><td>≈ 5 100 m·s⁻¹</td><td><span class="math">τ</span>₁ = <span class="math">d</span> / <span class="math">v</span>₁</td></tr>
+            <tr><td>Rail + air (son double)</td><td>son, deux trajets</td><td>5 100 et 340 m·s⁻¹</td><td><span class="math">Δt</span> = <span class="math">d</span>/<span class="math">v</span>₂ − <span class="math">d</span>/<span class="math">v</span>₁</td></tr>
+            <tr><td>Éclair → tonnerre</td><td>lumière + son</td><td>3,00 × 10⁸ et 340 m·s⁻¹</td><td><span class="math">d</span> ≈ <span class="math">τ</span> / 3 (en km)</td></tr>
+            <tr><td>Fond marin (sonar)</td><td>ultrasons</td><td>≈ 1 480 m·s⁻¹</td><td>2<span class="math">d</span> = <span class="math">v</span> × <span class="math">τ</span></td></tr>
+            <tr><td>Corps humain (échographie)</td><td>ultrasons</td><td>≈ 1 500 m·s⁻¹</td><td>2<span class="math">d</span> = <span class="math">v</span> × <span class="math">τ</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="lecture-formula-box">
+        <p class="lecture-formula-main">À réciter avant l'examen : <span class="math">v</span> = <span class="math">d</span> / <span class="math">Δt</span> · <span class="math">τ</span> = <span class="math">d</span> / <span class="math">v</span> · <span class="math">d</span> = <span class="math">v</span> × <span class="math">τ</span> · écho : 2<span class="math">d</span> = <span class="math">v</span> × <span class="math">τ</span>.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ===== QCM ===== -->
+  <div class="lecture-quiz">
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Un orage éclate à <span class="math">d</span> = 1,7 km. Le tonnerre arrive après environ…</p>
+      <div class="lecture-quiz-options"><span>A) 0,005 s</span><span>B) 5,0 s</span><span>C) 500 s</span><span>D) 17 s</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><strong>Réponse : B.</strong> <span class="math">τ</span> = <span class="math">d</span> / <span class="math">v</span> = 1 700 / 340 = 5,0 s (conversion km → m faite avant le calcul). Vérification : 340 × 5,0 = 1 700 ✓.</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">La célérité du son dans l'air dépend principalement…</p>
+      <div class="lecture-quiz-options"><span>A) de l'intensité du son</span><span>B) de la fréquence du son</span><span>C) du milieu (et de sa température)</span><span>D) du récepteur qui l'écoute</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><strong>Réponse : C.</strong> La célérité est une propriété du milieu : 340 m·s⁻¹ dans l'air à 20 °C, 1 480 m·s⁻¹ dans l'eau, 5 100 m·s⁻¹ dans l'acier. Elle ne dépend ni de l'intensité ni de la fréquence.</div></details>
+    </div>
+    <div class="lecture-quiz-item">
+      <p class="lecture-quiz-q">Un sonar reçoit son écho après <span class="math">τ</span> = 0,80 s (<span class="math">v</span> = 1 480 m·s⁻¹). La profondeur vaut…</p>
+      <div class="lecture-quiz-options"><span>A) 592 m</span><span>B) 1 184 m</span><span>C) 296 m</span><span>D) 444 m</span></div>
+      <details><summary>Voir la réponse</summary><div class="lecture-quiz-answer"><strong>Réponse : A.</strong> 2<span class="math">d</span> = <span class="math">v</span> × <span class="math">τ</span> = 1 480 × 0,80 = 1 184 m, donc <span class="math">d</span> = 592 m. Vérification : 592 × 2 = 1 184 et 1 184 / 1 480 = 0,80 ✓.</div></details>
+    </div>
+  </div>
+  <!-- ===== RÉCAP ===== -->
+  <div class="lecture-recap">
+    <div class="lecture-recap-title">📌 Ce qu'il faut retenir</div>
+    <ul class="lecture-recap-list">
+      <li><strong>Célérité</strong> <span class="math">v</span> = <span class="math">d</span> / <span class="math">Δt</span> : vitesse de la perturbation, imposée par le milieu, en m·s⁻¹.</li>
+      <li><strong>Retard</strong> <span class="math">τ</span> = <span class="math">d</span> / <span class="math">v</span> : durée entre émission et réception ; version directe : <span class="math">d</span> = <span class="math">v</span> × <span class="math">τ</span>.</li>
+      <li><strong>Écho (sonar)</strong> : l'onde fait l'aller-retour → 2<span class="math">d</span> = <span class="math">v</span> × <span class="math">τ</span>, ne jamais oublier le facteur 2.</li>
+      <li><strong>Deux valeurs à connaître</strong> : <span class="math">c</span> = 3,00 × 10⁸ m·s⁻¹ (lumière dans le vide) et ≈ 340 m·s⁻¹ (son dans l'air à 20 °C).</li>
+    </ul>
+  </div>
+  <!-- ===== FIN ===== -->
+  <div class="lecture-end">
+    <div class="lecture-end-icon">🎯</div>
+    <div class="lecture-end-text">Partie 02 terminée !</div>
+    <div class="lecture-end-sub">Tu sais maintenant mesurer distances et durées avec les ondes. Partie 03 : les ondes qui se répètent — période <span class="math">T</span>, fréquence <span class="math">f</span> et la fameuse longueur d'onde <span class="math">λ</span>. C'est le cœur du chapitre.</div>
+    <div class="lecture-end-divider"></div>
+  </div>
+</div>

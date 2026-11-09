@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#0A0A0A">
 <script>(function(){try{if(localStorage.getItem('arvexa-theme')==='light')document.documentElement.setAttribute('data-theme','light')}catch(e){}})();</script>
 <script src="theme.js"></script><script src="arvexa-contact.js"></script><script src="arvexa-i18n.js" defer></script>
-  <meta name="description" content="ARVEXA School — Rejoins le groupe WhatsApp et laisse ton numéro pour ne rien manquer.">
+  <meta name="description" content="ARVEXA School — Laisse ton numéro pour ne rien manquer.">
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon.png">
   <link rel="icon" href="icon.png" type="image/png">
@@ -994,6 +994,8 @@
               placeholder="+227 70 12 34 56"
               autocomplete="tel"
               inputmode="tel"
+              required
+              aria-required="true"
             >
             <span class="field-status" id="phoneStatus"></span>
           </div>
@@ -1008,30 +1010,11 @@
         <div class="field-help" id="phoneHelp"></div>
       </div>
 
-      <!-- REJOINDRE LE GROUPE -->
-      <a href="#" id="joinBtn" class="btn-whatsapp" target="_blank" rel="noopener">
-        <i class="fab fa-whatsapp"></i>
-        Rejoindre le groupe WhatsApp
-      </a>
-
       <!-- VALIDER -->
       <button type="button" class="btn-submit" id="validateBtn" disabled>
         <span class="btn-icon"><i class="fas fa-check"></i></span>
         <span class="btn-text">Valider et continuer</span>
         <span class="spinner"></span>
-      </button>
-
-      <!-- DIVIDER -->
-      <div class="divider">
-        <span class="line"></span>
-        <span class="text">ou</span>
-        <span class="line"></span>
-      </div>
-
-      <!-- PASSER -->
-      <button type="button" class="btn-back" id="skipBtn">
-        <i class="fas fa-forward"></i>
-        Passer cette étape
       </button>
 
       <!-- SECURITY -->
@@ -1063,9 +1046,8 @@
 // WHATSAPP — Étape post-inscription (v7.0)
 // Flux : register.html → whatsapp.html → onboarding.html
 //  - Guard : session obligatoire (sinon → auth-choice.html)
-//  - Numéro WhatsApp : validation live, sauvegarde Firestore (merge)
-//  - Bouton « Rejoindre le groupe » : lien d'invitation centralisé
-//    dans arvexa-contact.js (whatsappGroupUrl) ; si vide → wa.me support
+//  - Numéro WhatsApp OBLIGATOIRE (v8.29) : validation live, sauvegarde
+//    Firestore (merge) — « Passer cette étape » supprimé
 //  - « Valider et continuer » → onboarding.html (jamais bloquant :
 //    timeout 6 s, l'élève poursuit même si Firestore est lent)
 // ================================================================
@@ -1303,15 +1285,6 @@ function normalizePhone(raw) {
   return (e164.length - 1) <= 15 ? e164 : null;
 }
 
-function joinUrl() {
-  const c = window.ARVEXA_CONTACT || {};
-  if (c.whatsappGroupUrl && /^https?:\/\//i.test(c.whatsappGroupUrl)) {
-    return c.whatsappGroupUrl;
-  }
-  return 'https://wa.me/' + (c.phoneRaw || '22774872082') +
-    '?text=' + encodeURIComponent('Bonjour, je viens de créer mon compte ARVEXA School et je souhaite rejoindre le groupe WhatsApp.');
-}
-
 function validatePhone(input) {
   const wrap = $('phoneWrap'), help = $('phoneHelp'),
         status = $('phoneStatus'), btn = $('validateBtn');
@@ -1388,7 +1361,6 @@ function initDialPanel() {
 
 async function initPage(user) {
   const input = $('phoneInput');
-  $('joinBtn').href = joinUrl();
 
   initDialPanel();
   input.addEventListener('input', () => validatePhone(input));
@@ -1423,10 +1395,6 @@ async function initPage(user) {
   } catch (e) {
     console.warn('[WhatsApp] lecture profil :', e.code || e.message);
   }
-
-  $('skipBtn').addEventListener('click', () => {
-    window.location.replace('onboarding.html');
-  });
 
   $('validateBtn').addEventListener('click', async () => {
     const norm = validatePhone(input);

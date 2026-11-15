@@ -2046,7 +2046,9 @@
       .katex { font-size: 0.95em; }
     }
   </style>
-</head>
+<link rel="stylesheet" href="arvexa-native.css">
+  <script src="arvexa-native.js"></script>
+  </head>
 <body>
 
   <div class="gradient-bg"></div>
@@ -2985,6 +2987,10 @@ function toLocalPdfPath(htmlPath) {
     // garde-fou : même arborescence cours/<matiere>/<chapitre>/ que le HTML
     // d'origine (aucun caractère dangereux possible dans les attributs)
     if (!/^cours\/[a-z0-9_]+\/[a-z0-9_]+\/[A-Za-z0-9_-]+\.pdf$/.test(pdf)) return null;
+    // ✅ NATIF (APK Android) — les PDF de cours ne sont pas embarqués dans
+    // l'APK (optimisation de taille pour les téléphones modestes) : ils sont
+    // servis en streaming depuis le site, avec en-tête CORS autorisé.
+    if (window.ARVEXA_NATIVE) return 'https://arvexaschool.vercel.app/' + pdf;
     return pdf;
   } catch (e) { return null; }
 }
@@ -3231,7 +3237,7 @@ function openArvPdf(pdfPath, downloadRef) {
       // les morceaux (Range) utiles aux pages affichées → 1ʳᵉ page en ~2 s au
       // lieu d'attendre le PDF entier (~7 s à 200 Ko/s). Le téléchargement
       // complet pour le hors-ligne est assuré côté SW (CACHE_URL différé).
-      const task = window.pdfjsLib.getDocument({ url: pdfPath, disableAutoFetch: true });
+      const task = window.pdfjsLib.getDocument({ url: pdfPath, disableAutoFetch: !window.ARVEXA_NATIVE });
       task.onProgress = (d) => {
         if (token !== arvPdfSeq || !d || !d.total) return;
         const pct = Math.round((d.loaded / d.total) * 100);

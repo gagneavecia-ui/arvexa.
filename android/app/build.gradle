@@ -1,0 +1,86 @@
+apply plugin: 'com.android.application'
+
+/* ── ARVEXA School — Signature release sécurisée ─────────────────
+   Les 4 variables d'environnement suivantes sont requises pour signer
+   l'APK release (jamais commitées, jamais écrites dans le dépôt) :
+     ARVEXA_KEYSTORE_PATH       chemin du fichier .keystore
+     ARVEXA_KEYSTORE_PASSWORD   mot de passe du keystore
+     ARVEXA_KEY_ALIAS           alias de la clé (arvexa-school)
+     ARVEXA_KEY_PASSWORD        mot de passe de la clé
+   Sans ces variables, assembleRelease produit un APK non signé.
+   Les APK debug sont signés automatiquement avec la clé de debug. */
+def arvexaReleaseReady = [
+        System.getenv("ARVEXA_KEYSTORE_PATH"),
+        System.getenv("ARVEXA_KEYSTORE_PASSWORD"),
+        System.getenv("ARVEXA_KEY_ALIAS"),
+        System.getenv("ARVEXA_KEY_PASSWORD")
+].every { it != null && !it.toString().trim().isEmpty() }
+
+android {
+    namespace "com.arvexa.school"
+    compileSdk rootProject.ext.compileSdkVersion
+    defaultConfig {
+        applicationId "com.arvexa.school"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        aaptOptions {
+             // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
+             // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
+            ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+        }
+    }
+    signingConfigs {
+        release {
+            if (arvexaReleaseReady) {
+                storeFile file(System.getenv("ARVEXA_KEYSTORE_PATH"))
+                storePassword System.getenv("ARVEXA_KEYSTORE_PASSWORD")
+                keyAlias System.getenv("ARVEXA_KEY_ALIAS")
+                keyPassword System.getenv("ARVEXA_KEY_PASSWORD")
+                enableV1Signing true
+                enableV2Signing true
+                enableV3Signing true
+            }
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            if (arvexaReleaseReady) {
+                signingConfig signingConfigs.release
+            }
+        }
+    }
+}
+
+repositories {
+    flatDir{
+        dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+    implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
+    implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
+    implementation project(':capacitor-android')
+    testImplementation "junit:junit:$junitVersion"
+    androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
+    implementation project(':capacitor-cordova-android-plugins')
+}
+
+apply from: 'capacitor.build.gradle'
+
+try {
+    def servicesJSON = file('google-services.json')
+    if (servicesJSON.text) {
+        apply plugin: 'com.google.gms.google-services'
+    }
+} catch(Exception e) {
+    logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
+}

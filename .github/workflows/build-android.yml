@@ -1,0 +1,72 @@
+name: Build Android (ARVEXA School)
+
+on:
+  push:
+    branches: [main, android-capacitor]
+  workflow_dispatch:
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci || npm install
+
+      - name: Build assets web embarqués (www/)
+        run: node scripts/build-www.js
+
+      - name: Sync Capacitor Android
+        run: npx cap sync android
+
+      - name: Setup JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Restaurer le keystore release (secrets)
+        env:
+          KS_B64: ${{ secrets.ARVEXA_KEYSTORE_BASE64 }}
+        if: ${{ env.KS_B64 != '' }}
+        run: |
+          echo "$KS_B64" | base64 -d > "$RUNNER_TEMP/arvexa-release.keystore"
+          echo "ARVEXA_KEYSTORE_PATH=$RUNNER_TEMP/arvexa-release.keystore" >> "$GITHUB_ENV"
+          echo "ARVEXA_KEYSTORE_PASSWORD=${{ secrets.ARVEXA_KEYSTORE_PASSWORD }}" >> "$GITHUB_ENV"
+          echo "ARVEXA_KEY_ALIAS=${{ secrets.ARVEXA_KEY_ALIAS }}" >> "$GITHUB_ENV"
+          echo "ARVEXA_KEY_PASSWORD=${{ secrets.ARVEXA_KEY_PASSWORD }}" >> "$GITHUB_ENV"
+
+      - name: Build APK debug
+        run: cd android && ./gradlew assembleDebug --console=plain
+
+      - name: Build APK release (signé si secrets présents)
+        run: cd android && ./gradlew assembleRelease --console=plain
+
+      - name: Renommer les artefacts
+        run: |
+          mkdir -p out
+          cp android/app/build/outputs/apk/debug/app-debug.apk out/ARVEXA-SCHOOL-debug.apk
+          cp android/app/build/outputs/apk/release/app-release.apk out/ARVEXA-SCHOOL.apk
+
+      - name: Upload artefact APK debug
+        uses: actions/upload-artifact@v4
+        with:
+          name: ARVEXA-SCHOOL-debug
+          path: out/ARVEXA-SCHOOL-debug.apk
+
+      - name: Upload artefact APK release
+        uses: actions/upload-artifact@v4
+        with:
+          name: ARVEXA-SCHOOL-release
+          path: out/ARVEXA-SCHOOL.apk

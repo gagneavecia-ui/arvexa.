@@ -1,9 +1,25 @@
 {
   "private": true,
+  "name": "arvexa-school",
+  "version": "1.0.0",
+  "description": "ARVEXA School — plateforme éducative panafricaine (web + app Android Capacitor)",
   "engines": {
     "node": ">=18"
   },
+  "scripts": {
+    "android:www": "node scripts/build-www.js",
+    "android:sync": "node scripts/build-www.js && npx cap sync android",
+    "android:debug": "node scripts/build-www.js && npx cap sync android && cd android && ./gradlew assembleDebug",
+    "android:release": "node scripts/build-www.js && npx cap sync android && cd android && ./gradlew assembleRelease",
+    "android:patch": "python3 scripts/patch_html.py"
+  },
   "dependencies": {
+    "@capacitor/android": "^7.6.10",
+    "@capacitor/app": "^7.1.2",
+    "@capacitor/cli": "^7.6.10",
+    "@capacitor/core": "^7.6.10",
+    "@capacitor/splash-screen": "^7.0.5",
+    "@capacitor/status-bar": "^7.0.6",
     "firebase-admin": "^13.0.0",
     "nodemailer": "^10.3.1"
   }

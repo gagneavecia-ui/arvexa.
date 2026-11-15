@@ -1,0 +1,154 @@
+/* ================================================================
+   arvexa-native.css — COQUILLE NATIVE ANDROID — ARVEXA School
+   Palette « Cinematic Luxury Academic Technology » :
+     #0A0A0A  noir cinématique (surface sombre)
+     #1A3A2A  vert académique profond
+     #B8860B  or (accent principal)
+     #E0B84A  or lumineux (accent actif)
+     #F5F0E8  crème (surface claire)
+   Actif uniquement dans l'app Android ; sans effet sur le web.
+   ================================================================ */
+
+:root {
+  --arvx-nav-h: 62px;
+  --arvx-gold: #B8860B;
+  --arvx-gold-bright: #E0B84A;
+  --arvx-ink: #0A0A0A;
+  --arvx-green: #1A3A2A;
+  --arvx-cream: #F5F0E8;
+}
+
+/* ── Espace réservé au bas des pages ──────────────────────────── */
+body.arvx-has-nav {
+  padding-bottom: calc(var(--arvx-nav-h) + env(safe-area-inset-bottom, 0px) + 12px) !important;
+  box-sizing: border-box;
+}
+
+/* ── Barre de navigation ──────────────────────────────────────── */
+.arvx-nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 99990;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-around;
+  height: calc(var(--arvx-nav-h) + env(safe-area-inset-bottom, 0px));
+  padding: 0 6px env(safe-area-inset-bottom, 0px);
+  background: rgba(10, 10, 10, 0.93);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  backdrop-filter: blur(18px) saturate(140%);
+  border-top: 1px solid rgba(184, 134, 11, 0.28);
+  box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.45);
+}
+
+.arvx-nav::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 18%;
+  right: 18%;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, var(--arvx-gold) 25%, var(--arvx-gold-bright) 50%, var(--arvx-gold) 75%, transparent);
+  opacity: 0.75;
+  pointer-events: none;
+}
+
+/* ── Onglet ───────────────────────────────────────────────────── */
+.arvx-tab {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 6px 2px 4px;
+  text-decoration: none !important;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+  transition: transform 0.16s ease;
+}
+
+.arvx-tab:active {
+  transform: scale(0.94);
+}
+
+.arvx-tab-ico {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 26px;
+  border-radius: 999px;
+  font-size: 17px;
+  line-height: 1;
+  color: #8A8A7A;
+  transition: background 0.22s ease, color 0.22s ease, box-shadow 0.22s ease, transform 0.22s ease;
+}
+
+.arvx-tab-label {
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.1px;
+  color: #8A8A7A;
+  max-width: 84px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: color 0.22s ease;
+}
+
+/* Onglet actif — or lumineux sur pilule dorée translucide */
+.arvx-tab.arvx-tab-active .arvx-tab-ico {
+  color: var(--arvx-ink);
+  background: linear-gradient(135deg, var(--arvx-gold-bright), var(--arvx-gold));
+  box-shadow: 0 4px 14px rgba(184, 134, 11, 0.42);
+  transform: translateY(-1px);
+}
+
+.arvx-tab.arvx-tab-active .arvx-tab-label {
+  color: var(--arvx-gold-bright);
+  font-weight: 700;
+}
+
+/* ── Thème clair (data-theme="light" posé par theme.js) ───────── */
+html[data-theme="light"] .arvx-nav {
+  background: rgba(245, 240, 232, 0.94);
+  border-top: 1px solid rgba(26, 58, 42, 0.18);
+  box-shadow: 0 -8px 24px rgba(26, 58, 42, 0.12);
+}
+
+html[data-theme="light"] .arvx-nav::before {
+  background: linear-gradient(90deg, transparent, var(--arvx-gold) 25%, var(--arvx-green) 50%, var(--arvx-gold) 75%, transparent);
+  opacity: 0.55;
+}
+
+html[data-theme="light"] .arvx-tab .arvx-tab-ico { color: #7A7A6A; }
+html[data-theme="light"] .arvx-tab .arvx-tab-label { color: #7A7A6A; }
+
+html[data-theme="light"] .arvx-tab.arvx-tab-active .arvx-tab-ico {
+  color: var(--arvx-cream);
+  background: linear-gradient(135deg, var(--arvx-gold-bright), var(--arvx-gold));
+  box-shadow: 0 4px 14px rgba(184, 134, 11, 0.35);
+}
+
+html[data-theme="light"] .arvx-tab.arvx-tab-active .arvx-tab-label { color: #8C6A08; }
+
+/* ── Petits écrans ────────────────────────────────────────────── */
+@media (max-width: 360px) {
+  .arvx-tab .arvx-tab-label { font-size: 9px; max-width: 64px; }
+  .arvx-tab .arvx-tab-ico { width: 36px; font-size: 15.5px; }
+}
+
+/* ── Accessibilité : mouvement réduit ─────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .arvx-tab,
+  .arvx-tab .arvx-tab-ico {
+    transition: none;
+  }
+  .arvx-tab:active { transform: none; }
+}
